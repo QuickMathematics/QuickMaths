@@ -3,7 +3,7 @@ name = "quick-maths"
 version = "0.2.0"
 description = "Local-first mastery testing and prerequisite mapping for AI-assisted STEM learning."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
     "networkx>=3.2",
     "pyyaml>=6.0",
