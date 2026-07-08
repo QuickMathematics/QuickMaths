@@ -1,0 +1,347 @@
+id: MATH_PREALG_005
+schema_version: 0.2
+name: Translating words into expressions
+domain: Math
+subdomain: Pre-Algebra
+description: Translate common word phrases into algebraic expressions using variables, operations, and grouping.
+prerequisites:
+  - MATH_PREALG_001
+tags:
+  - pre_algebra
+  - variables
+  - expressions
+  - translating_words
+  - word_phrases
+  - algebraic_expressions
+unlocks:
+  - MATH_GRAPH_003
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Translating words into expressions means turning a phrase into algebra.
+
+  A variable represents the unknown number. Operations come from key words such as sum, difference, product, quotient, more than, less than, increased by, and decreased by.
+
+  Why it matters:
+  Word problems become much easier when you can turn the words into an expression. This skill is also important for writing formulas, rates, and linear models.
+
+  Common translations:
+  - "the sum of x and 5" means x + 5.
+  - "5 more than x" means x + 5.
+  - "5 less than x" means x - 5.
+  - "3 times x" means 3x.
+  - "x divided by 4" means x/4.
+  - "twice the sum of x and 7" means 2(x + 7).
+
+  Method:
+  1. Choose the variable named in the prompt, usually x.
+  2. Identify the operation words.
+  3. Watch order-sensitive phrases like "less than" and "subtracted from."
+  4. Use parentheses when a whole sum or difference is being multiplied.
+
+  Common mistake:
+  "5 less than x" is x - 5, not 5 - x. The phrase "less than" reverses the order.
+examples:
+  - prompt: "Translate: 8 more than a number. Use x for the number."
+    solution: "x + 8"
+    explanation: "More than means add. The number is x, so the expression is x + 8."
+  - prompt: "Translate: 6 less than a number. Use x for the number."
+    solution: "x - 6"
+    explanation: "Less than reverses the order: 6 less than x means x - 6."
+  - prompt: "Translate: 4 times a number increased by 9. Use x for the number."
+    solution: "4x + 9"
+    explanation: "4 times the number is 4x. Increased by 9 means add 9."
+  - prompt: "Translate: twice the sum of a number and 5. Use x for the number."
+    solution: "2(x + 5)"
+    explanation: "The phrase 'the sum of a number and 5' is grouped first, then multiplied by 2."
+applications:
+  - title: "Word problems"
+    description: "Translating words into expressions is the first step in turning a story into math."
+  - title: "Linear models"
+    description: "Phrases like starting amount plus a rate times x become linear expressions."
+  - title: "Programming"
+    description: "Turning requirements into expressions is similar to writing formulas in code."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: TRANSLATE_MORE_THAN_001
+      type: generated
+      prompt_template: "Translate into an algebraic expression: {a} more than a number. Use x for the number."
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 30
+      answer:
+        type: expression
+        value: "x + {a}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        "More than" means add.
+        A number is x.
+        {a} more than x is x + {a}.
+      mistake_tags:
+        - translation_error
+        - operation_error
+        - variable_error
+      difficulty: easy
+
+    - id: TRANSLATE_LESS_THAN_001
+      type: generated
+      prompt_template: "Translate into an algebraic expression: {a} less than a number. Use x for the number."
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 30
+      answer:
+        type: expression
+        value: "x - {a}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        "Less than" reverses the order.
+        {a} less than a number means x - {a}.
+      mistake_tags:
+        - translation_error
+        - less_than_order_error
+        - subtraction_error
+      difficulty: medium
+
+    - id: TRANSLATE_PRODUCT_001
+      type: generated
+      prompt_template: "Translate into an algebraic expression: the product of {a} and a number. Use x for the number."
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 15
+      answer:
+        type: expression
+        value: "{a}x"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Product means multiplication.
+        The product of {a} and x is {a}x.
+      mistake_tags:
+        - translation_error
+        - multiplication_error
+        - coefficient_error
+      difficulty: easy
+
+    - id: TRANSLATE_QUOTIENT_001
+      type: generated
+      prompt_template: "Translate into an algebraic expression: a number divided by {b}. Use x for the number."
+      answer_mode: final_plus_required_work
+      variables:
+        b:
+          type: int
+          min: 2
+          max: 15
+      answer:
+        type: expression
+        value: "x/{b}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A number is x.
+        A number divided by {b} means x/{b}.
+      mistake_tags:
+        - translation_error
+        - division_error
+        - order_error
+      difficulty: easy
+
+    - id: TRANSLATE_TIMES_INCREASED_BY_001
+      type: generated
+      prompt_template: "Translate into an algebraic expression: {a} times a number increased by {b}. Use x for the number."
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 30
+      answer:
+        type: expression
+        value: "{a}x + {b}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {a} times a number is {a}x.
+        Increased by {b} means add {b}.
+        The expression is {a}x + {b}.
+      mistake_tags:
+        - translation_error
+        - operation_error
+        - coefficient_error
+      difficulty: medium
+
+    - id: TRANSLATE_TIMES_DECREASED_BY_001
+      type: generated
+      prompt_template: "Translate into an algebraic expression: {a} times a number decreased by {b}. Use x for the number."
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 30
+      answer:
+        type: expression
+        value: "{a}x - {b}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {a} times a number is {a}x.
+        Decreased by {b} means subtract {b}.
+        The expression is {a}x - {b}.
+      mistake_tags:
+        - translation_error
+        - subtraction_error
+        - coefficient_error
+      difficulty: medium
+
+    - id: TRANSLATE_GROUPED_SUM_001
+      type: generated
+      prompt_template: "Translate into an algebraic expression: {a} times the sum of a number and {b}. Use x for the number."
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 20
+      answer:
+        type: expression
+        value: "{a}(x + {b})"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The sum of a number and {b} is x + {b}.
+        {a} times that whole sum means {a}(x + {b}).
+        Parentheses show that the sum is multiplied by {a}.
+      mistake_tags:
+        - translation_error
+        - grouping_error
+        - multiplication_error
+      difficulty: hard
+
+    - id: TRANSLATE_SUBTRACTED_FROM_001
+      type: generated
+      prompt_template: "Translate into an algebraic expression: {a} subtracted from {b} times a number. Use x for the number."
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 30
+        b:
+          type: int
+          min: 2
+          max: 12
+      answer:
+        type: expression
+        value: "{b}x - {a}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {b} times a number is {b}x.
+        "{a} subtracted from" means subtract {a} from that amount.
+        The expression is {b}x - {a}.
+      mistake_tags:
+        - translation_error
+        - subtracted_from_order_error
+        - subtraction_error
+        - coefficient_error
+      difficulty: hard

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Quick Maths Skill",
+  "type": "object",
+  "required": ["id", "name", "domain", "subdomain", "description", "prerequisites", "mastery", "theory", "test"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "domain": { "type": "string" },
+    "subdomain": { "type": "string" },
+    "description": { "type": "string" },
+    "prerequisites": { "type": "array", "items": { "type": "string" } },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "unlocks": { "type": "array", "items": { "type": "string" } },
+    "applications": { "type": "array" },
+    "mastery": {
+      "type": "object",
+      "required": ["passing_score", "minimum_confidence"],
+      "properties": {
+        "passing_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "minimum_confidence": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "max_guessing_allowed": { "type": "string" },
+        "review_after_days_if_mastered": { "type": "integer" },
+        "review_after_days_if_learning": { "type": "integer" }
+      }
+    },
+    "theory": { "type": "string" },
+    "examples": { "type": "array" },
+    "test": {
+      "type": "object",
+      "required": ["question_count", "questions"],
+      "properties": {
+        "question_count": { "type": "integer", "minimum": 1 },
+        "randomize_order": { "type": "boolean" },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "answer", "grading"],
+            "properties": {
+              "id": { "type": "string" },
+              "type": { "type": "string", "enum": ["generated", "fixed"] },
+              "prompt": { "type": "string" },
+              "prompt_template": { "type": "string" },
+              "variables": { "type": "object" },
+              "derived": { "type": "object" },
+              "constraints": { "type": "array", "items": { "type": "string" } },
+              "answer": { "type": "object" },
+              "grading": { "type": "object" },
+              "answer_mode": {
+                "type": "string",
+                "enum": [
+                  "final_only",
+                  "final_plus_optional_work",
+                  "final_plus_required_work",
+                  "structured_steps",
+                  "proof_required"
+                ],
+                "default": "final_only"
+              },
+              "work": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": ["none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check"]
+                  },
+                  "prompt": { "type": "string" },
+                  "line_type": { "type": "string", "enum": ["expression", "equation"] },
+                  "target_variable": { "type": "string" },
+                  "minimum_steps": { "type": "integer", "minimum": 0 },
+                  "require_final_answer_match": { "type": "boolean" },
+                  "proof_policy": { "type": "object" },
+                  "rubric": { "type": "object" },
+                  "grading": {
+                    "type": "string",
+                    "enum": ["not_graded", "tutor_review", "self_review"]
+                  }
+                }
+              },
+              "review_policy": {
+                "type": "object",
+                "properties": {
+                  "work_review": {
+                    "type": "string",
+                    "enum": ["optional", "none", "auto", "tutor_required", "self_review"]
+                  },
+                  "mastery_requires_review_pass": { "type": "boolean" },
+                  "allow_self_review": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

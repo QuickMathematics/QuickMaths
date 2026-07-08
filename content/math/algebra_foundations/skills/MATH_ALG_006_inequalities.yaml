@@ -1,0 +1,370 @@
+id: MATH_ALG_006
+schema_version: 0.2
+name: Inequalities
+domain: Math
+subdomain: Algebra Foundations
+description: Solve one-step and two-step linear inequalities without needing to reverse the inequality sign.
+prerequisites:
+  - MATH_ALG_002
+tags:
+  - algebra
+  - inequalities
+  - inverse_operations
+  - linear_inequalities
+  - comparison
+unlocks:
+  - MATH_ALG_007
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  An inequality compares two expressions using symbols such as <, >, <=, or >=.
+
+  Solving an inequality is like solving an equation: the goal is to isolate the variable. The solution is usually a range of values, not just one number.
+
+  Method:
+  1. Undo addition or subtraction using inverse operations.
+  2. Undo multiplication or division using inverse operations.
+  3. Keep the inequality sign facing the same way when adding, subtracting, multiplying by a positive number, or dividing by a positive number.
+  4. Write the answer with the variable isolated.
+
+  Example:
+  Solve 3x + 4 < 19.
+  Subtract 4 from both sides: 3x < 15.
+  Divide by 3: x < 5.
+
+  Common mistake:
+  Do not change the inequality sign unless you multiply or divide both sides by a negative number. That sign-reversal case is a separate skill.
+examples:
+  - prompt: "Solve: x + 7 < 12"
+    solution: "x < 5"
+    explanation: "Subtract 7 from both sides. The inequality sign stays the same."
+  - prompt: "Solve: x - 4 >= 9"
+    solution: "x >= 13"
+    explanation: "Add 4 to both sides. The inequality sign stays the same."
+  - prompt: "Solve: 5x <= 35"
+    solution: "x <= 7"
+    explanation: "Divide both sides by positive 5. The inequality sign stays the same."
+  - prompt: "Solve: 2x + 3 > 15"
+    solution: "x > 6"
+    explanation: "Subtract 3, then divide by positive 2."
+applications:
+  - title: "Real-life limits"
+    description: "Inequalities model limits such as budgets, minimum scores, age requirements, and capacity."
+  - title: "Number lines"
+    description: "Solving inequalities connects algebra to shaded regions on a number line."
+  - title: "Linear constraints"
+    description: "Inequalities are the foundation for constraints in graphing, systems, optimization, and programming."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: INEQ_ADD_LESS_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x < 5. x + {b} < {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "x + b"
+      answer:
+        type: text
+        value: "x < {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x + {b} < {c}.
+        Subtract {b} from both sides.
+        The sign stays the same: x < {x}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: INEQ_ADD_GREATER_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x > 5. x + {b} > {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "x + b"
+      answer:
+        type: text
+        value: "x > {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x + {b} > {c}.
+        Subtract {b} from both sides.
+        The sign stays the same: x > {x}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: INEQ_SUB_LESS_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x <= 5. x - {b} <= {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "x - b"
+      answer:
+        type: text
+        value: "x <= {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x - {b} <= {c}.
+        Add {b} to both sides.
+        The sign stays the same: x <= {x}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: INEQ_SUB_GREATER_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x >= 5. x - {b} >= {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "x - b"
+      answer:
+        type: text
+        value: "x >= {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x - {b} >= {c}.
+        Add {b} to both sides.
+        The sign stays the same: x >= {x}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: INEQ_MULT_LESS_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x < 5. {a}x < {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        c: "a * x"
+      answer:
+        type: text
+        value: "x < {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x < {c}.
+        Divide both sides by positive {a}.
+        Because {a} is positive, the sign stays the same: x < {x}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - division_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INEQ_MULT_GREATER_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x >= 5. {a}x >= {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        c: "a * x"
+      answer:
+        type: text
+        value: "x >= {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x >= {c}.
+        Divide both sides by positive {a}.
+        Because {a} is positive, the sign stays the same: x >= {x}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - division_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INEQ_TWO_STEP_LESS_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x <= 5. {a}x + {b} <= {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "a * x + b"
+        after_subtract: "a * x"
+      answer:
+        type: text
+        value: "x <= {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + {b} <= {c}.
+        Subtract {b} from both sides: {a}x <= {after_subtract}.
+        Divide by positive {a}.
+        The sign stays the same: x <= {x}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - division_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INEQ_TWO_STEP_GREATER_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x > 5. {a}x - {b} > {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "a * x - b"
+        after_add: "a * x"
+      answer:
+        type: text
+        value: "x > {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x - {b} > {c}.
+        Add {b} to both sides: {a}x > {after_add}.
+        Divide by positive {a}.
+        The sign stays the same: x > {x}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - division_error
+        - arithmetic_error
+      difficulty: medium

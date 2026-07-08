@@ -1,0 +1,341 @@
+id: MATH_ARITH_001
+schema_version: 0.2
+name: Integer operations
+domain: Math
+subdomain: Arithmetic Foundations
+description: Add, subtract, multiply, and divide positive and negative integers.
+prerequisites: []
+tags:
+  - arithmetic
+  - integers
+  - signed_numbers
+  - operations
+unlocks:
+  - MATH_ARITH_002
+  - MATH_ARITH_003
+  - MATH_GRAPH_001
+  - MATH_ALG_001
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Integers are whole numbers and their opposites: ..., -3, -2, -1, 0, 1, 2, 3, ...
+
+  Integer operations matter because algebra constantly mixes positive and negative values. Before solving equations or graphing lines, you need to be fluent with signs.
+
+  Addition and subtraction:
+  1. Same signs: add the sizes and keep the sign. Example: -4 + (-7) = -11.
+  2. Different signs: subtract the smaller size from the larger size and keep the sign of the number with the larger size. Example: -9 + 5 = -4.
+  3. Subtracting a number means adding its opposite. Example: 6 - (-2) = 6 + 2 = 8.
+
+  Multiplication and division:
+  1. Same signs give a positive result. Example: (-3)(-5) = 15.
+  2. Different signs give a negative result. Example: -18 / 6 = -3.
+
+  Common mistake: do not treat every minus sign the same way. In 5 - (-3), the first minus is subtraction and the second minus is the sign of the number. Subtracting a negative increases the value: 5 - (-3) = 8.
+examples:
+  - prompt: "Compute: -6 + (-4)"
+    solution: "-10"
+    explanation: "Both numbers are negative, so add 6 and 4, then keep the negative sign."
+  - prompt: "Compute: -12 + 5"
+    solution: "-7"
+    explanation: "The signs are different. Subtract 5 from 12 and keep the sign of -12."
+  - prompt: "Compute: 7 - (-9)"
+    solution: "16"
+    explanation: "Subtracting a negative is the same as adding the opposite: 7 + 9 = 16."
+  - prompt: "Compute: (-8)(-3)"
+    solution: "24"
+    explanation: "A negative times a negative is positive."
+  - prompt: "Compute: -36 / 9"
+    solution: "-4"
+    explanation: "A negative divided by a positive is negative."
+applications:
+  - title: "Algebra equations"
+    description: "Solving equations often requires moving negative constants or dividing by negative coefficients."
+  - title: "Coordinate graphing"
+    description: "Points, slopes, and changes can be positive, negative, or zero."
+  - title: "Money and temperature"
+    description: "Integer operations model debts, gains, losses, and changes above or below zero."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: INTEGER_ADD_SAME_SIGN_001
+      type: generated
+      prompt_template: "Compute: {a} + ({b})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -15
+          max: -1
+        b:
+          type: int
+          min: -15
+          max: -1
+      derived:
+        c: "a + b"
+      answer:
+        type: numeric
+        value: "{c}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Both numbers are negative.
+        Add their sizes: {abs(a)} + {abs(b)} = {abs(c)}.
+        Keep the negative sign, so the answer is {c}.
+      mistake_tags:
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: INTEGER_ADD_DIFFERENT_SIGNS_001
+      type: generated
+      prompt_template: "Compute: {a} + ({b})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -18
+          max: -2
+        b:
+          type: int
+          min: 2
+          max: 18
+      derived:
+        c: "a + b"
+      constraints:
+        - "c != 0"
+      answer:
+        type: numeric
+        value: "{c}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The signs are different, so subtract the smaller size from the larger size.
+        The result is {c}.
+      mistake_tags:
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INTEGER_SUBTRACT_POSITIVE_001
+      type: generated
+      prompt_template: "Compute: {a} - {b}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -15
+          max: 15
+        b:
+          type: int
+          min: 1
+          max: 15
+      derived:
+        c: "a - b"
+      answer:
+        type: numeric
+        value: "{c}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Subtracting {b} moves {b} units left on the number line.
+        {a} - {b} = {c}.
+      mistake_tags:
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: INTEGER_SUBTRACT_NEGATIVE_001
+      type: generated
+      prompt_template: "Compute: {a} - ({b})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -15
+          max: 15
+        b:
+          type: int
+          min: -15
+          max: -1
+      derived:
+        c: "a - b"
+      answer:
+        type: numeric
+        value: "{c}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Subtracting a negative means adding its opposite.
+        {a} - ({b}) = {a} + {abs(b)} = {c}.
+      mistake_tags:
+        - sign_error
+        - opposite_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INTEGER_MULTIPLY_SIGNS_001
+      type: generated
+      prompt_template: "Compute: {a} * ({b})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+      derived:
+        c: "a * b"
+      answer:
+        type: numeric
+        value: "{c}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply the sizes, then decide the sign.
+        Same signs give positive; different signs give negative.
+        {a} * ({b}) = {c}.
+      mistake_tags:
+        - sign_error
+        - multiplication_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INTEGER_DIVIDE_SIGNS_001
+      type: generated
+      prompt_template: "Compute: {a} / ({b})"
+      answer_mode: final_only
+      variables:
+        q:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+      derived:
+        a: "q * b"
+      answer:
+        type: numeric
+        value: "{q}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Divide the sizes, then decide the sign.
+        Same signs give positive; different signs give negative.
+        {a} / ({b}) = {q}.
+      mistake_tags:
+        - sign_error
+        - division_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INTEGER_ZERO_001
+      type: generated
+      prompt_template: "Compute: {a} + 0"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -20
+          max: 20
+      answer:
+        type: numeric
+        value: "{a}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Adding 0 does not change the number.
+        {a} + 0 = {a}.
+      mistake_tags:
+        - integer_identity
+        - arithmetic_error
+      difficulty: easy
+
+    - id: INTEGER_MIXED_TWO_OPERATIONS_001
+      type: generated
+      prompt_template: "Compute: {a} + ({b}) - ({c})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        b:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        c:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        answer_value: "a + b - c"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Work left to right because addition and subtraction have the same priority.
+        {a} + ({b}) - ({c}) = {answer_value}.
+      mistake_tags:
+        - sign_error
+        - order_error
+        - arithmetic_error
+      difficulty: hard

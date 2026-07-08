@@ -1,0 +1,440 @@
+id: MATH_ARITH_004
+schema_version: 0.2
+name: Multiplying and dividing fractions
+domain: Math
+subdomain: Arithmetic Foundations
+description: Multiply and divide fractions, including whole-number and signed fraction cases.
+prerequisites:
+  - MATH_ARITH_003
+tags:
+  - arithmetic
+  - fractions
+  - multiplying_fractions
+  - dividing_fractions
+  - reciprocals
+  - signed_numbers
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  To multiply fractions, multiply straight across: numerator times numerator and denominator times denominator.
+
+  To divide fractions, multiply by the reciprocal of the second fraction. The reciprocal flips the numerator and denominator.
+
+  Why it matters:
+  Fraction multiplication and division show up in rates, scale drawings, probability, slope, unit conversions, and algebra.
+
+  Multiplication rule:
+  a/b * c/d = (a*c)/(b*d)
+
+  Division rule:
+  a/b / c/d = a/b * d/c
+
+  Method:
+  1. For multiplication, multiply numerators and multiply denominators.
+  2. For division, rewrite as multiplication by the reciprocal.
+  3. Simplify the final fraction when possible.
+  4. Track signs: one negative factor gives a negative result, and two negative factors give a positive result.
+
+  Example:
+  2/3 * 5/7 = 10/21.
+
+  Example:
+  3/4 / 2/5 = 3/4 * 5/2 = 15/8.
+
+  Common mistake:
+  Do not divide straight across. For 1/2 / 3/4, the correct move is 1/2 * 4/3 = 4/6 = 2/3.
+examples:
+  - prompt: "Compute: 2/5 * 3/7"
+    solution: "6/35"
+    explanation: "Multiply numerators and denominators: (2*3)/(5*7) = 6/35."
+  - prompt: "Compute: 4/9 * 3"
+    solution: "4/3"
+    explanation: "Write 3 as 3/1, then multiply: 4/9 * 3/1 = 12/9 = 4/3."
+  - prompt: "Compute: 5/6 / 2/3"
+    solution: "5/4"
+    explanation: "Multiply by the reciprocal: 5/6 * 3/2 = 15/12 = 5/4."
+  - prompt: "Compute: -2/3 * 5/8"
+    solution: "-5/12"
+    explanation: "One factor is negative, so the product is negative. Multiply straight across and simplify."
+applications:
+  - title: "Recipes and scaling"
+    description: "Multiplying fractions helps scale ingredients up or down."
+  - title: "Rates"
+    description: "Dividing fractions is useful when comparing fractional quantities."
+  - title: "Slope"
+    description: "Fractions often appear in slope calculations and linear rates of change."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: FRAC_MULT_SIMPLE_001
+      type: generated
+      prompt_template: "Compute: {a}/{b} * {c}/{d}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+        - "c < d"
+      derived:
+        num: "a * c"
+        den: "b * d"
+      answer:
+        type: numeric
+        value: "{num}/{den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply numerators: {a} * {c} = {num}.
+        Multiply denominators: {b} * {d} = {den}.
+        The product is {num}/{den}. Simplify if possible.
+      mistake_tags:
+        - multiplying_fractions
+        - numerator_denominator_mixup
+        - arithmetic_error
+      difficulty: easy
+
+    - id: FRAC_MULT_WHOLE_NUMBER_001
+      type: generated
+      prompt_template: "Compute: {a}/{b} * {n}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+        n:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      derived:
+        num: "a * n"
+        den: "b"
+      answer:
+        type: numeric
+        value: "{num}/{den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Write {n} as {n}/1.
+        Multiply: {a}/{b} * {n}/1 = {num}/{den}.
+        Simplify if possible.
+      mistake_tags:
+        - multiplying_fractions
+        - whole_number_fraction
+        - arithmetic_error
+      difficulty: easy
+
+    - id: FRAC_MULT_SIGNED_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) * ({c}/{d})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -9
+          max: -1
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "abs(a) < b"
+        - "c < d"
+      derived:
+        num: "a * c"
+        den: "b * d"
+      answer:
+        type: numeric
+        value: "{num}/{den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        One factor is negative, so the product is negative.
+        Multiply numerators: {a} * {c} = {num}.
+        Multiply denominators: {b} * {d} = {den}.
+        The product is {num}/{den}. Simplify if possible.
+      mistake_tags:
+        - multiplying_fractions
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: FRAC_MULT_TWO_NEGATIVES_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) * ({c}/{d})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -9
+          max: -1
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -9
+          max: -1
+        d:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "abs(a) < b"
+        - "abs(c) < d"
+      derived:
+        num: "a * c"
+        den: "b * d"
+      answer:
+        type: numeric
+        value: "{num}/{den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Two negative factors make a positive product.
+        Multiply numerators: {a} * {c} = {num}.
+        Multiply denominators: {b} * {d} = {den}.
+        The product is {num}/{den}. Simplify if possible.
+      mistake_tags:
+        - multiplying_fractions
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: FRAC_DIV_SIMPLE_001
+      type: generated
+      prompt_template: "Compute: {a}/{b} / {c}/{d}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+        - "c < d"
+      derived:
+        num: "a * d"
+        den: "b * c"
+      answer:
+        type: numeric
+        value: "{num}/{den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        To divide by {c}/{d}, multiply by its reciprocal {d}/{c}.
+        {a}/{b} / {c}/{d} = {a}/{b} * {d}/{c}.
+        Multiply straight across: {num}/{den}.
+        Simplify if possible.
+      mistake_tags:
+        - dividing_fractions
+        - reciprocal_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: FRAC_DIV_BY_WHOLE_001
+      type: generated
+      prompt_template: "Compute: {a}/{b} / {n}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+        n:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      derived:
+        den: "b * n"
+      answer:
+        type: numeric
+        value: "{a}/{den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Write {n} as {n}/1.
+        Dividing by {n}/1 means multiplying by 1/{n}.
+        {a}/{b} * 1/{n} = {a}/{den}.
+        Simplify if possible.
+      mistake_tags:
+        - dividing_fractions
+        - reciprocal_error
+        - whole_number_fraction
+      difficulty: medium
+
+    - id: FRAC_DIV_WHOLE_BY_FRACTION_001
+      type: generated
+      prompt_template: "Compute: {n} / {a}/{b}"
+      answer_mode: final_only
+      variables:
+        n:
+          type: int
+          min: 2
+          max: 12
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      derived:
+        num: "n * b"
+        den: "a"
+      answer:
+        type: numeric
+        value: "{num}/{den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Write {n} as {n}/1.
+        Divide by {a}/{b} by multiplying by its reciprocal {b}/{a}.
+        {n}/1 * {b}/{a} = {num}/{den}.
+        Simplify if possible.
+      mistake_tags:
+        - dividing_fractions
+        - reciprocal_error
+        - whole_number_fraction
+        - arithmetic_error
+      difficulty: hard
+
+    - id: FRAC_DIV_SIGNED_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) / ({c}/{d})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -9
+          max: -1
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "abs(a) < b"
+        - "c < d"
+      derived:
+        num: "a * d"
+        den: "b * c"
+      answer:
+        type: numeric
+        value: "{num}/{den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Divide by multiplying by the reciprocal.
+        ({a}/{b}) / ({c}/{d}) = ({a}/{b}) * ({d}/{c}).
+        One factor is negative, so the result is negative.
+        The answer is {num}/{den}. Simplify if possible.
+      mistake_tags:
+        - dividing_fractions
+        - reciprocal_error
+        - sign_error
+        - arithmetic_error
+      difficulty: hard

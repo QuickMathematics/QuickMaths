@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.streamlit/
+data/quick_maths.sqlite
+data/exports/*.csv
+data/exports/*.md
+!data/exports/.gitkeep
+

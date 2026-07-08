@@ -1,0 +1,427 @@
+id: MATH_PREALG_001
+schema_version: 0.2
+name: Variables and substitution
+domain: Math
+subdomain: Pre-Algebra
+description: Evaluate expressions by replacing variables with given values and simplifying correctly.
+prerequisites:
+  - MATH_ARITH_002
+tags:
+  - pre_algebra
+  - variables
+  - substitution
+  - expressions
+  - order_of_operations
+unlocks:
+  - MATH_PREALG_002
+  - MATH_PREALG_005
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A variable is a letter that stands for a number. Substitution means replacing the variable with its given value.
+
+  This matters because algebra expressions become numbers once you know the values of the variables. Later, this is how you will use formulas, graph equations, and check solutions.
+
+  Method:
+  1. Replace each variable with the value given in the problem.
+  2. Use parentheses around negative substituted values when that makes the expression clearer.
+  3. Simplify using order of operations.
+
+  Example:
+  Evaluate 3x + 5 when x = 4.
+  Substitute 4 for x: 3(4) + 5 = 12 + 5 = 17.
+
+  Common mistake:
+  Be careful with negative values. If x = -3, then x^2 = (-3)^2 = 9, not -9.
+examples:
+  - prompt: "Evaluate: 4x + 7 when x = 3"
+    solution: "19"
+    explanation: "Replace x with 3: 4(3) + 7 = 12 + 7 = 19."
+  - prompt: "Evaluate: x^2 - 5 when x = -4"
+    solution: "11"
+    explanation: "Replace x with -4: (-4)^2 - 5 = 16 - 5 = 11."
+  - prompt: "Evaluate: 2a + 3b when a = 5 and b = -2"
+    solution: "4"
+    explanation: "Substitute both values: 2(5) + 3(-2) = 10 - 6 = 4."
+  - prompt: "Evaluate: 6(x - 2) when x = 9"
+    solution: "42"
+    explanation: "Substitute first, simplify inside parentheses, then multiply: 6(9 - 2) = 6(7) = 42."
+applications:
+  - title: "Using formulas"
+    description: "Substitution lets you plug values into formulas for area, distance, cost, and speed."
+  - title: "Checking answers"
+    description: "You can substitute a proposed value into an expression or equation to see whether it works."
+  - title: "Programming"
+    description: "Variables in code store values, and expressions are evaluated after those values are known."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: SUB_SINGLE_ADD_001
+      type: generated
+      prompt_template: "Evaluate: x + {b} when x = {x}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        answer_value: "x + b"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Replace x with {x}.
+        x + {b} becomes {x} + {b}.
+        {x} + {b} = {answer_value}.
+      mistake_tags:
+        - substitution_error
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: SUB_LINEAR_EXPRESSION_001
+      type: generated
+      prompt_template: "Evaluate: {a}x + {b} when x = {x}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -18
+          max: 18
+          exclude: [0]
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+      derived:
+        product: "a * x"
+        answer_value: "product + b"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Replace x with {x}.
+        {a}x + {b} becomes {a}({x}) + {b}.
+        {a} * {x} = {product}.
+        {product} + {b} = {answer_value}.
+      mistake_tags:
+        - substitution_error
+        - coefficient_error
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: SUB_TWO_VARIABLE_ADD_001
+      type: generated
+      prompt_template: "Evaluate: p + q when p = {p} and q = {q}"
+      answer_mode: final_only
+      variables:
+        p:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        q:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        answer_value: "p + q"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Substitute both values.
+        p + q becomes {p} + {q}.
+        {p} + {q} = {answer_value}.
+      mistake_tags:
+        - substitution_error
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: SUB_TWO_VARIABLE_LINEAR_001
+      type: generated
+      prompt_template: "Evaluate: {a}m + {b}n when m = {m} and n = {n}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 8
+        b:
+          type: int
+          min: 2
+          max: 8
+        m:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0]
+        n:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0]
+      derived:
+        first_product: "a * m"
+        second_product: "b * n"
+        answer_value: "first_product + second_product"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Substitute m = {m} and n = {n}.
+        {a}m + {b}n becomes {a}({m}) + {b}({n}).
+        {a} * {m} = {first_product}, and {b} * {n} = {second_product}.
+        {first_product} + {second_product} = {answer_value}.
+      mistake_tags:
+        - substitution_error
+        - coefficient_error
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: SUB_PRODUCT_VARIABLES_001
+      type: generated
+      prompt_template: "Evaluate: xy + {c} when x = {x} and y = {y}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0]
+        y:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0]
+        c:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+      derived:
+        product: "x * y"
+        answer_value: "product + c"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        In xy, the variables are multiplied.
+        xy + {c} becomes ({x})({y}) + {c}.
+        {x} * {y} = {product}.
+        {product} + {c} = {answer_value}.
+      mistake_tags:
+        - substitution_error
+        - multiplication_error
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: SUB_PARENTHESES_001
+      type: generated
+      prompt_template: "Evaluate: {a}(x + {b}) when x = {x}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 9
+        b:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        group_value: "x + b"
+        answer_value: "a * group_value"
+      constraints:
+        - "group_value != 0"
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Substitute x = {x}.
+        {a}(x + {b}) becomes {a}({x} + {b}).
+        Inside parentheses: {x} + {b} = {group_value}.
+        {a} * {group_value} = {answer_value}.
+      mistake_tags:
+        - substitution_error
+        - grouping_error
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: SUB_EXPONENT_001
+      type: generated
+      prompt_template: "Evaluate: x^2 + {b} when x = {x}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        square_value: "x ** 2"
+        answer_value: "square_value + b"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Substitute x = {x}.
+        x^2 + {b} becomes ({x})^2 + {b}.
+        ({x})^2 = {square_value}.
+        {square_value} + {b} = {answer_value}.
+      mistake_tags:
+        - substitution_error
+        - exponent_error
+        - sign_error
+        - arithmetic_error
+      difficulty: hard
+
+    - id: SUB_MIXED_ORDER_001
+      type: generated
+      prompt_template: "Evaluate: {a}x^2 - {b}y when x = {x} and y = {y}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 6
+        b:
+          type: int
+          min: 2
+          max: 8
+        x:
+          type: int
+          min: -6
+          max: 6
+          exclude: [0]
+        y:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0]
+      derived:
+        square_value: "x ** 2"
+        first_value: "a * square_value"
+        second_value: "b * y"
+        answer_value: "first_value - second_value"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Substitute x = {x} and y = {y}.
+        {a}x^2 - {b}y becomes {a}({x})^2 - {b}({y}).
+        ({x})^2 = {square_value}, so {a} * {square_value} = {first_value}.
+        {b} * {y} = {second_value}.
+        {first_value} - {second_value} = {answer_value}.
+      mistake_tags:
+        - substitution_error
+        - order_error
+        - exponent_error
+        - sign_error
+        - arithmetic_error
+      difficulty: hard

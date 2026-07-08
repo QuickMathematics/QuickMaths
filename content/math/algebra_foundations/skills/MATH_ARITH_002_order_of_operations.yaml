@@ -1,0 +1,399 @@
+id: MATH_ARITH_002
+schema_version: 0.2
+name: Order of operations
+domain: Math
+subdomain: Arithmetic Foundations
+description: Evaluate arithmetic expressions using grouping, exponents, multiplication and division, and addition and subtraction in the correct order.
+prerequisites:
+  - MATH_ARITH_001
+tags:
+  - arithmetic
+  - order_of_operations
+  - integers
+  - expressions
+unlocks:
+  - MATH_PREALG_001
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Order of operations tells you which parts of an expression to simplify first.
+
+  This matters because the same numbers can give different answers depending on the order. For example, 2 + 3 * 4 is 14, not 20, because multiplication happens before addition.
+
+  Method:
+  1. Simplify inside grouping symbols first, such as parentheses.
+  2. Evaluate exponents.
+  3. Multiply and divide from left to right.
+  4. Add and subtract from left to right.
+
+  Example:
+  6 + 2 * (8 - 5) = 6 + 2 * 3 = 6 + 6 = 12.
+
+  Common mistake:
+  Do not always work left to right. In 5 + 4 * 3, multiply first: 5 + 12 = 17.
+  But when operations have the same priority, do work left to right. For example, 20 / 5 * 2 = 4 * 2 = 8.
+examples:
+  - prompt: "Compute: 7 + 3 * 4"
+    solution: "19"
+    explanation: "Multiply first: 3 * 4 = 12, then add 7."
+  - prompt: "Compute: (7 + 3) * 4"
+    solution: "40"
+    explanation: "Parentheses first: 7 + 3 = 10, then multiply by 4."
+  - prompt: "Compute: 18 / 3 * 2"
+    solution: "12"
+    explanation: "Multiplication and division have the same priority, so work left to right: 18 / 3 = 6, then 6 * 2 = 12."
+  - prompt: "Compute: 5 + 2^3 * 4"
+    solution: "37"
+    explanation: "Evaluate the exponent first, then multiply, then add."
+applications:
+  - title: "Algebra substitution"
+    description: "After replacing variables with numbers, order of operations tells you how to evaluate the expression."
+  - title: "Programming"
+    description: "Code evaluates expressions using precedence rules, so order matters in formulas and conditions."
+  - title: "Science formulas"
+    description: "Physics and chemistry formulas often combine grouping, multiplication, division, and powers."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: ORDER_MULT_BEFORE_ADD_001
+      type: generated
+      prompt_template: "Compute: {a} + {b} * {c}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 20
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        product: "b * c"
+        answer_value: "a + product"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply before adding.
+        {b} * {c} = {product}.
+        {a} + {product} = {answer_value}.
+      mistake_tags:
+        - order_error
+        - multiplication_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: ORDER_GROUPING_FIRST_001
+      type: generated
+      prompt_template: "Compute: ({a} + {b}) * {c}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 15
+        b:
+          type: int
+          min: 2
+          max: 15
+        c:
+          type: int
+          min: 2
+          max: 10
+      derived:
+        group_value: "a + b"
+        answer_value: "group_value * c"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Parentheses come first.
+        {a} + {b} = {group_value}.
+        {group_value} * {c} = {answer_value}.
+      mistake_tags:
+        - order_error
+        - grouping_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: ORDER_DIV_BEFORE_SUB_001
+      type: generated
+      prompt_template: "Compute: {a} - {dividend} / {divisor}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 8
+          max: 30
+        quotient:
+          type: int
+          min: 2
+          max: 12
+        divisor:
+          type: int
+          min: 2
+          max: 10
+      derived:
+        dividend: "quotient * divisor"
+        answer_value: "a - quotient"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Divide before subtracting.
+        {dividend} / {divisor} = {quotient}.
+        {a} - {quotient} = {answer_value}.
+      mistake_tags:
+        - order_error
+        - division_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: ORDER_LEFT_TO_RIGHT_MULT_DIV_001
+      type: generated
+      prompt_template: "Compute: {dividend} / {divisor} * {c}"
+      answer_mode: final_only
+      variables:
+        quotient:
+          type: int
+          min: 2
+          max: 12
+        divisor:
+          type: int
+          min: 2
+          max: 10
+        c:
+          type: int
+          min: 2
+          max: 10
+      derived:
+        dividend: "quotient * divisor"
+        answer_value: "quotient * c"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiplication and division have the same priority, so work left to right.
+        {dividend} / {divisor} = {quotient}.
+        {quotient} * {c} = {answer_value}.
+      mistake_tags:
+        - order_error
+        - left_to_right_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: ORDER_LEFT_TO_RIGHT_ADD_SUB_001
+      type: generated
+      prompt_template: "Compute: {a} - {b} + {c}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 5
+          max: 30
+        b:
+          type: int
+          min: 2
+          max: 30
+        c:
+          type: int
+          min: 2
+          max: 30
+      derived:
+        first_step: "a - b"
+        answer_value: "first_step + c"
+      constraints:
+        - "first_step != 0"
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Addition and subtraction have the same priority, so work left to right.
+        {a} - {b} = {first_step}.
+        {first_step} + {c} = {answer_value}.
+      mistake_tags:
+        - order_error
+        - left_to_right_error
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: ORDER_EXPONENT_BEFORE_MULT_001
+      type: generated
+      prompt_template: "Compute: {a}^2 + {b} * {c}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 10
+        c:
+          type: int
+          min: 2
+          max: 10
+      derived:
+        power_value: "a ** 2"
+        product: "b * c"
+        answer_value: "power_value + product"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Evaluate the exponent before multiplying or adding.
+        {a}^2 = {power_value}.
+        {b} * {c} = {product}.
+        {power_value} + {product} = {answer_value}.
+      mistake_tags:
+        - order_error
+        - exponent_error
+        - multiplication_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: ORDER_GROUPING_WITH_EXPONENT_001
+      type: generated
+      prompt_template: "Compute: ({a} + {b})^2"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 12
+        b:
+          type: int
+          min: 1
+          max: 12
+      derived:
+        group_value: "a + b"
+        answer_value: "group_value ** 2"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Parentheses come before exponents.
+        {a} + {b} = {group_value}.
+        {group_value}^2 = {answer_value}.
+      mistake_tags:
+        - order_error
+        - grouping_error
+        - exponent_error
+        - arithmetic_error
+      difficulty: hard
+
+    - id: ORDER_MIXED_GROUPING_001
+      type: generated
+      prompt_template: "Compute: {a} + {b} * ({c} - {d})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 10
+        c:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        d:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        group_value: "c - d"
+        product: "b * group_value"
+        answer_value: "a + product"
+      constraints:
+        - "group_value != 0"
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start inside the parentheses.
+        {c} - {d} = {group_value}.
+        Then multiply: {b} * {group_value} = {product}.
+        Finally add: {a} + {product} = {answer_value}.
+      mistake_tags:
+        - order_error
+        - grouping_error
+        - sign_error
+        - arithmetic_error
+      difficulty: hard

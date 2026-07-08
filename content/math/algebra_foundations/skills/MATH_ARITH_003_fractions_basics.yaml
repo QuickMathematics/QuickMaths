@@ -1,0 +1,396 @@
+id: MATH_ARITH_003
+schema_version: 0.2
+name: Fractions basics
+domain: Math
+subdomain: Arithmetic Foundations
+description: Understand fractions as parts of a whole, simplify fractions, recognize equivalent fractions, and compare simple fractions.
+prerequisites:
+  - MATH_ARITH_001
+tags:
+  - arithmetic
+  - fractions
+  - equivalent_fractions
+  - simplifying_fractions
+  - comparing_fractions
+unlocks:
+  - MATH_ARITH_004
+  - MATH_ARITH_005
+  - MATH_GRAPH_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A fraction names part of a whole.
+
+  In a fraction like 3/5, the top number is the numerator and the bottom number is the denominator. The denominator tells how many equal parts the whole is split into. The numerator tells how many of those parts you have.
+
+  Why it matters:
+  Fractions show up in measurement, slope, probability, percents, rates, and algebra. Being comfortable with fractions makes later math much less painful.
+
+  Method:
+  1. Read the denominator as the number of equal parts in one whole.
+  2. Read the numerator as the number of parts being counted.
+  3. To simplify a fraction, divide the numerator and denominator by the same factor.
+  4. To make an equivalent fraction, multiply or divide the numerator and denominator by the same nonzero number.
+  5. To compare fractions with the same denominator, compare the numerators.
+
+  Example:
+  6/8 simplifies to 3/4 because both 6 and 8 can be divided by 2.
+
+  Common mistake:
+  Do not change only the numerator or only the denominator when making an equivalent fraction. For example, 2/3 is equivalent to 4/6, not 4/3.
+examples:
+  - prompt: "In the fraction 5/8, what is the numerator?"
+    solution: "5"
+    explanation: "The numerator is the top number."
+  - prompt: "Simplify: 12/18"
+    solution: "2/3"
+    explanation: "Divide both 12 and 18 by 6."
+  - prompt: "What numerator makes 3/4 = ?/20?"
+    solution: "15"
+    explanation: "The denominator was multiplied by 5, so multiply the numerator by 5 too."
+  - prompt: "Which is larger: 5/9 or 7/9?"
+    solution: "7/9"
+    explanation: "The denominators are the same, so compare 5 and 7."
+applications:
+  - title: "Measurement"
+    description: "Fractions are used for inches, cups, time, and many other measurements."
+  - title: "Slope"
+    description: "Slope is often written as a fraction comparing vertical change to horizontal change."
+  - title: "Percents and decimals"
+    description: "Fractions connect directly to decimal and percent conversions."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: FRACTIONS_NUMERATOR_001
+      type: generated
+      prompt_template: "In the fraction {n}/{d}, what is the numerator?"
+      answer_mode: final_only
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 12
+        d:
+          type: int
+          min: 2
+          max: 15
+      constraints:
+        - "n != d"
+      answer:
+        type: numeric
+        value: "{n}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The numerator is the top number of a fraction.
+        In {n}/{d}, the numerator is {n}.
+      mistake_tags:
+        - fraction_vocabulary
+        - numerator_denominator_mixup
+      difficulty: easy
+
+    - id: FRACTIONS_DENOMINATOR_001
+      type: generated
+      prompt_template: "In the fraction {n}/{d}, what is the denominator?"
+      answer_mode: final_only
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 12
+        d:
+          type: int
+          min: 2
+          max: 15
+      constraints:
+        - "n != d"
+      answer:
+        type: numeric
+        value: "{d}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The denominator is the bottom number of a fraction.
+        In {n}/{d}, the denominator is {d}.
+      mistake_tags:
+        - fraction_vocabulary
+        - numerator_denominator_mixup
+      difficulty: easy
+
+    - id: FRACTIONS_SIMPLIFY_001
+      type: generated
+      prompt_template: "Simplify the fraction: {num}/{den}"
+      answer_mode: final_only
+      max_attempts: 300
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 9
+        q:
+          type: int
+          min: 2
+          max: 12
+        k:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        num: "p * k"
+        den: "q * k"
+      constraints:
+        - "p < q"
+        - "not (p % 2 == 0 and q % 2 == 0)"
+        - "not (p % 3 == 0 and q % 3 == 0)"
+        - "not (p % 5 == 0 and q % 5 == 0)"
+        - "not (p % 7 == 0 and q % 7 == 0)"
+      answer:
+        type: numeric
+        value: "{p}/{q}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Both {num} and {den} have a common factor of {k}.
+        Divide the numerator and denominator by {k}.
+        {num}/{den} = {p}/{q}.
+      mistake_tags:
+        - simplifying_fractions
+        - common_factor_error
+        - division_error
+      difficulty: medium
+
+    - id: FRACTIONS_EQUIVALENT_NUMERATOR_001
+      type: generated
+      prompt_template: "What numerator makes this true? {p}/{q} = ?/{new_den}"
+      answer_mode: final_only
+      max_attempts: 300
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 9
+        q:
+          type: int
+          min: 2
+          max: 12
+        k:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        new_num: "p * k"
+        new_den: "q * k"
+      constraints:
+        - "p < q"
+        - "not (p % 2 == 0 and q % 2 == 0)"
+        - "not (p % 3 == 0 and q % 3 == 0)"
+        - "not (p % 5 == 0 and q % 5 == 0)"
+        - "not (p % 7 == 0 and q % 7 == 0)"
+      answer:
+        type: numeric
+        value: "{new_num}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The denominator changed from {q} to {new_den}.
+        That means it was multiplied by {k}.
+        Multiply the numerator by {k} too: {p} * {k} = {new_num}.
+      mistake_tags:
+        - equivalent_fractions
+        - multiplication_error
+        - numerator_denominator_mixup
+      difficulty: medium
+
+    - id: FRACTIONS_EQUIVALENT_DENOMINATOR_001
+      type: generated
+      prompt_template: "What denominator makes this true? {p}/{q} = {new_num}/?"
+      answer_mode: final_only
+      max_attempts: 300
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 9
+        q:
+          type: int
+          min: 2
+          max: 12
+        k:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        new_num: "p * k"
+        new_den: "q * k"
+      constraints:
+        - "p < q"
+        - "not (p % 2 == 0 and q % 2 == 0)"
+        - "not (p % 3 == 0 and q % 3 == 0)"
+        - "not (p % 5 == 0 and q % 5 == 0)"
+        - "not (p % 7 == 0 and q % 7 == 0)"
+      answer:
+        type: numeric
+        value: "{new_den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The numerator changed from {p} to {new_num}.
+        That means it was multiplied by {k}.
+        Multiply the denominator by {k} too: {q} * {k} = {new_den}.
+      mistake_tags:
+        - equivalent_fractions
+        - multiplication_error
+        - numerator_denominator_mixup
+      difficulty: medium
+
+    - id: FRACTIONS_COMPARE_SAME_DENOMINATOR_001
+      type: generated
+      prompt_template: "Which fraction is larger?"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 8
+        b:
+          type: int
+          min: 1
+          max: 8
+        d:
+          type: int
+          min: 9
+          max: 15
+      constraints:
+        - "a > b"
+        - "a < d"
+        - "b < d"
+      options:
+        - id: A
+          label: "{a}/{d}"
+        - id: B
+          label: "{b}/{d}"
+      derived:
+        correct_choice_is_a: "a > b"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The denominators are the same, so compare the numerators.
+        The larger numerator gives the larger fraction.
+      mistake_tags:
+        - comparing_fractions
+        - numerator_denominator_mixup
+      difficulty: easy
+
+    - id: FRACTIONS_COMPARE_WITH_ONE_HALF_001
+      type: generated
+      prompt_template: "Is {n}/{d} less than, equal to, or greater than 1/2?"
+      answer_mode: final_only
+      variables:
+        d:
+          type: int
+          min: 4
+          max: 20
+        n:
+          type: int
+          min: 1
+          max: 19
+      constraints:
+        - "n < d"
+        - "2 * n < d"
+      options:
+        - id: A
+          label: "Less than 1/2"
+        - id: B
+          label: "Equal to 1/2"
+        - id: C
+          label: "Greater than 1/2"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Compare {n}/{d} to 1/2 by doubling the numerator.
+        If 2 * {n} is less than {d}, the fraction is less than 1/2.
+        If 2 * {n} is greater than {d}, the fraction is greater than 1/2.
+      mistake_tags:
+        - comparing_fractions
+        - benchmark_fraction_error
+      difficulty: hard
+
+    - id: FRACTIONS_WHOLE_NUMBER_001
+      type: generated
+      prompt_template: "What whole number is equal to {num}/{d}?"
+      answer_mode: final_only
+      variables:
+        whole:
+          type: int
+          min: 2
+          max: 12
+        d:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        num: "whole * d"
+      answer:
+        type: numeric
+        value: "{whole}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A fraction equals a whole number when the numerator divides evenly by the denominator.
+        {num} / {d} = {whole}.
+        So {num}/{d} = {whole}.
+      mistake_tags:
+        - simplifying_fractions
+        - division_error
+        - improper_fraction_error
+      difficulty: hard

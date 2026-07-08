@@ -1,0 +1,511 @@
+id: MATH_PREALG_004
+schema_version: 0.2
+name: Simplifying linear expressions
+domain: Math
+subdomain: Pre-Algebra
+description: Simplify linear expressions by distributing when needed and combining like terms.
+prerequisites:
+  - MATH_PREALG_003
+tags:
+  - pre_algebra
+  - expressions
+  - linear_expressions
+  - distributive_property
+  - like_terms
+  - simplifying_expressions
+unlocks:
+  - MATH_ALG_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A linear expression has variable terms like x and constants, but no powers such as x^2. Simplifying a linear expression means rewriting it in a cleaner equivalent form, usually ax + b.
+
+  This matters because equations, inequalities, and line formulas are much easier to work with after each expression is simplified.
+
+  Method:
+  1. Distribute to remove parentheses.
+  2. Keep subtraction signs attached to the terms they affect.
+  3. Combine like variable terms.
+  4. Combine constants.
+  5. Write the result in a clear form like ax + b.
+
+  Example:
+  3(x + 4) + 2x - 5
+  = 3x + 12 + 2x - 5
+  = 5x + 7
+
+  Common mistake:
+  Watch subtraction before parentheses. In 8x - (3x + 5), the minus applies to both terms, so the expression becomes 8x - 3x - 5 = 5x - 5.
+examples:
+  - prompt: "Simplify: 4x + 7 + 3x - 2"
+    solution: "7x + 5"
+    explanation: "Combine x-terms: 4x + 3x = 7x. Combine constants: 7 - 2 = 5."
+  - prompt: "Simplify: 5(x + 2) - 3"
+    solution: "5x + 7"
+    explanation: "Distribute first: 5x + 10 - 3. Then combine constants."
+  - prompt: "Simplify: 2(3x - 4) + 5x"
+    solution: "11x - 8"
+    explanation: "Distribute: 6x - 8 + 5x. Then combine x-terms."
+  - prompt: "Simplify: 9x - (4x + 6)"
+    solution: "5x - 6"
+    explanation: "Subtract both terms inside the parentheses: 9x - 4x - 6."
+applications:
+  - title: "Two-step equations"
+    description: "Many equations need each side simplified before solving."
+  - title: "Inequalities"
+    description: "Simplifying expressions makes it easier to isolate the variable in inequalities."
+  - title: "Linear functions"
+    description: "Simplified linear expressions connect directly to slope-intercept form and graphing lines."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: SIMPLIFY_LINEAR_COMBINE_ONLY_001
+      type: generated
+      prompt_template: "Simplify: {a}x + {b} + {c}x + {d}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        c:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        d:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        x_total: "a + c"
+        constant_total: "b + d"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+        - "constant_total != 0"
+      answer:
+        type: expression
+        value: "{x_total}x + {constant_total}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Combine the x-terms: {a}x + {c}x = {x_total}x.
+        Combine the constants: {b} + {d} = {constant_total}.
+        The simplified expression is {x_total}x + {constant_total}.
+      mistake_tags:
+        - like_terms_error
+        - coefficient_error
+        - constant_error
+        - sign_error
+      difficulty: easy
+
+    - id: SIMPLIFY_LINEAR_DISTRIBUTE_CONSTANT_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b}) + {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        distributed_constant: "a * b"
+        constant_total: "distributed_constant + c"
+      constraints:
+        - "constant_total != 0"
+      answer:
+        type: expression
+        value: "{a}x + {constant_total}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute first: {a}(x + {b}) = {a}x + {distributed_constant}.
+        Then combine constants: {distributed_constant} + {c} = {constant_total}.
+        The simplified expression is {a}x + {constant_total}.
+      mistake_tags:
+        - distribution_error
+        - constant_error
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: SIMPLIFY_LINEAR_DISTRIBUTE_AND_COMBINE_X_001
+      type: generated
+      prompt_template: "Simplify: {a}({b}x + {c}) + {d}x"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 9
+        c:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        d:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0, 1, -1]
+      derived:
+        distributed_x: "a * b"
+        distributed_constant: "a * c"
+        x_total: "distributed_x + d"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+      answer:
+        type: expression
+        value: "{x_total}x + {distributed_constant}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute {a}: {a}({b}x + {c}) = {distributed_x}x + {distributed_constant}.
+        Combine x-terms: {distributed_x}x + {d}x = {x_total}x.
+        The simplified expression is {x_total}x + {distributed_constant}.
+      mistake_tags:
+        - distribution_error
+        - like_terms_error
+        - coefficient_error
+        - sign_error
+      difficulty: medium
+
+    - id: SIMPLIFY_LINEAR_NEGATIVE_DISTRIBUTION_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b}) + {c}x"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -12
+          max: -2
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+      derived:
+        distributed_constant: "a * b"
+        x_total: "a + c"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+      answer:
+        type: expression
+        value: "{x_total}x + {distributed_constant}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute the negative factor to both terms.
+        {a}(x + {b}) = {a}x + {distributed_constant}.
+        Combine x-terms: {a}x + {c}x = {x_total}x.
+        The simplified expression is {x_total}x + {distributed_constant}.
+      mistake_tags:
+        - distribution_error
+        - sign_error
+        - like_terms_error
+        - coefficient_error
+      difficulty: medium
+
+    - id: SIMPLIFY_LINEAR_SUBTRACT_PARENTHESES_001
+      type: generated
+      prompt_template: "Simplify: {a}x + {b} - ({c}x + {d})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 14
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        c:
+          type: int
+          min: 2
+          max: 14
+        d:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        x_total: "a - c"
+        constant_total: "b - d"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+        - "constant_total != 0"
+      answer:
+        type: expression
+        value: "{x_total}x + {constant_total}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The minus before parentheses changes both signs.
+        {a}x + {b} - ({c}x + {d}) = {a}x + {b} - {c}x - {d}.
+        Combine x-terms: {a}x - {c}x = {x_total}x.
+        Combine constants: {b} - {d} = {constant_total}.
+        The simplified expression is {x_total}x + {constant_total}.
+      mistake_tags:
+        - subtraction_error
+        - sign_error
+        - like_terms_error
+        - distribution_error
+      difficulty: hard
+
+    - id: SIMPLIFY_LINEAR_TWO_GROUPS_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b}) + {c}(x + {d})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0, 1, -1]
+        d:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        first_constant: "a * b"
+        second_constant: "c * d"
+        x_total: "a + c"
+        constant_total: "first_constant + second_constant"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+        - "constant_total != 0"
+      answer:
+        type: expression
+        value: "{x_total}x + {constant_total}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute both groups.
+        {a}(x + {b}) = {a}x + {first_constant}.
+        {c}(x + {d}) = {c}x + {second_constant}.
+        Combine x-terms: {a}x + {c}x = {x_total}x.
+        Combine constants: {first_constant} + {second_constant} = {constant_total}.
+        The simplified expression is {x_total}x + {constant_total}.
+      mistake_tags:
+        - distribution_error
+        - like_terms_error
+        - coefficient_error
+        - sign_error
+      difficulty: hard
+
+    - id: SIMPLIFY_LINEAR_GROUP_MINUS_GROUP_001
+      type: generated
+      prompt_template: "Simplify: {a}(x - {b}) - {c}(x + {d})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 12
+        d:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        first_constant: "0 - (a * b)"
+        second_constant_before_subtract: "c * d"
+        x_total: "a - c"
+        constant_total: "first_constant - second_constant_before_subtract"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+      answer:
+        type: expression
+        value: "{x_total}x + {constant_total}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute the first group: {a}(x - {b}) = {a}x + {first_constant}.
+        Distribute the second group before subtracting it: {c}(x + {d}) = {c}x + {second_constant_before_subtract}.
+        Now subtract the whole second group: {a}x + {first_constant} - {c}x - {second_constant_before_subtract}.
+        Combine x-terms: {a}x - {c}x = {x_total}x.
+        The simplified expression is {x_total}x + {constant_total}.
+      mistake_tags:
+        - distribution_error
+        - subtraction_error
+        - sign_error
+        - like_terms_error
+      difficulty: hard
+
+    - id: SIMPLIFY_LINEAR_MIXED_ORDER_001
+      type: generated
+      prompt_template: "Simplify: {a} + {b}x - {c} + {d}x"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        b:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        c:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        d:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+      derived:
+        constant_total: "a - c"
+        x_total: "b + d"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+        - "constant_total != 0"
+      answer:
+        type: expression
+        value: "{x_total}x + {constant_total}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Reorder mentally by like terms.
+        Constants: {a} - {c} = {constant_total}.
+        x-terms: {b}x + {d}x = {x_total}x.
+        The simplified expression is {x_total}x + {constant_total}.
+      mistake_tags:
+        - like_terms_error
+        - sign_error
+        - constant_error
+        - coefficient_error
+      difficulty: medium

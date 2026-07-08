@@ -1,0 +1,455 @@
+id: MATH_ALG_002
+schema_version: 0.2
+name: Two-step equations
+domain: Math
+subdomain: Algebra Foundations
+description: Solve two-step linear equations by undoing addition or subtraction and then undoing multiplication or division.
+prerequisites:
+  - MATH_PREALG_004
+  - MATH_ALG_001
+tags:
+  - algebra
+  - equations
+  - two_step_equations
+  - inverse_operations
+  - linear_equations
+unlocks:
+  - MATH_ALG_003
+  - MATH_ALG_006
+  - MATH_ALG_005
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A two-step equation needs two inverse operations to isolate the variable.
+
+  This matters because most algebra equations are solved by carefully undoing operations in reverse order. Two-step equations are the bridge between one-step equations and more complex linear equations.
+
+  Method:
+  1. Simplify each side if needed.
+  2. Undo addition or subtraction first.
+  3. Undo multiplication or division second.
+  4. Check by substituting your answer into the original equation.
+
+  Example:
+  Solve 3x + 5 = 20.
+  Subtract 5 from both sides: 3x = 15.
+  Divide both sides by 3: x = 5.
+
+  Common mistake:
+  Do not divide before removing the added or subtracted constant. In 4x - 7 = 13, add 7 first, then divide by 4.
+examples:
+  - prompt: "Solve: 2x + 5 = 17"
+    solution: "x = 6"
+    explanation: "Subtract 5 from both sides to get 2x = 12. Divide by 2 to get x = 6."
+  - prompt: "Solve: 5x - 8 = 27"
+    solution: "x = 7"
+    explanation: "Add 8 to both sides to get 5x = 35. Divide by 5."
+  - prompt: "Solve: -3x + 4 = 19"
+    solution: "x = -5"
+    explanation: "Subtract 4 from both sides to get -3x = 15. Divide by -3."
+  - prompt: "Solve: x/4 - 6 = 3"
+    solution: "x = 36"
+    explanation: "Add 6 to both sides to get x/4 = 9. Multiply by 4."
+applications:
+  - title: "Word problems"
+    description: "Two-step equations model situations with a repeated amount plus or minus a fixed amount."
+  - title: "Science formulas"
+    description: "Solving two-step equations helps isolate unknown quantities in measurement formulas."
+  - title: "Linear functions"
+    description: "Two-step solving prepares learners to work with slope-intercept equations and linear models."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: TWO_STEP_AX_PLUS_B_001
+      type: generated
+      prompt_template: "Solve for x: {a}x + {b} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "a * x + b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + {b} = {c}.
+        Subtract {b} from both sides: {a}x = {a * x}.
+        Divide both sides by {a}: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - sign_error
+        - division_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: TWO_STEP_AX_MINUS_B_001
+      type: generated
+      prompt_template: "Solve for x: {a}x - {b} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "a * x - b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x - {b} = {c}.
+        Add {b} to both sides: {a}x = {a * x}.
+        Divide both sides by {a}: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - sign_error
+        - division_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: TWO_STEP_NEG_AX_PLUS_B_001
+      type: generated
+      prompt_template: "Solve for x: {a}x + {b} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "a * x + b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + {b} = {c}.
+        Subtract {b} from both sides: {a}x = {a * x}.
+        Divide both sides by {a}: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - sign_error
+        - negative_coefficient
+        - division_error
+      difficulty: medium
+
+    - id: TWO_STEP_NEG_AX_MINUS_B_001
+      type: generated
+      prompt_template: "Solve for x: {a}x - {b} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "a * x - b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x - {b} = {c}.
+        Add {b} to both sides: {a}x = {a * x}.
+        Divide both sides by {a}: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - sign_error
+        - negative_coefficient
+        - division_error
+      difficulty: medium
+
+    - id: TWO_STEP_X_OVER_A_PLUS_B_001
+      type: generated
+      prompt_template: "Solve for x: x/{a} + {b} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        q:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        x: "a * q"
+        c: "q + b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x/{a} + {b} = {c}.
+        Subtract {b} from both sides: x/{a} = {q}.
+        Multiply both sides by {a}: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - multiplication_error
+        - fraction_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: TWO_STEP_X_OVER_A_MINUS_B_001
+      type: generated
+      prompt_template: "Solve for x: x/{a} - {b} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        q:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        x: "a * q"
+        c: "q - b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x/{a} - {b} = {c}.
+        Add {b} to both sides: x/{a} = {q}.
+        Multiply both sides by {a}: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - multiplication_error
+        - fraction_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: TWO_STEP_WITH_SIMPLIFY_LEFT_001
+      type: generated
+      prompt_template: "Solve for x: {a}x + {b}x + {c} = {d}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 8
+        b:
+          type: int
+          min: 2
+          max: 8
+        c:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+      derived:
+        coefficient_total: "a + b"
+        d: "coefficient_total * x + c"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        First combine like terms: {a}x + {b}x = {coefficient_total}x.
+        The equation becomes {coefficient_total}x + {c} = {d}.
+        Undo the constant, then divide by {coefficient_total}.
+        x = {x}.
+      mistake_tags:
+        - like_terms_error
+        - inverse_operations
+        - coefficient_error
+        - sign_error
+      difficulty: hard
+
+    - id: TWO_STEP_WITH_DISTRIBUTION_LEFT_001
+      type: generated
+      prompt_template: "Solve for x: {a}(x + {b}) = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        c: "a * (x + b)"
+        distributed_constant: "a * b"
+      constraints:
+        - "x + b != 0"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        You can distribute first: {a}(x + {b}) = {a}x + {distributed_constant}.
+        The equation becomes {a}x + {distributed_constant} = {c}.
+        Undo the constant, then divide by {a}.
+        x = {x}.
+      mistake_tags:
+        - distribution_error
+        - inverse_operations
+        - sign_error
+        - arithmetic_error
+      difficulty: hard

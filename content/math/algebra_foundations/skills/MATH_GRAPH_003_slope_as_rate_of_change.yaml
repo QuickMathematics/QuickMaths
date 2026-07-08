@@ -1,0 +1,420 @@
+id: MATH_GRAPH_003
+schema_version: 0.2
+name: Slope as rate of change
+domain: Math
+subdomain: Linear Functions
+description: Interpret slope as a rate of change between two quantities in tables, graphs, and real-world contexts.
+prerequisites:
+  - MATH_GRAPH_002
+tags:
+  - linear_functions
+  - slope
+  - rate_of_change
+  - unit_rate
+  - tables
+  - word_problems
+unlocks:
+  - MATH_GRAPH_004
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Slope is a rate of change.
+
+  It tells how much one quantity changes when another quantity increases by 1. On a graph, slope is change in y divided by change in x.
+
+  Formula:
+  rate of change = change in output / change in input
+  rate of change = change in y / change in x
+
+  Why it matters:
+  Rate of change helps describe speed, cost per item, earnings per hour, water filling a tank, and many other real situations.
+
+  Method:
+  1. Identify the input, usually x.
+  2. Identify the output, usually y.
+  3. Find the change in output.
+  4. Find the change in input.
+  5. Divide: rate of change = output change / input change.
+  6. Include units when the context has units.
+
+  Example:
+  A car travels 150 miles in 3 hours.
+  Rate of change = 150 / 3 = 50.
+  The car travels 50 miles per hour.
+
+  Common mistake:
+  Do not divide in the wrong order. If distance depends on time, the rate is change in distance divided by change in time.
+examples:
+  - prompt: "A car travels 180 miles in 3 hours. What is the rate of change?"
+    solution: "60"
+    explanation: "Divide distance by time: 180 / 3 = 60 miles per hour."
+  - prompt: "A tank has 12 gallons at minute 0 and 32 gallons at minute 5. What is the rate of change?"
+    solution: "4"
+    explanation: "The amount increases by 20 gallons over 5 minutes, so the rate is 20/5 = 4 gallons per minute."
+  - prompt: "A line passes through (2, 10) and (6, 22). What is its rate of change?"
+    solution: "3"
+    explanation: "The change in y is 12 and the change in x is 4, so the rate is 12/4 = 3."
+  - prompt: "A value changes from 50 to 35 over 5 seconds. What is the rate of change?"
+    solution: "-3"
+    explanation: "The output change is -15 over 5 seconds, so the rate is -15/5 = -3 per second."
+applications:
+  - title: "Speed"
+    description: "Speed is a rate of change comparing distance to time."
+  - title: "Money"
+    description: "Hourly pay, cost per item, and subscription costs can all be described with rates of change."
+  - title: "Linear functions"
+    description: "In a linear function, the rate of change is constant and becomes the slope in y = mx + b."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: RATE_DISTANCE_TIME_001
+      type: generated
+      prompt_template: "A car travels {distance} miles in {time} hours. What is the rate of change in miles per hour?"
+      answer_mode: final_plus_required_work
+      variables:
+        rate:
+          type: int
+          min: 20
+          max: 80
+        time:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        distance: "rate * time"
+      answer:
+        type: numeric
+        value: "{rate}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Rate of change is distance divided by time.
+        {distance} / {time} = {rate}.
+        The rate is {rate} miles per hour.
+      mistake_tags:
+        - rate_of_change_error
+        - division_error
+        - unit_rate_error
+      difficulty: easy
+
+    - id: RATE_COST_PER_ITEM_001
+      type: generated
+      prompt_template: "{items} identical items cost ${total_cost}. What is the cost per item?"
+      answer_mode: final_plus_required_work
+      variables:
+        unit_cost:
+          type: int
+          min: 2
+          max: 25
+        items:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        total_cost: "unit_cost * items"
+      answer:
+        type: numeric
+        value: "{unit_cost}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Cost per item is total cost divided by number of items.
+        {total_cost} / {items} = {unit_cost}.
+        The rate is ${unit_cost} per item.
+      mistake_tags:
+        - rate_of_change_error
+        - unit_rate_error
+        - division_error
+      difficulty: easy
+
+    - id: RATE_FROM_TWO_POINTS_001
+      type: generated
+      prompt_template: "A line passes through ({x1}, {y1}) and ({x2}, {y2}). What is the rate of change?"
+      answer_mode: final_plus_required_work
+      variables:
+        x1:
+          type: int
+          min: -8
+          max: 8
+        y1:
+          type: int
+          min: -12
+          max: 12
+        run:
+          type: int
+          min: 2
+          max: 9
+        rate:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0]
+      derived:
+        x2: "x1 + run"
+        rise: "rate * run"
+        y2: "y1 + rise"
+      constraints:
+        - "y2 >= -30"
+        - "y2 <= 30"
+      answer:
+        type: numeric
+        value: "{rate}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Rate of change is change in y divided by change in x.
+        Change in y: {y2} - {y1} = {rise}.
+        Change in x: {x2} - {x1} = {run}.
+        Rate of change = {rise}/{run} = {rate}.
+      mistake_tags:
+        - rate_of_change_error
+        - slope_error
+        - coordinate_order_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: RATE_FROM_TABLE_X_STEP_001
+      type: generated
+      prompt_template: "A table has points ({x1}, {y1}) and ({x2}, {y2}). What is the rate of change?"
+      answer_mode: final_plus_required_work
+      variables:
+        x1:
+          type: int
+          min: 0
+          max: 10
+        y1:
+          type: int
+          min: -15
+          max: 15
+        run:
+          type: int
+          min: 2
+          max: 8
+        rate:
+          type: int
+          min: 2
+          max: 9
+      derived:
+        x2: "x1 + run"
+        rise: "rate * run"
+        y2: "y1 + rise"
+      constraints:
+        - "y2 <= 40"
+      answer:
+        type: numeric
+        value: "{rate}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        In a table, rate of change is change in output divided by change in input.
+        Output change: {y2} - {y1} = {rise}.
+        Input change: {x2} - {x1} = {run}.
+        Rate of change = {rise}/{run} = {rate}.
+      mistake_tags:
+        - table_error
+        - rate_of_change_error
+        - division_error
+      difficulty: medium
+
+    - id: RATE_NEGATIVE_CONTEXT_001
+      type: generated
+      prompt_template: "A tank has {start_amount} gallons at minute 0 and {end_amount} gallons at minute {minutes}. What is the rate of change in gallons per minute?"
+      answer_mode: final_plus_required_work
+      variables:
+        start_amount:
+          type: int
+          min: 30
+          max: 100
+        rate_drop:
+          type: int
+          min: 2
+          max: 12
+        minutes:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        change: "0 - (rate_drop * minutes)"
+        end_amount: "start_amount + change"
+        rate: "0 - rate_drop"
+      constraints:
+        - "end_amount > 0"
+      answer:
+        type: numeric
+        value: "{rate}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The amount changes from {start_amount} to {end_amount}.
+        Change in amount: {end_amount} - {start_amount} = {change}.
+        Change in time: {minutes}.
+        Rate of change = {change}/{minutes} = {rate}.
+      mistake_tags:
+        - rate_of_change_error
+        - sign_error
+        - subtraction_error
+        - unit_rate_error
+      difficulty: medium
+
+    - id: RATE_INTERPRET_POSITIVE_001
+      type: generated
+      prompt_template: "A function has a rate of change of {rate}. What does that mean?"
+      answer_mode: final_only
+      variables:
+        rate:
+          type: int
+          min: 2
+          max: 12
+      options:
+        - id: A
+          label: "The output increases by {rate} each time the input increases by 1."
+        - id: B
+          label: "The output decreases by {rate} each time the input increases by 1."
+        - id: C
+          label: "The input increases by {rate} each time the output increases by 1."
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A positive rate of change means the output goes up as the input increases.
+        A rate of {rate} means the output increases by {rate} for every 1-unit increase in input.
+      mistake_tags:
+        - rate_interpretation_error
+        - sign_error
+        - input_output_mixup
+      difficulty: medium
+
+    - id: RATE_INTERPRET_NEGATIVE_001
+      type: generated
+      prompt_template: "A function has a rate of change of -{rate}. What does that mean?"
+      answer_mode: final_only
+      variables:
+        rate:
+          type: int
+          min: 2
+          max: 12
+      options:
+        - id: A
+          label: "The output increases by {rate} each time the input increases by 1."
+        - id: B
+          label: "The output decreases by {rate} each time the input increases by 1."
+        - id: C
+          label: "The input decreases by {rate} each time the output increases by 1."
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A negative rate of change means the output goes down as the input increases.
+        A rate of -{rate} means the output decreases by {rate} for every 1-unit increase in input.
+      mistake_tags:
+        - rate_interpretation_error
+        - sign_error
+        - input_output_mixup
+      difficulty: hard
+
+    - id: RATE_FRACTIONAL_UNIT_RATE_001
+      type: generated
+      prompt_template: "A machine makes {items} parts in {hours} hours. What is the rate of change in parts per hour?"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        items:
+          type: int
+          min: 1
+          max: 15
+        hours:
+          type: int
+          min: 2
+          max: 10
+      constraints:
+        - "items < hours"
+        - "not (items % 2 == 0 and hours % 2 == 0)"
+        - "not (items % 3 == 0 and hours % 3 == 0)"
+        - "not (items % 5 == 0 and hours % 5 == 0)"
+        - "not (items % 7 == 0 and hours % 7 == 0)"
+      answer:
+        type: numeric
+        value: "{items}/{hours}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Parts per hour means parts divided by hours.
+        {items} / {hours} = {items}/{hours}.
+        The rate is {items}/{hours} parts per hour.
+      mistake_tags:
+        - rate_of_change_error
+        - fraction_error
+        - unit_rate_error
+      difficulty: hard

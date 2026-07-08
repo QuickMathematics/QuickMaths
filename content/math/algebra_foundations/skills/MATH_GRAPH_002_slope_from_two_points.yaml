@@ -1,0 +1,492 @@
+id: MATH_GRAPH_002
+schema_version: 0.2
+name: Slope from two points
+domain: Math
+subdomain: Coordinate Graphing
+description: Find the slope of a line using two points on the coordinate plane.
+prerequisites:
+  - MATH_GRAPH_001
+  - MATH_ARITH_003
+tags:
+  - coordinate_graphing
+  - slope
+  - two_points
+  - rise_over_run
+  - fractions
+  - linear_functions
+unlocks:
+  - MATH_GRAPH_003
+  - MATH_GRAPH_004
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Slope measures how steep a line is.
+
+  Between two points, slope is the change in y divided by the change in x. This is often called rise over run.
+
+  Formula:
+  slope = (change in y) / (change in x)
+  slope = (y2 - y1) / (x2 - x1)
+
+  Why it matters:
+  Slope tells the rate of change of a line. It connects coordinate graphing to linear equations, graphing lines, and real-world rates.
+
+  Method:
+  1. Choose two points: (x1, y1) and (x2, y2).
+  2. Find the change in y: y2 - y1.
+  3. Find the change in x: x2 - x1.
+  4. Write slope as change in y over change in x.
+  5. Simplify the fraction if possible.
+
+  Example:
+  Find the slope through (2, 3) and (6, 11).
+  Change in y: 11 - 3 = 8.
+  Change in x: 6 - 2 = 4.
+  Slope = 8/4 = 2.
+
+  Common mistake:
+  Do not switch the order halfway through. If you do y2 - y1 on top, you must do x2 - x1 on bottom.
+examples:
+  - prompt: "Find the slope through (1, 4) and (5, 12)."
+    solution: "2"
+    explanation: "Change in y is 8 and change in x is 4, so slope = 8/4 = 2."
+  - prompt: "Find the slope through (-2, 7) and (4, 1)."
+    solution: "-1"
+    explanation: "Change in y is -6 and change in x is 6, so slope = -6/6 = -1."
+  - prompt: "Find the slope through (3, 5) and (9, 5)."
+    solution: "0"
+    explanation: "The y-value does not change, so the slope is 0."
+  - prompt: "Classify the slope through (2, -3) and (2, 8)."
+    solution: "Undefined"
+    explanation: "The x-value does not change, so the run is 0. Division by 0 is undefined."
+applications:
+  - title: "Graphing lines"
+    description: "Slope from two points helps draw the line that passes through both points."
+  - title: "Rate of change"
+    description: "Slope describes how much one quantity changes compared with another."
+  - title: "Linear equations"
+    description: "Finding slope is the first step in writing an equation of a line from points."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: SLOPE_TWO_POINTS_INTEGER_001
+      type: generated
+      prompt_template: "Find the slope through ({x1}, {y1}) and ({x2}, {y2})."
+      answer_mode: final_plus_required_work
+      variables:
+        x1:
+          type: int
+          min: -8
+          max: 8
+        y1:
+          type: int
+          min: -12
+          max: 12
+        run:
+          type: int
+          min: 2
+          max: 8
+        slope:
+          type: int
+          min: -6
+          max: 6
+          exclude: [0]
+      derived:
+        x2: "x1 + run"
+        rise: "slope * run"
+        y2: "y1 + rise"
+      constraints:
+        - "y2 >= -20"
+        - "y2 <= 20"
+      answer:
+        type: numeric
+        value: "{slope}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Change in y: {y2} - {y1} = {rise}.
+        Change in x: {x2} - {x1} = {run}.
+        Slope = {rise}/{run} = {slope}.
+      mistake_tags:
+        - slope_error
+        - coordinate_order_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: SLOPE_TWO_POINTS_FRACTION_POSITIVE_001
+      type: generated
+      prompt_template: "Find the slope through ({x1}, {y1}) and ({x2}, {y2})."
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x1:
+          type: int
+          min: -8
+          max: 8
+        y1:
+          type: int
+          min: -12
+          max: 12
+        rise:
+          type: int
+          min: 1
+          max: 8
+        run:
+          type: int
+          min: 2
+          max: 9
+      derived:
+        x2: "x1 + run"
+        y2: "y1 + rise"
+      constraints:
+        - "rise < run"
+        - "not (rise % 2 == 0 and run % 2 == 0)"
+        - "not (rise % 3 == 0 and run % 3 == 0)"
+        - "not (rise % 5 == 0 and run % 5 == 0)"
+        - "not (rise % 7 == 0 and run % 7 == 0)"
+        - "y2 <= 20"
+      answer:
+        type: numeric
+        value: "{rise}/{run}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Change in y: {y2} - {y1} = {rise}.
+        Change in x: {x2} - {x1} = {run}.
+        Slope = rise/run = {rise}/{run}.
+      mistake_tags:
+        - slope_error
+        - fraction_error
+        - coordinate_order_error
+      difficulty: medium
+
+    - id: SLOPE_TWO_POINTS_FRACTION_NEGATIVE_001
+      type: generated
+      prompt_template: "Find the slope through ({x1}, {y1}) and ({x2}, {y2})."
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x1:
+          type: int
+          min: -8
+          max: 8
+        y1:
+          type: int
+          min: -8
+          max: 16
+        fall:
+          type: int
+          min: 1
+          max: 8
+        run:
+          type: int
+          min: 2
+          max: 9
+      derived:
+        x2: "x1 + run"
+        rise: "0 - fall"
+        y2: "y1 + rise"
+      constraints:
+        - "fall < run"
+        - "not (fall % 2 == 0 and run % 2 == 0)"
+        - "not (fall % 3 == 0 and run % 3 == 0)"
+        - "not (fall % 5 == 0 and run % 5 == 0)"
+        - "not (fall % 7 == 0 and run % 7 == 0)"
+        - "y2 >= -20"
+      answer:
+        type: numeric
+        value: "{rise}/{run}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Change in y: {y2} - {y1} = {rise}.
+        Change in x: {x2} - {x1} = {run}.
+        Slope = {rise}/{run}.
+      mistake_tags:
+        - slope_error
+        - fraction_error
+        - sign_error
+        - coordinate_order_error
+      difficulty: medium
+
+    - id: SLOPE_TWO_POINTS_HORIZONTAL_001
+      type: generated
+      prompt_template: "Find the slope through ({x1}, {y}) and ({x2}, {y})."
+      answer_mode: final_plus_required_work
+      variables:
+        x1:
+          type: int
+          min: -10
+          max: -1
+        x2:
+          type: int
+          min: 1
+          max: 10
+        y:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The y-values are the same, so the change in y is 0.
+        Slope = 0 divided by the change in x.
+        Therefore, the slope is 0.
+      mistake_tags:
+        - slope_error
+        - horizontal_line_error
+        - zero_slope_error
+      difficulty: easy
+
+    - id: SLOPE_TWO_POINTS_VERTICAL_001
+      type: generated
+      prompt_template: "Classify the slope through ({x}, {y1}) and ({x}, {y2})."
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        y1:
+          type: int
+          min: -12
+          max: -1
+        y2:
+          type: int
+          min: 1
+          max: 12
+      options:
+        - id: A
+          label: "0"
+        - id: B
+          label: "1"
+        - id: C
+          label: "undefined"
+        - id: D
+          label: "-1"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The x-values are the same, so the change in x is 0.
+        Slope would require dividing by 0.
+        Division by 0 is undefined, so the slope is undefined.
+      mistake_tags:
+        - slope_error
+        - vertical_line_error
+        - undefined_slope_error
+      difficulty: medium
+
+    - id: SLOPE_FIND_RISE_001
+      type: generated
+      prompt_template: "For the points ({x1}, {y1}) and ({x2}, {y2}), what is the change in y?"
+      answer_mode: final_plus_required_work
+      variables:
+        x1:
+          type: int
+          min: -8
+          max: 8
+        x2:
+          type: int
+          min: -8
+          max: 8
+        y1:
+          type: int
+          min: -12
+          max: 12
+        rise:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        y2: "y1 + rise"
+      constraints:
+        - "x1 != x2"
+        - "y2 >= -20"
+        - "y2 <= 20"
+      answer:
+        type: numeric
+        value: "{rise}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Change in y is y2 - y1.
+        {y2} - {y1} = {rise}.
+        So the change in y is {rise}.
+      mistake_tags:
+        - slope_error
+        - y_coordinate_error
+        - subtraction_error
+        - sign_error
+      difficulty: medium
+
+    - id: SLOPE_FIND_RUN_001
+      type: generated
+      prompt_template: "For the points ({x1}, {y1}) and ({x2}, {y2}), what is the change in x?"
+      answer_mode: final_plus_required_work
+      variables:
+        x1:
+          type: int
+          min: -12
+          max: 12
+        run:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        y1:
+          type: int
+          min: -8
+          max: 8
+        y2:
+          type: int
+          min: -8
+          max: 8
+      derived:
+        x2: "x1 + run"
+      constraints:
+        - "y1 != y2"
+        - "x2 >= -20"
+        - "x2 <= 20"
+      answer:
+        type: numeric
+        value: "{run}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Change in x is x2 - x1.
+        {x2} - {x1} = {run}.
+        So the change in x is {run}.
+      mistake_tags:
+        - slope_error
+        - x_coordinate_error
+        - subtraction_error
+        - sign_error
+      difficulty: medium
+
+    - id: SLOPE_TWO_POINTS_NEGATIVE_RUN_001
+      type: generated
+      prompt_template: "Find the slope through ({x1}, {y1}) and ({x2}, {y2})."
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x2:
+          type: int
+          min: -8
+          max: 8
+        y2:
+          type: int
+          min: -12
+          max: 12
+        run_size:
+          type: int
+          min: 2
+          max: 8
+        slope:
+          type: int
+          min: -5
+          max: 5
+          exclude: [0]
+      derived:
+        x1: "x2 + run_size"
+        rise: "0 - (slope * run_size)"
+        y1: "y2 - rise"
+      constraints:
+        - "y1 >= -20"
+        - "y1 <= 20"
+      answer:
+        type: numeric
+        value: "{slope}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Use the same order for both coordinates.
+        Change in y: {y2} - {y1} = {rise}.
+        Change in x: {x2} - {x1} = {0 - run_size}.
+        Slope = {rise}/{0 - run_size} = {slope}.
+      mistake_tags:
+        - slope_error
+        - coordinate_order_error
+        - sign_error
+        - arithmetic_error
+      difficulty: hard

@@ -1,0 +1,40 @@
+id: TRACK_MATH_ALGEBRA_FOUNDATIONS
+schema_version: 0.2
+name: Algebra Foundations
+domain: Math
+description: Core arithmetic, pre-algebra, algebra, coordinate graphing, linear functions,
+  and systems skills for foundational math.
+entry_skills:
+- MATH_ARITH_001
+exit_skills:
+- MATH_ARITH_004
+- MATH_ARITH_005
+- MATH_ALG_007
+- MATH_ALG_008
+- MATH_SYS_001
+skills:
+- MATH_ARITH_001
+- MATH_ARITH_002
+- MATH_ARITH_003
+- MATH_GRAPH_001
+- MATH_PREALG_001
+- MATH_PREALG_002
+- MATH_PREALG_003
+- MATH_ALG_001
+- MATH_GRAPH_002
+- MATH_ARITH_004
+- MATH_ARITH_005
+- MATH_PREALG_005
+- MATH_PREALG_004
+- MATH_ALG_008
+- MATH_ALG_002
+- MATH_GRAPH_003
+- MATH_ALG_003
+- MATH_ALG_006
+- MATH_ALG_005
+- MATH_ALG_004
+- MATH_ALG_007
+- MATH_GRAPH_004
+- MATH_GRAPH_005
+- MATH_GRAPH_006
+- MATH_SYS_001

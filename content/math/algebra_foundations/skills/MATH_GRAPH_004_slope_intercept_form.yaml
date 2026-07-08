@@ -1,0 +1,405 @@
+id: MATH_GRAPH_004
+schema_version: 0.2
+name: Slope-intercept form
+domain: Math
+subdomain: Linear Functions
+description: Interpret and write linear equations in slope-intercept form y = mx + b.
+prerequisites:
+  - MATH_ALG_005
+tags:
+  - linear_functions
+  - slope_intercept_form
+  - graphing
+  - slope
+  - y_intercept
+  - literal_equations
+unlocks:
+  - MATH_GRAPH_005
+  - MATH_GRAPH_006
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Slope-intercept form is a way to write a linear equation:
+
+  y = mx + b
+
+  In this form, m is the slope and b is the y-intercept.
+
+  Why it matters:
+  Slope-intercept form makes a line easy to understand. The slope tells how fast y changes when x increases by 1. The y-intercept tells where the line crosses the y-axis.
+
+  Method:
+  1. Make sure y is alone on the left side.
+  2. Read the coefficient of x as the slope.
+  3. Read the constant as the y-intercept.
+  4. To write a line from slope and y-intercept, substitute m and b into y = mx + b.
+
+  Example:
+  y = 3x - 5 is in slope-intercept form.
+  The slope is 3.
+  The y-intercept is -5.
+
+  Common mistake:
+  Do not confuse the slope with the y-intercept. In y = -4x + 7, the slope is -4 and the y-intercept is 7.
+examples:
+  - prompt: "Identify the slope in y = 2x + 9"
+    solution: "2"
+    explanation: "In y = mx + b, the coefficient of x is the slope."
+  - prompt: "Identify the y-intercept in y = -5x + 8"
+    solution: "8"
+    explanation: "In y = mx + b, the constant term is the y-intercept."
+  - prompt: "Write the right-hand side of y = mx + b when the slope is 4 and the y-intercept is -3."
+    solution: "4x - 3"
+    explanation: "Substitute m = 4 and b = -3 into mx + b."
+  - prompt: "Rewrite y - 6 = 3x in slope-intercept form."
+    solution: "3x + 6"
+    explanation: "Add 6 to both sides to get y = 3x + 6."
+applications:
+  - title: "Graphing lines"
+    description: "Slope-intercept form lets learners graph a line quickly from its slope and y-intercept."
+  - title: "Linear models"
+    description: "In a real-world model, the slope is the rate of change and the y-intercept is the starting value."
+  - title: "Systems of equations"
+    description: "Lines in slope-intercept form are easier to compare, graph, and use in systems."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: SLOPE_INTERCEPT_IDENTIFY_SLOPE_001
+      type: generated
+      prompt_template: "What is the slope of the line y = {m}x + {b}?"
+      answer_mode: final_only
+      variables:
+        m:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: numeric
+        value: "{m}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Slope-intercept form is y = mx + b.
+        The slope is the coefficient of x.
+        In y = {m}x + {b}, the slope is {m}.
+      mistake_tags:
+        - slope_error
+        - y_intercept_error
+        - coefficient_error
+      difficulty: easy
+
+    - id: SLOPE_INTERCEPT_IDENTIFY_INTERCEPT_001
+      type: generated
+      prompt_template: "What is the y-intercept of the line y = {m}x + {b}?"
+      answer_mode: final_only
+      variables:
+        m:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: numeric
+        value: "{b}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Slope-intercept form is y = mx + b.
+        The y-intercept is the constant term b.
+        In y = {m}x + {b}, the y-intercept is {b}.
+      mistake_tags:
+        - y_intercept_error
+        - slope_error
+        - constant_error
+      difficulty: easy
+
+    - id: SLOPE_INTERCEPT_WRITE_FROM_M_B_001
+      type: generated
+      prompt_template: "A line has slope {m} and y-intercept {b}. Enter only the right-hand side of the equation y = ?"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: expression
+        value: "{m}x + {b}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Use y = mx + b.
+        Substitute m = {m} and b = {b}.
+        The right-hand side is {m}x + {b}.
+      mistake_tags:
+        - slope_error
+        - y_intercept_error
+        - equation_form_error
+        - sign_error
+      difficulty: easy
+
+    - id: SLOPE_INTERCEPT_REWRITE_ADD_TO_Y_001
+      type: generated
+      prompt_template: "Rewrite in slope-intercept form. Enter only the right-hand side for y: y - {b} = {m}x"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: 2
+          max: 20
+      answer:
+        type: expression
+        value: "{m}x + {b}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with y - {b} = {m}x.
+        Add {b} to both sides.
+        y = {m}x + {b}.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - sign_error
+        - equation_form_error
+      difficulty: medium
+
+    - id: SLOPE_INTERCEPT_REWRITE_SUBTRACT_FROM_Y_001
+      type: generated
+      prompt_template: "Rewrite in slope-intercept form. Enter only the right-hand side for y: y + {b} = {m}x"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        intercept: "0 - b"
+      answer:
+        type: expression
+        value: "{m}x + {intercept}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with y + {b} = {m}x.
+        Subtract {b} from both sides.
+        y = {m}x + {intercept}.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - sign_error
+        - equation_form_error
+      difficulty: medium
+
+    - id: SLOPE_INTERCEPT_SOLVE_FOR_Y_001
+      type: generated
+      prompt_template: "Rewrite in slope-intercept form. Enter only the right-hand side for y: y = {m}x + {b} + {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        c:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        intercept: "b + c"
+      constraints:
+        - "intercept != 0"
+      answer:
+        type: expression
+        value: "{m}x + {intercept}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The equation already has y alone, but the constants need to be combined.
+        {b} + {c} = {intercept}.
+        So the right-hand side is {m}x + {intercept}.
+      mistake_tags:
+        - like_terms_error
+        - constant_error
+        - sign_error
+        - equation_form_error
+      difficulty: medium
+
+    - id: SLOPE_INTERCEPT_FROM_STANDARD_POS_Y_001
+      type: generated
+      prompt_template: "Rewrite in slope-intercept form. Enter only the right-hand side for y: {a}x + y = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        c:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        slope: "0 - a"
+      answer:
+        type: expression
+        value: "{slope}x + {c}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + y = {c}.
+        Subtract {a}x from both sides.
+        y = {slope}x + {c}.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - slope_error
+        - sign_error
+      difficulty: hard
+
+    - id: SLOPE_INTERCEPT_FROM_BY_001
+      type: generated
+      prompt_template: "Rewrite in slope-intercept form. Enter only the right-hand side for y: {b}y = {m}x + {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        b:
+          type: int
+          min: 2
+          max: 9
+        m:
+          type: int
+          min: -18
+          max: 18
+          exclude: [0]
+        c:
+          type: int
+          min: -18
+          max: 18
+          exclude: [0]
+      constraints:
+        - "m % b == 0"
+        - "c % b == 0"
+        - "m // b != 0"
+        - "m // b != 1"
+        - "m // b != -1"
+        - "c // b != 0"
+      derived:
+        slope: "m // b"
+        intercept: "c // b"
+      answer:
+        type: expression
+        value: "{slope}x + {intercept}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {b}y = {m}x + {c}.
+        Divide every term by {b}.
+        {m}x / {b} = {slope}x, and {c} / {b} = {intercept}.
+        So y = {slope}x + {intercept}.
+      mistake_tags:
+        - literal_equation_error
+        - division_error
+        - slope_error
+        - y_intercept_error
+      difficulty: hard

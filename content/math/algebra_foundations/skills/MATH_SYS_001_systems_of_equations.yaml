@@ -1,0 +1,469 @@
+id: MATH_SYS_001
+schema_version: 0.2
+name: Systems of equations
+domain: Math
+subdomain: Systems of Equations
+description: Solve and classify systems of two linear equations.
+prerequisites:
+  - MATH_GRAPH_005
+  - MATH_ALG_004
+tags:
+  - systems_of_equations
+  - linear_equations
+  - graphing
+  - substitution
+  - intersections
+  - no_solution
+  - infinite_solutions
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A system of equations is a set of equations that must be true at the same time.
+
+  For two linear equations, the solution is the point where the two lines intersect. That point gives an x-value and a y-value that make both equations true.
+
+  Why it matters:
+  Systems model situations where two conditions must both be satisfied, such as comparing two prices, two distances, or two linear patterns.
+
+  Main cases:
+  1. One solution: the lines cross at one point.
+  2. No solution: the lines are parallel and never cross.
+  3. Infinitely many solutions: the two equations describe the same line.
+
+  Method for equations in slope-intercept form:
+  1. Set the two right-hand sides equal.
+  2. Solve for x.
+  3. Substitute x into either equation to find y.
+  4. Check that the point works in both equations.
+
+  Example:
+  Solve y = 2x + 3 and y = -x + 12.
+  Set them equal: 2x + 3 = -x + 12.
+  Add x: 3x + 3 = 12.
+  Subtract 3: 3x = 9.
+  Divide by 3: x = 3.
+  Substitute: y = 2(3) + 3 = 9.
+  The solution is the point (3, 9).
+
+  Common mistake:
+  Do not stop after finding x. A system solution is a point, so you also need the matching y-value.
+examples:
+  - prompt: "For y = x + 4 and y = -x + 10, what is the x-coordinate of the solution?"
+    solution: "3"
+    explanation: "Set x + 4 = -x + 10. Then 2x = 6, so x = 3."
+  - prompt: "For y = 2x + 1 and y = -x + 10, what is the y-coordinate of the solution?"
+    solution: "7"
+    explanation: "The equations meet at x = 3. Substitute into y = 2x + 1 to get y = 7."
+  - prompt: "Classify the system: y = 4x + 1 and y = 4x - 6"
+    solution: "No solution"
+    explanation: "The slopes are the same but the y-intercepts are different, so the lines are parallel."
+  - prompt: "Classify the system: y = -2x + 5 and 2x + y = 5"
+    solution: "Infinitely many solutions"
+    explanation: "Both equations describe the same line."
+applications:
+  - title: "Comparing costs"
+    description: "Systems can show when two pricing plans cost the same."
+  - title: "Motion problems"
+    description: "Systems can model when two moving objects meet."
+  - title: "Graphing"
+    description: "The solution to a linear system is the intersection point of the two graphs."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: SYSTEM_X_COORD_SLOPE_INTERCEPT_001
+      type: generated
+      prompt_template: "For the system y = {m1}x + {b1} and y = {m2}x + {b2}, what is the x-coordinate of the solution?"
+      answer_mode: final_only
+      max_attempts: 300
+      variables:
+        x:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0]
+        m1:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b1:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        m2:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+      derived:
+        y: "m1 * x + b1"
+        b2: "y - m2 * x"
+      constraints:
+        - "m1 != m2"
+        - "b2 != 0"
+        - "b2 != b1"
+      answer:
+        type: numeric
+        value: "{x}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        At the intersection, both equations have the same y-value.
+        Set the right sides equal: {m1}x + {b1} = {m2}x + {b2}.
+        Solving gives x = {x}.
+      mistake_tags:
+        - systems_error
+        - slope_intercept_form
+        - inverse_operations
+        - arithmetic_error
+      difficulty: easy
+
+    - id: SYSTEM_Y_COORD_SLOPE_INTERCEPT_001
+      type: generated
+      prompt_template: "For the system y = {m1}x + {b1} and y = {m2}x + {b2}, what is the y-coordinate of the solution?"
+      answer_mode: final_only
+      max_attempts: 300
+      variables:
+        x:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0]
+        m1:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b1:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        m2:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+      derived:
+        y: "m1 * x + b1"
+        b2: "y - m2 * x"
+      constraints:
+        - "m1 != m2"
+        - "b2 != 0"
+        - "b2 != b1"
+        - "y != 0"
+      answer:
+        type: numeric
+        value: "{y}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        First find the x-value where the two equations are equal.
+        The equations meet at x = {x}.
+        Substitute into the first equation: y = {m1}({x}) + {b1} = {y}.
+      mistake_tags:
+        - systems_error
+        - substitution_error
+        - slope_intercept_form
+        - arithmetic_error
+      difficulty: medium
+
+    - id: SYSTEM_SUBSTITUTION_X_GIVEN_001
+      type: generated
+      prompt_template: "Solve the system. What is y? x = {x} and y = {m}x + {b}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        m:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        y: "m * x + b"
+      constraints:
+        - "y != 0"
+      answer:
+        type: numeric
+        value: "{y}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The first equation gives x = {x}.
+        Substitute into the second equation.
+        y = {m}({x}) + {b} = {y}.
+      mistake_tags:
+        - systems_error
+        - substitution_error
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: SYSTEM_ELIMINATION_SUM_DIFF_X_001
+      type: generated
+      prompt_template: "For the system x + y = {sum_value} and x - y = {diff_value}, what is x?"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        y:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        sum_value: "x + y"
+        diff_value: "x - y"
+      constraints:
+        - "sum_value != 0"
+        - "diff_value != 0"
+      answer:
+        type: numeric
+        value: "{x}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Add the equations:
+        (x + y) + (x - y) = {sum_value} + {diff_value}.
+        The y-terms cancel, giving 2x = {sum_value + diff_value}.
+        So x = {x}.
+      mistake_tags:
+        - systems_error
+        - elimination_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: SYSTEM_ELIMINATION_SUM_DIFF_Y_001
+      type: generated
+      prompt_template: "For the system x + y = {sum_value} and x - y = {diff_value}, what is y?"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        y:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        sum_value: "x + y"
+        diff_value: "x - y"
+      constraints:
+        - "sum_value != 0"
+        - "diff_value != 0"
+      answer:
+        type: numeric
+        value: "{y}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Subtract the second equation from the first:
+        (x + y) - (x - y) = {sum_value} - {diff_value}.
+        The x-terms cancel, giving 2y = {sum_value - diff_value}.
+        So y = {y}.
+      mistake_tags:
+        - systems_error
+        - elimination_error
+        - arithmetic_error
+        - sign_error
+      difficulty: medium
+
+    - id: SYSTEM_CLASSIFY_NO_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the system: y = {m}x + {b1} and y = {m}x + {b2}"
+      answer_mode: final_only
+      variables:
+        m:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b1:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        b2:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      constraints:
+        - "b1 != b2"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The two lines have the same slope, {m}, but different y-intercepts, {b1} and {b2}.
+        They are parallel and never intersect.
+        The system has no solution.
+      mistake_tags:
+        - systems_classification
+        - no_solution
+        - parallel_lines
+        - slope_error
+      difficulty: medium
+
+    - id: SYSTEM_CLASSIFY_INFINITE_SOLUTIONS_001
+      type: generated
+      prompt_template: "Classify the system: y = {m}x + {b} and {a}y = {am}x + {ab}"
+      answer_mode: final_only
+      variables:
+        m:
+          type: int
+          min: -6
+          max: 6
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 6
+      derived:
+        am: "a * m"
+        ab: "a * b"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Divide the second equation by {a}.
+        {a}y = {am}x + {ab} becomes y = {m}x + {b}.
+        Both equations describe the same line, so there are infinitely many solutions.
+      mistake_tags:
+        - systems_classification
+        - infinite_solutions
+        - equivalent_equations
+        - division_error
+      difficulty: hard
+
+    - id: SYSTEM_CLASSIFY_ONE_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the system: y = {m1}x + {b1} and y = {m2}x + {b2}"
+      answer_mode: final_only
+      variables:
+        m1:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        m2:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b1:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        b2:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      constraints:
+        - "m1 != m2"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The slopes are different: {m1} and {m2}.
+        Lines with different slopes intersect at exactly one point.
+        The system has one solution.
+      mistake_tags:
+        - systems_classification
+        - one_solution
+        - slope_error
+      difficulty: hard

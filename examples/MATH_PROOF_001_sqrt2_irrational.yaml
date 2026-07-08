@@ -1,0 +1,111 @@
+id: MATH_PROOF_001
+name: Proving sqrt(2) is irrational
+domain: Math
+subdomain: Proof Foundations
+description: Write a contradiction proof that sqrt(2) cannot be expressed as a ratio of integers.
+prerequisites: []
+tags:
+  - proof
+  - contradiction
+  - number theory
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 14
+  review_after_days_if_learning: 2
+theory: |
+  A contradiction proof assumes the opposite of what we want, then derives an impossibility.
+
+  For sqrt(2), the standard proof assumes sqrt(2) = p/q in lowest terms. Squaring gives p^2 = 2q^2, so p is even. Substituting p = 2k then shows q is even too. That contradicts p/q being in lowest terms.
+examples:
+  - prompt: "What is the contradiction in the classic sqrt(2) proof?"
+    solution: "Both p and q are even, contradicting that p/q was in lowest terms."
+    explanation: "If both are even, the fraction was reducible."
+test:
+  question_count: 1
+  randomize_order: false
+  questions:
+    - id: SQRT2_PROOF_001
+      type: fixed
+      prompt: "Prove that sqrt(2) is irrational using contradiction and parity."
+      answer_mode: final_plus_required_work
+      answer:
+        type: theorem_conclusion
+        value: "sqrt(2) is irrational"
+        accepted_forms:
+          - "sqrt(2) is irrational"
+          - "therefore sqrt(2) is irrational"
+      grading:
+        method: theorem_conclusion
+      work:
+        mode: proof_obligations
+        prompt: "Write the proof. You may use obligation tags like [square_both_sides] if helpful."
+        proof_policy:
+          scope: taught_strategy_only
+          accepted_strategies:
+            - id: contradiction_parity
+              name: Contradiction using parity
+              description: "Assume sqrt(2) is rational in lowest terms and derive that numerator and denominator are both even."
+              assumptions_required:
+                - id: assume_rational_lowest_terms
+                  label: "Assume sqrt(2) = p/q in lowest terms"
+                  required: true
+              required_obligations:
+                - id: square_both_sides
+                  label: "Derive p^2 = 2q^2"
+                  required: true
+                - id: show_p_even
+                  label: "Show p is even"
+                  required: true
+                  depends_on:
+                    - square_both_sides
+                - id: substitute_p_equals_2k
+                  label: "Substitute p = 2k"
+                  required: true
+                  depends_on:
+                    - show_p_even
+                - id: show_q_even
+                  label: "Show q is even"
+                  required: true
+                  depends_on:
+                    - substitute_p_equals_2k
+                - id: contradiction_lowest_terms
+                  label: "Explain contradiction with p/q being in lowest terms"
+                  required: true
+                  depends_on:
+                    - show_p_even
+                    - show_q_even
+                - id: conclude_irrational
+                  label: "Conclude sqrt(2) is irrational"
+                  required: true
+                  depends_on:
+                    - contradiction_lowest_terms
+              allowed_lemmas:
+                - id: even_square_implies_even_base
+                  label: "If n^2 is even, then n is even"
+      review_policy:
+        work_review: tutor_required
+        mastery_requires_review_pass: true
+        allow_self_review: true
+      explanation_template: |
+        A complete proof should assume rationality, derive p^2 = 2q^2, show p and q are both even, and explain why that contradicts lowest terms.
+      mistake_tags:
+        - proof_structure
+        - contradiction_error
+        - parity_reasoning
+    - id: SQRT2_CONCLUSION_001
+      type: fixed
+      prompt: "State the conclusion of the classic contradiction proof for sqrt(2)."
+      answer_mode: final_only
+      answer:
+        type: theorem_conclusion
+        value: "sqrt(2) is irrational"
+        accepted_forms:
+          - "sqrt(2) is irrational"
+      grading:
+        method: theorem_conclusion
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false

@@ -1,0 +1,402 @@
+id: MATH_GRAPH_005
+schema_version: 0.2
+name: Graphing lines
+domain: Math
+subdomain: Linear Functions
+description: Graph lines in slope-intercept form by using the y-intercept and slope to find points on the line.
+prerequisites:
+  - MATH_GRAPH_004
+tags:
+  - linear_functions
+  - graphing
+  - slope
+  - y_intercept
+  - coordinate_plane
+  - slope_intercept_form
+unlocks:
+  - MATH_SYS_001
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  To graph a line in slope-intercept form, use the equation y = mx + b.
+
+  The y-intercept b gives the starting point on the y-axis. The slope m tells how to move from one point to another.
+
+  Why it matters:
+  Graphing lines turns an equation into a picture. This helps you see patterns, compare rates, and understand where two lines meet.
+
+  Method:
+  1. Write the equation in y = mx + b form.
+  2. Plot the y-intercept at x = 0.
+  3. Use the slope as rise/run to find another point.
+  4. Draw a straight line through the points.
+
+  Example:
+  y = 2x + 3 has y-intercept 3 and slope 2.
+  Start at (0, 3). Since slope 2 means up 2 and right 1, another point is (1, 5).
+
+  Common mistake:
+  Do not use the slope as the starting point. The y-intercept is where the graph begins on the y-axis. The slope tells the movement from point to point.
+examples:
+  - prompt: "For y = 3x + 4, what is the y-intercept?"
+    solution: "4"
+    explanation: "In y = mx + b, the y-intercept is b."
+  - prompt: "For y = 2x - 5, what is y when x = 1?"
+    solution: "-3"
+    explanation: "Substitute x = 1: y = 2(1) - 5 = -3."
+  - prompt: "A line has y-intercept 6 and slope -2. Starting at x = 0, what is y when x = 1?"
+    solution: "4"
+    explanation: "Moving right 1 changes y by -2, so 6 - 2 = 4."
+  - prompt: "A line has y-intercept -1 and slope 3/2. Starting at x = 0, what is y when x = 2?"
+    solution: "2"
+    explanation: "Slope 3/2 means right 2, up 3. Starting from -1 gives y = 2."
+applications:
+  - title: "Systems of equations"
+    description: "Graphing lines lets learners estimate where two equations have the same solution."
+  - title: "Rates of change"
+    description: "A line graph shows how a quantity changes at a constant rate."
+  - title: "Data and modeling"
+    description: "Linear graphs are used to model trends in cost, distance, temperature, and other measurements."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: GRAPH_LINES_Y_INTERCEPT_001
+      type: generated
+      prompt_template: "For the line y = {m}x + {b}, what is the y-intercept?"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+      answer:
+        type: numeric
+        value: "{b}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        In y = mx + b, the y-intercept is b.
+        For y = {m}x + {b}, the y-intercept is {b}.
+      mistake_tags:
+        - y_intercept_error
+        - slope_error
+        - graphing_error
+      difficulty: easy
+
+    - id: GRAPH_LINES_SLOPE_001
+      type: generated
+      prompt_template: "For the line y = {m}x + {b}, what is the slope?"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+      answer:
+        type: numeric
+        value: "{m}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        In y = mx + b, the slope is m.
+        For y = {m}x + {b}, the slope is {m}.
+      mistake_tags:
+        - slope_error
+        - y_intercept_error
+        - graphing_error
+      difficulty: easy
+
+    - id: GRAPH_LINES_POINT_AT_ZERO_001
+      type: generated
+      prompt_template: "For the line y = {m}x + {b}, what is y when x = 0?"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: numeric
+        value: "{b}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Substitute x = 0.
+        y = {m}(0) + {b} = {b}.
+        This matches the y-intercept.
+      mistake_tags:
+        - substitution_error
+        - y_intercept_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: GRAPH_LINES_SECOND_POINT_RIGHT_ONE_001
+      type: generated
+      prompt_template: "A line has slope {m} and y-intercept {b}. Starting at x = 0, what is y when x = 1?"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        y_value: "b + m"
+      constraints:
+        - "y_value != 0"
+      answer:
+        type: numeric
+        value: "{y_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The y-intercept gives y = {b} when x = 0.
+        Moving right 1 changes y by the slope, {m}.
+        {b} + {m} = {y_value}.
+      mistake_tags:
+        - slope_error
+        - y_intercept_error
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: GRAPH_LINES_VALUE_AT_X_001
+      type: generated
+      prompt_template: "For the line y = {m}x + {b}, what is y when x = {x}?"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        x:
+          type: int
+          min: -6
+          max: 6
+          exclude: [0, 1]
+      derived:
+        y_value: "m * x + b"
+      constraints:
+        - "y_value != 0"
+      answer:
+        type: numeric
+        value: "{y_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Substitute x = {x}.
+        y = {m}({x}) + {b}.
+        {m} * {x} + {b} = {y_value}.
+      mistake_tags:
+        - substitution_error
+        - slope_error
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: GRAPH_LINES_FRACTION_SLOPE_RIGHT_RUN_001
+      type: generated
+      prompt_template: "A line has y-intercept {b} and slope {rise}/{run}. Starting at x = 0, what is y when x = {run}?"
+      answer_mode: final_plus_required_work
+      variables:
+        b:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        rise:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0]
+        run:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        y_value: "b + rise"
+      constraints:
+        - "y_value != 0"
+      answer:
+        type: numeric
+        value: "{y_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Slope {rise}/{run} means when x increases by {run}, y changes by {rise}.
+        Start from y = {b}.
+        {b} + {rise} = {y_value}.
+      mistake_tags:
+        - slope_error
+        - fraction_error
+        - y_intercept_error
+        - sign_error
+      difficulty: medium
+
+    - id: GRAPH_LINES_FROM_M_B_X_VALUE_001
+      type: generated
+      prompt_template: "A line has slope {m} and y-intercept {b}. What is y when x = {x}?"
+      answer_mode: final_plus_required_work
+      variables:
+        m:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        x:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        y_value: "m * x + b"
+      constraints:
+        - "y_value != 0"
+      answer:
+        type: numeric
+        value: "{y_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation or equivalent expression steps, ending with the final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Use y = mx + b.
+        Substitute m = {m}, b = {b}, and x = {x}.
+        y = {m}({x}) + {b} = {y_value}.
+      mistake_tags:
+        - slope_intercept_form
+        - substitution_error
+        - arithmetic_error
+        - sign_error
+      difficulty: hard
+
+    - id: GRAPH_LINES_DIRECTION_OF_SLOPE_001
+      type: fixed
+      prompt: "When graphing from the y-intercept, what movement matches a slope of -3/4?"
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "Up 3 and right 4"
+        - id: B
+          label: "Down 3 and right 4"
+        - id: C
+          label: "Right 3 and up 4"
+        - id: D
+          label: "Down 4 and right 3"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A slope of -3/4 means the rise is -3 and the run is 4.
+        From a point, move down 3 and right 4.
+      mistake_tags:
+        - slope_error
+        - fraction_error
+        - graphing_error
+        - sign_error
+      difficulty: hard

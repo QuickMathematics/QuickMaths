@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Quick Maths Attempt",
+  "type": "object",
+  "required": ["attempt_id", "user_id", "skill_id", "started_at", "completed_at", "seed", "problem_instances", "user_answers", "grading_results", "raw_score", "percent_score", "reflection"],
+  "properties": {
+    "attempt_id": { "type": "string" },
+    "user_id": { "type": "string" },
+    "skill_id": { "type": "string" },
+    "started_at": { "type": "string" },
+    "completed_at": { "type": "string" },
+    "seed": { "type": "integer" },
+    "problem_instances": { "type": "array" },
+    "user_answers": { "type": "array", "items": { "type": "string" } },
+    "grading_results": { "type": "array" },
+    "raw_score": { "type": "integer" },
+    "percent_score": { "type": "number" },
+    "reflection": { "type": "object" }
+  }
+}
+

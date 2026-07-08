@@ -1,0 +1,417 @@
+id: MATH_PREALG_003
+schema_version: 0.2
+name: Distributive property
+domain: Math
+subdomain: Pre-Algebra
+description: Use the distributive property to multiply a factor across every term inside parentheses.
+prerequisites:
+  - MATH_PREALG_002
+tags:
+  - pre_algebra
+  - expressions
+  - distributive_property
+  - simplifying_expressions
+  - coefficients
+unlocks:
+  - MATH_PREALG_004
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  The distributive property lets you multiply one factor by every term inside parentheses.
+
+  This matters because many algebra expressions are written with parentheses. To simplify or solve later equations, you often need to remove parentheses correctly.
+
+  Rule:
+  a(b + c) = ab + ac
+
+  Method:
+  1. Multiply the outside factor by the first term inside the parentheses.
+  2. Multiply the outside factor by the second term inside the parentheses.
+  3. Keep the signs attached to the terms.
+  4. Combine like terms only if the expression has any after distributing.
+
+  Example:
+  3(x + 5) = 3x + 15.
+  The 3 multiplies both x and 5.
+
+  Common mistake:
+  Do not multiply only the first term. For 4(x + 7), the answer is 4x + 28, not 4x + 7.
+examples:
+  - prompt: "Simplify: 5(x + 3)"
+    solution: "5x + 15"
+    explanation: "Multiply 5 by both terms: 5(x) + 5(3) = 5x + 15."
+  - prompt: "Simplify: 4(2x - 7)"
+    solution: "8x - 28"
+    explanation: "Multiply 4 by 2x and by -7."
+  - prompt: "Simplify: -3(x + 6)"
+    solution: "-3x - 18"
+    explanation: "The negative outside factor multiplies every term inside the parentheses."
+  - prompt: "Simplify: 2(x + 5) + 3"
+    solution: "2x + 13"
+    explanation: "Distribute first: 2x + 10 + 3. Then combine constants."
+applications:
+  - title: "Solving equations"
+    description: "Distribution removes parentheses so equations can be simplified and solved."
+  - title: "Mental math"
+    description: "You can use distribution to compute products like 7 * 23 as 7(20 + 3)."
+  - title: "Linear expressions"
+    description: "Distribution is a key step in rewriting expressions into simpler linear form."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: DISTRIBUTE_SIMPLE_SUM_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        constant_term: "a * b"
+      answer:
+        type: expression
+        value: "{a}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply {a} by each term inside the parentheses.
+        {a} * x = {a}x.
+        {a} * {b} = {constant_term}.
+        The simplified expression is {a}x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - multiplication_error
+        - coefficient_error
+      difficulty: easy
+
+    - id: DISTRIBUTE_SIMPLE_DIFFERENCE_001
+      type: generated
+      prompt_template: "Simplify: {a}(x - {b})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        constant_term: "0 - (a * b)"
+      answer:
+        type: expression
+        value: "{a}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The subtraction means the second term is negative.
+        {a}(x - {b}) = {a}(x) + {a}(-{b}).
+        {a} * x = {a}x.
+        {a} * (-{b}) = {constant_term}.
+        The simplified expression is {a}x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - sign_error
+        - multiplication_error
+      difficulty: easy
+
+    - id: DISTRIBUTE_COEFFICIENT_X_001
+      type: generated
+      prompt_template: "Simplify: {a}({b}x + {c})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 10
+        c:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        x_term: "a * b"
+        constant_term: "a * c"
+      answer:
+        type: expression
+        value: "{x_term}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute {a} to both terms.
+        {a} * {b}x = {x_term}x.
+        {a} * {c} = {constant_term}.
+        The simplified expression is {x_term}x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - coefficient_error
+        - multiplication_error
+      difficulty: medium
+
+    - id: DISTRIBUTE_COEFFICIENT_X_NEGATIVE_CONSTANT_001
+      type: generated
+      prompt_template: "Simplify: {a}({b}x - {c})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 10
+        c:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        x_term: "a * b"
+        constant_term: "0 - (a * c)"
+      answer:
+        type: expression
+        value: "{x_term}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute {a} to both terms, including the negative term.
+        {a} * {b}x = {x_term}x.
+        {a} * (-{c}) = {constant_term}.
+        The simplified expression is {x_term}x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - sign_error
+        - coefficient_error
+        - multiplication_error
+      difficulty: medium
+
+    - id: DISTRIBUTE_NEGATIVE_FACTOR_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -12
+          max: -2
+        b:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        constant_term: "a * b"
+      answer:
+        type: expression
+        value: "{a}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The outside factor is negative, so both products are affected.
+        {a} * x = {a}x.
+        {a} * {b} = {constant_term}.
+        The simplified expression is {a}x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - sign_error
+        - multiplication_error
+      difficulty: medium
+
+    - id: DISTRIBUTE_NEGATIVE_FACTOR_DIFFERENCE_001
+      type: generated
+      prompt_template: "Simplify: {a}(x - {b})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -12
+          max: -2
+        b:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        constant_term: "0 - (a * b)"
+      answer:
+        type: expression
+        value: "{a}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Treat x - {b} as x + (-{b}).
+        {a} * x = {a}x.
+        {a} * (-{b}) = {constant_term}.
+        The simplified expression is {a}x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - sign_error
+        - multiplication_error
+      difficulty: hard
+
+    - id: DISTRIBUTE_AND_COMBINE_CONSTANTS_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b}) + {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        distributed_constant: "a * b"
+        constant_term: "distributed_constant + c"
+      constraints:
+        - "constant_term != 0"
+      answer:
+        type: expression
+        value: "{a}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        First distribute {a}.
+        {a}(x + {b}) = {a}x + {distributed_constant}.
+        Then combine the constants: {distributed_constant} + {c} = {constant_term}.
+        The simplified expression is {a}x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - constant_error
+        - sign_error
+        - arithmetic_error
+      difficulty: hard
+
+    - id: DISTRIBUTE_TWO_VARIABLE_TERMS_001
+      type: generated
+      prompt_template: "Simplify: {a}({b}x + {c}y)"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: 2
+          max: 8
+        c:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        x_term: "a * b"
+        y_term: "a * c"
+      constraints:
+        - "x_term != 1"
+        - "x_term != -1"
+        - "y_term != 1"
+        - "y_term != -1"
+      answer:
+        type: expression
+        value: "{x_term}x + {y_term}y"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute {a} to each variable term.
+        {a} * {b}x = {x_term}x.
+        {a} * {c}y = {y_term}y.
+        The simplified expression is {x_term}x + {y_term}y.
+      mistake_tags:
+        - distribution_error
+        - coefficient_error
+        - variable_error
+        - sign_error
+      difficulty: hard

@@ -1,0 +1,413 @@
+id: MATH_ALG_001
+schema_version: 0.2
+name: One-step equations
+domain: Math
+subdomain: Algebra Foundations
+description: Solve equations that require one inverse operation to isolate the variable.
+prerequisites:
+  - MATH_PREALG_002
+tags:
+  - algebra
+  - equations
+  - one_step_equations
+  - inverse_operations
+  - solving_equations
+unlocks:
+  - MATH_ALG_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A one-step equation can be solved with one inverse operation.
+
+  The goal is to isolate the variable. Whatever operation is being applied to x, undo it by applying the inverse operation to both sides of the equation.
+
+  Why it matters:
+  One-step equations are the foundation for solving more complicated equations. Every longer equation is solved by using these same balance moves repeatedly.
+
+  Common inverse operations:
+  - Addition is undone by subtraction.
+  - Subtraction is undone by addition.
+  - Multiplication is undone by division.
+  - Division is undone by multiplication.
+
+  Method:
+  1. Identify the operation being done to the variable.
+  2. Use the inverse operation on both sides.
+  3. Write the variable alone.
+  4. Check by substituting your answer into the original equation.
+
+  Example:
+  Solve x + 9 = 14.
+  Subtract 9 from both sides: x = 5.
+
+  Common mistake:
+  Keep the equation balanced. Whatever you do to one side, you must do to the other side.
+examples:
+  - prompt: "Solve: x + 5 = 12"
+    solution: "x = 7"
+    explanation: "Subtract 5 from both sides."
+  - prompt: "Solve: x - 6 = -2"
+    solution: "x = 4"
+    explanation: "Add 6 to both sides."
+  - prompt: "Solve: 4x = 20"
+    solution: "x = 5"
+    explanation: "Divide both sides by 4."
+  - prompt: "Solve: x / 3 = -4"
+    solution: "x = -12"
+    explanation: "Multiply both sides by 3."
+applications:
+  - title: "Checking answers"
+    description: "One-step equations teach how to isolate a variable and then check by substitution."
+  - title: "Two-step equations"
+    description: "Two-step equations are solved by chaining together one-step inverse operations."
+  - title: "Real-world unknowns"
+    description: "Simple unknown quantities such as missing costs, distances, or scores can often be modeled by one-step equations."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: ONE_STEP_ADD_001
+      type: generated
+      prompt_template: "Solve for x: x + {b} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 25
+      derived:
+        c: "x + b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x + {b} = {c}.
+        Subtract {b} from both sides.
+        x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: ONE_STEP_SUB_001
+      type: generated
+      prompt_template: "Solve for x: x - {b} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 25
+      derived:
+        c: "x - b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x - {b} = {c}.
+        Add {b} to both sides.
+        x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - sign_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: ONE_STEP_MULT_001
+      type: generated
+      prompt_template: "Solve for x: {a}x = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        c: "a * x"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x = {c}.
+        Divide both sides by {a}.
+        x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - division_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: ONE_STEP_DIV_001
+      type: generated
+      prompt_template: "Solve for x: x/{a} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -60
+          max: 60
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "x % a == 0"
+      derived:
+        c: "x // a"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x/{a} = {c}.
+        Multiply both sides by {a}.
+        x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - multiplication_error
+        - arithmetic_error
+      difficulty: easy
+
+    - id: ONE_STEP_ADD_NEGATIVE_CONSTANT_001
+      type: generated
+      prompt_template: "Solve for x: x + ({b}) = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: -25
+          max: -2
+      derived:
+        c: "x + b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Adding {b} is the same as subtracting {abs(b)}.
+        Use the inverse operation to isolate x.
+        x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - sign_error
+        - negative_numbers
+      difficulty: medium
+
+    - id: ONE_STEP_NEGATIVE_COEFFICIENT_001
+      type: generated
+      prompt_template: "Solve for x: {a}x = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+      derived:
+        c: "a * x"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x = {c}.
+        Divide both sides by {a}.
+        x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - sign_error
+        - negative_coefficient
+        - division_error
+      difficulty: medium
+
+    - id: ONE_STEP_VARIABLE_ON_RIGHT_ADD_001
+      type: generated
+      prompt_template: "Solve for x: {c} = x + {b}"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 25
+      derived:
+        c: "x + b"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The variable is on the right side, but the same inverse operation works.
+        Start with {c} = x + {b}.
+        Subtract {b} from both sides.
+        x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - equation_balance
+        - sign_error
+        - arithmetic_error
+      difficulty: hard
+
+    - id: ONE_STEP_VARIABLE_ON_RIGHT_MULT_001
+      type: generated
+      prompt_template: "Solve for x: {c} = {a}x"
+      answer_mode: final_plus_required_work
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+      derived:
+        c: "a * x"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {c} = {a}x.
+        Divide both sides by {a}.
+        x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - equation_balance
+        - sign_error
+        - division_error
+      difficulty: hard

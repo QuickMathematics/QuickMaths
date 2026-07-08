@@ -1,0 +1,25 @@
+[project]
+name = "quick-maths"
+version = "0.2.0"
+description = "Local-first mastery testing and prerequisite mapping for AI-assisted STEM learning."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "networkx>=3.2",
+    "pyyaml>=6.0",
+    "streamlit>=1.36",
+    "streamlit-agraph>=0.0.45",
+    "sympy>=1.12",
+]
+
+[project.scripts]
+quickmaths = "quickmaths.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

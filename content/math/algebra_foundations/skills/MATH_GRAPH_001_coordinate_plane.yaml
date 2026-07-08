@@ -1,0 +1,372 @@
+id: MATH_GRAPH_001
+schema_version: 0.2
+name: Coordinate plane
+domain: Math
+subdomain: Coordinate Graphing
+description: Read and interpret points on the coordinate plane using x-coordinates,
+  y-coordinates, axes, and quadrants.
+prerequisites:
+- MATH_ARITH_001
+tags:
+- coordinate_graphing
+- coordinate_plane
+- ordered_pairs
+- x_coordinate
+- y_coordinate
+- quadrants
+unlocks:
+- MATH_GRAPH_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'The coordinate plane is a flat grid used to locate points.
+
+
+  A point is written as an ordered pair: (x, y). The first number is the x-coordinate,
+  and the second number is the y-coordinate.
+
+
+  Why it matters:
+
+  Coordinate graphing lets you turn numbers and equations into pictures. It is the
+  foundation for graphing lines, slope, systems of equations, and many real-world
+  models.
+
+
+  Key ideas:
+
+  1. The x-axis runs left and right.
+
+  2. The y-axis runs up and down.
+
+  3. The origin is (0, 0).
+
+  4. Positive x-values move right, and negative x-values move left.
+
+  5. Positive y-values move up, and negative y-values move down.
+
+
+  Quadrants:
+
+  - Quadrant I: x positive, y positive.
+
+  - Quadrant II: x negative, y positive.
+
+  - Quadrant III: x negative, y negative.
+
+  - Quadrant IV: x positive, y negative.
+
+
+  Example:
+
+  The point (4, -3) means move 4 units right and 3 units down. It is in Quadrant IV.
+
+
+  Common mistake:
+
+  Do not switch the order. In (2, 7), x = 2 and y = 7. The first number is always
+  x.
+
+  '
+examples:
+- prompt: For the point (5, -2), what is the x-coordinate?
+  solution: '5'
+  explanation: The x-coordinate is the first number in the ordered pair.
+- prompt: For the point (-4, 9), what is the y-coordinate?
+  solution: '9'
+  explanation: The y-coordinate is the second number in the ordered pair.
+- prompt: Which quadrant contains the point (-3, -8)?
+  solution: Quadrant III
+  explanation: Both coordinates are negative, so the point is in Quadrant III.
+- prompt: A point has x = 0 and y = 6. Which axis is it on?
+  solution: y-axis
+  explanation: When x = 0, the point lies on the y-axis.
+applications:
+- title: Graphing lines
+  description: Lines are drawn by plotting coordinate points and connecting them.
+- title: Maps and games
+  description: Coordinate systems are used to locate positions on maps, grids, and
+    game boards.
+- title: Systems of equations
+  description: Solutions to systems are points where graphs intersect on the coordinate
+    plane.
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+  - id: COORD_PLANE_X_COORDINATE_001
+    type: generated
+    prompt_template: For the point ({x}, {y}), what is the x-coordinate?
+    answer_mode: final_only
+    variables:
+      x:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      y:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+    answer:
+      type: numeric
+      value: '{x}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: 'In an ordered pair (x, y), the x-coordinate is the first
+      number.
+
+      For ({x}, {y}), the x-coordinate is {x}.
+
+      '
+    mistake_tags:
+    - coordinate_order_error
+    - x_coordinate_error
+    difficulty: easy
+  - id: COORD_PLANE_Y_COORDINATE_001
+    type: generated
+    prompt_template: For the point ({x}, {y}), what is the y-coordinate?
+    answer_mode: final_only
+    variables:
+      x:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      y:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+    answer:
+      type: numeric
+      value: '{y}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: 'In an ordered pair (x, y), the y-coordinate is the second
+      number.
+
+      For ({x}, {y}), the y-coordinate is {y}.
+
+      '
+    mistake_tags:
+    - coordinate_order_error
+    - y_coordinate_error
+    difficulty: easy
+  - id: COORD_PLANE_QUADRANT_I_001
+    type: generated
+    prompt_template: 'Which quadrant contains the point ({x}, {y})?. Enter exactly
+      one of: Quadrant I, Quadrant II, Quadrant III, Quadrant IV.'
+    answer_mode: final_only
+    variables:
+      x:
+        type: int
+        min: 1
+        max: 12
+      y:
+        type: int
+        min: 1
+        max: 12
+    answer:
+      type: text
+      value: Quadrant I
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: 'The x-coordinate is positive and the y-coordinate is positive.
+
+      Points with positive x and positive y are in Quadrant I.
+
+      '
+    mistake_tags:
+    - quadrant_error
+    - sign_error
+    - coordinate_plane_error
+    difficulty: easy
+  - id: COORD_PLANE_QUADRANT_II_001
+    type: generated
+    prompt_template: 'Which quadrant contains the point ({x}, {y})?. Enter exactly
+      one of: Quadrant I, Quadrant II, Quadrant III, Quadrant IV.'
+    answer_mode: final_only
+    variables:
+      x:
+        type: int
+        min: -12
+        max: -1
+      y:
+        type: int
+        min: 1
+        max: 12
+    answer:
+      type: text
+      value: Quadrant II
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: 'The x-coordinate is negative and the y-coordinate is positive.
+
+      Points with negative x and positive y are in Quadrant II.
+
+      '
+    mistake_tags:
+    - quadrant_error
+    - sign_error
+    - coordinate_plane_error
+    difficulty: medium
+  - id: COORD_PLANE_QUADRANT_III_001
+    type: generated
+    prompt_template: 'Which quadrant contains the point ({x}, {y})?. Enter exactly
+      one of: Quadrant I, Quadrant II, Quadrant III, Quadrant IV.'
+    answer_mode: final_only
+    variables:
+      x:
+        type: int
+        min: -12
+        max: -1
+      y:
+        type: int
+        min: -12
+        max: -1
+    answer:
+      type: text
+      value: Quadrant III
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: 'The x-coordinate is negative and the y-coordinate is negative.
+
+      Points with negative x and negative y are in Quadrant III.
+
+      '
+    mistake_tags:
+    - quadrant_error
+    - sign_error
+    - coordinate_plane_error
+    difficulty: medium
+  - id: COORD_PLANE_QUADRANT_IV_001
+    type: generated
+    prompt_template: 'Which quadrant contains the point ({x}, {y})?. Enter exactly
+      one of: Quadrant I, Quadrant II, Quadrant III, Quadrant IV.'
+    answer_mode: final_only
+    variables:
+      x:
+        type: int
+        min: 1
+        max: 12
+      y:
+        type: int
+        min: -12
+        max: -1
+    answer:
+      type: text
+      value: Quadrant IV
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: 'The x-coordinate is positive and the y-coordinate is negative.
+
+      Points with positive x and negative y are in Quadrant IV.
+
+      '
+    mistake_tags:
+    - quadrant_error
+    - sign_error
+    - coordinate_plane_error
+    difficulty: medium
+  - id: COORD_PLANE_AXIS_X_001
+    type: generated
+    prompt_template: 'The point ({x}, 0) lies on which axis?. Enter exactly one of:
+      x-axis, y-axis, neither axis.'
+    answer_mode: final_only
+    variables:
+      x:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+    answer:
+      type: text
+      value: x-axis
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: 'Points on the x-axis have y = 0.
+
+      The point ({x}, 0) has y = 0, so it lies on the x-axis.
+
+      '
+    mistake_tags:
+    - axis_error
+    - coordinate_order_error
+    - coordinate_plane_error
+    difficulty: hard
+  - id: COORD_PLANE_AXIS_Y_001
+    type: generated
+    prompt_template: 'The point (0, {y}) lies on which axis?. Enter exactly one of:
+      x-axis, y-axis, neither axis.'
+    answer_mode: final_only
+    variables:
+      y:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+    answer:
+      type: text
+      value: y-axis
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: 'Points on the y-axis have x = 0.
+
+      The point (0, {y}) has x = 0, so it lies on the y-axis.
+
+      '
+    mistake_tags:
+    - axis_error
+    - coordinate_order_error
+    - coordinate_plane_error
+    difficulty: hard

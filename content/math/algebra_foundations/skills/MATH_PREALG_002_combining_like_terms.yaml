@@ -1,0 +1,484 @@
+id: MATH_PREALG_002
+schema_version: 0.2
+name: Combining like terms
+domain: Math
+subdomain: Pre-Algebra
+description: Simplify expressions by combining terms that have the same variable part.
+prerequisites:
+  - MATH_PREALG_001
+tags:
+  - pre_algebra
+  - expressions
+  - like_terms
+  - simplifying_expressions
+  - coefficients
+unlocks:
+  - MATH_PREALG_003
+  - MATH_ALG_001
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Like terms have the same variable part. You can combine them by adding or subtracting their coefficients.
+
+  This matters because simplifying expressions makes algebra easier. Before solving equations or graphing lines, you often need to clean up expressions by collecting like terms.
+
+  Method:
+  1. Identify terms with the same variable part.
+  2. Add or subtract their coefficients.
+  3. Keep the variable part unchanged.
+  4. Do not combine unlike terms.
+
+  Example:
+  4x + 7x - 3 = 11x - 3.
+  The x-terms combine because they both have x. The constant -3 stays separate.
+
+  Common mistake:
+  Do not combine unlike terms. In 5x + 2, the terms are not alike, so the expression is already simplified.
+examples:
+  - prompt: "Simplify: 6x + 4x"
+    solution: "10x"
+    explanation: "Both terms are x-terms, so add the coefficients: 6 + 4 = 10."
+  - prompt: "Simplify: 8x - 3 + 2x + 5"
+    solution: "10x + 2"
+    explanation: "Combine x-terms: 8x + 2x = 10x. Combine constants: -3 + 5 = 2."
+  - prompt: "Simplify: 4a + 7b - 2a + 3b"
+    solution: "2a + 10b"
+    explanation: "Combine a-terms with a-terms and b-terms with b-terms."
+  - prompt: "Simplify: 3x^2 + 5x + 4x^2"
+    solution: "7x^2 + 5x"
+    explanation: "x^2 terms combine with x^2 terms. The x-term is unlike them, so it stays separate."
+applications:
+  - title: "Solving equations"
+    description: "Combining like terms cleans up each side of an equation before using inverse operations."
+  - title: "Geometry expressions"
+    description: "Perimeter and area expressions often need like terms combined before they are useful."
+  - title: "Linear functions"
+    description: "Combining like terms helps rewrite expressions into standard linear forms."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: LIKE_TERMS_X_ONLY_001
+      type: generated
+      prompt_template: "Simplify: {a}x + {b}x"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+      derived:
+        x_total: "a + b"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+      answer:
+        type: expression
+        value: "{x_total}x"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Both terms are x-terms.
+        Add the coefficients: {a} + {b} = {x_total}.
+        The simplified expression is {x_total}x.
+      mistake_tags:
+        - coefficient_error
+        - sign_error
+        - like_terms_error
+      difficulty: easy
+
+    - id: LIKE_TERMS_WITH_CONSTANTS_001
+      type: generated
+      prompt_template: "Simplify: {a}x + {b} + {c}x + {d}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        c:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0, 1, -1]
+        d:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+      derived:
+        x_total: "a + c"
+        constant_total: "b + d"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+        - "constant_total != 0"
+      answer:
+        type: expression
+        value: "{x_total}x + {constant_total}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Combine the x-terms: {a}x + {c}x = {x_total}x.
+        Combine the constants: {b} + {d} = {constant_total}.
+        The simplified expression is {x_total}x + {constant_total}.
+      mistake_tags:
+        - coefficient_error
+        - sign_error
+        - constant_error
+        - like_terms_error
+      difficulty: medium
+
+    - id: LIKE_TERMS_REORDERED_001
+      type: generated
+      prompt_template: "Simplify: {a} + {b}x + {c} + {d}x"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -18
+          max: 18
+          exclude: [0]
+        b:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0, 1, -1]
+        c:
+          type: int
+          min: -18
+          max: 18
+          exclude: [0]
+        d:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0, 1, -1]
+      derived:
+        constant_total: "a + c"
+        x_total: "b + d"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+        - "constant_total != 0"
+      answer:
+        type: expression
+        value: "{x_total}x + {constant_total}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Like terms may not be next to each other.
+        Combine constants: {a} + {c} = {constant_total}.
+        Combine x-terms: {b}x + {d}x = {x_total}x.
+        The simplified expression is {x_total}x + {constant_total}.
+      mistake_tags:
+        - coefficient_error
+        - sign_error
+        - constant_error
+        - like_terms_error
+      difficulty: medium
+
+    - id: LIKE_TERMS_TWO_VARIABLES_001
+      type: generated
+      prompt_template: "Simplify: {a}x + {b}y + {c}x + {d}y"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        c:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        d:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+      derived:
+        x_total: "a + c"
+        y_total: "b + d"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+        - "y_total != 0"
+        - "y_total != 1"
+        - "y_total != -1"
+      answer:
+        type: expression
+        value: "{x_total}x + {y_total}y"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Combine x-terms with x-terms and y-terms with y-terms.
+        x-terms: {a}x + {c}x = {x_total}x.
+        y-terms: {b}y + {d}y = {y_total}y.
+        The simplified expression is {x_total}x + {y_total}y.
+      mistake_tags:
+        - coefficient_error
+        - sign_error
+        - variable_error
+        - like_terms_error
+      difficulty: medium
+
+    - id: LIKE_TERMS_SUBTRACTION_001
+      type: generated
+      prompt_template: "Simplify: {a}x - {b}x + {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        x_total: "a - b"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+      answer:
+        type: expression
+        value: "{x_total}x + {c}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Subtraction affects the coefficient after it.
+        {a}x - {b}x means ({a} - {b})x.
+        {a} - {b} = {x_total}.
+        The simplified expression is {x_total}x + {c}.
+      mistake_tags:
+        - coefficient_error
+        - sign_error
+        - subtraction_error
+        - like_terms_error
+      difficulty: hard
+
+    - id: LIKE_TERMS_UNLIKE_TRAP_001
+      type: generated
+      prompt_template: "Simplify: {a}x + {b}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: expression
+        value: "{a}x + {b}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {a}x and {b} are unlike terms.
+        One has a variable and the other is a constant, so they cannot be combined.
+        The expression is already simplified: {a}x + {b}.
+      mistake_tags:
+        - like_terms_error
+        - variable_error
+        - constant_error
+      difficulty: easy
+
+    - id: LIKE_TERMS_POWERS_001
+      type: generated
+      prompt_template: "Simplify: {a}x^2 + {b}x + {c}x^2"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0, 1, -1]
+        c:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+      derived:
+        square_total: "a + c"
+      constraints:
+        - "square_total != 0"
+        - "square_total != 1"
+        - "square_total != -1"
+      answer:
+        type: expression
+        value: "{square_total}x^2 + {b}x"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        x^2 terms combine with x^2 terms.
+        {a}x^2 + {c}x^2 = {square_total}x^2.
+        The {b}x term is not like an x^2 term, so it stays separate.
+        The simplified expression is {square_total}x^2 + {b}x.
+      mistake_tags:
+        - exponent_error
+        - variable_error
+        - coefficient_error
+        - like_terms_error
+      difficulty: hard
+
+    - id: LIKE_TERMS_THREE_X_TERMS_001
+      type: generated
+      prompt_template: "Simplify: {a}x + {b}x + {c}x + {d}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0, 1, -1]
+        c:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0, 1, -1]
+        d:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        x_total: "a + b + c"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+      answer:
+        type: expression
+        value: "{x_total}x + {d}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Combine all the x-coefficients.
+        {a} + {b} + {c} = {x_total}.
+        The constant {d} stays separate.
+        The simplified expression is {x_total}x + {d}.
+      mistake_tags:
+        - coefficient_error
+        - sign_error
+        - constant_error
+        - like_terms_error
+      difficulty: hard

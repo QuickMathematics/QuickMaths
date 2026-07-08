@@ -1,0 +1,461 @@
+id: MATH_ALG_004
+schema_version: 0.2
+name: No and infinite solutions
+domain: Math
+subdomain: Algebra Foundations
+description: Classify linear equations as having one solution, no solution, or infinitely many solutions.
+prerequisites:
+  - MATH_ALG_003
+tags:
+  - algebra
+  - equations
+  - linear_equations
+  - no_solution
+  - infinite_solutions
+  - variables_on_both_sides
+unlocks:
+  - MATH_SYS_001
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Some linear equations do not end with one value for x.
+
+  When solving an equation with variables on both sides, the variable terms may cancel out. What remains tells you what kind of equation you have.
+
+  Decision rule:
+  1. If you get a true statement like 8 = 8, the equation has infinitely many solutions.
+  2. If you get a false statement like 8 = 11, the equation has no solution.
+  3. If one variable term remains, the equation has one solution.
+
+  Example:
+  3x + 5 = 3x + 5
+  Subtract 3x from both sides: 5 = 5.
+  This is always true, so there are infinitely many solutions.
+
+  Example:
+  4x + 2 = 4x + 9
+  Subtract 4x from both sides: 2 = 9.
+  This is false, so there is no solution.
+
+  Common mistake:
+  Do not write x = 0 just because the x-terms cancel. Look at the statement that remains.
+examples:
+  - prompt: "Classify: 5x + 7 = 5x + 7"
+    solution: "Infinitely many solutions"
+    explanation: "Subtract 5x from both sides to get 7 = 7, which is always true."
+  - prompt: "Classify: 6x - 3 = 6x + 10"
+    solution: "No solution"
+    explanation: "Subtract 6x from both sides to get -3 = 10, which is false."
+  - prompt: "Classify: 8x + 4 = 2x + 22"
+    solution: "One solution"
+    explanation: "Subtract 2x from both sides to get 6x + 4 = 22, so one variable term remains."
+  - prompt: "Classify: 3(x + 4) = 3x + 12"
+    solution: "Infinitely many solutions"
+    explanation: "Distribute first: 3x + 12 = 3x + 12. Both sides are identical."
+applications:
+  - title: "Checking equations"
+    description: "Classification helps learners know whether solving should end in a value, a contradiction, or an identity."
+  - title: "Systems of equations"
+    description: "No solution and infinitely many solutions also describe special cases in systems of equations."
+  - title: "Modeling"
+    description: "Classifying equations can reveal whether a word problem has one answer, no possible answer, or many possible answers."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: CLASSIFY_IDENTICAL_SIMPLE_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x + {b} = {a}x + {b}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 30
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Both sides are exactly the same.
+        Subtract {a}x from both sides: {b} = {b}.
+        This is always true, so the equation has infinitely many solutions.
+      mistake_tags:
+        - equation_classification
+        - infinite_solutions
+        - variables_cancel
+      difficulty: easy
+
+    - id: CLASSIFY_SAME_X_DIFFERENT_CONSTANT_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x + {b} = {a}x + {c}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 30
+        c:
+          type: int
+          min: 2
+          max: 30
+      constraints:
+        - "b != c"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Subtract {a}x from both sides.
+        The equation becomes {b} = {c}.
+        Since {b} and {c} are not equal, this is false, so the equation has no solution.
+      mistake_tags:
+        - equation_classification
+        - no_solution
+        - variables_cancel
+      difficulty: easy
+
+    - id: CLASSIFY_ONE_SOLUTION_BASIC_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x + {b} = {c}x + {d}"
+      answer_mode: final_only
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 3
+          max: 14
+        c:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 30
+      derived:
+        d: "a * x + b - c * x"
+      constraints:
+        - "a != c"
+        - "d != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The x-coefficients are different: {a} and {c}.
+        When variable coefficients are different, the equation can be solved for one value of x.
+        This equation has one solution.
+      mistake_tags:
+        - equation_classification
+        - one_solution
+        - variables_on_both_sides
+      difficulty: easy
+
+    - id: CLASSIFY_DISTRIBUTION_IDENTITY_001
+      type: generated
+      prompt_template: "Classify the equation: {a}(x + {b}) = {a}x + {c}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        c: "a * b"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute the left side: {a}(x + {b}) = {a}x + {c}.
+        The equation becomes {a}x + {c} = {a}x + {c}.
+        Both sides are identical, so there are infinitely many solutions.
+      mistake_tags:
+        - distribution_error
+        - equation_classification
+        - infinite_solutions
+      difficulty: medium
+
+    - id: CLASSIFY_DISTRIBUTION_CONTRADICTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}(x + {b}) = {a}x + {d}"
+      answer_mode: final_only
+      max_attempts: 250
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+        d:
+          type: int
+          min: 2
+          max: 144
+      derived:
+        distributed_constant: "a * b"
+      constraints:
+        - "d != distributed_constant"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute the left side: {a}(x + {b}) = {a}x + {distributed_constant}.
+        The equation becomes {a}x + {distributed_constant} = {a}x + {d}.
+        Subtract {a}x from both sides: {distributed_constant} = {d}.
+        That statement is false, so there is no solution.
+      mistake_tags:
+        - distribution_error
+        - equation_classification
+        - no_solution
+        - variables_cancel
+      difficulty: medium
+
+    - id: CLASSIFY_COMBINE_IDENTITY_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x + {b}x + {c} = {d}x + {c}"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 30
+      derived:
+        d: "a + b"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Combine like terms on the left: {a}x + {b}x = {d}x.
+        The equation becomes {d}x + {c} = {d}x + {c}.
+        Both sides are identical, so there are infinitely many solutions.
+      mistake_tags:
+        - like_terms_error
+        - equation_classification
+        - infinite_solutions
+      difficulty: medium
+
+    - id: CLASSIFY_COMBINE_CONTRADICTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x + {b}x + {c} = {d}x + {e}"
+      answer_mode: final_only
+      max_attempts: 250
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 30
+        e:
+          type: int
+          min: 2
+          max: 30
+      derived:
+        d: "a + b"
+      constraints:
+        - "c != e"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Combine like terms on the left: {a}x + {b}x = {d}x.
+        The equation becomes {d}x + {c} = {d}x + {e}.
+        Subtract {d}x from both sides: {c} = {e}.
+        Since that is false, there is no solution.
+      mistake_tags:
+        - like_terms_error
+        - equation_classification
+        - no_solution
+        - variables_cancel
+      difficulty: hard
+
+    - id: CLASSIFY_DISTRIBUTION_ONE_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}(x + {b}) = {c}x + {d}"
+      answer_mode: final_only
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        d: "a * (x + b) - c * x"
+        distributed_constant: "a * b"
+      constraints:
+        - "a != c"
+        - "d != 0"
+        - "d != distributed_constant"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute the left side: {a}(x + {b}) = {a}x + {distributed_constant}.
+        The equation becomes {a}x + {distributed_constant} = {c}x + {d}.
+        The x-coefficients are different, so one variable term remains when you solve.
+        This equation has one solution.
+      mistake_tags:
+        - distribution_error
+        - equation_classification
+        - one_solution
+        - variables_on_both_sides
+      difficulty: hard

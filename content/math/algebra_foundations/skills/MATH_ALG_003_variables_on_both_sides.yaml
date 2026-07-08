@@ -1,0 +1,558 @@
+id: MATH_ALG_003
+schema_version: 0.2
+name: Variables on both sides
+domain: Math
+subdomain: Algebra Foundations
+description: Solve linear equations that have variable terms on both sides by moving variable terms to one side first.
+prerequisites:
+  - MATH_ALG_002
+tags:
+  - algebra
+  - equations
+  - variables_on_both_sides
+  - linear_equations
+  - inverse_operations
+unlocks:
+  - MATH_ALG_004
+  - MATH_SYS_001
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Some equations have variable terms on both sides. To solve them, first move the variable terms so all variables are on one side.
+
+  This matters because equations with variables on both sides show up constantly in algebra, geometry, and word problems. They also prepare you for systems of equations, where comparing two expressions is the main idea.
+
+  Method:
+  1. Simplify each side first if needed.
+  2. Move one variable term across the equals sign using inverse operations.
+  3. Move constants to the other side.
+  4. Divide by the remaining coefficient.
+  5. Check the answer in the original equation.
+
+  Example:
+  Solve 5x + 8 = 2x + 20.
+  Subtract 2x from both sides: 3x + 8 = 20.
+  Subtract 8 from both sides: 3x = 12.
+  Divide by 3: x = 4.
+
+  Common mistake:
+  Do not only move the constants. If the equation has x-terms on both sides, collect the x-terms first or you may accidentally leave two variable terms in the equation.
+examples:
+  - prompt: "Solve: 7x + 3 = 4x + 18"
+    solution: "x = 5"
+    explanation: "Subtract 4x from both sides to get 3x + 3 = 18. Subtract 3, then divide by 3."
+  - prompt: "Solve: 2x - 9 = 5x + 6"
+    solution: "x = -5"
+    explanation: "Subtract 2x from both sides to get -9 = 3x + 6. Subtract 6, then divide by 3."
+  - prompt: "Solve: 3(x + 2) = x + 14"
+    solution: "x = 4"
+    explanation: "Distribute first: 3x + 6 = x + 14. Then solve with variables on both sides."
+  - prompt: "Solve: 4x + 2x - 7 = 3x + 8"
+    solution: "x = 5"
+    explanation: "Combine like terms first: 6x - 7 = 3x + 8. Then move x-terms and constants."
+applications:
+  - title: "Comparing plans"
+    description: "Equations with variables on both sides model when two costs or memberships become equal."
+  - title: "Geometry"
+    description: "Many angle and side-length problems set two expressions equal and solve for a variable."
+  - title: "Systems of equations"
+    description: "Solving variables-on-both-sides equations prepares learners to compare two linear expressions."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: VAR_BOTH_SIDES_BASIC_001
+      type: generated
+      prompt_template: "Solve for x: {a}x + {b} = {c}x + {d}"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 4
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        d: "a * x + b - c * x"
+        variable_difference: "a - c"
+        constant_difference: "d - b"
+      constraints:
+        - "a != c"
+        - "d != 0"
+        - "variable_difference != 1"
+        - "variable_difference != -1"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + {b} = {c}x + {d}.
+        Move x-terms together: subtract {c}x from both sides to get {variable_difference}x + {b} = {d}.
+        Move constants: {variable_difference}x = {constant_difference}.
+        Divide by {variable_difference}: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - variables_on_both_sides
+        - sign_error
+        - coefficient_error
+      difficulty: easy
+
+    - id: VAR_BOTH_SIDES_SUBTRACTION_001
+      type: generated
+      prompt_template: "Solve for x: {a}x - {b} = {c}x + {d}"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 3
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        d: "a * x - b - c * x"
+        variable_difference: "a - c"
+        constant_after_move: "d + b"
+      constraints:
+        - "a != c"
+        - "d != 0"
+        - "variable_difference != 1"
+        - "variable_difference != -1"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x - {b} = {c}x + {d}.
+        Subtract {c}x from both sides: {variable_difference}x - {b} = {d}.
+        Add {b} to both sides: {variable_difference}x = {constant_after_move}.
+        Divide by {variable_difference}: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - variables_on_both_sides
+        - sign_error
+        - subtraction_error
+      difficulty: easy
+
+    - id: VAR_BOTH_SIDES_RIGHT_LARGER_001
+      type: generated
+      prompt_template: "Solve for x: {a}x + {b} = {c}x + {d}"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 7
+        c:
+          type: int
+          min: 8
+          max: 14
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        d: "a * x + b - c * x"
+        variable_difference: "a - c"
+        constant_difference: "d - b"
+      constraints:
+        - "d != 0"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Since the right-side coefficient is larger, the variable coefficient may become negative.
+        Subtract {c}x from both sides: {variable_difference}x + {b} = {d}.
+        Move constants: {variable_difference}x = {constant_difference}.
+        Divide by {variable_difference}: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - variables_on_both_sides
+        - negative_coefficient
+        - sign_error
+      difficulty: medium
+
+    - id: VAR_BOTH_SIDES_NEGATIVE_COEFFICIENT_001
+      type: generated
+      prompt_template: "Solve for x: {a}x + {b} = {c}x + {d}"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+        c:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        d: "a * x + b - c * x"
+        variable_difference: "a - c"
+        constant_difference: "d - b"
+      constraints:
+        - "d != 0"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Move the right-side x-term to the left.
+        {a}x - {c}x = {variable_difference}x.
+        The equation becomes {variable_difference}x + {b} = {d}.
+        Move constants and divide: x = {x}.
+      mistake_tags:
+        - inverse_operations
+        - variables_on_both_sides
+        - negative_coefficient
+        - sign_error
+      difficulty: medium
+
+    - id: VAR_BOTH_SIDES_REORDERED_001
+      type: generated
+      prompt_template: "Solve for x: {b} + {a}x = {d} + {c}x"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 3
+          max: 12
+        c:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        d: "a * x + b - c * x"
+        variable_difference: "a - c"
+        constant_difference: "d - b"
+      constraints:
+        - "a != c"
+        - "d != 0"
+        - "variable_difference != 1"
+        - "variable_difference != -1"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The terms are reordered, but the same method works.
+        Subtract {c}x from both sides: {b} + {variable_difference}x = {d}.
+        Subtract {b} from both sides: {variable_difference}x = {constant_difference}.
+        Divide by {variable_difference}: x = {x}.
+      mistake_tags:
+        - variables_on_both_sides
+        - like_terms_error
+        - sign_error
+        - inverse_operations
+      difficulty: medium
+
+    - id: VAR_BOTH_SIDES_DISTRIBUTE_LEFT_001
+      type: generated
+      prompt_template: "Solve for x: {a}(x + {b}) = {c}x + {d}"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        c:
+          type: int
+          min: -10
+          max: 12
+          exclude: [0]
+      derived:
+        d: "a * (x + b) - c * x"
+        distributed_constant: "a * b"
+        variable_difference: "a - c"
+        constant_difference: "d - distributed_constant"
+      constraints:
+        - "a != c"
+        - "d != 0"
+        - "distributed_constant != 0"
+        - "variable_difference != 1"
+        - "variable_difference != -1"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute first: {a}(x + {b}) = {a}x + {distributed_constant}.
+        The equation becomes {a}x + {distributed_constant} = {c}x + {d}.
+        Move x-terms together: {variable_difference}x + {distributed_constant} = {d}.
+        Move constants and divide: x = {x}.
+      mistake_tags:
+        - distribution_error
+        - variables_on_both_sides
+        - inverse_operations
+        - sign_error
+      difficulty: hard
+
+    - id: VAR_BOTH_SIDES_DISTRIBUTE_RIGHT_001
+      type: generated
+      prompt_template: "Solve for x: {a}x + {b} = {c}(x + {d})"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        a:
+          type: int
+          min: -10
+          max: 12
+          exclude: [0]
+        c:
+          type: int
+          min: 2
+          max: 12
+        d:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+      derived:
+        b: "c * (x + d) - a * x"
+        distributed_constant: "c * d"
+        variable_difference: "a - c"
+        constant_difference: "distributed_constant - b"
+      constraints:
+        - "a != c"
+        - "b != 0"
+        - "distributed_constant != 0"
+        - "variable_difference != 1"
+        - "variable_difference != -1"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute the right side first: {c}(x + {d}) = {c}x + {distributed_constant}.
+        The equation becomes {a}x + {b} = {c}x + {distributed_constant}.
+        Move x-terms together: {variable_difference}x + {b} = {distributed_constant}.
+        Move constants and divide: x = {x}.
+      mistake_tags:
+        - distribution_error
+        - variables_on_both_sides
+        - inverse_operations
+        - sign_error
+      difficulty: hard
+
+    - id: VAR_BOTH_SIDES_COMBINE_LEFT_001
+      type: generated
+      prompt_template: "Solve for x: {a}x + {b}x + {c} = {d}x + {e}"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 9
+        c:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        d:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        left_coefficient: "a + b"
+        e: "left_coefficient * x + c - d * x"
+        variable_difference: "left_coefficient - d"
+        constant_difference: "e - c"
+      constraints:
+        - "left_coefficient != d"
+        - "e != 0"
+        - "variable_difference != 1"
+        - "variable_difference != -1"
+      answer:
+        type: equation_solution
+        variable: x
+        value: "{x}"
+      grading:
+        method: equation_solution
+      work:
+        mode: procedural_steps
+        prompt: "Show each equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Combine like terms on the left first: {a}x + {b}x = {left_coefficient}x.
+        The equation becomes {left_coefficient}x + {c} = {d}x + {e}.
+        Move x-terms together: {variable_difference}x + {c} = {e}.
+        Move constants and divide: x = {x}.
+      mistake_tags:
+        - like_terms_error
+        - variables_on_both_sides
+        - inverse_operations
+        - coefficient_error
+      difficulty: hard

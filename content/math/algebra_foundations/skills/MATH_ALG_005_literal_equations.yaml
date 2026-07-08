@@ -1,0 +1,292 @@
+id: MATH_ALG_005
+schema_version: 0.2
+name: Literal equations
+domain: Math
+subdomain: Algebra Foundations
+description: Rearrange formulas and equations to solve for a chosen variable.
+prerequisites:
+  - MATH_ALG_002
+tags:
+  - algebra
+  - literal_equations
+  - formulas
+  - inverse_operations
+  - rearranging_equations
+unlocks:
+  - MATH_GRAPH_004
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A literal equation is an equation with several variables. Solving a literal equation means rearranging it to isolate one chosen variable.
+
+  This matters because formulas in science, geometry, graphing, and programming often need to be rewritten depending on what value you want to find.
+
+  Method:
+  1. Identify the variable you are solving for.
+  2. Treat every other variable like a known number.
+  3. Undo addition or subtraction first.
+  4. Undo multiplication or division second.
+  5. Stop when the chosen variable is alone.
+
+  Example:
+  Solve y = mx + b for b.
+  Subtract mx from both sides: y - mx = b.
+  So b = y - mx.
+
+  Common mistake:
+  Do not plug in numbers unless the problem gives numbers. In literal equations, the answer is usually another expression.
+examples:
+  - prompt: "Solve for b: y = mx + b"
+    solution: "y - mx"
+    explanation: "Subtract mx from both sides to isolate b."
+  - prompt: "Solve for x: ax + b = c"
+    solution: "(c - b)/a"
+    explanation: "Subtract b from both sides, then divide by a."
+  - prompt: "Solve for t: d = rt"
+    solution: "d/r"
+    explanation: "Divide both sides by r."
+  - prompt: "Solve for x: p = 2x + 2y"
+    solution: "p/2 - y"
+    explanation: "Subtract 2y, then divide by 2. Equivalent forms like (p - 2y)/2 are also correct."
+applications:
+  - title: "Physics formulas"
+    description: "Literal equations let learners rearrange formulas such as d = rt or F = ma for the unknown they need."
+  - title: "Geometry"
+    description: "Area, perimeter, and volume formulas often need to be solved for a missing dimension."
+  - title: "Linear functions"
+    description: "Rearranging formulas prepares learners to work with slope-intercept form and related line equations."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: LITERAL_SOLVE_X_AX_PLUS_B_001
+      type: fixed
+      prompt: "Solve for x. Enter only the expression for x: a*x + b = c"
+      answer_mode: final_plus_required_work
+      answer:
+        type: expression
+        value: "(c - b)/a"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with a*x + b = c.
+        Subtract b from both sides: a*x = c - b.
+        Divide by a: x = (c - b)/a.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - division_error
+      difficulty: easy
+
+    - id: LITERAL_SOLVE_B_SLOPE_INTERCEPT_001
+      type: fixed
+      prompt: "Solve for b. Enter only the expression for b: y = m*x + b"
+      answer_mode: final_plus_required_work
+      answer:
+        type: expression
+        value: "y - m*x"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with y = m*x + b.
+        Subtract m*x from both sides: y - m*x = b.
+        So b = y - m*x.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - sign_error
+      difficulty: easy
+
+    - id: LITERAL_SOLVE_T_DISTANCE_001
+      type: fixed
+      prompt: "Solve for t. Enter only the expression for t: d = r*t"
+      answer_mode: final_plus_required_work
+      answer:
+        type: expression
+        value: "d/r"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with d = r*t.
+        Divide both sides by r.
+        t = d/r.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - division_error
+      difficulty: easy
+
+    - id: LITERAL_SOLVE_R_DISTANCE_001
+      type: fixed
+      prompt: "Solve for r. Enter only the expression for r: d = r*t"
+      answer_mode: final_plus_required_work
+      answer:
+        type: expression
+        value: "d/t"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with d = r*t.
+        Divide both sides by t.
+        r = d/t.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - division_error
+      difficulty: easy
+
+    - id: LITERAL_SOLVE_X_PERIMETER_001
+      type: fixed
+      prompt: "Solve for x. Enter only the expression for x: p = 2*x + 2*y"
+      answer_mode: final_plus_required_work
+      answer:
+        type: expression
+        value: "(p - 2*y)/2"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with p = 2*x + 2*y.
+        Subtract 2*y from both sides: p - 2*y = 2*x.
+        Divide by 2: x = (p - 2*y)/2.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - division_error
+        - coefficient_error
+      difficulty: medium
+
+    - id: LITERAL_SOLVE_M_SLOPE_INTERCEPT_001
+      type: fixed
+      prompt: "Solve for m. Enter only the expression for m: y = m*x + b"
+      answer_mode: final_plus_required_work
+      answer:
+        type: expression
+        value: "(y - b)/x"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with y = m*x + b.
+        Subtract b from both sides: y - b = m*x.
+        Divide by x: m = (y - b)/x.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - division_error
+        - sign_error
+      difficulty: medium
+
+    - id: LITERAL_SOLVE_H_VOLUME_001
+      type: fixed
+      prompt: "Solve for h. Enter only the expression for h: v = l*w*h"
+      answer_mode: final_plus_required_work
+      answer:
+        type: expression
+        value: "v/(l*w)"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with v = l*w*h.
+        The h is multiplied by l*w.
+        Divide both sides by l*w: h = v/(l*w).
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - division_error
+        - variable_error
+      difficulty: hard
+
+    - id: LITERAL_SOLVE_F_CELSIUS_001
+      type: fixed
+      prompt: "Solve for f. Enter only the expression for f: c = 5*(f - 32)/9"
+      answer_mode: final_plus_required_work
+      answer:
+        type: expression
+        value: "9*c/5 + 32"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with c = 5*(f - 32)/9.
+        Multiply both sides by 9: 9*c = 5*(f - 32).
+        Divide by 5: 9*c/5 = f - 32.
+        Add 32: f = 9*c/5 + 32.
+      mistake_tags:
+        - literal_equation_error
+        - inverse_operations
+        - fraction_error
+        - sign_error
+      difficulty: hard

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Quick Maths Track",
+  "type": "object",
+  "required": ["id", "name", "domain", "description", "entry_skills", "exit_skills", "skills"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "domain": { "type": "string" },
+    "description": { "type": "string" },
+    "entry_skills": { "type": "array", "items": { "type": "string" } },
+    "exit_skills": { "type": "array", "items": { "type": "string" } },
+    "skills": { "type": "array", "items": { "type": "string" } }
+  }
+}
+

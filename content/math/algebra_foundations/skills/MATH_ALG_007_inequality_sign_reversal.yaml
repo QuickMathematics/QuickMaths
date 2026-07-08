@@ -1,0 +1,375 @@
+id: MATH_ALG_007
+schema_version: 0.2
+name: Inequality sign reversal
+domain: Math
+subdomain: Algebra Foundations
+description: Solve inequalities that require reversing the inequality sign after multiplying or dividing by a negative number.
+prerequisites:
+  - MATH_ALG_006
+tags:
+  - algebra
+  - inequalities
+  - inequality_sign_reversal
+  - inverse_operations
+  - negative_numbers
+  - linear_inequalities
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  When you multiply or divide both sides of an inequality by a negative number, you must reverse the inequality sign.
+
+  This matters because negative coefficients show up often in algebra. If you forget to flip the sign, your final solution describes the wrong side of the number line.
+
+  Rule:
+  - Dividing by a positive number keeps the inequality sign the same.
+  - Dividing by a negative number reverses the inequality sign.
+  - Multiplying by a negative number also reverses the inequality sign.
+
+  Example:
+  Solve -3x < 12.
+  Divide both sides by -3.
+  Because you divided by a negative number, reverse the sign: x > -4.
+
+  Common mistake:
+  Do not flip the sign just because you see a negative number. Flip only when you multiply or divide both sides by a negative number.
+examples:
+  - prompt: "Solve: -2x < 10"
+    solution: "x > -5"
+    explanation: "Divide by -2 and reverse the sign."
+  - prompt: "Solve: -4x >= 20"
+    solution: "x <= -5"
+    explanation: "Divide by -4 and reverse >= to <=."
+  - prompt: "Solve: -3x + 7 < 16"
+    solution: "x > -3"
+    explanation: "Subtract 7 first to get -3x < 9. Then divide by -3 and reverse the sign."
+  - prompt: "Solve: x / (-5) <= 3"
+    solution: "x >= -15"
+    explanation: "Multiply both sides by -5 and reverse <= to >=."
+applications:
+  - title: "Number-line reasoning"
+    description: "Sign reversal explains why multiplying by a negative reflects values across zero."
+  - title: "Linear inequalities"
+    description: "Negative coefficients are common in inequalities, so sign reversal is essential for correct solving."
+  - title: "Constraints"
+    description: "Reversing signs correctly keeps real-world limits such as maximums and minimums meaningful."
+test:
+  question_count: 8
+  randomize_order: true
+  questions:
+    - id: SIGN_REV_NEG_COEFF_LESS_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x > 5. {a}x < {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+      derived:
+        c: "a * x"
+      answer:
+        type: text
+        value: "x > {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x < {c}.
+        Divide both sides by {a}.
+        Since {a} is negative, reverse the sign.
+        The solution is x > {x}.
+      mistake_tags:
+        - inequality_error
+        - sign_reversal
+        - negative_coefficient
+        - division_error
+      difficulty: easy
+
+    - id: SIGN_REV_NEG_COEFF_GREATER_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x < 5. {a}x > {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+      derived:
+        c: "a * x"
+      answer:
+        type: text
+        value: "x < {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x > {c}.
+        Divide both sides by {a}.
+        Since {a} is negative, reverse the sign.
+        The solution is x < {x}.
+      mistake_tags:
+        - inequality_error
+        - sign_reversal
+        - negative_coefficient
+        - division_error
+      difficulty: easy
+
+    - id: SIGN_REV_NEG_COEFF_LESS_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x >= 5. {a}x <= {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+      derived:
+        c: "a * x"
+      answer:
+        type: text
+        value: "x >= {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x <= {c}.
+        Divide both sides by {a}.
+        Since {a} is negative, reverse <= to >=.
+        The solution is x >= {x}.
+      mistake_tags:
+        - inequality_error
+        - sign_reversal
+        - negative_coefficient
+        - division_error
+      difficulty: medium
+
+    - id: SIGN_REV_NEG_COEFF_GREATER_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x <= 5. {a}x >= {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+      derived:
+        c: "a * x"
+      answer:
+        type: text
+        value: "x <= {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x >= {c}.
+        Divide both sides by {a}.
+        Since {a} is negative, reverse >= to <=.
+        The solution is x <= {x}.
+      mistake_tags:
+        - inequality_error
+        - sign_reversal
+        - negative_coefficient
+        - division_error
+      difficulty: medium
+
+    - id: SIGN_REV_TWO_STEP_LESS_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x > 5. {a}x + {b} < {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+        b:
+          type: int
+          min: 2
+          max: 25
+      derived:
+        c: "a * x + b"
+        after_subtract: "a * x"
+      answer:
+        type: text
+        value: "x > {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + {b} < {c}.
+        Subtract {b} from both sides: {a}x < {after_subtract}.
+        Divide by negative {a}, so reverse the sign.
+        The solution is x > {x}.
+      mistake_tags:
+        - inequality_error
+        - sign_reversal
+        - inverse_operations
+        - negative_coefficient
+      difficulty: medium
+
+    - id: SIGN_REV_TWO_STEP_GREATER_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x <= 5. {a}x - {b} >= {c}"
+      answer_mode: final_only
+      variables:
+        x:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+        b:
+          type: int
+          min: 2
+          max: 25
+      derived:
+        c: "a * x - b"
+        after_add: "a * x"
+      answer:
+        type: text
+        value: "x <= {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x - {b} >= {c}.
+        Add {b} to both sides: {a}x >= {after_add}.
+        Divide by negative {a}, so reverse the sign.
+        The solution is x <= {x}.
+      mistake_tags:
+        - inequality_error
+        - sign_reversal
+        - inverse_operations
+        - negative_coefficient
+      difficulty: medium
+
+    - id: SIGN_REV_NEG_DIVISOR_LESS_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x >= 5. x / ({d}) <= {q}"
+      answer_mode: final_only
+      variables:
+        d:
+          type: int
+          min: -12
+          max: -2
+        q:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        x: "d * q"
+      answer:
+        type: text
+        value: "x >= {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x / ({d}) <= {q}.
+        Multiply both sides by {d}.
+        Since {d} is negative, reverse <= to >=.
+        The solution is x >= {x}.
+      mistake_tags:
+        - inequality_error
+        - sign_reversal
+        - negative_divisor
+        - multiplication_error
+      difficulty: hard
+
+    - id: SIGN_REV_NEG_DIVISOR_GREATER_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x < 5. x / ({d}) > {q}"
+      answer_mode: final_only
+      variables:
+        d:
+          type: int
+          min: -12
+          max: -2
+        q:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        x: "d * q"
+      answer:
+        type: text
+        value: "x < {x}"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x / ({d}) > {q}.
+        Multiply both sides by {d}.
+        Since {d} is negative, reverse > to <.
+        The solution is x < {x}.
+      mistake_tags:
+        - inequality_error
+        - sign_reversal
+        - negative_divisor
+        - multiplication_error
+      difficulty: hard
