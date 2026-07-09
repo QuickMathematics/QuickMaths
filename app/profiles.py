@@ -5,6 +5,7 @@ import time
 
 import streamlit as st
 
+from app.cloud_session import logout_cloud_storage, render_storage_landing_gate, storage_label, sync_to_google_drive
 from quickmaths.config import LOGO_PATH
 from quickmaths.storage import add_user_logged_seconds, create_user, get_user, get_user_logged_seconds, list_users
 
@@ -70,7 +71,9 @@ def heartbeat_profile_time(force: bool = False, persist_interval: int = 30) -> i
     stored_total = get_user_logged_seconds(user_id)
     if elapsed and (force or elapsed >= persist_interval):
         st.session_state["profile_time_last_heartbeat"] = now
-        return add_user_logged_seconds(user_id, elapsed)
+        total = add_user_logged_seconds(user_id, elapsed)
+        sync_to_google_drive("Profile time saved to Google Drive")
+        return total
     return stored_total + elapsed
 
 
@@ -130,6 +133,14 @@ def render_profile_landing() -> None:
         )
     st.markdown("<div class='qm-profile-header-spacer'></div>", unsafe_allow_html=True)
 
+    if not render_storage_landing_gate():
+        return
+    storage_cols = st.columns([3, 1])
+    storage_cols[0].caption(f"Storage: {storage_label()}")
+    if storage_cols[1].button("Change storage", width="stretch"):
+        logout_cloud_storage()
+        st.rerun()
+
     users = list_users()
     if users:
         st.subheader("Profiles")
@@ -154,4 +165,5 @@ def render_profile_landing() -> None:
             st.error(str(exc))
         else:
             select_profile(user)
+            sync_to_google_drive("Profile created in Google Drive")
             st.rerun()

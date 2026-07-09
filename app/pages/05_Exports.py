@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from app.cloud_session import sync_to_google_drive
 from app.page_helpers import app_context, set_page_config
 from app.profiles import selected_profile_id
 from quickmaths.config import EXPORT_DIR
@@ -18,12 +19,15 @@ st.caption("Download progress data and copy tutor-ready summaries.")
 cols = st.columns(3)
 if cols[0].button("Export Progress CSV", width="stretch"):
     path = export_progress_csv(skills, user_id=user_id)
+    sync_to_google_drive("Progress export saved to Google Drive")
     st.success(str(path))
 if cols[1].button("Export Attempts CSV", width="stretch"):
     path = export_attempts_csv(skills, user_id=user_id)
+    sync_to_google_drive("Attempts export saved to Google Drive")
     st.success(str(path))
 if cols[2].button("Export Reviews CSV", width="stretch"):
     path = export_reviews_csv(user_id=user_id)
+    sync_to_google_drive("Reviews export saved to Google Drive")
     st.success(str(path))
 
 progress_path = EXPORT_DIR / "progress.csv"

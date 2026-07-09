@@ -5,6 +5,7 @@ from datetime import datetime
 
 import streamlit as st
 
+from app.cloud_session import sync_to_google_drive
 from app.page_helpers import TEST_SCORE_HELP, app_context, set_page_config
 from app.profiles import selected_profile_id
 from quickmaths.exports import build_tutor_review_packet, build_tutor_summary, write_tutor_review_packet, write_tutor_summary
@@ -172,6 +173,7 @@ def _render_question_review_form(
             feedback=feedback,
         )
         save_review(review)
+        sync_to_google_drive("Review saved to Google Drive")
         remaining = [
             pending_problem.template_id
             for _, pending_problem, _ in pending_items
@@ -185,6 +187,7 @@ def _render_question_review_form(
                 updated = apply_review_to_progress(skill, previous, review, final_answer_passed=final_answer_passed)
                 save_progress(updated)
                 _refresh_tutor_summary_with_reviews(skill, attempt, updated, prerequisite_progress, attempt_id)
+                sync_to_google_drive("Review and tutor summary saved to Google Drive")
             st.success("Review saved and mastery updated.")
         _render_saved_review(
             {
@@ -369,6 +372,7 @@ if save:
         write_tutor_review_packet(review_packet)
     save_attempt(attempt)
     save_progress(record)
+    sync_to_google_drive("Attempt saved to Google Drive")
     st.session_state["saved_attempt_id"] = attempt_id
     st.session_state["latest_tutor_summary"] = summary
     st.session_state["latest_review_packet"] = review_packet

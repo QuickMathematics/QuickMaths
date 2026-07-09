@@ -5,6 +5,7 @@ from datetime import datetime
 
 import streamlit as st
 
+from app.cloud_session import sync_to_google_drive
 from app.page_helpers import (
     app_context,
     locked_reason,
@@ -110,6 +111,7 @@ def render_author_preview() -> None:
         EXPORT_DIR.mkdir(parents=True, exist_ok=True)
         path = EXPORT_DIR / f"author_preview_{_slug(skill.id)}.md"
         path.write_text(markdown, encoding="utf-8")
+        sync_to_google_drive("Author preview export saved to Google Drive")
         st.success(f"Exported {path}")
 
     st.subheader("Skill Metadata")

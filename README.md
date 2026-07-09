@@ -27,6 +27,25 @@ streamlit run app/Quick_Maths_Dev.py
 
 On launch, Quick Maths opens a full-screen profile picker using `Logosketch.png`. Each profile has separate local progress, attempts, reviews, and exports. Use the sidebar `Log Out` button to return to the profile picker.
 
+## Persistent Storage
+
+The landing page offers two storage modes:
+
+- **Google Drive**: recommended for deployed Streamlit apps. Quick Maths signs in with Google, creates or reuses a folder named `Quick Maths`, downloads the saved SQLite/export files at login, and uploads managed files after saves and exports.
+- **Local storage (Not recommended)**: uses the Streamlit server filesystem. This is fine for local development, but deployed app storage can disappear after restarts or redeploys.
+
+For Google Drive sign-in, create a Google Cloud OAuth client, enable the Google Drive API, and add these Streamlit secrets:
+
+```toml
+[google_oauth]
+client_id = "..."
+client_secret = "..."
+redirect_uri = "https://your-streamlit-app-url.streamlit.app"
+folder_name = "Quick Maths"
+```
+
+The app requests Google profile/email scopes plus `drive.file`, then stores only Quick Maths managed files in the selected Drive folder.
+
 ## Test
 
 ```powershell
