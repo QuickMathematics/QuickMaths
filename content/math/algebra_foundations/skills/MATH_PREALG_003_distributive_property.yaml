@@ -12,6 +12,8 @@ tags:
   - distributive_property
   - simplifying_expressions
   - coefficients
+  - signs
+  - parentheses
 unlocks:
   - MATH_PREALG_004
 mastery:
@@ -29,16 +31,40 @@ theory: |
 
   Method:
   1. Multiply the outside factor by the first term inside the parentheses.
-  2. Multiply the outside factor by the second term inside the parentheses.
+  2. Multiply the outside factor by every other term inside the parentheses.
   3. Keep the signs attached to the terms.
   4. Combine like terms only if the expression has any after distributing.
+  5. If the outside factor is negative, every term inside changes according to multiplication by a negative.
+  6. If there is a minus sign before parentheses, treat it like multiplying by -1.
 
   Example:
   3(x + 5) = 3x + 15.
+
   The 3 multiplies both x and 5.
+
+  Difference example:
+  4(x - 7) = 4x - 28.
+
+  The subtraction means the second term is negative.
+
+  Negative factor example:
+  -3(x + 6) = -3x - 18.
+
+  The negative outside factor multiplies every term inside the parentheses.
+
+  Hidden -1 example:
+  -(x + 5) = -x - 5.
+
+  A minus sign before parentheses means multiply the whole group by -1.
+
+  Combining after distributing:
+  2(x + 5) + 3x = 2x + 10 + 3x = 5x + 10.
 
   Common mistake:
   Do not multiply only the first term. For 4(x + 7), the answer is 4x + 28, not 4x + 7.
+
+  Another common mistake:
+  Do not lose the negative sign. For -2(x - 5), the answer is -2x + 10, not -2x - 10.
 examples:
   - prompt: "Simplify: 5(x + 3)"
     solution: "5x + 15"
@@ -49,9 +75,21 @@ examples:
   - prompt: "Simplify: -3(x + 6)"
     solution: "-3x - 18"
     explanation: "The negative outside factor multiplies every term inside the parentheses."
+  - prompt: "Simplify: -3(x - 6)"
+    solution: "-3x + 18"
+    explanation: "Negative times negative gives positive, so -3(-6) = 18."
+  - prompt: "Simplify: -(x + 8)"
+    solution: "-x - 8"
+    explanation: "A minus before parentheses means multiply every term by -1."
   - prompt: "Simplify: 2(x + 5) + 3"
     solution: "2x + 13"
     explanation: "Distribute first: 2x + 10 + 3. Then combine constants."
+  - prompt: "Simplify: 3(x + 4) + 5x"
+    solution: "8x + 12"
+    explanation: "Distribute first, then combine like x-terms."
+  - prompt: "Simplify: 2(x + y - 4)"
+    solution: "2x + 2y - 8"
+    explanation: "The 2 multiplies every term inside the parentheses."
 applications:
   - title: "Solving equations"
     description: "Distribution removes parentheses so equations can be simplified and solved."
@@ -59,8 +97,10 @@ applications:
     description: "You can use distribution to compute products like 7 * 23 as 7(20 + 3)."
   - title: "Linear expressions"
     description: "Distribution is a key step in rewriting expressions into simpler linear form."
+  - title: "Factoring"
+    description: "Factoring later reverses the distributive property by putting a common factor back outside parentheses."
 test:
-  question_count: 8
+  question_count: 20
   randomize_order: true
   questions:
     - id: DISTRIBUTE_SIMPLE_SUM_001
@@ -235,7 +275,7 @@ test:
         - multiplication_error
       difficulty: medium
 
-    - id: DISTRIBUTE_NEGATIVE_FACTOR_001
+    - id: DISTRIBUTE_NEGATIVE_FACTOR_SUM_001
       type: generated
       prompt_template: "Simplify: {a}(x + {b})"
       answer_mode: final_plus_required_work
@@ -315,6 +355,75 @@ test:
         - multiplication_error
       difficulty: hard
 
+    - id: DISTRIBUTE_IMPLICIT_NEGATIVE_ONE_SUM_001
+      type: generated
+      prompt_template: "Simplify: -(x + {b})"
+      answer_mode: final_plus_required_work
+      variables:
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        constant_term: "0 - b"
+      answer:
+        type: expression
+        value: "-x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Treat the minus sign before parentheses as multiplying by -1."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A minus before parentheses means multiply the whole group by -1.
+        -(x + {b}) = -1(x) + -1({b}).
+        The simplified expression is -x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - negative_one_error
+        - sign_error
+      difficulty: medium
+
+    - id: DISTRIBUTE_IMPLICIT_NEGATIVE_ONE_DIFFERENCE_001
+      type: generated
+      prompt_template: "Simplify: -(x - {b})"
+      answer_mode: final_plus_required_work
+      variables:
+        b:
+          type: int
+          min: 2
+          max: 20
+      answer:
+        type: expression
+        value: "-x + {b}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Treat the minus sign before parentheses as multiplying by -1."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A minus before parentheses means multiply the whole group by -1.
+        -(x - {b}) = -1(x) + -1(-{b}).
+        -1(-{b}) = {b}.
+        The simplified expression is -x + {b}.
+      mistake_tags:
+        - distribution_error
+        - negative_one_error
+        - sign_error
+      difficulty: hard
+
     - id: DISTRIBUTE_AND_COMBINE_CONSTANTS_001
       type: generated
       prompt_template: "Simplify: {a}(x + {b}) + {c}"
@@ -345,9 +454,9 @@ test:
         method: symbolic_expression
       work:
         mode: procedural_steps
-        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        prompt: "Distribute first, then combine constants."
         line_type: expression
-        minimum_steps: 2
+        minimum_steps: 3
         require_final_answer_match: true
       review_policy:
         work_review: auto
@@ -362,6 +471,158 @@ test:
         - constant_error
         - sign_error
         - arithmetic_error
+      difficulty: medium
+
+    - id: DISTRIBUTE_AND_CONSTANTS_CANCEL_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b}) - {distributed_constant}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        distributed_constant: "a * b"
+      answer:
+        type: expression
+        value: "{a}x"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Distribute first, then show the constants canceling."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        First distribute {a}.
+        {a}(x + {b}) = {a}x + {distributed_constant}.
+        Then {distributed_constant} - {distributed_constant} = 0.
+        The simplified expression is {a}x.
+      mistake_tags:
+        - distribution_error
+        - cancellation_error
+        - zero_error
+        - constant_error
+      difficulty: medium
+
+    - id: DISTRIBUTE_AND_COMBINE_X_TERMS_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b}) + {c}x"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0, 1, -1]
+      derived:
+        distributed_constant: "a * b"
+        x_total: "a + c"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+      answer:
+        type: expression
+        value: "{x_total}x + {distributed_constant}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Distribute first, then combine like x-terms."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        First distribute {a}.
+        {a}(x + {b}) = {a}x + {distributed_constant}.
+        Then combine x-terms: {a}x + {c}x = {x_total}x.
+        The simplified expression is {x_total}x + {distributed_constant}.
+      mistake_tags:
+        - distribution_error
+        - like_terms_error
+        - coefficient_error
+        - sign_error
+      difficulty: hard
+
+    - id: DISTRIBUTE_AND_COMBINE_X_AND_CONSTANTS_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b}) + {c}x + {d}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0, 1, -1]
+        d:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        distributed_constant: "a * b"
+        x_total: "a + c"
+        constant_term: "distributed_constant + d"
+      constraints:
+        - "x_total != 0"
+        - "x_total != 1"
+        - "x_total != -1"
+        - "constant_term != 0"
+      answer:
+        type: expression
+        value: "{x_total}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Distribute first, then combine x-terms and constants."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        First distribute {a}.
+        {a}(x + {b}) = {a}x + {distributed_constant}.
+        Combine x-terms: {a}x + {c}x = {x_total}x.
+        Combine constants: {distributed_constant} + {d} = {constant_term}.
+        The simplified expression is {x_total}x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - like_terms_error
+        - coefficient_error
+        - constant_error
+        - sign_error
       difficulty: hard
 
     - id: DISTRIBUTE_TWO_VARIABLE_TERMS_001
@@ -397,7 +658,7 @@ test:
         method: symbolic_expression
       work:
         mode: procedural_steps
-        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        prompt: "Distribute to every variable term."
         line_type: expression
         minimum_steps: 2
         require_final_answer_match: true
@@ -414,4 +675,314 @@ test:
         - coefficient_error
         - variable_error
         - sign_error
+      difficulty: hard
+
+    - id: DISTRIBUTE_THREE_TERMS_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b}y - {c})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 8
+        b:
+          type: int
+          min: 2
+          max: 8
+        c:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        y_term: "a * b"
+        constant_term: "0 - (a * c)"
+      answer:
+        type: expression
+        value: "{a}x + {y_term}y + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Distribute to all three terms inside the parentheses."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute {a} to every term inside the parentheses.
+        {a} * x = {a}x.
+        {a} * {b}y = {y_term}y.
+        {a} * (-{c}) = {constant_term}.
+        The simplified expression is {a}x + {y_term}y + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - missed_term_error
+        - sign_error
+        - coefficient_error
+      difficulty: hard
+
+    - id: DISTRIBUTE_VARIABLE_DIFFERENCE_001
+      type: generated
+      prompt_template: "Simplify: {a}(x - y)"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0, 1, -1]
+      derived:
+        y_term: "0 - a"
+      answer:
+        type: expression
+        value: "{a}x + {y_term}y"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Distribute to both variable terms and keep the subtraction sign."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Treat x - y as x + (-y).
+        {a} * x = {a}x.
+        {a} * (-y) = {y_term}y.
+        The simplified expression is {a}x + {y_term}y.
+      mistake_tags:
+        - distribution_error
+        - sign_error
+        - variable_error
+      difficulty: medium
+
+    - id: DISTRIBUTE_POWERS_AND_LINEAR_001
+      type: generated
+      prompt_template: "Simplify: {a}(x^2 + {b}x)"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        x_term: "a * b"
+      constraints:
+        - "x_term != 1"
+        - "x_term != -1"
+      answer:
+        type: expression
+        value: "{a}x^2 + {x_term}x"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Distribute to the x^2 term and the x term separately."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute {a} to both terms.
+        {a} * x^2 = {a}x^2.
+        {a} * {b}x = {x_term}x.
+        The simplified expression is {a}x^2 + {x_term}x.
+      mistake_tags:
+        - distribution_error
+        - exponent_error
+        - coefficient_error
+        - like_terms_error
+      difficulty: hard
+
+    - id: DISTRIBUTE_ZERO_FACTOR_001
+      type: generated
+      prompt_template: "Simplify: 0({a}x + {b})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: expression
+        value: "0"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show that multiplying every term by 0 gives 0."
+        line_type: expression
+        minimum_steps: 1
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Zero times any expression is 0.
+        0({a}x + {b}) = 0.
+      mistake_tags:
+        - distribution_error
+        - zero_error
+        - multiplication_error
+      difficulty: easy
+
+    - id: DISTRIBUTE_ONE_FACTOR_IDENTITY_001
+      type: generated
+      prompt_template: "Simplify: 1({a}x + {b})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: expression
+        value: "{a}x + {b}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show that multiplying by 1 leaves the expression unchanged."
+        line_type: expression
+        minimum_steps: 1
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiplying by 1 does not change the expression.
+        1({a}x + {b}) = {a}x + {b}.
+      mistake_tags:
+        - distribution_error
+        - identity_error
+        - coefficient_error
+      difficulty: easy
+
+    - id: DISTRIBUTE_DOUBLE_DISTRIBUTION_SUM_001
+      type: generated
+      prompt_template: "Simplify: {a}(x + {b}) + {c}(x + {d})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 8
+        b:
+          type: int
+          min: 2
+          max: 10
+        c:
+          type: int
+          min: 2
+          max: 8
+        d:
+          type: int
+          min: 2
+          max: 10
+      derived:
+        first_constant: "a * b"
+        second_constant: "c * d"
+        x_total: "a + c"
+        constant_total: "first_constant + second_constant"
+      answer:
+        type: expression
+        value: "{x_total}x + {constant_total}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Distribute both groups, then combine like terms."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute both groups.
+        {a}(x + {b}) = {a}x + {first_constant}.
+        {c}(x + {d}) = {c}x + {second_constant}.
+        Combine x-terms: {a}x + {c}x = {x_total}x.
+        Combine constants: {first_constant} + {second_constant} = {constant_total}.
+        The simplified expression is {x_total}x + {constant_total}.
+      mistake_tags:
+        - distribution_error
+        - like_terms_error
+        - constant_error
+        - coefficient_error
+      difficulty: hard
+
+    - id: DISTRIBUTE_SUBTRACT_DISTRIBUTED_GROUP_001
+      type: generated
+      prompt_template: "Simplify: {c} - {a}(x + {b})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        x_term: "0 - a"
+        distributed_constant: "a * b"
+        constant_term: "c - distributed_constant"
+      constraints:
+        - "constant_term != 0"
+      answer:
+        type: expression
+        value: "{x_term}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Distribute, then remember the whole distributed group is being subtracted."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        First distribute inside the group: {a}(x + {b}) = {a}x + {distributed_constant}.
+        The expression is {c} - ({a}x + {distributed_constant}).
+        Subtract the whole group: {c} - {a}x - {distributed_constant}.
+        The simplified expression is {x_term}x + {constant_term}.
+      mistake_tags:
+        - distribution_error
+        - subtraction_error
+        - sign_error
+        - grouping_error
+        - constant_error
       difficulty: hard
