@@ -1,8 +1,10 @@
 from quickmaths.cloud_storage import (
     DEFAULT_DRIVE_FOLDER_NAME,
     auth_config_from_streamlit_secrets,
+    credentials_from_access_token,
     oauth_config_problem,
     oauth_flow_from_config,
+    streamlit_oidc_config_problem,
 )
 
 
@@ -70,3 +72,28 @@ def test_oauth_flow_uses_persisted_pkce_verifier():
     flow = oauth_flow_from_config(config, state="state", code_verifier="verifier")
 
     assert flow.code_verifier == "verifier"
+
+
+def test_streamlit_oidc_config_requires_access_token_and_drive_scope():
+    base = {
+        "redirect_uri": "https://example.streamlit.app/oauth2callback",
+        "cookie_secret": "cookie-secret",
+        "client_id": "123.apps.googleusercontent.com",
+        "client_secret": "client-secret",
+        "server_metadata_url": "https://accounts.google.com/.well-known/openid-configuration",
+    }
+
+    assert "expose_tokens" in streamlit_oidc_config_problem({"auth": base})
+    base["expose_tokens"] = "access"
+    assert "drive.file" in streamlit_oidc_config_problem({"auth": base})
+    base["client_kwargs"] = {
+        "scope": "openid profile email https://www.googleapis.com/auth/drive.file"
+    }
+    assert streamlit_oidc_config_problem({"auth": base}) is None
+
+
+def test_access_token_credentials_can_call_drive_without_browser_storage():
+    credentials = credentials_from_access_token("access-token")
+
+    assert credentials.token == "access-token"
+    assert credentials.refresh_token is None

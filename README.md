@@ -34,17 +34,20 @@ The landing page offers two storage modes:
 - **Google Drive**: recommended for deployed Streamlit apps. Quick Maths signs in with Google, creates or reuses a folder named `Quick Maths`, downloads the saved SQLite/export files at login, and uploads managed files after saves and exports.
 - **Local storage (Not recommended)**: uses the Streamlit server filesystem. This is fine for local development, but deployed app storage can disappear after restarts or redeploys.
 
-For Google Drive sign-in, create a Google Cloud OAuth client, enable the Google Drive API, and add these Streamlit secrets:
+For persistent Google Drive sign-in, create a Google Cloud OAuth client, enable the Google Drive API, and register an authorized redirect URI ending in `/oauth2callback`, such as `https://your-streamlit-app-url.streamlit.app/oauth2callback`. Add these Streamlit secrets:
 
 ```toml
-[google_oauth]
+[auth]
+redirect_uri = "https://your-streamlit-app-url.streamlit.app/oauth2callback"
+cookie_secret = "replace-with-a-long-random-secret"
 client_id = "..."
 client_secret = "..."
-redirect_uri = "https://your-streamlit-app-url.streamlit.app"
-folder_name = "Quick Maths"
+server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
+expose_tokens = "access"
+client_kwargs = { scope = "openid profile email https://www.googleapis.com/auth/drive.file", prompt = "select_account" }
 ```
 
-The app requests Google profile/email scopes plus `drive.file`, then stores only Quick Maths managed files in the selected Drive folder.
+Generate `cookie_secret` with a password generator or `python -c "import secrets; print(secrets.token_urlsafe(32))"`. Streamlit keeps the identity in a secure browser cookie, so refreshes and new tabs restore the Google session. The app requests Google profile/email scopes plus `drive.file`, then stores only Quick Maths managed files in the `Quick Maths` Drive folder.
 
 ## Test
 

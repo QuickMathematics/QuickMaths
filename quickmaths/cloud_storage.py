@@ -57,6 +57,12 @@ def credentials_from_session(data: dict[str, Any]):
     )
 
 
+def credentials_from_access_token(token: str):
+    from google.oauth2.credentials import Credentials
+
+    return Credentials(token=token, scopes=DRIVE_SCOPES)
+
+
 def credentials_to_session(credentials) -> dict[str, Any]:
     return {
         "token": credentials.token,
@@ -206,6 +212,26 @@ def oauth_flow_from_config(
 
 def oauth_config_status(secrets: Any) -> str:
     return oauth_config_problem(secrets) or "ready"
+
+
+def streamlit_oidc_config_problem(secrets: Any) -> str | None:
+    section = secrets.get("auth", {}) if hasattr(secrets, "get") else {}
+    if not section:
+        return "Streamlit persistent authentication is not configured."
+    required = ["redirect_uri", "cookie_secret", "client_id", "client_secret", "server_metadata_url"]
+    missing = [key for key in required if not section.get(key)]
+    if missing:
+        return f"Streamlit authentication is missing: {', '.join(missing)}."
+    exposed = section.get("expose_tokens", [])
+    if isinstance(exposed, str):
+        exposed = [exposed]
+    if "access" not in exposed:
+        return 'Streamlit authentication must set expose_tokens = "access" for Google Drive.'
+    client_kwargs = section.get("client_kwargs", {})
+    scope = str(client_kwargs.get("scope", "")) if hasattr(client_kwargs, "get") else ""
+    if "https://www.googleapis.com/auth/drive.file" not in scope:
+        return "Streamlit authentication must request the Google Drive drive.file scope."
+    return None
 
 
 def managed_files_summary() -> str:

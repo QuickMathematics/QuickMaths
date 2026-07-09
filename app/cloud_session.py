@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from html import escape
 import logging
 import time
 
@@ -7,6 +8,7 @@ import streamlit as st
 
 from quickmaths.cloud_storage import (
     auth_config_from_streamlit_secrets,
+    credentials_from_access_token,
     credentials_from_session,
     credentials_to_session,
     download_managed_files,
@@ -14,6 +16,7 @@ from quickmaths.cloud_storage import (
     find_or_create_folder,
     oauth_config_status,
     oauth_flow_from_config,
+    streamlit_oidc_config_problem,
     upload_managed_files,
 )
 from quickmaths.oauth_state import consume_oauth_state_with_pkce, issue_oauth_state_with_pkce
@@ -48,6 +51,8 @@ def logout_cloud_storage() -> None:
         "google_last_sync_at",
     ]:
         st.session_state.pop(key, None)
+    if _streamlit_user_logged_in():
+        st.logout()
 
 
 def google_credentials():
@@ -58,7 +63,10 @@ def google_credentials():
 
 
 def render_storage_landing_gate() -> bool:
-    _complete_google_oauth_if_present()
+    if _streamlit_oidc_ready():
+        _restore_google_drive_from_streamlit_login()
+    else:
+        _complete_google_oauth_if_present()
     if is_google_drive_storage() or local_storage_selected():
         return True
 
@@ -67,23 +75,31 @@ def render_storage_landing_gate() -> bool:
     if oauth_error:
         st.error(str(oauth_error))
     st.write("Use Google Drive for persistent progress across Streamlit restarts, or continue locally for temporary storage.")
-    status = oauth_config_status(st.secrets)
-    if status == "ready":
-        st.link_button("Sign in with Google Drive", _google_oauth_url(), width="stretch")
+    if _streamlit_oidc_ready():
+        if st.button("Sign in with Google Drive", width="stretch", type="primary"):
+            st.login()
     else:
-        st.warning(status)
-        if "secrets" in status:
-            st.code(
-                """
+        auth_section = st.secrets.get("auth", {})
+        if auth_section:
+            st.warning(streamlit_oidc_config_problem(st.secrets))
+        status = oauth_config_status(st.secrets)
+        if status == "ready":
+            _same_tab_google_sign_in(_google_oauth_url())
+            st.caption("Persistent sign-in requires the Streamlit [auth] configuration described in the README.")
+        else:
+            st.warning(status)
+            if "secrets" in status:
+                st.code(
+                    """
 [google_oauth]
 client_id = "your-google-oauth-client-id"
 client_secret = "your-google-oauth-client-secret"
 redirect_uri = "https://your-app.streamlit.app"
 folder_name = "Quick Maths"
 """.strip(),
-                language="toml",
-            )
-            st.caption("Add this in Streamlit Cloud under App settings -> Secrets, then reboot the app.")
+                    language="toml",
+                )
+                st.caption("Add this in Streamlit Cloud under App settings -> Secrets, then reboot the app.")
 
     if st.button("Use local storage (Not recommended)", width="stretch"):
         select_local_storage()
@@ -137,6 +153,65 @@ def _google_oauth_url() -> str:
         prompt="consent",
     )
     return auth_url
+
+
+def _streamlit_oidc_ready() -> bool:
+    return streamlit_oidc_config_problem(st.secrets) is None
+
+
+def _streamlit_user_logged_in() -> bool:
+    if not _streamlit_oidc_ready():
+        return False
+    return bool(getattr(st.user, "is_logged_in", False))
+
+
+def _restore_google_drive_from_streamlit_login() -> None:
+    if not _streamlit_user_logged_in() or is_google_drive_storage():
+        return
+    access_token = st.user.tokens.get("access")
+    if not access_token:
+        st.session_state["google_oauth_error"] = "Google sign-in did not provide a Drive access token."
+        return
+    credentials = credentials_from_access_token(str(access_token))
+    folder = find_or_create_folder(credentials)
+    user_info = {
+        "id": str(st.user.get("sub") or ""),
+        "email": str(st.user.get("email") or ""),
+        "name": str(st.user.get("name") or ""),
+        "picture": str(st.user.get("picture") or ""),
+    }
+    st.session_state["storage_mode"] = "google_drive"
+    st.session_state["google_credentials"] = credentials_to_session(credentials)
+    st.session_state["google_user"] = user_info
+    st.session_state["google_drive_folder_id"] = folder.id
+    st.session_state["google_drive_folder_name"] = folder.name
+    sync_from_google_drive()
+
+
+def _same_tab_google_sign_in(auth_url: str) -> None:
+    st.markdown(
+        f"""
+        <a href="{escape(auth_url, quote=True)}" target="_self" class="qm-google-sign-in">
+            Sign in with Google Drive
+        </a>
+        <style>
+        .qm-google-sign-in {{
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.48rem 0.75rem;
+            border-radius: 6px;
+            background: #ff4b4b;
+            color: white !important;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none !important;
+        }}
+        .qm-google-sign-in:hover {{ background: #e63f3f; }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def _complete_google_oauth_if_present() -> None:
