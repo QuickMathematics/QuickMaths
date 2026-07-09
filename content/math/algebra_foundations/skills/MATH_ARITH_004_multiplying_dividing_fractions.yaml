@@ -3,7 +3,7 @@ schema_version: 0.2
 name: Multiplying and dividing fractions
 domain: Math
 subdomain: Arithmetic Foundations
-description: Multiply and divide fractions, including whole-number and signed fraction cases.
+description: Multiply and divide fractions, including whole-number, reciprocal, zero, and signed fraction cases.
 prerequisites:
   - MATH_ARITH_003
 tags:
@@ -13,6 +13,7 @@ tags:
   - dividing_fractions
   - reciprocals
   - signed_numbers
+  - zero
 unlocks: []
 mastery:
   passing_score: 0.8
@@ -20,7 +21,9 @@ mastery:
   review_after_days_if_mastered: 7
   review_after_days_if_learning: 2
 theory: |
-  To multiply fractions, multiply straight across: numerator times numerator and denominator times denominator.
+  To multiply fractions, multiply straight across:
+
+  numerator times numerator, denominator times denominator.
 
   To divide fractions, multiply by the reciprocal of the second fraction. The reciprocal flips the numerator and denominator.
 
@@ -35,18 +38,39 @@ theory: |
 
   Method:
   1. For multiplication, multiply numerators and multiply denominators.
-  2. For division, rewrite as multiplication by the reciprocal.
+  2. For division, rewrite as multiplication by the reciprocal of the second fraction.
   3. Simplify the final fraction when possible.
   4. Track signs: one negative factor gives a negative result, and two negative factors give a positive result.
+  5. Remember that division by zero is undefined.
+
+  Reciprocals:
+  The reciprocal of a/b is b/a, as long as a is not 0.
 
   Example:
+  The reciprocal of 3/5 is 5/3.
+
+  Multiplication example:
   2/3 * 5/7 = 10/21.
 
-  Example:
+  Division example:
   3/4 / 2/5 = 3/4 * 5/2 = 15/8.
 
+  Cross-canceling:
+  Before multiplying, you can sometimes simplify across the multiplication.
+
+  Example:
+  3/10 * 5/7 = 3/2 * 1/7 = 3/14.
+
   Common mistake:
-  Do not divide straight across. For 1/2 / 3/4, the correct move is 1/2 * 4/3 = 4/6 = 2/3.
+  Do not divide straight across. For 1/2 / 3/4, the correct move is:
+
+  1/2 * 4/3 = 4/6 = 2/3.
+
+  Another common mistake:
+  When dividing fractions, do not flip the first fraction. Only take the reciprocal of the second fraction.
+
+  Another common mistake:
+  You cannot divide by zero. For example, 3/5 / 0 is undefined.
 examples:
   - prompt: "Compute: 2/5 * 3/7"
     solution: "6/35"
@@ -54,12 +78,24 @@ examples:
   - prompt: "Compute: 4/9 * 3"
     solution: "4/3"
     explanation: "Write 3 as 3/1, then multiply: 4/9 * 3/1 = 12/9 = 4/3."
+  - prompt: "Compute: 3/10 * 5/7"
+    solution: "3/14"
+    explanation: "Cross-cancel 10 and 5 first, then multiply."
   - prompt: "Compute: 5/6 / 2/3"
     solution: "5/4"
     explanation: "Multiply by the reciprocal: 5/6 * 3/2 = 15/12 = 5/4."
   - prompt: "Compute: -2/3 * 5/8"
     solution: "-5/12"
     explanation: "One factor is negative, so the product is negative. Multiply straight across and simplify."
+  - prompt: "Compute: (-2/3) / (-4/5)"
+    solution: "5/6"
+    explanation: "Two negatives make a positive. Then multiply by the reciprocal."
+  - prompt: "Compute: 0 / 4/7"
+    solution: "0"
+    explanation: "Zero divided by any nonzero number is 0."
+  - prompt: "Is 3/5 / 0 defined?"
+    solution: "No"
+    explanation: "Division by zero is undefined."
 applications:
   - title: "Recipes and scaling"
     description: "Multiplying fractions helps scale ingredients up or down."
@@ -67,14 +103,17 @@ applications:
     description: "Dividing fractions is useful when comparing fractional quantities."
   - title: "Slope"
     description: "Fractions often appear in slope calculations and linear rates of change."
+  - title: "Unit conversion"
+    description: "Many unit conversions are multiplication by fractional conversion factors."
 test:
-  question_count: 8
+  question_count: 22
   randomize_order: true
   questions:
-    - id: FRAC_MULT_SIMPLE_001
+    - id: FRAC_MULT_SIMPLE_REDUCED_001
       type: generated
-      prompt_template: "Compute: {a}/{b} * {c}/{d}"
-      answer_mode: final_only
+      prompt_template: "Compute: ({a}/{b}) * ({c}/{d})"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
       variables:
         a:
           type: int
@@ -98,30 +137,156 @@ test:
       derived:
         num: "a * c"
         den: "b * d"
+      constraints:
+        - "a < b"
+        - "c < d"
+        - "not (num % 2 == 0 and den % 2 == 0)"
+        - "not (num % 3 == 0 and den % 3 == 0)"
+        - "not (num % 5 == 0 and den % 5 == 0)"
+        - "not (num % 7 == 0 and den % 7 == 0)"
       answer:
         type: numeric
         value: "{num}/{den}"
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the fraction multiplication, ending with the final fraction."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Multiply numerators: {a} * {c} = {num}.
         Multiply denominators: {b} * {d} = {den}.
-        The product is {num}/{den}. Simplify if possible.
+        The product is {num}/{den}.
       mistake_tags:
         - multiplying_fractions
         - numerator_denominator_mixup
         - arithmetic_error
       difficulty: easy
 
+    - id: FRAC_MULT_REQUIRES_SIMPLIFY_001
+      type: generated
+      prompt_template: "Compute: ({num1}/{den1}) * ({num2}/{den2})"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 5
+        q:
+          type: int
+          min: 3
+          max: 12
+        r:
+          type: int
+          min: 1
+          max: 5
+        s:
+          type: int
+          min: 3
+          max: 12
+        k:
+          type: int
+          min: 2
+          max: 6
+      derived:
+        num1: "p * k"
+        den1: "q"
+        num2: "r"
+        den2: "s * k"
+        raw_num: "num1 * num2"
+        raw_den: "den1 * den2"
+        final_num: "p * r"
+        final_den: "q * s"
+      constraints:
+        - "num1 < den1"
+        - "num2 < den2"
+        - "not (final_num % 2 == 0 and final_den % 2 == 0)"
+        - "not (final_num % 3 == 0 and final_den % 3 == 0)"
+        - "not (final_num % 5 == 0 and final_den % 5 == 0)"
+        - "not (final_num % 7 == 0 and final_den % 7 == 0)"
+      answer:
+        type: numeric
+        value: "{final_num}/{final_den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the multiplication and simplification, ending with the simplified final fraction."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply straight across first: {num1}/{den1} * {num2}/{den2} = {raw_num}/{raw_den}.
+        The common factor {k} can be reduced.
+        The simplified product is {final_num}/{final_den}.
+      mistake_tags:
+        - multiplying_fractions
+        - simplifying_fractions
+        - common_factor_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: FRAC_MULT_CROSS_CANCEL_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) * ({b}/{d})"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 8
+        b:
+          type: int
+          min: 2
+          max: 12
+        d:
+          type: int
+          min: 3
+          max: 15
+      constraints:
+        - "a < b"
+        - "b < d"
+        - "not (a % 2 == 0 and d % 2 == 0)"
+        - "not (a % 3 == 0 and d % 3 == 0)"
+        - "not (a % 5 == 0 and d % 5 == 0)"
+        - "not (a % 7 == 0 and d % 7 == 0)"
+      answer:
+        type: numeric
+        value: "{a}/{d}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the cross-canceling or multiplication steps, ending with the simplified final fraction."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The {b} in the denominator of the first fraction and the {b} in the numerator of the second fraction cancel.
+        That leaves {a}/{d}.
+      mistake_tags:
+        - multiplying_fractions
+        - cross_cancel_error
+        - simplifying_fractions
+      difficulty: medium
+
     - id: FRAC_MULT_WHOLE_NUMBER_001
       type: generated
-      prompt_template: "Compute: {a}/{b} * {n}"
-      answer_mode: final_only
+      prompt_template: "Compute: ({a}/{b}) * {n}"
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -146,9 +311,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Write the whole number as a fraction over 1, then multiply."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Write {n} as {n}/1.
@@ -160,10 +329,149 @@ test:
         - arithmetic_error
       difficulty: easy
 
-    - id: FRAC_MULT_SIGNED_001
+    - id: FRAC_MULT_WHOLE_RESULT_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) * {b}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      answer:
+        type: numeric
+        value: "{a}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show why the denominator cancels with the whole number."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Write {b} as {b}/1.
+        {a}/{b} * {b}/1 = {a}.
+        The denominator {b} cancels with the factor {b}.
+      mistake_tags:
+        - multiplying_fractions
+        - whole_number_fraction
+        - cross_cancel_error
+      difficulty: medium
+
+    - id: FRAC_MULT_BY_ONE_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) * 1"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      answer:
+        type: numeric
+        value: "{a}/{b}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiplying by 1 does not change the value.
+        {a}/{b} * 1 = {a}/{b}.
+      mistake_tags:
+        - multiplying_fractions
+        - identity_error
+      difficulty: easy
+
+    - id: FRAC_MULT_BY_ZERO_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) * 0"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Any number multiplied by 0 equals 0.
+        {a}/{b} * 0 = 0.
+      mistake_tags:
+        - multiplying_fractions
+        - zero_error
+      difficulty: easy
+
+    - id: FRAC_MULT_RECIPROCALS_ONE_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) * ({b}/{a})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      answer:
+        type: numeric
+        value: "1"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {b}/{a} is the reciprocal of {a}/{b}.
+        A nonzero number multiplied by its reciprocal equals 1.
+      mistake_tags:
+        - reciprocal_error
+        - multiplying_fractions
+        - simplifying_fractions
+      difficulty: medium
+
+    - id: FRAC_MULT_SIGNED_ONE_NEGATIVE_001
       type: generated
       prompt_template: "Compute: ({a}/{b}) * ({c}/{d})"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -193,9 +501,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the multiplication and keep track of the sign."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         One factor is negative, so the product is negative.
@@ -211,7 +523,7 @@ test:
     - id: FRAC_MULT_TWO_NEGATIVES_001
       type: generated
       prompt_template: "Compute: ({a}/{b}) * ({c}/{d})"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -241,9 +553,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the multiplication and keep track of the sign."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Two negative factors make a positive product.
@@ -256,10 +572,71 @@ test:
         - arithmetic_error
       difficulty: medium
 
+    - id: FRAC_RECIPROCAL_FRACTION_001
+      type: generated
+      prompt_template: "What is the reciprocal of {a}/{b}?"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      answer:
+        type: numeric
+        value: "{b}/{a}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The reciprocal flips the numerator and denominator.
+        The reciprocal of {a}/{b} is {b}/{a}.
+      mistake_tags:
+        - reciprocal_error
+        - numerator_denominator_mixup
+      difficulty: easy
+
+    - id: FRAC_RECIPROCAL_WHOLE_NUMBER_001
+      type: generated
+      prompt_template: "What is the reciprocal of {n}?"
+      answer_mode: final_only
+      variables:
+        n:
+          type: int
+          min: 2
+          max: 12
+      answer:
+        type: numeric
+        value: "1/{n}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Write {n} as {n}/1.
+        Flipping {n}/1 gives 1/{n}.
+      mistake_tags:
+        - reciprocal_error
+        - whole_number_fraction
+      difficulty: easy
+
     - id: FRAC_DIV_SIMPLE_001
       type: generated
-      prompt_template: "Compute: {a}/{b} / {c}/{d}"
-      answer_mode: final_only
+      prompt_template: "Compute: ({a}/{b}) / ({c}/{d})"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
       variables:
         a:
           type: int
@@ -283,31 +660,109 @@ test:
       derived:
         num: "a * d"
         den: "b * c"
+      constraints:
+        - "a < b"
+        - "c < d"
+        - "not (num % 2 == 0 and den % 2 == 0)"
+        - "not (num % 3 == 0 and den % 3 == 0)"
+        - "not (num % 5 == 0 and den % 5 == 0)"
+        - "not (num % 7 == 0 and den % 7 == 0)"
       answer:
         type: numeric
         value: "{num}/{den}"
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Rewrite division as multiplication by the reciprocal, then finish."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         To divide by {c}/{d}, multiply by its reciprocal {d}/{c}.
         {a}/{b} / {c}/{d} = {a}/{b} * {d}/{c}.
         Multiply straight across: {num}/{den}.
-        Simplify if possible.
       mistake_tags:
         - dividing_fractions
         - reciprocal_error
         - arithmetic_error
       difficulty: medium
 
+    - id: FRAC_DIV_REQUIRES_SIMPLIFY_001
+      type: generated
+      prompt_template: "Compute: ({num1}/{den1}) / ({num2}/{den2})"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 5
+        q:
+          type: int
+          min: 3
+          max: 12
+        r:
+          type: int
+          min: 1
+          max: 5
+        s:
+          type: int
+          min: 3
+          max: 12
+        k:
+          type: int
+          min: 2
+          max: 6
+      derived:
+        num1: "p * k"
+        den1: "q"
+        num2: "s * k"
+        den2: "r"
+        raw_num: "num1 * den2"
+        raw_den: "den1 * num2"
+        final_num: "p * r"
+        final_den: "q * s"
+      constraints:
+        - "num1 < den1"
+        - "den2 < num2"
+        - "not (final_num % 2 == 0 and final_den % 2 == 0)"
+        - "not (final_num % 3 == 0 and final_den % 3 == 0)"
+        - "not (final_num % 5 == 0 and final_den % 5 == 0)"
+        - "not (final_num % 7 == 0 and final_den % 7 == 0)"
+      answer:
+        type: numeric
+        value: "{final_num}/{final_den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Rewrite division as multiplication by the reciprocal, then simplify."
+        line_type: expression
+        minimum_steps: 4
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Divide by multiplying by the reciprocal.
+        {num1}/{den1} / {num2}/{den2} = {num1}/{den1} * {den2}/{num2}.
+        Multiplying gives {raw_num}/{raw_den}.
+        Simplifying gives {final_num}/{final_den}.
+      mistake_tags:
+        - dividing_fractions
+        - reciprocal_error
+        - simplifying_fractions
+        - arithmetic_error
+      difficulty: hard
+
     - id: FRAC_DIV_BY_WHOLE_001
       type: generated
-      prompt_template: "Compute: {a}/{b} / {n}"
-      answer_mode: final_only
+      prompt_template: "Compute: ({a}/{b}) / {n}"
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -331,9 +786,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Write the whole number as a fraction, then multiply by its reciprocal."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Write {n} as {n}/1.
@@ -348,8 +807,8 @@ test:
 
     - id: FRAC_DIV_WHOLE_BY_FRACTION_001
       type: generated
-      prompt_template: "Compute: {n} / {a}/{b}"
-      answer_mode: final_only
+      prompt_template: "Compute: {n} / ({a}/{b})"
+      answer_mode: final_plus_required_work
       variables:
         n:
           type: int
@@ -374,9 +833,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Write the whole number as a fraction, then divide by multiplying by the reciprocal."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Write {n} as {n}/1.
@@ -390,10 +853,77 @@ test:
         - arithmetic_error
       difficulty: hard
 
-    - id: FRAC_DIV_SIGNED_001
+    - id: FRAC_DIV_FRACTION_BY_ITSELF_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) / ({a}/{b})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      answer:
+        type: numeric
+        value: "1"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Any nonzero number divided by itself equals 1.
+        {a}/{b} / {a}/{b} = 1.
+      mistake_tags:
+        - dividing_fractions
+        - identity_error
+        - reciprocal_error
+      difficulty: medium
+
+    - id: FRAC_DIV_BY_ONE_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) / 1"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      answer:
+        type: numeric
+        value: "{a}/{b}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Dividing by 1 does not change the value.
+        {a}/{b} / 1 = {a}/{b}.
+      mistake_tags:
+        - dividing_fractions
+        - identity_error
+      difficulty: easy
+
+    - id: FRAC_DIV_SIGNED_ONE_NEGATIVE_001
       type: generated
       prompt_template: "Compute: ({a}/{b}) / ({c}/{d})"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -423,9 +953,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Rewrite division as multiplication by the reciprocal and keep track of the sign."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Divide by multiplying by the reciprocal.
@@ -437,4 +971,131 @@ test:
         - reciprocal_error
         - sign_error
         - arithmetic_error
+      difficulty: hard
+
+    - id: FRAC_DIV_TWO_NEGATIVES_001
+      type: generated
+      prompt_template: "Compute: ({a}/{b}) / ({c}/{d})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -9
+          max: -1
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: -9
+          max: -1
+        d:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "abs(a) < b"
+        - "abs(c) < d"
+      derived:
+        num: "a * d"
+        den: "b * c"
+      answer:
+        type: numeric
+        value: "{num}/{den}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Rewrite division as multiplication by the reciprocal and keep track of the sign."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Divide by multiplying by the reciprocal.
+        ({a}/{b}) / ({c}/{d}) = ({a}/{b}) * ({d}/{c}).
+        Two negative factors make a positive result.
+        The answer is {num}/{den}. Simplify if possible.
+      mistake_tags:
+        - dividing_fractions
+        - reciprocal_error
+        - sign_error
+        - arithmetic_error
+      difficulty: hard
+
+    - id: FRAC_DIV_ZERO_NUMERATOR_001
+      type: generated
+      prompt_template: "Compute: 0 / ({a}/{b})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Zero divided by any nonzero number is 0.
+        0 / ({a}/{b}) = 0.
+      mistake_tags:
+        - dividing_fractions
+        - zero_error
+      difficulty: easy
+
+    - id: FRAC_DIV_BY_ZERO_UNDEFINED_001
+      type: generated
+      prompt_template: "Is ({a}/{b}) / 0 defined?"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: 1
+          max: 9
+        b:
+          type: int
+          min: 2
+          max: 12
+      constraints:
+        - "a < b"
+      options:
+        - id: A
+          label: "Yes, it equals 0."
+        - id: B
+          label: "Yes, it equals {a}/{b}."
+        - id: C
+          label: "No, division by zero is undefined."
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Division by zero is undefined.
+        You can divide 0 by a nonzero number, but you cannot divide by 0.
+      mistake_tags:
+        - dividing_fractions
+        - zero_error
+        - undefined_error
       difficulty: hard
