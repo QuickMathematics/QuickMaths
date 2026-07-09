@@ -3,7 +3,7 @@ schema_version: 0.2
 name: Decimals, percents, and conversions
 domain: Math
 subdomain: Arithmetic Foundations
-description: Convert between fractions, decimals, and percents using place value and equivalent forms.
+description: Convert between fractions, decimals, and percents using place value, equivalent forms, and percent calculations.
 prerequisites:
   - MATH_ARITH_003
 tags:
@@ -13,6 +13,7 @@ tags:
   - fractions
   - conversions
   - place_value
+  - percent_of
 unlocks: []
 mastery:
   passing_score: 0.8
@@ -22,7 +23,9 @@ mastery:
 theory: |
   Fractions, decimals, and percents are three ways to describe parts of a whole.
 
-  A decimal uses place value. A percent means "out of 100." A fraction compares a numerator to a denominator.
+  A decimal uses place value.
+  A percent means "out of 100."
+  A fraction compares a numerator to a denominator.
 
   Why it matters:
   These forms show up in money, discounts, grades, data, probability, slope, and measurement. Converting between them helps you choose the form that is easiest to use.
@@ -32,29 +35,62 @@ theory: |
   - 0.5 = 1/2 = 50%
   - 0.75 = 3/4 = 75%
   - 1.0 = 1 = 100%
+  - 1.25 = 125/100 = 125%
 
   Method:
   1. Decimal to percent: multiply by 100.
   2. Percent to decimal: divide by 100.
-  3. Percent to fraction: write it over 100.
+  3. Percent to fraction: write it over 100, then simplify if needed.
   4. Fraction to decimal: divide the numerator by the denominator.
-  5. Fraction to percent: convert to a decimal, then multiply by 100.
+  5. Fraction to percent: convert to a decimal and multiply by 100, or make an equivalent fraction with denominator 100.
+  6. To find a percent of a number, write the percent as a decimal or fraction and multiply.
+  7. To find what percent one number is of another, divide part by whole, then multiply by 100.
+
+  Percent calculation methods:
+  There are often several valid ways to show percent work.
+
+  Decimal method:
+  25% of 80 = 0.25 * 80 = 20.
+
+  Fraction method:
+  25% of 80 = 25/100 * 80 = 1/4 * 80 = 20.
+
+  Proportion method:
+  x/80 = 25/100, so x = 20.
 
   Common mistake:
   Do not forget that percent means out of 100. For example, 8% is 0.08, not 0.8.
+
+  Another common mistake:
+  Moving the decimal the wrong direction changes the value by a factor of 100. For example, 0.6 = 60%, but 0.06 = 6%.
 examples:
   - prompt: "Convert 0.37 to a percent."
     solution: "37%"
     explanation: "Multiply by 100: 0.37 becomes 37%."
+  - prompt: "Convert 0.08 to a percent."
+    solution: "8%"
+    explanation: "0.08 means 8 hundredths, so it is 8%."
+  - prompt: "Convert 1.25 to a percent."
+    solution: "125%"
+    explanation: "Multiply by 100: 1.25 becomes 125%."
   - prompt: "Convert 42% to a decimal."
     solution: "0.42"
     explanation: "Divide by 100: 42% = 42/100 = 0.42."
+  - prompt: "Convert 8% to a decimal."
+    solution: "0.08"
+    explanation: "8% means 8 out of 100, so 8% = 0.08."
   - prompt: "Convert 3/4 to a decimal."
     solution: "0.75"
     explanation: "3 divided by 4 is 0.75."
   - prompt: "Convert 0.6 to a fraction."
-    solution: "6/10"
-    explanation: "The 6 is in the tenths place, so 0.6 = 6/10. This also simplifies to 3/5."
+    solution: "3/5"
+    explanation: "0.6 = 6/10, and 6/10 simplifies to 3/5."
+  - prompt: "Find 25% of 80."
+    solution: "20"
+    explanation: "25% = 1/4, and 1/4 of 80 is 20."
+  - prompt: "What percent of 80 is 20?"
+    solution: "25%"
+    explanation: "20/80 = 0.25 = 25%."
 applications:
   - title: "Money and discounts"
     description: "Percents are used for sales tax, tips, interest, and discounts."
@@ -62,18 +98,20 @@ applications:
     description: "Scores and statistics are often reported as percents or decimals."
   - title: "Probability"
     description: "Probabilities can be written as fractions, decimals, or percents depending on the context."
+  - title: "Scaling and rates"
+    description: "Percent calculations help compare parts, wholes, increases, decreases, and rates."
 test:
-  question_count: 8
+  question_count: 26
   randomize_order: true
   questions:
-    - id: CONVERT_DECIMAL_TO_PERCENT_001
+    - id: CONVERT_DECIMAL_TO_PERCENT_HUNDREDTHS_001
       type: generated
       prompt_template: "Convert {decimal_value} to a percent. Enter only the number before the percent sign."
       answer_mode: final_only
       variables:
         p:
           type: int
-          min: 1
+          min: 10
           max: 99
       derived:
         decimal_value: "p / 100"
@@ -97,6 +135,99 @@ test:
         - multiplication_error
       difficulty: easy
 
+    - id: CONVERT_DECIMAL_TO_PERCENT_UNDER_TEN_001
+      type: generated
+      prompt_template: "Convert {decimal_value} to a percent. Enter only the number before the percent sign."
+      answer_mode: final_only
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 9
+      derived:
+        decimal_value: "p / 100"
+      answer:
+        type: numeric
+        value: "{p}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {decimal_value} is {p} hundredths.
+        {p} hundredths means {p}%.
+      mistake_tags:
+        - percent_conversion
+        - decimal_place_error
+        - leading_zero_error
+      difficulty: medium
+
+    - id: CONVERT_DECIMAL_TO_PERCENT_GREATER_THAN_ONE_001
+      type: generated
+      prompt_template: "Convert {decimal_value} to a percent. Enter only the number before the percent sign."
+      answer_mode: final_only
+      variables:
+        p:
+          type: int
+          min: 101
+          max: 200
+      derived:
+        decimal_value: "p / 100"
+      answer:
+        type: numeric
+        value: "{p}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        To convert a decimal to a percent, multiply by 100.
+        {decimal_value} * 100 = {p}.
+        So {decimal_value} = {p}%.
+      mistake_tags:
+        - percent_conversion
+        - decimal_place_error
+        - greater_than_one_error
+      difficulty: medium
+
+    - id: CONVERT_DECIMAL_THOUSANDTHS_TO_PERCENT_001
+      type: generated
+      prompt_template: "Convert {decimal_value} to a percent. Enter only the number before the percent sign."
+      answer_mode: final_only
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 9
+      derived:
+        decimal_value: "p / 1000"
+        percent_value: "p / 10"
+      answer:
+        type: numeric
+        value: "{percent_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        To convert a decimal to a percent, multiply by 100.
+        {decimal_value} * 100 = {percent_value}.
+        So {decimal_value} = {percent_value}%.
+      mistake_tags:
+        - percent_conversion
+        - decimal_place_error
+        - thousandths_error
+      difficulty: hard
+
     - id: CONVERT_PERCENT_TO_DECIMAL_001
       type: generated
       prompt_template: "Convert {p}% to a decimal."
@@ -104,7 +235,7 @@ test:
       variables:
         p:
           type: int
-          min: 1
+          min: 10
           max: 99
       derived:
         decimal_value: "p / 100"
@@ -127,7 +258,123 @@ test:
         - division_error
       difficulty: easy
 
-    - id: CONVERT_PERCENT_TO_FRACTION_001
+    - id: CONVERT_PERCENT_UNDER_TEN_TO_DECIMAL_001
+      type: generated
+      prompt_template: "Convert {p}% to a decimal."
+      answer_mode: final_only
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 9
+      derived:
+        decimal_value: "p / 100"
+      answer:
+        type: numeric
+        value: "{decimal_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Percent means out of 100.
+        {p}% = {p}/100 = {decimal_value}.
+        Be careful: {p}% is not {p}/10.
+      mistake_tags:
+        - percent_conversion
+        - decimal_place_error
+        - leading_zero_error
+      difficulty: medium
+
+    - id: CONVERT_PERCENT_GREATER_THAN_100_TO_DECIMAL_001
+      type: generated
+      prompt_template: "Convert {p}% to a decimal."
+      answer_mode: final_only
+      variables:
+        p:
+          type: int
+          min: 101
+          max: 200
+      derived:
+        decimal_value: "p / 100"
+      answer:
+        type: numeric
+        value: "{decimal_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Percent means out of 100.
+        {p}% = {p}/100 = {decimal_value}.
+        A percent greater than 100 becomes a decimal greater than 1.
+      mistake_tags:
+        - percent_conversion
+        - decimal_place_error
+        - greater_than_one_error
+      difficulty: medium
+
+    - id: CONVERT_ZERO_PERCENT_TO_DECIMAL_001
+      type: generated
+      prompt_template: "Convert 0% to a decimal."
+      answer_mode: final_only
+      variables:
+        dummy:
+          type: int
+          min: 1
+          max: 1
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        0% means 0 out of 100.
+        0/100 = 0.
+      mistake_tags:
+        - percent_conversion
+        - zero_error
+      difficulty: easy
+
+    - id: CONVERT_HUNDRED_PERCENT_TO_DECIMAL_001
+      type: generated
+      prompt_template: "Convert 100% to a decimal."
+      answer_mode: final_only
+      variables:
+        dummy:
+          type: int
+          min: 1
+          max: 1
+      answer:
+        type: numeric
+        value: "1"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        100% means 100 out of 100.
+        100/100 = 1.
+      mistake_tags:
+        - percent_conversion
+        - one_whole_error
+      difficulty: easy
+
+    - id: CONVERT_PERCENT_TO_FRACTION_OVER_100_001
       type: generated
       prompt_template: "Convert {p}% to a fraction."
       answer_mode: final_only
@@ -156,10 +403,93 @@ test:
         - denominator_error
       difficulty: easy
 
-    - id: CONVERT_DECIMAL_TO_FRACTION_001
+    - id: CONVERT_PERCENT_TO_SIMPLIFIED_FRACTION_001
+      type: generated
+      prompt_template: "Convert {percent_value}% to a simplified fraction."
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 20
+      constraints:
+        - "n < d"
+        - "100 % d == 0"
+        - "not (n % 2 == 0 and d % 2 == 0)"
+        - "not (n % 3 == 0 and d % 3 == 0)"
+        - "not (n % 5 == 0 and d % 5 == 0)"
+        - "not (n % 7 == 0 and d % 7 == 0)"
+      derived:
+        multiplier: "100 // d"
+        percent_value: "n * multiplier"
+      answer:
+        type: numeric
+        value: "{n}/{d}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Write the percent over 100, then simplify the fraction."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Percent means out of 100.
+        {percent_value}% = {percent_value}/100.
+        Since {percent_value}/100 simplifies to {n}/{d}, the answer is {n}/{d}.
+      mistake_tags:
+        - percent_conversion
+        - fraction_conversion
+        - simplifying_fractions
+      difficulty: medium
+
+    - id: CONVERT_DECIMAL_TENTHS_TO_FRACTION_001
       type: generated
       prompt_template: "Convert {decimal_value} to a fraction."
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 9
+      derived:
+        decimal_value: "n / 10"
+      answer:
+        type: numeric
+        value: "{n}/10"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Use place value to write the decimal as a fraction."
+        line_type: expression
+        minimum_steps: 1
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {decimal_value} has tenths place value.
+        That means {decimal_value} = {n}/10.
+        You may simplify if possible.
+      mistake_tags:
+        - decimal_conversion
+        - fraction_conversion
+        - place_value_error
+      difficulty: easy
+
+    - id: CONVERT_DECIMAL_HUNDREDTHS_TO_FRACTION_001
+      type: generated
+      prompt_template: "Convert {decimal_value} to a fraction."
+      answer_mode: final_plus_required_work
       variables:
         p:
           type: int
@@ -173,24 +503,64 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Use place value to write the decimal as a fraction."
+        line_type: expression
+        minimum_steps: 1
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         {decimal_value} has hundredths place value.
         That means {decimal_value} = {p}/100.
-        You may simplify the fraction if possible.
+        You may simplify if possible.
       mistake_tags:
         - decimal_conversion
         - fraction_conversion
         - place_value_error
       difficulty: medium
 
+    - id: CONVERT_DECIMAL_GREATER_THAN_ONE_TO_FRACTION_001
+      type: generated
+      prompt_template: "Convert {decimal_value} to a fraction."
+      answer_mode: final_plus_required_work
+      variables:
+        p:
+          type: int
+          min: 101
+          max: 199
+      derived:
+        decimal_value: "p / 100"
+      answer:
+        type: numeric
+        value: "{p}/100"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Use place value to write the decimal as a fraction."
+        line_type: expression
+        minimum_steps: 1
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {decimal_value} is greater than 1, so the fraction will be greater than 1.
+        {decimal_value} = {p}/100.
+        You may simplify if possible.
+      mistake_tags:
+        - decimal_conversion
+        - fraction_conversion
+        - improper_fraction_error
+        - place_value_error
+      difficulty: medium
+
     - id: CONVERT_FRACTION_TO_DECIMAL_001
       type: generated
       prompt_template: "Convert {n}/{d} to a decimal."
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       max_attempts: 250
       variables:
         d:
@@ -212,9 +582,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the division or equivalent denominator step."
+        line_type: expression
+        minimum_steps: 1
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Divide the numerator by the denominator.
@@ -226,7 +600,7 @@ test:
         - division_error
       difficulty: medium
 
-    - id: CONVERT_FRACTION_TO_PERCENT_001
+    - id: CONVERT_FRACTION_TO_PERCENT_BY_DENOMINATOR_001
       type: generated
       prompt_template: "Convert {n}/{d} to a percent. Enter only the number before the percent sign."
       answer_mode: final_only
@@ -266,7 +640,7 @@ test:
         - equivalent_fractions
       difficulty: medium
 
-    - id: CONVERT_BENCHMARK_FRACTION_001
+    - id: CONVERT_BENCHMARK_FRACTION_TO_PERCENT_001
       type: generated
       prompt_template: "Convert {n}/{d} to a percent. Enter only the number before the percent sign."
       answer_mode: final_only
@@ -304,6 +678,278 @@ test:
         - percent_conversion
         - equivalent_fractions
         - fraction_conversion
+      difficulty: medium
+
+    - id: PERCENT_OF_WHOLE_NUMBER_001
+      type: generated
+      prompt_template: "Find {percent_value}% of {whole}."
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 20
+        scale:
+          type: int
+          min: 2
+          max: 15
+      constraints:
+        - "n < d"
+        - "100 % d == 0"
+        - "not (n % 2 == 0 and d % 2 == 0)"
+        - "not (n % 3 == 0 and d % 3 == 0)"
+        - "not (n % 5 == 0 and d % 5 == 0)"
+        - "not (n % 7 == 0 and d % 7 == 0)"
+      derived:
+        multiplier: "100 // d"
+        percent_value: "n * multiplier"
+        whole: "d * scale"
+        part: "n * scale"
+      answer:
+        type: numeric
+        value: "{part}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show either percent-as-decimal or percent-as-fraction multiplication."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {percent_value}% = {percent_value}/100 = {n}/{d}.
+        So {percent_value}% of {whole} is {n}/{d} * {whole} = {part}.
+      mistake_tags:
+        - percent_of
+        - percent_conversion
+        - multiplication_error
+      difficulty: medium
+
+    - id: WHAT_PERCENT_IS_PART_OF_WHOLE_001
+      type: generated
+      prompt_template: "What percent of {whole} is {part}? Enter only the number before the percent sign."
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 20
+        scale:
+          type: int
+          min: 2
+          max: 15
+      constraints:
+        - "n < d"
+        - "100 % d == 0"
+        - "not (n % 2 == 0 and d % 2 == 0)"
+        - "not (n % 3 == 0 and d % 3 == 0)"
+        - "not (n % 5 == 0 and d % 5 == 0)"
+        - "not (n % 7 == 0 and d % 7 == 0)"
+      derived:
+        multiplier: "100 // d"
+        percent_value: "n * multiplier"
+        whole: "d * scale"
+        part: "n * scale"
+      answer:
+        type: numeric
+        value: "{percent_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show part divided by whole, then multiply by 100."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Divide part by whole: {part}/{whole} = {n}/{d}.
+        Convert to a percent: {n}/{d} = {percent_value}/100 = {percent_value}%.
+      mistake_tags:
+        - percent_of
+        - percent_conversion
+        - fraction_conversion
+      difficulty: medium
+
+    - id: FIND_WHOLE_FROM_PART_AND_PERCENT_001
+      type: generated
+      prompt_template: "{part} is {percent_value}% of what number?"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 20
+        scale:
+          type: int
+          min: 2
+          max: 15
+      constraints:
+        - "n < d"
+        - "100 % d == 0"
+        - "not (n % 2 == 0 and d % 2 == 0)"
+        - "not (n % 3 == 0 and d % 3 == 0)"
+        - "not (n % 5 == 0 and d % 5 == 0)"
+        - "not (n % 7 == 0 and d % 7 == 0)"
+      derived:
+        multiplier: "100 // d"
+        percent_value: "n * multiplier"
+        whole: "d * scale"
+        part: "n * scale"
+      answer:
+        type: numeric
+        value: "{whole}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the calculation that recovers the whole from the part and percent."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {percent_value}% = {n}/{d}.
+        If {part} is {n}/{d} of the whole, divide by {n}/{d}.
+        {part} / ({n}/{d}) = {whole}.
+      mistake_tags:
+        - percent_of
+        - division_error
+        - reciprocal_error
+        - percent_conversion
+      difficulty: hard
+
+    - id: PERCENT_DISCOUNT_AMOUNT_001
+      type: generated
+      prompt_template: "A {percent_value}% discount is applied to {whole}. What is the discount amount?"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 20
+        scale:
+          type: int
+          min: 2
+          max: 20
+      constraints:
+        - "n < d"
+        - "100 % d == 0"
+        - "not (n % 2 == 0 and d % 2 == 0)"
+        - "not (n % 3 == 0 and d % 3 == 0)"
+        - "not (n % 5 == 0 and d % 5 == 0)"
+        - "not (n % 7 == 0 and d % 7 == 0)"
+      derived:
+        multiplier: "100 // d"
+        percent_value: "n * multiplier"
+        whole: "d * scale"
+        discount_amount: "n * scale"
+      answer:
+        type: numeric
+        value: "{discount_amount}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the percent-of calculation for the discount amount."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A discount amount is the percent of the original value.
+        {percent_value}% = {n}/{d}.
+        {n}/{d} * {whole} = {discount_amount}.
+      mistake_tags:
+        - percent_of
+        - discount_error
+        - percent_conversion
+        - multiplication_error
+      difficulty: medium
+
+    - id: PERCENT_DISCOUNT_FINAL_PRICE_001
+      type: generated
+      prompt_template: "A {percent_value}% discount is applied to {whole}. What is the final price?"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 20
+        scale:
+          type: int
+          min: 2
+          max: 20
+      constraints:
+        - "n < d"
+        - "100 % d == 0"
+        - "not (n % 2 == 0 and d % 2 == 0)"
+        - "not (n % 3 == 0 and d % 3 == 0)"
+        - "not (n % 5 == 0 and d % 5 == 0)"
+        - "not (n % 7 == 0 and d % 7 == 0)"
+      derived:
+        multiplier: "100 // d"
+        percent_value: "n * multiplier"
+        whole: "d * scale"
+        discount_amount: "n * scale"
+        final_price: "whole - discount_amount"
+      answer:
+        type: numeric
+        value: "{final_price}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the discount amount, then subtract it from the original value."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        First find the discount amount.
+        {percent_value}% = {n}/{d}, and {n}/{d} * {whole} = {discount_amount}.
+        Then subtract: {whole} - {discount_amount} = {final_price}.
+      mistake_tags:
+        - percent_of
+        - discount_error
+        - subtraction_error
+        - percent_conversion
       difficulty: hard
 
     - id: CONVERT_COMPARE_DECIMAL_FRACTION_001
@@ -343,6 +989,98 @@ test:
         Since {p} > {q}, {decimal_value} is larger.
       mistake_tags:
         - decimal_conversion
+        - fraction_conversion
+        - comparing_values
+      difficulty: medium
+
+    - id: CONVERT_COMPARE_PERCENT_DECIMAL_001
+      type: generated
+      prompt_template: "Which value is larger?"
+      answer_mode: final_only
+      variables:
+        p:
+          type: int
+          min: 51
+          max: 99
+        q:
+          type: int
+          min: 1
+          max: 50
+      derived:
+        decimal_value: "q / 100"
+      options:
+        - id: A
+          label: "{p}%"
+        - id: B
+          label: "{decimal_value}"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Convert {p}% to a decimal: {p}% = {p}/100.
+        {decimal_value} = {q}/100.
+        Since {p} > {q}, {p}% is larger.
+      mistake_tags:
+        - percent_conversion
+        - decimal_conversion
+        - comparing_values
+      difficulty: medium
+
+    - id: CONVERT_COMPARE_PERCENT_FRACTION_001
+      type: generated
+      prompt_template: "Which value is larger?"
+      answer_mode: final_only
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 9
+        d:
+          type: int
+          min: 2
+          max: 20
+        extra:
+          type: int
+          min: 1
+          max: 20
+      constraints:
+        - "n < d"
+        - "100 % d == 0"
+        - "not (n % 2 == 0 and d % 2 == 0)"
+        - "not (n % 3 == 0 and d % 3 == 0)"
+        - "not (n % 5 == 0 and d % 5 == 0)"
+        - "not (n % 7 == 0 and d % 7 == 0)"
+      derived:
+        multiplier: "100 // d"
+        percent_value: "n * multiplier"
+        larger_percent: "percent_value + extra"
+      options:
+        - id: A
+          label: "{n}/{d}"
+        - id: B
+          label: "{larger_percent}%"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {n}/{d} = {percent_value}%.
+        Since {larger_percent}% is greater than {percent_value}%, {larger_percent}% is larger.
+      mistake_tags:
+        - percent_conversion
         - fraction_conversion
         - comparing_values
       difficulty: hard
