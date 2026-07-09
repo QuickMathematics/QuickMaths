@@ -12,6 +12,8 @@ tags:
   - inverse_operations
   - linear_inequalities
   - comparison
+  - equation_balance
+  - number_line_reasoning
 unlocks:
   - MATH_ALG_007
 mastery:
@@ -27,16 +29,36 @@ theory: |
   Method:
   1. Undo addition or subtraction using inverse operations.
   2. Undo multiplication or division using inverse operations.
-  3. Keep the inequality sign facing the same way when adding, subtracting, multiplying by a positive number, or dividing by a positive number.
-  4. Write the answer with the variable isolated.
+  3. Keep the inequality sign facing the same way when adding or subtracting.
+  4. Keep the inequality sign facing the same way when multiplying or dividing by a positive number.
+  5. Write the answer with the variable isolated.
 
   Example:
   Solve 3x + 4 < 19.
-  Subtract 4 from both sides: 3x < 15.
-  Divide by 3: x < 5.
+
+  3x + 4 < 19
+  3x < 15
+  x < 5
+
+  Subtract 4 from both sides, then divide by positive 3. The inequality sign stays the same.
+
+  Example:
+  Solve x/4 - 6 >= 3.
+
+  x/4 - 6 >= 3
+  x/4 >= 9
+  x >= 36
+
+  Add 6 to both sides, then multiply by positive 4.
 
   Common mistake:
   Do not change the inequality sign unless you multiply or divide both sides by a negative number. That sign-reversal case is a separate skill.
+
+  Another common mistake:
+  The solution is a range of values. x < 5 means every number less than 5 is a solution.
+
+  Another common mistake:
+  If the variable expression is on the right, isolate x and then rewrite the final answer with x on the left.
 examples:
   - prompt: "Solve: x + 7 < 12"
     solution: "x < 5"
@@ -50,6 +72,12 @@ examples:
   - prompt: "Solve: 2x + 3 > 15"
     solution: "x > 6"
     explanation: "Subtract 3, then divide by positive 2."
+  - prompt: "Solve: x/3 - 5 <= 2"
+    solution: "x <= 21"
+    explanation: "Add 5, then multiply by positive 3."
+  - prompt: "Solve: 4 < x + 9"
+    solution: "x > -5"
+    explanation: "Subtract 9 from both sides to get -5 < x, then rewrite as x > -5."
 applications:
   - title: "Real-life limits"
     description: "Inequalities model limits such as budgets, minimum scores, age requirements, and capacity."
@@ -57,16 +85,18 @@ applications:
     description: "Solving inequalities connects algebra to shaded regions on a number line."
   - title: "Linear constraints"
     description: "Inequalities are the foundation for constraints in graphing, systems, optimization, and programming."
+  - title: "Decision rules"
+    description: "Inequalities describe when a value is allowed, too small, too large, or within a limit."
 test:
-  question_count: 8
+  question_count: 24
   randomize_order: true
   questions:
     - id: INEQ_ADD_LESS_THAN_001
       type: generated
-      prompt_template: "Solve for x. Write your answer like x < 5. x + {b} < {c}"
-      answer_mode: final_only
+      prompt_template: "Solve for x. Write your answer like x < 5: x + {b} < {c}"
+      answer_mode: final_plus_required_work
       variables:
-        x:
+        s:
           type: int
           min: -15
           max: 15
@@ -76,21 +106,26 @@ test:
           min: 2
           max: 20
       derived:
-        c: "x + b"
+        c: "s + b"
       answer:
         type: text
-        value: "x < {x}"
+        value: "x < {s}"
       grading:
         method: exact_text
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with x + {b} < {c}.
         Subtract {b} from both sides.
-        The sign stays the same: x < {x}.
+        The sign stays the same: x < {s}.
       mistake_tags:
         - inequality_error
         - inverse_operations
@@ -100,10 +135,10 @@ test:
 
     - id: INEQ_ADD_GREATER_THAN_001
       type: generated
-      prompt_template: "Solve for x. Write your answer like x > 5. x + {b} > {c}"
-      answer_mode: final_only
+      prompt_template: "Solve for x. Write your answer like x > 5: x + {b} > {c}"
+      answer_mode: final_plus_required_work
       variables:
-        x:
+        s:
           type: int
           min: -15
           max: 15
@@ -113,21 +148,26 @@ test:
           min: 2
           max: 20
       derived:
-        c: "x + b"
+        c: "s + b"
       answer:
         type: text
-        value: "x > {x}"
+        value: "x > {s}"
       grading:
         method: exact_text
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with x + {b} > {c}.
         Subtract {b} from both sides.
-        The sign stays the same: x > {x}.
+        The sign stays the same: x > {s}.
       mistake_tags:
         - inequality_error
         - inverse_operations
@@ -135,12 +175,12 @@ test:
         - arithmetic_error
       difficulty: easy
 
-    - id: INEQ_SUB_LESS_EQUAL_001
+    - id: INEQ_ADD_NEGATIVE_CONSTANT_LESS_EQUAL_001
       type: generated
-      prompt_template: "Solve for x. Write your answer like x <= 5. x - {b} <= {c}"
-      answer_mode: final_only
+      prompt_template: "Solve for x. Write your answer like x <= 5: x + (-{b}) <= {c}"
+      answer_mode: final_plus_required_work
       variables:
-        x:
+        s:
           type: int
           min: -15
           max: 15
@@ -150,34 +190,39 @@ test:
           min: 2
           max: 20
       derived:
-        c: "x - b"
+        c: "s - b"
       answer:
         type: text
-        value: "x <= {x}"
+        value: "x <= {s}"
       grading:
         method: exact_text
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
-        Start with x - {b} <= {c}.
+        Adding -{b} is the same as subtracting {b}.
         Add {b} to both sides.
-        The sign stays the same: x <= {x}.
+        The sign stays the same: x <= {s}.
       mistake_tags:
         - inequality_error
+        - negative_numbers
         - inverse_operations
         - sign_error
-        - arithmetic_error
-      difficulty: easy
+      difficulty: medium
 
     - id: INEQ_SUB_GREATER_EQUAL_001
       type: generated
-      prompt_template: "Solve for x. Write your answer like x >= 5. x - {b} >= {c}"
-      answer_mode: final_only
+      prompt_template: "Solve for x. Write your answer like x >= 5: x - {b} >= {c}"
+      answer_mode: final_plus_required_work
       variables:
-        x:
+        s:
           type: int
           min: -15
           max: 15
@@ -187,21 +232,26 @@ test:
           min: 2
           max: 20
       derived:
-        c: "x - b"
+        c: "s - b"
       answer:
         type: text
-        value: "x >= {x}"
+        value: "x >= {s}"
       grading:
         method: exact_text
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with x - {b} >= {c}.
         Add {b} to both sides.
-        The sign stays the same: x >= {x}.
+        The sign stays the same: x >= {s}.
       mistake_tags:
         - inequality_error
         - inverse_operations
@@ -209,12 +259,54 @@ test:
         - arithmetic_error
       difficulty: easy
 
+    - id: INEQ_SUBTRACT_NEGATIVE_LESS_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x < 5: x - (-{b}) < {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "s + b"
+      answer:
+        type: text
+        value: "x < {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Subtracting -{b} is the same as adding {b}.
+        x - (-{b}) < {c} means x + {b} < {c}.
+        Subtract {b}: x < {s}.
+      mistake_tags:
+        - inequality_error
+        - opposite_error
+        - sign_error
+        - inverse_operations
+      difficulty: medium
+
     - id: INEQ_MULT_LESS_THAN_001
       type: generated
-      prompt_template: "Solve for x. Write your answer like x < 5. {a}x < {c}"
-      answer_mode: final_only
+      prompt_template: "Solve for x. Write your answer like x < 5: {a}x < {c}"
+      answer_mode: final_plus_required_work
       variables:
-        x:
+        s:
           type: int
           min: -15
           max: 15
@@ -224,21 +316,26 @@ test:
           min: 2
           max: 12
       derived:
-        c: "a * x"
+        c: "a * s"
       answer:
         type: text
-        value: "x < {x}"
+        value: "x < {s}"
       grading:
         method: exact_text
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with {a}x < {c}.
         Divide both sides by positive {a}.
-        Because {a} is positive, the sign stays the same: x < {x}.
+        Because {a} is positive, the sign stays the same: x < {s}.
       mistake_tags:
         - inequality_error
         - inverse_operations
@@ -248,10 +345,10 @@ test:
 
     - id: INEQ_MULT_GREATER_EQUAL_001
       type: generated
-      prompt_template: "Solve for x. Write your answer like x >= 5. {a}x >= {c}"
-      answer_mode: final_only
+      prompt_template: "Solve for x. Write your answer like x >= 5: {a}x >= {c}"
+      answer_mode: final_plus_required_work
       variables:
-        x:
+        s:
           type: int
           min: -15
           max: 15
@@ -261,21 +358,26 @@ test:
           min: 2
           max: 12
       derived:
-        c: "a * x"
+        c: "a * s"
       answer:
         type: text
-        value: "x >= {x}"
+        value: "x >= {s}"
       grading:
         method: exact_text
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with {a}x >= {c}.
         Divide both sides by positive {a}.
-        Because {a} is positive, the sign stays the same: x >= {x}.
+        Because {a} is positive, the sign stays the same: x >= {s}.
       mistake_tags:
         - inequality_error
         - inverse_operations
@@ -283,55 +385,96 @@ test:
         - arithmetic_error
       difficulty: medium
 
-    - id: INEQ_TWO_STEP_LESS_EQUAL_001
+    - id: INEQ_DIV_LESS_EQUAL_001
       type: generated
-      prompt_template: "Solve for x. Write your answer like x <= 5. {a}x + {b} <= {c}"
-      answer_mode: final_only
+      prompt_template: "Solve for x. Write your answer like x <= 5: x/{a} <= {q}"
+      answer_mode: final_plus_required_work
       variables:
-        x:
-          type: int
-          min: -15
-          max: 15
-          exclude: [0]
         a:
           type: int
           min: 2
           max: 12
-        b:
+        q:
           type: int
-          min: 2
-          max: 20
+          min: -12
+          max: 12
+          exclude: [0]
       derived:
-        c: "a * x + b"
-        after_subtract: "a * x"
+        s: "a * q"
       answer:
         type: text
-        value: "x <= {x}"
+        value: "x <= {s}"
       grading:
         method: exact_text
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
-        Start with {a}x + {b} <= {c}.
-        Subtract {b} from both sides: {a}x <= {after_subtract}.
-        Divide by positive {a}.
-        The sign stays the same: x <= {x}.
+        Start with x/{a} <= {q}.
+        Multiply both sides by positive {a}.
+        Because {a} is positive, the sign stays the same: x <= {s}.
       mistake_tags:
         - inequality_error
         - inverse_operations
-        - division_error
-        - arithmetic_error
+        - multiplication_error
+        - fraction_error
       difficulty: medium
 
-    - id: INEQ_TWO_STEP_GREATER_THAN_001
+    - id: INEQ_DIV_GREATER_THAN_001
       type: generated
-      prompt_template: "Solve for x. Write your answer like x > 5. {a}x - {b} > {c}"
-      answer_mode: final_only
+      prompt_template: "Solve for x. Write your answer like x > 5: x/{a} > {q}"
+      answer_mode: final_plus_required_work
       variables:
-        x:
+        a:
+          type: int
+          min: 2
+          max: 12
+        q:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        s: "a * q"
+      answer:
+        type: text
+        value: "x > {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x/{a} > {q}.
+        Multiply both sides by positive {a}.
+        Because {a} is positive, the sign stays the same: x > {s}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - multiplication_error
+        - fraction_error
+      difficulty: medium
+
+    - id: INEQ_TWO_STEP_AX_PLUS_B_LESS_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x < 5: {a}x + {b} < {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
           type: int
           min: -15
           max: 15
@@ -345,26 +488,649 @@ test:
           min: 2
           max: 20
       derived:
-        c: "a * x - b"
-        after_add: "a * x"
+        ax_value: "a * s"
+        c: "ax_value + b"
       answer:
         type: text
-        value: "x > {x}"
+        value: "x < {s}"
       grading:
         method: exact_text
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + {b} < {c}.
+        Subtract {b} from both sides: {a}x < {ax_value}.
+        Divide by positive {a}.
+        The sign stays the same: x < {s}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - division_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INEQ_TWO_STEP_AX_PLUS_B_GREATER_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x >= 5: {a}x + {b} >= {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        ax_value: "a * s"
+        c: "ax_value + b"
+      answer:
+        type: text
+        value: "x >= {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + {b} >= {c}.
+        Subtract {b} from both sides: {a}x >= {ax_value}.
+        Divide by positive {a}.
+        The sign stays the same: x >= {s}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - division_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INEQ_TWO_STEP_AX_MINUS_B_LESS_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x <= 5: {a}x - {b} <= {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        ax_value: "a * s"
+        c: "ax_value - b"
+      answer:
+        type: text
+        value: "x <= {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x - {b} <= {c}.
+        Add {b} to both sides: {a}x <= {ax_value}.
+        Divide by positive {a}.
+        The sign stays the same: x <= {s}.
+      mistake_tags:
+        - inequality_error
+        - inverse_operations
+        - sign_error
+        - division_error
+      difficulty: medium
+
+    - id: INEQ_TWO_STEP_AX_MINUS_B_GREATER_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x > 5: {a}x - {b} > {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        ax_value: "a * s"
+        c: "ax_value - b"
+      answer:
+        type: text
+        value: "x > {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with {a}x - {b} > {c}.
-        Add {b} to both sides: {a}x > {after_add}.
+        Add {b} to both sides: {a}x > {ax_value}.
         Divide by positive {a}.
-        The sign stays the same: x > {x}.
+        The sign stays the same: x > {s}.
       mistake_tags:
         - inequality_error
         - inverse_operations
+        - sign_error
         - division_error
-        - arithmetic_error
       difficulty: medium
+
+    - id: INEQ_TWO_STEP_NEGATIVE_CONSTANT_LESS_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x <= 5: {a}x + (-{b}) <= {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        ax_value: "a * s"
+        c: "ax_value - b"
+      answer:
+        type: text
+        value: "x <= {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Adding -{b} is the same as subtracting {b}.
+        Add {b} to both sides: {a}x <= {ax_value}.
+        Divide by positive {a}: x <= {s}.
+      mistake_tags:
+        - inequality_error
+        - negative_numbers
+        - inverse_operations
+        - sign_error
+      difficulty: medium
+
+    - id: INEQ_TWO_STEP_CONSTANT_PLUS_AX_GREATER_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x > 5: {b} + {a}x > {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        ax_value: "a * s"
+        c: "b + ax_value"
+      answer:
+        type: text
+        value: "x > {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {b} + {a}x > {c}.
+        Subtract {b} from both sides: {a}x > {ax_value}.
+        Divide by positive {a}: x > {s}.
+      mistake_tags:
+        - inequality_error
+        - term_order_error
+        - inverse_operations
+        - division_error
+      difficulty: medium
+
+    - id: INEQ_TWO_STEP_X_OVER_A_PLUS_B_LESS_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x <= 5: x/{a} + {b} <= {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        q:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        s: "a * q"
+        c: "q + b"
+      answer:
+        type: text
+        value: "x <= {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x/{a} + {b} <= {c}.
+        Subtract {b}: x/{a} <= {q}.
+        Multiply by positive {a}: x <= {s}.
+      mistake_tags:
+        - inequality_error
+        - fraction_error
+        - multiplication_error
+        - inverse_operations
+      difficulty: hard
+
+    - id: INEQ_TWO_STEP_X_OVER_A_MINUS_B_GREATER_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x >= 5: x/{a} - {b} >= {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        q:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        s: "a * q"
+        c: "q - b"
+      answer:
+        type: text
+        value: "x >= {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with x/{a} - {b} >= {c}.
+        Add {b}: x/{a} >= {q}.
+        Multiply by positive {a}: x >= {s}.
+      mistake_tags:
+        - inequality_error
+        - fraction_error
+        - multiplication_error
+        - inverse_operations
+      difficulty: hard
+
+    - id: INEQ_VARIABLE_ON_RIGHT_ADD_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x > 5: {c} < x + {b}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        c: "s + b"
+      answer:
+        type: text
+        value: "x > {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent inequality steps, ending with x isolated on the left."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {c} < x + {b}.
+        Subtract {b} from both sides: {s} < x.
+        Rewriting with x on the left gives x > {s}.
+      mistake_tags:
+        - inequality_error
+        - variable_on_right_error
+        - inverse_operations
+        - comparison_direction_error
+      difficulty: hard
+
+    - id: INEQ_VARIABLE_ON_RIGHT_MULTIPLY_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x >= 5: {c} <= {a}x"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        c: "a * s"
+      answer:
+        type: text
+        value: "x >= {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent inequality steps, ending with x isolated on the left."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {c} <= {a}x.
+        Divide both sides by positive {a}: {s} <= x.
+        Rewriting with x on the left gives x >= {s}.
+      mistake_tags:
+        - inequality_error
+        - variable_on_right_error
+        - inverse_operations
+        - comparison_direction_error
+      difficulty: hard
+
+    - id: INEQ_VARIABLE_ON_RIGHT_TWO_STEP_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x < 5: {c} > {a}x + {b}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        ax_value: "a * s"
+        c: "ax_value + b"
+      answer:
+        type: text
+        value: "x < {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent inequality steps, ending with x isolated on the left."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {c} > {a}x + {b}.
+        Subtract {b}: {ax_value} > {a}x.
+        Divide by positive {a}: {s} > x.
+        Rewriting with x on the left gives x < {s}.
+      mistake_tags:
+        - inequality_error
+        - variable_on_right_error
+        - inverse_operations
+        - comparison_direction_error
+      difficulty: hard
+
+    - id: INEQ_TWO_STEP_NEGATIVE_BOUND_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x >= -5: {a}x + {b} >= {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -20
+          max: -1
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        ax_value: "a * s"
+        c: "ax_value + b"
+      answer:
+        type: text
+        value: "x >= {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + {b} >= {c}.
+        Remove the constant first: {a}x >= {ax_value}.
+        Divide by positive {a}: x >= {s}.
+      mistake_tags:
+        - inequality_error
+        - negative_numbers
+        - inverse_operations
+        - division_error
+      difficulty: medium
+
+    - id: INEQ_ZERO_BOUNDARY_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x <= 0: {a}x + {b} <= {b}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: text
+        value: "x <= 0"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, ending with x isolated."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with {a}x + {b} <= {b}.
+        Subtract {b} from both sides: {a}x <= 0.
+        Divide by positive {a}: x <= 0.
+      mistake_tags:
+        - inequality_error
+        - zero_error
+        - inverse_operations
+        - division_error
+      difficulty: medium
+
+    - id: INEQ_ALREADY_ISOLATED_LESS_THAN_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x < 5: x < {s}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: text
+        value: "x < {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "The variable is already isolated. Rewrite the solution."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 1
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        x is already isolated.
+        The solution is x < {s}.
+      mistake_tags:
+        - inequality_reading
+        - over_solving_error
+      difficulty: easy
+
+    - id: INEQ_ALREADY_ISOLATED_GREATER_EQUAL_001
+      type: generated
+      prompt_template: "Solve for x. Write your answer like x >= 5: x >= {s}"
+      answer_mode: final_plus_required_work
+      variables:
+        s:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: text
+        value: "x >= {s}"
+      grading:
+        method: exact_text
+      work:
+        mode: procedural_steps
+        prompt: "The variable is already isolated. Rewrite the solution."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 1
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        x is already isolated.
+        The solution is x >= {s}.
+      mistake_tags:
+        - inequality_reading
+        - over_solving_error
+      difficulty: easy
