@@ -66,6 +66,18 @@ def render_storage_landing_gate() -> bool:
         st.link_button("Sign in with Google Drive", _google_oauth_url(), width="stretch")
     else:
         st.warning(status)
+        if "secrets" in status:
+            st.code(
+                """
+[google_oauth]
+client_id = "your-google-oauth-client-id"
+client_secret = "your-google-oauth-client-secret"
+redirect_uri = "https://your-app.streamlit.app"
+folder_name = "Quick Maths"
+""".strip(),
+                language="toml",
+            )
+            st.caption("Add this in Streamlit Cloud under App settings -> Secrets, then reboot the app.")
 
     if st.button("Use local storage (Not recommended)", width="stretch"):
         select_local_storage()
