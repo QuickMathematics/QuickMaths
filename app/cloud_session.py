@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 
 import streamlit as st
@@ -16,6 +17,9 @@ from quickmaths.cloud_storage import (
     upload_managed_files,
 )
 from quickmaths.oauth_state import consume_oauth_state, issue_oauth_state
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def storage_mode() -> str:
@@ -59,6 +63,9 @@ def render_storage_landing_gate() -> bool:
         return True
 
     st.subheader("Storage")
+    oauth_error = st.session_state.pop("google_oauth_error", None)
+    if oauth_error:
+        st.error(str(oauth_error))
     st.write("Use Google Drive for persistent progress across Streamlit restarts, or continue locally for temporary storage.")
     status = oauth_config_status(st.secrets)
     if status == "ready":
@@ -139,14 +146,28 @@ def _complete_google_oauth_if_present() -> None:
     if not code or not state:
         return
     if not consume_oauth_state(str(state)):
-        st.error("Google sign-in expired or could not be verified. Try signing in again.")
+        _reset_failed_oauth("Google sign-in expired or was already used. Start a new Google sign-in below.")
         return
     config = auth_config_from_streamlit_secrets(st.secrets)
     if not config:
-        st.error("Google Drive sign-in is not configured.")
+        _reset_failed_oauth("Google Drive sign-in is not configured.")
         return
+    from oauthlib.oauth2 import OAuth2Error
+
     flow = oauth_flow_from_config(config, state=state)
-    flow.fetch_token(code=code)
+    try:
+        flow.fetch_token(code=str(code))
+    except OAuth2Error as exc:
+        LOGGER.warning(
+            "Google OAuth code exchange failed (%s, redirect_uri=%r): %s",
+            exc.__class__.__name__,
+            config.get("redirect_uri"),
+            exc,
+        )
+        _reset_failed_oauth(
+            "Google rejected the one-time sign-in code. Start a new Google sign-in below; do not refresh or reuse the callback URL."
+        )
+        return
     credentials = flow.credentials
     user_info = drive_user_info(credentials)
     folder = find_or_create_folder(credentials, str(config.get("folder_name") or "Quick Maths"))
@@ -156,5 +177,11 @@ def _complete_google_oauth_if_present() -> None:
     st.session_state["google_drive_folder_id"] = folder.id
     st.session_state["google_drive_folder_name"] = folder.name
     sync_from_google_drive()
+    st.query_params.clear()
+    st.rerun()
+
+
+def _reset_failed_oauth(message: str) -> None:
+    st.session_state["google_oauth_error"] = message
     st.query_params.clear()
     st.rerun()
