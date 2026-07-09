@@ -8,7 +8,7 @@ build/
 *.egg-info/
 .streamlit/
 data/quick_maths.sqlite
+data/oauth_state.sqlite
 data/exports/*.csv
 data/exports/*.md
 !data/exports/.gitkeep
-

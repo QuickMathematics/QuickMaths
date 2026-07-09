@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-import uuid
 
 import streamlit as st
 
@@ -16,6 +15,7 @@ from quickmaths.cloud_storage import (
     oauth_flow_from_config,
     upload_managed_files,
 )
+from quickmaths.oauth_state import consume_oauth_state, issue_oauth_state
 
 
 def storage_mode() -> str:
@@ -41,7 +41,6 @@ def logout_cloud_storage() -> None:
         "google_user",
         "google_drive_folder_id",
         "google_drive_folder_name",
-        "google_oauth_state",
         "google_last_sync_at",
     ]:
         st.session_state.pop(key, None)
@@ -123,8 +122,7 @@ def storage_label() -> str:
 
 def _google_oauth_url() -> str:
     config = auth_config_from_streamlit_secrets(st.secrets)
-    state = st.session_state.get("google_oauth_state") or uuid.uuid4().hex
-    st.session_state["google_oauth_state"] = str(state)
+    state = issue_oauth_state()
     flow = oauth_flow_from_config(config, state=state)
     auth_url, _state = flow.authorization_url(
         access_type="offline",
@@ -140,8 +138,8 @@ def _complete_google_oauth_if_present() -> None:
     state = params.get("state")
     if not code or not state:
         return
-    if state != st.session_state.get("google_oauth_state"):
-        st.error("Google sign-in state did not match. Try signing in again.")
+    if not consume_oauth_state(str(state)):
+        st.error("Google sign-in expired or could not be verified. Try signing in again.")
         return
     config = auth_config_from_streamlit_secrets(st.secrets)
     if not config:
