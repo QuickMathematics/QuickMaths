@@ -357,9 +357,9 @@ test:
         method: symbolic_expression
       work:
         mode: procedural_steps
-        prompt: "Show each equivalent expression step, ending with the simplified final answer."
+        prompt: "If the expression is already simplified, rewrite it as the final line."
         line_type: expression
-        minimum_steps: 2
+        minimum_steps: 1
         require_final_answer_match: true
       review_policy:
         work_review: auto
