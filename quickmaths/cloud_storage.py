@@ -166,6 +166,26 @@ def auth_config_from_streamlit_secrets(secrets: Any) -> dict[str, Any]:
     }
 
 
+def oauth_config_problem(secrets: Any) -> str | None:
+    if optional_google_import_error():
+        return "Google Drive dependencies are not installed."
+    section = secrets.get("google_oauth", {}) if hasattr(secrets, "get") else {}
+    client_id = str(section.get("client_id", "")).strip()
+    client_secret = str(section.get("client_secret", "")).strip()
+    redirect_uri = str(section.get("redirect_uri", "")).strip()
+    if not client_id or not client_secret or not redirect_uri:
+        return "Google Drive sign-in needs app secrets: google_oauth.client_id, client_secret, and redirect_uri."
+    if "your-google-oauth" in client_id or "..." in client_id:
+        return "Google Drive client_id is still a placeholder. Use the OAuth 2.0 Client ID from Google Cloud."
+    if not client_id.endswith(".apps.googleusercontent.com"):
+        return "Google Drive client_id does not look like a Google OAuth client ID. It should end with .apps.googleusercontent.com."
+    if "your-google-oauth" in client_secret or "..." in client_secret:
+        return "Google Drive client_secret is still a placeholder. Use the OAuth 2.0 Client Secret from Google Cloud."
+    if not (redirect_uri.startswith("http://localhost") or redirect_uri.startswith("https://")):
+        return "Google Drive redirect_uri must be a localhost URL for local testing or an https:// Streamlit app URL."
+    return None
+
+
 def oauth_flow_from_config(config: dict[str, Any], state: str | None = None):
     from google_auth_oauthlib.flow import Flow
 
@@ -175,11 +195,7 @@ def oauth_flow_from_config(config: dict[str, Any], state: str | None = None):
 
 
 def oauth_config_status(secrets: Any) -> str:
-    if optional_google_import_error():
-        return "Google Drive dependencies are not installed."
-    if not auth_config_from_streamlit_secrets(secrets):
-        return "Google Drive sign-in needs app secrets: google_oauth.client_id, client_secret, and redirect_uri."
-    return "ready"
+    return oauth_config_problem(secrets) or "ready"
 
 
 def managed_files_summary() -> str:
