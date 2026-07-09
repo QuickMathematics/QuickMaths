@@ -90,7 +90,7 @@ applications:
   - title: "Money and temperature"
     description: "Integer operations model debts, gains, losses, and changes above or below zero."
 test:
-  question_count: 8
+  question_count: 10
   randomize_order: true
   questions:
     - id: INTEGER_ADD_SAME_SIGN_001
