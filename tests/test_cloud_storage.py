@@ -8,6 +8,12 @@ from quickmaths.cloud_storage import (
 )
 
 
+def test_streamlit_native_auth_runtime_dependencies_import():
+    from authlib.integrations import starlette_client
+
+    assert starlette_client is not None
+
+
 def test_auth_config_from_streamlit_secrets_requires_core_fields():
     assert auth_config_from_streamlit_secrets({}) == {}
     assert auth_config_from_streamlit_secrets({"google_oauth": {"client_id": "id"}}) == {}
