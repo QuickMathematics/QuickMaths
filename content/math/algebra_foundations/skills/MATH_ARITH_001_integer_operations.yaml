@@ -10,6 +10,7 @@ tags:
   - integers
   - signed_numbers
   - operations
+  - negative_numbers
 unlocks:
   - MATH_ARITH_002
   - MATH_ARITH_003
@@ -21,20 +22,41 @@ mastery:
   review_after_days_if_mastered: 7
   review_after_days_if_learning: 2
 theory: |
-  Integers are whole numbers and their opposites: ..., -3, -2, -1, 0, 1, 2, 3, ...
+  Integers are whole numbers and their opposites:
+
+  ..., -3, -2, -1, 0, 1, 2, 3, ...
 
   Integer operations matter because algebra constantly mixes positive and negative values. Before solving equations or graphing lines, you need to be fluent with signs.
 
-  Addition and subtraction:
-  1. Same signs: add the sizes and keep the sign. Example: -4 + (-7) = -11.
-  2. Different signs: subtract the smaller size from the larger size and keep the sign of the number with the larger size. Example: -9 + 5 = -4.
-  3. Subtracting a number means adding its opposite. Example: 6 - (-2) = 6 + 2 = 8.
+  Addition:
+  1. Same signs: add the sizes and keep the sign.
+     Example: -4 + (-7) = -11.
+  2. Different signs: subtract the smaller size from the larger size.
+     Keep the sign of the number with the larger size.
+     Example: -9 + 5 = -4.
+  3. Opposites add to zero.
+     Example: 8 + (-8) = 0.
+
+  Subtraction:
+  Subtracting a number means adding its opposite.
+
+  Example:
+  6 - (-2) = 6 + 2 = 8.
+
+  This is one of the most important sign rules. Subtracting a negative increases the value.
 
   Multiplication and division:
-  1. Same signs give a positive result. Example: (-3)(-5) = 15.
-  2. Different signs give a negative result. Example: -18 / 6 = -3.
+  1. Same signs give a positive result.
+     Example: (-3)(-5) = 15.
+  2. Different signs give a negative result.
+     Example: -18 / 6 = -3.
+  3. Any integer multiplied by 0 equals 0.
+     Example: -9 * 0 = 0.
 
-  Common mistake: do not treat every minus sign the same way. In 5 - (-3), the first minus is subtraction and the second minus is the sign of the number. Subtracting a negative increases the value: 5 - (-3) = 8.
+  Common mistake:
+  Do not treat every minus sign the same way. In 5 - (-3), the first minus is subtraction and the second minus is the sign of the number. Subtracting a negative means adding the opposite:
+
+  5 - (-3) = 5 + 3 = 8.
 examples:
   - prompt: "Compute: -6 + (-4)"
     solution: "-10"
@@ -42,12 +64,21 @@ examples:
   - prompt: "Compute: -12 + 5"
     solution: "-7"
     explanation: "The signs are different. Subtract 5 from 12 and keep the sign of -12."
+  - prompt: "Compute: 8 + (-8)"
+    solution: "0"
+    explanation: "A number plus its opposite equals 0."
   - prompt: "Compute: 7 - (-9)"
     solution: "16"
     explanation: "Subtracting a negative is the same as adding the opposite: 7 + 9 = 16."
+  - prompt: "Compute: -11 - (-7)"
+    solution: "-4"
+    explanation: "Subtracting a negative means adding: -11 - (-7) = -11 + 7 = -4."
   - prompt: "Compute: (-8)(-3)"
     solution: "24"
     explanation: "A negative times a negative is positive."
+  - prompt: "Compute: -9 * 0"
+    solution: "0"
+    explanation: "Any number multiplied by 0 equals 0."
   - prompt: "Compute: -36 / 9"
     solution: "-4"
     explanation: "A negative divided by a positive is negative."
@@ -124,10 +155,45 @@ test:
         work_review: none
         mastery_requires_review_pass: false
       explanation_template: |
-        The signs are different, so subtract the smaller size from the larger size.
-        The result is {c}.
+        The signs are different.
+        Subtract the smaller size from the larger size.
+        Keep the sign of the number with the larger size.
+        {a} + ({b}) = {c}.
       mistake_tags:
         - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: INTEGER_ADD_OPPOSITES_ZERO_001
+      type: generated
+      prompt_template: "Compute: {a} + ({b})"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -15
+          max: 15
+          exclude: [0]
+      derived:
+        b: "-a"
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        {b} is the opposite of {a}.
+        A number plus its opposite equals 0.
+        {a} + ({b}) = 0.
+      mistake_tags:
+        - sign_error
+        - opposite_error
+        - zero_error
         - arithmetic_error
       difficulty: medium
 
@@ -195,6 +261,7 @@ test:
       mistake_tags:
         - sign_error
         - opposite_error
+        - subtraction_error
         - arithmetic_error
       difficulty: medium
 
@@ -234,6 +301,35 @@ test:
         - multiplication_error
         - arithmetic_error
       difficulty: medium
+
+    - id: INTEGER_MULTIPLY_ZERO_001
+      type: generated
+      prompt_template: "Compute: {a} * 0"
+      answer_mode: final_only
+      variables:
+        a:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Any number multiplied by 0 equals 0.
+        {a} * 0 = 0.
+      mistake_tags:
+        - zero_error
+        - multiplication_error
+        - arithmetic_error
+      difficulty: easy
 
     - id: INTEGER_DIVIDE_SIGNS_001
       type: generated
@@ -281,6 +377,7 @@ test:
           type: int
           min: -20
           max: 20
+          exclude: [0]
       answer:
         type: numeric
         value: "{a}"
@@ -296,6 +393,7 @@ test:
         {a} + 0 = {a}.
       mistake_tags:
         - integer_identity
+        - zero_error
         - arithmetic_error
       difficulty: easy
 
@@ -333,6 +431,7 @@ test:
         mastery_requires_review_pass: false
       explanation_template: |
         Work left to right because addition and subtraction have the same priority.
+        Be careful with signs.
         {a} + ({b}) - ({c}) = {answer_value}.
       mistake_tags:
         - sign_error
