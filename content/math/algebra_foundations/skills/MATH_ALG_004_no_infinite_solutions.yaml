@@ -12,7 +12,9 @@ tags:
   - linear_equations
   - no_solution
   - infinite_solutions
+  - one_solution
   - variables_on_both_sides
+  - equation_classification
 unlocks:
   - MATH_SYS_001
 mastery:
@@ -32,16 +34,39 @@ theory: |
 
   Example:
   3x + 5 = 3x + 5
-  Subtract 3x from both sides: 5 = 5.
+
+  Subtract 3x from both sides:
+
+  5 = 5
+
   This is always true, so there are infinitely many solutions.
 
   Example:
   4x + 2 = 4x + 9
-  Subtract 4x from both sides: 2 = 9.
+
+  Subtract 4x from both sides:
+
+  2 = 9
+
   This is false, so there is no solution.
+
+  Example:
+  8x + 4 = 2x + 22
+
+  Subtract 2x from both sides:
+
+  6x + 4 = 22
+
+  One variable term remains, so the equation has one solution.
 
   Common mistake:
   Do not write x = 0 just because the x-terms cancel. Look at the statement that remains.
+
+  Another common mistake:
+  If both sides simplify to the same expression, the equation has infinitely many solutions, not one solution.
+
+  Another common mistake:
+  If the variable terms cancel and the constants are different, the equation has no solution.
 examples:
   - prompt: "Classify: 5x + 7 = 5x + 7"
     solution: "Infinitely many solutions"
@@ -55,6 +80,12 @@ examples:
   - prompt: "Classify: 3(x + 4) = 3x + 12"
     solution: "Infinitely many solutions"
     explanation: "Distribute first: 3x + 12 = 3x + 12. Both sides are identical."
+  - prompt: "Classify: 4(x + 2) = 4x + 11"
+    solution: "No solution"
+    explanation: "Distribute first: 4x + 8 = 4x + 11. This reduces to 8 = 11, which is false."
+  - prompt: "Classify: 2(x + 5) = 6x - 2"
+    solution: "One solution"
+    explanation: "Distribute first: 2x + 10 = 6x - 2. One variable term remains after moving x-terms."
 applications:
   - title: "Checking equations"
     description: "Classification helps learners know whether solving should end in a value, a contradiction, or an identity."
@@ -62,14 +93,16 @@ applications:
     description: "No solution and infinitely many solutions also describe special cases in systems of equations."
   - title: "Modeling"
     description: "Classifying equations can reveal whether a word problem has one answer, no possible answer, or many possible answers."
+  - title: "Equivalent expressions"
+    description: "If both sides of an equation are equivalent expressions, the equation is true for every value of the variable."
 test:
-  question_count: 8
+  question_count: 24
   randomize_order: true
   questions:
     - id: CLASSIFY_IDENTICAL_SIMPLE_001
       type: generated
       prompt_template: "Classify the equation: {a}x + {b} = {a}x + {b}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -92,9 +125,13 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show equivalent equation steps until the equation reduces to a true statement, false statement, or x = value."
+        line_type: equation
+        minimum_steps: 2
+        require_final_answer_match: false
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Both sides are exactly the same.
@@ -109,7 +146,7 @@ test:
     - id: CLASSIFY_SAME_X_DIFFERENT_CONSTANT_001
       type: generated
       prompt_template: "Classify the equation: {a}x + {b} = {a}x + {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -138,9 +175,13 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show equivalent equation steps until the equation reduces to a true statement, false statement, or x = value."
+        line_type: equation
+        minimum_steps: 2
+        require_final_answer_match: false
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Subtract {a}x from both sides.
@@ -155,7 +196,7 @@ test:
     - id: CLASSIFY_ONE_SOLUTION_BASIC_001
       type: generated
       prompt_template: "Classify the equation: {a}x + {b} = {c}x + {d}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       max_attempts: 250
       variables:
         x:
@@ -177,6 +218,7 @@ test:
           max: 30
       derived:
         d: "a * x + b - c * x"
+        variable_difference: "a - c"
       constraints:
         - "a != c"
         - "d != 0"
@@ -193,13 +235,17 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show equivalent equation steps until the equation reduces to a true statement, false statement, or x = value."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         The x-coefficients are different: {a} and {c}.
-        When variable coefficients are different, the equation can be solved for one value of x.
+        When variable coefficients are different, one variable term remains after moving x-terms.
         This equation has one solution.
       mistake_tags:
         - equation_classification
@@ -207,10 +253,223 @@ test:
         - variables_on_both_sides
       difficulty: easy
 
+    - id: CLASSIFY_RIGHT_LARGER_ONE_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x + {b} = {c}x + {d}"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 7
+        c:
+          type: int
+          min: 8
+          max: 14
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        d: "a * x + b - c * x"
+      constraints:
+        - "d != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent equation steps until the equation reduces to a true statement, false statement, or x = value."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The x-coefficients are different.
+        Even though the right-side x-coefficient is larger, one variable term remains after moving x-terms.
+        This equation has one solution.
+      mistake_tags:
+        - equation_classification
+        - one_solution
+        - negative_coefficient
+        - variables_on_both_sides
+      difficulty: medium
+
+    - id: CLASSIFY_NEGATIVE_COEFFICIENT_ONE_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x + {b} = {c}x + {d}"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: -12
+          max: -2
+        c:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      derived:
+        d: "a * x + b - c * x"
+      constraints:
+        - "d != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent equation steps until the equation reduces to a true statement, false statement, or x = value."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The x-coefficients are different: {a} and {c}.
+        Since one variable term remains after moving x-terms, the equation has one solution.
+      mistake_tags:
+        - equation_classification
+        - one_solution
+        - negative_coefficient
+        - sign_error
+      difficulty: medium
+
+    - id: CLASSIFY_IDENTICAL_REORDERED_001
+      type: generated
+      prompt_template: "Classify the equation: {b} + {a}x = {a}x + {b}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: -30
+          max: 30
+          exclude: [0]
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent equation steps until the equation reduces to a true statement, false statement, or x = value."
+        line_type: equation
+        minimum_steps: 2
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The terms are reordered, but both sides are equivalent.
+        Subtract {a}x from both sides: {b} = {b}.
+        This is always true, so there are infinitely many solutions.
+      mistake_tags:
+        - equation_classification
+        - infinite_solutions
+        - term_order_error
+      difficulty: medium
+
+    - id: CLASSIFY_OPPOSITE_CONSTANTS_NO_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x - {b} = {a}x + {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 30
+        c:
+          type: int
+          min: 2
+          max: 30
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent equation steps until the equation reduces to a true statement, false statement, or x = value."
+        line_type: equation
+        minimum_steps: 2
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Subtract {a}x from both sides.
+        The equation becomes -{b} = {c}.
+        A negative number cannot equal this positive number, so there is no solution.
+      mistake_tags:
+        - equation_classification
+        - no_solution
+        - sign_error
+        - variables_cancel
+      difficulty: medium
+
     - id: CLASSIFY_DISTRIBUTION_IDENTITY_001
       type: generated
       prompt_template: "Classify the equation: {a}(x + {b}) = {a}x + {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -235,9 +494,13 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Distribute or simplify first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Distribute the left side: {a}(x + {b}) = {a}x + {c}.
@@ -252,7 +515,7 @@ test:
     - id: CLASSIFY_DISTRIBUTION_CONTRADICTION_001
       type: generated
       prompt_template: "Classify the equation: {a}(x + {b}) = {a}x + {d}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       max_attempts: 250
       variables:
         a:
@@ -284,9 +547,13 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Distribute or simplify first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Distribute the left side: {a}(x + {b}) = {a}x + {distributed_constant}.
@@ -300,10 +567,255 @@ test:
         - variables_cancel
       difficulty: medium
 
+    - id: CLASSIFY_DISTRIBUTION_ONE_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}(x + {b}) = {c}x + {d}"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        x:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        d: "a * (x + b) - c * x"
+        distributed_constant: "a * b"
+      constraints:
+        - "a != c"
+        - "d != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Distribute or simplify first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute the left side: {a}(x + {b}) = {a}x + {distributed_constant}.
+        The equation becomes {a}x + {distributed_constant} = {c}x + {d}.
+        The x-coefficients are different, so one variable term remains.
+        This equation has one solution.
+      mistake_tags:
+        - distribution_error
+        - equation_classification
+        - one_solution
+        - variables_on_both_sides
+      difficulty: hard
+
+    - id: CLASSIFY_DISTRIBUTE_BOTH_IDENTITY_001
+      type: generated
+      prompt_template: "Classify the equation: {a}(x + {b}) = {a}(x + {d}) + {e}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 15
+        d:
+          type: int
+          min: 2
+          max: 15
+      derived:
+        e: "a * (b - d)"
+      constraints:
+        - "b != d"
+        - "e != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Distribute both sides first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute both sides.
+        Left side: {a}x + {a} * {b}.
+        Right side: {a}x + {a} * {d} + {e}.
+        Since {e} was chosen to make the constants match, both sides simplify to the same expression.
+        The equation has infinitely many solutions.
+      mistake_tags:
+        - distribution_error
+        - equation_classification
+        - infinite_solutions
+        - variables_cancel
+      difficulty: hard
+
+    - id: CLASSIFY_DISTRIBUTE_BOTH_CONTRADICTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}(x + {b}) = {a}(x + {d}) + {e}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        b:
+          type: int
+          min: 2
+          max: 15
+        d:
+          type: int
+          min: 2
+          max: 15
+        r:
+          type: int
+          min: 1
+          max: 8
+      derived:
+        matching_constant: "a * (b - d)"
+        e: "matching_constant + r"
+      constraints:
+        - "b != d"
+        - "matching_constant != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Distribute both sides first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute both sides.
+        The x-coefficients are the same, so the x-terms cancel.
+        The constants do not match because {e} is not the value that would make both sides identical.
+        The equation has no solution.
+      mistake_tags:
+        - distribution_error
+        - equation_classification
+        - no_solution
+        - variables_cancel
+      difficulty: hard
+
+    - id: CLASSIFY_DISTRIBUTE_BOTH_ONE_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}(x + {b}) = {c}(x + {d}) + {e}"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        c:
+          type: int
+          min: -10
+          max: 12
+          exclude: [0]
+        d:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+      derived:
+        e: "a * (x + b) - c * (x + d)"
+      constraints:
+        - "a != c"
+        - "e != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Distribute both sides first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Distribute both sides.
+        The x-coefficients are different: {a} and {c}.
+        Since one variable term remains after moving x-terms, this equation has one solution.
+      mistake_tags:
+        - distribution_error
+        - equation_classification
+        - one_solution
+        - variables_on_both_sides
+      difficulty: hard
+
     - id: CLASSIFY_COMBINE_IDENTITY_001
       type: generated
       prompt_template: "Classify the equation: {a}x + {b}x + {c} = {d}x + {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -332,9 +844,13 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Combine like terms first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Combine like terms on the left: {a}x + {b}x = {d}x.
@@ -349,7 +865,7 @@ test:
     - id: CLASSIFY_COMBINE_CONTRADICTION_001
       type: generated
       prompt_template: "Classify the equation: {a}x + {b}x + {c} = {d}x + {e}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       max_attempts: 250
       variables:
         a:
@@ -385,9 +901,13 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Combine like terms first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Combine like terms on the left: {a}x + {b}x = {d}x.
@@ -399,12 +919,12 @@ test:
         - equation_classification
         - no_solution
         - variables_cancel
-      difficulty: hard
+      difficulty: medium
 
-    - id: CLASSIFY_DISTRIBUTION_ONE_SOLUTION_001
+    - id: CLASSIFY_COMBINE_ONE_SOLUTION_001
       type: generated
-      prompt_template: "Classify the equation: {a}(x + {b}) = {c}x + {d}"
-      answer_mode: final_only
+      prompt_template: "Classify the equation: {a}x + {b}x + {c} = {d}x + {e}"
+      answer_mode: final_plus_required_work
       max_attempts: 250
       variables:
         x:
@@ -415,22 +935,27 @@ test:
         a:
           type: int
           min: 2
-          max: 12
+          max: 10
         b:
           type: int
           min: 2
-          max: 12
+          max: 10
         c:
           type: int
-          min: 2
+          min: -20
+          max: 20
+          exclude: [0]
+        d:
+          type: int
+          min: -12
           max: 12
+          exclude: [0]
       derived:
-        d: "a * (x + b) - c * x"
-        distributed_constant: "a * b"
+        left_coefficient: "a + b"
+        e: "left_coefficient * x + c - d * x"
       constraints:
-        - "a != c"
-        - "d != 0"
-        - "d != distributed_constant"
+        - "left_coefficient != d"
+        - "e != 0"
       options:
         - id: A
           label: "One solution"
@@ -444,17 +969,476 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Combine like terms first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
-        Distribute the left side: {a}(x + {b}) = {a}x + {distributed_constant}.
-        The equation becomes {a}x + {distributed_constant} = {c}x + {d}.
-        The x-coefficients are different, so one variable term remains when you solve.
+        Combine like terms on the left: {a}x + {b}x = {left_coefficient}x.
+        The equation becomes {left_coefficient}x + {c} = {d}x + {e}.
+        The x-coefficients are different, so one variable term remains.
         This equation has one solution.
       mistake_tags:
-        - distribution_error
+        - like_terms_error
+        - equation_classification
+        - one_solution
+        - variables_on_both_sides
+      difficulty: hard
+
+    - id: CLASSIFY_SUBTRACT_PARENTHESES_IDENTITY_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x - ({b}x + {c}) = {m}x + {n}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 4
+          max: 14
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 20
+      derived:
+        m: "a - b"
+        n: "0 - c"
+      constraints:
+        - "m != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Remove parentheses carefully, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The minus before parentheses changes both signs.
+        {a}x - ({b}x + {c}) = {a}x - {b}x - {c}.
+        That simplifies to {m}x + {n}.
+        Both sides are identical, so there are infinitely many solutions.
+      mistake_tags:
+        - subtraction_error
+        - grouping_error
+        - equation_classification
+        - infinite_solutions
+      difficulty: hard
+
+    - id: CLASSIFY_SUBTRACT_PARENTHESES_CONTRADICTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x - ({b}x + {c}) = {m}x + {n}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 4
+          max: 14
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 20
+        r:
+          type: int
+          min: 1
+          max: 10
+      derived:
+        m: "a - b"
+        matching_constant: "0 - c"
+        n: "matching_constant + r"
+      constraints:
+        - "m != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Remove parentheses carefully, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The left side simplifies to {m}x + {matching_constant}.
+        The right side is {m}x + {n}.
+        The x-terms cancel, but the constants are different.
+        The equation has no solution.
+      mistake_tags:
+        - subtraction_error
+        - grouping_error
+        - equation_classification
+        - no_solution
+      difficulty: hard
+
+    - id: CLASSIFY_SUBTRACT_PARENTHESES_ONE_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the equation: {a}x - ({b}x + {c}) = {d}x + {e}"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        x:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        a:
+          type: int
+          min: 4
+          max: 14
+        b:
+          type: int
+          min: 2
+          max: 12
+        c:
+          type: int
+          min: 2
+          max: 20
+        d:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        left_coefficient: "a - b"
+        left_constant: "0 - c"
+        e: "left_coefficient * x + left_constant - d * x"
+      constraints:
+        - "left_coefficient != d"
+        - "left_coefficient != 0"
+        - "e != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Remove parentheses carefully, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The left side simplifies to {left_coefficient}x + {left_constant}.
+        The right side is {d}x + {e}.
+        Since the x-coefficients are different, one variable term remains.
+        The equation has one solution.
+      mistake_tags:
+        - subtraction_error
+        - grouping_error
+        - equation_classification
+        - one_solution
+      difficulty: hard
+
+    - id: CLASSIFY_ZERO_FACTOR_IDENTITY_001
+      type: generated
+      prompt_template: "Classify the equation: 0({a}x + {b}) + {c} = {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        c:
+          type: int
+          min: -30
+          max: 30
+          exclude: [0]
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Simplify the zero product first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 2
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        0 times any expression is 0.
+        The left side becomes 0 + {c}, which is {c}.
+        The equation becomes {c} = {c}, so it has infinitely many solutions.
+      mistake_tags:
+        - zero_error
+        - equation_classification
+        - infinite_solutions
+      difficulty: medium
+
+    - id: CLASSIFY_ZERO_FACTOR_CONTRADICTION_001
+      type: generated
+      prompt_template: "Classify the equation: 0({a}x + {b}) + {c} = {d}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        c:
+          type: int
+          min: -30
+          max: 30
+          exclude: [0]
+        d:
+          type: int
+          min: -30
+          max: 30
+          exclude: [0]
+      constraints:
+        - "c != d"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Simplify the zero product first, then reduce the equation."
+        line_type: equation
+        minimum_steps: 2
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        0 times any expression is 0.
+        The left side becomes {c}.
+        The equation becomes {c} = {d}.
+        Since that is false, the equation has no solution.
+      mistake_tags:
+        - zero_error
+        - equation_classification
+        - no_solution
+      difficulty: medium
+
+    - id: CLASSIFY_FRACTION_IDENTITY_001
+      type: generated
+      prompt_template: "Classify the equation: (x + {b})/{a} = x/{a} + {k}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        k:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        b: "a * k"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Clear the denominator or simplify the fraction expression, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Since {b} = {a} * {k}, the left side can be written as x/{a} + {k}.
+        Both sides are identical.
+        The equation has infinitely many solutions.
+      mistake_tags:
+        - fraction_error
+        - equation_classification
+        - infinite_solutions
+      difficulty: hard
+
+    - id: CLASSIFY_FRACTION_CONTRADICTION_001
+      type: generated
+      prompt_template: "Classify the equation: (x + {b})/{a} = x/{a} + {c}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        k:
+          type: int
+          min: 2
+          max: 12
+        r:
+          type: int
+          min: 1
+          max: 8
+      derived:
+        b: "a * k"
+        c: "k + r"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Clear the denominator or simplify the fraction expression, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Since {b} = {a} * {k}, the left side can be written as x/{a} + {k}.
+        The right side is x/{a} + {c}.
+        The x/{a} terms cancel, leaving {k} = {c}.
+        Since that is false, there is no solution.
+      mistake_tags:
+        - fraction_error
+        - equation_classification
+        - no_solution
+        - variables_cancel
+      difficulty: hard
+
+    - id: CLASSIFY_FRACTION_ONE_SOLUTION_001
+      type: generated
+      prompt_template: "Classify the equation: (x + {b})/{a} = {c}x + {d}"
+      answer_mode: final_plus_required_work
+      max_attempts: 300
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 10
+        q:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        c:
+          type: int
+          min: -8
+          max: 8
+          exclude: [0]
+      derived:
+        x: "a * q - b"
+        d: "q - c * x"
+      constraints:
+        - "x != 0"
+        - "d != 0"
+      options:
+        - id: A
+          label: "One solution"
+        - id: B
+          label: "No solution"
+        - id: C
+          label: "Infinitely many solutions"
+      answer:
+        type: multiple_choice
+        value: "A"
+      grading:
+        method: multiple_choice
+      work:
+        mode: procedural_steps
+        prompt: "Clear the denominator or simplify the fraction expression, then reduce the equation."
+        line_type: equation
+        minimum_steps: 3
+        require_final_answer_match: false
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        After clearing the denominator, one variable term remains because the two sides do not have matching variable coefficients.
+        Therefore the equation has one solution.
+      mistake_tags:
+        - fraction_error
         - equation_classification
         - one_solution
         - variables_on_both_sides
