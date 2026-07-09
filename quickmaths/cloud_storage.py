@@ -186,10 +186,20 @@ def oauth_config_problem(secrets: Any) -> str | None:
     return None
 
 
-def oauth_flow_from_config(config: dict[str, Any], state: str | None = None):
+def oauth_flow_from_config(
+    config: dict[str, Any],
+    state: str | None = None,
+    code_verifier: str | None = None,
+):
     from google_auth_oauthlib.flow import Flow
 
-    flow = Flow.from_client_config(config, scopes=DRIVE_SCOPES, state=state)
+    flow = Flow.from_client_config(
+        config,
+        scopes=DRIVE_SCOPES,
+        state=state,
+        code_verifier=code_verifier,
+        autogenerate_code_verifier=code_verifier is None,
+    )
     flow.redirect_uri = config["redirect_uri"]
     return flow
 

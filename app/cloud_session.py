@@ -16,7 +16,7 @@ from quickmaths.cloud_storage import (
     oauth_flow_from_config,
     upload_managed_files,
 )
-from quickmaths.oauth_state import consume_oauth_state, issue_oauth_state
+from quickmaths.oauth_state import consume_oauth_state_with_pkce, issue_oauth_state_with_pkce
 
 
 LOGGER = logging.getLogger(__name__)
@@ -129,8 +129,8 @@ def storage_label() -> str:
 
 def _google_oauth_url() -> str:
     config = auth_config_from_streamlit_secrets(st.secrets)
-    state = issue_oauth_state()
-    flow = oauth_flow_from_config(config, state=state)
+    state, code_verifier = issue_oauth_state_with_pkce()
+    flow = oauth_flow_from_config(config, state=state, code_verifier=code_verifier)
     auth_url, _state = flow.authorization_url(
         access_type="offline",
         include_granted_scopes="true",
@@ -145,7 +145,8 @@ def _complete_google_oauth_if_present() -> None:
     state = params.get("state")
     if not code or not state:
         return
-    if not consume_oauth_state(str(state)):
+    code_verifier = consume_oauth_state_with_pkce(str(state))
+    if not code_verifier:
         _reset_failed_oauth("Google sign-in expired or was already used. Start a new Google sign-in below.")
         return
     config = auth_config_from_streamlit_secrets(st.secrets)
@@ -154,7 +155,7 @@ def _complete_google_oauth_if_present() -> None:
         return
     from oauthlib.oauth2 import OAuth2Error
 
-    flow = oauth_flow_from_config(config, state=state)
+    flow = oauth_flow_from_config(config, state=state, code_verifier=code_verifier)
     try:
         flow.fetch_token(code=str(code))
     except OAuth2Error as exc:

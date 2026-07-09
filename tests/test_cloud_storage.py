@@ -1,4 +1,9 @@
-from quickmaths.cloud_storage import DEFAULT_DRIVE_FOLDER_NAME, auth_config_from_streamlit_secrets, oauth_config_problem
+from quickmaths.cloud_storage import (
+    DEFAULT_DRIVE_FOLDER_NAME,
+    auth_config_from_streamlit_secrets,
+    oauth_config_problem,
+    oauth_flow_from_config,
+)
 
 
 def test_auth_config_from_streamlit_secrets_requires_core_fields():
@@ -49,3 +54,19 @@ def test_oauth_config_problem_rejects_malformed_client_id():
     )
 
     assert "apps.googleusercontent.com" in problem
+
+
+def test_oauth_flow_uses_persisted_pkce_verifier():
+    config = auth_config_from_streamlit_secrets(
+        {
+            "google_oauth": {
+                "client_id": "123456789-test.apps.googleusercontent.com",
+                "client_secret": "client-secret",
+                "redirect_uri": "https://example.streamlit.app/",
+            }
+        }
+    )
+
+    flow = oauth_flow_from_config(config, state="state", code_verifier="verifier")
+
+    assert flow.code_verifier == "verifier"
