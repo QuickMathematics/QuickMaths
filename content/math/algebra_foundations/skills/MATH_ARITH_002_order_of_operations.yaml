@@ -11,6 +11,8 @@ tags:
   - order_of_operations
   - integers
   - expressions
+  - exponents
+  - grouping
 unlocks:
   - MATH_PREALG_001
 mastery:
@@ -29,11 +31,28 @@ theory: |
   3. Multiply and divide from left to right.
   4. Add and subtract from left to right.
 
+  Multiplication does not always happen before division. They have the same priority, so you work from left to right.
+
+  Example:
+  20 / 5 * 2 = 4 * 2 = 8.
+
+  Addition does not always happen before subtraction. They have the same priority, so you work from left to right.
+
+  Example:
+  10 - 7 + 4 = 3 + 4 = 7.
+
+  Parentheses can completely change the value.
+
   Example:
   6 + 2 * (8 - 5) = 6 + 2 * 3 = 6 + 6 = 12.
 
+  Be careful with negative numbers and exponents:
+  - (-3)^2 = 9 because the negative number is grouped.
+  - -3^2 = -9 because the exponent applies to 3 first, then the negative sign is applied.
+
   Common mistake:
   Do not always work left to right. In 5 + 4 * 3, multiply first: 5 + 12 = 17.
+
   But when operations have the same priority, do work left to right. For example, 20 / 5 * 2 = 4 * 2 = 8.
 examples:
   - prompt: "Compute: 7 + 3 * 4"
@@ -45,9 +64,21 @@ examples:
   - prompt: "Compute: 18 / 3 * 2"
     solution: "12"
     explanation: "Multiplication and division have the same priority, so work left to right: 18 / 3 = 6, then 6 * 2 = 12."
+  - prompt: "Compute: 10 - 7 + 4"
+    solution: "7"
+    explanation: "Addition and subtraction have the same priority, so work left to right: 10 - 7 = 3, then 3 + 4 = 7."
   - prompt: "Compute: 5 + 2^3 * 4"
     solution: "37"
     explanation: "Evaluate the exponent first, then multiply, then add."
+  - prompt: "Compute: (-3)^2"
+    solution: "9"
+    explanation: "The negative number is grouped, so (-3)^2 means (-3)(-3) = 9."
+  - prompt: "Compute: -3^2"
+    solution: "-9"
+    explanation: "The exponent happens before the leading negative sign, so -3^2 means -(3^2) = -9."
+  - prompt: "Compute: 8 + 6 * 0"
+    solution: "8"
+    explanation: "Multiply first: 6 * 0 = 0, then 8 + 0 = 8."
 applications:
   - title: "Algebra substitution"
     description: "After replacing variables with numbers, order of operations tells you how to evaluate the expression."
@@ -55,14 +86,16 @@ applications:
     description: "Code evaluates expressions using precedence rules, so order matters in formulas and conditions."
   - title: "Science formulas"
     description: "Physics and chemistry formulas often combine grouping, multiplication, division, and powers."
+  - title: "Spreadsheets and calculators"
+    description: "Spreadsheet formulas and calculators follow order rules, so parentheses are often needed to get the intended result."
 test:
-  question_count: 8
+  question_count: 15
   randomize_order: true
   questions:
     - id: ORDER_MULT_BEFORE_ADD_001
       type: generated
       prompt_template: "Compute: {a} + {b} * {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -85,9 +118,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Multiply before adding.
@@ -102,7 +139,7 @@ test:
     - id: ORDER_GROUPING_FIRST_001
       type: generated
       prompt_template: "Compute: ({a} + {b}) * {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -125,9 +162,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Parentheses come first.
@@ -142,7 +183,7 @@ test:
     - id: ORDER_DIV_BEFORE_SUB_001
       type: generated
       prompt_template: "Compute: {a} - {dividend} / {divisor}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -167,9 +208,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Divide before subtracting.
@@ -184,7 +229,7 @@ test:
     - id: ORDER_LEFT_TO_RIGHT_MULT_DIV_001
       type: generated
       prompt_template: "Compute: {dividend} / {divisor} * {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         quotient:
           type: int
@@ -207,9 +252,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Multiplication and division have the same priority, so work left to right.
@@ -224,7 +273,7 @@ test:
     - id: ORDER_LEFT_TO_RIGHT_ADD_SUB_001
       type: generated
       prompt_template: "Compute: {a} - {b} + {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -250,9 +299,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Addition and subtraction have the same priority, so work left to right.
@@ -268,7 +321,7 @@ test:
     - id: ORDER_EXPONENT_BEFORE_MULT_001
       type: generated
       prompt_template: "Compute: {a}^2 + {b} * {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -292,9 +345,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Evaluate the exponent before multiplying or adding.
@@ -311,7 +368,7 @@ test:
     - id: ORDER_GROUPING_WITH_EXPONENT_001
       type: generated
       prompt_template: "Compute: ({a} + {b})^2"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -330,9 +387,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Parentheses come before exponents.
@@ -345,10 +406,10 @@ test:
         - arithmetic_error
       difficulty: hard
 
-    - id: ORDER_MIXED_GROUPING_001
+    - id: ORDER_MIXED_GROUPING_SIGNED_001
       type: generated
       prompt_template: "Compute: {a} + {b} * ({c} - {d})"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         a:
           type: int
@@ -382,9 +443,13 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start inside the parentheses.
@@ -395,5 +460,354 @@ test:
         - order_error
         - grouping_error
         - sign_error
+        - arithmetic_error
+      difficulty: hard
+
+    - id: ORDER_NEGATIVE_UNGROUPED_EXPONENT_001
+      type: generated
+      prompt_template: "Compute: -{a}^2"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 9
+      derived:
+        power_value: "a ** 2"
+        answer_value: "-power_value"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The exponent applies to {a} before the leading negative sign is applied.
+        -{a}^2 means -({a}^2).
+        {a}^2 = {power_value}, so the answer is {answer_value}.
+      mistake_tags:
+        - order_error
+        - exponent_error
+        - sign_error
+      difficulty: hard
+
+    - id: ORDER_NEGATIVE_GROUPED_EXPONENT_001
+      type: generated
+      prompt_template: "Compute: (-{a})^2"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 9
+      derived:
+        answer_value: "a ** 2"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The negative number is inside the parentheses.
+        (-{a})^2 means (-{a}) * (-{a}).
+        A negative times a negative is positive, so the answer is {answer_value}.
+      mistake_tags:
+        - grouping_error
+        - exponent_error
+        - sign_error
+      difficulty: hard
+
+    - id: ORDER_GROUPED_DENOMINATOR_001
+      type: generated
+      prompt_template: "Compute: {dividend} / ({b} + {c})"
+      answer_mode: final_plus_required_work
+      variables:
+        quotient:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: 2
+          max: 10
+        c:
+          type: int
+          min: 2
+          max: 10
+      derived:
+        denominator: "b + c"
+        dividend: "quotient * denominator"
+      answer:
+        type: numeric
+        value: "{quotient}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Simplify the denominator inside parentheses first.
+        {b} + {c} = {denominator}.
+        Then divide: {dividend} / {denominator} = {quotient}.
+      mistake_tags:
+        - grouping_error
+        - division_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: ORDER_SUBTRACT_GROUP_001
+      type: generated
+      prompt_template: "Compute: {a} - ({b} + {c})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -20
+          max: 30
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 15
+        c:
+          type: int
+          min: 2
+          max: 15
+      derived:
+        group_value: "b + c"
+        answer_value: "a - group_value"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Simplify inside the parentheses first.
+        {b} + {c} = {group_value}.
+        Then subtract the whole group: {a} - {group_value} = {answer_value}.
+      mistake_tags:
+        - grouping_error
+        - subtraction_error
+        - sign_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: ORDER_SUBTRACT_NEGATIVE_GROUP_001
+      type: generated
+      prompt_template: "Compute: {a} - ({b} - {c})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -10
+          max: 20
+          exclude: [0]
+        b:
+          type: int
+          min: 2
+          max: 10
+        c:
+          type: int
+          min: 11
+          max: 20
+      derived:
+        group_value: "b - c"
+        answer_value: "a - group_value"
+      constraints:
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Simplify inside the parentheses first.
+        {b} - {c} = {group_value}.
+        Then subtract that value: {a} - ({group_value}) = {answer_value}.
+        This often becomes subtracting a negative.
+      mistake_tags:
+        - grouping_error
+        - subtraction_error
+        - sign_error
+        - opposite_error
+        - arithmetic_error
+      difficulty: hard
+
+    - id: ORDER_NESTED_GROUPING_001
+      type: generated
+      prompt_template: "Compute: {a} * ({b} + ({c} - {d}))"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 8
+        b:
+          type: int
+          min: 2
+          max: 15
+        c:
+          type: int
+          min: 2
+          max: 10
+        d:
+          type: int
+          min: 11
+          max: 20
+      derived:
+        inner_value: "c - d"
+        group_value: "b + inner_value"
+        answer_value: "a * group_value"
+      constraints:
+        - "group_value != 0"
+        - "answer_value != 0"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Start with the inner parentheses.
+        {c} - {d} = {inner_value}.
+        Then simplify the outer parentheses: {b} + ({inner_value}) = {group_value}.
+        Finally multiply: {a} * {group_value} = {answer_value}.
+      mistake_tags:
+        - grouping_error
+        - nested_grouping_error
+        - sign_error
+        - multiplication_error
+        - arithmetic_error
+      difficulty: hard
+
+    - id: ORDER_ZERO_PRODUCT_TRAP_001
+      type: generated
+      prompt_template: "Compute: {a} + {b} * 0"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+        b:
+          type: int
+          min: -20
+          max: 20
+          exclude: [0]
+      answer:
+        type: numeric
+        value: "{a}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply before adding.
+        {b} * 0 = 0.
+        {a} + 0 = {a}.
+      mistake_tags:
+        - order_error
+        - zero_error
+        - multiplication_error
+        - arithmetic_error
+      difficulty: medium
+
+    - id: ORDER_ZERO_EXPONENT_001
+      type: generated
+      prompt_template: "Compute: {a}^0 + {b}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        answer_value: "1 + b"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show the whole expression after each simplification step, one expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Any nonzero number to the power 0 equals 1.
+        {a}^0 = 1.
+        1 + {b} = {answer_value}.
+      mistake_tags:
+        - exponent_error
+        - order_error
         - arithmetic_error
       difficulty: hard
