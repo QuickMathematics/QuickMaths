@@ -32,6 +32,17 @@ class DriveFile:
     name: str
 
 
+def is_google_authentication_error(exc: Exception) -> bool:
+    from google.auth.exceptions import RefreshError
+    from googleapiclient.errors import HttpError
+
+    if isinstance(exc, RefreshError):
+        return True
+    if isinstance(exc, HttpError):
+        return int(getattr(exc.resp, "status", 0)) == 401
+    return False
+
+
 def optional_google_import_error() -> str | None:
     try:
         import google.auth.transport.requests  # noqa: F401

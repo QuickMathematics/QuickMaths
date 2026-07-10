@@ -2,6 +2,7 @@ from quickmaths.cloud_storage import (
     DEFAULT_DRIVE_FOLDER_NAME,
     auth_config_from_streamlit_secrets,
     credentials_from_access_token,
+    is_google_authentication_error,
     oauth_config_problem,
     oauth_flow_from_config,
     streamlit_oidc_config_problem,
@@ -103,3 +104,10 @@ def test_access_token_credentials_can_call_drive_without_browser_storage():
 
     assert credentials.token == "access-token"
     assert credentials.refresh_token is None
+
+
+def test_google_refresh_error_is_recognized_as_reconnect_condition():
+    from google.auth.exceptions import RefreshError
+
+    assert is_google_authentication_error(RefreshError("expired"))
+    assert not is_google_authentication_error(ValueError("not authentication"))

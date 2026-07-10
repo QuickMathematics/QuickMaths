@@ -4,7 +4,7 @@ from datetime import datetime
 
 import streamlit as st
 
-from app.cloud_session import logout_cloud_storage, storage_label, sync_to_google_drive
+from app.cloud_session import google_reconnect_required, logout_cloud_storage, storage_label, sync_to_google_drive
 from quickmaths.config import FAVICON_PATH, PROVEN_STATUSES
 from quickmaths.content_loader import load_curriculum
 from quickmaths.exports import recommended_action
@@ -70,6 +70,11 @@ def set_page_config() -> None:
     if selected_profile_id():
         st.sidebar.caption(f"Profile: {selected_profile_name()}")
         st.sidebar.caption(f"Storage: {storage_label()}")
+        if google_reconnect_required():
+            st.sidebar.warning("Google Drive sync is paused because access expired.")
+            if st.sidebar.button("Reconnect Drive", width="stretch"):
+                logout_profile()
+                st.logout()
         _render_sidebar_timers()
         if st.sidebar.button("Log Out", width="stretch"):
             logout_profile()

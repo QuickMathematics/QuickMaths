@@ -47,7 +47,7 @@ expose_tokens = "access"
 client_kwargs = { scope = "openid profile email https://www.googleapis.com/auth/drive.file", prompt = "select_account" }
 ```
 
-Generate `cookie_secret` with a password generator or `python -c "import secrets; print(secrets.token_urlsafe(32))"`. Streamlit keeps the identity in a secure browser cookie, so refreshes and new tabs restore the Google session. The app requests Google profile/email scopes plus `drive.file`, then stores only Quick Maths managed files in the `Quick Maths` Drive folder.
+Generate `cookie_secret` with a password generator or `python -c "import secrets; print(secrets.token_urlsafe(32))"`. Streamlit keeps the identity in a secure browser cookie, so refreshes and new tabs restore the Google identity. Google Drive access tokens are shorter-lived and Streamlit does not expose refresh tokens; when Drive access expires, Quick Maths preserves the downloaded local database and shows a reconnect action instead of attempting unsafe token storage. The app requests Google profile/email scopes plus `drive.file`, then stores only Quick Maths managed files in the `Quick Maths` Drive folder.
 
 ## Test
 

@@ -14,6 +14,7 @@ from quickmaths.cloud_storage import (
     download_managed_files,
     drive_user_info,
     find_or_create_folder,
+    is_google_authentication_error,
     oauth_config_status,
     oauth_flow_from_config,
     streamlit_oidc_config_problem,
@@ -37,6 +38,10 @@ def local_storage_selected() -> bool:
     return storage_mode() == "local"
 
 
+def google_reconnect_required() -> bool:
+    return bool(st.session_state.get("google_reconnect_required"))
+
+
 def select_local_storage() -> None:
     st.session_state["storage_mode"] = "local"
 
@@ -49,6 +54,8 @@ def logout_cloud_storage() -> None:
         "google_drive_folder_id",
         "google_drive_folder_name",
         "google_last_sync_at",
+        "google_reconnect_required",
+        "google_oauth_error",
     ]:
         st.session_state.pop(key, None)
     if _streamlit_user_logged_in():
@@ -76,7 +83,14 @@ def render_storage_landing_gate() -> bool:
         st.error(str(oauth_error))
     st.write("Use Google Drive for persistent progress across Streamlit restarts, or continue locally for temporary storage.")
     if _streamlit_oidc_ready():
-        if st.button("Sign in with Google Drive", width="stretch", type="primary"):
+        if google_reconnect_required() and _streamlit_user_logged_in():
+            st.warning(
+                "Your Google identity is still signed in, but its temporary Drive access token expired. "
+                "Reconnect to resume syncing; your downloaded Quick Maths data remains on this server."
+            )
+            if st.button("Reconnect Google Drive", width="stretch", type="primary"):
+                st.logout()
+        elif st.button("Sign in with Google Drive", width="stretch", type="primary"):
             st.login()
     else:
         auth_section = st.secrets.get("auth", {})
@@ -113,7 +127,14 @@ def sync_from_google_drive() -> None:
     folder_id = st.session_state.get("google_drive_folder_id")
     if not credentials or not folder_id:
         return
-    downloaded = download_managed_files(credentials, str(folder_id))
+    try:
+        downloaded = download_managed_files(credentials, str(folder_id))
+    except Exception as exc:
+        if is_google_authentication_error(exc):
+            _mark_google_reconnect_required()
+            st.error("Google Drive access expired. Reconnect from the profile screen before continuing.")
+            return
+        raise
     st.session_state["google_credentials"] = credentials_to_session(credentials)
     st.session_state["google_last_sync_at"] = time.time()
     if downloaded:
@@ -127,7 +148,14 @@ def sync_to_google_drive(label: str = "Saved to Google Drive") -> None:
     folder_id = st.session_state.get("google_drive_folder_id")
     if not credentials or not folder_id:
         return
-    uploaded = upload_managed_files(credentials, str(folder_id))
+    try:
+        uploaded = upload_managed_files(credentials, str(folder_id))
+    except Exception as exc:
+        if is_google_authentication_error(exc):
+            _mark_google_reconnect_required()
+            st.error("Saved locally, but Google Drive access expired. Reconnect to resume syncing.")
+            return
+        raise
     st.session_state["google_credentials"] = credentials_to_session(credentials)
     st.session_state["google_last_sync_at"] = time.time()
     if uploaded:
@@ -135,6 +163,8 @@ def sync_to_google_drive(label: str = "Saved to Google Drive") -> None:
 
 
 def storage_label() -> str:
+    if google_reconnect_required():
+        return "Google Drive (reconnect required)"
     if is_google_drive_storage():
         folder = st.session_state.get("google_drive_folder_name") or "Quick Maths"
         return f"Google Drive: {folder}"
@@ -173,7 +203,14 @@ def _restore_google_drive_from_streamlit_login() -> None:
         st.session_state["google_oauth_error"] = "Google sign-in did not provide a Drive access token."
         return
     credentials = credentials_from_access_token(str(access_token))
-    folder = find_or_create_folder(credentials)
+    try:
+        folder = find_or_create_folder(credentials)
+    except Exception as exc:
+        if is_google_authentication_error(exc):
+            LOGGER.info("Google Drive access token expired; learner must reconnect.")
+            _mark_google_reconnect_required()
+            return
+        raise
     user_info = {
         "id": str(st.user.get("sub") or ""),
         "email": str(st.user.get("email") or ""),
@@ -185,7 +222,20 @@ def _restore_google_drive_from_streamlit_login() -> None:
     st.session_state["google_user"] = user_info
     st.session_state["google_drive_folder_id"] = folder.id
     st.session_state["google_drive_folder_name"] = folder.name
+    st.session_state.pop("google_reconnect_required", None)
     sync_from_google_drive()
+
+
+def _mark_google_reconnect_required() -> None:
+    for key in [
+        "storage_mode",
+        "google_credentials",
+        "google_drive_folder_id",
+        "google_drive_folder_name",
+    ]:
+        st.session_state.pop(key, None)
+    st.session_state["google_reconnect_required"] = True
+    st.session_state["google_oauth_error"] = "Google Drive access expired. Reconnect to continue using persistent storage."
 
 
 def _same_tab_google_sign_in(auth_url: str) -> None:
