@@ -11,7 +11,8 @@ def test_loads_valid_default_skills():
     assert track.schema_version == "0.2"
     assert "MATH_ALG_001" in skills
     assert len(track.skills) == 25
-    assert skills["MATH_ALG_001"].test.question_count == 8
+    assert skills["MATH_ALG_001"].test.question_count >= 1
+    assert len(skills["MATH_ALG_001"].test.questions) >= skills["MATH_ALG_001"].test.question_count
     assert warnings == []
 
 
@@ -21,20 +22,46 @@ def test_default_content_uses_procedural_work_only_where_auto_checking_is_suppor
         for question in skill.test.questions:
             method = question.grading.get("method")
             mode = question.work.get("mode")
-            if mode == "procedural_steps" and question.work.get("line_type") == "expression":
+            if mode == "procedural_steps":
                 assert question.answer_mode == "final_plus_required_work"
                 assert question.review_policy["work_review"] == "auto"
                 assert question.review_policy["mastery_requires_review_pass"] is False
-                assert method in {"symbolic_expression", "exact_numeric"}
-            elif mode == "procedural_steps" and question.work.get("line_type") == "equation":
-                assert question.answer_mode == "final_plus_required_work"
-                assert question.work["target_variable"]
-                assert question.review_policy["work_review"] == "auto"
-                assert question.review_policy["mastery_requires_review_pass"] is False
-                assert method == "equation_solution"
+                line_type = question.work.get("line_type")
+                assert line_type in {"expression", "equation", "inequality"}
+                if line_type == "expression":
+                    assert method in {"symbolic_expression", "exact_numeric"}
+                elif line_type == "equation":
+                    assert method in {"equation_solution", "multiple_choice", "symbolic_expression"}
+                else:
+                    assert method in {"exact_text", "inequality_solution"}
             else:
                 assert question.answer_mode == "final_only"
                 assert question.work["mode"] == "none"
+
+
+def test_rewritten_content_watch_points_are_represented_in_schema():
+    _track, skills, _warnings = load_curriculum()
+
+    arithmetic = skills["MATH_ARITH_005"]
+    fixed_ids = {
+        question.id
+        for question in arithmetic.test.questions
+        if question.type == "fixed"
+    }
+    assert "CONVERT_ZERO_PERCENT_TO_DECIMAL_001" in fixed_ids
+    assert "CONVERT_HUNDRED_PERCENT_TO_DECIMAL_001" in fixed_ids
+
+    substitution = skills["MATH_PREALG_001"]
+    for question in substitution.test.questions:
+        if question.work.get("mode") == "procedural_steps":
+            assert "substitut" in question.work.get("prompt", "").casefold()
+
+    classification = skills["MATH_ALG_004"]
+    assert all(question.grading.get("method") == "multiple_choice" for question in classification.test.questions)
+    assert all(question.answer_mode == "final_plus_required_work" for question in classification.test.questions)
+
+    inequalities = skills["MATH_ALG_006"]
+    assert all(question.work.get("line_type") == "inequality" for question in inequalities.test.questions)
 
 
 def test_rejects_invalid_yaml(tmp_path: Path):

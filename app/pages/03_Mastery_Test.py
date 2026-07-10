@@ -72,7 +72,13 @@ with st.form("test-form"):
         st.write(display_math(problem.prompt))
         if problem.grading_method == "multiple_choice" and problem.options:
             labels = [str(option["id"]) for option in problem.options]
-            final_answer = st.radio("Final answer", labels, key=f"answer-{idx}")
+            option_labels = {str(option["id"]): str(option.get("label") or option["id"]) for option in problem.options}
+            final_answer = st.radio(
+                "Final answer",
+                labels,
+                format_func=lambda option_id: f"{option_id}. {display_math(option_labels[option_id])}",
+                key=f"answer-{idx}",
+            )
         else:
             final_answer = st.text_input("Final answer", key=f"answer-{idx}")
         mode = work_mode(problem)

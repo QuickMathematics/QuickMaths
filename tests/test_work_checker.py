@@ -51,6 +51,84 @@ def test_incorrect_equation_steps_fail():
     assert result.status == "incorrect"
 
 
+def test_equation_steps_allow_divide_first_or_distribute_first():
+    problem = _problem(
+        "3",
+        {
+            "mode": "procedural_steps",
+            "line_type": "equation",
+            "target_variable": "x",
+            "minimum_steps": 2,
+            "require_final_answer_match": True,
+        },
+        variable="x",
+        grading_method="equation_solution",
+    )
+    divide_first = check_work(problem, UserResponse(work="2(x + 1) = 8\nx + 1 = 4\nx = 3"))
+    distribute_first = check_work(problem, UserResponse(work="2(x + 1) = 8\n2x + 2 = 8\n2x = 6\nx = 3"))
+
+    assert divide_first.status == "correct"
+    assert distribute_first.status == "correct"
+
+
+def test_classification_equation_work_handles_identity_and_contradiction():
+    problem = _problem(
+        "infinitely many solutions",
+        {
+            "mode": "procedural_steps",
+            "line_type": "equation",
+            "minimum_steps": 2,
+            "require_final_answer_match": False,
+        },
+        grading_method="multiple_choice",
+    )
+
+    identity = check_work(problem, UserResponse(work="2x + 3 = 2x + 3\n3 = 3"))
+    wrong = check_work(problem, UserResponse(work="2x + 3 = 2x + 3\n3 = 4"))
+
+    assert identity.status == "correct"
+    assert wrong.status == "incorrect"
+
+
+def test_inequality_steps_allow_sign_flip_when_dividing_by_negative():
+    problem = _problem(
+        "x < 5",
+        {
+            "mode": "procedural_steps",
+            "line_type": "inequality",
+            "minimum_steps": 2,
+            "require_final_answer_match": True,
+        },
+        variable="x",
+        grading_method="exact_text",
+    )
+
+    correct = check_work(problem, UserResponse(work="-2x > -10\nx < 5"))
+    incorrect = check_work(problem, UserResponse(work="-2x > -10\nx > 5"))
+
+    assert correct.status == "correct"
+    assert incorrect.status == "incorrect"
+
+
+def test_literal_equation_work_can_end_in_expression_answer():
+    problem = _problem(
+        "(c - b)/a",
+        {
+            "mode": "procedural_steps",
+            "line_type": "equation",
+            "target_variable": "x",
+            "minimum_steps": 2,
+            "require_final_answer_match": True,
+        },
+        variable="x",
+        grading_method="symbolic_expression",
+    )
+
+    result = check_work(problem, UserResponse(work="a*x + b = c\na*x = c - b\nx = (c - b)/a"))
+
+    assert result.status == "correct"
+
+
 def test_parse_failure_returns_uncertain():
     problem = _problem("4", {"mode": "procedural_steps", "line_type": "equation", "target_variable": "x", "minimum_steps": 2}, variable="x")
     result = check_work(problem, UserResponse(final_answer="4", work="2x + 3 = 11\n2x + = 8"))

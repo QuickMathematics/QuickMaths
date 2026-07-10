@@ -881,18 +881,18 @@ test:
           min: -10
           max: 12
           exclude: [0]
-        d:
-          type: int
-          min: -10
-          max: 10
-          exclude: [0]
       derived:
         left_constant: "a * b"
-        right_constant: "c * d"
         variable_difference: "a - c"
+        required_right_constant: "variable_difference * x + left_constant"
+        d: "required_right_constant // c"
+        right_constant: "c * d"
         constant_difference: "right_constant - left_constant"
       constraints:
         - "a != c"
+        - "required_right_constant % c == 0"
+        - "d != 0"
+        - "abs(d) <= 10"
         - "left_constant != right_constant"
         - "variable_difference != 1"
         - "variable_difference != -1"

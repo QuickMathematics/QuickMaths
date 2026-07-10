@@ -3,13 +3,14 @@ from __future__ import annotations
 import re
 from decimal import Decimal, InvalidOperation
 
-from sympy import E, Eq, N, Symbol, pi, simplify, solve, sqrt
+from sympy import E, Eq, FiniteSet, Ge, Gt, Le, Lt, N, S, Symbol, pi, simplify, solve, sqrt
 from sympy.parsing.sympy_parser import (
     convert_xor,
     implicit_multiplication_application,
     parse_expr,
     standard_transformations,
 )
+from sympy.solvers.inequalities import solve_univariate_inequality
 
 from quickmaths.utils import normalize_spaces
 
@@ -52,6 +53,7 @@ def normalize_math_text(text: str) -> str:
     }
     for old, new in replacements.items():
         value = value.replace(old, new)
+    value = value.replace("\u2264", "<=").replace("\u2265", ">=")
     return value
 
 
@@ -77,10 +79,19 @@ def display_math(text: str) -> str:
 
 def parse_expression(text: str, variables: list[str] | None = None):
     local_dict = dict(LOCAL_DICT)
-    for variable in variables or []:
-        local_dict[variable] = Symbol(variable)
+    normalized = normalize_math_text(text)
+    symbol_names = set(variables or [])
+    for token in re.findall(r"[A-Za-z][A-Za-z0-9_]*", normalized):
+        if token in LOCAL_DICT:
+            continue
+        if token in symbol_names or "_" in token or any(character.isdigit() for character in token):
+            symbol_names.add(token)
+        else:
+            symbol_names.update(token)
+    for variable in symbol_names:
+        local_dict[variable] = Symbol(variable, real=True)
     try:
-        return parse_expr(normalize_math_text(text), transformations=TRANSFORMATIONS, local_dict=local_dict)
+        return parse_expr(normalized, transformations=TRANSFORMATIONS, local_dict=local_dict)
     except Exception as exc:
         raise MathSyntaxError(f"Could not parse math expression '{text}'") from exc
 
@@ -90,7 +101,19 @@ def parse_equation(text: str, variables: list[str] | None = None):
     if normalized.count("=") != 1:
         raise MathSyntaxError(f"Expected one equation sign in '{text}'")
     left, right = [part.strip() for part in normalized.split("=", 1)]
-    return Eq(parse_expression(left, variables), parse_expression(right, variables))
+    return Eq(parse_expression(left, variables), parse_expression(right, variables), evaluate=False)
+
+
+def parse_inequality(text: str, variables: list[str] | None = None):
+    normalized = normalize_math_text(text)
+    matches = list(re.finditer(r"<=|>=|<|>", normalized))
+    if len(matches) != 1:
+        raise MathSyntaxError(f"Expected one inequality sign in '{text}'")
+    match = matches[0]
+    left = parse_expression(normalized[: match.start()].strip(), variables)
+    right = parse_expression(normalized[match.end() :].strip(), variables)
+    relation = match.group(0)
+    return {"<": Lt, "<=": Le, ">": Gt, ">=": Ge}[relation](left, right, evaluate=False)
 
 
 def parse_equation_solution(text: str, variable: str):
@@ -106,12 +129,33 @@ def expressions_equivalent(a: str, b: str, variables: list[str] | None = None) -
 
 def equations_equivalent_solution_set(a: str, b: str, variable: str) -> bool | None:
     try:
-        symbol = Symbol(variable)
-        a_solution = solve(parse_equation(a, [variable]), symbol)
-        b_solution = solve(parse_equation(b, [variable]), symbol)
-        return set(a_solution) == set(b_solution)
+        symbol = Symbol(variable, real=True)
+        a_equation = parse_equation(a, [variable])
+        b_equation = parse_equation(b, [variable])
+        a_solution = _equation_solution_set(a_equation, symbol)
+        b_solution = _equation_solution_set(b_equation, symbol)
+        return a_solution == b_solution
     except Exception:
         return None
+
+
+def inequalities_equivalent_solution_set(a: str, b: str, variable: str) -> bool | None:
+    try:
+        symbol = Symbol(variable, real=True)
+        a_solution = solve_univariate_inequality(parse_inequality(a, [variable]), symbol, relational=False)
+        b_solution = solve_univariate_inequality(parse_inequality(b, [variable]), symbol, relational=False)
+        return simplify(a_solution.symmetric_difference(b_solution)) == S.EmptySet
+    except Exception:
+        return None
+
+
+def _equation_solution_set(equation, symbol: Symbol):
+    residual = simplify(equation.lhs - equation.rhs)
+    if residual == 0:
+        return S.Reals
+    if symbol not in residual.free_symbols:
+        return S.EmptySet
+    return FiniteSet(*(simplify(solution) for solution in solve(residual, symbol)))
 
 
 def symbolic_equal(expected: str, user: str) -> bool:
@@ -144,6 +188,13 @@ def decimal_value(value: str) -> Decimal:
 
 def equation_solution_equal(expected: str, user: str, variable: str) -> bool:
     return symbolic_equal(extract_solution_value(expected, variable), extract_solution_value(user, variable))
+
+
+def inequality_solution_equal(expected: str, user: str, variable: str) -> bool:
+    equivalent = inequalities_equivalent_solution_set(expected, user, variable)
+    if equivalent is None:
+        raise MathSyntaxError(f"Could not compare inequalities '{expected}' and '{user}'")
+    return equivalent
 
 
 def extract_solution_value(value: str, variable: str) -> str:

@@ -22,5 +22,6 @@ SUPPORTED_GRADING_METHODS = {
     "multiple_choice",
     "symbolic_expression",
     "equation_solution",
+    "inequality_solution",
     "theorem_conclusion",
 }

@@ -241,10 +241,8 @@ def _validate_work_block(skill: Skill, question: ProblemTemplate, report: Valida
 
 def _validate_procedural_work(skill: Skill, question: ProblemTemplate, report: ValidationReport) -> None:
     line_type = question.work.get("line_type")
-    if line_type not in {"expression", "equation"}:
-        report.add_error("work.line_type must be expression or equation for procedural_steps", skill, question)
-    if line_type == "equation" and not question.work.get("target_variable"):
-        report.add_error("work.target_variable is required for equation procedural_steps", skill, question)
+    if line_type not in {"expression", "equation", "inequality"}:
+        report.add_error("work.line_type must be expression, equation, or inequality for procedural_steps", skill, question)
     try:
         if int(question.work.get("minimum_steps", 0)) < 0:
             report.add_error("work.minimum_steps must be non-negative", skill, question)

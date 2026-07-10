@@ -18,8 +18,8 @@ def test_preview_samples_grade_expected_answers_and_metadata():
     metadata = skill_metadata(skill)
 
     assert metadata["id"] == "MATH_PREALG_002"
-    assert metadata["generated_template_count"] == 8
-    assert len(samples) == 16
+    assert metadata["generated_template_count"] == len(skill.test.questions)
+    assert len(samples) == metadata["generated_template_count"] * 2
     assert all(not sample.generation_error for sample in samples)
     assert all(sample.expected_answer_correct for sample in samples)
     assert all(not sample.ugly_warnings for sample in samples)

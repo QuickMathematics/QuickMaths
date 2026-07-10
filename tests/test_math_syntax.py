@@ -5,6 +5,7 @@ from quickmaths.math_syntax import (
     format_coefficient,
     format_linear_expression,
     format_school_expression,
+    inequalities_equivalent_solution_set,
     parse_equation_solution,
     parse_expression,
 )
@@ -20,6 +21,18 @@ def test_implicit_multiplication_and_exponents_are_equivalent():
 def test_equation_solution_and_solution_sets_parse():
     assert parse_equation_solution("x = 4", "x") == parse_equation_solution("4", "x")
     assert equations_equivalent_solution_set("2x + 3 = 11", "x = 4", "x") is True
+
+
+def test_equation_solution_sets_distinguish_identities_and_contradictions():
+    assert equations_equivalent_solution_set("2x + 3 = 2x + 3", "3 = 3", "x") is True
+    assert equations_equivalent_solution_set("2x + 3 = 2x + 4", "3 = 4", "x") is True
+    assert equations_equivalent_solution_set("3 = 3", "3 = 4", "x") is False
+
+
+def test_inequality_solution_sets_accept_equivalent_school_notation():
+    assert inequalities_equivalent_solution_set("2x + 6 < 16", "x < 5", "x") is True
+    assert inequalities_equivalent_solution_set("-2x > -10", "x < 5", "x") is True
+    assert inequalities_equivalent_solution_set("x ≤ 5", "x <= 5", "x") is True
 
 
 def test_sqrt_forms_parse():

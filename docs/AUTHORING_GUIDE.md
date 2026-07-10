@@ -664,6 +664,8 @@ For fixed questions, use either:
 prompt: "State the conclusion of the theorem."
 ```
 
+Fixed questions do not need a `variables` block. Do not add a one-value `dummy` variable just to make a constant question generate; use `type: fixed`.
+
 For generated questions, use:
 
 ```yaml
@@ -671,6 +673,17 @@ prompt_template: "Simplify: {a}x + {b}x"
 ```
 
 The loader stores both as `prompt_template`. Generated templates replace `{...}` placeholders.
+
+Placeholders may contain a safe expression such as `{a * d}`, but named `derived` values are preferred when the result is reused in prompts, answers, constraints, or explanations. Named values are easier to preview and diagnose:
+
+```yaml
+derived:
+  left_cross: "a * d"
+  right_cross: "c * b"
+explanation_template: |
+  {a} * {d} = {left_cross}.
+  {c} * {b} = {right_cross}.
+```
 
 ### `difficulty`
 
@@ -936,6 +949,7 @@ Supported methods:
 - `multiple_choice`
 - `symbolic_expression`
 - `equation_solution`
+- `inequality_solution`
 - `theorem_conclusion`
 
 ### `exact_text`
@@ -1007,6 +1021,7 @@ grading:
 ```
 
 Current UI submits the option `id`, not the label.
+Generated placeholders in option labels are rendered before the choices are displayed.
 
 ### `symbolic_expression`
 
@@ -1048,6 +1063,22 @@ Learners may enter:
 - `4 = x`
 
 The answer block must declare `variable`.
+
+Fraction solutions use the same school-notation parser as symbolic expressions. Inputs such as `x = 3/5`, `3/5`, and `x = -3/5` are supported.
+
+### `inequality_solution`
+
+Use for equivalent one-variable inequalities when spacing, Unicode signs, or algebraically equivalent forms should count:
+
+```yaml
+answer:
+  type: inequality
+  value: "x < {bound}"
+grading:
+  method: inequality_solution
+```
+
+Examples such as `x < 5`, `2x < 10`, and `x<5` compare by their real solution sets. The current Algebra Foundations inequality content may continue using `exact_text` until authors intentionally migrate it.
 
 ### `theorem_conclusion`
 
@@ -1211,10 +1242,27 @@ review_policy:
   mastery_requires_review_pass: false
 ```
 
+Inequality example:
+
+```yaml
+answer_mode: final_plus_required_work
+work:
+  mode: procedural_steps
+  prompt: "Show each equivalent inequality step."
+  line_type: inequality
+  target_variable: x
+  minimum_steps: 2
+  require_final_answer_match: true
+review_policy:
+  work_review: auto
+  mastery_requires_review_pass: false
+```
+
 Checker behavior:
 
 - Expression steps must be equivalent line by line.
 - Equation steps must preserve the solution set line by line.
+- Inequality steps must preserve the real solution set line by line, including reversing the sign after multiplying or dividing by a negative number.
 - If `require_final_answer_match: true`, the last work line must match the expected answer.
 - Parse failures return `uncertain`.
 - Incorrect transformations return `incorrect`.
@@ -1225,6 +1273,8 @@ Limitations:
 - It does not prove the learner used the intended method.
 - It is not a full CAS tutoring engine.
 - It should be used for straightforward algebraic transformations.
+
+`target_variable` is recommended whenever the target is not `x`. If omitted, equation and inequality checking defaults to `answer.variable`, then to `x`. Classification questions whose work ends in an identity or contradiction may omit it and set `require_final_answer_match: false`.
 
 ### `proof_obligations`
 

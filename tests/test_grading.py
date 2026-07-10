@@ -44,5 +44,16 @@ def test_equation_solution_accepts_school_style_equation_answer():
     assert grade_answer(problem, "x = 4").is_correct
 
 
+def test_equation_solution_accepts_positive_and_negative_fractions():
+    assert grade_answer(_problem("3/5", "equation_solution", variable="x"), "x = 3/5").is_correct
+    assert grade_answer(_problem("-3/5", "equation_solution", variable="x"), "x = -3/5").is_correct
+
+
+def test_inequality_solution_grading_normalizes_equivalent_forms():
+    problem = _problem("x < 5", "inequality_solution", variable="x")
+    assert grade_answer(problem, "2x < 10").is_correct
+    assert not grade_answer(problem, "x > 5").is_correct
+
+
 def test_symbolic_grading_accepts_caret_exponents():
     assert grade_answer(_problem("x**2 + 2*x + 1", "symbolic_expression"), "(x + 1)^2").is_correct

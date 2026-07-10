@@ -111,7 +111,7 @@ def _build_instance(skill_id: str, template: ProblemTemplate, seed: int, values:
         mistake_tags=list(template.mistake_tags),
         variable=answer.get("variable"),
         tolerance=template.grading.get("tolerance"),
-        options=deepcopy(template.options),
+        options=_render_options(template.options, values),
         answer_mode=template.answer_mode,
         work=deepcopy(template.work),
         review_policy=deepcopy(template.review_policy),
@@ -141,3 +141,11 @@ def _fixed_problem(skill_id: str, template: ProblemTemplate, seed: int) -> Probl
         review_policy=deepcopy(template.review_policy),
         accepted_forms=list(answer.get("accepted_forms", template.grading.get("accepted_forms", []))),
     )
+
+
+def _render_options(options: list[dict], values: dict[str, object]) -> list[dict]:
+    rendered_options = deepcopy(options)
+    for option in rendered_options:
+        if "label" in option:
+            option["label"] = render_template(str(option["label"]), values)
+    return rendered_options

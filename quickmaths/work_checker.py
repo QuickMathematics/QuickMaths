@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import re
 
-from quickmaths.math_syntax import equations_equivalent_solution_set, expressions_equivalent
+from quickmaths.math_syntax import (
+    equations_equivalent_solution_set,
+    expressions_equivalent,
+    inequalities_equivalent_solution_set,
+)
 from quickmaths.models import ProblemInstance, UserResponse, WorkCheckResult
 
 
@@ -74,6 +78,8 @@ def _check_procedural_steps(instance: ProblemInstance, work_text: str) -> WorkCh
         return _check_expression_steps(instance, lines)
     if line_type == "equation":
         return _check_equation_steps(instance, lines)
+    if line_type == "inequality":
+        return _check_inequality_steps(instance, lines)
     return WorkCheckResult("uncertain", "procedural_steps", "auto", messages=[f"Unsupported line_type '{line_type}'."])
 
 
@@ -124,6 +130,36 @@ def _check_equation_steps(instance: ProblemInstance, lines: list[str]) -> WorkCh
         if not equivalent:
             return WorkCheckResult("incorrect", "procedural_steps", "auto", score=0.0, messages=["Final work line does not match expected answer."])
     return WorkCheckResult("correct", "procedural_steps", "auto", score=1.0, messages=["Equation steps preserve the solution set."])
+
+
+def _check_inequality_steps(instance: ProblemInstance, lines: list[str]) -> WorkCheckResult:
+    variable = str(instance.work.get("target_variable") or instance.variable or "x")
+    for index, (previous, current) in enumerate(zip(lines, lines[1:]), start=2):
+        equivalent = inequalities_equivalent_solution_set(previous, current, variable)
+        if equivalent is None:
+            return WorkCheckResult("uncertain", "procedural_steps", "auto", failed_step_index=index)
+        if not equivalent:
+            return WorkCheckResult(
+                "incorrect",
+                "procedural_steps",
+                "auto",
+                score=0.0,
+                messages=[f"Line {index} does not preserve the inequality solution set."],
+                failed_step_index=index,
+            )
+    if instance.work.get("require_final_answer_match", False):
+        equivalent = inequalities_equivalent_solution_set(lines[-1], instance.expected_answer, variable)
+        if equivalent is None:
+            return WorkCheckResult("uncertain", "procedural_steps", "auto", messages=["Could not compare final inequality."])
+        if not equivalent:
+            return WorkCheckResult("incorrect", "procedural_steps", "auto", score=0.0, messages=["Final work line does not match expected answer."])
+    return WorkCheckResult(
+        "correct",
+        "procedural_steps",
+        "auto",
+        score=1.0,
+        messages=["Inequality steps preserve the solution set."],
+    )
 
 
 def _check_proof_obligations(instance: ProblemInstance, work_text: str, review_policy: str) -> WorkCheckResult:

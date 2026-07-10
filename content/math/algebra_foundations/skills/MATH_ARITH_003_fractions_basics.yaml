@@ -902,6 +902,9 @@ test:
           type: int
           min: 3
           max: 12
+      derived:
+        left_cross: "a * d"
+        right_cross: "c * b"
       constraints:
         - "a < b"
         - "c < d"
@@ -924,9 +927,9 @@ test:
         mastery_requires_review_pass: false
       explanation_template: |
         Cross-multiply to compare.
-        {a} * {d} = {a * d}.
-        {c} * {b} = {c * b}.
-        Since {a * d} > {c * b}, {a}/{b} is larger.
+        {a} * {d} = {left_cross}.
+        {c} * {b} = {right_cross}.
+        Since {left_cross} > {right_cross}, {a}/{b} is larger.
       mistake_tags:
         - comparing_fractions
         - cross_multiplication_error
@@ -954,6 +957,9 @@ test:
           type: int
           min: 3
           max: 12
+      derived:
+        left_cross: "a * d"
+        right_cross: "c * b"
       constraints:
         - "a < b"
         - "c < d"
@@ -976,9 +982,9 @@ test:
         mastery_requires_review_pass: false
       explanation_template: |
         Cross-multiply to compare.
-        {a} * {d} = {a * d}.
-        {c} * {b} = {c * b}.
-        Since {c * b} > {a * d}, {c}/{d} is larger.
+        {a} * {d} = {left_cross}.
+        {c} * {b} = {right_cross}.
+        Since {right_cross} > {left_cross}, {c}/{d} is larger.
       mistake_tags:
         - comparing_fractions
         - cross_multiplication_error

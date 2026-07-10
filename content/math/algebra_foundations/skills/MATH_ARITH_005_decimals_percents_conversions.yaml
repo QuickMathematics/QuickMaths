@@ -321,14 +321,9 @@ test:
       difficulty: medium
 
     - id: CONVERT_ZERO_PERCENT_TO_DECIMAL_001
-      type: generated
+      type: fixed
       prompt_template: "Convert 0% to a decimal."
       answer_mode: final_only
-      variables:
-        dummy:
-          type: int
-          min: 1
-          max: 1
       answer:
         type: numeric
         value: "0"
@@ -348,14 +343,9 @@ test:
       difficulty: easy
 
     - id: CONVERT_HUNDRED_PERCENT_TO_DECIMAL_001
-      type: generated
+      type: fixed
       prompt_template: "Convert 100% to a decimal."
       answer_mode: final_only
-      variables:
-        dummy:
-          type: int
-          min: 1
-          max: 1
       answer:
         type: numeric
         value: "1"

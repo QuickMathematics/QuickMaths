@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from quickmaths.math_syntax import accepted_text_match, equation_solution_equal, numeric_equal, numeric_with_tolerance, symbolic_equal
+from quickmaths.math_syntax import (
+    accepted_text_match,
+    equation_solution_equal,
+    inequality_solution_equal,
+    numeric_equal,
+    numeric_with_tolerance,
+    symbolic_equal,
+)
 from quickmaths.models import FinalAnswerGrade, GradingResult, ProblemInstance, UserResponse
 from quickmaths.utils import normalize_spaces
 from quickmaths.work_checker import check_work
@@ -36,6 +43,9 @@ def grade_answer(instance: ProblemInstance, user_answer: str | UserResponse) -> 
             correct = symbolic_equal(expected, user)
         elif method == "equation_solution":
             correct = equation_solution_equal(expected, user, instance.variable or "x")
+        elif method == "inequality_solution":
+            variable = str(instance.variable or instance.work.get("target_variable") or "x")
+            correct = inequality_solution_equal(expected, user, variable)
         elif method == "theorem_conclusion":
             accepted = instance.accepted_forms or [expected]
             correct = accepted_text_match(user, accepted)
