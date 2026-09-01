@@ -850,6 +850,10 @@ function renderSettings(snapshot) {
   `;
 }
 
+function renderLessonHubTabs(activeRoute) {
+  return `<nav class="lesson-hub-tabs" aria-label="Lesson Depot and Studio"><span>Lessons hub</span><div><button type="button" data-route="depot" aria-current="${activeRoute === "depot" ? "page" : "false"}"><b>◇</b> Browse Depot</button><button type="button" data-route="creator" aria-current="${activeRoute === "creator" ? "page" : "false"}"><b>✎</b> Create in Studio</button></div></nav>`;
+}
+
 function renderLessonDepot(snapshot) {
   const depot = lessonDepot?.snapshot() ?? { phase: "loading", catalog: null, error: "", query: "", sort: "popular", subject: "all", preview: null, installingId: "" };
   const packages = filterDepotPackages(depot.catalog?.packages ?? [], depot);
@@ -857,6 +861,7 @@ function renderLessonDepot(snapshot) {
   const installedById = new Map(snapshot.lessonPacks.map((pack) => [pack.id, pack]));
   const preview = depot.preview;
   elements.view.innerHTML = `
+    ${renderLessonHubTabs("depot")}
     <header class="page-head depot-head"><div><p class="eyebrow">Free · open · community reviewed</p><h1>Lesson Depot</h1><p>Find complete subjects and lesson packs made by the QuickMaths community. Every download is hash-checked and run through the same local validator before you can install it.</p></div><div class="page-actions"><a class="button button-outline" href="${DEPOT_DISCUSSIONS_URL}" target="_blank" rel="noopener">Community ↗</a><a class="button button-primary" href="${DEPOT_SUBMISSION_URL}" target="_blank" rel="noopener">Submit a lesson ↗</a></div></header>
     <section class="depot-trust-strip" aria-label="Lesson Depot safety model"><span><b>1</b><strong>Authors submit</strong><small>GitHub pull request</small></span><i>→</i><span><b>2</b><strong>Checks run</strong><small>Schema, graph, hashes</small></span><i>→</i><span><b>3</b><strong>You approve</strong><small>Local install confirmation</small></span><i>→</i><span><b>4</b><strong>Progress saves</strong><small>Normal backup pipeline</small></span></section>
     ${preview ? `<aside class="depot-preview"><div><p class="eyebrow">Validated preview</p><h2>${escapeHtml(preview.pack.name)}</h2><p>${escapeHtml(preview.pack.description)}</p><div class="depot-preview-facts"><span>${preview.preview.skillCount}<small>Lessons</small></span><span>${preview.preview.problemCount}<small>Questions</small></span><span>${escapeHtml(preview.preview.subjectName)}<small>Subject</small></span><span>${escapeHtml(preview.pack.license)}<small>License</small></span></div></div><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(preview.pack.id)}" data-pack-version="${escapeHtml(preview.pack.version)}">Install this pack</button><button class="quiet-button" data-depot-action="close-preview">Close preview</button></aside>` : ""}
@@ -873,7 +878,7 @@ function renderLessonDepot(snapshot) {
       const busy = depot.installingId === pack.id;
       return `<article class="depot-card" data-depot-pack-id="${escapeHtml(pack.id)}"><div class="depot-card-top"><span class="depot-subject">${escapeHtml(pack.subjectName)}</span><span class="depot-version">v${escapeHtml(pack.version)}</span></div><h2>${escapeHtml(pack.name)}</h2><p>${escapeHtml(pack.description)}</p><div class="depot-tags">${pack.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div><dl><div><dt>Author</dt><dd>${escapeHtml(pack.author)}</dd></div><div><dt>Contents</dt><dd>${pack.skills} lessons · ${pack.problems} questions</dd></div><div><dt>License</dt><dd>${escapeHtml(pack.license)}</dd></div></dl><div class="depot-community"><a href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener" aria-label="Vote or comment on ${escapeHtml(pack.name)}"><span>▲ ${pack.votes}</span><span>◯ ${pack.comments}</span><b>Discuss ↗</b></a></div><div class="depot-card-actions"><button class="button button-outline" data-depot-action="preview" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed ? "disabled" : ""}>Preview</button><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed || busy ? "disabled" : ""}>${installed ? `Installed v${escapeHtml(installed.version)}` : busy ? "Checking…" : "Install"}</button></div></article>`;
     }).join("")}</section>${!packages.length ? `<section class="depot-state"><span>⌕</span><h2>No matching lessons yet</h2><p>Try another search—or publish the lesson you wish existed.</p></section>` : ""}` : ""}
-    <section class="depot-contribute"><div><p class="eyebrow">Share what works</p><h2>Create a lesson. Help someone else learn it.</h2><p>Build in Lesson Studio, publish it for community review, or install lessons that other learners and teachers have shared. Every pack is previewed and checked before it can join your curriculum.</p></div><div><button class="button button-primary" data-depot-action="copy-publish-prompt">Copy Codex publishing prompt</button><a class="button button-outline" href="${DEPOT_REPOSITORY_URL}/tree/main/docs/lesson-depot" target="_blank" rel="noopener">See how the Depot works ↗</a></div></section>`;
+    <section class="depot-contribute"><div><p class="eyebrow">Share what works</p><h2>Create a lesson. Help someone else learn it.</h2><p>Build in Lesson Studio, publish it for community review, or install lessons that other learners and teachers have shared. Every pack is previewed and checked before it can join your curriculum.</p></div><div><button class="button button-primary" data-route="creator">Open Lesson Studio</button><button class="button button-outline" data-depot-action="copy-publish-prompt">Copy Codex publishing prompt</button><a class="button button-outline" href="${DEPOT_REPOSITORY_URL}/tree/main/docs/lesson-depot" target="_blank" rel="noopener">See how the Depot works ↗</a></div></section>`;
 }
 
 function renderActivity(activity) {
@@ -900,7 +905,9 @@ function renderActivity(activity) {
 
 function syncNavigation(route) {
   document.querySelectorAll("[data-route]").forEach((button) => {
-    if (button.tagName === "BUTTON") button.setAttribute("aria-current", button.dataset.route === route ? "page" : "false");
+    if (button.tagName !== "BUTTON") return;
+    const activeRoute = button.closest(".mobile-nav") && route === "creator" ? "depot" : route;
+    button.setAttribute("aria-current", button.dataset.route === activeRoute ? "page" : "false");
   });
 }
 
@@ -936,7 +943,7 @@ function render(snapshot) {
   else if (snapshot.ui.route === "test") renderTest(snapshot);
   else if (snapshot.ui.route === "results") renderResults(snapshot);
   else if (snapshot.ui.route === "settings") renderSettings(snapshot);
-  else if (snapshot.ui.route === "creator") elements.view.innerHTML = lessonStudio.render(snapshot);
+  else if (snapshot.ui.route === "creator") elements.view.innerHTML = `${renderLessonHubTabs("creator")}${lessonStudio.render(snapshot)}`;
   else if (snapshot.ui.route === "depot") renderLessonDepot(snapshot);
   if (previousRoute && previousRoute !== snapshot.ui.route) window.scrollTo({ top: 0, behavior: "auto" });
   const nextHash = ["map", "lesson", "test", "results"].includes(snapshot.ui.route)

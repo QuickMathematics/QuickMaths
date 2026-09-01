@@ -753,6 +753,12 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .depot-card dd { overflow: hidden; color: var(--ink); text-align: right; text-overflow: ellipsis; white-space: nowrap; }
 .depot-community a { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 9px; color: var(--pine); text-decoration: none; background: var(--paper); border-radius: 9px; font-size: 7px; font-weight: 800; }
 .depot-community b { margin-left: auto; }
+.lesson-hub-tabs { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; padding: 9px 10px 9px 15px; color: var(--muted); background: color-mix(in srgb, var(--mint) 38%, var(--paper-light)); border: 1px solid var(--line); border-radius: 13px; }
+.lesson-hub-tabs > span { font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.lesson-hub-tabs > div { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.lesson-hub-tabs button { min-height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 13px; color: var(--muted); background: transparent; border: 0; border-radius: 9px; cursor: pointer; font-size: 8px; font-weight: 850; }
+.lesson-hub-tabs button b { font-size: 11px; }
+.lesson-hub-tabs button[aria-current="page"] { color: #fff; background: var(--pine-2); box-shadow: 0 5px 14px rgba(21,63,54,.16); }
 .depot-card-actions { display: grid; grid-template-columns: .65fr 1fr; gap: 7px; }
 .depot-card-actions .button { width: 100%; min-width: 0; padding-inline: 9px; }
 .depot-card-actions button:disabled { cursor: default; opacity: .6; }
@@ -853,6 +859,10 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
   .profile-panel-footer p { max-width: none; text-align: left; }
   .welcome-footer { left: 14px; }
   .page-head { align-items: start; flex-direction: column; }
+  .lesson-hub-tabs { position: sticky; z-index: 35; top: 76px; align-items: stretch; flex-direction: column; gap: 7px; margin: -12px -2px 18px; padding: 8px; background: rgba(247,250,247,.96); box-shadow: 0 8px 20px rgba(21,63,54,.08); backdrop-filter: blur(10px); }
+  .lesson-hub-tabs > span { padding-left: 5px; font-size: 7px; }
+  .lesson-hub-tabs > div { width: 100%; }
+  .lesson-hub-tabs button { min-height: 40px; padding: 0 8px; font-size: 8px; }
   .page-actions { justify-content: flex-start; }
   .metric-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   .metric-card { min-height: 110px; padding: 15px; }

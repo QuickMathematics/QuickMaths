@@ -33,6 +33,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(html, /data-route="settings"/);
   assert.match(html, /data-route="depot"/);
   assert.match(js, /renderLessonDepot/);
+  assert.match(js, /renderLessonHubTabs/);
+  assert.match(js, /button\.closest\("\.mobile-nav"\) && route === "creator"/);
   assert.doesNotMatch(html, /class="mode-switch"|id="replay-tutorial"/);
   assert.match(js, /data-action="map-zoom-in"/);
   assert.match(js, /data-map-scope="all"/);
@@ -51,6 +53,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.map-edges \.is-cross-subject/);
   assert.match(css, /\.map-node \.map-node-subject-accent/);
   assert.match(css, /\.studio-student-preview/);
+  assert.match(css, /\.lesson-hub-tabs/);
   assert.match(css, /\.studio-question-roadmap/);
   assert.match(css, /\.result-review-guide/);
   assert.match(css, /height: clamp\(300px, 60svh, 540px\); max-height: none; contain: layout paint/);
