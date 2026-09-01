@@ -2,7 +2,7 @@
 
 QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, read a lesson, follow the 25-skill prerequisite tree, take varied mastery tests, reflect, review past work, and move progress between devices.
 
-The app requires no OpenAI API key and sends no learner data to an application server. GitHub Pages serves static files, browser `localStorage` holds the current copy, and visible JSON Save/Load controls provide portability.
+The app requires no OpenAI API key and sends no learner data to an application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task.
 
 ## Product surface
 
@@ -20,10 +20,11 @@ The app requires no OpenAI API key and sends no learner data to an application s
 - Human Lesson Creator with tutorial, tooltips, multiple lessons, all graders, proof/rubric controls, validation, download, and install
 - Validated schema 2.0 lesson-set JSON with Agent Lesson Authoring Guide and full backup integration
 - Responsive desktop, tablet, and mobile navigation
+- Optional GitHub Bridge with debounced learner checkpoints, an agent-only workspace, revision-bound agent responses, conflict protection, and a mobile setup guide
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers fifteen page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A machine-readable `agent-manifest.json` is exposed through the read-only `get_agent_guide` tool so backup, tutoring, privacy, navigation, subjects, and custom-content policy are available in context.
+A compatible ChatGPT or Codex browser discovers fifteen page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A machine-readable `agent-manifest.json` is exposed through the read-only `get_agent_guide` tool so backup, tutoring, privacy, navigation, subjects, custom-content, and Bridge policy are available in context.
 
 | Tool | Purpose |
 | --- | --- |
@@ -43,27 +44,31 @@ A compatible ChatGPT or Codex browser discovers fifteen page tools through `docu
 | `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
+The top-level `agent-bridge.html` workspace registers the same fifteen learning tools plus three transport tools:
+
+| Bridge tool | Purpose |
+| --- | --- |
+| `get_bridge_sync_status` | Read connection, dirty state, repository, and synchronization timing without exposing credentials. |
+| `sync_from_learner` | Pull the authoritative learner revision before inspection or work. |
+| `publish_agent_checkpoint` | Publish agent changes bound to the last learner revision. |
+
 Tool inputs use closed JSON Schemas and runtime validation. Read-only tools do not mutate learner state. Agent writes appear in the profile-scoped activity panel. Answer keys and solution steps are excluded from pre-submission learning context; arbitrary code, HTML, expressions to evaluate, storage keys, and network destinations are not accepted from tools.
 
 ## Architecture
 
 ```text
-ChatGPT / Codex browser agent
-            │ WebMCP tool calls
-            ▼
-document.modelContext.registerTool
-            │
-            ▼
-QuickMaths browser store ─────► visible SPA routes
-      │                              │
-      ├── learner profiles           ├── dashboard / subject maps / lessons
-      ├── progress + attempts        ├── tests / results / reviews
-      ├── subjects + lesson packs    ├── Human Lesson Creator
-      ├── reviews + drafts           └── save / load / exports
-      └── themes + timers + activity
-            │
-            ├── browser localStorage
-            └── JSON backup / CSV download
+Mobile learner browser                          Computer / remote Codex task
+┌──────────────────────────┐                    ┌────────────────────────────┐
+│ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
+│ localStorage + WebMCP    │                    │ 18 WebMCP tools            │
+└────────────┬─────────────┘                    └──────────────┬─────────────┘
+             │ debounced, complete state                       │ pull first / publish last
+             ▼                                                 ▼
+        learner-state.json ◄──── private GitHub repo ────► agent-state.json
+             │                    revision checks               │
+             └──── learner remains authoritative; stale or conflicting writes stop
+
+Default/offline mode: browser localStorage + JSON backup + CSV download only.
 ```
 
 Important files:
@@ -75,6 +80,11 @@ Important files:
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports
 - `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio
 - `docs/webmcp-tools.js` — WebMCP schemas, validation, registration, and execution
+- `docs/github-sync.js` — GitHub Contents transport, credential separation, revisions, polling, and conflict checks
+- `docs/agent-bridge.html` — top-level agent-only workspace with no learner-facing UI
+- `docs/bridge-webmcp-tools.js` — pull, publish, and bridge-status tools
+- `docs/bridge-guide.html` — human setup guide and copyable starting prompt
+- `docs/QUICKMATHS_BRIDGE.md` — complete setup, security, and recovery protocol
 - `docs/agent-manifest.json` — machine-readable agent operating and backup policy
 - `docs/CUSTOM_LESSON_SETS.md` — Agent Lesson Authoring Guide
 - `docs/lesson-set-example.json` — installable worked example
@@ -89,18 +99,18 @@ npm --prefix docs test
 pytest -q
 ```
 
-Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience.
+Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience. Open `http://localhost:8765/agent-bridge.html` for the separate 18-tool agent workspace.
 
-The browser contract suite covers profiles, subject filtering, Hard/Open progression, cross-subject bridges, themes, proof-review mastery gates, unlocks, timers, mastery updates, varied retakes, symbolic grading, procedural-work validation, answer-key privacy, agent policy, lesson-set staging and progress round-trips, malformed backups, CSV exports, strict tool inputs, navigation, visible follow-ups, and feedback-to-attempt linkage.
+The browser contract suite covers profiles, subject filtering, Hard/Open progression, cross-subject bridges, themes, proof-review mastery gates, unlocks, timers, mastery updates, varied retakes, symbolic grading, procedural-work validation, answer-key privacy, agent policy, lesson-set staging and progress round-trips, malformed backups, CSV exports, strict tool inputs, navigation, visible follow-ups, feedback-to-attempt linkage, credential isolation, Unicode GitHub transport, optimistic write conflicts, revision-bound agent output, and protection for unsynced learner work.
 
 ## Under-three-minute demo
 
-1. Open the landing page and choose **Explore sample learner**.
-2. Show the live clock, dashboard metrics, and recent attempt, then open the full **Mastery map**.
-3. Ask the browser agent: **“Look at my progress, open my map, choose the best next skill, take me to its lesson, and start its test.”**
-4. Enter one intentionally wrong answer with shown work. Ask: **“Inspect this reasoning, save one Socratic hint without revealing the answer, and prepare a follow-up targeting the misconception.”**
-5. Show the visible tutor note, targeted question, and profile-scoped activity log.
-6. Open **Settings**, download the JSON backup, and point out that the app has no backend, API key, or hosting bill.
+1. On the phone-sized learner page, choose **Explore sample learner** and show the live clock, subject-aware mastery map, and Settings → QuickMaths Bridge status.
+2. On the computer, open the dedicated Agent Bridge and call `sync_from_learner` from Codex. Show that its headless learner summary matches the phone.
+3. Ask: **“Read my progress, choose the best next skill, save one concise Socratic recommendation, and publish it back.”**
+4. Call `publish_agent_checkpoint`, then show the learner page receive the visible change and attribute it to the agent.
+5. Make an unsynced learner edit and demonstrate that stale agent output stops with a conflict instead of overwriting it.
+6. Open the no-code lesson creator or subject map, then download a JSON backup and point out: no app backend, no model API key, and no hosting bill.
 
 ## Free deployment and submission
 

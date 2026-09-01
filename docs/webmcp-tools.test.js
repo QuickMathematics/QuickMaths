@@ -40,6 +40,21 @@ test("browser shell exposes Settings, map zoom, prompt copy, and persistent Agen
   assert.match(css, /touch-action: none/);
   assert.match(css, /\.agent-dock\.is-closed/);
   assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
+  assert.match(js, /createGitHubSyncController/);
+  assert.match(js, /id="github-sync-form"/);
+  assert.match(js, /\.\/agent-bridge\.html/);
+});
+
+test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
+  const html = readFileSync(new URL("./agent-bridge.html", import.meta.url), "utf8");
+  const js = readFileSync(new URL("./agent-bridge.js", import.meta.url), "utf8");
+  assert.match(html, /id="connection-form"/);
+  assert.match(html, /id="pull-button"/);
+  assert.match(html, /id="push-button"/);
+  assert.match(js, /registerWebMcpTools/);
+  assert.match(js, /registerBridgeWebMcpTools/);
+  assert.match(js, /sync\.resume/);
+  assert.match(js, /quickmaths\.agent-bridge/);
 });
 
 test("registers all fifteen tools once with the WebMCP document context", async () => {

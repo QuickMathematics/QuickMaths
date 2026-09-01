@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#123f35">
+    <meta name="referrer" content="no-referrer">
+    <title>QuickMaths Bridge · Mobile agent setup</title>
+    <link rel="icon" href="./quickmaths-logo.png">
+    <link rel="stylesheet" href="./agent-bridge.css">
+  </head>
+  <body>
+    <main class="bridge-shell guide-shell">
+      <header class="bridge-header">
+        <a class="brand" href="./index.html"><span>Q<span>M</span></span><strong>QuickMaths<small>Bridge setup</small></strong></a>
+        <a class="quiet-button" href="./index.html#/settings">Back to Settings</a>
+      </header>
+
+      <section class="hero guide-hero">
+        <div><p class="eyebrow">Zero-backend mobile handoff</p><h1>Your phone learns.<br>Your computer agents.</h1><p>The learner browser and agent workspace exchange revision-checked checkpoints through one private GitHub data repository. QuickMaths still has no server and no model API bill.</p></div>
+        <div class="hero-mark" aria-hidden="true"><span>Q</span><span>M</span><i>↔</i></div>
+      </section>
+
+      <section class="panel guide-panel">
+        <p class="eyebrow">One-time setup</p>
+        <h2>Three things, once.</h2>
+        <ol class="setup-steps">
+          <li><span>1</span><div><h3>Create the data repository</h3><p>Make a private GitHub repository named <code>quickmaths-sync</code>. Check <strong>Add a README</strong> so the <code>main</code> branch exists.</p><a class="primary-button" href="https://github.com/new" target="_blank" rel="noopener">Create private repository ↗</a></div></li>
+          <li><span>2</span><div><h3>Create a narrow token</h3><p>Create a fine-grained token, select only that data repository, and grant only <strong>Repository permissions → Contents → Read and write</strong>. Give it an expiry.</p><a class="primary-button" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create fine-grained token ↗</a></div></li>
+          <li><span>3</span><div><h3>Connect both sides</h3><p>Enter the repository and token in the learner's Settings page. On the computer running Codex, open Agent Bridge as the top-level built-in-browser page and connect the same repository.</p><div class="guide-actions"><a class="primary-button" href="./index.html#/settings">Open learner Settings</a><a class="quiet-button" href="./agent-bridge.html">Open Agent Bridge</a></div></div></li>
+        </ol>
+      </section>
+
+      <section class="bridge-grid lower-grid guide-grid">
+        <article class="panel protocol-panel"><p class="eyebrow">Every agent session</p><ol><li><span>1</span><p><strong>Pull first</strong>Call <code>sync_from_learner</code> before reading or changing learning state.</p></li><li><span>2</span><p><strong>Work through tools</strong>Use QuickMaths site tools so the checkpoint and activity record stay coherent.</p></li><li><span>3</span><p><strong>Publish changes</strong>Call <code>publish_agent_checkpoint</code> after state-changing work.</p></li></ol></article>
+        <article class="panel safety-panel"><p class="eyebrow">Token safety</p><h2>Keys never enter the learning files.</h2><p>The token lives in this browser session unless you explicitly remember it on the device. It is never put in cookies, URLs, backups, lesson sets, WebMCP outputs, or Git commits.</p><p>Because it is still a bearer credential, keep the repository private, limit the token to that repository, and revoke it immediately if a device is lost.</p></article>
+      </section>
+
+      <section class="panel prompt-panel">
+        <p class="eyebrow">Suggested starting prompt</p><h2>Give the remote task a strict handoff routine.</h2>
+        <pre id="bridge-prompt">You are my QuickMaths learning agent. Keep the QuickMaths Agent Bridge open as the top-level page. Read get_agent_guide, then call sync_from_learner before inspecting progress, recommending work, or tutoring. Use only the registered QuickMaths tools to read or change learning state. Tutor Socratically, never reveal pre-submission answer keys, and preserve my subject and Hard/Open path choices. After any saved feedback, follow-up problem, preference change, or staged lesson set, call publish_agent_checkpoint. If sync reports a conflict, pull the learner again and repeat the intended change from current state; never force stale output over learner work. Recommend a downloadable JSON backup at natural stopping points.</pre>
+        <button class="primary-button" id="copy-bridge-prompt" type="button">Copy starting prompt</button><span class="copy-status" id="copy-status" role="status"></span>
+      </section>
+
+      <section class="panel reality-panel"><p class="eyebrow">Important limitation</p><h2>Remote continues a running computer task.</h2><p>GitHub Pages cannot launch Codex, and the phone does not directly control a static page. The computer must remain online with the Codex task running and Agent Bridge open in its built-in browser. Remote lets you continue that task from your phone; the two checkpoint files let its browser and your learner browser meet safely.</p><a class="quiet-button" href="./QUICKMATHS_BRIDGE.md">Read the complete protocol →</a></section>
+    </main>
+    <script type="module" src="./bridge-guide.js"></script>
+  </body>
+</html>

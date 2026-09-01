@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test challenge-core.test.js webmcp-tools.test.js"
+    "test": "node --test *.test.js"
   }
 }

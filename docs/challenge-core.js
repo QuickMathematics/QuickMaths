@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 8;
+export const APP_VERSION = 9;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -1768,6 +1768,16 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return JSON.stringify({ ...clone(state), exportedAt: isoNow(), app: "QuickMaths Web" }, null, 2);
   };
 
+  const exportSyncState = () => {
+    heartbeat();
+    return JSON.stringify({
+      ...clone(state),
+      syncedAt: isoNow(),
+      app: "QuickMaths Web",
+      transport: "QuickMaths Bridge",
+    }, null, 2);
+  };
+
   const parseBackup = (raw) => {
     if (typeof raw !== "string" || raw.length > 10_000_000) throw new Error("Backup file is invalid or too large.");
     let candidate;
@@ -1809,6 +1819,28 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     addActivity("load_progress_backup", `Loaded ${state.profiles.length} profile(s) from a backup.`);
     notify();
     return { ok: true, profileCount: state.profiles.length, attemptCount: state.attempts.length };
+  };
+
+  const importSyncState = (raw) => {
+    const { imported } = parseBackup(raw);
+    state = imported;
+    rebuildCatalog();
+    if (state.activeProfileId && state.profiles.some((profile) => profile.id === state.activeProfileId)) {
+      startSession(state.activeProfileId);
+      if (state.ui.route === "welcome") state.ui.route = state.profiles.find((profile) => profile.id === state.activeProfileId)?.tutorialCompletedAt ? "home" : "tutorial";
+    } else {
+      state.activeProfileId = null;
+      state.session = null;
+      state.ui.route = "welcome";
+    }
+    notify();
+    return {
+      ok: true,
+      activeProfileId: state.activeProfileId,
+      profileCount: state.profiles.length,
+      attemptCount: state.attempts.length,
+      lessonPackCount: state.lessonPacks.length,
+    };
   };
 
   const exportCsv = (kind) => {
@@ -1870,8 +1902,10 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     importLessonPack,
     exportLessonPack,
     exportBackup,
+    exportSyncState,
     previewBackup,
     importBackup,
+    importSyncState,
     exportCsv,
     heartbeat,
     replaceFromStorage,

@@ -490,6 +490,24 @@ test("backup import/export round-trips profiles and rejects unsafe files", () =>
   );
 });
 
+test("bridge sync snapshots round-trip without pretending a manual backup was downloaded", () => {
+  const source = harness();
+  source.store.createProfile("Bridge Learner", { demo: true });
+  const before = source.store.snapshot().backupStatus;
+  const raw = source.store.exportSyncState();
+  const after = source.store.snapshot().backupStatus;
+  assert.equal(before.lastExportAt, null);
+  assert.equal(after.lastExportAt, null);
+  assert.match(raw, /QuickMaths Bridge/);
+
+  const target = harness();
+  const imported = target.store.importSyncState(raw);
+  assert.equal(imported.profileCount, 1);
+  assert.equal(target.store.snapshot().activeProfile.displayName, "Bridge Learner");
+  assert.equal(target.store.snapshot().ui.route, "tutorial");
+  assert.deepEqual(target.store.snapshot().activity, []);
+});
+
 test("malformed nested backup records are removed instead of bricking the app", () => {
   const source = harness();
   source.store.createProfile("Safe Import");

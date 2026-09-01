@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#123f35">
+    <meta name="robots" content="noindex">
+    <meta name="referrer" content="no-referrer">
+    <title>QuickMaths Bridge · Agent workspace</title>
+    <link rel="icon" href="./quickmaths-logo.png">
+    <link rel="stylesheet" href="./agent-bridge.css">
+  </head>
+  <body>
+    <main class="bridge-shell">
+      <header class="bridge-header">
+        <a class="brand" href="./index.html"><span>Q<span>M</span></span><strong>QuickMaths<small>Agent Bridge</small></strong></a>
+        <a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a>
+        <div class="live-status" id="live-status" data-state="idle"><i aria-hidden="true"></i><span>Starting bridge…</span></div>
+      </header>
+
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Remote agent workspace</p>
+          <h1>The learner’s workspace,<br>without the learning UI.</h1>
+          <p>This top-level page mirrors learner checkpoints from GitHub, exposes the full QuickMaths WebMCP toolset, and publishes agent changes back only when they are based on the current learner revision.</p>
+        </div>
+        <div class="hero-mark" aria-hidden="true"><span>Q</span><span>M</span><i>↔</i></div>
+      </section>
+
+      <section class="bridge-grid">
+        <article class="panel connection-panel">
+          <div class="panel-heading"><div><p class="eyebrow">Connection</p><h2>GitHub data repository</h2></div><button id="disconnect-button" class="quiet-button" type="button" hidden>Disconnect</button></div>
+          <form id="connection-form">
+            <div class="two-fields">
+              <label>Owner<input name="owner" autocomplete="username" placeholder="github-user" required></label>
+              <label>Repository<input name="repo" placeholder="quickmaths-sync" required></label>
+            </div>
+            <label>Branch<input name="branch" value="main" required></label>
+            <label>Fine-grained GitHub token<input name="token" type="password" autocomplete="off" placeholder="Contents: read and write"></label>
+            <label class="check-row"><input name="remember" type="checkbox"><span><strong>Remember on this device</strong><small>Required for unattended Remote sessions. Never stored in the repository or a cookie.</small></span></label>
+            <button class="primary-button" type="submit">Connect agent workspace</button>
+            <p class="form-message" id="connection-message" role="status"></p>
+          </form>
+        </article>
+
+        <article class="panel state-panel">
+          <div class="panel-heading"><div><p class="eyebrow">Mirrored learner</p><h2 id="learner-name">Waiting for a checkpoint</h2></div><span class="profile-mark" id="profile-mark">?</span></div>
+          <div class="state-list">
+            <div><span>Subject</span><strong id="learner-subject">—</strong></div>
+            <div><span>Visible route</span><strong id="learner-route">—</strong></div>
+            <div><span>Saved attempts</span><strong id="learner-attempts">0</strong></div>
+            <div><span>Suggested next</span><strong id="learner-suggested">—</strong></div>
+          </div>
+          <div class="bridge-actions"><button id="pull-button" type="button">Pull learner now</button><button id="push-button" class="primary-button" type="button">Publish agent changes</button></div>
+          <p class="state-note" id="state-note">Connect the same repository used by the learner’s QuickMaths Settings page.</p>
+        </article>
+      </section>
+
+      <section class="bridge-grid lower-grid">
+        <article class="panel tool-panel">
+          <div class="panel-heading"><div><p class="eyebrow">WebMCP</p><h2>Agent tools</h2></div><strong id="tool-count">0</strong></div>
+          <p id="tool-status">Waiting for a compatible Codex or ChatGPT browser.</p>
+          <div id="tool-list" class="tool-list"></div>
+        </article>
+        <article class="panel protocol-panel">
+          <p class="eyebrow">Safe handoff protocol</p>
+          <ol>
+            <li><span>1</span><p><strong>Pull first</strong>Load the newest learner checkpoint before inspecting or changing anything.</p></li>
+            <li><span>2</span><p><strong>Use site tools</strong>Read progress, tutor visible work, stage lessons, or save feedback through QuickMaths.</p></li>
+            <li><span>3</span><p><strong>Publish once</strong>Send a based agent checkpoint. Stale work is rejected instead of overwriting learning.</p></li>
+          </ol>
+        </article>
+      </section>
+    </main>
+    <div id="toast" class="toast" hidden></div>
+    <script type="module" src="./agent-bridge.js"></script>
+  </body>
+</html>

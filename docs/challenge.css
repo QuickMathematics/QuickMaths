@@ -781,6 +781,50 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
   .tour-ownership-preview article > b { grid-column: 2; justify-self: start; }
 }
 
+/* QuickMaths Bridge */
+.github-bridge-card { margin: 24px 0; overflow: hidden; }
+.bridge-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.bridge-card-heading h2 { margin: 0 0 8px; font-family: var(--font-display); font-size: clamp(26px, 3vw, 38px); }
+.bridge-card-heading p:not(.eyebrow) { max-width: 760px; margin: 0; color: var(--muted); line-height: 1.6; }
+.sync-phase { display: inline-flex; align-items: center; flex: 0 0 auto; gap: 8px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: var(--paper-light); font-size: 11px; font-weight: 800; }
+.sync-phase i { width: 9px; height: 9px; border-radius: 50%; background: #a6aaa5; }
+.sync-phase.connected i { background: #359360; box-shadow: 0 0 0 4px color-mix(in srgb, #359360 15%, transparent); }
+.sync-phase.error i, .sync-phase.conflict i { background: var(--coral); box-shadow: 0 0 0 4px color-mix(in srgb, var(--coral) 15%, transparent); }
+.github-sync-form { display: grid; gap: 15px; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
+.github-sync-form label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 800; }
+.github-sync-form input { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper-light); color: var(--ink); outline: none; }
+.github-sync-form input:focus { border-color: var(--pine); box-shadow: 0 0 0 3px color-mix(in srgb, var(--pine) 12%, transparent); }
+.github-repo-fields { display: grid; grid-template-columns: 1fr 1fr .65fr; gap: 12px; }
+.bridge-remember { display: flex !important; align-items: flex-start; gap: 10px !important; color: var(--ink) !important; }
+.bridge-remember input { flex: 0 0 auto; width: 18px; min-height: 18px; margin-top: 2px; accent-color: var(--pine); }
+.bridge-remember span { display: grid; gap: 3px; }
+.bridge-remember small { color: var(--muted); font-weight: 500; line-height: 1.45; }
+.bridge-connect-actions, .bridge-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.bridge-form-note { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.bridge-warning, .bridge-choice { display: flex; align-items: center; gap: 14px; margin-top: 20px; padding: 15px; border-radius: 13px; background: color-mix(in srgb, var(--coral) 11%, var(--paper-light)); border-left: 4px solid var(--coral); }
+.bridge-warning { align-items: flex-start; }
+.bridge-warning p, .bridge-choice p { margin: 3px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.bridge-choice > div { flex: 1; }
+.bridge-status-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 23px 0; }
+.bridge-status-grid article { display: grid; gap: 4px; min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-light); }
+.bridge-status-grid span { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.bridge-status-grid strong { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.bridge-status-grid small { color: var(--muted); font-size: 10px; }
+.bridge-toolbar { margin-bottom: 14px; }
+.danger-link { margin-left: auto; color: var(--coral); }
+@media (max-width: 900px) {
+  .github-repo-fields { grid-template-columns: 1fr 1fr; }
+  .github-repo-fields label:last-child { grid-column: 1 / -1; }
+  .bridge-status-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .bridge-card-heading, .bridge-choice { align-items: flex-start; flex-direction: column; }
+  .github-repo-fields, .bridge-status-grid { grid-template-columns: 1fr; }
+  .github-repo-fields label:last-child { grid-column: auto; }
+  .bridge-connect-actions .button, .bridge-toolbar .button { width: 100%; justify-content: center; }
+  .danger-link { margin-left: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }

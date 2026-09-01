@@ -1,6 +1,11 @@
 import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js";
 import { createLessonStudio } from "./lesson-creator.js";
+import {
+  createGitHubContentsClient,
+  createGitHubCredentialStore,
+  createGitHubSyncController,
+} from "./github-sync.js";
 
 const elements = {
   loading: document.querySelector("#loading-screen"),
@@ -34,6 +39,10 @@ let agentHighlightTimer;
 let routeHistoryReady = false;
 let applyingHistory = false;
 let lessonStudio;
+let githubSync;
+let githubCredentials;
+let githubSyncSnapshot = { phase: "disconnected", connected: false, dirty: false, remoteAvailable: false, config: null, error: null, conflict: null };
+let bridgeNeedsChoice = false;
 
 const AGENT_STARTER_PROMPT = "Read the QuickMaths agent guide first. Check the current app state and whether I should make a backup. Review my active subject, learning path, mastery map, recent attempts, mistake tags, and any work currently visible. Recommend one best next skill and briefly explain why. If I choose it, open the lesson or test and tutor Socratically: inspect only visible work, give one hint or question at a time, never reveal answer keys before submission, save concise feedback when useful, and remind me to back up at a natural stopping point.";
 const MAP_ZOOM_MIN = 0.1;
@@ -673,6 +682,51 @@ function renderResults(snapshot) {
 
 const TUTOR_SETUP_PROMPT = `${AGENT_STARTER_PROMPT} If WebMCP tools are unavailable, ask me to paste only the relevant progress summary or shown work—never a raw lesson-set file with answer keys.`;
 
+function bridgePhaseLabel(status) {
+  if (status.phase === "conflict") return "Needs your choice";
+  if (status.error) return "Connection problem";
+  if (["connecting", "checking", "pulling", "pushing"].includes(status.phase)) return `${status.phase[0].toUpperCase()}${status.phase.slice(1)}…`;
+  if (status.connected && status.dirty) return "Waiting to sync";
+  if (status.connected) return "Connected";
+  return "Not connected";
+}
+
+function renderGitHubBridge(snapshot) {
+  const status = githubSyncSnapshot;
+  const saved = githubCredentials?.load({ role: "learner" });
+  const repository = status.config ? `${status.config.owner}/${status.config.repo}` : null;
+  const phaseClass = status.phase === "conflict" ? "conflict" : status.error ? "error" : status.connected ? "connected" : "idle";
+  if (!status.connected) {
+    return `
+      <section class="content-card github-bridge-card" id="github-bridge">
+        <div class="bridge-card-heading"><div><p class="eyebrow">QuickMaths Bridge · experimental</p><h2>Connect mobile learning to a remote agent</h2><p>Your browser remains the instant local save. A dedicated GitHub data repository carries debounced checkpoints between this learner page and the agent workspace.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
+        <form id="github-sync-form" class="github-sync-form">
+          <div class="github-repo-fields"><label>Repository owner<input name="owner" value="${escapeHtml(saved?.owner ?? "")}" autocomplete="username" placeholder="github-user" required></label><label>Data repository<input name="repo" value="${escapeHtml(saved?.repo ?? "quickmaths-sync")}" placeholder="quickmaths-sync" required></label><label>Branch<input name="branch" value="${escapeHtml(saved?.branch ?? "main")}" required></label></div>
+          <label>Fine-grained GitHub token<input name="token" type="password" autocomplete="off" placeholder="${saved?.token ? "Saved for this browser session" : "Repository Contents: read and write"}" ${saved?.token ? "" : "required"}></label>
+          <label class="bridge-remember"><input name="remember" type="checkbox" ${saved?.rememberToken ? "checked" : ""}><span><strong>Remember token on this device</strong><small>Useful on your own phone. This stores it in browser storage—not cookies or the repository. Leave off on a shared device.</small></span></label>
+          <div class="bridge-connect-actions"><button class="button button-primary" type="submit">Connect GitHub storage</button><a class="button button-outline" href="https://github.com/new" target="_blank" rel="noopener">Create private data repo ↗</a><a class="button button-outline" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create fine-grained token ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a></div>
+          <p class="bridge-form-note">For safety, grant the token access only to a separate data repository—not the public QuickMaths code fork. It needs <strong>Contents: read and write</strong>; no account, workflow, or administration permissions.</p>
+          <p id="github-sync-message" class="form-message" role="status">${escapeHtml(status.error ?? "")}</p>
+        </form>
+      </section>`;
+  }
+
+  return `
+    <section class="content-card github-bridge-card" id="github-bridge">
+      <div class="bridge-card-heading"><div><p class="eyebrow">QuickMaths Bridge · experimental</p><h2>${escapeHtml(repository)}</h2><p>Local work is checkpointed after a short pause. Agent updates are accepted only when they were created from the current learner revision.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
+      ${status.error ? `<aside class="bridge-warning"><strong>${status.phase === "conflict" ? "Sync conflict" : "Bridge paused"}</strong><p>${escapeHtml(status.error)}</p></aside>` : ""}
+      ${bridgeNeedsChoice ? `<aside class="bridge-choice"><div><strong>A learner checkpoint already exists on GitHub.</strong><p>Choose which complete copy should become current. Nothing is overwritten until you choose.</p></div><button class="button button-primary" data-action="bridge-load-remote">Load GitHub copy</button><button class="button button-outline" data-action="bridge-replace-remote">Use this device</button></aside>` : ""}
+      <div class="bridge-status-grid">
+        <article><span>Local state</span><strong>${status.dirty ? "Pending checkpoint" : "Checkpointed"}</strong><small>Browser autosave stays instant</small></article>
+        <article><span>Last learner push</span><strong>${status.lastPushedAt ? escapeHtml(formatDate(status.lastPushedAt)) : "This session: not yet"}</strong><small>${escapeHtml(status.config.branch)}</small></article>
+        <article><span>Last agent pull</span><strong>${status.lastPulledAt ? escapeHtml(formatDate(status.lastPulledAt)) : "Waiting"}</strong><small>${status.remoteAvailable ? "Remote files detected" : "No agent checkpoint yet"}</small></article>
+        <article><span>Token storage</span><strong>${saved?.rememberToken ? "Remembered here" : "This tab session"}</strong><small>Never committed</small></article>
+      </div>
+      <div class="bridge-toolbar"><button class="button button-primary" data-action="bridge-push" ${bridgeNeedsChoice ? "disabled" : ""}>Sync now</button><button class="button button-outline" data-action="bridge-pull-agent" ${bridgeNeedsChoice ? "disabled" : ""}>Check agent updates</button><a class="button button-outline" href="./agent-bridge.html" target="_blank" rel="noopener">Open Agent Bridge ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a><button class="quiet-button danger-link" data-action="bridge-disconnect">Disconnect</button></div>
+      <p class="bridge-form-note"><strong>Remote-session flow:</strong> keep the Agent Bridge open in the paired computer’s Codex browser, then start or guide that task from ChatGPT Remote on your phone.</p>
+    </section>`;
+}
+
 function renderSettings(snapshot) {
   const backup = snapshot.backupStatus;
   elements.view.innerHTML = `
@@ -681,6 +735,7 @@ function renderSettings(snapshot) {
       <article class="settings-control-card"><h2>Learning path</h2><p>This setting belongs to ${escapeHtml(snapshot.activeProfile.displayName)} and travels inside full backups.</p><div class="settings-mode-grid" role="group" aria-label="Progression mode"><button type="button" data-progression-mode="hard" aria-pressed="${snapshot.progressionMode === "hard"}"><strong>Hard path</strong><small>Prerequisites must be proven before connected mastery tests unlock.</small></button><button type="button" data-progression-mode="soft" aria-pressed="${snapshot.progressionMode === "soft"}"><strong>Open path</strong><small>Connections remain guidance, while every lesson and test stays available.</small></button></div></article>
       <article class="settings-control-card settings-tour-action"><div><h2>App tutorial</h2><p>Replay all six chapters without resetting progress, subjects, lessons, or preferences.</p></div><button class="button button-secondary" type="button" data-action="replay-tutorial">Replay app tour</button></article>
     </section>
+    ${renderGitHubBridge(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="storage-summary">
       <article><span>Storage</span><strong>${snapshot.storageError ? "Needs backup" : "Autosaving"}</strong><small>${snapshot.storageError ? escapeHtml(snapshot.storageError) : "Browser local storage"}</small></article>
@@ -807,6 +862,81 @@ function saveBackup() {
   showToast("Backup downloaded.");
 }
 
+async function prepareLearnerBridge({ resumed = false } = {}) {
+  const remote = await githubSync.inspectRemote();
+  const local = store.snapshot();
+  const metadata = githubCredentials.loadMetadata?.({ role: "learner" });
+  const remoteMatchesKnown = remote.learner.exists && metadata?.learnerSha === remote.learner.sha;
+  bridgeNeedsChoice = false;
+  if (!remote.learner.exists) {
+    if (local.profiles.length) await githubSync.pushNow();
+    githubSync.start();
+  } else if (!local.profiles.length) {
+    await githubSync.restoreLearner({ force: true });
+    githubSync.start();
+  } else if (resumed && remoteMatchesKnown) {
+    githubSync.start();
+    if (githubSync.snapshot().dirty) await githubSync.pushNow();
+  } else {
+    bridgeNeedsChoice = true;
+    githubSync.stop();
+  }
+  if (!bridgeNeedsChoice && remote.agent?.exists) {
+    try { await githubSync.pullNow(); } catch { /* The status card explains stale agent output. */ }
+  }
+  if (store.snapshot().ui.route === "settings") renderSettings(store.snapshot());
+  return remote;
+}
+
+async function connectLearnerBridge(form) {
+  const data = new FormData(form);
+  const saved = githubCredentials.load({ role: "learner" });
+  await githubSync.connect({
+    owner: data.get("owner"),
+    repo: data.get("repo"),
+    branch: data.get("branch"),
+    token: String(data.get("token") || saved?.token || ""),
+    rememberToken: data.get("remember") === "on",
+  }, { startPolling: false });
+  await prepareLearnerBridge();
+  showToast(bridgeNeedsChoice ? "Choose which learner checkpoint to keep." : "QuickMaths Bridge connected.");
+}
+
+async function bridgeAction(action) {
+  if (!githubSync) return;
+  try {
+    if (action === "bridge-push") {
+      await githubSync.pushNow();
+      showToast("Learner checkpoint pushed to GitHub.");
+    }
+    if (action === "bridge-pull-agent") {
+      const result = await githubSync.pullNow();
+      showToast(result.updated ? "Agent changes applied." : "No new agent changes.");
+    }
+    if (action === "bridge-load-remote") {
+      if (!window.confirm("Replace this browser's complete QuickMaths state with the GitHub learner checkpoint?\n\nDownload a JSON backup first if you need to keep the current browser copy.")) return;
+      await githubSync.restoreLearner({ force: true });
+      bridgeNeedsChoice = false;
+      githubSync.start();
+      showToast("GitHub learner checkpoint loaded.");
+    }
+    if (action === "bridge-replace-remote") {
+      if (!window.confirm("Replace the GitHub learner checkpoint with this browser's complete QuickMaths state?\n\nThe previous GitHub version remains in repository history.")) return;
+      await githubSync.pushNow({ force: true });
+      bridgeNeedsChoice = false;
+      githubSync.start();
+      showToast("GitHub learner checkpoint replaced.");
+    }
+    if (action === "bridge-disconnect") {
+      githubSync.disconnect();
+      bridgeNeedsChoice = false;
+      showToast("QuickMaths Bridge disconnected on this device.");
+    }
+  } catch (error) {
+    showToast(error instanceof Error ? error.message : String(error));
+  }
+}
+
 document.querySelector("#create-profile-form").addEventListener("submit", (event) => {
   event.preventDefault();
   elements.profileError.textContent = "";
@@ -917,6 +1047,10 @@ document.addEventListener("click", (event) => {
   }
   const action = event.target.closest("[data-action]");
   if (!action) return;
+  if (action.dataset.action.startsWith("bridge-")) {
+    bridgeAction(action.dataset.action);
+    return;
+  }
   if (action.dataset.action === "save-backup") saveBackup();
   if (["start-suggested", "start-test", "retake"].includes(action.dataset.action)) store.startTest(action.dataset.skillId);
   if (action.dataset.action === "open-attempt") store.openAttempt(action.dataset.attemptId);
@@ -982,6 +1116,13 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("submit", (event) => {
+  if (event.target.id === "github-sync-form") {
+    event.preventDefault();
+    connectLearnerBridge(event.target).catch((error) => {
+      showToast(error instanceof Error ? error.message : String(error));
+    });
+    return;
+  }
   if (event.target.id === "test-form") {
     event.preventDefault();
     const result = store.submitTest();
@@ -1070,6 +1211,24 @@ async function boot() {
     // The tools still work if the optional human/machine-readable guide is unavailable.
   }
   store = createQuickMathsStore({ storage: window.localStorage, curriculum });
+  githubCredentials = createGitHubCredentialStore({
+    configStorage: window.localStorage,
+    sessionCredentialStorage: window.sessionStorage,
+    persistentCredentialStorage: window.localStorage,
+  });
+  githubSync = createGitHubSyncController({
+    role: "learner",
+    client: createGitHubContentsClient(),
+    credentialStore: githubCredentials,
+    serializeState: () => store.exportSyncState(),
+    applyState: (raw) => store.importSyncState(raw),
+    subscribeToState: (listener) => store.subscribe(listener),
+  });
+  githubSyncSnapshot = githubSync.snapshot();
+  githubSync.subscribe((status) => {
+    githubSyncSnapshot = status;
+    if (currentSnapshot?.activeProfile && currentSnapshot.ui.route === "settings") renderSettings(currentSnapshot);
+  });
   lessonStudio = createLessonStudio({
     store,
     download,
@@ -1102,9 +1261,19 @@ async function boot() {
   }, 1000);
   document.addEventListener("visibilitychange", () => { if (document.hidden) store.heartbeat(true); });
   window.addEventListener("pagehide", () => store.heartbeat(true));
+  window.addEventListener("pagehide", () => githubSync.stop());
   window.addEventListener("storage", (event) => { if (event.key === "quickmaths.web.v2") store.replaceFromStorage(); });
   window.addEventListener("popstate", applyLocationRoute);
   window.addEventListener("hashchange", applyLocationRoute);
+  const savedBridge = githubCredentials.load({ role: "learner" });
+  if (savedBridge?.token) {
+    try {
+      await githubSync.resume({ startPolling: false });
+      await prepareLearnerBridge({ resumed: true });
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : String(error));
+    }
+  }
 }
 
 boot().catch((error) => {
