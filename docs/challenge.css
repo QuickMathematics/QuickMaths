@@ -45,7 +45,7 @@ a { color: var(--pine-2); }
 .skip-link:focus { transform: translateY(0); }
 
 .eyebrow { margin: 0 0 8px; color: var(--pine-2); font-size: 10px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
-.button { min-height: 44px; padding: 0 17px; border: 1px solid transparent; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight: 850; transition: transform 140ms ease, box-shadow 140ms ease; }
+.button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 8px 17px; color: inherit; text-align: center; text-decoration: none; border: 1px solid transparent; border-radius: 12px; cursor: pointer; font-family: var(--sans); font-size: 12px; font-weight: 850; line-height: 1.2; transition: transform 140ms ease, box-shadow 140ms ease; }
 .button:hover { transform: translateY(-1px); }
 .button-primary { color: #fff; background: var(--pine); box-shadow: 0 9px 20px rgba(21, 63, 54, .16); }
 .button-secondary { color: var(--pine); background: var(--mint); }
