@@ -1,6 +1,6 @@
 import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260901-guided-studio";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260901-combined-map";
-import { createLessonStudio } from "./lesson-creator.js?v=20260901-proof-picker";
+import { createLessonStudio } from "./lesson-creator.js?v=20260901-proof-lifecycle";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,

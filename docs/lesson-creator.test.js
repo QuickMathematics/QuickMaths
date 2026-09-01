@@ -39,11 +39,14 @@ test("Lesson Studio explains proof syntax and builds a required reviewed proof",
   const html = studio.render(state);
   const problem = studio.buildPack().skills[0].problems[0];
 
-  assert.match(html, /No proof language to learn/);
-  assert.match(html, /Proof required — structured proof \+ review/);
+  assert.match(html, /Author a proof skeleton, not a secret answer/);
+  assert.match(html, /Formal proof required — reviewed before mastery/);
   assert.match(html, /Question response type/);
+  assert.match(html, /Advanced Algebra/);
+  assert.match(html, /One question, two judgments, four stages/);
+  assert.match(html, /WebMCP tutor judges validity/);
   assert.match(html, /Learner view preview/);
-  assert.match(html, /Plain text/);
+  assert.match(html, /ordinary text/);
   assert.match(html, /Mastery waits for a passed review/);
   assert.equal(problem.answer_mode, "final_plus_required_work");
   assert.equal(problem.work.mode, "proof_obligations");
@@ -57,7 +60,7 @@ test("Lesson Studio help controls expose tappable tooltip content", () => {
   const { studio, state } = studioHarness();
   const html = studio.render(state);
   assert.match(html, /data-studio-help/);
-  assert.match(html, /data-tooltip="Choose proof here/);
+  assert.match(html, /data-tooltip="Advanced Algebra-style steps are checked automatically/);
   assert.match(html, /aria-expanded="false"/);
   assert.match(html, /Tap or hover any/);
 });
@@ -68,7 +71,11 @@ test("advanced authoring examples populate readable proof and rubric guidance", 
   studio.handleAction({ dataset: { creatorAction: "apply-proof-example", index: "0" } });
   let problem = studio.buildPack().skills[0].problems[0];
   assert.match(problem.work.prompt, /plain language/i);
-  assert.equal(problem.work.proof_policy.obligations.length, 4);
+  assert.equal(problem.grading_method, "theorem_conclusion");
+  assert.equal(problem.expected_answer, "sqrt(2) is irrational");
+  assert.equal(problem.work.proof_policy.obligations.length, 6);
+  assert.deepEqual(problem.work.proof_policy.accepted_strategies, ["Contradiction using parity"]);
+  assert.equal(problem.review_policy.mastery_requires_review_pass, true);
 
   changeWorkMode(studio, "rubric_check");
   studio.handleAction({ dataset: { creatorAction: "apply-rubric-example", index: "0" } });

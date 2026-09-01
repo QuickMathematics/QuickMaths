@@ -165,6 +165,19 @@ Supported `answer_mode` values are `final_only`, `final_plus_optional_work`, and
 | Structure a proof | `proof_obligations` | Shows obligations and strategies, captures the proof, and waits for review. |
 | Grade open reasoning | `rubric_check` | Shows rubric criteria, captures work, and waits for review. |
 
+### Checked maths steps are not formal proofs
+
+The Advanced Algebra curriculum primarily uses `procedural_steps`. The learner writes one equivalent equation or expression per line, and QuickMaths conservatively checks each transition plus the final-line match. That workflow can finish automatically.
+
+`proof_obligations` is a different system. A proof question has two deliberately separate judgments:
+
+1. The short final conclusion is graded with the selected final-answer grader and `accepted_forms`.
+2. The proof text is required and stored with the exact obligation checklist shown to the learner.
+3. QuickMaths checks that a meaningful submission exists, but never treats a correct conclusion or matching keywords as proof validity.
+4. A self, human, or WebMCP tutor reviews the reasoning against every obligation. When `mastery_requires_review_pass` is true, mastery remains unchanged until that review passes.
+
+Author obligations as concrete logical milestones—such as “Derives p² = 2q²” and “Explains the contradiction with lowest terms”—rather than vague instructions such as “Shows good reasoning.” Accepted strategies are legitimate routes the learner may take, not phrases they must reproduce.
+
 Procedural example:
 
 ```json

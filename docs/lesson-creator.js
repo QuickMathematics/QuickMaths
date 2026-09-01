@@ -21,15 +21,15 @@ const WORK_MODE_GUIDES = {
   },
   procedural_steps: {
     title: "Checked maths steps",
-    summary: "Asks for one mathematical step per line and checks the shape of each line before submission.",
-    syntax: "Use readable maths such as 2x + 5 = 13, one equation or expression per line.",
-    flow: "Student enters steps → app checks notation and step count → app grades the final answer.",
+    summary: "The Advanced Algebra-style workflow: the learner writes one transformation per line and QuickMaths checks that each line stays mathematically equivalent.",
+    syntax: "Use readable maths such as 2x + 5 = 13, one equation or expression per line. This is machine-checked work, not a formal proof review.",
+    flow: "Student enters steps → app checks every transition and the final line → mastery can update immediately.",
   },
   proof_obligations: {
-    title: "Structured proof",
-    summary: "Shows a required proof box plus a checklist of claims the proof must address.",
-    syntax: "Plain text—no JSON, LaTeX, or magic keywords. One claim or reason per line is easiest to review.",
-    flow: "Student writes proof → app checks that work was supplied → self, human, or agent review signs it off → mastery updates.",
+    title: "Required formal proof",
+    summary: "Creates two judgments: QuickMaths grades the short conclusion, then a self, human, or agent reviewer judges the proof against your obligation checklist.",
+    syntax: "The proof is ordinary text—no JSON, LaTeX, or magic keywords. QuickMaths checks that proof text exists; it never pretends that this proves the logic is valid.",
+    flow: "Conclusion is graded → proof is saved as pending review → reviewer checks every obligation → mastery moves only after a pass.",
   },
   rubric_check: {
     title: "Rubric-reviewed response",
@@ -172,12 +172,29 @@ function renderStudentPreview(problem) {
     <header><div><span>Learner view preview</span><strong>${esc(guide.title)}</strong></div><b>${required ? "Required work" : problem.answerMode === "final_plus_optional_work" ? "Optional work" : "Final answer"}</b></header>
     <article>
       <small>QUESTION</small><h4>${esc(problem.prompt || "Your learner-facing question appears here.")}</h4>
-      <label><span>Final answer</span><i>${esc(problem.expectedAnswer ? "Learner enters an answer here" : "Set the private expected answer above")}</i></label>
+      <label><span>${problem.workMode === "proof_obligations" ? "Final conclusion (graded separately)" : "Final answer"}</span><i>${esc(problem.expectedAnswer ? "Learner enters an answer here" : problem.workMode === "proof_obligations" ? "Set the private expected conclusion above" : "Set the private expected answer above")}</i></label>
       ${problem.workMode === "proof_obligations" ? `<div class="studio-preview-guide"><strong>Your proof must cover</strong><ol>${obligations.map((item) => `<li>${esc(item)}</li>`).join("") || "<li>Add at least one proof obligation.</li>"}</ol>${strategies.length ? `<p><b>Accepted approaches:</b> ${strategies.map(esc).join(" · ")}</p>` : ""}</div>` : ""}
       ${problem.workMode === "rubric_check" ? `<div class="studio-preview-guide"><strong>Your response will be reviewed for</strong><ul>${criteria.map((item) => `<li>${esc(item)}</li>`).join("") || "<li>Add at least one rubric criterion.</li>"}</ul></div>` : ""}
       ${problem.workMode !== "none" ? `<label class="studio-preview-work"><span>${esc(problem.workPrompt || "Show your work")} ${required ? "(required)" : "(optional)"}</span><i>${esc(workPlaceholder(problem.workMode)).replaceAll("\n", "<br>")}</i></label>` : ""}
     </article>
     <footer>${esc(guide.flow)}</footer>
+  </section>`;
+}
+
+function renderProofAnatomy(problem) {
+  const reviewer = problem.workReview === "self_review" ? "Learner self-review" : "Human tutor or agent review";
+  return `<section class="studio-proof-anatomy">
+    <header><div><span>What “proof required” actually does</span><strong>One question, two judgments, four stages</strong></div><b>Mastery gate</b></header>
+    <div class="studio-proof-flow">
+      <article><span>1</span><div><strong>Conclusion</strong><b>Auto-graded</b><p>The short final conclusion is checked against the private expected conclusion and any accepted forms. This score alone does not validate the proof.</p></div></article>
+      <i>→</i>
+      <article><span>2</span><div><strong>Proof submission</strong><b>Required</b><p>The learner receives a separate proof box and the visible obligation checklist you author below. Empty or extremely short work is blocked.</p></div></article>
+      <i>→</i>
+      <article><span>3</span><div><strong>Pending review</strong><b>Saved, not guessed</b><p>QuickMaths stores the exact proof and exposes it with the obligations. It does not claim that keywords or a correct conclusion make the reasoning valid.</p></div></article>
+      <i>→</i>
+      <article><span>4</span><div><strong>${esc(reviewer)}</strong><b>Pass required</b><p>The reviewer compares the reasoning with every obligation and records pass, partial, revision, or fail. Mastery waits until the required review passes.</p></div></article>
+    </div>
+    <div class="studio-proof-contrast"><article><span>Advanced Algebra</span><strong>Checked maths steps</strong><p>QuickMaths checks whether each equation or expression is equivalent to the previous line and whether the last line matches the answer. Usually no tutor sign-off.</p></article><article><span>Formal proof</span><strong>Proof obligations</strong><p>QuickMaths checks submission requirements, then a human or WebMCP tutor judges validity against the proof skeleton. The final conclusion and the proof are deliberately separate.</p></article></div>
   </section>`;
 }
 
@@ -198,7 +215,7 @@ function renderAdvancedWork(problem, index) {
     <div class="studio-two">${indexed(select("Answer layout", "problem.answerMode", answerValue, answerOptions, "Proofs, rubrics, and checked maths steps always require the work box; explanations may be optional."))}${indexed(select(reviewIsRequired ? "Who signs it off?" : "After submission", "problem.workReview", reviewValue, reviewOptions, "Proofs and rubric responses are never semantically auto-graded; a reviewer must pass them."))}</div>
     ${problem.workMode !== "none" ? indexed(area("Instruction above the learner's work box", "problem.workPrompt", problem.workPrompt, { rows: 2, hint: "This sentence appears verbatim above the learner's response box." })) : ""}
     ${problem.workMode === "procedural_steps" ? `<div class="studio-two">${indexed(field("Minimum lines", "problem.minimumSteps", problem.minimumSteps, { type:"number", min:1, max:10, hint:"The app blocks submission until this many non-empty lines are present." }))}${indexed(select("Allowed line format", "problem.lineType", problem.lineType, [["expression","Expressions"],["equation","Equations / relations"],["mixed","Maths or explanatory text"],["text","Text only"]], "Equation mode expects =, <, >, ≤, or ≥ on every line."))}</div><button class="studio-example-button" type="button" data-creator-action="apply-procedural-example" data-index="${index}">Use a clear step-by-step instruction</button>` : ""}
-    ${problem.workMode === "proof_obligations" ? `<aside class="studio-syntax-note"><strong>No proof language to learn.</strong><p>The learner writes ordinary text in one box. Each line below becomes a visible checklist item; it is not a command or a hidden keyword.</p></aside>${indexed(area("What the proof must establish — one item per line", "problem.proofObligations", problem.proofObligations, { rows:5, hint:"Write outcomes, not instructions: “Defines continuity at x = a” is better than “Do the proof.”" }))}${indexed(area("Accepted proof approaches — one per line", "problem.proofStrategies", problem.proofStrategies, { rows:3, hint:"These are suggestions shown to the learner, not exact phrases they must type." }))}<button class="studio-example-button" type="button" data-creator-action="apply-proof-example" data-index="${index}">Fill with an editable proof example</button>` : ""}
+    ${problem.workMode === "proof_obligations" ? `${renderProofAnatomy(problem)}<aside class="studio-syntax-note"><strong>Author a proof skeleton, not a secret answer.</strong><p>Each line below becomes one visible requirement for the learner and the Results/WebMCP reviewer. Use concrete logical milestones. Accepted approaches are suggestions, never exact phrases the learner must type.</p></aside>${indexed(area("Proof obligations — one logical milestone per line", "problem.proofObligations", problem.proofObligations, { rows:6, hint:"Example: “Derives p² = 2q²” or “Explains why both p and q being even contradicts lowest terms.”" }))}${indexed(area("Accepted proof approaches — one per line", "problem.proofStrategies", problem.proofStrategies, { rows:3, hint:"Name legitimate routes such as direct proof, contradiction, induction, or a subject-specific argument." }))}<button class="studio-example-button" type="button" data-creator-action="apply-proof-example" data-index="${index}">Load the complete editable √2 contradiction-proof example</button>` : ""}
     ${problem.workMode === "rubric_check" ? `<aside class="studio-syntax-note"><strong>Describe observable qualities.</strong><p>Each line becomes one visible review criterion with equal weight. The learner can structure the response however the prompt asks.</p></aside>${indexed(area("Review criteria — one per line", "problem.rubricCriteria", problem.rubricCriteria, { rows:5, hint:"Use specific criteria such as “Uses two relevant sources” rather than “Good answer.”" }))}<button class="studio-example-button" type="button" data-creator-action="apply-rubric-example" data-index="${index}">Fill with an editable rubric example</button>` : ""}
     ${reviewIsRequired ? `<div class="studio-review-lock"><span aria-hidden="true">✓</span><div><strong>Mastery waits for a passed review</strong><p>${problem.workReview === "self_review" ? "The learner can review this response on the Results page." : "A human tutor or connected agent reviews the saved response on the Results page."}</p></div></div>` : `<div class="studio-checks"><label><input type="checkbox" data-index="${index}" data-creator-field="problem.masteryRequiresReview" ${problem.masteryRequiresReview ? "checked" : ""}> Review must pass before mastery</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.allowSelfReview" ${problem.allowSelfReview ? "checked" : ""}> Allow self review</label></div>`}
     ${renderStudentPreview(problem)}
@@ -207,22 +224,23 @@ function renderAdvancedWork(problem, index) {
 
 function renderProblemEditor(skill, problem, index) {
   const indexed = (markup) => markup.replaceAll("data-creator-field", `data-index="${index}" data-creator-field`);
-  const graderHelp = "This checks only the final-answer field. Proofs and long responses are handled separately under How the learner answers.";
+  const isProof = problem.workMode === "proof_obligations";
+  const graderHelp = isProof ? "This grades only the short conclusion. It never decides whether the proof is valid; that happens through the obligation review below." : "This checks only the final-answer field. Proofs and long responses are handled separately under How the learner answers.";
   return `<details ${index === 0 ? "open" : ""}>
     <summary><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(problem.prompt || "Untitled question")}</b><small>${esc(problem.gradingMethod)} · ${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</small></summary>
     <div class="studio-problem-body">
       <div class="studio-repeat-head"><b>Question ${index + 1}</b>${skill.problems.length > 1 ? `<button data-creator-action="remove-problem" data-index="${index}">Remove</button>` : ""}</div>
       ${indexed(field("Question ID", "problem.templateId", problem.templateId, { hint: "A stable internal name; learners do not see it." }))}
       ${indexed(area("Learner prompt", "problem.prompt", problem.prompt, { rows: 3, hint: "Ask for both the final answer and reasoning here when reasoning matters." }))}
-      <div class="studio-response-picker"><div><strong>Question response type</strong><small>Proof requirements belong to each mastery question, so one lesson can mix ordinary answers, calculations, and proofs.</small></div>${indexed(select("What must the learner submit?", "problem.workMode", problem.workMode, [["none","Final answer only"],["capture_only","Final answer + written explanation"],["procedural_steps","Required step-by-step maths"],["proof_obligations","Proof required — structured proof + review"],["rubric_check","Required long response + rubric review"]], "Choose proof here to give the learner a required proof box and visible proof checklist. Proof mastery waits for a self, tutor, or agent review."))}</div>
+      <div class="studio-response-picker"><div><strong>Question response type</strong><small>Proof requirements belong to each mastery question, so one lesson can mix ordinary answers, calculations, and proofs.</small></div>${indexed(select("What must the learner submit?", "problem.workMode", problem.workMode, [["none","Final answer only"],["capture_only","Final answer + written explanation"],["procedural_steps","Checked maths steps — Advanced Algebra style"],["proof_obligations","Formal proof required — reviewed before mastery"],["rubric_check","Required long response + rubric review"]], "Advanced Algebra-style steps are checked automatically. Formal proofs are stored for an obligation-by-obligation human or agent review before mastery can advance."))}<div class="studio-response-summary"><span aria-hidden="true">${problem.workMode === "proof_obligations" ? "∴" : problem.workMode === "procedural_steps" ? "=" : problem.workMode === "rubric_check" ? "☷" : "✎"}</span><div><strong>${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</strong><p>${esc(WORK_MODE_GUIDES[problem.workMode]?.summary ?? "")}</p></div></div></div>
       <div class="studio-three">
         ${indexed(select("Difficulty", "problem.difficulty", problem.difficulty, [["easy","Easy"],["medium","Medium"],["hard","Hard"],["brutal","Brutal"]]))}
-        ${indexed(select("Final-answer grader", "problem.gradingMethod", problem.gradingMethod, [["exact_numeric","Exact number"],["numeric_with_tolerance","Number with tolerance"],["multiple_choice","Multiple choice"],["symbolic_expression","Equivalent expression"],["equation_solution","Equation solution"],["exact_text","Exact text"],["theorem_conclusion","Accepted conclusion"]], graderHelp))}
-        ${indexed(field("Private expected answer", "problem.expectedAnswer", problem.expectedAnswer, { help: "Never shown before submission. For multiple choice, enter the correct option ID.", hint: "The final-answer grader compares the learner's answer with this value." }))}
+        ${indexed(select(isProof ? "Conclusion grader" : "Final-answer grader", "problem.gradingMethod", problem.gradingMethod, [["exact_numeric","Exact number"],["numeric_with_tolerance","Number with tolerance"],["multiple_choice","Multiple choice"],["symbolic_expression","Equivalent expression"],["equation_solution","Equation solution"],["exact_text","Exact text"],["theorem_conclusion",isProof ? "Accepted conclusion · recommended" : "Accepted conclusion"]], graderHelp))}
+        ${indexed(field(isProof ? "Private expected conclusion" : "Private expected answer", "problem.expectedAnswer", problem.expectedAnswer, { help: isProof ? "The short conclusion is graded separately from the proof. This value is never shown before submission." : "Never shown before submission. For multiple choice, enter the correct option ID.", hint: isProof ? "A correct conclusion still leaves the proof pending review." : "The final-answer grader compares the learner's answer with this value." }))}
       </div>
       ${problem.gradingMethod === "multiple_choice" ? indexed(area("Choices — ID | label, one per line", "problem.options", problem.options, { rows: 4, hint: "Example: A | Pacific Ocean. Put the correct ID, such as A, in Private expected answer." })) : ""}
       ${problem.gradingMethod === "numeric_with_tolerance" ? indexed(field("Allowed numerical difference", "problem.tolerance", problem.tolerance, { type: "number", min: 0, step: .001, hint: "0.01 accepts answers within ±0.01 of the expected number." })) : ""}
-      ${["theorem_conclusion", "symbolic_expression", "equation_solution"].includes(problem.gradingMethod) ? indexed(area("Other accepted final answers — one per line", "problem.acceptedForms", problem.acceptedForms, { rows: 3, hint: "These apply only to the short final answer, not the proof text." })) : ""}
+      ${["theorem_conclusion", "symbolic_expression", "equation_solution"].includes(problem.gradingMethod) ? indexed(area(isProof ? "Other accepted conclusions — one per line" : "Other accepted final answers — one per line", "problem.acceptedForms", problem.acceptedForms, { rows: 3, hint: "These apply only to the short final answer, not the proof text." })) : ""}
       ${indexed(area("Private solution outline — one step per line", "problem.solutionSteps", problem.solutionSteps, { rows: 4, hint: "Shown after submission; keep answer-key reasoning out of the learner prompt." }))}
       ${indexed(area("Mistake tags — one per line", "problem.mistakeTags", problem.mistakeTags, { rows: 2, hint: "Short labels such as sign_error or missing_evidence help the tutor target follow-up work." }))}
       ${renderAdvancedWork(problem, index)}
@@ -459,9 +477,19 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     }
     if (action === "apply-proof-example") {
       const problem = skill.problems[index];
-      problem.workPrompt = "Write a proof in plain language. Address every requirement below and put each claim or reason on its own line.";
-      problem.proofObligations = "State the claim precisely\nName the definition, theorem, or evidence you rely on\nJustify the link between each step\nState why the conclusion follows";
-      problem.proofStrategies = "Direct proof\nProof by contradiction\nProof by contrapositive";
+      problem.prompt = "Prove that sqrt(2) is irrational using contradiction and parity.";
+      problem.expectedAnswer = "sqrt(2) is irrational";
+      problem.answerType = "text";
+      problem.gradingMethod = "theorem_conclusion";
+      problem.acceptedForms = "sqrt(2) is irrational\ntherefore sqrt(2) is irrational";
+      problem.workPrompt = "Write the contradiction proof in plain language. Address every obligation below and put each main claim or reason on its own line.";
+      problem.proofObligations = "Assumes sqrt(2) = p/q with p/q in lowest terms\nDerives p² = 2q² by squaring\nUses parity to show p is even\nSubstitutes p = 2k and shows q is even\nExplains why p and q both being even contradicts lowest terms\nConcludes that sqrt(2) is irrational";
+      problem.proofStrategies = "Contradiction using parity";
+      problem.solutionSteps = "Assume sqrt(2) = p/q in lowest terms.\nSquare to obtain p² = 2q², so p is even.\nWrite p = 2k and substitute to show q is even.\nBoth p and q are even, contradicting lowest terms.\nTherefore sqrt(2) is irrational.";
+      problem.mistakeTags = "proof_structure\ncontradiction_error\nparity_reasoning";
+      problem.workReview = "tutor_required";
+      problem.masteryRequiresReview = true;
+      problem.allowSelfReview = false;
     }
     if (action === "apply-rubric-example") {
       const problem = skill.problems[index];

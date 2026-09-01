@@ -56,6 +56,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.lesson-hub-tabs/);
   assert.match(css, /\.studio-question-roadmap/);
   assert.match(css, /\.studio-response-picker/);
+  assert.match(css, /\.studio-proof-anatomy/);
+  assert.match(css, /\.studio-proof-contrast/);
   assert.match(css, /\.studio-help\[aria-expanded="true"\]/);
   assert.match(css, /\.result-review-guide/);
   assert.match(css, /height: clamp\(300px, 60svh, 540px\); max-height: none; contain: layout paint/);
@@ -110,6 +112,13 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.equal(guide.guide.lesson_depot.route, "depot");
   assert.equal(serialized.includes("expected_answer"), false);
   assert.equal(serialized.includes("finalAnswer"), false);
+});
+
+test("agent lesson authoring guide distinguishes checked steps from reviewed proofs", () => {
+  const guide = readFileSync(new URL("./CUSTOM_LESSON_SETS.md", import.meta.url), "utf8");
+  assert.match(guide, /Checked maths steps are not formal proofs/);
+  assert.match(guide, /two deliberately separate judgments/);
+  assert.match(guide, /mastery remains unchanged until that review passes/);
 });
 
 test("schemas reject unknown properties and invalid navigation values", async () => {
