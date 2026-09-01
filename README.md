@@ -4,6 +4,18 @@ Quick Maths is a local-first mastery testing and prerequisite mapping skeleton f
 
 Learners enter normal school-style math notation. The app separates final answers from shown work, autogrades final answers only, and exports work for AI tutor review.
 
+## WebMCP Challenge Demo
+
+The zero-cost static demo in [`docs/`](docs/) turns one real QuickMaths skill into an agent-native algebra workspace. A compatible ChatGPT or Codex browser discovers four page tools that can read the current lesson, inspect shown work, save visible Socratic feedback, and open an allowlisted follow-up problem. The page also works without an agent, stores progress only in browser `localStorage`, and needs no backend, model API, account, or API key.
+
+Run it locally:
+
+```powershell
+python -m http.server 8765 --directory docs
+```
+
+Then open `http://localhost:8765/`. See [WEBMCP_CHALLENGE.md](WEBMCP_CHALLENGE.md) for architecture, testing, deployment, and the under-three-minute demo script.
+
 ## Version 0.2 Scope
 
 This repository intentionally includes only a few sample skills. The goal is the infrastructure: content-as-data, generated problems, final-answer grading, captured/procedural/proof work, tutor review packets, reflection, persistence, graph status, and exports.
@@ -53,6 +65,7 @@ Generate `cookie_secret` with a password generator or `python -c "import secrets
 
 ```powershell
 pytest
+npm --prefix docs test
 ```
 
 ## Validate Content

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A local-first algebra workspace with native WebMCP tools for agent-guided practice.">
+    <meta name="theme-color" content="#f5f0e6">
+    <title>QuickMaths — Agent-guided algebra practice</title>
+    <link rel="stylesheet" href="./challenge.css">
+    <script type="module" src="./challenge.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Skip to practice</a>
+
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="QuickMaths home">
+        <span class="brand-mark" aria-hidden="true">Q</span>
+        <span>
+          <strong>QuickMaths</strong>
+          <small>Practice that adapts to your reasoning</small>
+        </span>
+      </a>
+      <div class="privacy-note">
+        <span class="privacy-dot" aria-hidden="true"></span>
+        Local-first · your work stays in this browser
+      </div>
+    </header>
+
+    <main id="workspace" class="workspace">
+      <section class="lesson-column" aria-labelledby="lesson-title">
+        <div class="lesson-kicker">
+          <span>Today’s focus</span>
+          <span class="skill-code">MATH_ALG_002</span>
+        </div>
+
+        <div class="lesson-heading">
+          <div>
+            <h1 id="lesson-title">Undo the steps.<br>Keep the equation balanced.</h1>
+            <p>Undo addition or subtraction first, then multiplication or division. Whatever you do to one side, do to the other.</p>
+          </div>
+          <div class="progress-card" aria-label="Learning progress">
+            <div>
+              <span>Skill strength</span>
+              <strong id="mastery-value">45%</strong>
+            </div>
+            <div class="progress-track" aria-hidden="true"><span id="mastery-bar"></span></div>
+            <small><span id="attempt-count">0</span> attempts in this browser</small>
+          </div>
+        </div>
+
+        <article class="problem-card" aria-labelledby="equation">
+          <div class="problem-meta">
+            <span>Practice step <strong id="problem-id">ALG002-P1</strong></span>
+            <span id="difficulty" class="difficulty">foundation</span>
+          </div>
+
+          <div class="equation-wrap">
+            <p class="eyebrow">Solve for x</p>
+            <p id="equation" class="equation" aria-live="polite">3x + 5 = 20</p>
+          </div>
+
+          <div class="response-grid">
+            <label class="field field-work" for="student-work">
+              <span>Show your steps</span>
+              <small>One move per line helps your tutor see your reasoning.</small>
+              <textarea id="student-work" rows="6" maxlength="4000" placeholder="Start by undoing the constant…" spellcheck="false"></textarea>
+            </label>
+
+            <label class="field" for="final-answer">
+              <span>Final answer</span>
+              <small>Enter a number or x = …</small>
+              <input id="final-answer" type="text" maxlength="120" inputmode="decimal" placeholder="x =">
+            </label>
+          </div>
+
+          <div class="answer-row">
+            <span id="answer-status" class="answer-status" aria-live="polite">Not checked yet</span>
+            <div class="button-row">
+              <button id="demo-mistake" class="button button-ghost" type="button">Load demo mistake</button>
+              <button id="check-answer" class="button button-secondary" type="button">Check answer</button>
+              <button id="ask-tutor" class="button button-primary" type="button">
+                <span aria-hidden="true">✦</span> Ask tutor to review
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article id="tutor-feedback" class="feedback-card" data-tone="coach" aria-live="polite" hidden>
+          <div class="feedback-mark" aria-hidden="true">✦</div>
+          <div>
+            <p class="eyebrow">Tutor review</p>
+            <h2 id="feedback-title">I found one key move to revisit.</h2>
+            <p id="feedback-body"></p>
+            <div class="next-step"><strong>Try asking:</strong> <span id="feedback-step"></span></div>
+            <button id="follow-up" class="text-button" type="button">Practice a targeted follow-up <span aria-hidden="true">→</span></button>
+          </div>
+        </article>
+      </section>
+
+      <aside class="agent-column" aria-labelledby="agent-title">
+        <div class="agent-sticky">
+          <div class="agent-heading">
+            <div>
+              <p class="eyebrow">Agent studio</p>
+              <h2 id="agent-title">A tutor that can act here</h2>
+            </div>
+            <span class="agent-orbit" aria-hidden="true">✦</span>
+          </div>
+
+          <div class="bridge-card">
+            <div class="bridge-topline">
+              <span id="bridge-status" class="bridge-status" data-state="checking">Checking WebMCP…</span>
+              <span class="pulse" aria-hidden="true"></span>
+            </div>
+            <p id="bridge-detail">Looking for browser agent support.</p>
+          </div>
+
+          <section class="prompt-card" aria-labelledby="prompt-title">
+            <div class="section-label">
+              <h3 id="prompt-title">Try with your agent</h3>
+              <button id="copy-prompt" class="copy-button" type="button"><span id="copy-label">Copy prompt</span></button>
+            </div>
+            <p id="agent-prompt">Review my current work Socratically. Inspect it, save concise tutor feedback, then create one follow-up problem targeting my misconception. Do not reveal the answer.</p>
+          </section>
+
+          <section class="tools-card" aria-labelledby="tools-title">
+            <div class="section-label">
+              <h3 id="tools-title">Available tools</h3>
+              <span>4 native actions</span>
+            </div>
+            <ul class="tool-list">
+              <li><code>get_learning_context</code><span>read lesson</span></li>
+              <li><code>inspect_student_work</code><span>read reasoning</span></li>
+              <li><code>record_tutor_feedback</code><span>save coaching</span></li>
+              <li><code>create_followup_problem</code><span>adapt practice</span></li>
+            </ul>
+          </section>
+
+          <section class="activity-card" aria-labelledby="activity-title">
+            <div class="section-label">
+              <h3 id="activity-title">Tutor activity</h3>
+              <span>Visible by design</span>
+            </div>
+            <p id="activity-empty" class="empty-activity">The tutor will inspect your steps, explain one key move, and choose what you practice next.</p>
+            <ol id="activity-list" class="activity-list" aria-live="polite"></ol>
+          </section>
+
+          <button id="reset-demo" class="reset-button" type="button">Reset local demo</button>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <p>Built from the open-source <a href="https://github.com/Srednjak/QuickMaths">QuickMaths</a> learning model · No account, server, or API key required.</p>
+    </footer>
+  </body>
+</html>
