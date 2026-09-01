@@ -14,6 +14,7 @@ if (catalog.format !== "quickmaths.lesson-depot.catalog" || catalog.schema_versi
 
 const rawPackages = [];
 for (const entry of catalog.packages) {
+  if (entry.availability === "preview") continue;
   const lessonPath = resolve(root, String(entry.lesson_path || ""));
   const rel = relative(root, lessonPath);
   if (!rel || rel.startsWith(`..${sep}`) || rel === "..") throw new Error(`Catalog path escapes the Depot: ${entry.lesson_path}`);

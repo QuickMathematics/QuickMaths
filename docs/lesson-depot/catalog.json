@@ -2,6 +2,292 @@
   "format": "quickmaths.lesson-depot.catalog",
   "packages": [
     {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future workshop on claims, structure, evidence, revision, citation, and writing for real readers.",
+      "id": "PACK_PREVIEW_ACADEMIC_WRITING",
+      "license": "Not published",
+      "name": "Academic Writing",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "academic-writing",
+      "subject_id": "SUBJECT_LANGUAGE_ARTS",
+      "subject_name": "Language Arts",
+      "tags": [
+        "argument",
+        "revision",
+        "writing"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned quantitative treatment of pH, buffers, titration, equilibrium, and competing chemical models.",
+      "id": "PACK_PREVIEW_ACIDS_BASES",
+      "license": "Not published",
+      "name": "Acids, Bases & Equilibria",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "acids-bases-equilibria",
+      "subject_id": "SUBJECT_CHEMISTRY",
+      "subject_name": "Chemistry",
+      "tags": [
+        "acids",
+        "equilibrium",
+        "titration"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future path through algorithm design, correctness arguments, runtime growth, and practical limits.",
+      "id": "PACK_PREVIEW_ALGORITHMS_COMPLEXITY",
+      "license": "Not published",
+      "name": "Algorithms & Complexity",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "algorithms-complexity",
+      "subject_id": "SUBJECT_COMPUTER_SCIENCE",
+      "subject_name": "Computer Science",
+      "tags": [
+        "algorithms",
+        "complexity",
+        "correctness"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A comparative history of early states, trade networks, belief systems, evidence, and historical debate.",
+      "id": "PACK_PREVIEW_ANCIENT_CIVILIZATIONS",
+      "license": "Not published",
+      "name": "Ancient Civilizations",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "ancient-civilizations",
+      "subject_id": "SUBJECT_HISTORY",
+      "subject_name": "History",
+      "tags": [
+        "ancient history",
+        "civilizations",
+        "sources"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned progression from evidence for atoms to electron structure, periodicity, and chemical behavior.",
+      "id": "PACK_PREVIEW_ATOMIC_STRUCTURE",
+      "license": "Not published",
+      "name": "Atomic Structure",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "atomic-structure",
+      "subject_id": "SUBJECT_CHEMISTRY",
+      "subject_name": "Chemistry",
+      "tags": [
+        "atoms",
+        "electrons",
+        "periodic table"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned path through cell structure, membranes, metabolism, division, and experimental evidence.",
+      "id": "PACK_PREVIEW_CELL_BIOLOGY",
+      "license": "Not published",
+      "name": "Cell Biology",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "cell-biology",
+      "subject_id": "SUBJECT_BIOLOGY",
+      "subject_name": "Biology",
+      "tags": [
+        "cells",
+        "metabolism",
+        "microscopy"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future pack on equations, stoichiometry, energy change, reaction rates, and laboratory reasoning.",
+      "id": "PACK_PREVIEW_CHEMICAL_REACTIONS",
+      "license": "Not published",
+      "name": "Chemical Reactions",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "chemical-reactions",
+      "subject_id": "SUBJECT_CHEMISTRY",
+      "subject_name": "Chemistry",
+      "tags": [
+        "kinetics",
+        "reactions",
+        "stoichiometry"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future path from motion graphs and vectors to forces, energy, momentum, and model limitations.",
+      "id": "PACK_PREVIEW_CLASSICAL_MECHANICS",
+      "license": "Not published",
+      "name": "Classical Mechanics",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "classical-mechanics",
+      "subject_id": "SUBJECT_PHYSICS",
+      "subject_name": "Physics",
+      "tags": [
+        "energy",
+        "forces",
+        "motion"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned visual course on arrays, lists, stacks, queues, trees, graphs, and design tradeoffs.",
+      "id": "PACK_PREVIEW_DATA_STRUCTURES",
+      "license": "Not published",
+      "name": "Data Structures",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "data-structures",
+      "subject_id": "SUBJECT_COMPUTER_SCIENCE",
+      "subject_name": "Computer Science",
+      "tags": [
+        "data structures",
+        "graphs",
+        "trees"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned studio for choosing encodings, spotting misleading graphics, and communicating uncertainty clearly.",
+      "id": "PACK_PREVIEW_DATA_VISUALIZATION",
+      "license": "Not published",
+      "name": "Data Visualization",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "data-visualization",
+      "subject_id": "SUBJECT_STATISTICS",
+      "subject_name": "Statistics",
+      "tags": [
+        "charts",
+        "communication",
+        "data"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned inquiry-driven pack covering charge, fields, potential, circuit models, and measurement.",
+      "id": "PACK_PREVIEW_ELECTRICITY_CIRCUITS",
+      "license": "Not published",
+      "name": "Electricity & Circuits",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "electricity-circuits",
+      "subject_id": "SUBJECT_PHYSICS",
+      "subject_name": "Physics",
+      "tags": [
+        "circuits",
+        "electricity",
+        "fields"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
       "author": "QuickMaths",
       "community": {
         "comments": 1,
@@ -28,6 +314,370 @@
       ],
       "updated_at": "2026-09-01",
       "version": "1.0.0"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future sequence connecting Mendelian models, chromosomes, molecular genetics, and population variation.",
+      "id": "PACK_PREVIEW_GENETICS_INHERITANCE",
+      "license": "Not published",
+      "name": "Genetics & Inheritance",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "genetics-inheritance",
+      "subject_id": "SUBJECT_BIOLOGY",
+      "subject_name": "Biology",
+      "tags": [
+        "dna",
+        "genetics",
+        "inheritance"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future evidence-based path through rocks, plate tectonics, deep time, resources, and landscape change.",
+      "id": "PACK_PREVIEW_GEOLOGY",
+      "license": "Not published",
+      "name": "Geology & Earth History",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "geology-earth-history",
+      "subject_id": "SUBJECT_EARTH_SCIENCE",
+      "subject_name": "Earth Science",
+      "tags": [
+        "deep time",
+        "geology",
+        "tectonics"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A systems-level tour of circulation, respiration, digestion, regulation, and physiological tradeoffs.",
+      "id": "PACK_PREVIEW_HUMAN_PHYSIOLOGY",
+      "license": "Not published",
+      "name": "Human Physiology",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "human-physiology",
+      "subject_id": "SUBJECT_BIOLOGY",
+      "subject_name": "Biology",
+      "tags": [
+        "homeostasis",
+        "organ systems",
+        "physiology"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned investigation of industrialization, labor, technology, empire, urban change, and inequality.",
+      "id": "PACK_PREVIEW_INDUSTRIAL_REVOLUTION",
+      "license": "Not published",
+      "name": "Industrial Revolution",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "industrial-revolution",
+      "subject_id": "SUBJECT_HISTORY",
+      "subject_name": "History",
+      "tags": [
+        "industry",
+        "labor",
+        "technology"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned close-reading sequence connecting form, voice, context, interpretation, and critical disagreement.",
+      "id": "PACK_PREVIEW_LITERARY_ANALYSIS",
+      "license": "Not published",
+      "name": "Literary Analysis",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "literary-analysis",
+      "subject_id": "SUBJECT_LANGUAGE_ARTS",
+      "subject_name": "Language Arts",
+      "tags": [
+        "close reading",
+        "interpretation",
+        "literature"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future practice course on validity, informal fallacies, charitable reconstruction, and disciplined disagreement.",
+      "id": "PACK_PREVIEW_LOGIC_ARGUMENTATION",
+      "license": "Not published",
+      "name": "Logic & Argumentation",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "logic-argumentation",
+      "subject_id": "SUBJECT_PHILOSOPHY",
+      "subject_name": "Philosophy",
+      "tags": [
+        "arguments",
+        "logic",
+        "reasoning"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future path through national accounts, inflation, unemployment, growth, policy, and open economies.",
+      "id": "PACK_PREVIEW_MACROECONOMICS",
+      "license": "Not published",
+      "name": "Macroeconomics",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "macroeconomics",
+      "subject_id": "SUBJECT_ECONOMICS",
+      "subject_name": "Economics",
+      "tags": [
+        "growth",
+        "inflation",
+        "policy"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned course on incentives, markets, elasticity, strategic behavior, externalities, and welfare.",
+      "id": "PACK_PREVIEW_MICROECONOMICS",
+      "license": "Not published",
+      "name": "Microeconomics",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "microeconomics",
+      "subject_id": "SUBJECT_ECONOMICS",
+      "subject_name": "Economics",
+      "tags": [
+        "incentives",
+        "markets",
+        "welfare"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned practical pack on budgeting, credit, compound growth, risk, insurance, and investing claims.",
+      "id": "PACK_PREVIEW_PERSONAL_FINANCE",
+      "license": "Not published",
+      "name": "Personal Finance",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "personal-finance",
+      "subject_id": "SUBJECT_ECONOMICS",
+      "subject_name": "Economics",
+      "tags": [
+        "credit",
+        "money",
+        "risk"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future course moving from sample spaces and conditional probability to simulation and Bayesian updating.",
+      "id": "PACK_PREVIEW_PROBABILITY",
+      "license": "Not published",
+      "name": "Probability",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "probability",
+      "subject_id": "SUBJECT_STATISTICS",
+      "subject_name": "Statistics",
+      "tags": [
+        "bayes",
+        "probability",
+        "simulation"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A language-neutral introduction to state, control flow, functions, debugging, and program design.",
+      "id": "PACK_PREVIEW_PROGRAMMING_FOUNDATIONS",
+      "license": "Not published",
+      "name": "Programming Foundations",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "programming-foundations",
+      "subject_id": "SUBJECT_COMPUTER_SCIENCE",
+      "subject_name": "Computer Science",
+      "tags": [
+        "debugging",
+        "functions",
+        "programming"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future evidence-led sequence on world wars, decolonization, ideology, globalization, and memory.",
+      "id": "PACK_PREVIEW_TWENTIETH_CENTURY_WORLD",
+      "license": "Not published",
+      "name": "The Twentieth-Century World",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "twentieth-century-world",
+      "subject_id": "SUBJECT_HISTORY",
+      "subject_name": "History",
+      "tags": [
+        "decolonization",
+        "globalization",
+        "modern history"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A future curriculum linking oscillations, wave representations, interference, imaging, and acoustics.",
+      "id": "PACK_PREVIEW_WAVES_OPTICS_SOUND",
+      "license": "Not published",
+      "name": "Waves, Optics & Sound",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "waves-optics-sound",
+      "subject_id": "SUBJECT_PHYSICS",
+      "subject_name": "Physics",
+      "tags": [
+        "optics",
+        "sound",
+        "waves"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "availability": "preview",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A planned quantitative course on atmosphere, forecasting, climate systems, evidence, and uncertainty.",
+      "id": "PACK_PREVIEW_WEATHER_CLIMATE",
+      "license": "Not published",
+      "name": "Weather & Climate",
+      "problems": 0,
+      "published_at": "",
+      "skills": 0,
+      "slug": "weather-climate",
+      "subject_id": "SUBJECT_EARTH_SCIENCE",
+      "subject_name": "Earth Science",
+      "tags": [
+        "atmosphere",
+        "climate",
+        "weather"
+      ],
+      "updated_at": "",
+      "version": "0.0.0-preview.1"
     }
   ],
   "schema_version": "1.0"

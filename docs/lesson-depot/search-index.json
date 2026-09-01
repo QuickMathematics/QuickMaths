@@ -1,6 +1,182 @@
 {
   "entries": [
     {
+      "author": "QuickMaths Preview",
+      "description": "A future workshop on claims, structure, evidence, revision, citation, and writing for real readers.",
+      "id": "PACK_PREVIEW_ACADEMIC_WRITING",
+      "license": "Not published",
+      "name": "Academic Writing",
+      "slug": "academic-writing",
+      "subject_name": "Language Arts",
+      "tags": [
+        "argument",
+        "revision",
+        "writing"
+      ],
+      "terms": "academic-writing academic writing a future workshop on claims, structure, evidence, revision, citation, and writing for real readers. quickmaths preview language arts argument revision writing",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned quantitative treatment of pH, buffers, titration, equilibrium, and competing chemical models.",
+      "id": "PACK_PREVIEW_ACIDS_BASES",
+      "license": "Not published",
+      "name": "Acids, Bases & Equilibria",
+      "slug": "acids-bases-equilibria",
+      "subject_name": "Chemistry",
+      "tags": [
+        "acids",
+        "equilibrium",
+        "titration"
+      ],
+      "terms": "acids-bases-equilibria acids, bases & equilibria a planned quantitative treatment of ph, buffers, titration, equilibrium, and competing chemical models. quickmaths preview chemistry acids equilibrium titration",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future path through algorithm design, correctness arguments, runtime growth, and practical limits.",
+      "id": "PACK_PREVIEW_ALGORITHMS_COMPLEXITY",
+      "license": "Not published",
+      "name": "Algorithms & Complexity",
+      "slug": "algorithms-complexity",
+      "subject_name": "Computer Science",
+      "tags": [
+        "algorithms",
+        "complexity",
+        "correctness"
+      ],
+      "terms": "algorithms-complexity algorithms & complexity a future path through algorithm design, correctness arguments, runtime growth, and practical limits. quickmaths preview computer science algorithms complexity correctness",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A comparative history of early states, trade networks, belief systems, evidence, and historical debate.",
+      "id": "PACK_PREVIEW_ANCIENT_CIVILIZATIONS",
+      "license": "Not published",
+      "name": "Ancient Civilizations",
+      "slug": "ancient-civilizations",
+      "subject_name": "History",
+      "tags": [
+        "ancient history",
+        "civilizations",
+        "sources"
+      ],
+      "terms": "ancient-civilizations ancient civilizations a comparative history of early states, trade networks, belief systems, evidence, and historical debate. quickmaths preview history ancient history civilizations sources",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned progression from evidence for atoms to electron structure, periodicity, and chemical behavior.",
+      "id": "PACK_PREVIEW_ATOMIC_STRUCTURE",
+      "license": "Not published",
+      "name": "Atomic Structure",
+      "slug": "atomic-structure",
+      "subject_name": "Chemistry",
+      "tags": [
+        "atoms",
+        "electrons",
+        "periodic table"
+      ],
+      "terms": "atomic-structure atomic structure a planned progression from evidence for atoms to electron structure, periodicity, and chemical behavior. quickmaths preview chemistry atoms electrons periodic table",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned path through cell structure, membranes, metabolism, division, and experimental evidence.",
+      "id": "PACK_PREVIEW_CELL_BIOLOGY",
+      "license": "Not published",
+      "name": "Cell Biology",
+      "slug": "cell-biology",
+      "subject_name": "Biology",
+      "tags": [
+        "cells",
+        "metabolism",
+        "microscopy"
+      ],
+      "terms": "cell-biology cell biology a planned path through cell structure, membranes, metabolism, division, and experimental evidence. quickmaths preview biology cells metabolism microscopy",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future pack on equations, stoichiometry, energy change, reaction rates, and laboratory reasoning.",
+      "id": "PACK_PREVIEW_CHEMICAL_REACTIONS",
+      "license": "Not published",
+      "name": "Chemical Reactions",
+      "slug": "chemical-reactions",
+      "subject_name": "Chemistry",
+      "tags": [
+        "kinetics",
+        "reactions",
+        "stoichiometry"
+      ],
+      "terms": "chemical-reactions chemical reactions a future pack on equations, stoichiometry, energy change, reaction rates, and laboratory reasoning. quickmaths preview chemistry kinetics reactions stoichiometry",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future path from motion graphs and vectors to forces, energy, momentum, and model limitations.",
+      "id": "PACK_PREVIEW_CLASSICAL_MECHANICS",
+      "license": "Not published",
+      "name": "Classical Mechanics",
+      "slug": "classical-mechanics",
+      "subject_name": "Physics",
+      "tags": [
+        "energy",
+        "forces",
+        "motion"
+      ],
+      "terms": "classical-mechanics classical mechanics a future path from motion graphs and vectors to forces, energy, momentum, and model limitations. quickmaths preview physics energy forces motion",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned visual course on arrays, lists, stacks, queues, trees, graphs, and design tradeoffs.",
+      "id": "PACK_PREVIEW_DATA_STRUCTURES",
+      "license": "Not published",
+      "name": "Data Structures",
+      "slug": "data-structures",
+      "subject_name": "Computer Science",
+      "tags": [
+        "data structures",
+        "graphs",
+        "trees"
+      ],
+      "terms": "data-structures data structures a planned visual course on arrays, lists, stacks, queues, trees, graphs, and design tradeoffs. quickmaths preview computer science data structures graphs trees",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned studio for choosing encodings, spotting misleading graphics, and communicating uncertainty clearly.",
+      "id": "PACK_PREVIEW_DATA_VISUALIZATION",
+      "license": "Not published",
+      "name": "Data Visualization",
+      "slug": "data-visualization",
+      "subject_name": "Statistics",
+      "tags": [
+        "charts",
+        "communication",
+        "data"
+      ],
+      "terms": "data-visualization data visualization a planned studio for choosing encodings, spotting misleading graphics, and communicating uncertainty clearly. quickmaths preview statistics charts communication data",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned inquiry-driven pack covering charge, fields, potential, circuit models, and measurement.",
+      "id": "PACK_PREVIEW_ELECTRICITY_CIRCUITS",
+      "license": "Not published",
+      "name": "Electricity & Circuits",
+      "slug": "electricity-circuits",
+      "subject_name": "Physics",
+      "tags": [
+        "circuits",
+        "electricity",
+        "fields"
+      ],
+      "terms": "electricity-circuits electricity & circuits a planned inquiry-driven pack covering charge, fields, potential, circuit models, and measurement. quickmaths preview physics circuits electricity fields",
+      "version": "0.0.0-preview.1"
+    },
+    {
       "author": "QuickMaths",
       "description": "Build the habit of estimating first and using bounds to catch unreasonable calculations.",
       "id": "PACK_ESTIMATION_LAB",
@@ -15,6 +191,230 @@
       ],
       "terms": "estimation-lab estimation lab build the habit of estimating first and using bounds to catch unreasonable calculations. quickmaths mathematics estimation number sense reasoning",
       "version": "1.0.0"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future sequence connecting Mendelian models, chromosomes, molecular genetics, and population variation.",
+      "id": "PACK_PREVIEW_GENETICS_INHERITANCE",
+      "license": "Not published",
+      "name": "Genetics & Inheritance",
+      "slug": "genetics-inheritance",
+      "subject_name": "Biology",
+      "tags": [
+        "dna",
+        "genetics",
+        "inheritance"
+      ],
+      "terms": "genetics-inheritance genetics & inheritance a future sequence connecting mendelian models, chromosomes, molecular genetics, and population variation. quickmaths preview biology dna genetics inheritance",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future evidence-based path through rocks, plate tectonics, deep time, resources, and landscape change.",
+      "id": "PACK_PREVIEW_GEOLOGY",
+      "license": "Not published",
+      "name": "Geology & Earth History",
+      "slug": "geology-earth-history",
+      "subject_name": "Earth Science",
+      "tags": [
+        "deep time",
+        "geology",
+        "tectonics"
+      ],
+      "terms": "geology-earth-history geology & earth history a future evidence-based path through rocks, plate tectonics, deep time, resources, and landscape change. quickmaths preview earth science deep time geology tectonics",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A systems-level tour of circulation, respiration, digestion, regulation, and physiological tradeoffs.",
+      "id": "PACK_PREVIEW_HUMAN_PHYSIOLOGY",
+      "license": "Not published",
+      "name": "Human Physiology",
+      "slug": "human-physiology",
+      "subject_name": "Biology",
+      "tags": [
+        "homeostasis",
+        "organ systems",
+        "physiology"
+      ],
+      "terms": "human-physiology human physiology a systems-level tour of circulation, respiration, digestion, regulation, and physiological tradeoffs. quickmaths preview biology homeostasis organ systems physiology",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned investigation of industrialization, labor, technology, empire, urban change, and inequality.",
+      "id": "PACK_PREVIEW_INDUSTRIAL_REVOLUTION",
+      "license": "Not published",
+      "name": "Industrial Revolution",
+      "slug": "industrial-revolution",
+      "subject_name": "History",
+      "tags": [
+        "industry",
+        "labor",
+        "technology"
+      ],
+      "terms": "industrial-revolution industrial revolution a planned investigation of industrialization, labor, technology, empire, urban change, and inequality. quickmaths preview history industry labor technology",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned close-reading sequence connecting form, voice, context, interpretation, and critical disagreement.",
+      "id": "PACK_PREVIEW_LITERARY_ANALYSIS",
+      "license": "Not published",
+      "name": "Literary Analysis",
+      "slug": "literary-analysis",
+      "subject_name": "Language Arts",
+      "tags": [
+        "close reading",
+        "interpretation",
+        "literature"
+      ],
+      "terms": "literary-analysis literary analysis a planned close-reading sequence connecting form, voice, context, interpretation, and critical disagreement. quickmaths preview language arts close reading interpretation literature",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future practice course on validity, informal fallacies, charitable reconstruction, and disciplined disagreement.",
+      "id": "PACK_PREVIEW_LOGIC_ARGUMENTATION",
+      "license": "Not published",
+      "name": "Logic & Argumentation",
+      "slug": "logic-argumentation",
+      "subject_name": "Philosophy",
+      "tags": [
+        "arguments",
+        "logic",
+        "reasoning"
+      ],
+      "terms": "logic-argumentation logic & argumentation a future practice course on validity, informal fallacies, charitable reconstruction, and disciplined disagreement. quickmaths preview philosophy arguments logic reasoning",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future path through national accounts, inflation, unemployment, growth, policy, and open economies.",
+      "id": "PACK_PREVIEW_MACROECONOMICS",
+      "license": "Not published",
+      "name": "Macroeconomics",
+      "slug": "macroeconomics",
+      "subject_name": "Economics",
+      "tags": [
+        "growth",
+        "inflation",
+        "policy"
+      ],
+      "terms": "macroeconomics macroeconomics a future path through national accounts, inflation, unemployment, growth, policy, and open economies. quickmaths preview economics growth inflation policy",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned course on incentives, markets, elasticity, strategic behavior, externalities, and welfare.",
+      "id": "PACK_PREVIEW_MICROECONOMICS",
+      "license": "Not published",
+      "name": "Microeconomics",
+      "slug": "microeconomics",
+      "subject_name": "Economics",
+      "tags": [
+        "incentives",
+        "markets",
+        "welfare"
+      ],
+      "terms": "microeconomics microeconomics a planned course on incentives, markets, elasticity, strategic behavior, externalities, and welfare. quickmaths preview economics incentives markets welfare",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned practical pack on budgeting, credit, compound growth, risk, insurance, and investing claims.",
+      "id": "PACK_PREVIEW_PERSONAL_FINANCE",
+      "license": "Not published",
+      "name": "Personal Finance",
+      "slug": "personal-finance",
+      "subject_name": "Economics",
+      "tags": [
+        "credit",
+        "money",
+        "risk"
+      ],
+      "terms": "personal-finance personal finance a planned practical pack on budgeting, credit, compound growth, risk, insurance, and investing claims. quickmaths preview economics credit money risk",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future course moving from sample spaces and conditional probability to simulation and Bayesian updating.",
+      "id": "PACK_PREVIEW_PROBABILITY",
+      "license": "Not published",
+      "name": "Probability",
+      "slug": "probability",
+      "subject_name": "Statistics",
+      "tags": [
+        "bayes",
+        "probability",
+        "simulation"
+      ],
+      "terms": "probability probability a future course moving from sample spaces and conditional probability to simulation and bayesian updating. quickmaths preview statistics bayes probability simulation",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A language-neutral introduction to state, control flow, functions, debugging, and program design.",
+      "id": "PACK_PREVIEW_PROGRAMMING_FOUNDATIONS",
+      "license": "Not published",
+      "name": "Programming Foundations",
+      "slug": "programming-foundations",
+      "subject_name": "Computer Science",
+      "tags": [
+        "debugging",
+        "functions",
+        "programming"
+      ],
+      "terms": "programming-foundations programming foundations a language-neutral introduction to state, control flow, functions, debugging, and program design. quickmaths preview computer science debugging functions programming",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future evidence-led sequence on world wars, decolonization, ideology, globalization, and memory.",
+      "id": "PACK_PREVIEW_TWENTIETH_CENTURY_WORLD",
+      "license": "Not published",
+      "name": "The Twentieth-Century World",
+      "slug": "twentieth-century-world",
+      "subject_name": "History",
+      "tags": [
+        "decolonization",
+        "globalization",
+        "modern history"
+      ],
+      "terms": "twentieth-century-world the twentieth-century world a future evidence-led sequence on world wars, decolonization, ideology, globalization, and memory. quickmaths preview history decolonization globalization modern history",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A future curriculum linking oscillations, wave representations, interference, imaging, and acoustics.",
+      "id": "PACK_PREVIEW_WAVES_OPTICS_SOUND",
+      "license": "Not published",
+      "name": "Waves, Optics & Sound",
+      "slug": "waves-optics-sound",
+      "subject_name": "Physics",
+      "tags": [
+        "optics",
+        "sound",
+        "waves"
+      ],
+      "terms": "waves-optics-sound waves, optics & sound a future curriculum linking oscillations, wave representations, interference, imaging, and acoustics. quickmaths preview physics optics sound waves",
+      "version": "0.0.0-preview.1"
+    },
+    {
+      "author": "QuickMaths Preview",
+      "description": "A planned quantitative course on atmosphere, forecasting, climate systems, evidence, and uncertainty.",
+      "id": "PACK_PREVIEW_WEATHER_CLIMATE",
+      "license": "Not published",
+      "name": "Weather & Climate",
+      "slug": "weather-climate",
+      "subject_name": "Earth Science",
+      "tags": [
+        "atmosphere",
+        "climate",
+        "weather"
+      ],
+      "terms": "weather-climate weather & climate a planned quantitative course on atmosphere, forecasting, climate systems, evidence, and uncertainty. quickmaths preview earth science atmosphere climate weather",
+      "version": "0.0.0-preview.1"
     }
   ],
   "format": "quickmaths.lesson-depot.search",

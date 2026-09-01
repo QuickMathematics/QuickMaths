@@ -23,6 +23,7 @@ _VERSION = re.compile(r"^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:[-+][0
 _LICENSE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 .+()/-]{0,119}$")
 _PACK_ID = re.compile(r"^PACK_[A-Z0-9_]+$")
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_SHOWCASE_FORMAT = "quickmaths.lesson-depot.showcase"
 
 
 class DepotError(ValueError):
@@ -88,6 +89,58 @@ def _community_count(value: Any, field: str) -> int:
     except (TypeError, ValueError) as exc:
         raise DepotError(f"community {field} must be an integer") from exc
     return max(0, min(1_000_000, count))
+
+
+def _showcase_packages(root: Path) -> list[dict[str, Any]]:
+    """Load metadata-only concept cards that demonstrate a populated Depot.
+
+    Showcase entries deliberately have no lesson path, hash, community thread,
+    or install capability. They cannot be mistaken for reviewed lesson content.
+    """
+    path = root / "showcase.json"
+    if not path.is_file():
+        return []
+    payload = _read_json(path)
+    if payload.get("format") != _SHOWCASE_FORMAT or payload.get("schema_version") != "1.0":
+        raise DepotError("showcase.json has an unsupported format")
+    entries = payload.get("packages")
+    if not isinstance(entries, list) or len(entries) > 100:
+        raise DepotError("showcase.json packages must be an array of at most 100 entries")
+    packages: list[dict[str, Any]] = []
+    for index, entry in enumerate(entries, start=1):
+        if not isinstance(entry, dict):
+            raise DepotError(f"showcase package {index} must be an object")
+        package_id = _text(entry.get("id"), "id")
+        slug = _text(entry.get("slug"), "slug")
+        version = _text(entry.get("version"), "version")
+        if not _PACK_ID.fullmatch(package_id) or not package_id.startswith("PACK_PREVIEW_"):
+            raise DepotError("showcase package IDs must start with PACK_PREVIEW_")
+        if not _SLUG.fullmatch(slug):
+            raise DepotError(f"showcase package {package_id} has an invalid slug")
+        if not _VERSION.fullmatch(version) or "-preview" not in version:
+            raise DepotError(f"showcase package {package_id} must use a preview semantic version")
+        tags = entry.get("tags", [])
+        if not isinstance(tags, list) or len(tags) > 20 or any(not isinstance(tag, str) or not tag.strip() or len(tag.strip()) > 40 for tag in tags):
+            raise DepotError(f"showcase package {package_id} has invalid tags")
+        packages.append({
+            "id": package_id,
+            "slug": slug,
+            "version": version,
+            "name": _text(entry.get("name"), "name"),
+            "description": _text(entry.get("description"), "description"),
+            "author": "QuickMaths Preview",
+            "license": "Not published",
+            "availability": "preview",
+            "skills": 0,
+            "problems": 0,
+            "subject_id": _text(entry.get("subject_id"), "subject_id"),
+            "subject_name": _text(entry.get("subject_name"), "subject_name"),
+            "tags": sorted({tag.strip().lower() for tag in tags}),
+            "published_at": "",
+            "updated_at": "",
+            "community": {"votes": 0, "comments": 0, "discussion_url": ""},
+        })
+    return packages
 
 
 def build_catalog(depot_dir: str | Path, output_dir: str | Path | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -183,6 +236,7 @@ def build_catalog(depot_dir: str | Path, output_dir: str | Path | None = None) -
             },
         }
         packages.append(entry)
+    packages.extend(_showcase_packages(root))
     slugs_by_id: dict[str, str] = {}
     for package in packages:
         prior_slug = slugs_by_id.setdefault(package["id"], package["slug"])

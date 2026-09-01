@@ -29,6 +29,20 @@ test("rejects duplicate identities and unsafe lesson URLs", () => {
   assert.throws(() => normalizeDepotCatalog({ ...catalog, packages: [{ ...catalog.packages[0], lesson_path: "javascript:alert(1)" }] }, { baseUrl: "https://example.com/" }), /invalid lesson URL/);
 });
 
+test("normalizes concept previews without inventing an install URL", () => {
+  const preview = {
+    ...catalog.packages[0],
+    id: "PACK_PREVIEW_CELL_BIOLOGY",
+    slug: "cell-biology",
+    version: "0.0.0-preview.1",
+    availability: "preview",
+    lesson_path: undefined,
+  };
+  const result = normalizeDepotCatalog({ ...catalog, packages: [preview] }, { baseUrl: "https://example.com/" });
+  assert.equal(result.packages[0].availability, "preview");
+  assert.equal(result.packages[0].lessonUrl, "");
+});
+
 test("searches by subject, tag, and author and sorts predictably", () => {
   const packages = normalizeDepotCatalog(catalog, { baseUrl: "https://example.com/" }).packages;
   assert.deepEqual(filterDepotPackages(packages, { query: "cells" }).map((pack) => pack.id), ["PACK_BIO"]);
@@ -61,6 +75,32 @@ test("controller previews before explicit install", async () => {
   const result = await depot.installPack("PACK_BIO", "1.1.0");
   assert.equal(confirmations, 1);
   assert.equal(result.installed, true);
+});
+
+test("controller refuses to fetch or stage metadata-only concept previews", async () => {
+  const previewCatalog = {
+    ...catalog,
+    packages: [{
+      ...catalog.packages[0],
+      id: "PACK_PREVIEW_CELL_BIOLOGY",
+      slug: "cell-biology",
+      version: "0.0.0-preview.1",
+      availability: "preview",
+      lesson_path: undefined,
+    }],
+  };
+  let lessonFetches = 0;
+  const store = { snapshot: () => ({ lessonPacks: [] }) };
+  const fetchImpl = async (url) => {
+    if (url.endsWith("catalog.json")) return { ok: true, json: async () => previewCatalog };
+    lessonFetches += 1;
+    throw new Error("Concept previews must never be fetched.");
+  };
+  const depot = createLessonDepot({ store, fetchImpl, catalogUrl: "https://example.com/catalog.json" });
+  await depot.load();
+  await assert.rejects(depot.previewPack("PACK_PREVIEW_CELL_BIOLOGY", "0.0.0-preview.1"), /concept preview/i);
+  await assert.rejects(depot.stagePack("PACK_PREVIEW_CELL_BIOLOGY", "0.0.0-preview.1"), /concept preview/i);
+  assert.equal(lessonFetches, 0);
 });
 
 test("publishing prompt keeps validation and human approval in the flow", () => {

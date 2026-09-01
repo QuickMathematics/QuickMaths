@@ -44,7 +44,7 @@ const category = categories.find((item) => item.name.toLowerCase() === "general"
   ?? categories[0];
 if (!category) throw new Error("GitHub Discussions has no category available for lesson threads.");
 
-for (const entry of catalog.packages) {
+for (const entry of catalog.packages.filter((item) => item.availability !== "preview")) {
   const title = `[Lesson] ${entry.id}`;
   if (discussions.some((item) => item.title.trim().toUpperCase() === title.toUpperCase())) continue;
   const body = `# ${entry.name}\n\n**Version:** ${entry.version}  \n**Author:** ${entry.author}  \n**Subject:** ${entry.subject_name}  \n**License:** ${entry.license}\n\n${entry.description}\n\nUse 👍 on this post as your vote. Add comments for questions, corrections, teaching notes, and update requests. Report licensing, safety, or correctness concerns through the repository's Depot report form.\n\n[View the reviewed package](https://github.com/${repository}/tree/main/docs/lesson-depot/lessons/${entry.slug}/${entry.version}) · [Open QuickMaths](https://${owner.toLowerCase()}.github.io/${name}/#/depot)`;
@@ -55,7 +55,7 @@ for (const entry of catalog.packages) {
 }
 
 const packages = {};
-for (const entry of catalog.packages) {
+for (const entry of catalog.packages.filter((item) => item.availability !== "preview")) {
   const discussion = discussions.find((item) => item.title.trim().toUpperCase() === `[LESSON] ${entry.id}`);
   if (!discussion) continue;
   packages[entry.id] = {

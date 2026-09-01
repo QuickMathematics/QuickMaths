@@ -1,0 +1,256 @@
+{
+  "format": "quickmaths.lesson-depot.showcase",
+  "schema_version": "1.0",
+  "packages": [
+    {
+      "id": "PACK_PREVIEW_CELL_BIOLOGY",
+      "slug": "cell-biology",
+      "version": "0.0.0-preview.1",
+      "name": "Cell Biology",
+      "description": "A planned path through cell structure, membranes, metabolism, division, and experimental evidence.",
+      "subject_id": "SUBJECT_BIOLOGY",
+      "subject_name": "Biology",
+      "tags": ["cells", "metabolism", "microscopy"]
+    },
+    {
+      "id": "PACK_PREVIEW_GENETICS_INHERITANCE",
+      "slug": "genetics-inheritance",
+      "version": "0.0.0-preview.1",
+      "name": "Genetics & Inheritance",
+      "description": "A future sequence connecting Mendelian models, chromosomes, molecular genetics, and population variation.",
+      "subject_id": "SUBJECT_BIOLOGY",
+      "subject_name": "Biology",
+      "tags": ["genetics", "inheritance", "dna"]
+    },
+    {
+      "id": "PACK_PREVIEW_HUMAN_PHYSIOLOGY",
+      "slug": "human-physiology",
+      "version": "0.0.0-preview.1",
+      "name": "Human Physiology",
+      "description": "A systems-level tour of circulation, respiration, digestion, regulation, and physiological tradeoffs.",
+      "subject_id": "SUBJECT_BIOLOGY",
+      "subject_name": "Biology",
+      "tags": ["physiology", "organ systems", "homeostasis"]
+    },
+    {
+      "id": "PACK_PREVIEW_ATOMIC_STRUCTURE",
+      "slug": "atomic-structure",
+      "version": "0.0.0-preview.1",
+      "name": "Atomic Structure",
+      "description": "A planned progression from evidence for atoms to electron structure, periodicity, and chemical behavior.",
+      "subject_id": "SUBJECT_CHEMISTRY",
+      "subject_name": "Chemistry",
+      "tags": ["atoms", "electrons", "periodic table"]
+    },
+    {
+      "id": "PACK_PREVIEW_CHEMICAL_REACTIONS",
+      "slug": "chemical-reactions",
+      "version": "0.0.0-preview.1",
+      "name": "Chemical Reactions",
+      "description": "A future pack on equations, stoichiometry, energy change, reaction rates, and laboratory reasoning.",
+      "subject_id": "SUBJECT_CHEMISTRY",
+      "subject_name": "Chemistry",
+      "tags": ["reactions", "stoichiometry", "kinetics"]
+    },
+    {
+      "id": "PACK_PREVIEW_ACIDS_BASES",
+      "slug": "acids-bases-equilibria",
+      "version": "0.0.0-preview.1",
+      "name": "Acids, Bases & Equilibria",
+      "description": "A planned quantitative treatment of pH, buffers, titration, equilibrium, and competing chemical models.",
+      "subject_id": "SUBJECT_CHEMISTRY",
+      "subject_name": "Chemistry",
+      "tags": ["acids", "equilibrium", "titration"]
+    },
+    {
+      "id": "PACK_PREVIEW_CLASSICAL_MECHANICS",
+      "slug": "classical-mechanics",
+      "version": "0.0.0-preview.1",
+      "name": "Classical Mechanics",
+      "description": "A future path from motion graphs and vectors to forces, energy, momentum, and model limitations.",
+      "subject_id": "SUBJECT_PHYSICS",
+      "subject_name": "Physics",
+      "tags": ["motion", "forces", "energy"]
+    },
+    {
+      "id": "PACK_PREVIEW_ELECTRICITY_CIRCUITS",
+      "slug": "electricity-circuits",
+      "version": "0.0.0-preview.1",
+      "name": "Electricity & Circuits",
+      "description": "A planned inquiry-driven pack covering charge, fields, potential, circuit models, and measurement.",
+      "subject_id": "SUBJECT_PHYSICS",
+      "subject_name": "Physics",
+      "tags": ["electricity", "circuits", "fields"]
+    },
+    {
+      "id": "PACK_PREVIEW_WAVES_OPTICS_SOUND",
+      "slug": "waves-optics-sound",
+      "version": "0.0.0-preview.1",
+      "name": "Waves, Optics & Sound",
+      "description": "A future curriculum linking oscillations, wave representations, interference, imaging, and acoustics.",
+      "subject_id": "SUBJECT_PHYSICS",
+      "subject_name": "Physics",
+      "tags": ["waves", "optics", "sound"]
+    },
+    {
+      "id": "PACK_PREVIEW_PROGRAMMING_FOUNDATIONS",
+      "slug": "programming-foundations",
+      "version": "0.0.0-preview.1",
+      "name": "Programming Foundations",
+      "description": "A language-neutral introduction to state, control flow, functions, debugging, and program design.",
+      "subject_id": "SUBJECT_COMPUTER_SCIENCE",
+      "subject_name": "Computer Science",
+      "tags": ["programming", "debugging", "functions"]
+    },
+    {
+      "id": "PACK_PREVIEW_DATA_STRUCTURES",
+      "slug": "data-structures",
+      "version": "0.0.0-preview.1",
+      "name": "Data Structures",
+      "description": "A planned visual course on arrays, lists, stacks, queues, trees, graphs, and design tradeoffs.",
+      "subject_id": "SUBJECT_COMPUTER_SCIENCE",
+      "subject_name": "Computer Science",
+      "tags": ["data structures", "trees", "graphs"]
+    },
+    {
+      "id": "PACK_PREVIEW_ALGORITHMS_COMPLEXITY",
+      "slug": "algorithms-complexity",
+      "version": "0.0.0-preview.1",
+      "name": "Algorithms & Complexity",
+      "description": "A future path through algorithm design, correctness arguments, runtime growth, and practical limits.",
+      "subject_id": "SUBJECT_COMPUTER_SCIENCE",
+      "subject_name": "Computer Science",
+      "tags": ["algorithms", "complexity", "correctness"]
+    },
+    {
+      "id": "PACK_PREVIEW_ANCIENT_CIVILIZATIONS",
+      "slug": "ancient-civilizations",
+      "version": "0.0.0-preview.1",
+      "name": "Ancient Civilizations",
+      "description": "A comparative history of early states, trade networks, belief systems, evidence, and historical debate.",
+      "subject_id": "SUBJECT_HISTORY",
+      "subject_name": "History",
+      "tags": ["ancient history", "civilizations", "sources"]
+    },
+    {
+      "id": "PACK_PREVIEW_INDUSTRIAL_REVOLUTION",
+      "slug": "industrial-revolution",
+      "version": "0.0.0-preview.1",
+      "name": "Industrial Revolution",
+      "description": "A planned investigation of industrialization, labor, technology, empire, urban change, and inequality.",
+      "subject_id": "SUBJECT_HISTORY",
+      "subject_name": "History",
+      "tags": ["industry", "labor", "technology"]
+    },
+    {
+      "id": "PACK_PREVIEW_TWENTIETH_CENTURY_WORLD",
+      "slug": "twentieth-century-world",
+      "version": "0.0.0-preview.1",
+      "name": "The Twentieth-Century World",
+      "description": "A future evidence-led sequence on world wars, decolonization, ideology, globalization, and memory.",
+      "subject_id": "SUBJECT_HISTORY",
+      "subject_name": "History",
+      "tags": ["modern history", "decolonization", "globalization"]
+    },
+    {
+      "id": "PACK_PREVIEW_MICROECONOMICS",
+      "slug": "microeconomics",
+      "version": "0.0.0-preview.1",
+      "name": "Microeconomics",
+      "description": "A planned course on incentives, markets, elasticity, strategic behavior, externalities, and welfare.",
+      "subject_id": "SUBJECT_ECONOMICS",
+      "subject_name": "Economics",
+      "tags": ["markets", "incentives", "welfare"]
+    },
+    {
+      "id": "PACK_PREVIEW_MACROECONOMICS",
+      "slug": "macroeconomics",
+      "version": "0.0.0-preview.1",
+      "name": "Macroeconomics",
+      "description": "A future path through national accounts, inflation, unemployment, growth, policy, and open economies.",
+      "subject_id": "SUBJECT_ECONOMICS",
+      "subject_name": "Economics",
+      "tags": ["inflation", "growth", "policy"]
+    },
+    {
+      "id": "PACK_PREVIEW_PERSONAL_FINANCE",
+      "slug": "personal-finance",
+      "version": "0.0.0-preview.1",
+      "name": "Personal Finance",
+      "description": "A planned practical pack on budgeting, credit, compound growth, risk, insurance, and investing claims.",
+      "subject_id": "SUBJECT_ECONOMICS",
+      "subject_name": "Economics",
+      "tags": ["money", "credit", "risk"]
+    },
+    {
+      "id": "PACK_PREVIEW_ACADEMIC_WRITING",
+      "slug": "academic-writing",
+      "version": "0.0.0-preview.1",
+      "name": "Academic Writing",
+      "description": "A future workshop on claims, structure, evidence, revision, citation, and writing for real readers.",
+      "subject_id": "SUBJECT_LANGUAGE_ARTS",
+      "subject_name": "Language Arts",
+      "tags": ["writing", "argument", "revision"]
+    },
+    {
+      "id": "PACK_PREVIEW_LITERARY_ANALYSIS",
+      "slug": "literary-analysis",
+      "version": "0.0.0-preview.1",
+      "name": "Literary Analysis",
+      "description": "A planned close-reading sequence connecting form, voice, context, interpretation, and critical disagreement.",
+      "subject_id": "SUBJECT_LANGUAGE_ARTS",
+      "subject_name": "Language Arts",
+      "tags": ["literature", "close reading", "interpretation"]
+    },
+    {
+      "id": "PACK_PREVIEW_PROBABILITY",
+      "slug": "probability",
+      "version": "0.0.0-preview.1",
+      "name": "Probability",
+      "description": "A future course moving from sample spaces and conditional probability to simulation and Bayesian updating.",
+      "subject_id": "SUBJECT_STATISTICS",
+      "subject_name": "Statistics",
+      "tags": ["probability", "simulation", "bayes"]
+    },
+    {
+      "id": "PACK_PREVIEW_DATA_VISUALIZATION",
+      "slug": "data-visualization",
+      "version": "0.0.0-preview.1",
+      "name": "Data Visualization",
+      "description": "A planned studio for choosing encodings, spotting misleading graphics, and communicating uncertainty clearly.",
+      "subject_id": "SUBJECT_STATISTICS",
+      "subject_name": "Statistics",
+      "tags": ["data", "charts", "communication"]
+    },
+    {
+      "id": "PACK_PREVIEW_GEOLOGY",
+      "slug": "geology-earth-history",
+      "version": "0.0.0-preview.1",
+      "name": "Geology & Earth History",
+      "description": "A future evidence-based path through rocks, plate tectonics, deep time, resources, and landscape change.",
+      "subject_id": "SUBJECT_EARTH_SCIENCE",
+      "subject_name": "Earth Science",
+      "tags": ["geology", "tectonics", "deep time"]
+    },
+    {
+      "id": "PACK_PREVIEW_WEATHER_CLIMATE",
+      "slug": "weather-climate",
+      "version": "0.0.0-preview.1",
+      "name": "Weather & Climate",
+      "description": "A planned quantitative course on atmosphere, forecasting, climate systems, evidence, and uncertainty.",
+      "subject_id": "SUBJECT_EARTH_SCIENCE",
+      "subject_name": "Earth Science",
+      "tags": ["weather", "climate", "atmosphere"]
+    },
+    {
+      "id": "PACK_PREVIEW_LOGIC_ARGUMENTATION",
+      "slug": "logic-argumentation",
+      "version": "0.0.0-preview.1",
+      "name": "Logic & Argumentation",
+      "description": "A future practice course on validity, informal fallacies, charitable reconstruction, and disciplined disagreement.",
+      "subject_id": "SUBJECT_PHILOSOPHY",
+      "subject_name": "Philosophy",
+      "tags": ["logic", "arguments", "reasoning"]
+    }
+  ]
+}

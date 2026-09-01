@@ -14,6 +14,8 @@ docs/lesson-depot/lessons/<slug>/<version>/
 
 The lesson file must follow `quickmaths.lesson-set` schema 2.0 and pass the same complete validator used by local uploads and WebMCP staging. See the [Agent Lesson Authoring Guide](../CUSTOM_LESSON_SETS.md).
 
+`showcase.json` contains metadata-only **Concept preview** cards used to exercise the populated Depot layout and communicate possible future subjects. They are visually distinct, have no lesson file or community thread, cannot be previewed, staged, or installed, and must use `PACK_PREVIEW_*` IDs plus a preview semantic version. Remove a concept card when its complete reviewed package is published.
+
 ## Build and validate
 
 From the repository root:

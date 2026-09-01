@@ -82,3 +82,47 @@ def test_trusted_community_overlay_is_materialized_and_url_checked(tmp_path):
     community_path.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(DepotError, match="github.com"):
         build_catalog(tmp_path)
+
+
+def test_showcase_entries_are_searchable_but_never_installable_packages(tmp_path):
+    _package(tmp_path)
+    (tmp_path / "showcase.json").write_text(json.dumps({
+        "format": "quickmaths.lesson-depot.showcase",
+        "schema_version": "1.0",
+        "packages": [{
+            "id": "PACK_PREVIEW_CELL_BIOLOGY",
+            "slug": "cell-biology",
+            "version": "0.0.0-preview.1",
+            "name": "Cell Biology",
+            "description": "A future sequence about cells.",
+            "subject_id": "SUBJECT_BIOLOGY",
+            "subject_name": "Biology",
+            "tags": ["cells"],
+        }],
+    }), encoding="utf-8")
+    catalog, search = build_catalog(tmp_path)
+    preview = next(item for item in catalog["packages"] if item["id"] == "PACK_PREVIEW_CELL_BIOLOGY")
+    assert preview["availability"] == "preview"
+    assert "lesson_path" not in preview
+    assert "sha256" not in preview
+    assert preview["community"] == {"votes": 0, "comments": 0, "discussion_url": ""}
+    assert any(item["id"] == preview["id"] for item in search["entries"])
+
+
+def test_showcase_rejects_entries_that_could_masquerade_as_published(tmp_path):
+    (tmp_path / "showcase.json").write_text(json.dumps({
+        "format": "quickmaths.lesson-depot.showcase",
+        "schema_version": "1.0",
+        "packages": [{
+            "id": "PACK_NOT_MARKED_PREVIEW",
+            "slug": "not-preview",
+            "version": "1.0.0",
+            "name": "Not Preview",
+            "description": "Unsafe metadata-only package.",
+            "subject_id": "SUBJECT_TEST",
+            "subject_name": "Test",
+            "tags": [],
+        }],
+    }), encoding="utf-8")
+    with pytest.raises(DepotError, match="PACK_PREVIEW_"):
+        build_catalog(tmp_path)

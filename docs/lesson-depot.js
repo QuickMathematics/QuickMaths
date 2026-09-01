@@ -43,8 +43,9 @@ export function normalizeDepotCatalog(input, { catalogUrl = DEFAULT_DEPOT_CATALO
     const key = `${id}@${version}`;
     if (seen.has(key)) throw new Error(`Catalog contains duplicate ${key}.`);
     seen.add(key);
-    const lessonUrl = safeHttpUrl(entry.lesson_url || entry.lesson_path, resolvedCatalogUrl);
-    if (!lessonUrl) throw new Error(`${id} has an invalid lesson URL.`);
+    const availability = entry.availability === "preview" ? "preview" : "published";
+    const lessonUrl = availability === "preview" ? "" : safeHttpUrl(entry.lesson_url || entry.lesson_path, resolvedCatalogUrl);
+    if (availability === "published" && !lessonUrl) throw new Error(`${id} has an invalid lesson URL.`);
     const community = entry.community && typeof entry.community === "object" ? entry.community : {};
     const discussionUrl = safeHttpUrl(community.discussion_url, resolvedCatalogUrl) || DEPOT_DISCUSSIONS_URL;
     return {
@@ -62,6 +63,7 @@ export function normalizeDepotCatalog(input, { catalogUrl = DEFAULT_DEPOT_CATALO
       problems: cleanCount(entry.problems),
       publishedAt: optionalText(entry.published_at, 20),
       updatedAt: optionalText(entry.updated_at, 20),
+      availability,
       lessonUrl,
       sha256: /^[a-f0-9]{64}$/i.test(entry.sha256 ?? "") ? entry.sha256.toLowerCase() : "",
       votes: cleanCount(community.votes),
@@ -128,6 +130,7 @@ export function createLessonDepot({ store, fetchImpl = globalThis.fetch?.bind(gl
   };
 
   const fetchPack = async (pack) => {
+    if (pack.availability === "preview") throw new Error(`${pack.name} is a concept preview. Installable lesson content has not been published yet.`);
     const response = await fetchImpl(pack.lessonUrl, { cache: "no-cache" });
     if (!response.ok) throw new Error(`Lesson download failed (${response.status}).`);
     const raw = await response.text();
@@ -175,7 +178,7 @@ export function createLessonDepot({ store, fetchImpl = globalThis.fetch?.bind(gl
     return filterDepotPackages(state.catalog.packages, { query, subject, sort }).slice(0, Math.max(1, Math.min(50, Number(limit) || 20))).map((pack) => ({
       id: pack.id, name: pack.name, version: pack.version, description: pack.description, author: pack.author,
       license: pack.license, subject_id: pack.subjectId, subject_name: pack.subjectName, tags: [...pack.tags],
-      skill_count: pack.skills, problem_count: pack.problems, votes: pack.votes, comments: pack.comments,
+      skill_count: pack.skills, problem_count: pack.problems, votes: pack.votes, comments: pack.comments, availability: pack.availability,
     }));
   };
 
