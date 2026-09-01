@@ -33,7 +33,7 @@ A compatible ChatGPT or Codex browser discovers fifteen page tools through `docu
 | `get_progress_summary` | Read per-skill mastery, attempts, and misconception tags. |
 | `list_subjects` | Read installed subjects and lesson totals. |
 | `set_learning_preferences` | Change the visible subject and Hard/Open path mode. |
-| `navigate_learning_app` | Open the dashboard, map, lesson, test, results, Lesson studio, or data view. |
+| `navigate_learning_app` | Open the dashboard, map, lesson, test, results, Lesson studio, or Settings. |
 | `open_lesson_creator` | Open the no-code Human Lesson Creator. |
 | `validate_lesson_set` | Validate schema 2.0 subjects, bridges, questions, proof/rubric policy, and safety limits. |
 | `stage_custom_lesson_set` | Stage validated content in the visible UI; only the human can install it. |
@@ -100,7 +100,7 @@ The browser contract suite covers profiles, subject filtering, Hard/Open progres
 3. Ask the browser agent: **“Look at my progress, open my map, choose the best next skill, take me to its lesson, and start its test.”**
 4. Enter one intentionally wrong answer with shown work. Ask: **“Inspect this reasoning, save one Socratic hint without revealing the answer, and prepare a follow-up targeting the misconception.”**
 5. Show the visible tutor note, targeted question, and profile-scoped activity log.
-6. Open **Save & load**, download the JSON backup, and point out that the app has no backend, API key, or hosting bill.
+6. Open **Settings**, download the JSON backup, and point out that the app has no backend, API key, or hosting bill.
 
 ## Free deployment and submission
 

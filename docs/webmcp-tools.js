@@ -182,11 +182,11 @@ export function buildToolDefinitions(store, agentManifest = {}) {
     {
       name: "navigate_learning_app",
       title: "Navigate QuickMaths",
-      description: "Open a QuickMaths dashboard, map, lesson, test, results, Lesson studio, or save/load view. This changes the visible page.",
+      description: "Open a QuickMaths dashboard, map, lesson, test, results, Lesson studio, or Settings view. This changes the visible page.",
       inputSchema: {
         type: "object",
         properties: {
-          view: { type: "string", enum: ["home", "map", "lesson", "test", "results", "creator", "data"] },
+          view: { type: "string", enum: ["home", "map", "lesson", "test", "results", "creator", "settings", "data"] },
           skill_id: stringSchema("Optional skill to select when opening a lesson, test, or map.", 60),
         },
         required: ["view"],
@@ -195,10 +195,10 @@ export function buildToolDefinitions(store, agentManifest = {}) {
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["view", "skill_id"]);
         const view = requiredString(input, "view", 20);
-        if (!["home", "map", "lesson", "test", "results", "creator", "data"].includes(view)) throw new Error("view is invalid.");
+        if (!["home", "map", "lesson", "test", "results", "creator", "settings", "data"].includes(view)) throw new Error("view is invalid.");
         const skillId = optionalString(input, "skill_id", 60) || null;
         store.navigate(view, skillId, { activityActor: "agent" });
-        return { ok: true, visible_view: view, selected_skill_id: store.snapshot().ui.selectedSkillId };
+        return { ok: true, visible_view: store.snapshot().ui.route, selected_skill_id: store.snapshot().ui.selectedSkillId };
       },
     },
     {
@@ -238,7 +238,7 @@ export function buildToolDefinitions(store, agentManifest = {}) {
     {
       name: "stage_custom_lesson_set",
       title: "Stage a custom lesson set",
-      description: "Validate and stage declarative lesson-set JSON in Save & load. This cannot install it: a human must review the visible preview and click Install.",
+      description: "Validate and stage declarative lesson-set JSON in Settings. This cannot install it: a human must review the visible preview and click Install.",
       inputSchema: {
         type: "object",
         properties: { lesson_set_json: stringSchema("Declarative QuickMaths lesson-set JSON to stage for human review.", 1800000) },

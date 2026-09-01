@@ -283,7 +283,7 @@ Agents cannot call the final install action. They should recommend a full JSON p
 ## Installation, progress, and backups
 
 1. Download a full progress backup before changing installed content.
-2. Use **Save & load → Load lesson set**, use Lesson studio, or ask an agent to stage a set.
+2. Use **Settings → Load lesson set**, use Lesson studio, or ask an agent to stage a set.
 3. Review the subject, author, version, lesson count, question count, and prerequisite links.
 4. Confirm installation.
 5. Choose the subject in the left sidebar.

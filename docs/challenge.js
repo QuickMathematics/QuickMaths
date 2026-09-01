@@ -19,6 +19,7 @@ const elements = {
   activity: document.querySelector("#activity-list"),
   activityEmpty: document.querySelector("#activity-empty"),
   agentDock: document.querySelector("#agent-dock"),
+  agentToggle: document.querySelector("#agent-toggle"),
   backupFile: document.querySelector("#backup-file"),
   lessonSetFile: document.querySelector("#lesson-set-file"),
   creatorFile: document.querySelector("#creator-file"),
@@ -33,6 +34,8 @@ let agentHighlightTimer;
 let routeHistoryReady = false;
 let applyingHistory = false;
 let lessonStudio;
+
+const AGENT_STARTER_PROMPT = "Read the QuickMaths agent guide first. Check the current app state and whether I should make a backup. Review my active subject, learning path, mastery map, recent attempts, mistake tags, and any work currently visible. Recommend one best next skill and briefly explain why. If I choose it, open the lesson or test and tutor Socratically: inspect only visible work, give one hint or question at a time, never reveal answer keys before submission, save concise feedback when useful, and remind me to back up at a natural stopping point.";
 
 const THEME_VARIABLES = {
   paper: "--paper", paperDeep: "--paper-deep", paperLight: "--paper-light", ink: "--ink", muted: "--muted",
@@ -74,13 +77,35 @@ function showToast(message) {
   toastTimer = window.setTimeout(() => { elements.toast.hidden = true; }, 2800);
 }
 
-function openAgentStudio() {
+function openAgentStudio({ announce = true, focus = true } = {}) {
+  elements.shell.classList.remove("agent-collapsed");
+  elements.agentDock.classList.remove("is-closed");
   elements.agentDock.classList.add("is-open", "is-highlighted");
-  elements.agentDock.focus({ preventScroll: true });
-  elements.agentDock.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  elements.agentToggle.setAttribute("aria-expanded", "true");
+  if (focus) {
+    elements.agentDock.focus({ preventScroll: true });
+    elements.agentDock.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  }
   window.clearTimeout(agentHighlightTimer);
   agentHighlightTimer = window.setTimeout(() => elements.agentDock.classList.remove("is-highlighted"), 1400);
-  showToast("Agent Studio opened.");
+  if (announce) showToast("Agent Studio opened.");
+}
+
+function closeAgentStudio({ focusToggle = true } = {}) {
+  elements.agentDock.classList.remove("is-open", "is-highlighted");
+  elements.agentDock.classList.add("is-closed");
+  elements.shell.classList.add("agent-collapsed");
+  elements.agentToggle.setAttribute("aria-expanded", "false");
+  if (focusToggle) elements.agentToggle.focus();
+}
+
+async function copyAgentPrompt() {
+  try {
+    await navigator.clipboard.writeText(AGENT_STARTER_PROMPT);
+    showToast("Starting prompt copied.");
+  } catch {
+    showToast("Select the prompt to copy it.");
+  }
 }
 
 function renderProfiles(snapshot) {
@@ -107,13 +132,13 @@ const TUTORIAL_STEPS = [
     title: "Welcome to QuickMaths.",
     lede: "This is a mastery map, lesson library, testing room, tutor workspace, and portable learning record—all running locally in your browser.",
     points: ["Your profile keeps progress separate from other learners.", "Work autosaves on this device as you learn.", "A full JSON backup moves everything without an account."],
-    tip: "You can leave the tour at any time. Replay it later from the left sidebar.",
+    tip: "You can leave the tour at any time. Replay it later from Settings.",
     visual: "welcome",
   },
   {
     eyebrow: "Subjects and learning paths",
     title: "Choose what to learn—and how strict the path should be.",
-    lede: "The controls in the left sidebar shape the curriculum you see. Custom lesson sets can extend Mathematics or add entirely new subjects with their own colors.",
+    lede: "The subject picker in the left sidebar and Learning path control in Settings shape the curriculum you see. Custom lesson sets can extend Mathematics or add entirely new subjects with their own colors.",
     points: ["Subject switches the dashboard, map, lessons, and theme.", "Hard path locks tests until prerequisites are proven.", "Open path keeps the same connections as guidance but opens every test."],
     tip: "The subject and path choice belongs to this profile and travels inside backups.",
     visual: "subjects",
@@ -123,7 +148,7 @@ const TUTORIAL_STEPS = [
     title: "Read the map before picking your next lesson.",
     lede: "Every node is a skill. Connections show prerequisite knowledge—including bridges that can reach into another subject.",
     points: ["Ready means the test is available.", "Learning means you started but have not proven mastery yet.", "Proven and mastered unlock later work; rusty means review is due."],
-    tip: "Select any map node to see mastery, confidence, attempts, prerequisites, and what it unlocks.",
+    tip: "Use the map’s − and + controls to change scale, then select any node to inspect mastery, confidence, prerequisites, and unlocks.",
     visual: "map",
   },
   {
@@ -139,13 +164,13 @@ const TUTORIAL_STEPS = [
     title: "Bring a tutor into the same live workspace.",
     lede: "In a compatible Codex or ChatGPT browser, the agent sees narrow QuickMaths tools—not your browser storage or hidden answer keys. Its visible actions use the same app state you do.",
     points: ["Ask it to inspect your progress and recommend the next skill.", "Let it inspect only the work visible in an active test.", "It can save Socratic feedback and prepare targeted follow-up practice."],
-    tip: "Use the sparkle button to open Agent Studio and see connected tools plus a starter prompt.",
+    tip: "Copy the starter prompt, paste it into your connected agent, and keep the learning loop visible in QuickMaths.",
     visual: "agent",
   },
   {
     eyebrow: "Ownership and creation",
     title: "Your progress and curriculum stay yours.",
-    lede: "Save & load handles portable backups and exports. Lesson Studio lets humans build entire subjects without coding, while agents can validate and stage lesson sets for your approval.",
+    lede: "Settings handles portable backups, exports, learning-path controls, and the replayable tour. Lesson Studio lets humans build entire subjects without coding, while agents can validate and stage lesson sets for your approval.",
     points: ["Download a full backup at natural stopping points.", "Load custom lessons into the same map, testing, and progress pipeline.", "Use Lesson Studio for themes, bridges, graders, proofs, rubrics, and multiple lessons."],
     tip: "Agents can stage a lesson set, but only a human can click Install.",
     visual: "ownership",
@@ -157,7 +182,7 @@ function tutorialVisual(type, snapshot) {
   if (type === "subjects") return `<div class="tour-subject-preview"><p>Visible subject</p><div><span>${escapeHtml(snapshot.activeSubject.icon)}</span><strong>${escapeHtml(snapshot.activeSubject.name)}</strong><b>⌄</b></div></div><div class="tour-mode-preview" aria-label="Choose a learning path"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}"><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}"><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>`;
   if (type === "map") return `<div class="tour-map-preview"><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
   if (type === "loop") return `<div class="tour-loop-preview"><article><span>01</span><b>Read</b><small>Theory and examples</small></article><i>→</i><article><span>02</span><b>Test</b><small>Answers and shown work</small></article><i>→</i><article><span>03</span><b>Reflect</b><small>Confidence and difficulty</small></article><i>→</i><article><span>04</span><b>Review</b><small>Mastery and next date</small></article></div><div class="tour-work-preview"><code>2x + 5 = 13<br>2x = 8<br>x = 4</code><span>Step check passed</span></div>`;
-  if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent studio</small><strong>Tutor in the loop</strong></div><i>Connected</i></div><p>“Check my progress, choose the best next lesson, and tutor from the work I show.”</p><div class="tour-tool-row"><code>get_progress_summary</code><code>inspect_student_work</code><code>record_tutor_feedback</code></div><button class="button button-secondary" type="button" data-tutorial-action="open-agent">Open Agent Studio</button></div>`;
+  if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent studio</small><strong>Tutor in the loop</strong></div><i>Connected</i></div><div class="tour-agent-prompt"><span>Suggested starting prompt</span><p>${escapeHtml(AGENT_STARTER_PROMPT)}</p><button class="button button-secondary" type="button" data-tutorial-action="copy-agent-prompt">Copy to clipboard</button></div><div class="tour-tool-row"><code>get_progress_summary</code><code>inspect_student_work</code><code>record_tutor_feedback</code></div></div>`;
   return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, subjects, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>✎</span><div><strong>Human Lesson Creator</strong><small>No-code subjects, bridges, questions, proofs, and rubrics</small></div><b>Studio</b></article></div>`;
 }
 
@@ -280,6 +305,24 @@ function splitLabel(value, max = 22) {
   return lines;
 }
 
+function applyMapZoom(zoom) {
+  const svg = document.querySelector(".mastery-map");
+  if (!svg) return;
+  const baseWidth = Number(svg.dataset.baseWidth);
+  const baseHeight = Number(svg.dataset.baseHeight);
+  svg.style.width = `${Math.round(baseWidth * zoom)}px`;
+  svg.style.height = `${Math.round(baseHeight * zoom)}px`;
+  const output = document.querySelector("#map-zoom-output");
+  if (output) output.textContent = `${Math.round(zoom * 100)}%`;
+  document.querySelector('[data-action="map-zoom-out"]')?.toggleAttribute("disabled", zoom <= 0.6);
+  document.querySelector('[data-action="map-zoom-in"]')?.toggleAttribute("disabled", zoom >= 1.6);
+}
+
+function changeMapZoom(delta) {
+  const current = Number(store.snapshot().ui.mapZoom ?? 1);
+  applyMapZoom(store.setMapZoom(current + delta));
+}
+
 function renderMap(snapshot) {
   const selected = rowForSkill(snapshot, snapshot.ui.selectedMapSkillId) ?? snapshot.progressRows[0];
   if (!selected) {
@@ -288,6 +331,7 @@ function renderMap(snapshot) {
   }
   const selectedSkill = snapshot.curriculum.skills.find((skill) => skill.id === selected.id);
   const { positions, width, height } = mapLayout(snapshot.curriculum.skills);
+  const zoom = Number(snapshot.ui.mapZoom ?? 1);
   const edges = snapshot.curriculum.skills.flatMap((skill) => skill.prerequisites.map((prerequisite) => {
     const from = positions[prerequisite];
     const to = positions[skill.id];
@@ -312,12 +356,12 @@ function renderMap(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head">
       <div><p class="eyebrow">${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} · ${snapshot.progressRows.length} connected lessons</p><h1>Mastery map</h1><p>${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Cross-subject bridges still show what knowledge travels between curricula.</p></div>
-      <div class="page-actions"><label class="compact-select">Jump to skill<select id="map-skill-select">${skillOptions(snapshot, selected.id)}</select></label></div>
+      <div class="page-actions map-toolbar"><label class="compact-select">Jump to skill<select id="map-skill-select">${skillOptions(snapshot, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= 0.6 ? "disabled" : ""}>−</button><output id="map-zoom-output">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= 1.6 ? "disabled" : ""}>+</button></div></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}</div>
     <section class="map-layout">
       <div class="map-scroll" aria-label="Interactive prerequisite map">
-        <svg class="mastery-map" viewBox="0 0 ${width} ${height}" style="width:${width}px;height:${height}px">
+        <svg class="mastery-map" viewBox="0 0 ${width} ${height}" data-base-width="${width}" data-base-height="${height}" style="width:${Math.round(width * zoom)}px;height:${Math.round(height * zoom)}px">
           <g class="map-edges">${edges}</g>
           <g>${nodes}</g>
         </svg>
@@ -478,12 +522,16 @@ function renderResults(snapshot) {
   `;
 }
 
-const TUTOR_SETUP_PROMPT = `You are my QuickMaths tutor. Use the learner's mastery map, attempts, shown work, confidence, and mistake tags. Diagnose briefly, teach one concept at a time, ask one practice question at a time, and do not reveal answers before I attempt them. Save concise Socratic feedback in the app when WebMCP tools are available. At natural stopping points, before imports or lesson-set changes, and whenever the app says a backup is recommended, ask me to download a full JSON backup from Save & load.`;
+const TUTOR_SETUP_PROMPT = `${AGENT_STARTER_PROMPT} If WebMCP tools are unavailable, ask me to paste only the relevant progress summary or shown work—never a raw lesson-set file with answer keys.`;
 
-function renderData(snapshot) {
+function renderSettings(snapshot) {
   const backup = snapshot.backupStatus;
   elements.view.innerHTML = `
-    <header class="page-head"><div><p class="eyebrow">Data portability & custom content</p><h1>Save & load</h1><p>QuickMaths autosaves on this device. A JSON backup moves every profile, lesson set, attempt, review, timer, and mastery record without an account.</p></div><div class="page-actions"><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
+    <header class="page-head"><div><p class="eyebrow">Profile preferences & data</p><h1>Settings</h1><p>Choose how this profile moves through the curriculum, replay the guided tour, and manage every save, export, custom lesson, and restore point.</p></div><div class="page-actions"><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
+    <section class="settings-controls">
+      <article class="settings-control-card"><h2>Learning path</h2><p>This setting belongs to ${escapeHtml(snapshot.activeProfile.displayName)} and travels inside full backups.</p><div class="settings-mode-grid" role="group" aria-label="Progression mode"><button type="button" data-progression-mode="hard" aria-pressed="${snapshot.progressionMode === "hard"}"><strong>Hard path</strong><small>Prerequisites must be proven before connected mastery tests unlock.</small></button><button type="button" data-progression-mode="soft" aria-pressed="${snapshot.progressionMode === "soft"}"><strong>Open path</strong><small>Connections remain guidance, while every lesson and test stays available.</small></button></div></article>
+      <article class="settings-control-card settings-tour-action"><div><h2>App tutorial</h2><p>Replay all six chapters without resetting progress, subjects, lessons, or preferences.</p></div><button class="button button-secondary" type="button" data-action="replay-tutorial">Replay app tour</button></article>
+    </section>
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="storage-summary">
       <article><span>Storage</span><strong>${snapshot.storageError ? "Needs backup" : "Autosaving"}</strong><small>${snapshot.storageError ? escapeHtml(snapshot.storageError) : "Browser local storage"}</small></article>
@@ -566,7 +614,7 @@ function render(snapshot) {
   else if (snapshot.ui.route === "lesson") renderLesson(snapshot);
   else if (snapshot.ui.route === "test") renderTest(snapshot);
   else if (snapshot.ui.route === "results") renderResults(snapshot);
-  else if (snapshot.ui.route === "data") renderData(snapshot);
+  else if (snapshot.ui.route === "settings") renderSettings(snapshot);
   else if (snapshot.ui.route === "creator") elements.view.innerHTML = lessonStudio.render(snapshot);
   const nextHash = ["map", "lesson", "test", "results"].includes(snapshot.ui.route)
     ? `#/${snapshot.ui.route}/${snapshot.ui.selectedSkillId}`
@@ -588,7 +636,7 @@ function applyLocationRoute() {
     try { store.logout(); } finally { applyingHistory = false; }
     return;
   }
-  if (!["tutorial", "home", "map", "lesson", "test", "results", "data", "creator"].includes(route)) return;
+  if (!["tutorial", "home", "map", "lesson", "test", "results", "settings", "data", "creator"].includes(route)) return;
   const selectedSkill = skillId && store.skillsById[skillId] ? skillId : null;
   if (state.ui.route === route && (!selectedSkill || state.ui.selectedSkillId === selectedSkill)) return;
   applyingHistory = true;
@@ -631,7 +679,6 @@ elements.profiles.addEventListener("click", (event) => {
 });
 
 document.querySelector("#logout-button").addEventListener("click", () => store.logout());
-document.querySelector("#replay-tutorial").addEventListener("click", () => store.startTutorial());
 document.querySelector("#welcome-load").addEventListener("click", () => elements.backupFile.click());
 
 elements.backupFile.addEventListener("change", async () => {
@@ -693,10 +740,10 @@ document.addEventListener("click", (event) => {
     const action = tutorialAction.dataset.tutorialAction;
     if (action === "next") store.setTutorialStep(currentSnapshot.ui.tutorialStep + 1);
     if (action === "back") store.setTutorialStep(currentSnapshot.ui.tutorialStep - 1);
-    if (action === "skip") { store.completeTutorial({ skipped: true }); showToast("Tour skipped. Replay it anytime from the sidebar."); }
+    if (action === "skip") { store.completeTutorial({ skipped: true }); showToast("Tour skipped. Replay it anytime from Settings."); }
     if (action === "finish") { store.completeTutorial(); showToast("Tour complete. Welcome to QuickMaths."); }
     if (action === "finish-creator") { store.completeTutorial(); store.navigate("creator"); }
-    if (action === "open-agent") openAgentStudio();
+    if (action === "copy-agent-prompt") copyAgentPrompt();
     return;
   }
   const creatorAction = event.target.closest?.("[data-creator-action]");
@@ -718,7 +765,6 @@ document.addEventListener("click", (event) => {
     const route = routeButton.dataset.route;
     const skillId = routeButton.dataset.skillId || null;
     store.navigate(route, skillId);
-    elements.agentDock.classList.remove("is-open");
   }
   const action = event.target.closest("[data-action]");
   if (!action) return;
@@ -727,6 +773,9 @@ document.addEventListener("click", (event) => {
   if (action.dataset.action === "open-attempt") store.openAttempt(action.dataset.attemptId);
   if (action.dataset.action === "load-backup") elements.backupFile.click();
   if (action.dataset.action === "load-lesson-set") elements.lessonSetFile.click();
+  if (action.dataset.action === "replay-tutorial") store.startTutorial();
+  if (action.dataset.action === "map-zoom-out") changeMapZoom(-0.1);
+  if (action.dataset.action === "map-zoom-in") changeMapZoom(0.1);
   if (action.dataset.action === "install-staged-pack") {
     const staged = store.snapshot().stagedLessonPack;
     if (staged && window.confirm(`Install ${staged.name}?\n\n${staged.skillCount} lessons · ${staged.problemCount} questions · ${staged.subjectName}\n\nThis agent-staged set passed validation, but installation changes your curriculum.`)) {
@@ -824,17 +873,9 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-document.querySelector("#agent-toggle").addEventListener("click", () => {
-  if (elements.agentDock.classList.contains("is-open")) elements.agentDock.classList.remove("is-open");
-  else openAgentStudio();
-});
-document.querySelector("#agent-close").addEventListener("click", () => elements.agentDock.classList.remove("is-open"));
-document.querySelector("#copy-prompt").addEventListener("click", async () => {
-  try {
-    await navigator.clipboard.writeText(document.querySelector("#agent-prompt").textContent.trim());
-    showToast("Agent prompt copied.");
-  } catch { showToast("Select the prompt to copy it."); }
-});
+document.querySelector("#agent-toggle").addEventListener("click", () => openAgentStudio());
+document.querySelector("#agent-close").addEventListener("click", () => closeAgentStudio());
+document.querySelector("#copy-prompt").addEventListener("click", copyAgentPrompt);
 
 function initClock() {
   const svgNS = "http://www.w3.org/2000/svg";
@@ -887,6 +928,9 @@ async function boot() {
     getSnapshot: () => store.snapshot(),
     openFilePicker: () => elements.creatorFile.click(),
   });
+  document.querySelector("#agent-prompt").textContent = AGENT_STARTER_PROMPT;
+  if (window.matchMedia("(max-width: 1240px)").matches) closeAgentStudio({ focusToggle: false });
+  else openAgentStudio({ announce: false, focus: false });
   applyLocationRoute();
   store.subscribe(render);
   initClock();

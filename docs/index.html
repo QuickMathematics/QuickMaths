@@ -82,13 +82,8 @@
           <span><strong>QuickMaths</strong><small>Algebra foundations</small></span>
         </div>
 
-        <section class="subject-switcher" aria-label="Subject and progression settings">
+        <section class="subject-switcher" aria-label="Subject selection">
           <label for="subject-select"><span>Subject</span><select id="subject-select"></select></label>
-          <div class="mode-switch" role="group" aria-label="Progression mode">
-            <button type="button" data-progression-mode="hard" title="Prerequisites lock advanced mastery tests until earlier skills are proven.">Hard path</button>
-            <button type="button" data-progression-mode="soft" title="Connections become recommendations. Every lesson and mastery test stays open.">Open path</button>
-          </div>
-          <button id="replay-tutorial" class="sidebar-tour-button" type="button"><span aria-hidden="true">?</span> Replay app tour</button>
         </section>
 
         <div class="clock-card">
@@ -114,7 +109,7 @@
           <button type="button" data-route="test"><span aria-hidden="true">✓</span> Mastery test</button>
           <button type="button" data-route="results"><span aria-hidden="true">↗</span> Results</button>
           <button type="button" data-route="creator"><span aria-hidden="true">✎</span> Lesson studio</button>
-          <button type="button" data-route="data"><span aria-hidden="true">⇩</span> Save &amp; load</button>
+          <button type="button" data-route="settings"><span aria-hidden="true">⚙</span> Settings</button>
         </nav>
 
         <div class="sidebar-profile">
@@ -140,7 +135,7 @@
         </div>
           <div class="agent-prompt-card">
           <div class="mini-heading"><span>Suggested prompt</span><button id="copy-prompt" type="button">Copy</button></div>
-          <p id="agent-prompt">Read the QuickMaths agent guide, check whether I need a backup, then look at my progress and choose the best next skill.</p>
+          <p id="agent-prompt">Read the QuickMaths agent guide first. Check the current app state and whether I should make a backup. Review my active subject, learning path, mastery map, recent attempts, mistake tags, and any work currently visible. Recommend one best next skill and briefly explain why. If I choose it, open the lesson or test and tutor Socratically: inspect only visible work, give one hint or question at a time, never reveal answer keys before submission, save concise feedback when useful, and remind me to back up at a natural stopping point.</p>
         </div>
         <details class="agent-tools">
           <summary><span>Available tools</span><strong id="tool-count">15</strong></summary>
@@ -153,13 +148,13 @@
         </section>
       </aside>
 
-      <button id="agent-toggle" class="agent-toggle" type="button" aria-label="Open agent studio">✦</button>
+      <button id="agent-toggle" class="agent-toggle" type="button" aria-label="Open agent studio" aria-controls="agent-dock" aria-expanded="false">✦</button>
       <nav class="mobile-nav" aria-label="Mobile navigation">
         <button type="button" data-route="home">Home</button>
         <button type="button" data-route="map">Map</button>
         <button type="button" data-route="lesson">Learn</button>
         <button type="button" data-route="test">Test</button>
-        <button type="button" data-route="data">Save</button>
+        <button type="button" data-route="settings">Settings</button>
       </nav>
     </div>
 

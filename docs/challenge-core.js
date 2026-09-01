@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 6;
+export const APP_VERSION = 7;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -29,7 +29,7 @@ export const STATUS_COLORS = Object.freeze({
 });
 
 const PROVEN = new Set(["proven", "mastered"]);
-const ROUTES = new Set(["welcome", "tutorial", "home", "map", "lesson", "test", "results", "data", "creator"]);
+const ROUTES = new Set(["welcome", "tutorial", "home", "map", "lesson", "test", "results", "settings", "data", "creator"]);
 const TUTORIAL_STEPS = 6;
 const MAX_ACTIVITY = 60;
 const MAX_ATTEMPTS = 500;
@@ -436,6 +436,7 @@ function initialState() {
       route: "welcome",
       selectedSkillId: "MATH_ARITH_001",
       selectedMapSkillId: "MATH_ARITH_001",
+      mapZoom: 1,
       activeAttemptId: null,
       pendingResults: null,
       agentOpen: false,
@@ -641,7 +642,8 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   const profileIds = new Set(profiles.map((profile) => profile.id));
   const activeProfileId = profileIds.has(candidate.activeProfileId) ? candidate.activeProfileId : null;
   const ui = candidate.ui && typeof candidate.ui === "object" ? candidate.ui : {};
-  const route = ROUTES.has(ui.route) ? ui.route : activeProfileId ? "home" : "welcome";
+  const savedRoute = ROUTES.has(ui.route) ? ui.route : activeProfileId ? "home" : "welcome";
+  const route = savedRoute === "data" ? "settings" : savedRoute;
   const selectedSkillId = skills.has(ui.selectedSkillId) ? ui.selectedSkillId : catalog.track.entry_skills[0];
   for (const profile of profiles) {
     if (!catalog.subjects.some((subject) => subject.id === profile.activeSubjectId)) profile.activeSubjectId = DEFAULT_SUBJECT_ID;
@@ -672,6 +674,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       route: activeProfileId ? (route === "welcome" ? "home" : route) : "welcome",
       selectedSkillId,
       selectedMapSkillId: skills.has(ui.selectedMapSkillId) ? ui.selectedMapSkillId : selectedSkillId,
+      mapZoom: Math.round(cleanNumber(Number(ui.mapZoom), 1, 0.6, 1.6) * 10) / 10,
       activeAttemptId: attempts.some((attempt) => attempt.attemptId === ui.activeAttemptId) ? ui.activeAttemptId : null,
       pendingResults: sanitizePendingResults(ui.pendingResults, skills),
       agentOpen: Boolean(ui.agentOpen),
@@ -1302,8 +1305,9 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       state.ui.selectedMapSkillId = skillId;
       activeProfile().activeSubjectId = skillsById[skillId].subjectId;
     }
-    state.ui.route = route;
-    addActivity("navigate_learning_app", `Opened ${route}${skillId ? ` for ${skillId}` : ""}.`, undefined, activityActor);
+    const visibleRoute = route === "data" ? "settings" : route;
+    state.ui.route = visibleRoute;
+    addActivity("navigate_learning_app", `Opened ${visibleRoute}${skillId ? ` for ${skillId}` : ""}.`, undefined, activityActor);
     notify();
   };
 
@@ -1341,6 +1345,13 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     activeProfile().activeSubjectId = skillsById[skillId].subjectId;
     state.ui.selectedMapSkillId = skillId;
     notify();
+  };
+
+  const setMapZoom = (zoom) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    state.ui.mapZoom = Math.round(cleanNumber(Number(zoom), 1, 0.6, 1.6) * 10) / 10;
+    persist();
+    return state.ui.mapZoom;
   };
 
   const setLearningPreferences = ({ subjectId = null, progressionMode = null, activityActor = "learner" } = {}) => {
@@ -1717,7 +1728,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
   const stageLessonPack = (raw, { activityActor = "learner" } = {}) => {
     const pack = parseLessonPack(raw);
     stagedLessonPack = { raw: typeof raw === "string" ? raw : JSON.stringify(raw), pack };
-    state.ui.route = "data";
+    state.ui.route = "settings";
     addActivity("stage_custom_lesson_set", `Staged ${pack.name}; human confirmation is required to install it.`, undefined, activityActor);
     notify();
     return { ok: true, status: "staged", requires_human_confirmation: true, preview: previewLessonPack(raw) };
@@ -1838,6 +1849,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     setTutorialStep,
     completeTutorial,
     selectMapSkill,
+    setMapZoom,
     setLearningPreferences,
     startTest,
     updateResponse,

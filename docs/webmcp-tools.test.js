@@ -26,6 +26,18 @@ function toolsFor(store) {
   return Object.fromEntries(buildToolDefinitions(store, agentManifest).map((tool) => [tool.name, tool]));
 }
 
+test("browser shell exposes Settings, map zoom, prompt copy, and persistent Agent Studio controls", () => {
+  const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  const js = readFileSync(new URL("./challenge.js", import.meta.url), "utf8");
+  const css = readFileSync(new URL("./challenge.css", import.meta.url), "utf8");
+  assert.match(html, /data-route="settings"/);
+  assert.doesNotMatch(html, /class="mode-switch"|id="replay-tutorial"/);
+  assert.match(js, /data-action="map-zoom-in"/);
+  assert.match(js, /data-tutorial-action="copy-agent-prompt"/);
+  assert.match(css, /\.agent-dock\.is-closed/);
+  assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
+});
+
 test("registers all fifteen tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
@@ -83,6 +95,15 @@ test("agent navigation updates the same visible route and selected skill", async
   assert.equal(store.snapshot().ui.route, "lesson");
 });
 
+test("agent navigation opens Settings and normalizes the former data route", async () => {
+  const store = createStore();
+  const tools = toolsFor(store);
+  const settings = await tools.navigate_learning_app.execute({ view: "settings" });
+  assert.equal(settings.visible_view, "settings");
+  const legacy = await tools.navigate_learning_app.execute({ view: "data" });
+  assert.equal(legacy.visible_view, "settings");
+});
+
 test("Agent activity includes tool actions but excludes learner UI actions", async () => {
   const store = createStore();
   const tools = toolsFor(store);
@@ -120,7 +141,7 @@ test("lesson-set tools validate and stage content but cannot install it", async 
   assert.equal(store.snapshot().lessonPacks.length, 0);
   const staged = await tools.stage_custom_lesson_set.execute({ lesson_set_json: raw });
   assert.equal(staged.requires_human_confirmation, true);
-  assert.equal(store.snapshot().ui.route, "data");
+  assert.equal(store.snapshot().ui.route, "settings");
   assert.equal(store.snapshot().stagedLessonPack.id, "PACK_PERSONAL_FINANCE");
   assert.equal(store.snapshot().lessonPacks.length, 0);
   assert.equal(tools.confirm_lesson_set_install, undefined);

@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 6,
+  "app_version": 7,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app.",
   "homepage": "https://srednjak.github.io/QuickMaths/",
   "discovery": {
@@ -45,7 +45,7 @@
   },
   "backup_policy": {
     "recommend": true,
-    "human_action": "Navigate to Save & load and ask the user to click Download JSON backup.",
+    "human_action": "Navigate to Settings and ask the user to click Download JSON backup.",
     "recommend_when": [
       "get_app_state reports backup.recommended true",
       "the learner completed new mastery attempts or received important tutor feedback",
@@ -58,7 +58,7 @@
     "avoid_nagging": "Recommend once at a natural stopping point unless data is at immediate risk. Do not interrupt every question.",
     "never_claim_downloaded": "A backup is downloaded only after the human activates the download and the app reports it."
   },
-  "routes": ["tutorial", "home", "map", "lesson", "test", "results", "creator", "data"],
+  "routes": ["tutorial", "home", "map", "lesson", "test", "results", "creator", "settings"],
   "tools": [
     "get_agent_guide",
     "get_app_state",
@@ -81,7 +81,7 @@
     "schema_version": "2.0",
     "authoring_guide": "https://srednjak.github.io/QuickMaths/CUSTOM_LESSON_SETS.md",
     "example": "https://srednjak.github.io/QuickMaths/lesson-set-example.json",
-    "install_route": "data",
+    "install_route": "settings",
     "human_creator_route": "creator",
     "limits": { "file_bytes": 2000000, "sets": 10, "skills_per_set": 50, "problems_per_skill": 100 },
     "id_rules": { "pack_prefix": "PACK_", "skill_prefix": "CUSTOM_", "characters": "uppercase letters, numbers, and underscores" },

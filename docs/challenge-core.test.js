@@ -134,6 +134,20 @@ test("new-profile tutorial can be stepped, skipped, replayed, and completed", ()
   assert.equal(store.snapshot().activeProfile.tutorialSkipped, false);
 });
 
+test("Settings replaces the legacy data route and map zoom persists safely", () => {
+  const { store, storage } = harness();
+  store.createProfile("Settings Learner");
+  store.completeTutorial();
+  store.navigate("data");
+  assert.equal(store.snapshot().ui.route, "settings");
+  assert.equal(store.setMapZoom(1.4), 1.4);
+  assert.equal(store.setMapZoom(99), 1.6);
+
+  const reloaded = createQuickMathsStore({ storage, curriculum, now: () => new Date("2026-09-01T09:41:00.000Z") });
+  assert.equal(reloaded.snapshot().ui.route, "settings");
+  assert.equal(reloaded.snapshot().ui.mapZoom, 1.6);
+});
+
 test("profiles from older saves are treated as already onboarded", () => {
   const storage = memoryStorage({
     [STORAGE_KEY]: JSON.stringify({
