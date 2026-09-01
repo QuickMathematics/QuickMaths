@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 3,
+  "app_version": 4,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app.",
   "homepage": "https://srednjak.github.io/QuickMaths/",
   "discovery": {
@@ -30,12 +30,14 @@
     ],
     "navigation": [
       "Use navigate_learning_app and start_skill_test so agent changes remain visible in the human interface.",
-      "Do not bypass prerequisite locks.",
+      "Respect the learner's path mode: Hard path enforces prerequisites; Open path treats the same connections as recommended preparation.",
+      "Use list_subjects and set_learning_preferences when changing subject or path mode so the human sees the change.",
       "Do not replace or reset learner data through ordinary browser actions."
     ],
     "custom_content": [
-      "Installed custom lesson sets are part of the same map, lesson, testing, and progress model as built-in skills.",
-      "Lesson-set file selection and confirmation are human-controlled. Navigate to the data view and ask the user to choose Load lesson set.",
+      "Installed custom lesson sets and subjects are part of the same map, lesson, testing, progress, and backup model as built-in skills.",
+      "Use validate_lesson_set before stage_custom_lesson_set. Staging is visible but cannot install content.",
+      "Final installation is human-controlled. Ask the user to review the staged preview and click Install, or open Human Lesson Creator.",
       "Do not request or repeat raw answer keys from a lesson-set file in tutoring conversation."
     ]
   },
@@ -54,13 +56,18 @@
     "avoid_nagging": "Recommend once at a natural stopping point unless data is at immediate risk. Do not interrupt every question.",
     "never_claim_downloaded": "A backup is downloaded only after the human activates the download and the app reports it."
   },
-  "routes": ["home", "map", "lesson", "test", "results", "data"],
+  "routes": ["home", "map", "lesson", "test", "results", "creator", "data"],
   "tools": [
     "get_agent_guide",
     "get_app_state",
     "get_curriculum_map",
     "get_progress_summary",
+    "list_subjects",
+    "set_learning_preferences",
     "navigate_learning_app",
+    "open_lesson_creator",
+    "validate_lesson_set",
+    "stage_custom_lesson_set",
     "get_learning_context",
     "start_skill_test",
     "inspect_student_work",
@@ -69,10 +76,11 @@
   ],
   "custom_lesson_sets": {
     "format": "quickmaths.lesson-set",
-    "schema_version": "1.0",
+    "schema_version": "2.0",
     "authoring_guide": "https://srednjak.github.io/QuickMaths/CUSTOM_LESSON_SETS.md",
     "example": "https://srednjak.github.io/QuickMaths/lesson-set-example.json",
     "install_route": "data",
+    "human_creator_route": "creator",
     "limits": { "file_bytes": 2000000, "sets": 10, "skills_per_set": 50, "problems_per_skill": 100 },
     "id_rules": { "pack_prefix": "PACK_", "skill_prefix": "CUSTOM_", "characters": "uppercase letters, numbers, and underscores" },
     "supported_grading": [
@@ -84,6 +92,14 @@
       "exact_text",
       "theorem_conclusion"
     ],
+    "supported_work_modes": ["none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check"],
+    "subject_system": {
+      "default_subject_id": "SUBJECT_MATH",
+      "new_subjects": "Schema 2.0 lesson sets can create themed subjects or extend an installed subject.",
+      "bridges": "Prerequisites may reference lessons in any installed subject by globally unique skill ID or explicit subject_id/skill_id object.",
+      "progression_modes": { "hard": "Prerequisites lock tests.", "soft": "Connections are guidance and all tests are open." },
+      "theme_safety": "Only fixed six-digit color tokens are accepted; CSS, HTML, scripts, and URLs are rejected."
+    },
     "backup_integration": "Installed lesson-set content and all related learner records are embedded in full JSON backups."
   }
 }

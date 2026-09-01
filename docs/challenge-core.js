@@ -1,8 +1,23 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 3;
+export const APP_VERSION = 4;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
-export const LESSON_SET_SCHEMA_VERSION = "1.0";
+export const LESSON_SET_SCHEMA_VERSION = "2.0";
+export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
+
+export const DEFAULT_SUBJECT = Object.freeze({
+  id: DEFAULT_SUBJECT_ID,
+  name: "Mathematics",
+  shortName: "Maths",
+  icon: "∑",
+  description: "The built-in Algebra Foundations curriculum.",
+  builtIn: true,
+  theme: Object.freeze({
+    paper: "#f3eee3", paperDeep: "#e8dfce", paperLight: "#fffdf8", ink: "#16211d",
+    muted: "#68716b", line: "#d6cdbd", primary: "#153f36", primaryAlt: "#205c4e",
+    tint: "#b8d9c9", highlight: "#dceca9", accent: "#df755b",
+  }),
+});
 
 export const STATUS_COLORS = Object.freeze({
   locked: "#858a89",
@@ -14,7 +29,7 @@ export const STATUS_COLORS = Object.freeze({
 });
 
 const PROVEN = new Set(["proven", "mastered"]);
-const ROUTES = new Set(["welcome", "home", "map", "lesson", "test", "results", "data"]);
+const ROUTES = new Set(["welcome", "home", "map", "lesson", "test", "results", "data", "creator"]);
 const MAX_ACTIVITY = 60;
 const MAX_ATTEMPTS = 500;
 const MAX_REVIEWS = 1000;
@@ -24,7 +39,9 @@ const MAX_LESSON_SET_SKILLS = 50;
 const MAX_PROBLEMS_PER_SKILL = 100;
 const LESSON_SET_ID = /^PACK_[A-Z0-9_]{3,54}$/;
 const CUSTOM_SKILL_ID = /^CUSTOM_[A-Z0-9_]{3,52}$/;
+const SUBJECT_ID = /^SUBJECT_[A-Z0-9_]{2,51}$/;
 const SAFE_ID = /^[A-Z][A-Z0-9_]{2,119}$/;
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 const GRADING_METHODS = new Set([
   "exact_numeric", "numeric_with_tolerance", "multiple_choice", "symbolic_expression",
   "equation_solution", "exact_text", "theorem_conclusion",
@@ -70,6 +87,53 @@ function idList(value, label, { max = 50 } = {}) {
   return ids;
 }
 
+function prerequisiteList(value, label, { max = 50 } = {}) {
+  if (value == null) return [];
+  if (!Array.isArray(value) || value.length > max) throw new Error(`${label} must be a list with at most ${max} references.`);
+  const refs = value.map((item) => {
+    if (typeof item === "string") return { skillId: requiredText(item, label, 120), subjectId: null };
+    if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`${label} contains an invalid reference.`);
+    const skillId = requiredText(item.skill_id, `${label} skill_id`, 120);
+    const subjectId = item.subject_id == null ? null : requiredText(item.subject_id, `${label} subject_id`, 60);
+    if (subjectId && !SUBJECT_ID.test(subjectId)) throw new Error(`${label} contains an invalid subject_id.`);
+    return { skillId, subjectId };
+  });
+  if (refs.some((ref) => !SAFE_ID.test(ref.skillId))) throw new Error(`${label} contains an invalid skill ID.`);
+  if (new Set(refs.map((ref) => ref.skillId)).size !== refs.length) throw new Error(`${label} contains a duplicate skill reference.`);
+  return refs;
+}
+
+function normalizeTheme(value, { required = false } = {}) {
+  if (value == null && !required) return null;
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Subject theme must be an object of color values.");
+  const fallback = DEFAULT_SUBJECT.theme;
+  const keys = ["paper", "paperDeep", "paperLight", "ink", "muted", "line", "primary", "primaryAlt", "tint", "highlight", "accent"];
+  const output = {};
+  for (const key of keys) {
+    const color = value[key] ?? fallback[key];
+    if (typeof color !== "string" || !HEX_COLOR.test(color)) throw new Error(`Subject theme ${key} must be a six-digit hex color.`);
+    output[key] = color.toLowerCase();
+  }
+  return output;
+}
+
+function normalizeSubject(candidate, schemaVersion) {
+  if (schemaVersion === "1.0") return clone(DEFAULT_SUBJECT);
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error("Lesson set subject is required for schema 2.0.");
+  const id = requiredText(candidate.id, "Subject ID", 60);
+  if (!SUBJECT_ID.test(id)) throw new Error("Subject ID must start with SUBJECT_ and use uppercase letters, numbers, and underscores.");
+  const isMath = id === DEFAULT_SUBJECT_ID;
+  return {
+    id,
+    name: isMath ? DEFAULT_SUBJECT.name : requiredText(candidate.name, "Subject name", 120),
+    shortName: optionalText(candidate.short_name ?? candidate.shortName, "Subject short_name", 40) || (isMath ? DEFAULT_SUBJECT.shortName : requiredText(candidate.name, "Subject name", 120).slice(0, 24)),
+    icon: optionalText(candidate.icon, "Subject icon", 8) || (isMath ? DEFAULT_SUBJECT.icon : "◇"),
+    description: optionalText(candidate.description, "Subject description", 500) || (isMath ? DEFAULT_SUBJECT.description : "Custom QuickMaths subject."),
+    builtIn: isMath,
+    theme: isMath ? clone(DEFAULT_SUBJECT.theme) : normalizeTheme(candidate.theme, { required: true }),
+  };
+}
+
 function normalizeProblem(candidate, skillId, questionIds) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${skillId} contains an invalid problem.`);
   const templateId = requiredText(candidate.template_id, `${skillId} problem ID`, 120);
@@ -96,14 +160,29 @@ function normalizeProblem(candidate, skillId, questionIds) {
   }
   const workCandidate = candidate.work && typeof candidate.work === "object" && !Array.isArray(candidate.work) ? candidate.work : {};
   const workMode = workCandidate.mode ?? "none";
-  if (!["none", "procedural_steps"].includes(workMode)) throw new Error(`${templateId} uses unsupported work mode ${workMode}.`);
-  const answerMode = candidate.answer_mode ?? (workMode === "procedural_steps" ? "final_plus_required_work" : "final_only");
+  if (!["none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check"].includes(workMode)) throw new Error(`${templateId} uses unsupported work mode ${workMode}.`);
+  const answerMode = candidate.answer_mode ?? (workMode === "none" ? "final_only" : "final_plus_required_work");
   if (!["final_only", "final_plus_optional_work", "final_plus_required_work"].includes(answerMode)) throw new Error(`${templateId} uses unsupported answer_mode ${answerMode}.`);
   const minimumSteps = Math.floor(cleanNumber(Number(workCandidate.minimum_steps), workMode === "procedural_steps" ? 2 : 1, 1, 10));
   const solutionSteps = Array.isArray(candidate.solution_steps)
     ? candidate.solution_steps.map((step) => requiredText(String(step), `${templateId} solution step`, 1000)).slice(0, 20)
     : [];
   if (!solutionSteps.length) throw new Error(`${templateId} needs at least one solution step.`);
+  const proofCandidate = workCandidate.proof_policy && typeof workCandidate.proof_policy === "object" && !Array.isArray(workCandidate.proof_policy) ? workCandidate.proof_policy : {};
+  const rubricCandidate = workCandidate.rubric && typeof workCandidate.rubric === "object" && !Array.isArray(workCandidate.rubric) ? workCandidate.rubric : {};
+  const criteria = Array.isArray(rubricCandidate.criteria) ? rubricCandidate.criteria.slice(0, 12).map((criterion, index) => ({
+    id: optionalText(criterion?.id, `${templateId} rubric criterion ${index + 1} ID`, 80) || `criterion_${index + 1}`,
+    description: requiredText(criterion?.description, `${templateId} rubric criterion ${index + 1}`, 500),
+    weight: cleanNumber(Number(criterion?.weight), 1, 0.01, 100),
+  })) : [];
+  if (workMode === "rubric_check" && !criteria.length) throw new Error(`${templateId} rubric_check needs at least one rubric criterion.`);
+  const obligations = Array.isArray(proofCandidate.obligations)
+    ? proofCandidate.obligations.map((item) => requiredText(String(item), `${templateId} proof obligation`, 500)).slice(0, 12)
+    : [];
+  if (workMode === "proof_obligations" && !obligations.length) throw new Error(`${templateId} proof_obligations needs at least one obligation.`);
+  const reviewCandidate = candidate.review_policy && typeof candidate.review_policy === "object" && !Array.isArray(candidate.review_policy) ? candidate.review_policy : {};
+  const workReview = reviewCandidate.work_review ?? (["proof_obligations", "rubric_check"].includes(workMode) ? "tutor_required" : "none");
+  if (!["none", "optional", "auto", "tutor_required", "self_review"].includes(workReview)) throw new Error(`${templateId} uses unsupported work_review ${workReview}.`);
   return {
     template_id: templateId,
     source_template_id: templateId,
@@ -123,12 +202,24 @@ function normalizeProblem(candidate, skillId, questionIds) {
     answer_mode: answerMode,
     work: {
       mode: workMode,
-      prompt: optionalText(workCandidate.prompt, `${templateId} work prompt`, 500) || (workMode === "procedural_steps" ? "Show one mathematical step per line." : ""),
-      line_type: "expression",
+      prompt: optionalText(workCandidate.prompt, `${templateId} work prompt`, 500) || (workMode === "procedural_steps" ? "Show one mathematical step per line." : workMode === "none" ? "" : "Explain your reasoning clearly."),
+      line_type: ["expression", "equation", "mixed", "text"].includes(workCandidate.line_type) ? workCandidate.line_type : "expression",
+      target_variable: optionalText(workCandidate.target_variable, `${templateId} target_variable`, 40) || null,
       minimum_steps: minimumSteps,
       require_final_answer_match: workCandidate.require_final_answer_match !== false,
+      proof_policy: {
+        obligations,
+        accepted_strategies: Array.isArray(proofCandidate.accepted_strategies)
+          ? proofCandidate.accepted_strategies.map((item) => requiredText(String(item), `${templateId} proof strategy`, 200)).slice(0, 12)
+          : [],
+      },
+      rubric: { criteria },
     },
-    review_policy: { work_review: "none", mastery_requires_review_pass: false },
+    review_policy: {
+      work_review: workReview,
+      mastery_requires_review_pass: reviewCandidate.mastery_requires_review_pass === true || ["proof_obligations", "rubric_check"].includes(workMode),
+      allow_self_review: reviewCandidate.allow_self_review !== false,
+    },
     accepted_forms: Array.isArray(candidate.accepted_forms) ? candidate.accepted_forms.map((form) => requiredText(String(form), `${templateId} accepted form`, 300)).slice(0, 12) : [],
     work_required: candidate.work_required === true || answerMode === "final_plus_required_work",
   };
@@ -142,7 +233,9 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
   }
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error("Lesson set must be a JSON object.");
   if (candidate.format !== LESSON_SET_FORMAT) throw new Error(`Lesson set format must be ${LESSON_SET_FORMAT}.`);
-  if (candidate.schema_version !== LESSON_SET_SCHEMA_VERSION) throw new Error(`Unsupported lesson set schema_version ${candidate.schema_version ?? "missing"}.`);
+  const schemaVersion = candidate.schema_version;
+  if (!["1.0", LESSON_SET_SCHEMA_VERSION].includes(schemaVersion)) throw new Error(`Unsupported lesson set schema_version ${schemaVersion ?? "missing"}.`);
+  const subject = normalizeSubject(candidate.subject, schemaVersion);
   const id = requiredText(candidate.id, "Lesson set ID", 60);
   if (!LESSON_SET_ID.test(id)) throw new Error("Lesson set ID must start with PACK_ and use uppercase letters, numbers, and underscores.");
   if (!Array.isArray(candidate.skills) || !candidate.skills.length || candidate.skills.length > MAX_LESSON_SET_SKILLS) {
@@ -160,7 +253,8 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
   const questionIds = new Set();
   const skills = candidate.skills.map((skillCandidate) => {
     const skillId = skillCandidate.id;
-    const prerequisites = idList(skillCandidate.prerequisites, `${skillId} prerequisites`);
+    const prerequisiteRefs = prerequisiteList(skillCandidate.prerequisites, `${skillId} prerequisites`);
+    const prerequisites = prerequisiteRefs.map((ref) => ref.skillId);
     const unlocks = idList(skillCandidate.unlocks, `${skillId} unlocks`);
     for (const prerequisite of prerequisites) if (!allKnown.has(prerequisite)) throw new Error(`${skillId} references missing prerequisite ${prerequisite}.`);
     for (const unlock of unlocks) if (!packSkillSet.has(unlock)) throw new Error(`${skillId} unlock ${unlock} must belong to the same lesson set.`);
@@ -181,6 +275,8 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
       id: skillId,
       packId: id,
       custom: true,
+      subjectId: subject.id,
+      prerequisiteRefs,
       name: requiredText(skillCandidate.name, `${skillId} name`, 160),
       domain: optionalText(skillCandidate.domain, `${skillId} domain`, 80) || "Custom",
       subdomain: optionalText(skillCandidate.subdomain, `${skillId} subdomain`, 120) || requiredText(candidate.name, "Lesson set name", 160),
@@ -228,6 +324,7 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
     author: optionalText(candidate.author, "Lesson set author", 160) || "Unknown author",
     version: optionalText(candidate.version, "Lesson set version", 40) || "1.0.0",
     importedAt: cleanText(candidate.importedAt, 40) || new Date().toISOString(),
+    subject,
     track: {
       id: optionalText(trackCandidate.id, "Track ID", 120) || `TRACK_${id}`,
       name: optionalText(trackCandidate.name, "Track name", 160) || requiredText(candidate.name, "Lesson set name", 160),
@@ -237,6 +334,7 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
       exit_skills: exitSkills,
       skills: trackSkills,
       schema_version: LESSON_SET_SCHEMA_VERSION,
+      subject_id: subject.id,
     },
     skills,
   };
@@ -256,6 +354,7 @@ function sanitizeLessonPacks(value, curriculum, { strict = false } = {}) {
     try {
       const pack = normalizeLessonPack(candidate, { knownSkillIds: known });
       if (packIds.has(pack.id)) throw new Error(`Duplicate lesson set ID: ${pack.id}.`);
+      validateCatalogGraph(curriculum, [...output, pack]);
       output.push(pack);
       packIds.add(pack.id);
       pack.skills.forEach((skill) => known.add(skill.id));
@@ -266,8 +365,44 @@ function sanitizeLessonPacks(value, curriculum, { strict = false } = {}) {
   return output;
 }
 
+function validateCatalogGraph(curriculum, lessonPacks) {
+  const builtInSkills = curriculum.skills.map((skill) => ({ ...skill, subjectId: skill.subjectId ?? DEFAULT_SUBJECT_ID }));
+  const skills = [...builtInSkills, ...lessonPacks.flatMap((pack) => pack.skills)];
+  const byId = Object.fromEntries(skills.map((skill) => [skill.id, skill]));
+  if (Object.keys(byId).length !== skills.length) throw new Error("The combined curriculum contains a duplicate skill ID.");
+  for (const skill of skills) {
+    for (const prerequisite of skill.prerequisites ?? []) {
+      if (!byId[prerequisite]) throw new Error(`${skill.id} references missing prerequisite ${prerequisite}.`);
+    }
+    for (const ref of skill.prerequisiteRefs ?? []) {
+      const target = byId[ref.skillId];
+      if (ref.subjectId && target && ref.subjectId !== (target.subjectId ?? DEFAULT_SUBJECT_ID)) {
+        throw new Error(`${skill.id} says ${ref.skillId} belongs to ${ref.subjectId}, but it belongs to ${target.subjectId ?? DEFAULT_SUBJECT_ID}.`);
+      }
+    }
+  }
+  const visiting = new Set();
+  const visited = new Set();
+  const visit = (skillId) => {
+    if (visiting.has(skillId)) throw new Error(`Combined prerequisite cycle includes ${skillId}.`);
+    if (visited.has(skillId)) return;
+    visiting.add(skillId);
+    for (const prerequisite of byId[skillId]?.prerequisites ?? []) visit(prerequisite);
+    visiting.delete(skillId);
+    visited.add(skillId);
+  };
+  skills.forEach((skill) => visit(skill.id));
+}
+
 function mergeCurriculum(curriculum, lessonPacks) {
+  validateCatalogGraph(curriculum, lessonPacks);
+  const builtInSkills = curriculum.skills.map((skill) => ({ ...skill, subjectId: skill.subjectId ?? DEFAULT_SUBJECT_ID }));
   const customSkills = lessonPacks.flatMap((pack) => pack.skills);
+  const subjectMap = new Map([[DEFAULT_SUBJECT_ID, { ...clone(DEFAULT_SUBJECT), skillIds: [] }]]);
+  for (const pack of lessonPacks) {
+    if (!subjectMap.has(pack.subject.id)) subjectMap.set(pack.subject.id, { ...clone(pack.subject), skillIds: [] });
+  }
+  for (const skill of [...builtInSkills, ...customSkills]) subjectMap.get(skill.subjectId)?.skillIds.push(skill.id);
   return {
     ...curriculum,
     track: {
@@ -275,7 +410,8 @@ function mergeCurriculum(curriculum, lessonPacks) {
       skills: [...curriculum.track.skills, ...lessonPacks.flatMap((pack) => pack.track.skills)],
       exit_skills: [...curriculum.track.exit_skills, ...lessonPacks.flatMap((pack) => pack.track.exit_skills)],
     },
-    skills: [...curriculum.skills, ...customSkills],
+    skills: [...builtInSkills, ...customSkills],
+    subjects: [...subjectMap.values()],
   };
 }
 
@@ -302,6 +438,7 @@ function initialState() {
       activeAttemptId: null,
       pendingResults: null,
       agentOpen: false,
+      stagedLessonPack: null,
     },
     session: null,
     activity: [],
@@ -319,6 +456,8 @@ function sanitizeProfile(candidate) {
     createdAt: cleanText(candidate.createdAt, 40) || new Date().toISOString(),
     totalLoggedSeconds: Math.floor(cleanNumber(candidate.totalLoggedSeconds, 0, 0, 100_000_000)),
     demo: Boolean(candidate.demo),
+    activeSubjectId: SUBJECT_ID.test(candidate.activeSubjectId) ? candidate.activeSubjectId : DEFAULT_SUBJECT_ID,
+    progressionMode: candidate.progressionMode === "soft" ? "soft" : "hard",
   };
 }
 
@@ -370,6 +509,8 @@ function sanitizeResult(candidate) {
     solutionSteps: Array.isArray(candidate.solutionSteps) ? candidate.solutionSteps.map((step) => cleanText(step, 1000)).filter(Boolean).slice(0, 20) : [],
     mistakeTags: Array.isArray(candidate.mistakeTags) ? candidate.mistakeTags.map((tag) => cleanText(tag, 80)).filter(Boolean).slice(0, 12) : [],
     workRequired: Boolean(candidate.workRequired),
+    reviewRequired: Boolean(candidate.reviewRequired),
+    allowSelfReview: candidate.allowSelfReview !== false,
   };
 }
 
@@ -497,6 +638,9 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   const ui = candidate.ui && typeof candidate.ui === "object" ? candidate.ui : {};
   const route = ROUTES.has(ui.route) ? ui.route : activeProfileId ? "home" : "welcome";
   const selectedSkillId = skills.has(ui.selectedSkillId) ? ui.selectedSkillId : catalog.track.entry_skills[0];
+  for (const profile of profiles) {
+    if (!catalog.subjects.some((subject) => subject.id === profile.activeSubjectId)) profile.activeSubjectId = DEFAULT_SUBJECT_ID;
+  }
 
   const attempts = Array.isArray(candidate.attempts)
     ? candidate.attempts.map((item) => sanitizeAttempt(item, profileIds, skills)).filter(Boolean).slice(-MAX_ATTEMPTS)
@@ -526,6 +670,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       activeAttemptId: attempts.some((attempt) => attempt.attemptId === ui.activeAttemptId) ? ui.activeAttemptId : null,
       pendingResults: sanitizePendingResults(ui.pendingResults, skills),
       agentOpen: Boolean(ui.agentOpen),
+      stagedLessonPack: null,
     },
     session: candidate.session && profileIds.has(candidate.session.profileId)
       ? {
@@ -555,7 +700,7 @@ function migrateLegacy(storage, curriculum) {
     if (!legacy || typeof legacy !== "object") return null;
     const state = initialState();
     const now = new Date().toISOString();
-    const profile = { id: "profile-migrated-demo", displayName: "Demo Learner", createdAt: now, totalLoggedSeconds: 0, demo: true };
+    const profile = { id: "profile-migrated-demo", displayName: "Demo Learner", createdAt: now, totalLoggedSeconds: 0, demo: true, activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard" };
     state.profiles = [profile];
     state.activeProfileId = profile.id;
     state.ui.route = "home";
@@ -761,9 +906,25 @@ function validateProceduralWork(problem, work) {
   if (!problem.work_required) return null;
   const lines = String(work ?? "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const minimumSteps = Math.max(1, Number(problem.work?.minimum_steps ?? 1));
+  const mode = problem.work?.mode ?? "none";
+  if (mode === "capture_only" && !lines.length) return "Add your reasoning or notes before submitting.";
+  if (mode === "proof_obligations") {
+    if (!lines.length || lines.join(" ").length < 20) return "Write a proof that addresses the listed obligations before submitting.";
+    return null;
+  }
+  if (mode === "rubric_check") {
+    if (!lines.length || lines.join(" ").length < 20) return "Add enough reasoning for the review rubric before submitting.";
+    return null;
+  }
+  if (mode !== "procedural_steps") return null;
   if (lines.length < minimumSteps) return `Show at least ${minimumSteps} mathematical steps.`;
+  const lineType = problem.work?.line_type ?? "expression";
+  if (lineType === "text") return null;
+  if (lineType === "equation" && lines.some((line) => !/[=<>≤≥]/.test(line))) return "Each work line needs an equation or relation.";
+  if (problem.work?.target_variable && !lines.some((line) => line.includes(problem.work.target_variable))) return `Shown work needs to use ${problem.work.target_variable}.`;
   const partsFor = (line) => line.split(/<=|>=|≤|≥|=|<|>/).map((part) => part.trim()).filter(Boolean);
   for (const line of lines) {
+    if (lineType === "mixed" && !/[\d=+\-*/^()<>≤≥]/.test(line)) continue;
     if (!/[\d=+\-*/^()<>≤≥]/.test(line)) return "Each work line needs a mathematical expression or equation.";
     const parts = partsFor(line);
     if (!parts.length || parts.some((part) => !expressionTokens(part))) return "One or more work lines are not valid mathematical notation.";
@@ -843,6 +1004,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
   const unlocks = {};
   let catalog = curriculum;
   let state = loadState(storage, curriculum);
+  let stagedLessonPack = null;
   const listeners = new Set();
   let storageError = null;
 
@@ -888,6 +1050,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
   const activeProfile = () => state.profiles.find((profile) => profile.id === state.activeProfileId) ?? null;
   const activeProgress = () => state.progress[state.activeProfileId] ?? {};
   const profileAttempts = () => state.attempts.filter((attempt) => attempt.profileId === state.activeProfileId);
+  const activeSubjectId = () => activeProfile()?.activeSubjectId ?? DEFAULT_SUBJECT_ID;
 
   const heartbeat = (force = false) => {
     const profile = activeProfile();
@@ -906,19 +1069,22 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     if (!skill) return "locked";
     const record = activeProgress()[skillId];
     if (record) {
+      if (record.status === "locked" && activeProfile()?.progressionMode === "soft") return "ready";
       if (PROVEN.has(record.status) && record.nextReviewAt && new Date(record.nextReviewAt).getTime() < milliseconds()) return "rusty";
       return record.status;
     }
+    if (activeProfile()?.progressionMode === "soft") return "ready";
     return skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status)) ? "ready" : "locked";
   };
 
-  const progressRows = () => skillOrder.map((skillId) => {
+  const progressRows = ({ subjectId = null } = {}) => skillOrder.filter((skillId) => !subjectId || skillsById[skillId]?.subjectId === subjectId).map((skillId) => {
     const skill = skillsById[skillId];
     const record = activeProgress()[skillId] ?? {};
     return {
       id: skill.id,
       packId: skill.packId ?? null,
       custom: Boolean(skill.custom),
+      subjectId: skill.subjectId,
       name: skill.name,
       subdomain: skill.subdomain,
       description: skill.description,
@@ -932,6 +1098,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       attemptCount: record.attemptCount ?? 0,
       nextReviewAt: record.nextReviewAt ?? null,
       mistakeTags: [...(record.mistakeTags ?? [])],
+      unmetPrerequisites: skill.prerequisites.filter((id) => !PROVEN.has(activeProgress()[id]?.status)),
     };
   });
 
@@ -974,7 +1141,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
   };
 
   const snapshot = () => {
-    const rows = state.activeProfileId ? progressRows() : [];
+    const allRows = state.activeProfileId ? progressRows() : [];
+    const rows = state.activeProfileId ? progressRows({ subjectId: activeSubjectId() }) : [];
     const counts = Object.fromEntries(["locked", "ready", "learning", "proven", "mastered", "rusty"].map((key) => [key, rows.filter((row) => row.status === key).length]));
     const suggested = rows.find((row) => row.status === "rusty")
       ?? rows.find((row) => row.status === "learning")
@@ -983,8 +1151,12 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return {
       version: state.version,
       activeProfile: clone(activeProfile()),
+      activeSubject: clone(catalog.subjects.find((subject) => subject.id === activeSubjectId()) ?? catalog.subjects[0]),
+      subjects: clone(catalog.subjects),
+      progressionMode: activeProfile()?.progressionMode ?? "hard",
       profiles: clone(state.profiles),
       progressRows: clone(rows),
+      allProgressRows: clone(allRows),
       progressCounts: counts,
       suggested: clone(suggested),
       attempts: clone(profileAttempts().slice().reverse()),
@@ -994,6 +1166,16 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       activity: clone(state.activity.filter((item) => item.profileId === state.activeProfileId)),
       storageError,
       backupStatus: backupStatus(),
+      stagedLessonPack: stagedLessonPack ? {
+        id: stagedLessonPack.pack.id,
+        name: stagedLessonPack.pack.name,
+        author: stagedLessonPack.pack.author,
+        version: stagedLessonPack.pack.version,
+        subjectId: stagedLessonPack.pack.subject.id,
+        subjectName: stagedLessonPack.pack.subject.name,
+        skillCount: stagedLessonPack.pack.skills.length,
+        problemCount: stagedLessonPack.pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
+      } : null,
       lessonPacks: state.lessonPacks.map((pack) => ({
         id: pack.id,
         name: pack.name,
@@ -1003,6 +1185,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
         importedAt: pack.importedAt,
         skillCount: pack.skills.length,
         problemCount: pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
+        subjectId: pack.subject.id,
+        subjectName: pack.subject.name,
       })),
       selectedSkill: clone(skillsById[state.ui.selectedSkillId] ?? skillsById[skillOrder[0]]),
       selectedMapSkill: clone(skillsById[state.ui.selectedMapSkillId] ?? skillsById[skillOrder[0]]),
@@ -1010,17 +1194,24 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       pendingResults: clone(state.ui.pendingResults),
       curriculum: {
         track: clone(catalog.track),
+        subjects: clone(catalog.subjects),
         lessonPacks: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, skill_ids: [...pack.track.skills] })),
-        skills: catalog.skills.map((skill) => ({
+        skills: catalog.skills.filter((skill) => skill.subjectId === activeSubjectId()).map((skill) => ({
           id: skill.id,
           packId: skill.packId ?? null,
           custom: Boolean(skill.custom),
+          subjectId: skill.subjectId,
           name: skill.name,
           subdomain: skill.subdomain,
           description: skill.description,
           prerequisites: [...skill.prerequisites],
           unlocks: [...(unlocks[skill.id] ?? [])],
           applications: clone(skill.applications),
+        })),
+        allSkills: catalog.skills.map((skill) => ({
+          id: skill.id, packId: skill.packId ?? null, custom: Boolean(skill.custom), subjectId: skill.subjectId,
+          name: skill.name, subdomain: skill.subdomain, description: skill.description,
+          prerequisites: [...skill.prerequisites], unlocks: [...(unlocks[skill.id] ?? [])],
         })),
       },
     };
@@ -1036,6 +1227,12 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     state.activeProfileId = profileId;
     state.progress[profileId] ??= {};
     state.drafts[profileId] ??= {};
+    const subjectId = activeProfile()?.activeSubjectId ?? DEFAULT_SUBJECT_ID;
+    const firstSkill = skillOrder.find((id) => skillsById[id]?.subjectId === subjectId) ?? skillOrder[0];
+    if (firstSkill && skillsById[state.ui.selectedSkillId]?.subjectId !== subjectId) {
+      state.ui.selectedSkillId = firstSkill;
+      state.ui.selectedMapSkillId = firstSkill;
+    }
     state.ui.route = "home";
     state.ui.pendingResults = null;
     startSession(profileId);
@@ -1046,7 +1243,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
   const createProfile = (displayName, { demo = false } = {}) => {
     const name = cleanText(displayName, 60);
     if (name.length < 2) throw new Error("Profile name must contain at least 2 characters.");
-    const profile = { id: makeId("profile"), displayName: name, createdAt: isoNow(), totalLoggedSeconds: 0, demo };
+    const profile = { id: makeId("profile"), displayName: name, createdAt: isoNow(), totalLoggedSeconds: 0, demo, activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard" };
     state.profiles.push(profile);
     state.progress[profile.id] = {};
     state.drafts[profile.id] = {};
@@ -1090,6 +1287,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       if (!skillsById[skillId]) throw new Error("Unknown skill_id.");
       state.ui.selectedSkillId = skillId;
       state.ui.selectedMapSkillId = skillId;
+      activeProfile().activeSubjectId = skillsById[skillId].subjectId;
     }
     state.ui.route = route;
     addActivity("navigate_learning_app", `Opened ${route}${skillId ? ` for ${skillId}` : ""}.`);
@@ -1098,8 +1296,30 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
 
   const selectMapSkill = (skillId) => {
     if (!skillsById[skillId]) throw new Error("Unknown skill_id.");
+    activeProfile().activeSubjectId = skillsById[skillId].subjectId;
     state.ui.selectedMapSkillId = skillId;
     notify();
+  };
+
+  const setLearningPreferences = ({ subjectId = null, progressionMode = null } = {}) => {
+    const profile = activeProfile();
+    if (!profile) throw new Error("Select a profile first.");
+    if (subjectId != null) {
+      if (!catalog.subjects.some((subject) => subject.id === subjectId)) throw new Error("Unknown subject_id.");
+      profile.activeSubjectId = subjectId;
+      const firstSkill = skillOrder.find((id) => skillsById[id]?.subjectId === subjectId);
+      if (firstSkill && skillsById[state.ui.selectedSkillId]?.subjectId !== subjectId) {
+        state.ui.selectedSkillId = firstSkill;
+        state.ui.selectedMapSkillId = firstSkill;
+      }
+    }
+    if (progressionMode != null) {
+      if (!["hard", "soft"].includes(progressionMode)) throw new Error("progression_mode must be hard or soft.");
+      profile.progressionMode = progressionMode;
+    }
+    addActivity("set_learning_preferences", `Using ${profile.progressionMode} progression in ${catalog.subjects.find((subject) => subject.id === profile.activeSubjectId)?.name ?? profile.activeSubjectId}.`);
+    notify();
+    return { ok: true, subject_id: profile.activeSubjectId, progression_mode: profile.progressionMode };
   };
 
   const startTest = (skillId, { force = false } = {}) => {
@@ -1161,6 +1381,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
         solutionSteps: clone(problem.solution_steps ?? []),
         mistakeTags: grade.correct ? [] : clone(problem.mistake_tags ?? []),
         workRequired: Boolean(problem.work_required),
+        reviewRequired: ["proof_obligations", "rubric_check"].includes(problem.work?.mode) || problem.review_policy?.mastery_requires_review_pass === true,
+        allowSelfReview: problem.review_policy?.allow_self_review !== false,
       };
     });
     const rawScore = results.filter((result) => result.correct).length;
@@ -1198,7 +1420,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       const mode = source?.work?.mode;
       return ["proof_obligations", "rubric_check"].includes(mode) || source?.review_policy?.mastery_requires_review_pass === true;
     });
-    const prerequisitesMet = skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status));
+    const prerequisitesMet = activeProfile()?.progressionMode === "soft" || skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status));
     const mastery = hasPendingReview ? previous.masteryScore : updateMastery(previous.masteryScore, pending.percentScore, reflection);
     const passed = prerequisitesMet
       && pending.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
@@ -1307,6 +1529,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     if (!safeFeedback || !safeNextStep) throw new Error("feedback and next_step are required.");
     if (!["low", "medium", "high"].includes(confidence)) throw new Error("confidence is invalid.");
     if (!["pass", "partial", "needs_revision", "fail"].includes(verdict)) throw new Error("verdict is invalid.");
+    const activeResult = activeAttempt?.results?.find((result) => result.questionId === safeQuestionId);
+    if (reviewerType === "self" && activeResult?.allowSelfReview === false) throw new Error("This question requires tutor review and does not allow self review.");
     const review = {
       reviewId: makeId("review"), profileId: state.activeProfileId, attemptId: state.ui.activeAttemptId,
       draftId: state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId]?.draftId ?? null,
@@ -1319,6 +1543,28 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     if (review.mistakeTag && review.mistakeTag !== "none") {
       const record = activeProgress()[state.ui.selectedSkillId];
       if (record) record.mistakeTags = [review.mistakeTag, ...(record.mistakeTags ?? []).filter((tag) => tag !== review.mistakeTag)].slice(0, 12);
+    }
+    if (activeAttempt?.hasPendingReview) {
+      const required = activeAttempt.results.filter((result) => result.reviewRequired);
+      const verdicts = required.map((result) => state.reviews.filter((item) => item.attemptId === activeAttempt.attemptId && item.questionId === result.questionId).at(-1)?.verdict ?? null);
+      if (verdicts.every((item) => item === "pass")) {
+        const skill = skillsById[activeAttempt.skillId];
+        const record = activeProgress()[activeAttempt.skillId];
+        const prerequisitesMet = activeProfile()?.progressionMode === "soft" || skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status));
+        const passed = prerequisitesMet
+          && activeAttempt.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
+          && activeAttempt.reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
+          && activeAttempt.reflection.guessed !== "yes";
+        record.masteryScore = updateMastery(record.masteryScore, activeAttempt.percentScore, activeAttempt.reflection);
+        record.status = passed ? (record.status === "proven" ? "mastered" : "proven") : "learning";
+        record.nextReviewAt = reviewDate(record.status, activeAttempt.percentScore, activeAttempt.reflection.confidenceRating, now());
+        record.updatedAt = isoNow();
+        activeAttempt.masteryUpdate = { status: record.status, masteryScore: record.masteryScore };
+        activeAttempt.reviewStatus = "review_passed";
+        activeAttempt.hasPendingReview = false;
+      } else if (verdicts.every(Boolean) && verdicts.some((item) => item !== "pass")) {
+        activeAttempt.reviewStatus = "needs_revision";
+      }
     }
     addActivity("record_tutor_feedback", "Saved visible tutor feedback to this profile.");
     notify();
@@ -1348,11 +1594,13 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
 
   const getProgressSummary = () => {
     if (!activeProfile()) throw new Error("Select a profile first.");
-    const rows = progressRows();
+    const rows = progressRows({ subjectId: activeSubjectId() });
     const view = snapshot();
     return {
       ok: true,
       profile: { display_name: activeProfile()?.displayName ?? "" },
+      subject: { subject_id: view.activeSubject.id, name: view.activeSubject.name },
+      progression_mode: activeProfile()?.progressionMode ?? "hard",
       counts: view.progressCounts,
       suggested_next: view.suggested ? {
         skill_id: view.suggested.id,
@@ -1387,7 +1635,9 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       try { candidate = JSON.parse(raw); } catch { throw new Error("Lesson set is not valid JSON."); }
     }
     if (state.lessonPacks.some((pack) => pack.id === candidate?.id)) throw new Error(`Lesson set ${candidate.id} is already installed.`);
-    return normalizeLessonPack(candidate, { knownSkillIds: Object.keys(skillsById) });
+    const pack = normalizeLessonPack(candidate, { knownSkillIds: Object.keys(skillsById) });
+    validateCatalogGraph(curriculum, [...state.lessonPacks, pack]);
+    return pack;
   };
 
   const previewLessonPack = (raw) => {
@@ -1399,6 +1649,9 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       description: pack.description,
       author: pack.author,
       version: pack.version,
+      subjectId: pack.subject.id,
+      subjectName: pack.subject.name,
+      createsSubject: !catalog.subjects.some((subject) => subject.id === pack.subject.id),
       skillCount: pack.skills.length,
       problemCount: pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
       prerequisiteLinksToBuiltIn: pack.skills.reduce((count, skill) => count + skill.prerequisites.filter((id) => !id.startsWith("CUSTOM_")).length, 0),
@@ -1409,9 +1662,40 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     const pack = parseLessonPack(raw);
     state.lessonPacks.push(pack);
     rebuildCatalog();
+    if (activeProfile()) {
+      activeProfile().activeSubjectId = pack.subject.id;
+      state.ui.selectedSkillId = pack.track.skills[0];
+      state.ui.selectedMapSkillId = pack.track.skills[0];
+    }
     addActivity("load_lesson_set", `Installed ${pack.name} with ${pack.skills.length} skills.`);
     notify();
-    return { ok: true, id: pack.id, name: pack.name, skillCount: pack.skills.length, totalSkillCount: skillOrder.length };
+    return { ok: true, id: pack.id, name: pack.name, subjectId: pack.subject.id, subjectName: pack.subject.name, skillCount: pack.skills.length, totalSkillCount: skillOrder.length };
+  };
+
+  const stageLessonPack = (raw) => {
+    const pack = parseLessonPack(raw);
+    stagedLessonPack = { raw: typeof raw === "string" ? raw : JSON.stringify(raw), pack };
+    state.ui.route = "data";
+    addActivity("stage_custom_lesson_set", `Staged ${pack.name}; human confirmation is required to install it.`);
+    notify();
+    return { ok: true, status: "staged", requires_human_confirmation: true, preview: previewLessonPack(raw) };
+  };
+
+  const installStagedLessonPack = () => {
+    if (!stagedLessonPack) throw new Error("No lesson set is staged.");
+    const staged = stagedLessonPack;
+    stagedLessonPack = null;
+    try { return importLessonPack(staged.raw); }
+    catch (error) { stagedLessonPack = staged; throw error; }
+  };
+
+  const discardStagedLessonPack = () => {
+    if (!stagedLessonPack) return { ok: true, discarded: false };
+    const name = stagedLessonPack.pack.name;
+    stagedLessonPack = null;
+    addActivity("discard_staged_lesson_set", `Discarded staged lesson set ${name}.`);
+    notify();
+    return { ok: true, discarded: true };
   };
 
   const exportLessonPack = (packId) => {
@@ -1509,6 +1793,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     logout,
     navigate,
     selectMapSkill,
+    setLearningPreferences,
     startTest,
     updateResponse,
     submitTest,
@@ -1522,6 +1807,9 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     getProgressSummary,
     createFollowupProblem,
     previewLessonPack,
+    stageLessonPack,
+    installStagedLessonPack,
+    discardStagedLessonPack,
     importLessonPack,
     exportLessonPack,
     exportBackup,

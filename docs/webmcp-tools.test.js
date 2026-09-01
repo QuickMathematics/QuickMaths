@@ -26,13 +26,13 @@ function toolsFor(store) {
   return Object.fromEntries(buildToolDefinitions(store, agentManifest).map((tool) => [tool.name, tool]));
 }
 
-test("registers all ten tools once with the WebMCP document context", async () => {
+test("registers all fifteen tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
   }, agentManifest);
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 10);
+  assert.equal(TOOL_NAMES.length, 15);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
   assert.ok(registered.every(({ description }) => description.length > 0));
@@ -52,7 +52,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.equal(guide.guide.app, "QuickMaths Web");
   assert.equal(guide.guide.backup_policy.recommend, true);
   assert.equal(guide.guide.custom_lesson_sets.format, "quickmaths.lesson-set");
-  assert.equal(guide.guide.tools.length, 10);
+  assert.equal(guide.guide.tools.length, 15);
   assert.equal(serialized.includes("expected_answer"), false);
   assert.equal(serialized.includes("finalAnswer"), false);
 });
@@ -81,6 +81,34 @@ test("agent navigation updates the same visible route and selected skill", async
   const result = await tools.navigate_learning_app.execute({ view: "lesson", skill_id: "MATH_ARITH_001" });
   assert.deepEqual(result, { ok: true, visible_view: "lesson", selected_skill_id: "MATH_ARITH_001" });
   assert.equal(store.snapshot().ui.route, "lesson");
+});
+
+test("subject tools switch visible curricula and open the no-code creator", async () => {
+  const store = createStore();
+  const tools = toolsFor(store);
+  const subjects = await tools.list_subjects.execute({});
+  assert.equal(subjects.active_subject_id, "SUBJECT_MATH");
+  assert.equal(subjects.subjects[0].skill_count, 25);
+  const changed = await tools.set_learning_preferences.execute({ progression_mode: "soft" });
+  assert.equal(changed.progression_mode, "soft");
+  const opened = await tools.open_lesson_creator.execute({ subject_id: "SUBJECT_MATH" });
+  assert.equal(opened.visible_view, "creator");
+  assert.equal(store.snapshot().ui.route, "creator");
+});
+
+test("lesson-set tools validate and stage content but cannot install it", async () => {
+  const store = createStore();
+  const tools = toolsFor(store);
+  const raw = readFileSync(new URL("./lesson-set-example.json", import.meta.url), "utf8");
+  const validated = await tools.validate_lesson_set.execute({ lesson_set_json: raw });
+  assert.equal(validated.valid, true);
+  assert.equal(store.snapshot().lessonPacks.length, 0);
+  const staged = await tools.stage_custom_lesson_set.execute({ lesson_set_json: raw });
+  assert.equal(staged.requires_human_confirmation, true);
+  assert.equal(store.snapshot().ui.route, "data");
+  assert.equal(store.snapshot().stagedLessonPack.id, "PACK_PERSONAL_FINANCE");
+  assert.equal(store.snapshot().lessonPacks.length, 0);
+  assert.equal(tools.confirm_lesson_set_install, undefined);
 });
 
 test("starting a test exposes prompts but not expected answers", async () => {

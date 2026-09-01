@@ -3,8 +3,8 @@
 QuickMaths is a local-first mastery learning app with WebMCP site tools.
 
 Agent operating guide: /agent-manifest.json
-Custom lesson-set authoring guide: /CUSTOM_LESSON_SETS.md
+Agent Lesson Authoring Guide (subjects, bridges, themes, proof/rubric work): /CUSTOM_LESSON_SETS.md
 Custom lesson-set example: /lesson-set-example.json
 Challenge architecture and demo: https://github.com/Srednjak/QuickMaths/blob/main/WEBMCP_CHALLENGE.md
 
-Use the registered get_agent_guide WebMCP tool for the in-context operating policy. Never expose pre-submission answer keys. Recommend a portable JSON progress backup at natural stopping points, before imports or custom-content changes, and whenever get_app_state reports that a backup is recommended.
+Use the registered get_agent_guide WebMCP tool for the in-context operating policy. Use list_subjects before subject-aware work, validate_lesson_set before stage_custom_lesson_set, and leave final installation to the human's visible Install button. Never expose pre-submission answer keys. Recommend a portable JSON progress backup at natural stopping points, before imports or custom-content changes, and whenever get_app_state reports that a backup is recommended.

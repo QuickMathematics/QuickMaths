@@ -1,5 +1,6 @@
 import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js";
+import { createLessonStudio } from "./lesson-creator.js";
 
 const elements = {
   loading: document.querySelector("#loading-screen"),
@@ -20,6 +21,8 @@ const elements = {
   agentDock: document.querySelector("#agent-dock"),
   backupFile: document.querySelector("#backup-file"),
   lessonSetFile: document.querySelector("#lesson-set-file"),
+  creatorFile: document.querySelector("#creator-file"),
+  subjectSelect: document.querySelector("#subject-select"),
   toast: document.querySelector("#toast"),
 };
 
@@ -28,6 +31,18 @@ let currentSnapshot;
 let toastTimer;
 let routeHistoryReady = false;
 let applyingHistory = false;
+let lessonStudio;
+
+const THEME_VARIABLES = {
+  paper: "--paper", paperDeep: "--paper-deep", paperLight: "--paper-light", ink: "--ink", muted: "--muted",
+  line: "--line", primary: "--pine", primaryAlt: "--pine-2", tint: "--mint", highlight: "--lime", accent: "--coral",
+};
+
+function applySubjectTheme(subject) {
+  if (!subject?.theme) return;
+  for (const [key, variable] of Object.entries(THEME_VARIABLES)) document.documentElement.style.setProperty(variable, subject.theme[key]);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", subject.theme.paper);
+}
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
@@ -83,9 +98,9 @@ function renderDashboard(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head">
       <div>
-        <p class="eyebrow">Learning dashboard</p>
+        <p class="eyebrow">${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} dashboard · ${snapshot.progressionMode === "soft" ? "Open path" : "Hard path"}</p>
         <h1>Welcome back, ${escapeHtml(snapshot.activeProfile.displayName)}.</h1>
-        <p>Your map updates from saved attempts, confidence, reasoning review, and time—not just one score.</p>
+        <p>Your ${escapeHtml(snapshot.activeSubject.shortName)} map updates from saved attempts, confidence, reasoning review, and time—not just one score.</p>
       </div>
       <div class="page-actions">
         <button class="button button-outline" type="button" data-action="save-backup">Save backup</button>
@@ -178,6 +193,10 @@ function splitLabel(value, max = 22) {
 
 function renderMap(snapshot) {
   const selected = rowForSkill(snapshot, snapshot.ui.selectedMapSkillId) ?? snapshot.progressRows[0];
+  if (!selected) {
+    elements.view.innerHTML = `<section class="test-empty content-card"><h2>No lessons in ${escapeHtml(snapshot.activeSubject.name)}</h2><p>Use Lesson studio or load a custom set to add the first lesson.</p><button class="button button-primary" data-route="creator">Open Lesson studio</button></section>`;
+    return;
+  }
   const selectedSkill = snapshot.curriculum.skills.find((skill) => skill.id === selected.id);
   const { positions, width, height } = mapLayout(snapshot.curriculum.skills);
   const edges = snapshot.curriculum.skills.flatMap((skill) => skill.prerequisites.map((prerequisite) => {
@@ -203,7 +222,7 @@ function renderMap(snapshot) {
 
   elements.view.innerHTML = `
     <header class="page-head">
-      <div><p class="eyebrow">${snapshot.progressRows.length} connected skills${snapshot.lessonPacks.length ? ` · ${snapshot.lessonPacks.length} custom set${snapshot.lessonPacks.length === 1 ? "" : "s"}` : ""}</p><h1>Mastery map</h1><p>Every path begins with what you have already proven. Select a node to see why it is ready, locked, learning, or due for review.</p></div>
+      <div><p class="eyebrow">${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} · ${snapshot.progressRows.length} connected lessons</p><h1>Mastery map</h1><p>${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Cross-subject bridges still show what knowledge travels between curricula.</p></div>
       <div class="page-actions"><label class="compact-select">Jump to skill<select id="map-skill-select">${skillOptions(snapshot, selected.id)}</select></label></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}</div>
@@ -225,10 +244,10 @@ function renderMap(snapshot) {
           <span>Confidence<strong>${selected.confidence == null ? "—" : `${selected.confidence}/5`}</strong></span>
         </div>
         <dl class="skill-relations">
-          <div><dt>Prerequisites</dt><dd>${selected.prerequisites.length ? selected.prerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "None"}</dd></div>
+          <div><dt>${snapshot.progressionMode === "soft" ? "Recommended preparation" : "Prerequisites"}</dt><dd>${selected.prerequisites.length ? selected.prerequisites.map((id) => { const target = store.skillsById[id]; const subject = snapshot.subjects.find((item) => item.id === target?.subjectId); return `${escapeHtml(target?.name ?? id)}${target?.subjectId !== snapshot.activeSubject.id ? ` <small>(${escapeHtml(subject?.name ?? target?.subjectId)})</small>` : ""}`; }).join(", ") : "None"}</dd></div>
           <div><dt>Unlocks</dt><dd>${selected.unlocks.length ? selected.unlocks.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "Track complete"}</dd></div>
         </dl>
-        ${selected.status === "locked" ? `<div class="locked-note"><strong>Why locked?</strong><p>Prove ${selected.prerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(" and ")} first.</p></div>` : ""}
+        ${selected.status === "locked" ? `<div class="locked-note"><strong>Why locked?</strong><p>Prove ${selected.unmetPrerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(" and ")} first, or switch this profile to Open path.</p></div>` : selected.unmetPrerequisites.length ? `<div class="guideline-note"><strong>Open-path guidance</strong><p>${selected.unmetPrerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(" and ")} would make this lesson easier, but they do not block you.</p></div>` : ""}
         ${selectedSkill.applications?.length ? `<div class="application-mini"><strong>Why this matters</strong>${selectedSkill.applications.slice(0, 2).map((item) => `<p>${escapeHtml(item.title)}: ${escapeHtml(item.description)}</p>`).join("")}</div>` : ""}
         <div class="map-detail-actions">
           <button class="button button-secondary" type="button" data-route="lesson" data-skill-id="${escapeHtml(selected.id)}">Open lesson</button>
@@ -265,15 +284,15 @@ function renderLesson(snapshot) {
         <div>${statusChip(row.status)}<code>${escapeHtml(skill.id)}</code></div>
         <div class="lesson-score"><span>Mastery</span><strong>${Math.round(row.masteryScore)}</strong><small>/ 100</small></div>
         <div class="mastery-track"><i style="width:${Math.round(row.masteryScore)}%"></i></div>
-        <dl class="skill-relations"><div><dt>Prerequisites</dt><dd>${row.prerequisites.length ? row.prerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "None"}</dd></div><div><dt>Unlocks</dt><dd>${row.unlocks.length ? row.unlocks.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "Track complete"}</dd></div></dl>
-        ${row.status === "locked" ? `<div class="locked-note"><strong>Lesson available, test locked</strong><p>Prove the prerequisite skills before testing this one.</p></div>` : `<button class="button button-primary" type="button" data-action="start-test" data-skill-id="${escapeHtml(skill.id)}">Start ${skill.problems.length}-question test</button>`}
+        <dl class="skill-relations"><div><dt>${snapshot.progressionMode === "soft" ? "Recommended preparation" : "Prerequisites"}</dt><dd>${row.prerequisites.length ? row.prerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "None"}</dd></div><div><dt>Unlocks</dt><dd>${row.unlocks.length ? row.unlocks.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "Track complete"}</dd></div></dl>
+        ${row.status === "locked" ? `<div class="locked-note"><strong>Lesson available, test locked</strong><p>Prove the prerequisite skills or switch this profile to Open path.</p></div>` : `<button class="button button-primary" type="button" data-action="start-test" data-skill-id="${escapeHtml(skill.id)}">Start ${skill.problems.length}-question test</button>`}
       </div>
       <article class="theory-card">
         <p class="eyebrow">Core idea</p>
         <div class="theory-copy">${formatTheory(skill.theory)}</div>
       </article>
     </section>
-    ${skill.applications?.length ? `<section class="application-grid"><div class="section-title"><p class="eyebrow">Why this matters</p><h2>Math that travels</h2></div>${skill.applications.map((item) => `<article><strong>${escapeHtml(item.title ?? item.subject ?? "Application")}</strong><p>${escapeHtml(item.description)}</p></article>`).join("")}</section>` : ""}
+    ${skill.applications?.length ? `<section class="application-grid"><div class="section-title"><p class="eyebrow">Why this matters</p><h2>${escapeHtml(snapshot.activeSubject.shortName)} that travels</h2></div>${skill.applications.map((item) => `<article><strong>${escapeHtml(item.title ?? item.subject ?? "Application")}</strong><p>${escapeHtml(item.description)}</p></article>`).join("")}</section>` : ""}
     <section class="examples-section">
       <div class="section-title"><p class="eyebrow">Worked examples</p><h2>Watch the method</h2></div>
       <div class="example-list">${skill.examples.map((example, index) => `<details ${index === 0 ? "open" : ""}><summary><span>${String(index + 1).padStart(2, "0")}</span>${escapeHtml(example.prompt)}</summary><div><p class="example-solution">${escapeHtml(example.solution)}</p><p>${escapeHtml(example.explanation)}</p></div></details>`).join("")}</div>
@@ -389,9 +408,10 @@ function renderData(snapshot) {
     </section>
     <section class="content-card lesson-packs-card">
       <div class="card-heading"><div><p class="eyebrow">Extend the curriculum</p><h2>Custom lesson sets</h2><p>Load validated JSON lessons into the same map, testing, progress, and backup pipeline.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson set</button></div>
-      <div class="lesson-pack-guide"><div><strong>Build your own</strong><p>Start from the working example, keep IDs namespaced, then let QuickMaths validate prerequisites, grading, questions, and safety limits before anything is installed.</p></div><a class="button button-outline" href="./lesson-set-example.json" download>Download example</a><a class="button button-secondary" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Read authoring guide</a></div>
+      ${snapshot.stagedLessonPack ? `<aside class="staged-pack"><span>Agent-staged</span><div><strong>${escapeHtml(snapshot.stagedLessonPack.name)}</strong><p>${escapeHtml(snapshot.stagedLessonPack.subjectName)} · ${snapshot.stagedLessonPack.skillCount} lessons · ${snapshot.stagedLessonPack.problemCount} questions · ${escapeHtml(snapshot.stagedLessonPack.author)}</p><small>An agent validated this file, but only you can install it.</small></div><button class="button button-primary" data-action="install-staged-pack">Install</button><button class="button button-outline" data-action="discard-staged-pack">Discard</button></aside>` : ""}
+      <div class="lesson-pack-guide"><div><strong>Two ways to build</strong><p>Use the Human Lesson Creator for friendly forms, tooltips, themes, bridges, proofs, and rubrics—or give the machine-readable guide to an agent.</p></div><button class="button button-primary" data-route="creator">Open Human Lesson Creator</button><a class="button button-outline" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Agent Lesson Authoring Guide</a></div>
       <div class="installed-packs">
-        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">＋</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.skillCount} skill${pack.skillCount === 1 ? "" : "s"} · ${pack.problemCount} problems · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></article>`).join("") : `<div class="empty-state">No custom sets installed. The built-in 25-skill Algebra Foundations track remains available.</div>`}
+        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></article>`).join("") : `<div class="empty-state">No custom sets installed. The built-in 25-skill Mathematics curriculum remains available.</div>`}
       </div>
       <p class="pack-security-note"><strong>Teacher-file warning:</strong> lesson-set JSON contains answer keys and solutions. Don’t paste the raw file into a learner tutoring conversation.</p>
     </section>
@@ -442,6 +462,11 @@ function render(snapshot) {
 
   elements.profileName.textContent = snapshot.activeProfile.displayName;
   elements.profileAvatar.textContent = snapshot.activeProfile.displayName.slice(0, 1).toUpperCase();
+  applySubjectTheme(snapshot.activeSubject);
+  elements.subjectSelect.innerHTML = snapshot.subjects.map((subject) => `<option value="${escapeHtml(subject.id)}" ${subject.id === snapshot.activeSubject.id ? "selected" : ""}>${escapeHtml(subject.icon)} ${escapeHtml(subject.name)}</option>`).join("");
+  document.querySelectorAll("[data-progression-mode]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.progressionMode === snapshot.progressionMode ? "true" : "false"));
+  const sidebarSubtitle = document.querySelector(".sidebar-brand small");
+  if (sidebarSubtitle) sidebarSubtitle.textContent = snapshot.activeSubject.name;
   elements.sessionTime.textContent = formatDuration(snapshot.timers.sessionSeconds);
   elements.profileTime.textContent = formatDuration(snapshot.timers.profileSeconds);
   renderActivity(snapshot.activity);
@@ -452,6 +477,7 @@ function render(snapshot) {
   else if (snapshot.ui.route === "test") renderTest(snapshot);
   else if (snapshot.ui.route === "results") renderResults(snapshot);
   else if (snapshot.ui.route === "data") renderData(snapshot);
+  else if (snapshot.ui.route === "creator") elements.view.innerHTML = lessonStudio.render(snapshot);
   const nextHash = snapshot.ui.route === "home" ? "#/home" : `#/${snapshot.ui.route}/${snapshot.ui.selectedSkillId}`;
   if (location.hash !== nextHash) {
     if (routeHistoryReady && !applyingHistory) history.pushState(null, "", nextHash);
@@ -470,7 +496,7 @@ function applyLocationRoute() {
     try { store.logout(); } finally { applyingHistory = false; }
     return;
   }
-  if (!["home", "map", "lesson", "test", "results", "data"].includes(route)) return;
+  if (!["home", "map", "lesson", "test", "results", "data", "creator"].includes(route)) return;
   const selectedSkill = skillId && store.skillsById[skillId] ? skillId : null;
   if (state.ui.route === route && (!selectedSkill || state.ui.selectedSkillId === selectedSkill)) return;
   applyingHistory = true;
@@ -543,7 +569,7 @@ elements.lessonSetFile.addEventListener("change", async () => {
     const raw = await file.text();
     const preview = store.previewLessonPack(raw);
     const confirmed = window.confirm(
-      `Install ${preview.name}?\n\n${preview.skillCount} skill(s) · ${preview.problemCount} problems\nAuthor: ${preview.author}\nVersion: ${preview.version}\n\nThe set will be added to the mastery map and embedded in future full backups. Download a progress backup first if you want a restore point before changing installed content.`,
+      `Install ${preview.name}?\n\nSubject: ${preview.subjectName}${preview.createsSubject ? " (new subject)" : ""}\n${preview.skillCount} lesson(s) · ${preview.problemCount} questions\nAuthor: ${preview.author}\nVersion: ${preview.version}\n\nThe set will be added to the mastery map and embedded in future full backups. Download a progress backup first if you want a restore point before changing installed content.`,
     );
     if (!confirmed) return;
     const result = store.importLessonPack(raw);
@@ -555,7 +581,27 @@ elements.lessonSetFile.addEventListener("change", async () => {
   }
 });
 
+elements.creatorFile.addEventListener("change", async () => {
+  const file = elements.creatorFile.files?.[0];
+  if (!file) return;
+  try {
+    if (lessonStudio.loadRaw(await file.text())) render(store.snapshot());
+  } finally { elements.creatorFile.value = ""; }
+});
+
 document.addEventListener("click", (event) => {
+  const creatorAction = event.target.closest?.("[data-creator-action]");
+  if (creatorAction && currentSnapshot?.ui.route === "creator") {
+    event.preventDefault();
+    if (lessonStudio.handleAction(creatorAction)) render(store.snapshot());
+    return;
+  }
+  const modeButton = event.target.closest?.("[data-progression-mode]");
+  if (modeButton && currentSnapshot?.activeProfile) {
+    store.setLearningPreferences({ progressionMode: modeButton.dataset.progressionMode });
+    showToast(modeButton.dataset.progressionMode === "soft" ? "Open path enabled. Connections are now guidance." : "Hard path enabled. Prerequisites lock tests.");
+    return;
+  }
   const mapNode = event.target.closest?.("[data-map-skill]");
   if (mapNode) store.selectMapSkill(mapNode.dataset.mapSkill);
   const routeButton = event.target.closest("[data-route]");
@@ -572,6 +618,14 @@ document.addEventListener("click", (event) => {
   if (action.dataset.action === "open-attempt") store.openAttempt(action.dataset.attemptId);
   if (action.dataset.action === "load-backup") elements.backupFile.click();
   if (action.dataset.action === "load-lesson-set") elements.lessonSetFile.click();
+  if (action.dataset.action === "install-staged-pack") {
+    const staged = store.snapshot().stagedLessonPack;
+    if (staged && window.confirm(`Install ${staged.name}?\n\n${staged.skillCount} lessons · ${staged.problemCount} questions · ${staged.subjectName}\n\nThis agent-staged set passed validation, but installation changes your curriculum.`)) {
+      const result = store.installStagedLessonPack();
+      showToast(`${result.name} installed.`);
+    }
+  }
+  if (action.dataset.action === "discard-staged-pack") store.discardStagedLessonPack();
   if (action.dataset.action === "export-lesson-set") {
     const packId = action.dataset.packId;
     download(`${packId.toLowerCase().replaceAll("_", "-")}.json`, store.exportLessonPack(packId), "application/json");
@@ -588,12 +642,25 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("change", (event) => {
+  if (event.target.id === "subject-select") {
+    store.setLearningPreferences({ subjectId: event.target.value });
+    return;
+  }
+  if (currentSnapshot?.ui.route === "creator" && (event.target.matches?.("[data-creator-field]") || event.target.matches?.("[data-creator-prerequisites]"))) {
+    lessonStudio.handleInput(event.target);
+    render(store.snapshot());
+    return;
+  }
   if (event.target.id === "lesson-select") store.navigate("lesson", event.target.value);
   if (event.target.id === "map-skill-select") store.selectMapSkill(event.target.value);
   if (event.target.id === "test-skill-select") store.navigate("test", event.target.value);
 });
 
 document.addEventListener("input", (event) => {
+  if (currentSnapshot?.ui.route === "creator" && event.target.matches?.("[data-creator-field]")) {
+    if (lessonStudio.handleInput(event.target)) render(store.snapshot());
+    return;
+  }
   if (event.target.id === "reflection-confidence") {
     const output = document.querySelector("#confidence-output");
     if (output) output.textContent = `${event.target.value} / 5`;
@@ -701,6 +768,13 @@ async function boot() {
     // The tools still work if the optional human/machine-readable guide is unavailable.
   }
   store = createQuickMathsStore({ storage: window.localStorage, curriculum });
+  lessonStudio = createLessonStudio({
+    store,
+    download,
+    showToast,
+    getSnapshot: () => store.snapshot(),
+    openFilePicker: () => elements.creatorFile.click(),
+  });
   applyLocationRoute();
   store.subscribe(render);
   initClock();

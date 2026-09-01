@@ -8,7 +8,7 @@
     <title>QuickMaths — Map your mastery</title>
     <link rel="icon" href="./quickmaths-logo.png">
     <link rel="alternate" type="application/json" href="./agent-manifest.json" title="QuickMaths agent guide">
-    <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Custom lesson-set authoring guide">
+    <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
     <link rel="stylesheet" href="./challenge.css">
     <script type="module" src="./challenge.js"></script>
   </head>
@@ -42,7 +42,7 @@
           <div class="welcome-proof">
             <span><strong>25</strong> connected skills</span>
             <span><strong>375</strong> varied mastery questions</span>
-            <span><strong>9</strong> agent actions</span>
+            <span><strong>15</strong> agent actions</span>
           </div>
         </section>
 
@@ -82,6 +82,14 @@
           <span><strong>QuickMaths</strong><small>Algebra foundations</small></span>
         </div>
 
+        <section class="subject-switcher" aria-label="Subject and progression settings">
+          <label for="subject-select"><span>Subject</span><select id="subject-select"></select></label>
+          <div class="mode-switch" role="group" aria-label="Progression mode">
+            <button type="button" data-progression-mode="hard" title="Prerequisites lock advanced mastery tests until earlier skills are proven.">Hard path</button>
+            <button type="button" data-progression-mode="soft" title="Connections become recommendations. Every lesson and mastery test stays open.">Open path</button>
+          </div>
+        </section>
+
         <div class="clock-card">
           <svg id="analog-clock" class="analog-clock" viewBox="0 0 120 120" role="img" aria-label="Current local time">
             <circle class="clock-face" cx="60" cy="60" r="54"></circle>
@@ -104,6 +112,7 @@
           <button type="button" data-route="lesson"><span aria-hidden="true">◫</span> Lessons</button>
           <button type="button" data-route="test"><span aria-hidden="true">✓</span> Mastery test</button>
           <button type="button" data-route="results"><span aria-hidden="true">↗</span> Results</button>
+          <button type="button" data-route="creator"><span aria-hidden="true">✎</span> Lesson studio</button>
           <button type="button" data-route="data"><span aria-hidden="true">⇩</span> Save &amp; load</button>
         </nav>
 
@@ -128,12 +137,12 @@
           <div><span id="bridge-status">Checking WebMCP…</span><i></i></div>
           <p id="bridge-detail">Looking for browser agent support.</p>
         </div>
-        <div class="agent-prompt-card">
+          <div class="agent-prompt-card">
           <div class="mini-heading"><span>Suggested prompt</span><button id="copy-prompt" type="button">Copy</button></div>
           <p id="agent-prompt">Read the QuickMaths agent guide, check whether I need a backup, then look at my progress and choose the best next skill.</p>
         </div>
         <details class="agent-tools">
-          <summary><span>Available tools</span><strong id="tool-count">10</strong></summary>
+          <summary><span>Available tools</span><strong id="tool-count">15</strong></summary>
           <div id="tool-list"></div>
         </details>
         <section class="agent-activity" aria-labelledby="activity-title">
@@ -155,6 +164,7 @@
 
     <input id="backup-file" type="file" accept="application/json,.json" hidden>
     <input id="lesson-set-file" type="file" accept="application/json,.json" hidden>
+    <input id="creator-file" type="file" accept="application/json,.json" hidden>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   </body>
 </html>

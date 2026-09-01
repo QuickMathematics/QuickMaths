@@ -15,20 +15,27 @@ The app requires no OpenAI API key and sends no learner data to an application s
 - Results, reflection-based mastery updates, spaced review dates, and saved tutor/self reviews
 - Live analog clock plus per-session and cumulative profile timers
 - Browser autosave, backup recommendations, confirmed JSON restore, and formula-safe CSV exports
-- Validated custom lesson-set JSON with authoring guide, example, and full backup integration
+- Multi-subject curricula, cross-subject prerequisite bridges, safe per-subject themes, and Hard/Open progression modes
+- Human Lesson Creator with tutorial, tooltips, multiple lessons, all graders, proof/rubric controls, validation, download, and install
+- Validated schema 2.0 lesson-set JSON with Agent Lesson Authoring Guide and full backup integration
 - Responsive desktop, tablet, and mobile navigation
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers ten page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A machine-readable `agent-manifest.json` is exposed through the read-only `get_agent_guide` tool so backup, tutoring, privacy, navigation, and custom-content policy are available in context.
+A compatible ChatGPT or Codex browser discovers fifteen page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A machine-readable `agent-manifest.json` is exposed through the read-only `get_agent_guide` tool so backup, tutoring, privacy, navigation, subjects, and custom-content policy are available in context.
 
 | Tool | Purpose |
 | --- | --- |
 | `get_agent_guide` | Read operating, tutoring, privacy, backup, and custom lesson-set guidance. |
 | `get_app_state` | Read the visible view, learner, timers, mastery counts, and current suggestion. |
-| `get_curriculum_map` | Read all 25 skills with statuses, prerequisites, and unlocks. |
+| `get_curriculum_map` | Read one subject map with statuses, prerequisite bridges, and unlocks. |
 | `get_progress_summary` | Read per-skill mastery, attempts, and misconception tags. |
-| `navigate_learning_app` | Open the dashboard, map, lesson, test, results, or data view. |
+| `list_subjects` | Read installed subjects and lesson totals. |
+| `set_learning_preferences` | Change the visible subject and Hard/Open path mode. |
+| `navigate_learning_app` | Open the dashboard, map, lesson, test, results, Lesson studio, or data view. |
+| `open_lesson_creator` | Open the no-code Human Lesson Creator. |
+| `validate_lesson_set` | Validate schema 2.0 subjects, bridges, questions, proof/rubric policy, and safety limits. |
+| `stage_custom_lesson_set` | Stage validated content in the visible UI; only the human can install it. |
 | `get_learning_context` | Read the selected lesson or active test without answer keys. |
 | `start_skill_test` | Create or resume a test for an unlocked skill and show it on screen. |
 | `inspect_student_work` | Inspect one visible response without returning its expected answer. |
@@ -48,10 +55,11 @@ document.modelContext.registerTool
             ▼
 QuickMaths browser store ─────► visible SPA routes
       │                              │
-      ├── learner profiles           ├── dashboard / map / lessons
+      ├── learner profiles           ├── dashboard / subject maps / lessons
       ├── progress + attempts        ├── tests / results / reviews
+      ├── subjects + lesson packs    ├── Human Lesson Creator
       ├── reviews + drafts           └── save / load / exports
-      └── timers + activity
+      └── themes + timers + activity
             │
             ├── browser localStorage
             └── JSON backup / CSV download
@@ -64,9 +72,10 @@ Important files:
 - `docs/curriculum-data.json` — browser-ready 25-skill curriculum and 375 problem variants
 - `docs/challenge-core.js` — profiles, mastery graph, grading, attempts, reviews, timers, and persistence
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports
+- `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio
 - `docs/webmcp-tools.js` — WebMCP schemas, validation, registration, and execution
 - `docs/agent-manifest.json` — machine-readable agent operating and backup policy
-- `docs/CUSTOM_LESSON_SETS.md` — custom lesson-set authoring and validation guide
+- `docs/CUSTOM_LESSON_SETS.md` — Agent Lesson Authoring Guide
 - `docs/lesson-set-example.json` — installable worked example
 - `scripts/export_web_curriculum.py` — deterministic export from the original YAML curriculum
 
@@ -81,7 +90,7 @@ pytest -q
 
 Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience.
 
-The browser contract suite covers profiles, unlocks, timers, mastery updates, varied retakes, semantic symbolic grading, procedural-work validation, answer-key privacy, agent-guide policy, custom lesson-set validation and progress round-trips, malformed backups, backup recommendations, CSV exports, strict tool inputs, navigation, locked-skill enforcement, visible follow-ups, and feedback-to-attempt linkage.
+The browser contract suite covers profiles, subject filtering, Hard/Open progression, cross-subject bridges, themes, proof-review mastery gates, unlocks, timers, mastery updates, varied retakes, symbolic grading, procedural-work validation, answer-key privacy, agent policy, lesson-set staging and progress round-trips, malformed backups, CSV exports, strict tool inputs, navigation, visible follow-ups, and feedback-to-attempt linkage.
 
 ## Under-three-minute demo
 

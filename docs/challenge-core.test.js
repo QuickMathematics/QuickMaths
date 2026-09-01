@@ -39,6 +39,32 @@ function harness(seed = {}) {
   };
 }
 
+function biologyLessonSet() {
+  const pack = JSON.parse(lessonSetExample);
+  pack.id = "PACK_CELL_BIOLOGY";
+  pack.name = "Cell Biology";
+  pack.description = "A biology subject with a bridge from Mathematics.";
+  pack.subject = {
+    id: "SUBJECT_BIOLOGY", name: "Biology", short_name: "Bio", icon: "DNA", description: "Cells and living systems.",
+    theme: {
+      paper: "#eef6f1", paperDeep: "#dcebe2", paperLight: "#ffffff", ink: "#18231d", muted: "#607067",
+      line: "#c7d8ce", primary: "#225c48", primaryAlt: "#33765e", tint: "#bfe2ce", highlight: "#e4ef9b", accent: "#e06b54",
+    },
+  };
+  pack.track.id = "TRACK_CELL_BIOLOGY";
+  pack.track.name = "Cell Biology";
+  pack.track.skills = ["CUSTOM_BIO_CELL_001"];
+  pack.track.entry_skills = ["CUSTOM_BIO_CELL_001"];
+  pack.track.exit_skills = ["CUSTOM_BIO_CELL_001"];
+  const skill = pack.skills[0];
+  skill.id = "CUSTOM_BIO_CELL_001";
+  skill.name = "Cell ratios";
+  skill.domain = "Biology";
+  skill.prerequisites = [{ subject_id: "SUBJECT_MATH", skill_id: "MATH_ARITH_005" }];
+  skill.problems = skill.problems.map((problem, index) => ({ ...problem, template_id: `CUSTOM_BIO_CELL_Q${String(index + 1).padStart(2, "0")}`, skill_id: skill.id }));
+  return pack;
+}
+
 function answerActiveTestCorrectly(store) {
   const draft = store.snapshot().activeTest;
   assert.equal(draft.problems.length, 5);
@@ -158,6 +184,73 @@ test("a valid custom lesson set joins the real curriculum without replacing buil
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "CUSTOM_FINANCE_DISCOUNTS").custom, true);
   assert.equal(store.statusForSkill("CUSTOM_FINANCE_DISCOUNTS"), "locked");
   assert.match(store.exportLessonPack("PACK_PERSONAL_FINANCE"), new RegExp(LESSON_SET_FORMAT));
+});
+
+test("subjects filter the visible map, apply bridge locks, and support per-profile Open path", () => {
+  const { store } = harness();
+  store.createProfile("Biology Learner");
+  const preview = store.previewLessonPack(biologyLessonSet());
+  assert.equal(preview.subjectId, "SUBJECT_BIOLOGY");
+  assert.equal(preview.createsSubject, true);
+  store.importLessonPack(biologyLessonSet());
+  let state = store.snapshot();
+  assert.equal(state.activeSubject.id, "SUBJECT_BIOLOGY");
+  assert.equal(state.subjects.length, 2);
+  assert.equal(state.progressRows.length, 1);
+  assert.equal(state.allProgressRows.length, 26);
+  assert.equal(state.progressRows[0].status, "locked");
+  assert.deepEqual(state.progressRows[0].unmetPrerequisites, ["MATH_ARITH_005"]);
+  store.setLearningPreferences({ progressionMode: "soft" });
+  state = store.snapshot();
+  assert.equal(state.progressionMode, "soft");
+  assert.equal(state.progressRows[0].status, "ready");
+  assert.doesNotThrow(() => store.startTest("CUSTOM_BIO_CELL_001"));
+});
+
+test("explicit cross-subject bridge references verify the target subject", () => {
+  const { store } = harness();
+  store.createProfile("Bridge Author");
+  const invalid = biologyLessonSet();
+  invalid.skills[0].prerequisites = [{ subject_id: "SUBJECT_BIOLOGY", skill_id: "MATH_ARITH_005" }];
+  assert.throws(() => store.previewLessonPack(invalid), /belongs to SUBJECT_MATH/i);
+  assert.equal(store.snapshot().lessonPacks.length, 0);
+});
+
+test("proof and rubric authoring modes retain structured review policies", () => {
+  const { store } = harness();
+  store.createProfile("Proof Author");
+  const pack = biologyLessonSet();
+  const problem = pack.skills[0].problems[0];
+  problem.answer_mode = "final_plus_required_work";
+  problem.work = {
+    mode: "proof_obligations", prompt: "Explain the biological claim.",
+    proof_policy: { obligations: ["State the claim", "Connect evidence"], accepted_strategies: ["direct argument"] },
+  };
+  problem.review_policy = { work_review: "tutor_required", mastery_requires_review_pass: true, allow_self_review: false };
+  const normalized = store.previewLessonPack(pack);
+  assert.equal(normalized.problemCount, 5);
+  store.importLessonPack(pack);
+  store.setLearningPreferences({ progressionMode: "soft" });
+  store.startTest("CUSTOM_BIO_CELL_001", { force: true });
+  const draft = store.snapshot().activeTest;
+  assert.equal(draft.problems[0].work.mode, "proof_obligations");
+  assert.deepEqual(draft.problems[0].work.proof_policy.obligations, ["State the claim", "Connect evidence"]);
+  for (const item of draft.problems) {
+    store.updateResponse(item.template_id, {
+      finalAnswer: String(item.expected_answer),
+      work: item.work.mode === "proof_obligations" ? "The claim follows because the evidence connects each biological step." : item.work_required ? workFor(item) : "",
+    });
+  }
+  assert.equal(store.submitTest().ok, true);
+  const attempt = store.saveReflection({ confidenceRating: 4, difficultyFelt: "medium", hintsUsed: "none", guessed: "no" });
+  assert.equal(attempt.hasPendingReview, true);
+  assert.equal(store.snapshot().progressRows[0].status, "learning");
+  store.recordTutorFeedback({
+    questionId: draft.problems[0].template_id, feedback: "The proof addresses both obligations.", nextStep: "Continue to the next cell process.",
+    confidence: "high", verdict: "pass", reviewerType: "human_tutor",
+  });
+  assert.equal(store.getAttempt(attempt.attemptId).reviewStatus, "review_passed");
+  assert.equal(store.snapshot().progressRows[0].status, "proven");
 });
 
 test("custom lesson-set validation rejects collisions, missing references, cycles, and unsupported grading", () => {
