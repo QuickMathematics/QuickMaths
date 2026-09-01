@@ -10,7 +10,7 @@
     <link rel="icon" href="./quickmaths-logo.png">
     <link rel="alternate" type="application/json" href="./agent-manifest.json" title="QuickMaths agent guide">
     <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
-    <link rel="stylesheet" href="./challenge.css">
+    <link rel="stylesheet" href="./challenge.css?v=20260901-profile-dashboard">
     <script type="module" src="./challenge.js?v=20260901-bridge-fix"></script>
   </head>
   <body>
@@ -115,9 +115,11 @@
         </nav>
 
         <div class="sidebar-profile">
-          <div class="avatar" id="profile-avatar">Q</div>
-          <div><strong id="sidebar-profile-name">Learner</strong><small>Saved in this browser</small></div>
-          <button id="logout-button" type="button" aria-label="Change learner">↪</button>
+          <button class="profile-dashboard-button" type="button" data-route="home" aria-label="Open learner dashboard" title="Open dashboard">
+            <span class="avatar" id="profile-avatar" aria-hidden="true">Q</span>
+            <span class="profile-copy"><strong id="sidebar-profile-name">Learner</strong><small>Saved in this browser</small></span>
+          </button>
+          <button id="logout-button" type="button" aria-label="Change learner" title="Change learner">↪</button>
         </div>
       </aside>
 
