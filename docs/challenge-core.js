@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 7;
+export const APP_VERSION = 8;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -674,7 +674,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       route: activeProfileId ? (route === "welcome" ? "home" : route) : "welcome",
       selectedSkillId,
       selectedMapSkillId: skills.has(ui.selectedMapSkillId) ? ui.selectedMapSkillId : selectedSkillId,
-      mapZoom: Math.round(cleanNumber(Number(ui.mapZoom), 1, 0.6, 1.6) * 10) / 10,
+      mapZoom: Math.round(cleanNumber(Number(ui.mapZoom), 1, 0.1, 1.6) * 100) / 100,
       activeAttemptId: attempts.some((attempt) => attempt.attemptId === ui.activeAttemptId) ? ui.activeAttemptId : null,
       pendingResults: sanitizePendingResults(ui.pendingResults, skills),
       agentOpen: Boolean(ui.agentOpen),
@@ -1349,7 +1349,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
 
   const setMapZoom = (zoom) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
-    state.ui.mapZoom = Math.round(cleanNumber(Number(zoom), 1, 0.6, 1.6) * 10) / 10;
+    state.ui.mapZoom = Math.round(cleanNumber(Number(zoom), 1, 0.1, 1.6) * 100) / 100;
     persist();
     return state.ui.mapZoom;
   };

@@ -141,6 +141,8 @@ test("Settings replaces the legacy data route and map zoom persists safely", () 
   store.navigate("data");
   assert.equal(store.snapshot().ui.route, "settings");
   assert.equal(store.setMapZoom(1.4), 1.4);
+  assert.equal(store.setMapZoom(0.137), 0.14);
+  assert.equal(store.setMapZoom(-10), 0.1);
   assert.equal(store.setMapZoom(99), 1.6);
 
   const reloaded = createQuickMathsStore({ storage, curriculum, now: () => new Date("2026-09-01T09:41:00.000Z") });

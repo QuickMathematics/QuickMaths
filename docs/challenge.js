@@ -36,6 +36,9 @@ let applyingHistory = false;
 let lessonStudio;
 
 const AGENT_STARTER_PROMPT = "Read the QuickMaths agent guide first. Check the current app state and whether I should make a backup. Review my active subject, learning path, mastery map, recent attempts, mistake tags, and any work currently visible. Recommend one best next skill and briefly explain why. If I choose it, open the lesson or test and tutor Socratically: inspect only visible work, give one hint or question at a time, never reveal answer keys before submission, save concise feedback when useful, and remind me to back up at a natural stopping point.";
+const MAP_ZOOM_MIN = 0.1;
+const MAP_ZOOM_MAX = 1.6;
+const MAP_ZOOM_STEP = 0.1;
 
 const THEME_VARIABLES = {
   paper: "--paper", paperDeep: "--paper-deep", paperLight: "--paper-light", ink: "--ink", muted: "--muted",
@@ -305,22 +308,166 @@ function splitLabel(value, max = 22) {
   return lines;
 }
 
-function applyMapZoom(zoom) {
+function clampMapZoom(value) {
+  return Math.min(MAP_ZOOM_MAX, Math.max(MAP_ZOOM_MIN, Math.round(Number(value) * 100) / 100));
+}
+
+function applyMapZoom(zoom, anchor = null) {
   const svg = document.querySelector(".mastery-map");
-  if (!svg) return;
+  if (!svg) return null;
+  const scroller = svg.closest(".map-scroll");
   const baseWidth = Number(svg.dataset.baseWidth);
   const baseHeight = Number(svg.dataset.baseHeight);
-  svg.style.width = `${Math.round(baseWidth * zoom)}px`;
-  svg.style.height = `${Math.round(baseHeight * zoom)}px`;
+  const normalized = clampMapZoom(zoom);
+  const previousWidth = svg.getBoundingClientRect().width || baseWidth * Number(svg.dataset.currentZoom ?? 1);
+  const previousHeight = svg.getBoundingClientRect().height || baseHeight * Number(svg.dataset.currentZoom ?? 1);
+  let focalPoint = null;
+  if (anchor && scroller) {
+    const bounds = scroller.getBoundingClientRect();
+    const localX = anchor.clientX - bounds.left;
+    const localY = anchor.clientY - bounds.top;
+    focalPoint = {
+      localX,
+      localY,
+      ratioX: anchor.contentXRatio ?? (scroller.scrollLeft + localX) / Math.max(previousWidth, 1),
+      ratioY: anchor.contentYRatio ?? (scroller.scrollTop + localY) / Math.max(previousHeight, 1),
+    };
+  }
+  const nextWidth = baseWidth * normalized;
+  const nextHeight = baseHeight * normalized;
+  svg.style.width = `${Math.round(nextWidth)}px`;
+  svg.style.height = `${Math.round(nextHeight)}px`;
+  svg.dataset.currentZoom = String(normalized);
+  if (focalPoint && scroller) {
+    scroller.scrollLeft = focalPoint.ratioX * nextWidth - focalPoint.localX;
+    scroller.scrollTop = focalPoint.ratioY * nextHeight - focalPoint.localY;
+  }
   const output = document.querySelector("#map-zoom-output");
-  if (output) output.textContent = `${Math.round(zoom * 100)}%`;
-  document.querySelector('[data-action="map-zoom-out"]')?.toggleAttribute("disabled", zoom <= 0.6);
-  document.querySelector('[data-action="map-zoom-in"]')?.toggleAttribute("disabled", zoom >= 1.6);
+  if (output) output.textContent = `${Math.round(normalized * 100)}%`;
+  document.querySelector('[data-action="map-zoom-out"]')?.toggleAttribute("disabled", normalized <= MAP_ZOOM_MIN);
+  document.querySelector('[data-action="map-zoom-in"]')?.toggleAttribute("disabled", normalized >= MAP_ZOOM_MAX);
+  return normalized;
 }
 
 function changeMapZoom(delta) {
-  const current = Number(store.snapshot().ui.mapZoom ?? 1);
-  applyMapZoom(store.setMapZoom(current + delta));
+  const svg = document.querySelector(".mastery-map");
+  const scroller = svg?.closest(".map-scroll");
+  const current = Number(svg?.dataset.currentZoom ?? store.snapshot().ui.mapZoom ?? 1);
+  const bounds = scroller?.getBoundingClientRect();
+  const anchor = bounds ? { clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2 } : null;
+  applyMapZoom(store.setMapZoom(current + delta), anchor);
+}
+
+function setupMapInteractions() {
+  const scroller = document.querySelector(".map-scroll");
+  const svg = scroller?.querySelector(".mastery-map");
+  if (!scroller || !svg) return;
+
+  const pointers = new Map();
+  let gesture = null;
+  let suppressClickUntil = 0;
+
+  const pointFrom = (event) => ({ x: event.clientX, y: event.clientY });
+  const pair = () => Array.from(pointers.values()).slice(0, 2);
+  const midpoint = ([first, second]) => ({ x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 });
+  const distance = ([first, second]) => Math.hypot(second.x - first.x, second.y - first.y);
+  const currentZoom = () => Number(svg.dataset.currentZoom ?? store.snapshot().ui.mapZoom ?? 1);
+
+  const beginPan = (pointer) => {
+    gesture = {
+      mode: "pan",
+      startX: pointer.x,
+      startY: pointer.y,
+      startScrollLeft: scroller.scrollLeft,
+      startScrollTop: scroller.scrollTop,
+      moved: false,
+    };
+  };
+
+  const beginPinch = () => {
+    const points = pair();
+    if (points.length < 2) return;
+    const center = midpoint(points);
+    const bounds = scroller.getBoundingClientRect();
+    const svgBounds = svg.getBoundingClientRect();
+    const localX = center.x - bounds.left;
+    const localY = center.y - bounds.top;
+    gesture = {
+      mode: "pinch",
+      startDistance: Math.max(distance(points), 1),
+      startZoom: currentZoom(),
+      contentXRatio: (scroller.scrollLeft + localX) / Math.max(svgBounds.width, 1),
+      contentYRatio: (scroller.scrollTop + localY) / Math.max(svgBounds.height, 1),
+    };
+  };
+
+  const finishPointer = (event) => {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.delete(event.pointerId);
+    if (gesture?.mode === "pinch") {
+      applyMapZoom(store.setMapZoom(currentZoom()));
+      suppressClickUntil = Date.now() + 300;
+    }
+    if (pointers.size === 1) beginPan(Array.from(pointers.values())[0]);
+    else if (!pointers.size) {
+      gesture = null;
+      scroller.classList.remove("is-panning", "is-pinching");
+    }
+  };
+
+  scroller.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    pointers.set(event.pointerId, pointFrom(event));
+    try { scroller.setPointerCapture(event.pointerId); } catch { /* Capture is best-effort. */ }
+    if (pointers.size === 1) beginPan(pointFrom(event));
+    else {
+      beginPinch();
+      scroller.classList.remove("is-panning");
+      scroller.classList.add("is-pinching");
+    }
+  });
+
+  scroller.addEventListener("pointermove", (event) => {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.set(event.pointerId, pointFrom(event));
+    if (pointers.size >= 2) {
+      if (gesture?.mode !== "pinch") beginPinch();
+      const points = pair();
+      const center = midpoint(points);
+      const nextZoom = clampMapZoom(gesture.startZoom * distance(points) / gesture.startDistance);
+      applyMapZoom(nextZoom, {
+        clientX: center.x,
+        clientY: center.y,
+        contentXRatio: gesture.contentXRatio,
+        contentYRatio: gesture.contentYRatio,
+      });
+      suppressClickUntil = Date.now() + 300;
+      event.preventDefault();
+      return;
+    }
+    if (gesture?.mode !== "pan") return;
+    const pointer = pointFrom(event);
+    const deltaX = pointer.x - gesture.startX;
+    const deltaY = pointer.y - gesture.startY;
+    if (!gesture.moved && Math.hypot(deltaX, deltaY) > 4) {
+      gesture.moved = true;
+      scroller.classList.add("is-panning");
+    }
+    if (!gesture.moved) return;
+    scroller.scrollLeft = gesture.startScrollLeft - deltaX;
+    scroller.scrollTop = gesture.startScrollTop - deltaY;
+    suppressClickUntil = Date.now() + 300;
+    event.preventDefault();
+  });
+
+  scroller.addEventListener("pointerup", finishPointer);
+  scroller.addEventListener("pointercancel", finishPointer);
+  scroller.addEventListener("lostpointercapture", finishPointer);
+  scroller.addEventListener("click", (event) => {
+    if (Date.now() >= suppressClickUntil) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
 }
 
 function renderMap(snapshot) {
@@ -356,12 +503,13 @@ function renderMap(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head">
       <div><p class="eyebrow">${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} · ${snapshot.progressRows.length} connected lessons</p><h1>Mastery map</h1><p>${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Cross-subject bridges still show what knowledge travels between curricula.</p></div>
-      <div class="page-actions map-toolbar"><label class="compact-select">Jump to skill<select id="map-skill-select">${skillOptions(snapshot, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= 0.6 ? "disabled" : ""}>−</button><output id="map-zoom-output">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= 1.6 ? "disabled" : ""}>+</button></div></div>
+      <div class="page-actions map-toolbar"><label class="compact-select">Jump to skill<select id="map-skill-select">${skillOptions(snapshot, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}</div>
     <section class="map-layout">
-      <div class="map-scroll" aria-label="Interactive prerequisite map">
-        <svg class="mastery-map" viewBox="0 0 ${width} ${height}" data-base-width="${width}" data-base-height="${height}" style="width:${Math.round(width * zoom)}px;height:${Math.round(height * zoom)}px">
+      <div class="map-scroll" aria-label="Interactive prerequisite map. Drag to move and pinch on a touchscreen to zoom.">
+        <div class="map-gesture-hint" aria-hidden="true">Drag to move <span>· Pinch to zoom</span></div>
+        <svg class="mastery-map" viewBox="0 0 ${width} ${height}" data-base-width="${width}" data-base-height="${height}" data-current-zoom="${zoom}" style="width:${Math.round(width * zoom)}px;height:${Math.round(height * zoom)}px">
           <g class="map-edges">${edges}</g>
           <g>${nodes}</g>
         </svg>
@@ -389,6 +537,7 @@ function renderMap(snapshot) {
       </aside>
     </section>
   `;
+  setupMapInteractions();
 }
 
 function formatTheory(value) {
@@ -774,8 +923,8 @@ document.addEventListener("click", (event) => {
   if (action.dataset.action === "load-backup") elements.backupFile.click();
   if (action.dataset.action === "load-lesson-set") elements.lessonSetFile.click();
   if (action.dataset.action === "replay-tutorial") store.startTutorial();
-  if (action.dataset.action === "map-zoom-out") changeMapZoom(-0.1);
-  if (action.dataset.action === "map-zoom-in") changeMapZoom(0.1);
+  if (action.dataset.action === "map-zoom-out") changeMapZoom(-MAP_ZOOM_STEP);
+  if (action.dataset.action === "map-zoom-in") changeMapZoom(MAP_ZOOM_STEP);
   if (action.dataset.action === "install-staged-pack") {
     const staged = store.snapshot().stagedLessonPack;
     if (staged && window.confirm(`Install ${staged.name}?\n\n${staged.skillCount} lessons · ${staged.problemCount} questions · ${staged.subjectName}\n\nThis agent-staged set passed validation, but installation changes your curriculum.`)) {

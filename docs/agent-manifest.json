@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 7,
+  "app_version": 8,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app.",
   "homepage": "https://srednjak.github.io/QuickMaths/",
   "discovery": {

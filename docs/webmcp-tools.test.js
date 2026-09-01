@@ -33,7 +33,11 @@ test("browser shell exposes Settings, map zoom, prompt copy, and persistent Agen
   assert.match(html, /data-route="settings"/);
   assert.doesNotMatch(html, /class="mode-switch"|id="replay-tutorial"/);
   assert.match(js, /data-action="map-zoom-in"/);
+  assert.match(js, /MAP_ZOOM_MIN = 0\.1/);
+  assert.match(js, /addEventListener\("pointermove"/);
+  assert.match(js, /startDistance/);
   assert.match(js, /data-tutorial-action="copy-agent-prompt"/);
+  assert.match(css, /touch-action: none/);
   assert.match(css, /\.agent-dock\.is-closed/);
   assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
 });
