@@ -25,8 +25,12 @@ let repositoryId = "";
 let categories = [];
 let after = null;
 do {
-  const query = `query($owner:String!,$name:String!,$after:String){repository(owner:$owner,name:$name){id discussionCategories(first:25){nodes{id name isAnswerable}}discussions(first:100,after:$after){pageInfo{hasNextPage endCursor}nodes{title url comments{totalCount}reactions(content:THUMBS_UP){totalCount}}}}}`;
+  const query = `query($owner:String!,$name:String!,$after:String){repository(owner:$owner,name:$name){id hasDiscussionsEnabled discussionCategories(first:25){nodes{id name isAnswerable}}discussions(first:100,after:$after){pageInfo{hasNextPage endCursor}nodes{title url comments{totalCount}reactions(content:THUMBS_UP){totalCount}}}}}`;
   const repositoryData = (await graphql(query, { owner, name, after }))?.repository;
+  if (repositoryData?.hasDiscussionsEnabled === false) {
+    console.log("GitHub Discussions is not enabled; keeping the checked-in community totals unchanged.");
+    process.exit(0);
+  }
   const connection = repositoryData?.discussions;
   if (!connection) throw new Error("GitHub Discussions is not enabled or could not be read.");
   repositoryId = repositoryData.id;
