@@ -1,4 +1,4 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260901-guided-studio";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-tour-refresh";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-showcase";
 import { createLessonStudio } from "./lesson-creator.js?v=20260901-proof-lifecycle";
 import {
@@ -25,6 +25,10 @@ const elements = {
   shell: document.querySelector("#app-shell"),
   profiles: document.querySelector("#profile-list"),
   profileError: document.querySelector("#profile-error"),
+  welcomeLede: document.querySelector("#welcome-lede"),
+  welcomeLessonCount: document.querySelector("#welcome-lesson-count"),
+  welcomeQuestionCount: document.querySelector("#welcome-question-count"),
+  welcomeToolCount: document.querySelector("#welcome-tool-count"),
   view: document.querySelector("#view-root"),
   profileName: document.querySelector("#sidebar-profile-name"),
   profileAvatar: document.querySelector("#profile-avatar"),
@@ -60,7 +64,7 @@ let githubSyncSnapshot = { phase: "disconnected", connected: false, dirty: false
 let bridgeNeedsChoice = false;
 const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
 
-const AGENT_STARTER_PROMPT = "Read the QuickMaths agent guide first. Check the current app state and whether I should make a backup. Review my active subject, learning path, mastery map, recent attempts, mistake tags, and any work currently visible. Recommend one best next skill and briefly explain why. If I choose it, open the lesson or test and tutor Socratically: inspect only visible work, give one hint or question at a time, never reveal answer keys before submission, save concise feedback when useful, and remind me to back up at a natural stopping point.";
+const AGENT_STARTER_PROMPT = "Read the QuickMaths agent manifest through WebMCP, then guide me through the learning experience.";
 const MAP_ZOOM_MIN = 0.1;
 const MAP_ZOOM_MAX = 1.6;
 const MAP_ZOOM_STEP = 0.1;
@@ -150,6 +154,16 @@ function renderProfiles(snapshot) {
   `).join("");
 }
 
+function renderWelcomeSummary(snapshot) {
+  const lessonCount = snapshot.curriculum.allSkills.length;
+  const subjectCount = snapshot.subjects.length;
+  const questionCount = Object.values(store.skillsById).reduce((total, skill) => total + (skill.problems?.length ?? 0), 0);
+  elements.welcomeLede.textContent = `QuickMaths turns ${lessonCount} connected lessons across ${subjectCount} installed subject${subjectCount === 1 ? "" : "s"} into living mastery maps. Practice, reflect, save your progress, and let a browser agent tutor from the work actually on screen.`;
+  elements.welcomeLessonCount.textContent = String(lessonCount);
+  elements.welcomeQuestionCount.textContent = String(questionCount);
+  elements.welcomeToolCount.textContent = String(TOOL_NAMES.length);
+}
+
 function statusChip(status) {
   return `<span class="status-chip" style="--status-color:${STATUS_COLORS[status] ?? STATUS_COLORS.locked}">${escapeHtml(status)}</span>`;
 }
@@ -174,33 +188,41 @@ const TUTORIAL_STEPS = [
   {
     eyebrow: "The mastery map",
     title: "Read the map before picking your next lesson.",
-    lede: "Every node is a skill. Connections show prerequisite knowledge—including bridges that can reach into another subject.",
-    points: ["Ready means the test is available.", "Learning means you started but have not proven mastery yet.", "Proven and mastered unlock later work; rusty means review is due."],
-    tip: "Use the map’s − and + controls to change scale, then select any node to inspect mastery, confidence, prerequisites, and unlocks.",
+    lede: "Every node is a lesson. Connections show prerequisite knowledge—including bridges between Mathematics, Geography, and any subjects you install.",
+    points: ["Switch between the current subject and an All subjects map.", "Drag in either direction; use the mouse wheel on desktop or pinch on mobile to zoom.", "Node colors identify subjects, while status dots show ready, learning, proven, mastered, rusty, or locked."],
+    tip: "Select any node to inspect mastery, confidence, prerequisites, and everything it unlocks.",
     visual: "map",
   },
   {
     eyebrow: "The learning loop",
     title: "Learn, test, reflect, then review.",
-    lede: "QuickMaths does more than mark a final answer. It can collect shown work, check algebraic steps, route proofs through review, and use your reflection when updating mastery.",
-    points: ["Lessons provide theory, applications, and worked examples.", "Tests draw up to five questions and preserve unfinished answers.", "Results include solutions; reflection records confidence, guessing, and difficulty."],
-    tip: "Proof and rubric questions stay in Learning until their required review passes.",
+    lede: "QuickMaths does more than mark a final answer. It collects shown work, checks algebraic steps, routes proofs and rubric responses through review, and uses reflection when updating mastery.",
+    points: ["Lessons provide theory, applications, and worked examples.", "Tests preserve unfinished answers and can require calculations, explanations, structured work, or proof.", "Results show solutions; reflection records confidence, guessing, difficulty, and review needs."],
+    tip: "Proof and rubric questions stay in Learning until their required review passes—correct syntax alone is not treated as understanding.",
     visual: "loop",
+  },
+  {
+    eyebrow: "Lesson Depot",
+    title: "Find lessons—and join the conversation.",
+    lede: "Browse published lesson packs and clearly labelled roadmap concepts. Every card follows its subject’s color scheme, and published packages can carry live GitHub-backed upvotes and discussion.",
+    points: ["Preview, hash-check, and validate a published pack before installing it.", "Connect GitHub Community to upvote and comment without leaving the app.", "Open Lesson Studio from the Depot to build a lesson or an entirely new subject."],
+    tip: "Community authorization is separate from learner storage. Installing content and posting publicly always remain human-controlled actions.",
+    visual: "depot",
   },
   {
     eyebrow: "Agent-assisted learning",
     title: "Bring a tutor into the same live workspace.",
-    lede: "In a compatible Codex or ChatGPT browser, the agent sees narrow QuickMaths tools—not your browser storage or hidden answer keys. Its visible actions use the same app state you do.",
-    points: ["Ask it to inspect your progress and recommend the next skill.", "Let it inspect only the work visible in an active test.", "It can save Socratic feedback and prepare targeted follow-up practice."],
-    tip: "Copy the starter prompt, paste it into your connected agent, and keep the learning loop visible in QuickMaths.",
+    lede: "In a compatible Codex or ChatGPT browser, WebMCP gives the agent narrow QuickMaths tools—not raw browser storage or hidden answer keys. The manifest teaches it the rules and available workflow.",
+    points: ["The agent can inspect progress, navigate, recommend a lesson, and tutor from visible work.", "It can save Socratic feedback and prepare targeted follow-up practice without revealing answer keys.", "Agent Activity records tool actions only, so your own clicks are never mislabelled as the agent’s."],
+    tip: "The short starter prompt is enough: WebMCP provides the detailed operating guide when the agent begins.",
     visual: "agent",
   },
   {
-    eyebrow: "Ownership and creation",
-    title: "Your progress and curriculum stay yours.",
-    lede: "Settings handles portable backups, exports, learning-path controls, and the replayable tour. Lesson Studio lets humans build entire subjects without coding, while agents can validate and stage lesson sets for your approval.",
-    points: ["Download a full backup at natural stopping points.", "Load custom lessons into the same map, testing, and progress pipeline.", "Use Lesson Studio for themes, bridges, graders, proofs, rubrics, and multiple lessons."],
-    tip: "Agents can stage a lesson set, but only a human can click Install.",
+    eyebrow: "Settings, sync, and creation",
+    title: "Keep it portable. Extend it when you are ready.",
+    lede: "Settings brings together learning-path controls, JSON save and load, the optional GitHub Bridge, and this replayable tour. Lesson Studio creates full curricula without requiring raw JSON.",
+    points: ["Download full backups containing profiles, progress, custom subjects, lessons, reviews, and timers.", "Optionally sync learner and remote-agent checkpoints through your own GitHub repository.", "Use Lesson Studio for themes, cross-subject bridges, graders, proofs, rubrics, and multi-lesson packs."],
+    tip: "Agents may validate and stage content, but only you can install it. Replay this tour anytime from Settings.",
     visual: "ownership",
   },
 ];
@@ -208,10 +230,11 @@ const TUTORIAL_STEPS = [
 function tutorialVisual(type, snapshot) {
   if (type === "welcome") return `<div class="tour-profile-preview"><img src="./quickmaths-logo.png" alt="" width="88" height="82"><div><span>Profile ready</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>Autosaving on this device</small></div><i>✓</i></div><div class="tour-local-row"><span>Free</span><span>Local-first</span><span>No account</span></div>`;
   if (type === "subjects") return `<div class="tour-subject-preview"><p>Visible subject</p><div><span>${escapeHtml(snapshot.activeSubject.icon)}</span><strong>${escapeHtml(snapshot.activeSubject.name)}</strong><b>⌄</b></div></div><div class="tour-mode-preview" aria-label="Choose a learning path"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}"><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}"><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>`;
-  if (type === "map") return `<div class="tour-map-preview"><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
+  if (type === "map") return `<div class="tour-map-preview"><div class="tour-map-controls"><span>Current subject</span><strong>All subjects</strong><i>− &nbsp; 100% &nbsp; +</i></div><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
   if (type === "loop") return `<div class="tour-loop-preview"><article><span>01</span><b>Read</b><small>Theory and examples</small></article><i>→</i><article><span>02</span><b>Test</b><small>Answers and shown work</small></article><i>→</i><article><span>03</span><b>Reflect</b><small>Confidence and difficulty</small></article><i>→</i><article><span>04</span><b>Review</b><small>Mastery and next date</small></article></div><div class="tour-work-preview"><code>2x + 5 = 13<br>2x = 8<br>x = 4</code><span>Step check passed</span></div>`;
+  if (type === "depot") return `<div class="tour-depot-preview"><header><div><small>Community curriculum</small><strong>Lesson Depot</strong></div><span>Browse · discuss · install</span></header><div><article class="is-geography"><span>Geography</span><strong>Field Cartography</strong><small>3 lessons · Published</small><footer><b>👍 18</b><b>◯ 6</b></footer></article><article class="is-biology"><span>Biology</span><strong>Cell Systems</strong><small>Concept preview</small><footer><b>Roadmap</b></footer></article></div><p><b>✓</b> Packages are hash-checked and validated before installation.</p></div>`;
   if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent studio</small><strong>Tutor in the loop</strong></div><i>Connected</i></div><div class="tour-agent-prompt"><span>Suggested starting prompt</span><p>${escapeHtml(AGENT_STARTER_PROMPT)}</p><button class="button button-secondary" type="button" data-tutorial-action="copy-agent-prompt">Copy to clipboard</button></div><div class="tour-tool-row"><code>get_progress_summary</code><code>inspect_student_work</code><code>record_tutor_feedback</code></div></div>`;
-  return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, subjects, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>✎</span><div><strong>Human Lesson Creator</strong><small>No-code subjects, bridges, questions, proofs, and rubrics</small></div><b>Studio</b></article></div>`;
+  return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, subjects, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>↔</span><div><strong>Optional GitHub Bridge</strong><small>Checkpoint learner state and exchange agent updates across sessions</small></div><b>Sync</b></article><article><span>✎</span><div><strong>Lesson Studio</strong><small>No-code subjects, bridges, questions, proofs, rubrics, and themes</small></div><b>Create</b></article></div>`;
 }
 
 function renderTutorial(snapshot) {
@@ -1021,6 +1044,7 @@ function render(snapshot) {
   const signedIn = Boolean(snapshot.activeProfile);
   elements.welcome.hidden = signedIn;
   elements.shell.hidden = !signedIn;
+  renderWelcomeSummary(snapshot);
   if (!signedIn) {
     renderProfiles(snapshot);
     if (location.hash !== "#/welcome") history.replaceState(null, "", "#/welcome");

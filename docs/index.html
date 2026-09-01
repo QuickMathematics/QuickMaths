@@ -10,8 +10,8 @@
     <link rel="icon" href="./quickmaths-logo.png">
     <link rel="alternate" type="application/json" href="./agent-manifest.json" title="QuickMaths agent guide">
     <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
-    <link rel="stylesheet" href="./challenge.css?v=20260902-wheel-zoom">
-    <script type="module" src="./challenge.js?v=20260902-wheel-zoom"></script>
+    <link rel="stylesheet" href="./challenge.css?v=20260902-tour-refresh">
+    <script type="module" src="./challenge.js?v=20260902-tour-refresh"></script>
   </head>
   <body>
     <a class="skip-link" href="#view-root">Skip to learning workspace</a>
@@ -39,11 +39,11 @@
         <section class="welcome-copy">
           <p class="eyebrow">Algebra foundations</p>
           <h1 id="welcome-title">Know what you know.<br><em>See what comes next.</em></h1>
-          <p class="welcome-lede">QuickMaths turns 43 connected Mathematics and Geography lessons into living mastery maps. Practice, reflect, save your progress, and let a browser agent tutor from the work actually on screen.</p>
+          <p id="welcome-lede" class="welcome-lede">QuickMaths turns your installed lessons into living mastery maps. Practice, reflect, save your progress, and let a browser agent tutor from the work actually on screen.</p>
           <div class="welcome-proof">
-            <span><strong>25</strong> connected skills</span>
-            <span><strong>375</strong> varied mastery questions</span>
-            <span><strong>17</strong> agent actions</span>
+            <span><strong id="welcome-lesson-count">…</strong> connected lessons</span>
+            <span><strong id="welcome-question-count">…</strong> varied mastery questions</span>
+            <span><strong id="welcome-tool-count">…</strong> agent actions</span>
           </div>
         </section>
 
@@ -139,7 +139,7 @@
         </div>
           <div class="agent-prompt-card">
           <div class="mini-heading"><span>Suggested prompt</span><button id="copy-prompt" type="button">Copy</button></div>
-          <p id="agent-prompt">Read the QuickMaths agent guide first. Check the current app state and whether I should make a backup. Review my active subject, learning path, mastery map, recent attempts, mistake tags, and any work currently visible. Recommend one best next skill and briefly explain why. If I choose it, open the lesson or test and tutor Socratically: inspect only visible work, give one hint or question at a time, never reveal answer keys before submission, save concise feedback when useful, and remind me to back up at a natural stopping point.</p>
+          <p id="agent-prompt">Read the QuickMaths agent manifest through WebMCP, then guide me through the learning experience.</p>
         </div>
         <details class="agent-tools">
           <summary><span>Available tools</span><strong id="tool-count">17</strong></summary>

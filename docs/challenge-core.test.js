@@ -162,7 +162,7 @@ test("new-profile tutorial can be stepped, skipped, replayed, and completed", ()
   assert.equal(store.snapshot().ui.route, "tutorial");
   assert.equal(store.snapshot().ui.tutorialStep, 0);
   store.setTutorialStep(99);
-  assert.equal(store.snapshot().ui.tutorialStep, 5);
+  assert.equal(store.snapshot().ui.tutorialStep, 6);
   store.completeTutorial();
   assert.equal(store.snapshot().activeProfile.tutorialSkipped, false);
 });

@@ -50,6 +50,13 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /addEventListener\("pointermove"/);
   assert.match(js, /startDistance/);
   assert.match(js, /data-tutorial-action="copy-agent-prompt"/);
+  assert.match(html, /id="welcome-lesson-count">…<\/strong> connected lessons/);
+  assert.doesNotMatch(html, /<strong>25<\/strong> connected skills/);
+  assert.match(js, /snapshot\.curriculum\.allSkills\.length/);
+  assert.match(js, /Read the QuickMaths agent manifest through WebMCP/);
+  assert.match(js, /visual: "depot"/);
+  assert.match(js, /GitHub Bridge/);
+  assert.match(css, /\.tour-depot-preview/);
   assert.match(css, /touch-action: none/);
   assert.match(css, /\.map-scope-control/);
   assert.match(css, /\.map-edges \.is-cross-subject/);

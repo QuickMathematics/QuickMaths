@@ -30,7 +30,7 @@ export const STATUS_COLORS = Object.freeze({
 
 const PROVEN = new Set(["proven", "mastered"]);
 const ROUTES = new Set(["welcome", "tutorial", "home", "map", "lesson", "test", "results", "settings", "data", "creator", "depot"]);
-const TUTORIAL_STEPS = 6;
+const TUTORIAL_STEPS = 7;
 const MAX_ACTIVITY = 60;
 const MAX_ATTEMPTS = 500;
 const MAX_REVIEWS = 1000;
