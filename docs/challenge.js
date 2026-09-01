@@ -13,7 +13,7 @@ import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js";
+} from "./github-sync.js?v=20260901-bridge-fix";
 
 const elements = {
   loading: document.querySelector("#loading-screen"),

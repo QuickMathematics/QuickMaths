@@ -5,7 +5,7 @@ import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js";
+} from "./github-sync.js?v=20260901-bridge-fix";
 import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js";
 import {
   createLocalBridgeCredentialStore,
