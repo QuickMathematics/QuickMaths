@@ -1,0 +1,45 @@
+name: Lesson Depot checks
+
+on:
+  pull_request:
+    paths:
+      - "docs/lesson-depot/**"
+      - "docs/challenge-core.js"
+      - "scripts/lesson_depot.py"
+      - "tests/test_lesson_depot.py"
+      - ".github/workflows/lesson-depot.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/lesson-depot/**"
+      - "scripts/lesson_depot.py"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install focused test dependency
+        run: python -m pip install pytest
+      - name: Test deterministic catalog builder
+        run: python -m pytest tests/test_lesson_depot.py
+      - name: Verify generated catalog is committed
+        run: |
+          mkdir -p "$RUNNER_TEMP/lesson-depot"
+          python -m scripts.lesson_depot docs/lesson-depot --output "$RUNNER_TEMP/lesson-depot"
+          diff -u docs/lesson-depot/catalog.json "$RUNNER_TEMP/lesson-depot/catalog.json"
+          diff -u docs/lesson-depot/search-index.json "$RUNNER_TEMP/lesson-depot/search-index.json"
+      - name: Validate every published lesson and the combined prerequisite graph
+        run: node scripts/validate_lesson_depot.mjs docs/lesson-depot
+      - name: Run browser validator and WebMCP tests
+        working-directory: docs
+        run: npm test

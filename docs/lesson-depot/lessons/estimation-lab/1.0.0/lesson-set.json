@@ -1,0 +1,99 @@
+{
+  "format": "quickmaths.lesson-set",
+  "schema_version": "2.0",
+  "id": "PACK_ESTIMATION_LAB",
+  "name": "Estimation Lab",
+  "description": "Build the habit of estimating first and using bounds to catch unreasonable calculations.",
+  "author": "QuickMaths",
+  "version": "1.0.0",
+  "subject": {
+    "id": "SUBJECT_MATH",
+    "name": "Mathematics",
+    "short_name": "Maths",
+    "icon": "∑",
+    "description": "The built-in Mathematics curriculum. Its existing theme is preserved."
+  },
+  "track": {
+    "id": "TRACK_PACK_ESTIMATION_LAB",
+    "name": "Estimation Lab",
+    "domain": "Math",
+    "description": "Estimate, bound, and sanity-check numerical results.",
+    "entry_skills": ["CUSTOM_ESTIMATION_SANITY"],
+    "exit_skills": ["CUSTOM_ESTIMATION_SANITY"],
+    "skills": ["CUSTOM_ESTIMATION_SANITY"]
+  },
+  "skills": [
+    {
+      "id": "CUSTOM_ESTIMATION_SANITY",
+      "name": "Estimate before calculating",
+      "domain": "Math",
+      "subdomain": "Number Sense",
+      "description": "Use friendly numbers and bounds to predict the size of a result and catch implausible answers.",
+      "prerequisites": ["MATH_ARITH_002"],
+      "unlocks": [],
+      "tags": ["estimation", "bounds", "reasoning"],
+      "mastery": {
+        "passing_score": 0.8,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "maybe",
+        "review_after_days_if_mastered": 7,
+        "review_after_days_if_learning": 2
+      },
+      "theory": "An estimate is a deliberately simple calculation that tells you roughly where the exact answer should land. Round each number to a nearby friendly value, keep track of whether you rounded up or down, and calculate mentally.\n\nA good estimate is not random. It creates a useful interval or expected order of magnitude. If the exact calculation falls far outside that expectation, check the operation, decimal point, units, and copied numbers before trusting it.\n\nFor multiplication, round factors to one or two significant digits. For totals, round each addend in a consistent direction when you want an upper or lower bound.",
+      "examples": [
+        {
+          "prompt": "Estimate 49 × 21 before calculating exactly.",
+          "solution": "About 1,000",
+          "explanation": "Round 49 to 50 and 21 to 20. Then 50 × 20 = 1,000, so an exact result near one thousand is plausible."
+        }
+      ],
+      "applications": [
+        {
+          "title": "Spot a checkout error",
+          "description": "Estimate a basket total before paying so a duplicated item or misplaced decimal is obvious."
+        }
+      ],
+      "problems": [
+        {
+          "template_id": "CUSTOM_ESTIMATION_Q01",
+          "skill_id": "CUSTOM_ESTIMATION_SANITY",
+          "difficulty": "easy",
+          "prompt": "Estimate 198 × 51 by rounding to friendly numbers. Enter the estimated product.",
+          "expected_answer": "10000",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": ["Round 198 to 200 and 51 to 50.", "Compute 200 × 50 = 10,000."],
+          "mistake_tags": ["rounding_direction", "place_value"],
+          "answer_mode": "final_plus_optional_work",
+          "work": {
+            "mode": "capture_only",
+            "prompt": "Show the friendly numbers you chose."
+          },
+          "review_policy": {
+            "work_review": "optional",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_ESTIMATION_Q02",
+          "skill_id": "CUSTOM_ESTIMATION_SANITY",
+          "difficulty": "medium",
+          "prompt": "A calculator shows 49 × 21 = 10,029. Which option best describes the result?",
+          "expected_answer": "implausible",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {"id": "plausible", "label": "Plausible because both factors are near 50"},
+            {"id": "implausible", "label": "Implausible because the product should be near 1,000"},
+            {"id": "unknown", "label": "Impossible to judge without long multiplication"}
+          ],
+          "solution_steps": ["Round 49 to 50 and 21 to 20.", "The estimate is 1,000, so 10,029 is about ten times too large."],
+          "mistake_tags": ["order_of_magnitude", "calculator_trust"],
+          "answer_mode": "final_only",
+          "work": {"mode": "none"}
+        }
+      ]
+    }
+  ]
+}

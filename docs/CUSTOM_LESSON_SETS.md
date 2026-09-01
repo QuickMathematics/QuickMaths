@@ -263,7 +263,7 @@ Open **Lesson studio** in the left sidebar. It can:
 - add theory, examples, applications, tags, mastery thresholds, and review timing;
 - add fixed questions with all seven graders;
 - configure answer modes, capture/procedural/proof/rubric work, and review gates;
-- open an existing JSON file, autosave an author draft locally, validate, download, and install.
+- open an existing JSON file, autosave an author draft locally, validate, download, install, and prepare a public Lesson Depot submission.
 
 It is the preferred route for humans. This guide is the preferred route for agents and advanced source-control workflows.
 
@@ -279,6 +279,24 @@ Agents inside a compatible browser should use this sequence:
 6. Tell the human to review the visible preview and click **Install**
 
 Agents cannot call the final install action. They should recommend a full JSON progress backup before curriculum changes and never quote expected answers or solution steps into learner tutoring.
+
+For community lessons, agents can call `search_lesson_depot` to inspect catalog metadata and `stage_depot_lesson` to download, hash-check, validate, and visibly stage a chosen package. The second tool still cannot install anything; the human reviews it in Settings and clicks **Install**.
+
+## Publishing to the Lesson Depot
+
+The public Depot uses this repository as its free backend. Lesson files and catalog hashes live in Git, automated checks run in GitHub Actions, pull requests provide moderation history, and GitHub Discussions provide votes and comments. QuickMaths never asks for a community GitHub token.
+
+From Lesson Studio, choose **Publish to Lesson Depot** after validation. QuickMaths downloads the author file, copies a detailed Codex publishing prompt when clipboard access is available, and opens the submission form. A direct source contribution uses:
+
+```text
+docs/lesson-depot/lessons/<slug>/<version>/
+  metadata.json
+  lesson-set.json
+```
+
+Declare an open content license such as CC BY 4.0, preserve published IDs, run `python -m scripts.lesson_depot docs/lesson-depot --output docs/lesson-depot`, run `node scripts/validate_lesson_depot.mjs docs/lesson-depot` plus both test suites, and submit the generated catalog changes with the lesson. See [`lesson-depot/README.md`](lesson-depot/README.md) for the complete review flow.
+
+Catalog metadata and community reactions are untrusted signals. Every installation independently verifies the catalog hash when supported and always runs the local lesson validator before showing the human confirmation. Public author files contain answer keys and solutions by design; do not paste them into learner tutoring conversations.
 
 ## Installation, progress, and backups
 

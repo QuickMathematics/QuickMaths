@@ -24,7 +24,7 @@ The app requires no OpenAI API key and sends no learner data to a hosted applica
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers fifteen page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A machine-readable `agent-manifest.json` is exposed through the read-only `get_agent_guide` tool so backup, tutoring, privacy, navigation, subjects, custom-content, and Bridge policy are available in context.
+A compatible ChatGPT or Codex browser discovers seventeen page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A machine-readable `agent-manifest.json` is exposed through the read-only `get_agent_guide` tool so backup, tutoring, privacy, navigation, subjects, Lesson Depot, custom-content, and Bridge policy are available in context.
 
 | Tool | Purpose |
 | --- | --- |
@@ -44,7 +44,7 @@ A compatible ChatGPT or Codex browser discovers fifteen page tools through `docu
 | `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
-The top-level `agent-bridge.html` workspace registers the same fifteen learning tools plus three transport tools:
+The top-level `agent-bridge.html` workspace registers the same seventeen learning tools plus three transport tools:
 
 | Bridge tool | Purpose |
 | --- | --- |

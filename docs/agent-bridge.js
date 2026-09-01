@@ -1,5 +1,6 @@
 import { createQuickMathsStore } from "./challenge-core.js";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js";
+import { createLessonDepot } from "./lesson-depot.js";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
@@ -34,6 +35,7 @@ const elements = {
 
 let store;
 let sync;
+let lessonDepot;
 let credentialStore;
 let toastTimer;
 let localMode = false;
@@ -123,6 +125,8 @@ async function boot() {
   const curriculum = await curriculumResponse.json();
   const manifest = manifestResponse?.ok ? await manifestResponse.json() : {};
   store = createQuickMathsStore({ storage: createAgentStateStorage(window.localStorage), curriculum });
+  lessonDepot = createLessonDepot({ store, showToast: toast });
+  lessonDepot.load();
   const localCapability = resolveLocalBridgeCapability();
   let bridgeClient;
   let localRepository = null;
@@ -166,7 +170,7 @@ async function boot() {
     elements.form.elements.remember.checked = saved.rememberToken;
   }
 
-  const siteTools = await registerWebMcpTools(store, document.modelContext, manifest);
+  const siteTools = await registerWebMcpTools(store, document.modelContext, manifest, lessonDepot);
   const bridgeTools = await registerBridgeWebMcpTools(sync, document.modelContext);
   const toolNames = [...TOOL_NAMES, ...BRIDGE_TOOL_NAMES];
   elements.toolCount.textContent = String(toolNames.length);

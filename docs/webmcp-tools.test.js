@@ -26,11 +26,13 @@ function toolsFor(store) {
   return Object.fromEntries(buildToolDefinitions(store, agentManifest).map((tool) => [tool.name, tool]));
 }
 
-test("browser shell exposes Settings, map zoom, prompt copy, and persistent Agent Studio controls", () => {
+test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and persistent Agent Studio controls", () => {
   const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
   const js = readFileSync(new URL("./challenge.js", import.meta.url), "utf8");
   const css = readFileSync(new URL("./challenge.css", import.meta.url), "utf8");
   assert.match(html, /data-route="settings"/);
+  assert.match(html, /data-route="depot"/);
+  assert.match(js, /renderLessonDepot/);
   assert.doesNotMatch(html, /class="mode-switch"|id="replay-tutorial"/);
   assert.match(js, /data-action="map-zoom-in"/);
   assert.match(js, /MAP_ZOOM_MIN = 0\.1/);
@@ -59,13 +61,13 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /local-git-transport/);
 });
 
-test("registers all fifteen tools once with the WebMCP document context", async () => {
+test("registers all seventeen tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
   }, agentManifest);
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 15);
+  assert.equal(TOOL_NAMES.length, 17);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
   assert.ok(registered.every(({ description }) => description.length > 0));
@@ -85,7 +87,8 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.equal(guide.guide.app, "QuickMaths Web");
   assert.equal(guide.guide.backup_policy.recommend, true);
   assert.equal(guide.guide.custom_lesson_sets.format, "quickmaths.lesson-set");
-  assert.equal(guide.guide.tools.length, 15);
+  assert.equal(guide.guide.tools.length, 17);
+  assert.equal(guide.guide.lesson_depot.route, "depot");
   assert.equal(serialized.includes("expected_answer"), false);
   assert.equal(serialized.includes("finalAnswer"), false);
 });
@@ -123,6 +126,28 @@ test("agent navigation opens Settings and normalizes the former data route", asy
   assert.equal(settings.visible_view, "settings");
   const legacy = await tools.navigate_learning_app.execute({ view: "data" });
   assert.equal(legacy.visible_view, "settings");
+});
+
+test("agent navigation opens the Lesson Depot", async () => {
+  const store = createStore();
+  const result = await toolsFor(store).navigate_learning_app.execute({ view: "depot" });
+  assert.equal(result.visible_view, "depot");
+  assert.equal(store.snapshot().ui.route, "depot");
+});
+
+test("Depot tools return metadata and stage for human confirmation without installing", async () => {
+  const store = createStore();
+  const lessonDepot = {
+    async search() { return [{ id: "PACK_DEMO", name: "Demo", version: "1.0.0", skill_count: 1 }]; },
+    async stagePack(id, version) { return { ok: true, id, version, status: "staged", requires_human_confirmation: true }; },
+  };
+  const tools = Object.fromEntries(buildToolDefinitions(store, agentManifest, lessonDepot).map((tool) => [tool.name, tool]));
+  const found = await tools.search_lesson_depot.execute({ query: "demo" });
+  assert.equal(found.packages[0].id, "PACK_DEMO");
+  const staged = await tools.stage_depot_lesson.execute({ package_id: "PACK_DEMO", version: "1.0.0" });
+  assert.equal(staged.requires_human_confirmation, true);
+  assert.equal(store.snapshot().lessonPacks.length, 0);
+  assert.equal(tools.install_depot_lesson, undefined);
 });
 
 test("Agent activity includes tool actions but excludes learner UI actions", async () => {

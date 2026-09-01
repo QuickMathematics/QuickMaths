@@ -1,0 +1,12 @@
+{
+  "id": "PACK_ESTIMATION_LAB",
+  "slug": "estimation-lab",
+  "version": "1.0.0",
+  "name": "Estimation Lab",
+  "description": "Build the habit of estimating first and using bounds to catch unreasonable calculations.",
+  "author": "QuickMaths",
+  "license": "CC BY 4.0",
+  "tags": ["estimation", "reasoning", "number sense"],
+  "published_at": "2026-09-01",
+  "updated_at": "2026-09-01"
+}

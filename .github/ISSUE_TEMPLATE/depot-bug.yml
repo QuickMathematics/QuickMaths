@@ -1,0 +1,31 @@
+name: Report a Depot package
+description: Report broken, unsafe, inaccurate, or improperly licensed lesson content.
+title: "[Depot report]: "
+labels: ["lesson depot", "needs review"]
+body:
+  - type: input
+    id: package
+    attributes:
+      label: Package ID and version
+      placeholder: PACK_ESTIMATION_LAB v1.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: reason
+    attributes:
+      label: Problem type
+      options:
+        - Incorrect lesson or answer
+        - Broken install or validation
+        - Copyright or licensing concern
+        - Unsafe or inappropriate content
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What happened?
+      description: Do not include private learner progress, browser tokens, or other credentials.
+    validations:
+      required: true

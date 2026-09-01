@@ -1,0 +1,56 @@
+name: Submit a lesson pack
+description: Propose a validated lesson set for the free QuickMaths Lesson Depot.
+title: "[Lesson submission]: "
+labels: ["lesson submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing a curriculum. Export and validate it in Lesson Studio first. A maintainer or agent will turn accepted submissions into a pull request when needed.
+  - type: input
+    id: name
+    attributes:
+      label: Lesson set name
+      placeholder: Estimation Lab
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Author / credit
+      description: The name or handle that should appear in the catalog.
+    validations:
+      required: true
+  - type: dropdown
+    id: license
+    attributes:
+      label: Content license
+      description: You must own the content or have permission to share it.
+      options:
+        - CC BY 4.0
+        - CC BY-SA 4.0
+        - CC0 1.0
+        - Other open license (explain below)
+    validations:
+      required: true
+  - type: textarea
+    id: file
+    attributes:
+      label: Lesson-set file
+      description: Drag the validated JSON file here, paste a public link, or link the branch containing it. JSON contains answer keys, so do not reuse private or copyrighted assessment content.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Audience, prerequisites, and review notes
+      description: Tell reviewers who this is for and flag any cross-subject bridges or tutor-review requirements.
+  - type: checkboxes
+    id: declarations
+    attributes:
+      label: Author declaration
+      options:
+        - label: I have the right to publish this content under the selected license.
+          required: true
+        - label: I validated this file in QuickMaths and understand it will be publicly downloadable, including its answer keys.
+          required: true

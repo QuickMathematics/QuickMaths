@@ -9,6 +9,8 @@ export const TOOL_NAMES = Object.freeze([
   "open_lesson_creator",
   "validate_lesson_set",
   "stage_custom_lesson_set",
+  "search_lesson_depot",
+  "stage_depot_lesson",
   "get_learning_context",
   "start_skill_test",
   "inspect_student_work",
@@ -39,7 +41,7 @@ function optionalString(input, key, maxLength) {
   return requiredString(input, key, maxLength);
 }
 
-export function buildToolDefinitions(store, agentManifest = {}) {
+export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = null) {
   const guide = agentManifest && typeof agentManifest === "object" && !Array.isArray(agentManifest)
     ? JSON.parse(JSON.stringify(agentManifest))
     : {};
@@ -182,11 +184,11 @@ export function buildToolDefinitions(store, agentManifest = {}) {
     {
       name: "navigate_learning_app",
       title: "Navigate QuickMaths",
-      description: "Open a QuickMaths dashboard, map, lesson, test, results, Lesson studio, or Settings view. This changes the visible page.",
+      description: "Open a QuickMaths dashboard, map, lesson, test, results, Lesson Depot, Lesson studio, or Settings view. This changes the visible page.",
       inputSchema: {
         type: "object",
         properties: {
-          view: { type: "string", enum: ["home", "map", "lesson", "test", "results", "creator", "settings", "data"] },
+          view: { type: "string", enum: ["home", "map", "lesson", "test", "results", "depot", "creator", "settings", "data"] },
           skill_id: stringSchema("Optional skill to select when opening a lesson, test, or map.", 60),
         },
         required: ["view"],
@@ -195,7 +197,7 @@ export function buildToolDefinitions(store, agentManifest = {}) {
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["view", "skill_id"]);
         const view = requiredString(input, "view", 20);
-        if (!["home", "map", "lesson", "test", "results", "creator", "settings", "data"].includes(view)) throw new Error("view is invalid.");
+        if (!["home", "map", "lesson", "test", "results", "depot", "creator", "settings", "data"].includes(view)) throw new Error("view is invalid.");
         const skillId = optionalString(input, "skill_id", 60) || null;
         store.navigate(view, skillId, { activityActor: "agent" });
         return { ok: true, visible_view: store.snapshot().ui.route, selected_skill_id: store.snapshot().ui.selectedSkillId };
@@ -249,6 +251,51 @@ export function buildToolDefinitions(store, agentManifest = {}) {
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["lesson_set_json"]);
         return store.stageLessonPack(requiredString(input, "lesson_set_json", 1800000), { activityActor: "agent" });
+      },
+    },
+    {
+      name: "search_lesson_depot",
+      title: "Search the QuickMaths Lesson Depot",
+      description: "Search the public, community-reviewed lesson catalog by title, author, subject, or tag. Results contain metadata only—never answer keys.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          query: stringSchema("Optional title, author, subject, or tag search.", 120),
+          subject_id: stringSchema("Optional Depot subject ID.", 60),
+          sort: { type: "string", enum: ["popular", "newest", "name"] },
+          limit: { type: "integer", minimum: 1, maximum: 50 },
+        },
+        additionalProperties: false,
+      },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      async execute(input = {}) {
+        requireObject(input); rejectUnknown(input, ["query", "subject_id", "sort", "limit"]);
+        if (!lessonDepot) throw new Error("Lesson Depot is unavailable in this build.");
+        const results = await lessonDepot.search({
+          query: optionalString(input, "query", 120), subject: optionalString(input, "subject_id", 60) || "all",
+          sort: input.sort ?? "popular", limit: input.limit ?? 20,
+        });
+        return { ok: true, count: results.length, packages: results };
+      },
+    },
+    {
+      name: "stage_depot_lesson",
+      title: "Stage a Lesson Depot package",
+      description: "Download, hash-check, validate, and stage one public Depot package for visible human review. This cannot install it; the learner must confirm installation in Settings.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          package_id: stringSchema("Exact PACK_* ID returned by search_lesson_depot.", 60),
+          version: stringSchema("Exact package version returned by search_lesson_depot.", 40),
+        },
+        required: ["package_id", "version"],
+        additionalProperties: false,
+      },
+      annotations: { untrustedContentHint: true },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["package_id", "version"]);
+        if (!lessonDepot) throw new Error("Lesson Depot is unavailable in this build.");
+        return lessonDepot.stagePack(requiredString(input, "package_id", 60), requiredString(input, "version", 40));
       },
     },
     {
@@ -363,11 +410,11 @@ export function buildToolDefinitions(store, agentManifest = {}) {
   ];
 }
 
-export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext, agentManifest = {}) {
+export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext, agentManifest = {}, lessonDepot = null) {
   if (!modelContext || typeof modelContext.registerTool !== "function") return { available: false, registered: [], error: null };
   const registered = [];
   try {
-    for (const definition of buildToolDefinitions(store, agentManifest)) {
+    for (const definition of buildToolDefinitions(store, agentManifest, lessonDepot)) {
       await modelContext.registerTool(definition);
       registered.push(definition.name);
     }

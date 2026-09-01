@@ -1,0 +1,22 @@
+{
+  "entries": [
+    {
+      "author": "QuickMaths",
+      "description": "Build the habit of estimating first and using bounds to catch unreasonable calculations.",
+      "id": "PACK_ESTIMATION_LAB",
+      "license": "CC BY 4.0",
+      "name": "Estimation Lab",
+      "slug": "estimation-lab",
+      "subject_name": "Mathematics",
+      "tags": [
+        "estimation",
+        "number sense",
+        "reasoning"
+      ],
+      "terms": "estimation-lab estimation lab build the habit of estimating first and using bounds to catch unreasonable calculations. quickmaths mathematics estimation number sense reasoning",
+      "version": "1.0.0"
+    }
+  ],
+  "format": "quickmaths.lesson-depot.search",
+  "schema_version": "1.0"
+}

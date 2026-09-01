@@ -167,7 +167,7 @@ function draftFromPack(pack, snapshot) {
   return base;
 }
 
-export function createLessonStudio({ store, download, showToast, getSnapshot, openFilePicker }) {
+export function createLessonStudio({ store, download, showToast, getSnapshot, openFilePicker, publishToDepot = () => {} }) {
   let draft = restoreDraft(getSnapshot());
 
   const save = () => persist(draft);
@@ -252,7 +252,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
           <section class="studio-card studio-publish">
             <div><p class="eyebrow">4 · Validate and publish</p><h2>Ready for the map?</h2><p>Validation uses the exact same safety and graph checks as file upload and WebMCP staging.</p></div>
             ${validation ? `<div class="studio-validation ${validation.ok ? "is-valid" : "is-error"}"><strong>${validation.ok ? "✓ Valid lesson set" : "Needs a little work"}</strong><p>${esc(validation.message)}</p>${validation.ok ? `<small>${validation.skillCount} lessons · ${validation.problemCount} questions · ${esc(validation.subjectName)}</small>` : ""}</div>` : `<div class="studio-validation"><strong>Not checked yet</strong><p>Validate before downloading or installing.</p></div>`}
-            <div class="studio-publish-actions"><button class="button button-outline" data-creator-action="validate">Validate preview</button><button class="button button-secondary" data-creator-action="download">Download JSON</button><button class="button button-primary" data-creator-action="install">Install into QuickMaths</button></div>
+            <div class="studio-publish-actions"><button class="button button-outline" data-creator-action="validate">Validate preview</button><button class="button button-secondary" data-creator-action="download">Download JSON</button><button class="button button-primary" data-creator-action="install">Install into QuickMaths</button><button class="button button-outline" data-creator-action="publish-depot">Publish to Lesson Depot ↗</button></div>
             <p class="pack-security-note"><strong>Answer-key warning:</strong> the downloaded file contains expected answers and solutions. Treat it as an author file, not a learner worksheet.</p>
           </section>
         </div>
@@ -307,9 +307,13 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
         const result = store.importLessonPack(JSON.stringify(buildPack(draft))); showToast(`${result.name} installed in ${result.subjectName}.`);
       }
     }
+    if (action === "publish-depot") {
+      const preview = validate();
+      if (preview) publishToDepot(buildPack(draft));
+    }
     if (action === "import") openFilePicker();
     if (action === "reset" && confirm("Reset the Human Lesson Creator draft? Download it first if you want to keep it.")) draft = blankDraft(getSnapshot());
-    draft.lastValidation = action === "validate" || action === "download" || action === "install" ? draft.lastValidation : null;
+    draft.lastValidation = ["validate", "download", "install", "publish-depot"].includes(action) ? draft.lastValidation : null;
     save(); return true;
   };
 

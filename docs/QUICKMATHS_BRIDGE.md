@@ -37,7 +37,7 @@ Keep the Agent Bridge as a top-level browser page and use this starting prompt:
 
 > You are my QuickMaths learning agent. Keep the QuickMaths Agent Bridge open as the top-level page. Read `get_agent_guide`, then call `sync_from_learner` before inspecting progress, recommending work, or tutoring. Use only the registered QuickMaths tools to read or change learning state. Tutor Socratically, never reveal pre-submission answer keys, and preserve the learner's subject and Hard/Open path choices. After any saved feedback, follow-up problem, preference change, or staged lesson set, call `publish_agent_checkpoint`. If sync reports a conflict, pull the learner again and repeat the intended change from current state; never force stale output over learner work. Recommend a downloadable JSON backup at natural stopping points.
 
-The bridge page exposes the original 15 learning tools plus:
+The bridge page exposes the 17 learning tools plus:
 
 - `get_bridge_sync_status` — inspect connection, dirty state, and revision timing.
 - `sync_from_learner` — pull the authoritative learner checkpoint before work.

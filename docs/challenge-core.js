@@ -29,7 +29,7 @@ export const STATUS_COLORS = Object.freeze({
 });
 
 const PROVEN = new Set(["proven", "mastered"]);
-const ROUTES = new Set(["welcome", "tutorial", "home", "map", "lesson", "test", "results", "settings", "data", "creator"]);
+const ROUTES = new Set(["welcome", "tutorial", "home", "map", "lesson", "test", "results", "settings", "data", "creator", "depot"]);
 const TUTORIAL_STEPS = 6;
 const MAX_ACTIVITY = 60;
 const MAX_ATTEMPTS = 500;
@@ -339,6 +339,27 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
     },
     skills,
   };
+}
+
+export function normalizeLessonPackCollection(inputs, curriculum) {
+  if (!Array.isArray(inputs) || !inputs.length || inputs.length > 1000) throw new Error("Lesson pack collection must contain 1 to 1000 packages.");
+  if (!curriculum || !Array.isArray(curriculum.skills)) throw new Error("A base curriculum is required.");
+  const candidates = inputs.map((input) => {
+    if (typeof input !== "string") return input;
+    if (input.length > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
+    try { return JSON.parse(input); } catch { throw new Error("Lesson set is not valid JSON."); }
+  });
+  const skillIdsByPack = candidates.map((candidate, index) => {
+    if (!candidate || !Array.isArray(candidate.skills)) throw new Error(`Lesson pack ${index + 1} has no skill list.`);
+    return candidate.skills.map((skill) => requiredText(skill?.id, `Lesson pack ${index + 1} skill ID`, 60));
+  });
+  const builtInIds = curriculum.skills.map((skill) => skill.id);
+  const packs = candidates.map((candidate, index) => normalizeLessonPack(candidate, {
+    knownSkillIds: [...builtInIds, ...skillIdsByPack.flatMap((ids, otherIndex) => otherIndex === index ? [] : ids)],
+  }));
+  if (new Set(packs.map((pack) => pack.id)).size !== packs.length) throw new Error("Lesson pack collection contains duplicate pack IDs.");
+  validateCatalogGraph(curriculum, packs);
+  return packs;
 }
 
 function sanitizeLessonPacks(value, curriculum, { strict = false } = {}) {

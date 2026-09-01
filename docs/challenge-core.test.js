@@ -10,6 +10,7 @@ import {
   createQuickMathsStore,
   loadState,
   normalizeLessonPack,
+  normalizeLessonPackCollection,
 } from "./challenge-core.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
@@ -268,6 +269,16 @@ test("explicit cross-subject bridge references verify the target subject", () =>
   invalid.skills[0].prerequisites = [{ subject_id: "SUBJECT_BIOLOGY", skill_id: "MATH_ARITH_005" }];
   assert.throws(() => store.previewLessonPack(invalid), /belongs to SUBJECT_MATH/i);
   assert.equal(store.snapshot().lessonPacks.length, 0);
+});
+
+test("Depot collection validation resolves cross-pack bridges and rejects combined cycles", () => {
+  const finance = JSON.parse(lessonSetExample);
+  const biology = biologyLessonSet();
+  biology.skills[0].prerequisites = [{ subject_id: "SUBJECT_MATH", skill_id: "CUSTOM_FINANCE_DISCOUNTS" }];
+  const packs = normalizeLessonPackCollection([biology, finance], curriculum);
+  assert.equal(packs.length, 2);
+  finance.skills[0].prerequisites = ["CUSTOM_BIO_CELL_001"];
+  assert.throws(() => normalizeLessonPackCollection([biology, finance], curriculum), /cycle/i);
 });
 
 test("proof and rubric authoring modes retain structured review policies", () => {
