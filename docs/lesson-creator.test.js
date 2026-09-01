@@ -40,6 +40,8 @@ test("Lesson Studio explains proof syntax and builds a required reviewed proof",
   const problem = studio.buildPack().skills[0].problems[0];
 
   assert.match(html, /No proof language to learn/);
+  assert.match(html, /Proof required — structured proof \+ review/);
+  assert.match(html, /Question response type/);
   assert.match(html, /Learner view preview/);
   assert.match(html, /Plain text/);
   assert.match(html, /Mastery waits for a passed review/);
@@ -49,6 +51,15 @@ test("Lesson Studio explains proof syntax and builds a required reviewed proof",
   assert.equal(problem.review_policy.mastery_requires_review_pass, true);
   assert.equal(problem.review_policy.allow_self_review, false);
   assert.ok(problem.work.proof_policy.obligations.length >= 3);
+});
+
+test("Lesson Studio help controls expose tappable tooltip content", () => {
+  const { studio, state } = studioHarness();
+  const html = studio.render(state);
+  assert.match(html, /data-studio-help/);
+  assert.match(html, /data-tooltip="Choose proof here/);
+  assert.match(html, /aria-expanded="false"/);
+  assert.match(html, /Tap or hover any/);
 });
 
 test("advanced authoring examples populate readable proof and rubric guidance", () => {

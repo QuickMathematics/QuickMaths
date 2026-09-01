@@ -1,6 +1,6 @@
 import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260901-guided-studio";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260901-combined-map";
-import { createLessonStudio } from "./lesson-creator.js?v=20260901-guided-studio";
+import { createLessonStudio } from "./lesson-creator.js?v=20260901-proof-picker";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
@@ -1139,6 +1139,16 @@ elements.creatorFile.addEventListener("change", async () => {
 });
 
 document.addEventListener("click", async (event) => {
+  const studioHelp = event.target.closest?.("[data-studio-help]");
+  const openStudioHelp = document.querySelectorAll?.('[data-studio-help][aria-expanded="true"]') ?? [];
+  openStudioHelp.forEach((button) => {
+    if (button !== studioHelp) button.setAttribute("aria-expanded", "false");
+  });
+  if (studioHelp && currentSnapshot?.ui.route === "creator") {
+    event.preventDefault();
+    studioHelp.setAttribute("aria-expanded", studioHelp.getAttribute("aria-expanded") === "true" ? "false" : "true");
+    return;
+  }
   const tutorialStep = event.target.closest?.("[data-tutorial-step]");
   if (tutorialStep && currentSnapshot?.ui.route === "tutorial") {
     store.setTutorialStep(Number(tutorialStep.dataset.tutorialStep));

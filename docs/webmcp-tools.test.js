@@ -55,6 +55,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.studio-student-preview/);
   assert.match(css, /\.lesson-hub-tabs/);
   assert.match(css, /\.studio-question-roadmap/);
+  assert.match(css, /\.studio-response-picker/);
+  assert.match(css, /\.studio-help\[aria-expanded="true"\]/);
   assert.match(css, /\.result-review-guide/);
   assert.match(css, /height: clamp\(300px, 60svh, 540px\); max-height: none; contain: layout paint/);
   assert.match(css, /\.agent-dock\.is-closed/);
