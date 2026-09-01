@@ -34,12 +34,12 @@
   },
   "github_community": {
     "optional": true,
-    "purpose": "Lets a human upvote and comment on a lesson package's public GitHub Discussion without leaving the Lesson Depot.",
+    "purpose": "Lets a human vote with a 👍 reaction and comment on a lesson package's public GitHub Discussion without leaving the Lesson Depot.",
     "permissions": "The GitHub App is installed only on Srednjak/QuickMaths and requests repository Discussions read/write. It cannot read learner progress, edit lesson files, or access a learner's bridge repository.",
     "credential_separation": "The GitHub App user token is unrelated to the fine-grained learner-storage token. It is held in sessionStorage by default or localStorage only after the human chooses Keep me connected, and is excluded from backups, bridge checkpoints, WebMCP results, URLs, logs, and commits.",
     "oauth_boundary": "Authorization uses state and PKCE. A stateless callback worker holds the GitHub App client secret and exchanges or refreshes tokens without a database or retained user state.",
-    "public_actions": "Upvotes and comments are public and attributed to the authorizing GitHub identity. Community write actions remain direct human UI controls and are intentionally not exposed as WebMCP tools.",
-    "agent_rule": "Never authorize, upvote, remove an upvote, post a comment, or disconnect GitHub on the learner's behalf. The human must operate those controls directly."
+    "public_actions": "Votes use GitHub's public 👍 reaction and comments are public; both are attributed to the authorizing GitHub identity. Community write actions remain direct human UI controls and are intentionally not exposed as WebMCP tools.",
+    "agent_rule": "Never authorize, add or remove a vote, post a comment, or disconnect GitHub on the learner's behalf. The human must operate those controls directly."
   },
   "agent_policy": {
     "start": [

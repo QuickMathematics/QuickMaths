@@ -75,13 +75,24 @@ test("refresh preserves the secretless browser contract", async () => {
   assert.equal((await response.json()).access_token, "ghu_new");
 });
 
-test("GitHub errors are sanitized", async () => {
+test("credential errors are actionable without leaking GitHub diagnostics", async () => {
   const handler = createCommunityAuthHandler({
     fetchImpl: async () => Response.json({ error: "incorrect_client_credentials", error_description: "secret leaked in diagnostic" }, { status: 401 }),
   });
   const response = await handler(request("/exchange", { code: "authorization-code", code_verifier: "pkce-verifier", redirect_uri: env.ALLOWED_CALLBACKS }), env);
   assert.equal(response.status, 400);
   const payload = await response.json();
-  assert.match(payload.error, /could not verify/i);
+  assert.match(payload.error, /credentials do not match/i);
   assert.equal(JSON.stringify(payload).includes("secret leaked"), false);
+});
+
+test("used or expired authorization codes get a distinct retry message", async () => {
+  const handler = createCommunityAuthHandler({
+    fetchImpl: async () => Response.json({ error: "bad_verification_code", error_description: "the raw code was rejected" }, { status: 400 }),
+  });
+  const response = await handler(request("/exchange", { code: "authorization-code", code_verifier: "pkce-verifier", redirect_uri: env.ALLOWED_CALLBACKS }), env);
+  assert.equal(response.status, 400);
+  const payload = await response.json();
+  assert.match(payload.error, /expired or was already used/i);
+  assert.equal(JSON.stringify(payload).includes("raw code"), false);
 });

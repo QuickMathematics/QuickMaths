@@ -161,14 +161,17 @@ function githubErrorMessage(errors) {
 }
 
 function normalizeDiscussion(node, viewerLogin = "") {
+  const voteReaction = Array.isArray(node?.reactionGroups)
+    ? node.reactionGroups.find((group) => group?.content === "THUMBS_UP")
+    : null;
   const comments = Array.isArray(node?.comments?.nodes) ? node.comments.nodes : [];
   return {
     id: String(node?.id ?? ""),
     number: Number(node?.number) || 0,
     title: String(node?.title ?? ""),
     url: String(node?.url ?? ""),
-    votes: Math.max(0, Number(node?.upvoteCount) || 0),
-    viewerHasVoted: node?.viewerHasUpvoted === true,
+    votes: Math.max(0, Number(voteReaction?.users?.totalCount) || 0),
+    viewerHasVoted: voteReaction?.viewerHasReacted === true,
     commentCount: Math.max(0, Number(node?.comments?.totalCount) || 0),
     comments: comments.map((comment) => ({
       id: String(comment?.id ?? ""),
@@ -312,7 +315,7 @@ export function createGitHubCommunityClient({
     const number = parseDiscussionNumber(discussionUrl, config.repository);
     if (!number) throw new GitHubCommunityError("This lesson package does not have a valid QuickMaths discussion.", { code: "invalid_discussion" });
     if (!viewer) await connect();
-    const data = await graphql(`query QuickMathsLessonDiscussion($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){discussion(number:$number){id number title url upvoteCount viewerHasUpvoted viewerCanUpvote comments(last:50){totalCount nodes{id bodyText createdAt updatedAt url author{login avatarUrl url}}}}}}`, { ...config.repository, number });
+    const data = await graphql(`query QuickMathsLessonDiscussion($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){discussion(number:$number){id number title url viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}comments(last:50){totalCount nodes{id bodyText createdAt updatedAt url author{login avatarUrl url}}}}}}`, { ...config.repository, number });
     if (!data?.repository?.discussion?.id) throw new GitHubCommunityError("This package discussion no longer exists.", { code: "discussion_missing", status: 404 });
     return normalizeDiscussion(data.repository.discussion, viewer?.login);
   };
@@ -321,11 +324,12 @@ export function createGitHubCommunityClient({
     const id = String(discussionId ?? "");
     if (!id || id.length > 200) throw new GitHubCommunityError("Discussion ID is invalid.", { code: "invalid_discussion" });
     const mutation = shouldVote
-      ? `mutation QuickMathsUpvote($id:ID!){addUpvote(input:{subjectId:$id}){subject{upvoteCount viewerHasUpvoted}}}`
-      : `mutation QuickMathsRemoveUpvote($id:ID!){removeUpvote(input:{subjectId:$id}){subject{upvoteCount viewerHasUpvoted}}}`;
+      ? `mutation QuickMathsVote($id:ID!){addReaction(input:{subjectId:$id,content:THUMBS_UP}){subject{reactionGroups{content viewerHasReacted users{totalCount}}}}}`
+      : `mutation QuickMathsRemoveVote($id:ID!){removeReaction(input:{subjectId:$id,content:THUMBS_UP}){subject{reactionGroups{content viewerHasReacted users{totalCount}}}}}`;
     const data = await graphql(mutation, { id });
-    const subject = shouldVote ? data?.addUpvote?.subject : data?.removeUpvote?.subject;
-    return { votes: Math.max(0, Number(subject?.upvoteCount) || 0), viewerHasVoted: subject?.viewerHasUpvoted === true };
+    const subject = shouldVote ? data?.addReaction?.subject : data?.removeReaction?.subject;
+    const voteReaction = subject?.reactionGroups?.find((group) => group?.content === "THUMBS_UP");
+    return { votes: Math.max(0, Number(voteReaction?.users?.totalCount) || 0), viewerHasVoted: voteReaction?.viewerHasReacted === true };
   };
 
   const addComment = async (discussionId, body) => {

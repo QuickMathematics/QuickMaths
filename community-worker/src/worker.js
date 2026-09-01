@@ -75,10 +75,13 @@ async function exchangeWithGitHub(body, env, fetchImpl) {
   let payload = null;
   try { payload = await response.json(); } catch { payload = null; }
   if (!response.ok || !payload?.access_token) {
-    const error = ["bad_verification_code", "incorrect_client_credentials"].includes(payload?.error)
-      ? "GitHub could not verify this authorization. Start again from QuickMaths."
-      : "GitHub sign-in is temporarily unavailable.";
-    return { ok: false, status: response.status >= 400 && response.status < 500 ? 400 : 502, error };
+    const error = payload?.error === "incorrect_client_credentials"
+      ? "The QuickMaths Community credentials do not match the GitHub App. The maintainer needs to replace the callback secret."
+      : payload?.error === "bad_verification_code"
+        ? "This GitHub authorization code expired or was already used. Return to QuickMaths and connect again."
+        : "GitHub sign-in is temporarily unavailable.";
+    const knownOAuthError = ["incorrect_client_credentials", "bad_verification_code"].includes(payload?.error);
+    return { ok: false, status: knownOAuthError || (response.status >= 400 && response.status < 500) ? 400 : 502, error };
   }
   return {
     ok: true,

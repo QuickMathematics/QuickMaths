@@ -1,7 +1,7 @@
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
-} from "./github-community.js?v=20260901-community";
+} from "./github-community.js?v=20260902-community-vote";
 
 const title = document.querySelector("#community-auth-title");
 const message = document.querySelector("#community-auth-message");

@@ -71,8 +71,9 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /data-depot-action="community-vote"/);
   assert.match(js, /id="community-comment-form"/);
   assert.match(css, /\.depot-community-panel/);
-  assert.match(community, /addUpvote/);
-  assert.match(community, /removeUpvote/);
+  assert.match(community, /addReaction/);
+  assert.match(community, /removeReaction/);
+  assert.match(community, /THUMBS_UP/);
   assert.match(community, /addDiscussionComment/);
   assert.match(community, /quickmaths\.github-community\.credential\.session/);
   assert.doesNotMatch(community, /client_secret/);

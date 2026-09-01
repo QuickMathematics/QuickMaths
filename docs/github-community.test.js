@@ -96,8 +96,8 @@ test("authenticated community client loads live votes/comments and writes both a
   const calls = [];
   const responses = [
     { data: { viewer: { login: "ada", avatarUrl: "https://avatars.example/ada", url: "https://github.com/ada" }, repository: { id: "R_repo", nameWithOwner: "Srednjak/QuickMaths", hasDiscussionsEnabled: true } } },
-    { data: { repository: { discussion: { id: "D_1", number: 1, title: "Estimation Lab", url: "https://github.com/Srednjak/QuickMaths/discussions/1", upvoteCount: 3, viewerHasUpvoted: false, viewerCanUpvote: true, comments: { totalCount: 1, nodes: [{ id: "C_1", bodyText: "Useful pack", createdAt: "2026-09-01T10:00:00Z", updatedAt: "2026-09-01T10:00:00Z", url: "https://github.com/comment", author: { login: "bo", avatarUrl: "", url: "https://github.com/bo" } }] } } } } },
-    { data: { addUpvote: { subject: { upvoteCount: 4, viewerHasUpvoted: true } } } },
+    { data: { repository: { discussion: { id: "D_1", number: 1, title: "Estimation Lab", url: "https://github.com/Srednjak/QuickMaths/discussions/1", viewerCanReact: true, reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: false, users: { totalCount: 3 } }], comments: { totalCount: 1, nodes: [{ id: "C_1", bodyText: "Useful pack", createdAt: "2026-09-01T10:00:00Z", updatedAt: "2026-09-01T10:00:00Z", url: "https://github.com/comment", author: { login: "bo", avatarUrl: "", url: "https://github.com/bo" } }] } } } } },
+    { data: { addReaction: { subject: { reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: true, users: { totalCount: 4 } }] } } } },
     { data: { addDiscussionComment: { comment: { id: "C_2", bodyText: "My note", createdAt: "2026-09-01T11:00:00Z", updatedAt: "2026-09-01T11:00:00Z", url: "https://github.com/comment2", author: { login: "ada", avatarUrl: "", url: "https://github.com/ada" } } } } },
   ];
   const client = createGitHubCommunityClient({
@@ -114,7 +114,7 @@ test("authenticated community client loads live votes/comments and writes both a
   assert.deepEqual(vote, { votes: 4, viewerHasVoted: true });
   const comment = await client.addComment(discussion.id, "My note");
   assert.equal(comment.viewerDidAuthor, true);
-  assert.match(calls[2].body.query, /addUpvote/);
+  assert.match(calls[2].body.query, /addReaction/);
   assert.equal(calls[3].body.variables.body, "My note");
   assert.ok(calls.every((call) => call.options.headers.authorization === "Bearer ghu_access"));
 });

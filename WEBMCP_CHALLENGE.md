@@ -2,7 +2,7 @@
 
 QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, switch between Mathematics and Geography, inspect one curriculum or every installed subject in a combined bridge map, take varied mastery tests, reflect, review past work, and move progress between devices.
 
-The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page. A separate optional Community GitHub App enables in-app public Discussion upvotes and comments. Its stateless OAuth callback worker stores no data and is isolated from learner state and Bridge credentials.
+The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page. A separate optional Community GitHub App enables in-app public Discussion votes via 👍 reactions and comments. Its stateless OAuth callback worker stores no data and is isolated from learner state and Bridge credentials.
 
 ## Product surface
 
@@ -21,7 +21,7 @@ The app requires no OpenAI API key and sends no learner data to a hosted applica
 - Validated schema 2.0 lesson-set JSON with Agent Lesson Authoring Guide and full backup integration
 - Responsive desktop, tablet, and mobile navigation
 - Optional GitHub Bridge with debounced learner checkpoints, an agent-only workspace, a credential-free local Git transport for Codex, revision-bound agent responses, conflict protection, and a mobile setup guide
-- Optional in-app GitHub Discussion upvotes and comments through a least-privilege GitHub App, state + PKCE, short-lived user tokens, and a stateless free callback worker
+- Optional in-app GitHub Discussion 👍 votes and comments through a least-privilege GitHub App, state + PKCE, short-lived user tokens, and a stateless free callback worker
 
 ## WebMCP integration
 
@@ -82,7 +82,7 @@ Important files:
 - `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio
 - `docs/webmcp-tools.js` — WebMCP schemas, validation, registration, and execution
 - `docs/github-sync.js` — GitHub Contents transport, credential separation, revisions, polling, and conflict checks
-- `docs/github-community.js` — least-privilege GitHub App OAuth, credential isolation, live upvotes, and comments
+- `docs/github-community.js` — least-privilege GitHub App OAuth, credential isolation, live 👍 votes, and comments
 - `community-worker/` — stateless OAuth code-exchange and refresh boundary for free deployment
 - `docs/local-git-client.js` — same-origin browser adapter for the credential-free loopback transport
 - `docs/agent-bridge.html` — top-level agent-only workspace with no learner-facing UI
