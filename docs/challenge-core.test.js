@@ -5,12 +5,15 @@ import { readFileSync } from "node:fs";
 import {
   APP_VERSION,
   LEGACY_STORAGE_KEY,
+  LESSON_SET_FORMAT,
   STORAGE_KEY,
   createQuickMathsStore,
   loadState,
+  normalizeLessonPack,
 } from "./challenge-core.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
+const lessonSetExample = readFileSync(new URL("./lesson-set-example.json", import.meta.url), "utf8");
 
 function memoryStorage(seed = {}) {
   const values = new Map(Object.entries(seed));
@@ -42,7 +45,7 @@ function answerActiveTestCorrectly(store) {
   for (const problem of draft.problems) {
     store.updateResponse(problem.template_id, {
       finalAnswer: String(problem.expected_answer),
-      work: problem.work_required ? "A valid first step\nA valid final step" : "",
+      work: problem.work_required ? workFor(problem) : "",
     });
   }
   return draft;
@@ -137,6 +140,109 @@ test("retakes draw a fresh five-question set from the seeded variant bank", () =
   store.startTest("MATH_ARITH_001");
   const secondIds = store.snapshot().activeTest.problems.map((problem) => problem.template_id);
   assert.equal(new Set([...firstIds, ...secondIds]).size, 10);
+});
+
+test("a valid custom lesson set joins the real curriculum without replacing built-in skills", () => {
+  const { store } = harness();
+  store.createProfile("Pack Learner");
+  const preview = store.previewLessonPack(lessonSetExample);
+  assert.equal(preview.id, "PACK_PERSONAL_FINANCE");
+  assert.equal(preview.skillCount, 1);
+  assert.equal(store.snapshot().progressRows.length, 25, "preview must not mutate state");
+
+  const installed = store.importLessonPack(lessonSetExample);
+  const state = store.snapshot();
+  assert.equal(installed.totalSkillCount, 26);
+  assert.equal(state.lessonPacks.length, 1);
+  assert.equal(state.progressRows.length, 26);
+  assert.equal(state.curriculum.skills.find((skill) => skill.id === "CUSTOM_FINANCE_DISCOUNTS").custom, true);
+  assert.equal(store.statusForSkill("CUSTOM_FINANCE_DISCOUNTS"), "locked");
+  assert.match(store.exportLessonPack("PACK_PERSONAL_FINANCE"), new RegExp(LESSON_SET_FORMAT));
+});
+
+test("custom lesson-set validation rejects collisions, missing references, cycles, and unsupported grading", () => {
+  const valid = JSON.parse(lessonSetExample);
+  assert.equal(normalizeLessonPack(valid, { knownSkillIds: curriculum.track.skills }).skills.length, 1);
+
+  const duplicateBuiltIn = structuredClone(valid);
+  duplicateBuiltIn.skills[0].id = "CUSTOM_FINANCE_DISCOUNTS";
+  assert.throws(
+    () => normalizeLessonPack(duplicateBuiltIn, { knownSkillIds: [...curriculum.track.skills, "CUSTOM_FINANCE_DISCOUNTS"] }),
+    /already installed/i,
+  );
+
+  const missing = structuredClone(valid);
+  missing.skills[0].prerequisites = ["MISSING_SKILL"];
+  assert.throws(() => normalizeLessonPack(missing, { knownSkillIds: curriculum.track.skills }), /missing prerequisite/i);
+
+  const cycle = structuredClone(valid);
+  cycle.skills.push({
+    ...structuredClone(cycle.skills[0]),
+    id: "CUSTOM_FINANCE_ADVANCED",
+    name: "Advanced finance",
+    prerequisites: ["CUSTOM_FINANCE_DISCOUNTS"],
+    problems: cycle.skills[0].problems.map((problem, index) => ({
+      ...problem,
+      template_id: `CUSTOM_FINANCE_ADV_Q0${index + 1}`,
+      skill_id: "CUSTOM_FINANCE_ADVANCED",
+    })),
+  });
+  cycle.skills[0].prerequisites = ["CUSTOM_FINANCE_ADVANCED"];
+  cycle.track.skills.push("CUSTOM_FINANCE_ADVANCED");
+  cycle.track.exit_skills = ["CUSTOM_FINANCE_ADVANCED"];
+  assert.throws(() => normalizeLessonPack(cycle, { knownSkillIds: curriculum.track.skills }), /cycle/i);
+
+  const unsupported = structuredClone(valid);
+  unsupported.skills[0].problems[0].grading_method = "run_javascript";
+  assert.throws(() => normalizeLessonPack(unsupported, { knownSkillIds: curriculum.track.skills }), /unsupported grading/i);
+});
+
+test("custom progress and content round-trip together through a full backup", () => {
+  const source = harness();
+  source.store.createProfile("Portable Pack");
+  source.store.importLessonPack(lessonSetExample);
+  source.store.startTest("CUSTOM_FINANCE_DISCOUNTS", { force: true });
+  answerActiveTestCorrectly(source.store);
+  assert.equal(source.store.submitTest().ok, true);
+  source.store.saveReflection({ confidenceRating: 4, difficultyFelt: "medium", hintsUsed: "none", guessed: "no" });
+  assert.equal(source.store.snapshot().backupStatus.recommended, true);
+  const raw = source.store.exportBackup();
+  assert.equal(source.store.snapshot().backupStatus.recommended, false);
+
+  const target = harness();
+  const preview = target.store.previewBackup(raw);
+  assert.equal(preview.lessonPackCount, 1);
+  assert.deepEqual(preview.lessonPackNames, ["Personal Finance Practice"]);
+  target.store.importBackup(raw);
+  target.store.selectProfile(target.store.snapshot().profiles[0].id);
+  const restored = target.store.snapshot();
+  assert.equal(restored.progressRows.length, 26);
+  assert.equal(restored.attempts[0].skillId, "CUSTOM_FINANCE_DISCOUNTS");
+  assert.equal(restored.progressRows.find((row) => row.id === "CUSTOM_FINANCE_DISCOUNTS").attemptCount, 1);
+});
+
+test("duplicate lesson-set installs fail without mutating saved state", () => {
+  const { store } = harness();
+  store.createProfile("Safe Packs");
+  store.importLessonPack(lessonSetExample);
+  const before = store.snapshot().progressRows.length;
+  assert.throws(() => store.importLessonPack(lessonSetExample), /already installed/i);
+  assert.equal(store.snapshot().progressRows.length, before);
+  assert.equal(store.snapshot().lessonPacks.length, 1);
+});
+
+test("oversized lesson sets and invalid embedded backup packs are rejected before mutation", () => {
+  const { store } = harness();
+  store.createProfile("Strict Packs");
+  assert.throws(() => store.previewLessonPack(" ".repeat(2_000_001)), /larger than 2 MB/i);
+
+  store.importLessonPack(lessonSetExample);
+  const backup = JSON.parse(store.exportBackup());
+  backup.lessonPacks[0].skills[0].problems[0].grading_method = "unsafe_eval";
+  const target = harness();
+  assert.throws(() => target.store.previewBackup(JSON.stringify(backup)), /unsupported grading/i);
+  assert.equal(target.store.snapshot().profiles.length, 0);
+  assert.equal(target.store.snapshot().lessonPacks.length, 0);
 });
 
 test("locked tests cannot be started before their prerequisites", () => {

@@ -6,6 +6,7 @@ import { createQuickMathsStore } from "./challenge-core.js";
 import { buildToolDefinitions, registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
+const agentManifest = JSON.parse(readFileSync(new URL("./agent-manifest.json", import.meta.url), "utf8"));
 
 function createStore({ profile = true } = {}) {
   const values = new Map();
@@ -22,16 +23,16 @@ function createStore({ profile = true } = {}) {
 }
 
 function toolsFor(store) {
-  return Object.fromEntries(buildToolDefinitions(store).map((tool) => [tool.name, tool]));
+  return Object.fromEntries(buildToolDefinitions(store, agentManifest).map((tool) => [tool.name, tool]));
 }
 
-test("registers all nine tools once with the WebMCP document context", async () => {
+test("registers all ten tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
-  });
+  }, agentManifest);
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 9);
+  assert.equal(TOOL_NAMES.length, 10);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
   assert.ok(registered.every(({ description }) => description.length > 0));
@@ -41,6 +42,19 @@ test("registers all nine tools once with the WebMCP document context", async () 
 test("degrades cleanly when WebMCP is unavailable", async () => {
   const result = await registerWebMcpTools(createStore(), undefined);
   assert.deepEqual(result, { available: false, registered: [], error: null });
+});
+
+test("agent guide exposes operating, backup, and custom-content policy without learner answers", async () => {
+  const store = createStore();
+  store.startTest("MATH_ARITH_001");
+  const guide = await toolsFor(store).get_agent_guide.execute({});
+  const serialized = JSON.stringify(guide);
+  assert.equal(guide.guide.app, "QuickMaths Web");
+  assert.equal(guide.guide.backup_policy.recommend, true);
+  assert.equal(guide.guide.custom_lesson_sets.format, "quickmaths.lesson-set");
+  assert.equal(guide.guide.tools.length, 10);
+  assert.equal(serialized.includes("expected_answer"), false);
+  assert.equal(serialized.includes("finalAnswer"), false);
 });
 
 test("schemas reject unknown properties and invalid navigation values", async () => {
@@ -108,6 +122,7 @@ test("agent workflow inspects work, saves feedback, and opens a follow-up", asyn
   });
   assert.equal(feedback.saved, true);
   assert.equal(store.snapshot().reviews.length, 1);
+  assert.equal(store.snapshot().backupStatus.recommended, true);
 
   const followup = await tools.create_followup_problem.execute({
     skill_id: "MATH_ARITH_001",
@@ -154,7 +169,7 @@ test("registration reports partial failure without duplicating names", async () 
       if (registered.length === 3) throw new Error("registration stopped");
       registered.push(definition.name);
     },
-  });
+  }, agentManifest);
   assert.equal(result.available, true);
   assert.deepEqual(result.registered, TOOL_NAMES.slice(0, 3));
   assert.match(result.error, /registration stopped/);

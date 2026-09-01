@@ -14,15 +14,17 @@ The app requires no OpenAI API key and sends no learner data to an application s
 - Multiple-choice, free-response, required shown work, local grading, and step checks
 - Results, reflection-based mastery updates, spaced review dates, and saved tutor/self reviews
 - Live analog clock plus per-session and cumulative profile timers
-- Browser autosave, confirmed JSON backup restore, and formula-safe CSV exports
+- Browser autosave, backup recommendations, confirmed JSON restore, and formula-safe CSV exports
+- Validated custom lesson-set JSON with authoring guide, example, and full backup integration
 - Responsive desktop, tablet, and mobile navigation
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers nine page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state.
+A compatible ChatGPT or Codex browser discovers ten page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A machine-readable `agent-manifest.json` is exposed through the read-only `get_agent_guide` tool so backup, tutoring, privacy, navigation, and custom-content policy are available in context.
 
 | Tool | Purpose |
 | --- | --- |
+| `get_agent_guide` | Read operating, tutoring, privacy, backup, and custom lesson-set guidance. |
 | `get_app_state` | Read the visible view, learner, timers, mastery counts, and current suggestion. |
 | `get_curriculum_map` | Read all 25 skills with statuses, prerequisites, and unlocks. |
 | `get_progress_summary` | Read per-skill mastery, attempts, and misconception tags. |
@@ -63,6 +65,9 @@ Important files:
 - `docs/challenge-core.js` — profiles, mastery graph, grading, attempts, reviews, timers, and persistence
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports
 - `docs/webmcp-tools.js` — WebMCP schemas, validation, registration, and execution
+- `docs/agent-manifest.json` — machine-readable agent operating and backup policy
+- `docs/CUSTOM_LESSON_SETS.md` — custom lesson-set authoring and validation guide
+- `docs/lesson-set-example.json` — installable worked example
 - `scripts/export_web_curriculum.py` — deterministic export from the original YAML curriculum
 
 ## Run and test
@@ -76,7 +81,7 @@ pytest -q
 
 Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience.
 
-The browser contract suite covers profiles, unlocks, timers, mastery updates, varied retakes, semantic symbolic grading, procedural-work validation, answer-key privacy, malformed backups, backup round-trips, CSV exports, strict tool inputs, navigation, locked-skill enforcement, visible follow-ups, and feedback-to-attempt linkage.
+The browser contract suite covers profiles, unlocks, timers, mastery updates, varied retakes, semantic symbolic grading, procedural-work validation, answer-key privacy, agent-guide policy, custom lesson-set validation and progress round-trips, malformed backups, backup recommendations, CSV exports, strict tool inputs, navigation, locked-skill enforcement, visible follow-ups, and feedback-to-attempt linkage.
 
 ## Under-three-minute demo
 

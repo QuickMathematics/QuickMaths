@@ -6,7 +6,7 @@ Learners enter normal school-style math notation. The app separates final answer
 
 ## WebMCP Challenge Demo
 
-The zero-cost static app in [`docs/`](docs/) ports the complete 25-skill Algebra Foundations experience to the browser. It includes the learner landing page, multiple profiles, dashboard, prerequisite mastery tree, lessons, generated five-question tests, results and reflection, tutor reviews, the original analog clock and timers, JSON backup/load, and CSV exports. A compatible ChatGPT or Codex browser also discovers nine WebMCP tools that let an agent understand the learner's curriculum and progress, navigate the visible app, begin an unlocked test, inspect shown work, save Socratic feedback, and prepare targeted follow-up practice.
+The zero-cost static app in [`docs/`](docs/) ports the complete 25-skill Algebra Foundations experience to the browser. It includes the learner landing page, multiple profiles, dashboard, prerequisite mastery tree, lessons, generated five-question tests, results and reflection, tutor reviews, the original analog clock and timers, JSON backup/load, CSV exports, and validated custom lesson sets that travel inside full backups. A compatible ChatGPT or Codex browser also discovers ten WebMCP tools, including an agent operating guide with backup and tutoring policy, plus tools that understand the learner's curriculum and progress, navigate the visible app, begin an unlocked test, inspect shown work, save Socratic feedback, and prepare targeted follow-up practice.
 
 All state remains in browser `localStorage`; visible Save/Load controls make it portable between browsers. The static build needs no backend, model API, account, API key, or paid hosting.
 

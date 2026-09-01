@@ -1,6 +1,8 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 2;
+export const APP_VERSION = 3;
+export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
+export const LESSON_SET_SCHEMA_VERSION = "1.0";
 
 export const STATUS_COLORS = Object.freeze({
   locked: "#858a89",
@@ -16,6 +18,17 @@ const ROUTES = new Set(["welcome", "home", "map", "lesson", "test", "results", "
 const MAX_ACTIVITY = 60;
 const MAX_ATTEMPTS = 500;
 const MAX_REVIEWS = 1000;
+const MAX_LESSON_SETS = 10;
+const MAX_LESSON_SET_BYTES = 2_000_000;
+const MAX_LESSON_SET_SKILLS = 50;
+const MAX_PROBLEMS_PER_SKILL = 100;
+const LESSON_SET_ID = /^PACK_[A-Z0-9_]{3,54}$/;
+const CUSTOM_SKILL_ID = /^CUSTOM_[A-Z0-9_]{3,52}$/;
+const SAFE_ID = /^[A-Z][A-Z0-9_]{2,119}$/;
+const GRADING_METHODS = new Set([
+  "exact_numeric", "numeric_with_tolerance", "multiple_choice", "symbolic_expression",
+  "equation_solution", "exact_text", "theorem_conclusion",
+]);
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -34,6 +47,238 @@ function makeId(prefix = "id") {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function requiredText(value, label, maxLength, minLength = 1) {
+  if (typeof value !== "string") throw new Error(`${label} must be text.`);
+  const clean = value.trim();
+  if (clean.length < minLength) throw new Error(`${label} is required.`);
+  if (clean.length > maxLength) throw new Error(`${label} is too long (maximum ${maxLength} characters).`);
+  if (/<script\b|javascript:/i.test(clean)) throw new Error(`${label} contains unsupported executable content.`);
+  return clean;
+}
+
+function optionalText(value, label, maxLength) {
+  if (value == null || value === "") return "";
+  return requiredText(value, label, maxLength);
+}
+
+function idList(value, label, { max = 50 } = {}) {
+  if (value == null) return [];
+  if (!Array.isArray(value) || value.length > max) throw new Error(`${label} must be a list with at most ${max} IDs.`);
+  const ids = value.map((item) => requiredText(item, label, 120));
+  if (ids.some((id) => !SAFE_ID.test(id))) throw new Error(`${label} contains an invalid ID.`);
+  if (new Set(ids).size !== ids.length) throw new Error(`${label} contains a duplicate ID.`);
+  return ids;
+}
+
+function normalizeProblem(candidate, skillId, questionIds) {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${skillId} contains an invalid problem.`);
+  const templateId = requiredText(candidate.template_id, `${skillId} problem ID`, 120);
+  if (!SAFE_ID.test(templateId)) throw new Error(`${templateId} is not a valid problem ID.`);
+  if (questionIds.has(templateId)) throw new Error(`Duplicate problem ID: ${templateId}.`);
+  questionIds.add(templateId);
+  if (candidate.skill_id != null && candidate.skill_id !== skillId) throw new Error(`${templateId} must use skill_id ${skillId}.`);
+  const gradingMethod = requiredText(candidate.grading_method, `${templateId} grading_method`, 60);
+  if (!GRADING_METHODS.has(gradingMethod)) throw new Error(`${templateId} uses unsupported grading method ${gradingMethod}.`);
+  const expectedAnswer = requiredText(String(candidate.expected_answer ?? ""), `${templateId} expected_answer`, 300);
+  const options = candidate.options == null ? [] : candidate.options;
+  if (!Array.isArray(options) || options.length > 8) throw new Error(`${templateId} options must be a list of at most 8 choices.`);
+  const normalizedOptions = options.map((option, index) => {
+    if (!option || typeof option !== "object" || Array.isArray(option)) throw new Error(`${templateId} option ${index + 1} is invalid.`);
+    return {
+      id: requiredText(String(option.id ?? ""), `${templateId} option ID`, 30),
+      label: requiredText(String(option.label ?? option.id ?? ""), `${templateId} option label`, 300),
+    };
+  });
+  if (new Set(normalizedOptions.map((option) => option.id)).size !== normalizedOptions.length) throw new Error(`${templateId} contains duplicate option IDs.`);
+  if (gradingMethod === "multiple_choice") {
+    if (normalizedOptions.length < 2) throw new Error(`${templateId} needs at least two options.`);
+    if (!normalizedOptions.some((option) => option.id === expectedAnswer)) throw new Error(`${templateId} expected_answer must match an option ID.`);
+  }
+  const workCandidate = candidate.work && typeof candidate.work === "object" && !Array.isArray(candidate.work) ? candidate.work : {};
+  const workMode = workCandidate.mode ?? "none";
+  if (!["none", "procedural_steps"].includes(workMode)) throw new Error(`${templateId} uses unsupported work mode ${workMode}.`);
+  const answerMode = candidate.answer_mode ?? (workMode === "procedural_steps" ? "final_plus_required_work" : "final_only");
+  if (!["final_only", "final_plus_optional_work", "final_plus_required_work"].includes(answerMode)) throw new Error(`${templateId} uses unsupported answer_mode ${answerMode}.`);
+  const minimumSteps = Math.floor(cleanNumber(Number(workCandidate.minimum_steps), workMode === "procedural_steps" ? 2 : 1, 1, 10));
+  const solutionSteps = Array.isArray(candidate.solution_steps)
+    ? candidate.solution_steps.map((step) => requiredText(String(step), `${templateId} solution step`, 1000)).slice(0, 20)
+    : [];
+  if (!solutionSteps.length) throw new Error(`${templateId} needs at least one solution step.`);
+  return {
+    template_id: templateId,
+    source_template_id: templateId,
+    skill_id: skillId,
+    seed: Math.floor(cleanNumber(Number(candidate.seed), 1, 0, 2_000_000_000)),
+    difficulty: ["easy", "medium", "hard", "brutal"].includes(candidate.difficulty) ? candidate.difficulty : "medium",
+    values: {},
+    prompt: requiredText(candidate.prompt, `${templateId} prompt`, 2000),
+    expected_answer: expectedAnswer,
+    answer_type: optionalText(candidate.answer_type, `${templateId} answer_type`, 60) || "text",
+    grading_method: gradingMethod,
+    solution_steps: solutionSteps,
+    mistake_tags: Array.isArray(candidate.mistake_tags) ? candidate.mistake_tags.map((tag) => requiredText(String(tag), `${templateId} mistake tag`, 80)).slice(0, 12) : [],
+    variable: null,
+    tolerance: candidate.tolerance == null ? null : cleanNumber(Number(candidate.tolerance), 0.001, 0, 1_000_000),
+    options: normalizedOptions,
+    answer_mode: answerMode,
+    work: {
+      mode: workMode,
+      prompt: optionalText(workCandidate.prompt, `${templateId} work prompt`, 500) || (workMode === "procedural_steps" ? "Show one mathematical step per line." : ""),
+      line_type: "expression",
+      minimum_steps: minimumSteps,
+      require_final_answer_match: workCandidate.require_final_answer_match !== false,
+    },
+    review_policy: { work_review: "none", mastery_requires_review_pass: false },
+    accepted_forms: Array.isArray(candidate.accepted_forms) ? candidate.accepted_forms.map((form) => requiredText(String(form), `${templateId} accepted form`, 300)).slice(0, 12) : [],
+    work_required: candidate.work_required === true || answerMode === "final_plus_required_work",
+  };
+}
+
+export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
+  let candidate = input;
+  if (typeof input === "string") {
+    if (input.length > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
+    try { candidate = JSON.parse(input); } catch { throw new Error("Lesson set is not valid JSON."); }
+  }
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error("Lesson set must be a JSON object.");
+  if (candidate.format !== LESSON_SET_FORMAT) throw new Error(`Lesson set format must be ${LESSON_SET_FORMAT}.`);
+  if (candidate.schema_version !== LESSON_SET_SCHEMA_VERSION) throw new Error(`Unsupported lesson set schema_version ${candidate.schema_version ?? "missing"}.`);
+  const id = requiredText(candidate.id, "Lesson set ID", 60);
+  if (!LESSON_SET_ID.test(id)) throw new Error("Lesson set ID must start with PACK_ and use uppercase letters, numbers, and underscores.");
+  if (!Array.isArray(candidate.skills) || !candidate.skills.length || candidate.skills.length > MAX_LESSON_SET_SKILLS) {
+    throw new Error(`Lesson set must contain 1 to ${MAX_LESSON_SET_SKILLS} skills.`);
+  }
+  const usedSkillIds = new Set(knownSkillIds);
+  const packSkillIds = candidate.skills.map((skill) => requiredText(skill?.id, "Skill ID", 60));
+  if (new Set(packSkillIds).size !== packSkillIds.length) throw new Error("Lesson set contains duplicate skill IDs.");
+  for (const skillId of packSkillIds) {
+    if (!CUSTOM_SKILL_ID.test(skillId)) throw new Error(`${skillId} must start with CUSTOM_ and use uppercase letters, numbers, and underscores.`);
+    if (usedSkillIds.has(skillId)) throw new Error(`Skill ID ${skillId} is already installed.`);
+  }
+  const packSkillSet = new Set(packSkillIds);
+  const allKnown = new Set([...usedSkillIds, ...packSkillIds]);
+  const questionIds = new Set();
+  const skills = candidate.skills.map((skillCandidate) => {
+    const skillId = skillCandidate.id;
+    const prerequisites = idList(skillCandidate.prerequisites, `${skillId} prerequisites`);
+    const unlocks = idList(skillCandidate.unlocks, `${skillId} unlocks`);
+    for (const prerequisite of prerequisites) if (!allKnown.has(prerequisite)) throw new Error(`${skillId} references missing prerequisite ${prerequisite}.`);
+    for (const unlock of unlocks) if (!packSkillSet.has(unlock)) throw new Error(`${skillId} unlock ${unlock} must belong to the same lesson set.`);
+    if (!Array.isArray(skillCandidate.problems) || !skillCandidate.problems.length || skillCandidate.problems.length > MAX_PROBLEMS_PER_SKILL) {
+      throw new Error(`${skillId} must contain 1 to ${MAX_PROBLEMS_PER_SKILL} problems.`);
+    }
+    const mastery = skillCandidate.mastery && typeof skillCandidate.mastery === "object" ? skillCandidate.mastery : {};
+    const examples = Array.isArray(skillCandidate.examples) ? skillCandidate.examples.slice(0, 20).map((example, index) => ({
+      prompt: requiredText(example?.prompt, `${skillId} example ${index + 1} prompt`, 1000),
+      solution: requiredText(String(example?.solution ?? ""), `${skillId} example ${index + 1} solution`, 1000),
+      explanation: requiredText(example?.explanation, `${skillId} example ${index + 1} explanation`, 2000),
+    })) : [];
+    const applications = Array.isArray(skillCandidate.applications) ? skillCandidate.applications.slice(0, 20).map((application, index) => ({
+      title: requiredText(application?.title, `${skillId} application ${index + 1} title`, 160),
+      description: requiredText(application?.description, `${skillId} application ${index + 1} description`, 1000),
+    })) : [];
+    return {
+      id: skillId,
+      packId: id,
+      custom: true,
+      name: requiredText(skillCandidate.name, `${skillId} name`, 160),
+      domain: optionalText(skillCandidate.domain, `${skillId} domain`, 80) || "Custom",
+      subdomain: optionalText(skillCandidate.subdomain, `${skillId} subdomain`, 120) || requiredText(candidate.name, "Lesson set name", 160),
+      description: requiredText(skillCandidate.description, `${skillId} description`, 1000),
+      prerequisites,
+      unlocks,
+      tags: Array.isArray(skillCandidate.tags) ? skillCandidate.tags.map((tag) => requiredText(String(tag), `${skillId} tag`, 80)).slice(0, 20) : [],
+      mastery: {
+        passing_score: cleanNumber(Number(mastery.passing_score), 0.8, 0.5, 1),
+        minimum_confidence: Math.round(cleanNumber(Number(mastery.minimum_confidence), 3, 1, 5)),
+        max_guessing_allowed: ["no", "maybe"].includes(mastery.max_guessing_allowed) ? mastery.max_guessing_allowed : "maybe",
+        review_after_days_if_mastered: Math.round(cleanNumber(Number(mastery.review_after_days_if_mastered), 7, 1, 365)),
+        review_after_days_if_learning: Math.round(cleanNumber(Number(mastery.review_after_days_if_learning), 2, 1, 365)),
+      },
+      theory: requiredText(skillCandidate.theory, `${skillId} theory`, 15_000),
+      examples,
+      applications,
+      problems: skillCandidate.problems.map((problem) => normalizeProblem(problem, skillId, questionIds)),
+    };
+  });
+  const skillById = Object.fromEntries(skills.map((skill) => [skill.id, skill]));
+  const visiting = new Set();
+  const visited = new Set();
+  const visit = (skillId) => {
+    if (visiting.has(skillId)) throw new Error(`Lesson set prerequisite cycle includes ${skillId}.`);
+    if (visited.has(skillId)) return;
+    visiting.add(skillId);
+    for (const prerequisite of skillById[skillId].prerequisites.filter((item) => packSkillSet.has(item))) visit(prerequisite);
+    visiting.delete(skillId);
+    visited.add(skillId);
+  };
+  packSkillIds.forEach(visit);
+  const trackCandidate = candidate.track && typeof candidate.track === "object" ? candidate.track : {};
+  const trackSkills = idList(trackCandidate.skills ?? packSkillIds, "Track skills", { max: MAX_LESSON_SET_SKILLS });
+  if (trackSkills.length !== packSkillIds.length || trackSkills.some((skillId) => !packSkillSet.has(skillId))) throw new Error("Track skills must list every lesson-set skill exactly once.");
+  const entrySkills = idList(trackCandidate.entry_skills ?? trackSkills.filter((skillId) => !skillById[skillId].prerequisites.some((item) => packSkillSet.has(item))), "Track entry_skills");
+  const exitSkills = idList(trackCandidate.exit_skills ?? trackSkills.filter((skillId) => !skills.some((skill) => skill.prerequisites.includes(skillId))), "Track exit_skills");
+  if (entrySkills.some((skillId) => !packSkillSet.has(skillId)) || exitSkills.some((skillId) => !packSkillSet.has(skillId))) throw new Error("Track entry and exit skills must belong to this lesson set.");
+  return {
+    format: LESSON_SET_FORMAT,
+    schema_version: LESSON_SET_SCHEMA_VERSION,
+    id,
+    name: requiredText(candidate.name, "Lesson set name", 160),
+    description: requiredText(candidate.description, "Lesson set description", 1000),
+    author: optionalText(candidate.author, "Lesson set author", 160) || "Unknown author",
+    version: optionalText(candidate.version, "Lesson set version", 40) || "1.0.0",
+    importedAt: cleanText(candidate.importedAt, 40) || new Date().toISOString(),
+    track: {
+      id: optionalText(trackCandidate.id, "Track ID", 120) || `TRACK_${id}`,
+      name: optionalText(trackCandidate.name, "Track name", 160) || requiredText(candidate.name, "Lesson set name", 160),
+      domain: optionalText(trackCandidate.domain, "Track domain", 80) || "Custom",
+      description: optionalText(trackCandidate.description, "Track description", 1000) || requiredText(candidate.description, "Lesson set description", 1000),
+      entry_skills: entrySkills,
+      exit_skills: exitSkills,
+      skills: trackSkills,
+      schema_version: LESSON_SET_SCHEMA_VERSION,
+    },
+    skills,
+  };
+}
+
+function sanitizeLessonPacks(value, curriculum, { strict = false } = {}) {
+  if (value == null) return [];
+  if (!Array.isArray(value)) {
+    if (strict) throw new Error("Backup lessonPacks must be a list.");
+    return [];
+  }
+  if (strict && value.length > MAX_LESSON_SETS) throw new Error(`Backup contains more than ${MAX_LESSON_SETS} lesson sets.`);
+  const output = [];
+  const known = new Set(curriculum.skills.map((skill) => skill.id));
+  const packIds = new Set();
+  for (const candidate of value.slice(0, MAX_LESSON_SETS)) {
+    try {
+      const pack = normalizeLessonPack(candidate, { knownSkillIds: known });
+      if (packIds.has(pack.id)) throw new Error(`Duplicate lesson set ID: ${pack.id}.`);
+      output.push(pack);
+      packIds.add(pack.id);
+      pack.skills.forEach((skill) => known.add(skill.id));
+    } catch (error) {
+      if (strict) throw error;
+    }
+  }
+  return output;
+}
+
+function mergeCurriculum(curriculum, lessonPacks) {
+  const customSkills = lessonPacks.flatMap((pack) => pack.skills);
+  return {
+    ...curriculum,
+    track: {
+      ...curriculum.track,
+      skills: [...curriculum.track.skills, ...lessonPacks.flatMap((pack) => pack.track.skills)],
+      exit_skills: [...curriculum.track.exit_skills, ...lessonPacks.flatMap((pack) => pack.track.exit_skills)],
+    },
+    skills: [...curriculum.skills, ...customSkills],
+  };
+}
+
 function initialState() {
   return {
     version: APP_VERSION,
@@ -43,6 +288,13 @@ function initialState() {
     attempts: [],
     reviews: [],
     drafts: {},
+    lessonPacks: [],
+    backup: {
+      lastExportAt: null,
+      attemptCountAtExport: 0,
+      reviewCountAtExport: 0,
+      lessonPackCountAtExport: 0,
+    },
     ui: {
       route: "welcome",
       selectedSkillId: "MATH_ARITH_001",
@@ -231,10 +483,12 @@ function sanitizePendingResults(candidate, skillIds) {
   };
 }
 
-function sanitizeState(candidate, curriculum) {
+function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   const base = initialState();
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return base;
-  const skills = new Set(curriculum.skills.map((skill) => skill.id));
+  const lessonPacks = sanitizeLessonPacks(candidate.lessonPacks, curriculum, { strict: strictPacks });
+  const catalog = mergeCurriculum(curriculum, lessonPacks);
+  const skills = new Set(catalog.skills.map((skill) => skill.id));
   const profiles = Array.isArray(candidate.profiles)
     ? candidate.profiles.map(sanitizeProfile).filter(Boolean).slice(0, 30)
     : [];
@@ -242,7 +496,7 @@ function sanitizeState(candidate, curriculum) {
   const activeProfileId = profileIds.has(candidate.activeProfileId) ? candidate.activeProfileId : null;
   const ui = candidate.ui && typeof candidate.ui === "object" ? candidate.ui : {};
   const route = ROUTES.has(ui.route) ? ui.route : activeProfileId ? "home" : "welcome";
-  const selectedSkillId = skills.has(ui.selectedSkillId) ? ui.selectedSkillId : curriculum.track.entry_skills[0];
+  const selectedSkillId = skills.has(ui.selectedSkillId) ? ui.selectedSkillId : catalog.track.entry_skills[0];
 
   const attempts = Array.isArray(candidate.attempts)
     ? candidate.attempts.map((item) => sanitizeAttempt(item, profileIds, skills)).filter(Boolean).slice(-MAX_ATTEMPTS)
@@ -257,7 +511,14 @@ function sanitizeState(candidate, curriculum) {
     progress: sanitizeProgress(candidate.progress, profileIds, skills),
     attempts,
     reviews,
-    drafts: sanitizeDrafts(candidate.drafts, profileIds, curriculum),
+    drafts: sanitizeDrafts(candidate.drafts, profileIds, catalog),
+    lessonPacks,
+    backup: {
+      lastExportAt: cleanText(candidate.backup?.lastExportAt, 40) || null,
+      attemptCountAtExport: Math.floor(cleanNumber(candidate.backup?.attemptCountAtExport, 0, 0, MAX_ATTEMPTS)),
+      reviewCountAtExport: Math.floor(cleanNumber(candidate.backup?.reviewCountAtExport, 0, 0, MAX_REVIEWS)),
+      lessonPackCountAtExport: Math.floor(cleanNumber(candidate.backup?.lessonPackCountAtExport, 0, 0, MAX_LESSON_SETS)),
+    },
     ui: {
       route: activeProfileId ? (route === "welcome" ? "home" : route) : "welcome",
       selectedSkillId,
@@ -577,19 +838,30 @@ function reviewDate(status, score, confidence, date) {
 }
 
 export function createQuickMathsStore({ storage, curriculum, now = () => new Date() }) {
-  const skillsById = Object.fromEntries(curriculum.skills.map((skill) => [skill.id, skill]));
-  const skillOrder = curriculum.track.skills.filter((id) => skillsById[id]);
-  const unlocks = Object.fromEntries(skillOrder.map((id) => [id, [...(skillsById[id].unlocks ?? [])]]));
-  for (const skill of curriculum.skills) {
-    for (const prerequisite of skill.prerequisites) {
-      unlocks[prerequisite] ??= [];
-      if (!unlocks[prerequisite].includes(skill.id)) unlocks[prerequisite].push(skill.id);
-    }
-  }
-
+  const skillsById = {};
+  const skillOrder = [];
+  const unlocks = {};
+  let catalog = curriculum;
   let state = loadState(storage, curriculum);
   const listeners = new Set();
   let storageError = null;
+
+  const rebuildCatalog = () => {
+    catalog = mergeCurriculum(curriculum, state.lessonPacks ?? []);
+    for (const key of Object.keys(skillsById)) delete skillsById[key];
+    for (const key of Object.keys(unlocks)) delete unlocks[key];
+    skillOrder.splice(0, skillOrder.length);
+    for (const skill of catalog.skills) skillsById[skill.id] = skill;
+    skillOrder.push(...catalog.track.skills.filter((id) => skillsById[id]));
+    for (const id of skillOrder) unlocks[id] = [...(skillsById[id].unlocks ?? [])];
+    for (const skill of catalog.skills) {
+      for (const prerequisite of skill.prerequisites) {
+        unlocks[prerequisite] ??= [];
+        if (!unlocks[prerequisite].includes(skill.id)) unlocks[prerequisite].push(skill.id);
+      }
+    }
+  };
+  rebuildCatalog();
 
   const milliseconds = () => now().getTime();
   const isoNow = () => now().toISOString();
@@ -645,6 +917,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     const record = activeProgress()[skillId] ?? {};
     return {
       id: skill.id,
+      packId: skill.packId ?? null,
+      custom: Boolean(skill.custom),
       name: skill.name,
       subdomain: skill.subdomain,
       description: skill.description,
@@ -669,6 +943,36 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return { sessionSeconds, profileSeconds: profile.totalLoggedSeconds + unflushed };
   };
 
+  const backupStatus = () => {
+    let reason = "Progress is covered by browser autosave.";
+    let recommended = false;
+    if (storageError) {
+      recommended = true;
+      reason = "Browser autosave reported a problem; download a backup now.";
+    } else if (!state.backup.lastExportAt && (state.attempts.length > 0 || state.lessonPacks.length > 0)) {
+      recommended = true;
+      reason = "No portable backup has been downloaded yet.";
+    } else if (state.attempts.length > state.backup.attemptCountAtExport) {
+      recommended = true;
+      reason = "New mastery attempts have been saved since the last backup.";
+    } else if (state.reviews.length > state.backup.reviewCountAtExport) {
+      recommended = true;
+      reason = "New tutor or self reviews have been saved since the last backup.";
+    } else if (state.lessonPacks.length !== state.backup.lessonPackCountAtExport) {
+      recommended = true;
+      reason = "The installed lesson sets changed since the last backup.";
+    } else if (state.backup.lastExportAt && milliseconds() - new Date(state.backup.lastExportAt).getTime() > 7 * 86_400_000) {
+      recommended = true;
+      reason = "The last portable backup is more than seven days old.";
+    }
+    return {
+      lastExportAt: state.backup.lastExportAt,
+      recommended,
+      reason,
+      attemptsSinceExport: Math.max(0, state.attempts.length - state.backup.attemptCountAtExport),
+    };
+  };
+
   const snapshot = () => {
     const rows = state.activeProfileId ? progressRows() : [];
     const counts = Object.fromEntries(["locked", "ready", "learning", "proven", "mastered", "rusty"].map((key) => [key, rows.filter((row) => row.status === key).length]));
@@ -689,14 +993,28 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       timers: timers(),
       activity: clone(state.activity.filter((item) => item.profileId === state.activeProfileId)),
       storageError,
+      backupStatus: backupStatus(),
+      lessonPacks: state.lessonPacks.map((pack) => ({
+        id: pack.id,
+        name: pack.name,
+        description: pack.description,
+        author: pack.author,
+        version: pack.version,
+        importedAt: pack.importedAt,
+        skillCount: pack.skills.length,
+        problemCount: pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
+      })),
       selectedSkill: clone(skillsById[state.ui.selectedSkillId] ?? skillsById[skillOrder[0]]),
       selectedMapSkill: clone(skillsById[state.ui.selectedMapSkillId] ?? skillsById[skillOrder[0]]),
       activeTest: clone(state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId] ?? null),
       pendingResults: clone(state.ui.pendingResults),
       curriculum: {
-        track: clone(curriculum.track),
-        skills: curriculum.skills.map((skill) => ({
+        track: clone(catalog.track),
+        lessonPacks: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, skill_ids: [...pack.track.skills] })),
+        skills: catalog.skills.map((skill) => ({
           id: skill.id,
+          packId: skill.packId ?? null,
+          custom: Boolean(skill.custom),
           name: skill.name,
           subdomain: skill.subdomain,
           description: skill.description,
@@ -1017,7 +1335,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return {
       ok: true,
       route: state.ui.route,
-      skill: { id: skill.id, name: skill.name, description: skill.description, status: row.status },
+      skill: { id: skill.id, pack_id: skill.packId ?? null, custom: Boolean(skill.custom), name: skill.name, description: skill.description, status: row.status },
       active_test: draft ? {
         question_count: draft.problems.length,
         answered_count: Object.values(draft.responses).filter((response) => response.finalAnswer).length,
@@ -1042,7 +1360,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
         status: view.suggested.status,
         mastery_score: view.suggested.masteryScore,
       } : null,
-      skills: rows.map((row) => ({ skill_id: row.id, name: row.name, status: row.status, mastery_score: row.masteryScore, mistake_tags: row.mistakeTags })),
+      custom_lesson_sets: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skills.length })),
+      skills: rows.map((row) => ({ skill_id: row.id, pack_id: row.packId, custom: row.custom, name: row.name, status: row.status, mastery_score: row.masteryScore, mistake_tags: row.mistakeTags })),
     };
   };
 
@@ -1060,8 +1379,55 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return { ok: true, saved: true, problem: { question_id: matching.template_id, skill_id: skillId, prompt: matching.prompt, difficulty: matching.difficulty } };
   };
 
+  const parseLessonPack = (raw) => {
+    if (state.lessonPacks.length >= MAX_LESSON_SETS) throw new Error(`QuickMaths supports at most ${MAX_LESSON_SETS} custom lesson sets.`);
+    let candidate = raw;
+    if (typeof raw === "string") {
+      if (raw.length > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
+      try { candidate = JSON.parse(raw); } catch { throw new Error("Lesson set is not valid JSON."); }
+    }
+    if (state.lessonPacks.some((pack) => pack.id === candidate?.id)) throw new Error(`Lesson set ${candidate.id} is already installed.`);
+    return normalizeLessonPack(candidate, { knownSkillIds: Object.keys(skillsById) });
+  };
+
+  const previewLessonPack = (raw) => {
+    const pack = parseLessonPack(raw);
+    return {
+      ok: true,
+      id: pack.id,
+      name: pack.name,
+      description: pack.description,
+      author: pack.author,
+      version: pack.version,
+      skillCount: pack.skills.length,
+      problemCount: pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
+      prerequisiteLinksToBuiltIn: pack.skills.reduce((count, skill) => count + skill.prerequisites.filter((id) => !id.startsWith("CUSTOM_")).length, 0),
+    };
+  };
+
+  const importLessonPack = (raw) => {
+    const pack = parseLessonPack(raw);
+    state.lessonPacks.push(pack);
+    rebuildCatalog();
+    addActivity("load_lesson_set", `Installed ${pack.name} with ${pack.skills.length} skills.`);
+    notify();
+    return { ok: true, id: pack.id, name: pack.name, skillCount: pack.skills.length, totalSkillCount: skillOrder.length };
+  };
+
+  const exportLessonPack = (packId) => {
+    const pack = state.lessonPacks.find((item) => item.id === packId);
+    if (!pack) throw new Error("Lesson set not found.");
+    return JSON.stringify(pack, null, 2);
+  };
+
   const exportBackup = () => {
     heartbeat(true);
+    state.backup.lastExportAt = isoNow();
+    state.backup.attemptCountAtExport = state.attempts.length;
+    state.backup.reviewCountAtExport = state.reviews.length;
+    state.backup.lessonPackCountAtExport = state.lessonPacks.length;
+    addActivity("export_progress_backup", "Downloaded a portable progress backup.");
+    notify();
     return JSON.stringify({ ...clone(state), exportedAt: isoNow(), app: "QuickMaths Web" }, null, 2);
   };
 
@@ -1071,7 +1437,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     try { candidate = JSON.parse(raw); } catch { throw new Error("Backup file is not valid JSON."); }
     if (!candidate || typeof candidate !== "object") throw new Error("Backup file is invalid.");
     if (Number(candidate.version) > APP_VERSION) throw new Error("This backup was created by a newer QuickMaths version.");
-    const imported = sanitizeState(candidate, curriculum);
+    const imported = sanitizeState(candidate, curriculum, { strictPacks: true });
     if (!imported.profiles.length) throw new Error("Backup does not contain any learner profiles.");
     return { candidate, imported };
   };
@@ -1086,6 +1452,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       profileNames: imported.profiles.map((profile) => profile.displayName),
       attemptCount: imported.attempts.length,
       reviewCount: imported.reviews.length,
+      lessonPackCount: imported.lessonPacks.length,
+      lessonPackNames: imported.lessonPacks.map((pack) => pack.name),
       replaces: {
         profileCount: state.profiles.length,
         attemptCount: state.attempts.length,
@@ -1097,6 +1465,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
   const importBackup = (raw) => {
     const { imported } = parseBackup(raw);
     state = imported;
+    rebuildCatalog();
     state.activeProfileId = null;
     state.session = null;
     state.ui.route = "welcome";
@@ -1128,6 +1497,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
 
   const replaceFromStorage = () => {
     state = loadState(storage, curriculum);
+    rebuildCatalog();
     notify();
   };
 
@@ -1151,6 +1521,9 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     getLearningContext,
     getProgressSummary,
     createFollowupProblem,
+    previewLessonPack,
+    importLessonPack,
+    exportLessonPack,
     exportBackup,
     previewBackup,
     importBackup,

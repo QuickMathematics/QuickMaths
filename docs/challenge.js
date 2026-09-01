@@ -19,6 +19,7 @@ const elements = {
   activityEmpty: document.querySelector("#activity-empty"),
   agentDock: document.querySelector("#agent-dock"),
   backupFile: document.querySelector("#backup-file"),
+  lessonSetFile: document.querySelector("#lesson-set-file"),
   toast: document.querySelector("#toast"),
 };
 
@@ -202,7 +203,7 @@ function renderMap(snapshot) {
 
   elements.view.innerHTML = `
     <header class="page-head">
-      <div><p class="eyebrow">25 connected skills</p><h1>Mastery map</h1><p>Every path begins with what you have already proven. Select a node to see why it is ready, locked, learning, or due for review.</p></div>
+      <div><p class="eyebrow">${snapshot.progressRows.length} connected skills${snapshot.lessonPacks.length ? ` · ${snapshot.lessonPacks.length} custom set${snapshot.lessonPacks.length === 1 ? "" : "s"}` : ""}</p><h1>Mastery map</h1><p>Every path begins with what you have already proven. Select a node to see why it is ready, locked, learning, or due for review.</p></div>
       <div class="page-actions"><label class="compact-select">Jump to skill<select id="map-skill-select">${skillOptions(snapshot, selected.id)}</select></label></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}</div>
@@ -369,20 +370,30 @@ function renderResults(snapshot) {
   `;
 }
 
-const TUTOR_SETUP_PROMPT = `You are my QuickMaths tutor. Use the learner's mastery map, attempts, shown work, confidence, and mistake tags. Diagnose briefly, teach one concept at a time, ask one practice question at a time, and do not reveal answers before I attempt them. Save concise Socratic feedback in the app when WebMCP tools are available.`;
+const TUTOR_SETUP_PROMPT = `You are my QuickMaths tutor. Use the learner's mastery map, attempts, shown work, confidence, and mistake tags. Diagnose briefly, teach one concept at a time, ask one practice question at a time, and do not reveal answers before I attempt them. Save concise Socratic feedback in the app when WebMCP tools are available. At natural stopping points, before imports or lesson-set changes, and whenever the app says a backup is recommended, ask me to download a full JSON backup from Save & load.`;
 
 function renderData(snapshot) {
-  const storageBytes = new Blob([JSON.stringify({ profiles: snapshot.profiles, attempts: snapshot.attempts, reviews: snapshot.reviews, progress: snapshot.progressRows })]).size;
+  const backup = snapshot.backupStatus;
   elements.view.innerHTML = `
-    <header class="page-head"><div><p class="eyebrow">Data portability</p><h1>Save & load</h1><p>QuickMaths autosaves on this device. A JSON backup moves every profile, attempt, review, timer, and mastery record without an account.</p></div><div class="page-actions"><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
+    <header class="page-head"><div><p class="eyebrow">Data portability & custom content</p><h1>Save & load</h1><p>QuickMaths autosaves on this device. A JSON backup moves every profile, lesson set, attempt, review, timer, and mastery record without an account.</p></div><div class="page-actions"><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
+    ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="storage-summary">
       <article><span>Storage</span><strong>${snapshot.storageError ? "Needs backup" : "Autosaving"}</strong><small>${snapshot.storageError ? escapeHtml(snapshot.storageError) : "Browser local storage"}</small></article>
       <article><span>Current profile</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>${snapshot.attempts.length} saved attempts</small></article>
-      <article><span>Backup size</span><strong>${Math.max(1, Math.round(storageBytes / 1024))} KB</strong><small>Portable JSON</small></article>
+      <article><span>Portable backup</span><strong>${backup.lastExportAt ? escapeHtml(formatDate(backup.lastExportAt)) : "Not yet"}</strong><small>${backup.recommended ? `${backup.attemptsSinceExport} new attempt${backup.attemptsSinceExport === 1 ? "" : "s"}` : "Up to date"}</small></article>
+      <article><span>Custom lesson sets</span><strong>${snapshot.lessonPacks.length}</strong><small>${snapshot.lessonPacks.reduce((count, pack) => count + pack.skillCount, 0)} added skills</small></article>
     </section>
     <section class="data-grid">
-      <article class="content-card"><div class="card-heading"><div><h2>Full progress backup</h2><p>Best for moving or restoring QuickMaths.</p></div></div><div class="backup-flow"><span>1<strong>Autosave</strong><small>Every edit stays here</small></span><b>→</b><span>2<strong>Download</strong><small>Keep the JSON file</small></span><b>→</b><span>3<strong>Load</strong><small>Restore on another device</small></span></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download JSON backup</button><button class="button button-outline" data-action="load-backup">Choose backup file</button></div></article>
+      <article class="content-card"><div class="card-heading"><div><h2>Full progress backup</h2><p>Includes installed lesson sets and every learner record.</p></div></div><div class="backup-flow"><span>1<strong>Autosave</strong><small>Every edit stays here</small></span><b>→</b><span>2<strong>Download</strong><small>Keep the JSON file</small></span><b>→</b><span>3<strong>Load</strong><small>Confirmed full restore</small></span></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download JSON backup</button><button class="button button-outline" data-action="load-backup">Choose backup file</button></div></article>
       <article class="content-card"><div class="card-heading"><div><h2>Spreadsheet exports</h2><p>Human-readable snapshots for analysis.</p></div></div><div class="export-list"><button data-action="download-csv" data-kind="progress"><span>Progress</span><small>Status, mastery, scores, confidence</small><b>CSV ↓</b></button><button data-action="download-csv" data-kind="attempts"><span>Attempts</span><small>Scores, dates, mastery updates</small><b>CSV ↓</b></button><button data-action="download-csv" data-kind="reviews"><span>Reviews</span><small>Verdicts, feedback, next steps</small><b>CSV ↓</b></button></div></article>
+    </section>
+    <section class="content-card lesson-packs-card">
+      <div class="card-heading"><div><p class="eyebrow">Extend the curriculum</p><h2>Custom lesson sets</h2><p>Load validated JSON lessons into the same map, testing, progress, and backup pipeline.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson set</button></div>
+      <div class="lesson-pack-guide"><div><strong>Build your own</strong><p>Start from the working example, keep IDs namespaced, then let QuickMaths validate prerequisites, grading, questions, and safety limits before anything is installed.</p></div><a class="button button-outline" href="./lesson-set-example.json" download>Download example</a><a class="button button-secondary" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Read authoring guide</a></div>
+      <div class="installed-packs">
+        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">＋</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.skillCount} skill${pack.skillCount === 1 ? "" : "s"} · ${pack.problemCount} problems · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></article>`).join("") : `<div class="empty-state">No custom sets installed. The built-in 25-skill Algebra Foundations track remains available.</div>`}
+      </div>
+      <p class="pack-security-note"><strong>Teacher-file warning:</strong> lesson-set JSON contains answer keys and solutions. Don’t paste the raw file into a learner tutoring conversation.</p>
     </section>
     <section class="content-card tutor-setup"><div class="card-heading"><div><h2>Tutor setup prompt</h2><p>Use this in any AI tutor when WebMCP is unavailable.</p></div><button class="quiet-button" data-action="copy-tutor-setup">Copy prompt</button></div><pre id="tutor-setup-prompt">${escapeHtml(TUTOR_SETUP_PROMPT)}</pre></section>
   `;
@@ -511,8 +522,9 @@ elements.backupFile.addEventListener("change", async () => {
     const raw = await file.text();
     const preview = store.previewBackup(raw);
     const names = preview.profileNames.slice(0, 5).join(", ") + (preview.profileNames.length > 5 ? ", …" : "");
+    const lessonSets = preview.lessonPackNames.length ? `\nLesson sets: ${preview.lessonPackNames.join(", ")}` : "\nLesson sets: none";
     const confirmed = window.confirm(
-      `Load ${file.name}?\n\nIncoming: ${preview.profileCount} profile(s), ${preview.attemptCount} attempt(s), ${preview.reviewCount} review(s)\nProfiles: ${names}\n\nThis replaces the ${preview.replaces.profileCount} profile(s) currently saved in this browser. Download a backup first if you want to keep them.`,
+      `Load ${file.name}?\n\nIncoming: ${preview.profileCount} profile(s), ${preview.attemptCount} attempt(s), ${preview.reviewCount} review(s), ${preview.lessonPackCount} custom lesson set(s)\nProfiles: ${names}${lessonSets}\n\nThis replaces everything currently saved in this browser. Download a backup first if you want to keep it.`,
     );
     if (!confirmed) return;
     const result = store.importBackup(raw);
@@ -521,6 +533,25 @@ elements.backupFile.addEventListener("change", async () => {
     showToast(error instanceof Error ? error.message : String(error));
   } finally {
     elements.backupFile.value = "";
+  }
+});
+
+elements.lessonSetFile.addEventListener("change", async () => {
+  const file = elements.lessonSetFile.files?.[0];
+  if (!file) return;
+  try {
+    const raw = await file.text();
+    const preview = store.previewLessonPack(raw);
+    const confirmed = window.confirm(
+      `Install ${preview.name}?\n\n${preview.skillCount} skill(s) · ${preview.problemCount} problems\nAuthor: ${preview.author}\nVersion: ${preview.version}\n\nThe set will be added to the mastery map and embedded in future full backups. Download a progress backup first if you want a restore point before changing installed content.`,
+    );
+    if (!confirmed) return;
+    const result = store.importLessonPack(raw);
+    showToast(`${result.name} installed. ${result.totalSkillCount} skills are now available.`);
+  } catch (error) {
+    showToast(error instanceof Error ? error.message : String(error));
+  } finally {
+    elements.lessonSetFile.value = "";
   }
 });
 
@@ -540,6 +571,12 @@ document.addEventListener("click", (event) => {
   if (["start-suggested", "start-test", "retake"].includes(action.dataset.action)) store.startTest(action.dataset.skillId);
   if (action.dataset.action === "open-attempt") store.openAttempt(action.dataset.attemptId);
   if (action.dataset.action === "load-backup") elements.backupFile.click();
+  if (action.dataset.action === "load-lesson-set") elements.lessonSetFile.click();
+  if (action.dataset.action === "export-lesson-set") {
+    const packId = action.dataset.packId;
+    download(`${packId.toLowerCase().replaceAll("_", "-")}.json`, store.exportLessonPack(packId), "application/json");
+    showToast("Lesson-set source downloaded.");
+  }
   if (action.dataset.action === "download-csv") {
     const kind = action.dataset.kind;
     download(`quickmaths-${kind}.csv`, store.exportCsv(kind), "text/csv");
@@ -656,12 +693,20 @@ async function boot() {
   const response = await fetch("./curriculum-data.json");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
+  let agentManifest = {};
+  try {
+    const manifestResponse = await fetch("./agent-manifest.json");
+    if (manifestResponse.ok) agentManifest = await manifestResponse.json();
+  } catch {
+    // The tools still work if the optional human/machine-readable guide is unavailable.
+  }
   store = createQuickMathsStore({ storage: window.localStorage, curriculum });
   applyLocationRoute();
   store.subscribe(render);
   initClock();
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code>${name}</code>`).join("");
-  const bridge = await registerWebMcpTools(store);
+  document.querySelector("#tool-count").textContent = String(TOOL_NAMES.length);
+  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest);
   elements.bridgeCard.dataset.state = bridge.available && !bridge.error ? "ready" : bridge.error ? "warning" : "idle";
   elements.bridgeStatus.textContent = bridge.error ? "WebMCP partly connected" : bridge.available ? "Agent tools connected" : "Ready for a WebMCP browser";
   elements.bridgeDetail.textContent = bridge.error

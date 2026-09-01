@@ -1,0 +1,134 @@
+{
+  "format": "quickmaths.lesson-set",
+  "schema_version": "1.0",
+  "id": "PACK_PERSONAL_FINANCE",
+  "name": "Personal Finance Practice",
+  "description": "A small example set that applies percentage skills to discounts, tips, and tax.",
+  "author": "QuickMaths",
+  "version": "1.0.0",
+  "track": {
+    "id": "TRACK_PACK_PERSONAL_FINANCE",
+    "name": "Personal Finance Practice",
+    "domain": "Math",
+    "description": "Use percentages in everyday money decisions.",
+    "entry_skills": ["CUSTOM_FINANCE_DISCOUNTS"],
+    "exit_skills": ["CUSTOM_FINANCE_DISCOUNTS"],
+    "skills": ["CUSTOM_FINANCE_DISCOUNTS"]
+  },
+  "skills": [
+    {
+      "id": "CUSTOM_FINANCE_DISCOUNTS",
+      "name": "Discounts, tips, and tax",
+      "domain": "Math",
+      "subdomain": "Personal Finance",
+      "description": "Calculate percentage increases and decreases in practical money situations.",
+      "prerequisites": ["MATH_ARITH_005"],
+      "unlocks": [],
+      "tags": ["percent", "money", "discount", "tax"],
+      "mastery": {
+        "passing_score": 0.8,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "maybe",
+        "review_after_days_if_mastered": 7,
+        "review_after_days_if_learning": 2
+      },
+      "theory": "A percentage describes a part out of 100. Convert a percentage to a decimal before multiplying.\n\nDiscount: sale price = original price × (1 - discount rate).\n\nTip or tax: total = starting amount × (1 + rate).\n\nEstimate first so you can catch calculator or decimal-place mistakes.",
+      "examples": [
+        {
+          "prompt": "A €40 item is 25% off. What is the sale price?",
+          "solution": "€30",
+          "explanation": "25% of 40 is 10, so subtract 10 from 40. Equivalently, 40 × 0.75 = 30."
+        }
+      ],
+      "applications": [
+        {
+          "title": "Shopping",
+          "description": "Compare sale prices and decide whether a discount is actually useful."
+        },
+        {
+          "title": "Budgeting",
+          "description": "Estimate tax, tips, fees, and price increases before spending."
+        }
+      ],
+      "problems": [
+        {
+          "template_id": "CUSTOM_FINANCE_Q01",
+          "skill_id": "CUSTOM_FINANCE_DISCOUNTS",
+          "difficulty": "easy",
+          "prompt": "A €50 jacket is 20% off. Enter the sale price without the currency symbol.",
+          "expected_answer": "40",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": ["20% of 50 is 10. Subtract 10 from 50 to get 40."],
+          "mistake_tags": ["percent_conversion", "discount_direction"],
+          "answer_mode": "final_only",
+          "work": { "mode": "none" }
+        },
+        {
+          "template_id": "CUSTOM_FINANCE_Q02",
+          "skill_id": "CUSTOM_FINANCE_DISCOUNTS",
+          "difficulty": "medium",
+          "prompt": "A meal costs €24 before a 15% tip. Enter the total without the currency symbol.",
+          "expected_answer": "27.6",
+          "answer_type": "numeric",
+          "grading_method": "numeric_with_tolerance",
+          "tolerance": 0.01,
+          "solution_steps": ["Multiply 24 by 1.15 to include the original cost and the 15% tip: 27.60."],
+          "mistake_tags": ["percent_conversion", "increase_direction"],
+          "answer_mode": "final_only",
+          "work": { "mode": "none" }
+        },
+        {
+          "template_id": "CUSTOM_FINANCE_Q03",
+          "skill_id": "CUSTOM_FINANCE_DISCOUNTS",
+          "difficulty": "medium",
+          "prompt": "A €80 item has a 30% discount. How many euros are taken off?",
+          "expected_answer": "24",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": ["Convert 30% to 0.30, then multiply 80 by 0.30 to get 24."],
+          "mistake_tags": ["percent_conversion", "discount_amount"],
+          "answer_mode": "final_only",
+          "work": { "mode": "none" }
+        },
+        {
+          "template_id": "CUSTOM_FINANCE_Q04",
+          "skill_id": "CUSTOM_FINANCE_DISCOUNTS",
+          "difficulty": "hard",
+          "prompt": "A €120 purchase has 8% tax. Enter the final total without the currency symbol.",
+          "expected_answer": "129.6",
+          "answer_type": "numeric",
+          "grading_method": "numeric_with_tolerance",
+          "tolerance": 0.01,
+          "solution_steps": ["Multiply 120 by 1.08 to include the original price and 8% tax: 129.60."],
+          "mistake_tags": ["percent_conversion", "tax_direction"],
+          "answer_mode": "final_plus_required_work",
+          "work": {
+            "mode": "procedural_steps",
+            "prompt": "Show the tax calculation and final total, one expression per line.",
+            "minimum_steps": 2,
+            "require_final_answer_match": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_FINANCE_Q05",
+          "skill_id": "CUSTOM_FINANCE_DISCOUNTS",
+          "difficulty": "hard",
+          "prompt": "A €200 item is reduced by 15%, then the sale price is taxed by 10%. Enter the final price.",
+          "expected_answer": "187",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": ["Apply the discount: 200 × 0.85 = 170. Then apply tax: 170 × 1.10 = 187."],
+          "mistake_tags": ["successive_percentages", "operation_order"],
+          "answer_mode": "final_plus_required_work",
+          "work": {
+            "mode": "procedural_steps",
+            "prompt": "Show the discounted price and then the taxed total, one expression per line.",
+            "minimum_steps": 2,
+            "require_final_answer_match": true
+          }
+        }
+      ]
+    }
+  ]
+}

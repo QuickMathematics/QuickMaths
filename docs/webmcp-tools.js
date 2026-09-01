@@ -1,4 +1,5 @@
 export const TOOL_NAMES = Object.freeze([
+  "get_agent_guide",
   "get_app_state",
   "get_curriculum_map",
   "get_progress_summary",
@@ -33,8 +34,30 @@ function optionalString(input, key, maxLength) {
   return requiredString(input, key, maxLength);
 }
 
-export function buildToolDefinitions(store) {
+export function buildToolDefinitions(store, agentManifest = {}) {
+  const guide = agentManifest && typeof agentManifest === "object" && !Array.isArray(agentManifest)
+    ? JSON.parse(JSON.stringify(agentManifest))
+    : {};
   return [
+    {
+      name: "get_agent_guide",
+      title: "Get QuickMaths agent guide",
+      description: "Read the QuickMaths operating guide, tutoring rules, backup policy, routes, tools, and custom lesson-set format before assisting a learner.",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      async execute(input = {}) {
+        requireObject(input); rejectUnknown(input, []);
+        return {
+          ok: true,
+          guide: Object.keys(guide).length ? guide : {
+            app: "QuickMaths Web",
+            policy: ["Inspect state before acting.", "Never reveal pre-submission answer keys.", "Recommend a full JSON backup at natural stopping points and before imports."],
+            authoring_guide: "./CUSTOM_LESSON_SETS.md",
+            example_lesson_set: "./lesson-set-example.json",
+          },
+        };
+      },
+    },
     {
       name: "get_app_state",
       title: "Get QuickMaths app state",
@@ -53,6 +76,12 @@ export function buildToolDefinitions(store) {
           mastery_counts: state.progressCounts,
           selected_skill: state.activeProfile ? { skill_id: state.selectedSkill.id, name: state.selectedSkill.name } : null,
           suggested_next: state.suggested ? { skill_id: state.suggested.id, name: state.suggested.name, status: state.suggested.status } : null,
+          backup: {
+            last_export_at: state.backupStatus.lastExportAt,
+            recommended: state.backupStatus.recommended,
+            reason: state.backupStatus.reason,
+          },
+          custom_lesson_sets: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
         };
       },
     },
@@ -74,6 +103,7 @@ export function buildToolDefinitions(store) {
         return {
           ok: true,
           track: { id: state.curriculum.track.id, name: state.curriculum.track.name },
+          custom_lesson_sets: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
           skills: rows.map((row) => ({
             skill_id: row.id, name: row.name, subdomain: row.subdomain, status: row.status,
             mastery_score: row.masteryScore, prerequisites: row.prerequisites, unlocks: row.unlocks,
@@ -221,11 +251,11 @@ export function buildToolDefinitions(store) {
   ];
 }
 
-export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext) {
+export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext, agentManifest = {}) {
   if (!modelContext || typeof modelContext.registerTool !== "function") return { available: false, registered: [], error: null };
   const registered = [];
   try {
-    for (const definition of buildToolDefinitions(store)) {
+    for (const definition of buildToolDefinitions(store, agentManifest)) {
       await modelContext.registerTool(definition);
       registered.push(definition.name);
     }

@@ -7,6 +7,8 @@
     <meta name="theme-color" content="#f3eee3">
     <title>QuickMaths — Map your mastery</title>
     <link rel="icon" href="./quickmaths-logo.png">
+    <link rel="alternate" type="application/json" href="./agent-manifest.json" title="QuickMaths agent guide">
+    <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Custom lesson-set authoring guide">
     <link rel="stylesheet" href="./challenge.css">
     <script type="module" src="./challenge.js"></script>
   </head>
@@ -128,10 +130,10 @@
         </div>
         <div class="agent-prompt-card">
           <div class="mini-heading"><span>Suggested prompt</span><button id="copy-prompt" type="button">Copy</button></div>
-          <p id="agent-prompt">Look at my progress, open my map, choose the best next skill, take me to its lesson, and start its test.</p>
+          <p id="agent-prompt">Read the QuickMaths agent guide, check whether I need a backup, then look at my progress and choose the best next skill.</p>
         </div>
         <details class="agent-tools">
-          <summary><span>Available tools</span><strong id="tool-count">9</strong></summary>
+          <summary><span>Available tools</span><strong id="tool-count">10</strong></summary>
           <div id="tool-list"></div>
         </details>
         <section class="agent-activity" aria-labelledby="activity-title">
@@ -152,6 +154,7 @@
     </div>
 
     <input id="backup-file" type="file" accept="application/json,.json" hidden>
+    <input id="lesson-set-file" type="file" accept="application/json,.json" hidden>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   </body>
 </html>
