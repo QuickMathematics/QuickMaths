@@ -104,10 +104,48 @@ test("a new profile gets the real unlock graph and persistent session", () => {
   const profile = store.createProfile("Ada Learner");
   const state = store.snapshot();
   assert.equal(state.activeProfile.id, profile.id);
-  assert.equal(state.ui.route, "home");
+  assert.equal(state.ui.route, "tutorial");
+  assert.equal(state.ui.tutorialStep, 0);
+  assert.equal(state.activeProfile.tutorialCompletedAt, null);
   assert.equal(state.progressRows.find((row) => row.id === "MATH_ARITH_001").status, "ready");
   assert.equal(state.progressRows.find((row) => row.id === "MATH_SYS_001").status, "locked");
   assert.match(storage.value(STORAGE_KEY), /Ada Learner/);
+});
+
+test("new-profile tutorial can be stepped, skipped, replayed, and completed", () => {
+  const { store } = harness();
+  const profile = store.createProfile("Tour Learner");
+  store.setTutorialStep(3);
+  assert.equal(store.snapshot().ui.route, "tutorial");
+  assert.equal(store.snapshot().ui.tutorialStep, 3);
+  const skipped = store.completeTutorial({ skipped: true });
+  assert.equal(skipped.skipped, true);
+  assert.equal(store.snapshot().ui.route, "home");
+  assert.equal(store.snapshot().activeProfile.tutorialSkipped, true);
+  store.logout();
+  store.selectProfile(profile.id);
+  assert.equal(store.snapshot().ui.route, "home", "completed onboarding must not fire again when selecting the profile");
+  store.startTutorial();
+  assert.equal(store.snapshot().ui.route, "tutorial");
+  assert.equal(store.snapshot().ui.tutorialStep, 0);
+  store.setTutorialStep(99);
+  assert.equal(store.snapshot().ui.tutorialStep, 5);
+  store.completeTutorial();
+  assert.equal(store.snapshot().activeProfile.tutorialSkipped, false);
+});
+
+test("profiles from older saves are treated as already onboarded", () => {
+  const storage = memoryStorage({
+    [STORAGE_KEY]: JSON.stringify({
+      version: 4,
+      profiles: [{ id: "profile-old", displayName: "Existing Learner", createdAt: "2026-08-01T00:00:00.000Z" }],
+      activeProfileId: null,
+    }),
+  });
+  const store = createQuickMathsStore({ storage, curriculum, now: () => new Date("2026-09-01T09:41:00.000Z") });
+  store.selectProfile("profile-old");
+  assert.equal(store.snapshot().ui.route, "home");
+  assert.equal(store.snapshot().activeProfile.tutorialCompletedAt, "2026-08-01T00:00:00.000Z");
 });
 
 test("the demo profile arrives with visible progress and a suggested next step", () => {

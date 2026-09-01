@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 4;
+export const APP_VERSION = 5;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -29,7 +29,8 @@ export const STATUS_COLORS = Object.freeze({
 });
 
 const PROVEN = new Set(["proven", "mastered"]);
-const ROUTES = new Set(["welcome", "home", "map", "lesson", "test", "results", "data", "creator"]);
+const ROUTES = new Set(["welcome", "tutorial", "home", "map", "lesson", "test", "results", "data", "creator"]);
+const TUTORIAL_STEPS = 6;
 const MAX_ACTIVITY = 60;
 const MAX_ATTEMPTS = 500;
 const MAX_REVIEWS = 1000;
@@ -439,6 +440,7 @@ function initialState() {
       pendingResults: null,
       agentOpen: false,
       stagedLessonPack: null,
+      tutorialStep: 0,
     },
     session: null,
     activity: [],
@@ -450,14 +452,17 @@ function sanitizeProfile(candidate) {
   const id = cleanText(candidate.id, 100);
   const displayName = cleanText(candidate.displayName ?? candidate.display_name, 60);
   if (!id || !displayName) return null;
+  const createdAt = cleanText(candidate.createdAt, 40) || new Date().toISOString();
   return {
     id,
     displayName,
-    createdAt: cleanText(candidate.createdAt, 40) || new Date().toISOString(),
+    createdAt,
     totalLoggedSeconds: Math.floor(cleanNumber(candidate.totalLoggedSeconds, 0, 0, 100_000_000)),
     demo: Boolean(candidate.demo),
     activeSubjectId: SUBJECT_ID.test(candidate.activeSubjectId) ? candidate.activeSubjectId : DEFAULT_SUBJECT_ID,
     progressionMode: candidate.progressionMode === "soft" ? "soft" : "hard",
+    tutorialCompletedAt: candidate.tutorialCompletedAt === null ? null : cleanText(candidate.tutorialCompletedAt, 40) || createdAt,
+    tutorialSkipped: Boolean(candidate.tutorialSkipped),
   };
 }
 
@@ -671,6 +676,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       pendingResults: sanitizePendingResults(ui.pendingResults, skills),
       agentOpen: Boolean(ui.agentOpen),
       stagedLessonPack: null,
+      tutorialStep: Math.floor(cleanNumber(Number(ui.tutorialStep), 0, 0, TUTORIAL_STEPS - 1)),
     },
     session: candidate.session && profileIds.has(candidate.session.profileId)
       ? {
@@ -700,7 +706,7 @@ function migrateLegacy(storage, curriculum) {
     if (!legacy || typeof legacy !== "object") return null;
     const state = initialState();
     const now = new Date().toISOString();
-    const profile = { id: "profile-migrated-demo", displayName: "Demo Learner", createdAt: now, totalLoggedSeconds: 0, demo: true, activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard" };
+    const profile = { id: "profile-migrated-demo", displayName: "Demo Learner", createdAt: now, totalLoggedSeconds: 0, demo: true, activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", tutorialCompletedAt: now, tutorialSkipped: false };
     state.profiles = [profile];
     state.activeProfileId = profile.id;
     state.ui.route = "home";
@@ -1233,7 +1239,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       state.ui.selectedSkillId = firstSkill;
       state.ui.selectedMapSkillId = firstSkill;
     }
-    state.ui.route = "home";
+    state.ui.route = activeProfile()?.tutorialCompletedAt ? "home" : "tutorial";
+    state.ui.tutorialStep = 0;
     state.ui.pendingResults = null;
     startSession(profileId);
     addActivity("select_profile", "Opened a learner profile.");
@@ -1243,7 +1250,10 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
   const createProfile = (displayName, { demo = false } = {}) => {
     const name = cleanText(displayName, 60);
     if (name.length < 2) throw new Error("Profile name must contain at least 2 characters.");
-    const profile = { id: makeId("profile"), displayName: name, createdAt: isoNow(), totalLoggedSeconds: 0, demo, activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard" };
+    const profile = {
+      id: makeId("profile"), displayName: name, createdAt: isoNow(), totalLoggedSeconds: 0, demo,
+      activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", tutorialCompletedAt: null, tutorialSkipped: false,
+    };
     state.profiles.push(profile);
     state.progress[profile.id] = {};
     state.drafts[profile.id] = {};
@@ -1292,6 +1302,35 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     state.ui.route = route;
     addActivity("navigate_learning_app", `Opened ${route}${skillId ? ` for ${skillId}` : ""}.`);
     notify();
+  };
+
+  const startTutorial = () => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    state.ui.route = "tutorial";
+    state.ui.tutorialStep = 0;
+    addActivity("start_tutorial", "Opened the QuickMaths app tour.");
+    notify();
+  };
+
+  const setTutorialStep = (step) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    state.ui.route = "tutorial";
+    state.ui.tutorialStep = Math.floor(cleanNumber(Number(step), 0, 0, TUTORIAL_STEPS - 1));
+    persist();
+    const view = snapshot();
+    listeners.forEach((listener) => listener(view));
+  };
+
+  const completeTutorial = ({ skipped = false } = {}) => {
+    const profile = activeProfile();
+    if (!profile) throw new Error("Select a profile first.");
+    profile.tutorialCompletedAt = isoNow();
+    profile.tutorialSkipped = Boolean(skipped);
+    state.ui.tutorialStep = 0;
+    state.ui.route = "home";
+    addActivity(skipped ? "skip_tutorial" : "complete_tutorial", skipped ? "Skipped the app tour." : "Completed the app tour.");
+    notify();
+    return { ok: true, skipped: Boolean(skipped), completed_at: profile.tutorialCompletedAt };
   };
 
   const selectMapSkill = (skillId) => {
@@ -1792,6 +1831,9 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     selectProfile,
     logout,
     navigate,
+    startTutorial,
+    setTutorialStep,
+    completeTutorial,
     selectMapSkill,
     setLearningPreferences,
     startTest,

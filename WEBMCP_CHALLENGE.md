@@ -7,6 +7,7 @@ The app requires no OpenAI API key and sends no learner data to an application s
 ## Product surface
 
 - Original logo landing page with multiple learner profiles and sample progress
+- Six-chapter onboarding tour for every new profile, with skip and persistent replay controls
 - Dashboard metrics, suggested next work, recent attempts, and continue flow
 - Full 25-skill Algebra Foundations prerequisite/mastery map
 - Theory, applications, prerequisites, unlocks, and worked examples for every skill

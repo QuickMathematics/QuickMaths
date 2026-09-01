@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 4,
+  "app_version": 5,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app.",
   "homepage": "https://srednjak.github.io/QuickMaths/",
   "discovery": {
@@ -30,6 +30,7 @@
     ],
     "navigation": [
       "Use navigate_learning_app and start_skill_test so agent changes remain visible in the human interface.",
+      "If the visible route is tutorial, let the human complete or skip onboarding; do not silently navigate them away from it.",
       "Respect the learner's path mode: Hard path enforces prerequisites; Open path treats the same connections as recommended preparation.",
       "Use list_subjects and set_learning_preferences when changing subject or path mode so the human sees the change.",
       "Do not replace or reset learner data through ordinary browser actions."
@@ -56,7 +57,7 @@
     "avoid_nagging": "Recommend once at a natural stopping point unless data is at immediate risk. Do not interrupt every question.",
     "never_claim_downloaded": "A backup is downloaded only after the human activates the download and the app reports it."
   },
-  "routes": ["home", "map", "lesson", "test", "results", "creator", "data"],
+  "routes": ["tutorial", "home", "map", "lesson", "test", "results", "creator", "data"],
   "tools": [
     "get_agent_guide",
     "get_app_state",

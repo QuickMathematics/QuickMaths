@@ -69,7 +69,7 @@ test("app, curriculum, and progress tools expose the full learner state", async 
   const map = await tools.get_curriculum_map.execute({ include_locked: true });
   const summary = await tools.get_progress_summary.execute({});
   assert.equal(app.has_profile, true);
-  assert.equal(app.view, "home");
+  assert.equal(app.view, "tutorial");
   assert.equal(map.skills.length, 25);
   assert.equal(summary.skills.length, 25);
   assert.equal(summary.suggested_next.skill_id, "MATH_ARITH_001");

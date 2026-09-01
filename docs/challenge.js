@@ -91,6 +91,85 @@ function statusChip(status) {
   return `<span class="status-chip" style="--status-color:${STATUS_COLORS[status] ?? STATUS_COLORS.locked}">${escapeHtml(status)}</span>`;
 }
 
+const TUTORIAL_STEPS = [
+  {
+    eyebrow: "Your learning workspace",
+    title: "Welcome to QuickMaths.",
+    lede: "This is a mastery map, lesson library, testing room, tutor workspace, and portable learning record—all running locally in your browser.",
+    points: ["Your profile keeps progress separate from other learners.", "Work autosaves on this device as you learn.", "A full JSON backup moves everything without an account."],
+    tip: "You can leave the tour at any time. Replay it later from the left sidebar.",
+    visual: "welcome",
+  },
+  {
+    eyebrow: "Subjects and learning paths",
+    title: "Choose what to learn—and how strict the path should be.",
+    lede: "The controls in the left sidebar shape the curriculum you see. Custom lesson sets can extend Mathematics or add entirely new subjects with their own colors.",
+    points: ["Subject switches the dashboard, map, lessons, and theme.", "Hard path locks tests until prerequisites are proven.", "Open path keeps the same connections as guidance but opens every test."],
+    tip: "The subject and path choice belongs to this profile and travels inside backups.",
+    visual: "subjects",
+  },
+  {
+    eyebrow: "The mastery map",
+    title: "Read the map before picking your next lesson.",
+    lede: "Every node is a skill. Connections show prerequisite knowledge—including bridges that can reach into another subject.",
+    points: ["Ready means the test is available.", "Learning means you started but have not proven mastery yet.", "Proven and mastered unlock later work; rusty means review is due."],
+    tip: "Select any map node to see mastery, confidence, attempts, prerequisites, and what it unlocks.",
+    visual: "map",
+  },
+  {
+    eyebrow: "The learning loop",
+    title: "Learn, test, reflect, then review.",
+    lede: "QuickMaths does more than mark a final answer. It can collect shown work, check algebraic steps, route proofs through review, and use your reflection when updating mastery.",
+    points: ["Lessons provide theory, applications, and worked examples.", "Tests draw up to five questions and preserve unfinished answers.", "Results include solutions; reflection records confidence, guessing, and difficulty."],
+    tip: "Proof and rubric questions stay in Learning until their required review passes.",
+    visual: "loop",
+  },
+  {
+    eyebrow: "Agent-assisted learning",
+    title: "Bring a tutor into the same live workspace.",
+    lede: "In a compatible Codex or ChatGPT browser, the agent sees narrow QuickMaths tools—not your browser storage or hidden answer keys. Its visible actions use the same app state you do.",
+    points: ["Ask it to inspect your progress and recommend the next skill.", "Let it inspect only the work visible in an active test.", "It can save Socratic feedback and prepare targeted follow-up practice."],
+    tip: "Use the sparkle button to open Agent Studio and see connected tools plus a starter prompt.",
+    visual: "agent",
+  },
+  {
+    eyebrow: "Ownership and creation",
+    title: "Your progress and curriculum stay yours.",
+    lede: "Save & load handles portable backups and exports. Lesson Studio lets humans build entire subjects without coding, while agents can validate and stage lesson sets for your approval.",
+    points: ["Download a full backup at natural stopping points.", "Load custom lessons into the same map, testing, and progress pipeline.", "Use Lesson Studio for themes, bridges, graders, proofs, rubrics, and multiple lessons."],
+    tip: "Agents can stage a lesson set, but only a human can click Install.",
+    visual: "ownership",
+  },
+];
+
+function tutorialVisual(type, snapshot) {
+  if (type === "welcome") return `<div class="tour-profile-preview"><img src="./quickmaths-logo.png" alt="" width="88" height="82"><div><span>Profile ready</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>Autosaving on this device</small></div><i>✓</i></div><div class="tour-local-row"><span>Free</span><span>Local-first</span><span>No account</span></div>`;
+  if (type === "subjects") return `<div class="tour-subject-preview"><p>Visible subject</p><div><span>${escapeHtml(snapshot.activeSubject.icon)}</span><strong>${escapeHtml(snapshot.activeSubject.name)}</strong><b>⌄</b></div></div><div class="tour-mode-preview"><article class="${snapshot.progressionMode === "hard" ? "is-active" : ""}"><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small></article><article class="${snapshot.progressionMode === "soft" ? "is-active" : ""}"><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small></article></div>`;
+  if (type === "map") return `<div class="tour-map-preview"><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
+  if (type === "loop") return `<div class="tour-loop-preview"><article><span>01</span><b>Read</b><small>Theory and examples</small></article><i>→</i><article><span>02</span><b>Test</b><small>Answers and shown work</small></article><i>→</i><article><span>03</span><b>Reflect</b><small>Confidence and difficulty</small></article><i>→</i><article><span>04</span><b>Review</b><small>Mastery and next date</small></article></div><div class="tour-work-preview"><code>2x + 5 = 13<br>2x = 8<br>x = 4</code><span>Step check passed</span></div>`;
+  if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent studio</small><strong>Tutor in the loop</strong></div><i>Connected</i></div><p>“Check my progress, choose the best next lesson, and tutor from the work I show.”</p><div class="tour-tool-row"><code>get_progress_summary</code><code>inspect_student_work</code><code>record_tutor_feedback</code></div><button class="button button-secondary" type="button" data-tutorial-action="open-agent">Open Agent Studio</button></div>`;
+  return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, subjects, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>✎</span><div><strong>Human Lesson Creator</strong><small>No-code subjects, bridges, questions, proofs, and rubrics</small></div><b>Studio</b></article></div>`;
+}
+
+function renderTutorial(snapshot) {
+  const stepIndex = Math.max(0, Math.min(TUTORIAL_STEPS.length - 1, Number(snapshot.ui.tutorialStep ?? 0)));
+  const step = TUTORIAL_STEPS[stepIndex];
+  const last = stepIndex === TUTORIAL_STEPS.length - 1;
+  elements.view.innerHTML = `
+    <section class="app-tour" aria-labelledby="tutorial-title">
+      <header class="tour-topbar"><a class="tour-brand" href="#/tutorial"><img src="./quickmaths-logo.png" alt="" width="48" height="45"><span>QuickMaths tour</span></a><div><span>${stepIndex + 1} of ${TUTORIAL_STEPS.length}</span><button class="quiet-button" type="button" data-tutorial-action="skip">Skip tutorial</button></div></header>
+      <div class="tour-progress" aria-hidden="true"><i style="width:${((stepIndex + 1) / TUTORIAL_STEPS.length) * 100}%"></i></div>
+      <div class="tour-layout">
+        <nav class="tour-steps" aria-label="Tutorial chapters">${TUTORIAL_STEPS.map((item, index) => `<button type="button" data-tutorial-step="${index}" class="${index === stepIndex ? "is-active" : ""} ${index < stepIndex ? "is-complete" : ""}" aria-current="${index === stepIndex ? "step" : "false"}"><span>${index < stepIndex ? "✓" : String(index + 1).padStart(2, "0")}</span><div><strong>${escapeHtml(item.eyebrow)}</strong><small>${escapeHtml(item.title)}</small></div></button>`).join("")}</nav>
+        <article class="tour-stage">
+          <div class="tour-copy"><p class="eyebrow">${escapeHtml(step.eyebrow)}</p><h1 id="tutorial-title">${escapeHtml(step.title)}</h1><p class="tour-lede">${escapeHtml(step.lede)}</p><ul>${step.points.map((point) => `<li><span>✓</span>${escapeHtml(point)}</li>`).join("")}</ul><aside><span>Good to know</span><p>${escapeHtml(step.tip)}</p></aside></div>
+          <div class="tour-visual">${tutorialVisual(step.visual, snapshot)}</div>
+          <footer class="tour-actions">${stepIndex ? `<button class="button button-outline" type="button" data-tutorial-action="back">← Back</button>` : `<span></span>`}<div>${!last ? `<button class="quiet-button" type="button" data-tutorial-action="skip">Skip for now</button><button class="button button-primary" type="button" data-tutorial-action="next">Next chapter →</button>` : `<button class="button button-outline" type="button" data-tutorial-action="finish-creator">Finish in Lesson Studio</button><button class="button button-primary" type="button" data-tutorial-action="finish">Finish tour · Open dashboard</button>`}</div></footer>
+        </article>
+      </div>
+    </section>`;
+}
+
 function renderDashboard(snapshot) {
   const counts = snapshot.progressCounts;
   const attempts = snapshot.attempts.slice(0, 5);
@@ -472,6 +551,7 @@ function render(snapshot) {
   renderActivity(snapshot.activity);
   syncNavigation(snapshot.ui.route);
   if (snapshot.ui.route === "home") renderDashboard(snapshot);
+  else if (snapshot.ui.route === "tutorial") renderTutorial(snapshot);
   else if (snapshot.ui.route === "map") renderMap(snapshot);
   else if (snapshot.ui.route === "lesson") renderLesson(snapshot);
   else if (snapshot.ui.route === "test") renderTest(snapshot);
@@ -496,7 +576,7 @@ function applyLocationRoute() {
     try { store.logout(); } finally { applyingHistory = false; }
     return;
   }
-  if (!["home", "map", "lesson", "test", "results", "data", "creator"].includes(route)) return;
+  if (!["tutorial", "home", "map", "lesson", "test", "results", "data", "creator"].includes(route)) return;
   const selectedSkill = skillId && store.skillsById[skillId] ? skillId : null;
   if (state.ui.route === route && (!selectedSkill || state.ui.selectedSkillId === selectedSkill)) return;
   applyingHistory = true;
@@ -539,6 +619,7 @@ elements.profiles.addEventListener("click", (event) => {
 });
 
 document.querySelector("#logout-button").addEventListener("click", () => store.logout());
+document.querySelector("#replay-tutorial").addEventListener("click", () => store.startTutorial());
 document.querySelector("#welcome-load").addEventListener("click", () => elements.backupFile.click());
 
 elements.backupFile.addEventListener("change", async () => {
@@ -590,6 +671,22 @@ elements.creatorFile.addEventListener("change", async () => {
 });
 
 document.addEventListener("click", (event) => {
+  const tutorialStep = event.target.closest?.("[data-tutorial-step]");
+  if (tutorialStep && currentSnapshot?.ui.route === "tutorial") {
+    store.setTutorialStep(Number(tutorialStep.dataset.tutorialStep));
+    return;
+  }
+  const tutorialAction = event.target.closest?.("[data-tutorial-action]");
+  if (tutorialAction && currentSnapshot?.ui.route === "tutorial") {
+    const action = tutorialAction.dataset.tutorialAction;
+    if (action === "next") store.setTutorialStep(currentSnapshot.ui.tutorialStep + 1);
+    if (action === "back") store.setTutorialStep(currentSnapshot.ui.tutorialStep - 1);
+    if (action === "skip") { store.completeTutorial({ skipped: true }); showToast("Tour skipped. Replay it anytime from the sidebar."); }
+    if (action === "finish") { store.completeTutorial(); showToast("Tour complete. Welcome to QuickMaths."); }
+    if (action === "finish-creator") { store.completeTutorial(); store.navigate("creator"); }
+    if (action === "open-agent") elements.agentDock.classList.add("is-open");
+    return;
+  }
   const creatorAction = event.target.closest?.("[data-creator-action]");
   if (creatorAction && currentSnapshot?.ui.route === "creator") {
     event.preventDefault();
