@@ -30,6 +30,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
   const js = readFileSync(new URL("./challenge.js", import.meta.url), "utf8");
   const css = readFileSync(new URL("./challenge.css", import.meta.url), "utf8");
+  const community = readFileSync(new URL("./github-community.js", import.meta.url), "utf8");
+  const communityCallback = readFileSync(new URL("./community-auth.html", import.meta.url), "utf8");
   assert.match(html, /data-route="settings"/);
   assert.match(html, /data-route="depot"/);
   assert.match(js, /renderLessonDepot/);
@@ -66,6 +68,15 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /createGitHubSyncController/);
   assert.match(js, /id="github-sync-form"/);
   assert.match(js, /\.\/agent-bridge\.html/);
+  assert.match(js, /data-depot-action="community-vote"/);
+  assert.match(js, /id="community-comment-form"/);
+  assert.match(css, /\.depot-community-panel/);
+  assert.match(community, /addUpvote/);
+  assert.match(community, /removeUpvote/);
+  assert.match(community, /addDiscussionComment/);
+  assert.match(community, /quickmaths\.github-community\.credential\.session/);
+  assert.doesNotMatch(community, /client_secret/);
+  assert.match(communityCallback, /community-auth\.js/);
 });
 
 test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {

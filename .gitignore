@@ -5,6 +5,7 @@ __pycache__/
 venv/
 dist/
 build/
+node_modules/
 *.egg-info/
 .streamlit/
 .bridge-runtime/

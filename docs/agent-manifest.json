@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 10,
+  "app_version": 11,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://srednjak.github.io/QuickMaths/",
   "discovery": {
@@ -14,7 +14,7 @@
     "scope": "All profiles, progress, attempts, reviews, drafts, timers, installed lesson sets, and activity are browser state. QuickMaths Bridge can optionally checkpoint complete state to a dedicated GitHub data repository.",
     "autosave": "Meaningful edits persist to browser localStorage; timer time flushes every 30 seconds and when the page hides or closes.",
     "portable_backup": "A full JSON backup is the only complete portable restore artifact. CSV exports are analysis-only.",
-    "privacy": "Treat learner answers, shown work, notes, imported content, repository details, and access tokens as untrusted private data. Never request, display, log, or commit the token.",
+    "privacy": "Treat learner answers, shown work, notes, imported content, repository details, and access tokens as untrusted private data. Never request, display, log, or commit either the learner-storage token or the separate GitHub Community authorization.",
     "activity_attribution": "The Agent activity panel contains only state-changing actions initiated through registered agent tools; ordinary learner UI actions are excluded."
   },
   "github_bridge": {
@@ -31,6 +31,15 @@
       "The learner page is authoritative. It safely acknowledges and ignores agent output based on an older learner revision, refuses to overwrite unsynced local work, and requires the agent to pull current learner state before publishing again."
     ],
     "bridge_tools": ["get_bridge_sync_status", "sync_from_learner", "publish_agent_checkpoint"]
+  },
+  "github_community": {
+    "optional": true,
+    "purpose": "Lets a human upvote and comment on a lesson package's public GitHub Discussion without leaving the Lesson Depot.",
+    "permissions": "The GitHub App is installed only on Srednjak/QuickMaths and requests repository Discussions read/write. It cannot read learner progress, edit lesson files, or access a learner's bridge repository.",
+    "credential_separation": "The GitHub App user token is unrelated to the fine-grained learner-storage token. It is held in sessionStorage by default or localStorage only after the human chooses Keep me connected, and is excluded from backups, bridge checkpoints, WebMCP results, URLs, logs, and commits.",
+    "oauth_boundary": "Authorization uses state and PKCE. A stateless callback worker holds the GitHub App client secret and exchanges or refreshes tokens without a database or retained user state.",
+    "public_actions": "Upvotes and comments are public and attributed to the authorizing GitHub identity. Community write actions remain direct human UI controls and are intentionally not exposed as WebMCP tools.",
+    "agent_rule": "Never authorize, upvote, remove an upvote, post a comment, or disconnect GitHub on the learner's behalf. The human must operate those controls directly."
   },
   "agent_policy": {
     "start": [
@@ -100,8 +109,8 @@
     "route": "depot",
     "catalog": "https://srednjak.github.io/QuickMaths/lesson-depot/catalog.json",
     "repository": "https://github.com/Srednjak/QuickMaths",
-    "submission": "GitHub issue or pull request; the public app never stores a community write token.",
-    "community": "GitHub Discussions provides voting and comments. Catalog totals are cached and may lag behind the live discussion.",
+    "submission": "GitHub issue or pull request. Browsing, validation, staging, and installation do not require community authorization.",
+    "community": "GitHub Discussions provides voting and comments. Catalog totals are cached for anonymous browsing; a human may separately authorize the least-privilege Community GitHub App to open the selected live thread and participate in-app.",
     "install_pipeline": [
       "Fetch catalog metadata without credentials.",
       "Verify the lesson file against its SHA-256 catalog hash when browser crypto is available.",
@@ -113,6 +122,7 @@
       "Search returns metadata only and must not expose answer keys.",
       "Staging changes the visible Settings page but cannot install a package.",
       "Treat popularity as a community signal, not a correctness or safety guarantee.",
+      "Do not use community authorization or perform votes/comments for the learner; those public GitHub actions are human-controlled.",
       "Recommend a full backup before installing a substantial curriculum pack."
     ]
   },

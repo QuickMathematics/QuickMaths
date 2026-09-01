@@ -305,7 +305,7 @@ For community lessons, agents can call `search_lesson_depot` to inspect catalog 
 
 ## Publishing to the Lesson Depot
 
-The public Depot uses this repository as its free backend. Lesson files and catalog hashes live in Git, automated checks run in GitHub Actions, pull requests provide moderation history, and GitHub Discussions provide votes and comments. QuickMaths never asks for a community GitHub token.
+The public Depot uses this repository as its free backend. Lesson files and catalog hashes live in Git, automated checks run in GitHub Actions, pull requests provide moderation history, and GitHub Discussions provide votes and comments. Browsing and installation require no sign-in. To vote or comment inside QuickMaths, a user can authorize the separate least-privilege QuickMaths Community GitHub App; no personal access token is requested, and its user token never enters learner storage or backups.
 
 From Lesson Studio, choose **Publish to Lesson Depot** after validation. QuickMaths downloads the author file, copies a detailed Codex publishing prompt when clipboard access is available, and opens the submission form. A direct source contribution uses:
 

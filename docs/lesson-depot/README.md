@@ -1,6 +1,6 @@
 # QuickMaths Lesson Depot
 
-The Lesson Depot is a zero-cost, open-source catalog of declarative QuickMaths lesson sets. The browser never receives a GitHub write token: anyone can browse and install, while submissions use pull requests and community voting/comments use GitHub Discussions.
+The Lesson Depot is a zero-cost, open-source catalog of declarative QuickMaths lesson sets. Anyone can browse and install without signing in. Submissions use pull requests, while an optional least-privilege GitHub App lets a signed-in user upvote and comment on the matching GitHub Discussion from inside QuickMaths.
 
 ## Package layout
 
@@ -26,7 +26,7 @@ cd docs
 npm test
 ```
 
-The catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. A least-privilege Action creates a matching GitHub Discussion titled `[Lesson] PACK_ID` for each accepted catalog entry, then materializes its 👍 reaction and comment totals into `community.json`; the public app never spends GitHub API quota per page view.
+The catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. A least-privilege Action creates a matching GitHub Discussion titled `[Lesson] PACK_ID` for each accepted catalog entry, then materializes its upvote and comment totals into `community.json` for anonymous browsing. Connected users fetch the selected live thread only when they open its community panel.
 
 ## Community flow
 
@@ -35,5 +35,11 @@ The catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks th
 3. Automated checks verify the package and deterministic catalog.
 4. Maintainers review and merge.
 5. A matching GitHub Discussion carries votes, comments, questions, and future update notes.
+
+## In-app community authorization
+
+The Community GitHub App is installed only on `Srednjak/QuickMaths` and requests only repository Discussions read/write. The user access token is separate from the optional learner-storage bridge token. QuickMaths keeps it in `sessionStorage` by default, or in `localStorage` only when the user explicitly chooses to remain connected. It is never placed in a lesson file, learner backup, WebMCP response, URL, or Git commit.
+
+The static callback uses the OAuth authorization-code flow with state and PKCE. A free, stateless Cloudflare Worker holds the GitHub App client secret and performs only code exchange and token refresh; it has no database and retains no user token. Comments and upvotes are public GitHub actions attributed to the authorizing GitHub account. Disconnecting clears the browser copy, and GitHub authorization can also be revoked from GitHub settings.
 
 Answer keys are necessarily present in author packages. Do not paste raw lesson files into learner tutoring conversations or reveal solutions before submission.

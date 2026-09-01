@@ -14,6 +14,10 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
 } from "./github-sync.js?v=20260901-bridge-fix";
+import {
+  createGitHubCommunityClient,
+  createGitHubCommunityCredentialStore,
+} from "./github-community.js?v=20260901-community";
 
 const elements = {
   loading: document.querySelector("#loading-screen"),
@@ -49,10 +53,12 @@ let routeHistoryReady = false;
 let applyingHistory = false;
 let lessonStudio;
 let lessonDepot;
+let githubCommunity;
 let githubSync;
 let githubCredentials;
 let githubSyncSnapshot = { phase: "disconnected", connected: false, dirty: false, remoteAvailable: false, config: null, error: null, conflict: null };
 let bridgeNeedsChoice = false;
+const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
 
 const AGENT_STARTER_PROMPT = "Read the QuickMaths agent guide first. Check the current app state and whether I should make a backup. Review my active subject, learning path, mastery map, recent attempts, mistake tags, and any work currently visible. Recommend one best next skill and briefly explain why. If I choose it, open the lesson or test and tutor Socratically: inspect only visible work, give one hint or question at a time, never reveal answer keys before submission, save concise feedback when useful, and remind me to back up at a natural stopping point.";
 const MAP_ZOOM_MIN = 0.1;
@@ -854,15 +860,80 @@ function renderLessonHubTabs(activeRoute) {
   return `<nav class="lesson-hub-tabs" aria-label="Lesson Depot and Studio"><span>Lessons hub</span><div><button type="button" data-route="depot" aria-current="${activeRoute === "depot" ? "page" : "false"}"><b>◇</b> Browse Depot</button><button type="button" data-route="creator" aria-current="${activeRoute === "creator" ? "page" : "false"}"><b>✎</b> Create in Studio</button></div></nav>`;
 }
 
+function communityConnection() {
+  return githubCommunity?.snapshot?.() ?? { configured: false, connected: false, remembered: false, viewer: null };
+}
+
+function formatCommunityDate(value) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "Recently";
+  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
+}
+
+function renderCommunityComment(comment) {
+  const body = escapeHtml(comment.body).replaceAll("\n", "<br>");
+  return `<article class="community-comment"><div class="community-comment-avatar" aria-hidden="true">${escapeHtml(comment.author.slice(0, 1).toUpperCase() || "?")}</div><div><header><strong>${escapeHtml(comment.author)}</strong>${comment.viewerDidAuthor ? "<span>You</span>" : ""}<time datetime="${escapeHtml(comment.createdAt)}">${escapeHtml(formatCommunityDate(comment.createdAt))}</time></header><p>${body}</p><a href="${escapeHtml(comment.url)}" target="_blank" rel="noopener">View on GitHub ↗</a></div></article>`;
+}
+
+function renderDepotCommunityPanel() {
+  const pack = communityUi.activePack;
+  if (!pack) return "";
+  const connection = communityConnection();
+  const external = `<a class="button button-outline" href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener">Open on GitHub ↗</a>`;
+  let content = "";
+  if (!connection.configured) {
+    content = `<div class="community-connect-copy"><p class="eyebrow">GitHub Discussions</p><h2>Vote and discuss this lesson.</h2><p>In-app participation is being connected. The complete discussion remains available on GitHub.</p><div>${external}</div></div>`;
+  } else if (!connection.connected) {
+    content = `<div class="community-connect-copy"><p class="eyebrow">One-time connection</p><h2>Join the discussion without leaving QuickMaths.</h2><p>GitHub will ask you to authorize the QuickMaths Community App. It can participate only in this repository’s Discussions—it cannot read learner progress, alter lessons, or access the separate storage bridge.</p>${communityUi.connectionError ? `<p class="community-error" role="alert">${escapeHtml(communityUi.connectionError)}</p>` : ""}<label class="community-remember"><input id="community-remember" type="checkbox"><span><strong>Keep me connected on this device</strong><small>Otherwise the authorization lasts only in this browser tab.</small></span></label><div><button class="button button-primary" type="button" data-depot-action="community-connect">Authorize with GitHub</button>${external}</div></div>`;
+  } else if (communityUi.phase === "loading") {
+    content = `<div class="community-loading"><span class="depot-spinner" aria-hidden="true"></span><strong>Loading the live discussion…</strong><small>Signed in as ${escapeHtml(connection.viewer?.login ?? "a GitHub user")}</small></div>`;
+  } else if (communityUi.phase === "error") {
+    content = `<div class="community-connect-copy"><p class="eyebrow">Discussion unavailable</p><h2>GitHub did not return this conversation.</h2><p class="community-error" role="alert">${escapeHtml(communityUi.error)}</p><div><button class="button button-primary" type="button" data-depot-action="community-refresh">Try again</button>${external}</div></div>`;
+  } else if (communityUi.discussion) {
+    const discussion = communityUi.discussion;
+    content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. Comments are public and Markdown works when viewed on GitHub.</p></div><button class="community-vote-button" type="button" data-depot-action="community-vote" aria-pressed="${discussion.viewerHasVoted}" ${communityUi.busy ? "disabled" : ""}><span>▲</span><strong>${discussion.viewerHasVoted ? "Upvoted" : "Upvote"}</strong><small>${discussion.votes} vote${discussion.votes === 1 ? "" : "s"}</small></button></div><div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, or experience with this lesson…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
+  }
+  return `<aside class="depot-community-panel" id="depot-community-panel"><header><div><span>Community</span><strong>${escapeHtml(pack.name)}</strong></div><button class="quiet-button" type="button" data-depot-action="community-close" aria-label="Close lesson discussion">Close ×</button></header>${content}<footer><span>Community authorization is separate from learner storage.</span>${connection.connected ? `<button class="quiet-button danger-link" type="button" data-depot-action="community-disconnect">Disconnect GitHub</button>` : ""}</footer></aside>`;
+}
+
+function rerenderDepotCommunity() {
+  if (currentSnapshot?.activeProfile && currentSnapshot.ui.route === "depot") renderLessonDepot(store.snapshot());
+}
+
+async function loadDepotDiscussion() {
+  if (!githubCommunity?.configured || !communityUi.activePack) return;
+  communityUi.phase = "loading"; communityUi.error = ""; communityUi.discussion = null; rerenderDepotCommunity();
+  try {
+    communityUi.discussion = await githubCommunity.loadDiscussion(communityUi.activePack.discussionUrl);
+    communityUi.phase = "ready";
+  } catch (error) {
+    communityUi.phase = "error";
+    communityUi.error = error instanceof Error ? error.message : String(error);
+  }
+  rerenderDepotCommunity();
+  document.querySelector("#depot-community-panel")?.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+async function openDepotCommunity(packId, packVersion) {
+  const pack = lessonDepot?.snapshot().catalog?.packages.find((item) => item.id === packId && item.version === packVersion);
+  if (!pack) throw new Error("Lesson package discussion was not found.");
+  communityUi.activePack = pack; communityUi.discussion = null; communityUi.commentDraft = ""; communityUi.error = ""; communityUi.phase = "idle";
+  rerenderDepotCommunity();
+  if (communityConnection().connected) await loadDepotDiscussion();
+  else document.querySelector("#depot-community-panel")?.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
 function renderLessonDepot(snapshot) {
   const depot = lessonDepot?.snapshot() ?? { phase: "loading", catalog: null, error: "", query: "", sort: "popular", subject: "all", preview: null, installingId: "" };
   const packages = filterDepotPackages(depot.catalog?.packages ?? [], depot);
   const subjects = [...new Map((depot.catalog?.packages ?? []).map((pack) => [pack.subjectId, pack.subjectName])).entries()];
   const installedById = new Map(snapshot.lessonPacks.map((pack) => [pack.id, pack]));
   const preview = depot.preview;
+  const connection = communityConnection();
   elements.view.innerHTML = `
     ${renderLessonHubTabs("depot")}
-    <header class="page-head depot-head"><div><p class="eyebrow">Free · open · community reviewed</p><h1>Lesson Depot</h1><p>Find complete subjects and lesson packs made by the QuickMaths community. Every download is hash-checked and run through the same local validator before you can install it.</p></div><div class="page-actions"><a class="button button-outline" href="${DEPOT_DISCUSSIONS_URL}" target="_blank" rel="noopener">Community ↗</a><a class="button button-primary" href="${DEPOT_SUBMISSION_URL}" target="_blank" rel="noopener">Submit a lesson ↗</a></div></header>
+    <header class="page-head depot-head"><div><p class="eyebrow">Free · open · community reviewed</p><h1>Lesson Depot</h1><p>Find complete subjects and lesson packs made by the QuickMaths community. Every download is hash-checked and run through the same local validator before you can install it.</p></div><div class="page-actions">${connection.configured ? `<button class="button ${connection.connected ? "button-secondary" : "button-outline"}" type="button" data-depot-action="community-connect">${connection.connected ? `GitHub · ${escapeHtml(connection.viewer?.login ?? "connected")}` : "Connect GitHub"}</button>` : `<a class="button button-outline" href="${DEPOT_DISCUSSIONS_URL}" target="_blank" rel="noopener">Community ↗</a>`}<a class="button button-primary" href="${DEPOT_SUBMISSION_URL}" target="_blank" rel="noopener">Submit a lesson ↗</a></div></header>
+    ${renderDepotCommunityPanel()}
     <section class="depot-trust-strip" aria-label="Lesson Depot safety model"><span><b>1</b><strong>Authors submit</strong><small>GitHub pull request</small></span><i>→</i><span><b>2</b><strong>Checks run</strong><small>Schema, graph, hashes</small></span><i>→</i><span><b>3</b><strong>You approve</strong><small>Local install confirmation</small></span><i>→</i><span><b>4</b><strong>Progress saves</strong><small>Normal backup pipeline</small></span></section>
     ${preview ? `<aside class="depot-preview"><div><p class="eyebrow">Validated preview</p><h2>${escapeHtml(preview.pack.name)}</h2><p>${escapeHtml(preview.pack.description)}</p><div class="depot-preview-facts"><span>${preview.preview.skillCount}<small>Lessons</small></span><span>${preview.preview.problemCount}<small>Questions</small></span><span>${escapeHtml(preview.preview.subjectName)}<small>Subject</small></span><span>${escapeHtml(preview.pack.license)}<small>License</small></span></div></div><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(preview.pack.id)}" data-pack-version="${escapeHtml(preview.pack.version)}">Install this pack</button><button class="quiet-button" data-depot-action="close-preview">Close preview</button></aside>` : ""}
     <section class="depot-toolbar" aria-label="Filter lesson packages">
@@ -873,10 +944,14 @@ function renderLessonDepot(snapshot) {
     </section>
     ${depot.phase === "loading" ? `<section class="depot-state"><span class="depot-spinner" aria-hidden="true"></span><h2>Opening the catalog…</h2><p>The app itself remains fully local-first.</p></section>` : ""}
     ${depot.phase === "error" ? `<section class="depot-state is-error"><span>!</span><h2>The catalog is unavailable</h2><p>${escapeHtml(depot.error)}</p><button class="button button-primary" data-depot-action="reload">Try again</button></section>` : ""}
-    ${depot.phase === "ready" ? `<section class="depot-results-heading"><div><p class="eyebrow">Catalog</p><h2>${packages.length} package${packages.length === 1 ? "" : "s"}</h2></div><small>Votes and comments are cached from GitHub Discussions; use the community link for live totals.</small></section><section id="lesson-depot" class="depot-grid">${packages.map((pack) => {
+    ${depot.phase === "ready" ? `<section class="depot-results-heading"><div><p class="eyebrow">Catalog</p><h2>${packages.length} package${packages.length === 1 ? "" : "s"}</h2></div><small>${connection.connected ? "Open a package’s community panel for live totals, voting, and comments." : "Catalog totals are cached from GitHub Discussions. Connect GitHub for live in-app voting and comments."}</small></section><section id="lesson-depot" class="depot-grid">${packages.map((pack) => {
       const installed = installedById.get(pack.id);
       const busy = depot.installingId === pack.id;
-      return `<article class="depot-card" data-depot-pack-id="${escapeHtml(pack.id)}"><div class="depot-card-top"><span class="depot-subject">${escapeHtml(pack.subjectName)}</span><span class="depot-version">v${escapeHtml(pack.version)}</span></div><h2>${escapeHtml(pack.name)}</h2><p>${escapeHtml(pack.description)}</p><div class="depot-tags">${pack.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div><dl><div><dt>Author</dt><dd>${escapeHtml(pack.author)}</dd></div><div><dt>Contents</dt><dd>${pack.skills} lessons · ${pack.problems} questions</dd></div><div><dt>License</dt><dd>${escapeHtml(pack.license)}</dd></div></dl><div class="depot-community"><a href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener" aria-label="Vote or comment on ${escapeHtml(pack.name)}"><span>▲ ${pack.votes}</span><span>◯ ${pack.comments}</span><b>Discuss ↗</b></a></div><div class="depot-card-actions"><button class="button button-outline" data-depot-action="preview" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed ? "disabled" : ""}>Preview</button><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed || busy ? "disabled" : ""}>${installed ? `Installed v${escapeHtml(installed.version)}` : busy ? "Checking…" : "Install"}</button></div></article>`;
+      const live = communityUi.activePack?.id === pack.id && communityUi.activePack?.version === pack.version ? communityUi.discussion : null;
+      const votes = live?.votes ?? pack.votes;
+      const comments = live?.commentCount ?? pack.comments;
+      const communityControl = connection.configured ? `<button type="button" data-depot-action="community-open" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" aria-label="Vote and discuss ${escapeHtml(pack.name)} inside QuickMaths"><span>▲ ${votes}</span><span>◯ ${comments}</span><b>${connection.connected ? "Join discussion" : "Vote & discuss"}</b></button>` : `<a href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener" aria-label="Upvote or comment on ${escapeHtml(pack.name)} on GitHub"><span>▲ ${votes}</span><span>◯ ${comments}</span><b>Vote or comment ↗</b></a>`;
+      return `<article class="depot-card" data-depot-pack-id="${escapeHtml(pack.id)}"><div class="depot-card-top"><span class="depot-subject">${escapeHtml(pack.subjectName)}</span><span class="depot-version">v${escapeHtml(pack.version)}</span></div><h2>${escapeHtml(pack.name)}</h2><p>${escapeHtml(pack.description)}</p><div class="depot-tags">${pack.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div><dl><div><dt>Author</dt><dd>${escapeHtml(pack.author)}</dd></div><div><dt>Contents</dt><dd>${pack.skills} lessons · ${pack.problems} questions</dd></div><div><dt>License</dt><dd>${escapeHtml(pack.license)}</dd></div></dl><div class="depot-community">${communityControl}</div><div class="depot-card-actions"><button class="button button-outline" data-depot-action="preview" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed ? "disabled" : ""}>Preview</button><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed || busy ? "disabled" : ""}>${installed ? `Installed v${escapeHtml(installed.version)}` : busy ? "Checking…" : "Install"}</button></div></article>`;
     }).join("")}</section>${!packages.length ? `<section class="depot-state"><span>⌕</span><h2>No matching lessons yet</h2><p>Try another search—or publish the lesson you wish existed.</p></section>` : ""}` : ""}
     <section class="depot-contribute"><div><p class="eyebrow">Share what works</p><h2>Create a lesson. Help someone else learn it.</h2><p>Build in Lesson Studio, publish it for community review, or install lessons that other learners and teachers have shared. Every pack is previewed and checked before it can join your curriculum.</p></div><div><button class="button button-primary" data-route="creator">Open Lesson Studio</button><button class="button button-outline" data-depot-action="copy-publish-prompt">Copy Codex publishing prompt</button><a class="button button-outline" href="${DEPOT_REPOSITORY_URL}/tree/main/docs/lesson-depot" target="_blank" rel="noopener">See how the Depot works ↗</a></div></section>`;
 }
@@ -1180,6 +1255,31 @@ document.addEventListener("click", async (event) => {
       if (actionName === "preview") await lessonDepot.previewPack(depotAction.dataset.packId, depotAction.dataset.packVersion);
       if (actionName === "install") await lessonDepot.installPack(depotAction.dataset.packId, depotAction.dataset.packVersion);
       if (actionName === "close-preview") lessonDepot.closePreview();
+      if (actionName === "community-open") await openDepotCommunity(depotAction.dataset.packId, depotAction.dataset.packVersion);
+      if (actionName === "community-close") {
+        communityUi.activePack = null; communityUi.discussion = null; communityUi.commentDraft = ""; communityUi.error = ""; communityUi.phase = "idle";
+        rerenderDepotCommunity();
+      }
+      if (actionName === "community-connect") {
+        if (!githubCommunity?.configured) throw new Error("In-app GitHub community access is not configured yet.");
+        const authorizationUrl = await githubCommunity.beginAuthorization({ remember: document.querySelector("#community-remember")?.checked === true });
+        window.location.assign(authorizationUrl);
+      }
+      if (actionName === "community-refresh") await loadDepotDiscussion();
+      if (actionName === "community-vote" && communityUi.discussion && !communityUi.busy) {
+        communityUi.busy = true; rerenderDepotCommunity();
+        try {
+          const vote = await githubCommunity.setVote(communityUi.discussion.id, !communityUi.discussion.viewerHasVoted);
+          communityUi.discussion = { ...communityUi.discussion, ...vote };
+          showToast(vote.viewerHasVoted ? "Lesson upvoted on GitHub." : "GitHub upvote removed.");
+        } finally { communityUi.busy = false; rerenderDepotCommunity(); }
+      }
+      if (actionName === "community-disconnect") {
+        githubCommunity?.disconnect();
+        communityUi.phase = "idle"; communityUi.discussion = null; communityUi.error = ""; communityUi.connectionError = "";
+        rerenderDepotCommunity();
+        showToast("GitHub community disconnected on this device.");
+      }
       if (actionName === "copy-publish-prompt") {
         await navigator.clipboard.writeText(buildDepotSubmissionPrompt());
         showToast("Depot publishing prompt copied.");
@@ -1275,6 +1375,10 @@ document.addEventListener("change", (event) => {
 });
 
 document.addEventListener("input", (event) => {
+  if (event.target.id === "community-comment-body") {
+    communityUi.commentDraft = event.target.value;
+    return;
+  }
   if (event.target.id === "depot-search") {
     const value = event.target.value;
     const caret = event.target.selectionStart;
@@ -1307,6 +1411,26 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("submit", (event) => {
+  if (event.target.id === "community-comment-form") {
+    event.preventDefault();
+    if (!communityUi.discussion || communityUi.busy) return;
+    const form = event.target;
+    const body = new FormData(form).get("body");
+    communityUi.commentDraft = String(body ?? "");
+    communityUi.busy = true; rerenderDepotCommunity();
+    githubCommunity.addComment(communityUi.discussion.id, body).then((comment) => {
+      communityUi.discussion = {
+        ...communityUi.discussion,
+        commentCount: communityUi.discussion.commentCount + 1,
+        comments: [...communityUi.discussion.comments, comment].slice(-50),
+      };
+      communityUi.commentDraft = "";
+      showToast("Comment posted to GitHub Discussions.");
+    }).catch((error) => {
+      showToast(error instanceof Error ? error.message : String(error));
+    }).finally(() => { communityUi.busy = false; rerenderDepotCommunity(); });
+    return;
+  }
   if (event.target.id === "github-sync-form") {
     event.preventDefault();
     connectLearnerBridge(event.target).catch((error) => {
@@ -1395,11 +1519,18 @@ async function boot() {
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let agentManifest = {};
+  let communityConfig = { enabled: false };
   try {
     const manifestResponse = await fetch("./agent-manifest.json");
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
   } catch {
     // The tools still work if the optional human/machine-readable guide is unavailable.
+  }
+  try {
+    const communityResponse = await fetch("./github-community-config.json", { cache: "no-store" });
+    if (communityResponse.ok) communityConfig = await communityResponse.json();
+  } catch {
+    // External GitHub links remain available if optional in-app community authorization is unavailable.
   }
   store = createQuickMathsStore({ storage: window.localStorage, curriculum });
   lessonDepot = createLessonDepot({
@@ -1411,6 +1542,11 @@ async function boot() {
     configStorage: window.localStorage,
     sessionCredentialStorage: window.sessionStorage,
     persistentCredentialStorage: window.localStorage,
+  });
+  githubCommunity = createGitHubCommunityClient({
+    config: communityConfig,
+    credentialStore: createGitHubCommunityCredentialStore({ sessionStorage: window.sessionStorage, persistentStorage: window.localStorage }),
+    transactionStorage: window.sessionStorage,
   });
   githubSync = createGitHubSyncController({
     role: "learner",
@@ -1455,6 +1591,18 @@ async function boot() {
       ? `${bridge.registered.length} tools can navigate and tutor across QuickMaths.`
       : "Open this site in a compatible ChatGPT or Codex browser to expose the tools.";
   render(store.snapshot());
+  const returnedFromCommunityAuthorization = new URLSearchParams(window.location.search).get("community") === "connected";
+  if (returnedFromCommunityAuthorization) history.replaceState(null, "", `${window.location.pathname}${window.location.hash}`);
+  if (communityConnection().connected) {
+    githubCommunity.connect().then(() => {
+      communityUi.connectionError = "";
+      rerenderDepotCommunity();
+      if (returnedFromCommunityAuthorization) showToast("GitHub connected. You can vote and comment inside QuickMaths.");
+    }).catch((error) => {
+      communityUi.connectionError = error instanceof Error ? error.message : String(error);
+      rerenderDepotCommunity();
+    });
+  }
   window.setInterval(() => {
     store.heartbeat();
     const snapshot = store.snapshot();
