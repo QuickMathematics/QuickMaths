@@ -1,0 +1,99 @@
+from __future__ import annotations
+
+from dataclasses import asdict
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from quickmaths.content_loader import load_curriculum
+from quickmaths.problem_generator import generate_test
+
+
+OUTPUT_PATH = PROJECT_ROOT / "docs" / "curriculum-data.json"
+PROBLEMS_PER_SKILL = 15
+MAX_VARIANT_SEEDS = 12
+
+
+def stable_seed(skill_id: str) -> int:
+    digest = hashlib.sha256(skill_id.encode("utf-8")).hexdigest()
+    return int(digest[:8], 16) % 2_000_000_000 or 1
+
+
+def build_payload() -> dict:
+    track, skills, warnings = load_curriculum()
+    skill_rows = []
+    for skill_id in track.skills:
+        skill = skills[skill_id]
+        problems = []
+        signatures: set[str] = set()
+        for variant_index in range(MAX_VARIANT_SEEDS):
+            generated = generate_test(skill, stable_seed(skill.id) + variant_index * 104_729)
+            for instance in generated:
+                signature = json.dumps(
+                    [instance.prompt, str(instance.expected_answer), instance.options],
+                    sort_keys=True,
+                    default=str,
+                )
+                if signature in signatures:
+                    continue
+                signatures.add(signature)
+                row = asdict(instance)
+                row["source_template_id"] = instance.template_id
+                row["template_id"] = f"{instance.template_id}__{len(problems) + 1:02d}"
+                row["work_required"] = instance.answer_mode in {
+                    "final_plus_required_work",
+                    "structured_steps",
+                    "proof_required",
+                } or str(instance.work.get("mode", "none")) in {
+                    "required",
+                    "procedural_steps",
+                    "proof_obligations",
+                    "rubric_check",
+                }
+                problems.append(row)
+                if len(problems) >= PROBLEMS_PER_SKILL:
+                    break
+            if len(problems) >= PROBLEMS_PER_SKILL:
+                break
+        skill_rows.append(
+            {
+                "id": skill.id,
+                "name": skill.name,
+                "domain": skill.domain,
+                "subdomain": skill.subdomain,
+                "description": skill.description,
+                "prerequisites": skill.prerequisites,
+                "unlocks": skill.unlocks,
+                "tags": skill.tags,
+                "mastery": asdict(skill.mastery),
+                "theory": skill.theory,
+                "examples": [asdict(example) for example in skill.examples],
+                "applications": skill.applications,
+                "problems": problems,
+            }
+        )
+    return {
+        "schema_version": "1.0",
+        "generated_from": "content/math/algebra_foundations",
+        "track": asdict(track),
+        "warnings": warnings,
+        "skills": skill_rows,
+    }
+
+
+def main() -> None:
+    OUTPUT_PATH.write_text(
+        json.dumps(build_payload(), indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    print(f"Wrote {OUTPUT_PATH}")
+
+
+if __name__ == "__main__":
+    main()

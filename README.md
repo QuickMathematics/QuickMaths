@@ -1,12 +1,14 @@
 # Quick Maths
 
-Quick Maths is a local-first mastery testing and prerequisite mapping skeleton for AI-assisted learning. It loads skills from YAML, generates mastery tests, grades answers, stores local progress in SQLite, shows a prerequisite map, and exports CSV/Markdown summaries for a preferred AI tutor.
+Quick Maths is a local-first mastery testing and prerequisite mapping app for AI-assisted learning. It loads skills from YAML, generates mastery tests, grades answers, stores learner progress, shows a prerequisite map, and exports portable progress records for a preferred AI tutor.
 
 Learners enter normal school-style math notation. The app separates final answers from shown work, autogrades final answers only, and exports work for AI tutor review.
 
 ## WebMCP Challenge Demo
 
-The zero-cost static demo in [`docs/`](docs/) turns one real QuickMaths skill into an agent-native algebra workspace. A compatible ChatGPT or Codex browser discovers four page tools that can read the current lesson, inspect shown work, save visible Socratic feedback, and open an allowlisted follow-up problem. The page also works without an agent, stores progress only in browser `localStorage`, and needs no backend, model API, account, or API key.
+The zero-cost static app in [`docs/`](docs/) ports the complete 25-skill Algebra Foundations experience to the browser. It includes the learner landing page, multiple profiles, dashboard, prerequisite mastery tree, lessons, generated five-question tests, results and reflection, tutor reviews, the original analog clock and timers, JSON backup/load, and CSV exports. A compatible ChatGPT or Codex browser also discovers nine WebMCP tools that let an agent understand the learner's curriculum and progress, navigate the visible app, begin an unlocked test, inspect shown work, save Socratic feedback, and prepare targeted follow-up practice.
+
+All state remains in browser `localStorage`; visible Save/Load controls make it portable between browsers. The static build needs no backend, model API, account, API key, or paid hosting.
 
 Run it locally:
 
@@ -18,7 +20,7 @@ Then open `http://localhost:8765/`. See [WEBMCP_CHALLENGE.md](WEBMCP_CHALLENGE.m
 
 ## Version 0.2 Scope
 
-This repository intentionally includes only a few sample skills. The goal is the infrastructure: content-as-data, generated problems, final-answer grading, captured/procedural/proof work, tutor review packets, reflection, persistence, graph status, and exports.
+The Algebra Foundations track contains 25 connected skills and more than 400 authored question templates. The Python/Streamlit app is the full authoring and reference implementation; the static browser port exports 375 seeded variants and serves five-question tests from that bank, so retakes vary without a backend.
 
 ## Run Locally
 

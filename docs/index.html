@@ -3,155 +3,155 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A local-first algebra workspace with native WebMCP tools for agent-guided practice.">
-    <meta name="theme-color" content="#f5f0e6">
-    <title>QuickMaths — Agent-guided algebra practice</title>
+    <meta name="description" content="QuickMaths is a local-first mastery map and agent-guided learning workspace.">
+    <meta name="theme-color" content="#f3eee3">
+    <title>QuickMaths — Map your mastery</title>
+    <link rel="icon" href="./quickmaths-logo.png">
     <link rel="stylesheet" href="./challenge.css">
     <script type="module" src="./challenge.js"></script>
   </head>
   <body>
-    <a class="skip-link" href="#workspace">Skip to practice</a>
+    <a class="skip-link" href="#view-root">Skip to learning workspace</a>
 
-    <header class="site-header">
-      <a class="brand" href="./" aria-label="QuickMaths home">
-        <span class="brand-mark" aria-hidden="true">Q</span>
-        <span>
-          <strong>QuickMaths</strong>
-          <small>Practice that adapts to your reasoning</small>
-        </span>
-      </a>
-      <div class="privacy-note">
-        <span class="privacy-dot" aria-hidden="true"></span>
-        Local-first · your work stays in this browser
+    <div id="loading-screen" class="loading-screen" role="status">
+      <img src="./quickmaths-logo.png" alt="" width="88" height="82">
+      <p>Opening QuickMaths…</p>
+    </div>
+
+    <section id="welcome-screen" class="welcome-screen" hidden aria-labelledby="welcome-title">
+      <div class="welcome-art" aria-hidden="true">
+        <div class="math-scribble scribble-one">x²</div>
+        <div class="math-scribble scribble-two">∑</div>
+        <div class="math-scribble scribble-three">y = mx + b</div>
       </div>
-    </header>
+      <header class="welcome-header">
+        <a class="welcome-brand" href="#/welcome" aria-label="QuickMaths home">
+          <img src="./quickmaths-logo.png" alt="" width="68" height="64">
+          <span>QuickMaths</span>
+        </a>
+        <span class="local-pill"><i></i> Free · local-first · no account</span>
+      </header>
 
-    <main id="workspace" class="workspace">
-      <section class="lesson-column" aria-labelledby="lesson-title">
-        <div class="lesson-kicker">
-          <span>Today’s focus</span>
-          <span class="skill-code">MATH_ALG_002</span>
+      <main class="welcome-main">
+        <section class="welcome-copy">
+          <p class="eyebrow">Algebra foundations</p>
+          <h1 id="welcome-title">Know what you know.<br><em>See what comes next.</em></h1>
+          <p class="welcome-lede">QuickMaths turns 25 connected skills into a living mastery map. Practice, reflect, save your progress, and let a browser agent tutor from the work actually on screen.</p>
+          <div class="welcome-proof">
+            <span><strong>25</strong> connected skills</span>
+            <span><strong>375</strong> varied mastery questions</span>
+            <span><strong>9</strong> agent actions</span>
+          </div>
+        </section>
+
+        <section class="profile-panel" aria-labelledby="profiles-title">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">This browser</p>
+              <h2 id="profiles-title">Choose a learner</h2>
+            </div>
+            <button id="welcome-load" class="quiet-button" type="button">Load backup</button>
+          </div>
+
+          <div id="profile-list" class="profile-list"></div>
+
+          <form id="create-profile-form" class="create-profile-form">
+            <label for="profile-name">New profile</label>
+            <div class="input-action">
+              <input id="profile-name" name="profile-name" maxlength="60" placeholder="Learner name" autocomplete="off" required>
+              <button class="button button-primary" type="submit">Create profile</button>
+            </div>
+            <p id="profile-error" class="form-message" aria-live="polite"></p>
+          </form>
+
+          <div class="profile-panel-footer">
+            <button id="create-demo" class="text-button" type="button">Explore with sample progress →</button>
+            <p>Progress autosaves here. Download a backup anytime to move it elsewhere.</p>
+          </div>
+        </section>
+      </main>
+      <footer class="welcome-footer">Open source · MIT licensed · Built from the original QuickMaths curriculum</footer>
+    </section>
+
+    <div id="app-shell" class="app-shell" hidden>
+      <aside class="sidebar" aria-label="QuickMaths navigation">
+        <div class="sidebar-brand">
+          <img src="./quickmaths-logo.png" alt="" width="54" height="51">
+          <span><strong>QuickMaths</strong><small>Algebra foundations</small></span>
         </div>
 
-        <div class="lesson-heading">
-          <div>
-            <h1 id="lesson-title">Undo the steps.<br>Keep the equation balanced.</h1>
-            <p>Undo addition or subtraction first, then multiplication or division. Whatever you do to one side, do to the other.</p>
-          </div>
-          <div class="progress-card" aria-label="Learning progress">
-            <div>
-              <span>Skill strength</span>
-              <strong id="mastery-value">45%</strong>
-            </div>
-            <div class="progress-track" aria-hidden="true"><span id="mastery-bar"></span></div>
-            <small><span id="attempt-count">0</span> attempts in this browser</small>
+        <div class="clock-card">
+          <svg id="analog-clock" class="analog-clock" viewBox="0 0 120 120" role="img" aria-label="Current local time">
+            <circle class="clock-face" cx="60" cy="60" r="54"></circle>
+            <g id="clock-minute-marks"></g>
+            <g id="clock-hour-marks"></g>
+            <line id="clock-hour" class="clock-hand clock-hour" x1="60" y1="60" x2="60" y2="34"></line>
+            <line id="clock-minute" class="clock-hand clock-minute" x1="60" y1="60" x2="60" y2="23"></line>
+            <line id="clock-second" class="clock-hand clock-second" x1="60" y1="66" x2="60" y2="17"></line>
+            <circle class="clock-center" cx="60" cy="60" r="4"></circle>
+          </svg>
+          <div class="timer-grid">
+            <span>Session<strong id="session-time">0s</strong></span>
+            <span>Profile total<strong id="profile-time">0s</strong></span>
           </div>
         </div>
 
-        <article class="problem-card" aria-labelledby="equation">
-          <div class="problem-meta">
-            <span>Practice step <strong id="problem-id">ALG002-P1</strong></span>
-            <span id="difficulty" class="difficulty">foundation</span>
-          </div>
+        <nav class="main-nav">
+          <button type="button" data-route="home"><span aria-hidden="true">⌂</span> Dashboard</button>
+          <button type="button" data-route="map"><span aria-hidden="true">⌘</span> Mastery map</button>
+          <button type="button" data-route="lesson"><span aria-hidden="true">◫</span> Lessons</button>
+          <button type="button" data-route="test"><span aria-hidden="true">✓</span> Mastery test</button>
+          <button type="button" data-route="results"><span aria-hidden="true">↗</span> Results</button>
+          <button type="button" data-route="data"><span aria-hidden="true">⇩</span> Save &amp; load</button>
+        </nav>
 
-          <div class="equation-wrap">
-            <p class="eyebrow">Solve for x</p>
-            <p id="equation" class="equation" aria-live="polite">3x + 5 = 20</p>
-          </div>
-
-          <div class="response-grid">
-            <label class="field field-work" for="student-work">
-              <span>Show your steps</span>
-              <small>One move per line helps your tutor see your reasoning.</small>
-              <textarea id="student-work" rows="6" maxlength="4000" placeholder="Start by undoing the constant…" spellcheck="false"></textarea>
-            </label>
-
-            <label class="field" for="final-answer">
-              <span>Final answer</span>
-              <small>Enter a number or x = …</small>
-              <input id="final-answer" type="text" maxlength="120" inputmode="decimal" placeholder="x =">
-            </label>
-          </div>
-
-          <div class="answer-row">
-            <span id="answer-status" class="answer-status" aria-live="polite">Not checked yet</span>
-            <div class="button-row">
-              <button id="demo-mistake" class="button button-ghost" type="button">Load demo mistake</button>
-              <button id="check-answer" class="button button-secondary" type="button">Check answer</button>
-              <button id="ask-tutor" class="button button-primary" type="button">
-                <span aria-hidden="true">✦</span> Ask tutor to review
-              </button>
-            </div>
-          </div>
-        </article>
-
-        <article id="tutor-feedback" class="feedback-card" data-tone="coach" aria-live="polite" hidden>
-          <div class="feedback-mark" aria-hidden="true">✦</div>
-          <div>
-            <p class="eyebrow">Tutor review</p>
-            <h2 id="feedback-title">I found one key move to revisit.</h2>
-            <p id="feedback-body"></p>
-            <div class="next-step"><strong>Try asking:</strong> <span id="feedback-step"></span></div>
-            <button id="follow-up" class="text-button" type="button">Practice a targeted follow-up <span aria-hidden="true">→</span></button>
-          </div>
-        </article>
-      </section>
-
-      <aside class="agent-column" aria-labelledby="agent-title">
-        <div class="agent-sticky">
-          <div class="agent-heading">
-            <div>
-              <p class="eyebrow">Agent studio</p>
-              <h2 id="agent-title">A tutor that can act here</h2>
-            </div>
-            <span class="agent-orbit" aria-hidden="true">✦</span>
-          </div>
-
-          <div class="bridge-card">
-            <div class="bridge-topline">
-              <span id="bridge-status" class="bridge-status" data-state="checking">Checking WebMCP…</span>
-              <span class="pulse" aria-hidden="true"></span>
-            </div>
-            <p id="bridge-detail">Looking for browser agent support.</p>
-          </div>
-
-          <section class="prompt-card" aria-labelledby="prompt-title">
-            <div class="section-label">
-              <h3 id="prompt-title">Try with your agent</h3>
-              <button id="copy-prompt" class="copy-button" type="button"><span id="copy-label">Copy prompt</span></button>
-            </div>
-            <p id="agent-prompt">Review my current work Socratically. Inspect it, save concise tutor feedback, then create one follow-up problem targeting my misconception. Do not reveal the answer.</p>
-          </section>
-
-          <section class="tools-card" aria-labelledby="tools-title">
-            <div class="section-label">
-              <h3 id="tools-title">Available tools</h3>
-              <span>4 native actions</span>
-            </div>
-            <ul class="tool-list">
-              <li><code>get_learning_context</code><span>read lesson</span></li>
-              <li><code>inspect_student_work</code><span>read reasoning</span></li>
-              <li><code>record_tutor_feedback</code><span>save coaching</span></li>
-              <li><code>create_followup_problem</code><span>adapt practice</span></li>
-            </ul>
-          </section>
-
-          <section class="activity-card" aria-labelledby="activity-title">
-            <div class="section-label">
-              <h3 id="activity-title">Tutor activity</h3>
-              <span>Visible by design</span>
-            </div>
-            <p id="activity-empty" class="empty-activity">The tutor will inspect your steps, explain one key move, and choose what you practice next.</p>
-            <ol id="activity-list" class="activity-list" aria-live="polite"></ol>
-          </section>
-
-          <button id="reset-demo" class="reset-button" type="button">Reset local demo</button>
+        <div class="sidebar-profile">
+          <div class="avatar" id="profile-avatar">Q</div>
+          <div><strong id="sidebar-profile-name">Learner</strong><small>Saved in this browser</small></div>
+          <button id="logout-button" type="button" aria-label="Change learner">↪</button>
         </div>
       </aside>
-    </main>
 
-    <footer>
-      <p>Built from the open-source <a href="https://github.com/Srednjak/QuickMaths">QuickMaths</a> learning model · No account, server, or API key required.</p>
-    </footer>
+      <main id="view-root" class="view-root" tabindex="-1"></main>
+
+      <aside id="agent-dock" class="agent-dock" aria-labelledby="agent-dock-title">
+        <div class="agent-dock-header">
+          <div>
+            <p class="eyebrow">Agent studio</p>
+            <h2 id="agent-dock-title">Tutor in the loop</h2>
+          </div>
+          <button id="agent-close" class="agent-close" type="button" aria-label="Close agent studio">×</button>
+        </div>
+        <div class="bridge-card">
+          <div><span id="bridge-status">Checking WebMCP…</span><i></i></div>
+          <p id="bridge-detail">Looking for browser agent support.</p>
+        </div>
+        <div class="agent-prompt-card">
+          <div class="mini-heading"><span>Suggested prompt</span><button id="copy-prompt" type="button">Copy</button></div>
+          <p id="agent-prompt">Look at my progress, open my map, choose the best next skill, take me to its lesson, and start its test.</p>
+        </div>
+        <details class="agent-tools">
+          <summary><span>Available tools</span><strong id="tool-count">9</strong></summary>
+          <div id="tool-list"></div>
+        </details>
+        <section class="agent-activity" aria-labelledby="activity-title">
+          <div class="mini-heading"><span id="activity-title">Agent activity</span><small>Visible by design</small></div>
+          <p id="activity-empty">Agent actions will appear here as they change the learning workspace.</p>
+          <ol id="activity-list" aria-live="polite"></ol>
+        </section>
+      </aside>
+
+      <button id="agent-toggle" class="agent-toggle" type="button" aria-label="Open agent studio">✦</button>
+      <nav class="mobile-nav" aria-label="Mobile navigation">
+        <button type="button" data-route="home">Home</button>
+        <button type="button" data-route="map">Map</button>
+        <button type="button" data-route="lesson">Learn</button>
+        <button type="button" data-route="test">Test</button>
+        <button type="button" data-route="data">Save</button>
+      </nav>
+    </div>
+
+    <input id="backup-file" type="file" accept="application/json,.json" hidden>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   </body>
 </html>
