@@ -1,5 +1,5 @@
-import { createQuickMathsStore } from "./challenge-core.js";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260901-geography-2";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260901-geography-2";
 import { createLessonDepot } from "./lesson-depot.js";
 import {
   createGitHubContentsClient,

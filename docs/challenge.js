@@ -1,5 +1,5 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260901-geography-2";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260901-geography-2";
 import { createLessonStudio } from "./lesson-creator.js";
 import {
   buildDepotSubmissionPrompt,
