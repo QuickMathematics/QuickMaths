@@ -62,7 +62,10 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.studio-proof-contrast/);
   assert.match(css, /\.studio-help\[aria-expanded="true"\]/);
   assert.match(css, /\.result-review-guide/);
+  assert.match(css, /\.map-layout \{[^}]*align-items: start;[^}]*min-height: 0;/);
+  assert.match(css, /\.map-scroll \{[^}]*width: 100%;[^}]*height: clamp\(420px, 62svh, 560px\);[^}]*contain: layout paint;/);
   assert.match(css, /height: clamp\(300px, 60svh, 540px\); max-height: none; contain: layout paint/);
+  assert.match(js, /scroller\.scrollLeft = gesture\.startScrollLeft - deltaX;\s+scroller\.scrollTop = gesture\.startScrollTop - deltaY;/);
   assert.match(js, /addEventListener\("wheel"/);
   assert.match(js, /passive: false/);
   assert.match(js, /map-hint-desktop/);
