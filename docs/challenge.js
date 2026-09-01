@@ -693,7 +693,8 @@ function renderResults(snapshot) {
 const TUTOR_SETUP_PROMPT = `${AGENT_STARTER_PROMPT} If WebMCP tools are unavailable, ask me to paste only the relevant progress summary or shown work—never a raw lesson-set file with answer keys.`;
 
 function bridgePhaseLabel(status) {
-  if (status.phase === "conflict") return "Needs your choice";
+  if (bridgeNeedsChoice) return "Needs your choice";
+  if (status.phase === "conflict") return "Sync paused";
   if (status.error) return "Connection problem";
   if (["connecting", "checking", "pulling", "pushing"].includes(status.phase)) return `${status.phase[0].toUpperCase()}${status.phase.slice(1)}…`;
   if (status.connected && status.dirty) return "Waiting to sync";
@@ -950,20 +951,24 @@ async function bridgeAction(action) {
     }
     if (action === "bridge-pull-agent") {
       const result = await githubSync.pullNow();
-      showToast(result.updated ? "Agent changes applied." : "No new agent changes.");
+      showToast(result.updated ? "Agent changes applied." : result.stale ? "Outdated agent changes ignored. Ask the agent to sync again." : "No new agent changes.");
     }
     if (action === "bridge-load-remote") {
       if (!window.confirm("Replace this browser's complete QuickMaths state with the GitHub learner checkpoint?\n\nDownload a JSON backup first if you need to keep the current browser copy.")) return;
       await githubSync.restoreLearner({ force: true });
       bridgeNeedsChoice = false;
+      try { await githubSync.pullNow(); } catch { /* Keep the resolved learner channel active; polling can retry the agent channel. */ }
       githubSync.start();
+      renderSettings(store.snapshot());
       showToast("GitHub learner checkpoint loaded.");
     }
     if (action === "bridge-replace-remote") {
       if (!window.confirm("Replace the GitHub learner checkpoint with this browser's complete QuickMaths state?\n\nThe previous GitHub version remains in repository history.")) return;
       await githubSync.pushNow({ force: true });
       bridgeNeedsChoice = false;
+      try { await githubSync.pullNow(); } catch { /* Keep the resolved learner channel active; polling can retry the agent channel. */ }
       githubSync.start();
+      renderSettings(store.snapshot());
       showToast("GitHub learner checkpoint replaced.");
     }
     if (action === "bridge-disconnect") {

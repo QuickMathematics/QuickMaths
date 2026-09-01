@@ -496,10 +496,20 @@ export function createGitHubSyncController({
       baseLearnerSha: channel === "agent" ? learnerSha : null,
       now,
     });
-    const result = await client.writeFile(current, path, envelope, {
-      sha: latest.sha,
-      message: `QuickMaths Bridge: ${channel} checkpoint`,
-    });
+    let result;
+    try {
+      result = await client.writeFile(current, path, envelope, {
+        sha: latest.sha,
+        message: `QuickMaths Bridge: ${channel} checkpoint`,
+      });
+    } catch (error) {
+      if (!force || role !== "learner" || !(error instanceof GitHubSyncConflictError)) throw error;
+      const refreshed = await readChannel(channel);
+      result = await client.writeFile(current, path, envelope, {
+        sha: refreshed.sha,
+        message: `QuickMaths Bridge: resolve ${channel} checkpoint conflict`,
+      });
+    }
     if (channel === "learner") learnerSha = result.sha;
     else agentSha = result.sha;
     persistMetadata();
@@ -527,10 +537,21 @@ export function createGitHubSyncController({
         : "This agent workspace has unpublished changes. Publish or discard them before pulling a newer learner checkpoint.");
     }
     if (role === "learner" && (!learnerSha || remote.envelope.baseLearnerSha !== learnerSha)) {
-      throw new GitHubSyncConflictError("The agent response was not based on this device's current learner checkpoint.", {
-        baseLearnerSha: remote.envelope.baseLearnerSha,
-        learnerSha,
+      agentSha = remote.sha;
+      persistMetadata();
+      consecutiveIdlePolls = 0;
+      update({
+        phase: status.dirty ? "idle" : "synced",
+        remoteAvailable: true,
+        lastPulledAt: now().toISOString(),
+        lastRemoteUpdatedAt: remote.envelope.updatedAt,
+        error: null,
+        conflict: null,
       });
+      return {
+        updated: false, exists: true, ignored: true, stale: true,
+        sha: remote.sha, channel, updatedAt: remote.envelope.updatedAt,
+      };
     }
     await applyRemote(remote.envelope.stateJson);
     if (channel === "learner") learnerSha = remote.sha;

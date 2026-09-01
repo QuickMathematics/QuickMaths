@@ -28,7 +28,7 @@
       "Make changes only through registered QuickMaths tools.",
       "Call publish_agent_checkpoint after state-changing work.",
       "If either sync tool reports a conflict, do not force or retry blindly. Pull the learner again and repeat the intended change from current state.",
-      "The learner page is authoritative. It rejects agent output based on an older learner revision and refuses to overwrite unsynced local work."
+      "The learner page is authoritative. It safely acknowledges and ignores agent output based on an older learner revision, refuses to overwrite unsynced local work, and requires the agent to pull current learner state before publishing again."
     ],
     "bridge_tools": ["get_bridge_sync_status", "sync_from_learner", "publish_agent_checkpoint"]
   },

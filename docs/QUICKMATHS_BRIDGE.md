@@ -50,7 +50,9 @@ Codex Remote continues the task that is running on the computer; it does not mak
 - The app never merges arbitrary JSON fields. A complete checkpoint wins only after a verified handoff.
 - A learner device cannot apply agent output while local changes are unsynced.
 - An agent cannot publish if the learner repository revision changed after its last pull.
+- An agent response based on an older learner revision is marked as seen and ignored without changing learner data; the agent must pull the current learner checkpoint and repeat its intended action.
 - A second learner device cannot overwrite a newer GitHub learner file without an explicit choice.
+- After the learner chooses **Load GitHub copy** or **Use this device**, that choice resolves the initial handoff immediately; a narrowly raced GitHub write is retried once only for this explicit human-approved resolution.
 - `learner-state.json` and `agent-state.json` contain learning records, not the GitHub token.
 - Repository history is a recovery trail, not a substitute for the app's **Download JSON backup** button.
 

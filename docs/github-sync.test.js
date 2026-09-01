@@ -208,6 +208,64 @@ test("stale agent output is rejected before it can overwrite newer learner work"
   assert.equal(learnerState.read().staleTutorNote, undefined);
 });
 
+test("learner safely acknowledges an agent response made stale by newer learner work", async () => {
+  const github = fakeGitHub();
+  const learnerState = stateHarness("Learner");
+  const agentState = stateHarness("Agent");
+  const learner = controller({ role: "learner", client: github, harness: learnerState });
+  const agent = controller({ role: "agent", client: github, harness: agentState });
+  await learner.connect(connection(), { startPolling: false });
+  await learner.pushNow();
+  await agent.connect(connection("agent"), { startPolling: false });
+  await agent.pullNow();
+  agentState.mutate({ staleTutorNote: "This must never be applied." });
+  await agent.pushNow();
+
+  learnerState.mutate({ newerLearnerWork: true });
+  await learner.pushNow();
+  const ignored = await learner.pullNow();
+  assert.equal(ignored.stale, true);
+  assert.equal(ignored.ignored, true);
+  assert.equal(learnerState.read().staleTutorNote, undefined);
+  assert.equal(learner.snapshot().phase, "synced");
+  assert.equal(learner.snapshot().conflict, null);
+
+  const alreadyAcknowledged = await learner.pullNow();
+  assert.equal(alreadyAcknowledged.updated, false);
+  assert.equal(alreadyAcknowledged.stale, undefined);
+});
+
+test("explicit learner conflict resolution retries one raced remote write", async () => {
+  const github = fakeGitHub();
+  const firstState = stateHarness("First");
+  const secondState = stateHarness("Second");
+  const first = controller({ role: "learner", client: github, harness: firstState });
+  await first.connect(connection(), { startPolling: false });
+  await first.pushNow();
+
+  let injectedRace = false;
+  const racingClient = {
+    ...github,
+    async writeFile(config, path, content, options = {}) {
+      if (!injectedRace && path === LEARNER_STATE_PATH && options.sha) {
+        injectedRace = true;
+        await github.writeFile(config, path, createBridgeEnvelope({
+          channel: "learner",
+          stateJson: JSON.stringify({ version: 8, profiles: [], raced: true }),
+          deviceId: "racing-device",
+        }), { sha: options.sha });
+      }
+      return github.writeFile(config, path, content, options);
+    },
+  };
+  const second = controller({ role: "learner", client: racingClient, harness: secondState });
+  await second.connect(connection(), { startPolling: false });
+  await second.pushNow({ force: true });
+  const resolved = parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content);
+  assert.equal(JSON.parse(resolved.stateJson).profiles[0].displayName, "Second");
+  assert.equal(second.snapshot().phase, "synced");
+});
+
 test("changes made while a saved bridge is offline remain dirty for the next resume", async () => {
   const github = fakeGitHub();
   const learnerState = stateHarness("Learner");
