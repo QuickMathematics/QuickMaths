@@ -1,6 +1,88 @@
 {
   "format": "quickmaths.lesson-depot.showcase",
   "schema_version": "1.0",
+  "themes": {
+    "SUBJECT_BIOLOGY": {
+      "paperLight": "#f8fcf9",
+      "primary": "#225c48",
+      "primaryAlt": "#33765e",
+      "tint": "#bfe2ce",
+      "highlight": "#e4ef9b",
+      "accent": "#e06b54"
+    },
+    "SUBJECT_CHEMISTRY": {
+      "paperLight": "#fcfaff",
+      "primary": "#523b70",
+      "primaryAlt": "#755a96",
+      "tint": "#d6c6e5",
+      "highlight": "#efe3a2",
+      "accent": "#c85c7a"
+    },
+    "SUBJECT_PHYSICS": {
+      "paperLight": "#f8fbfe",
+      "primary": "#244f73",
+      "primaryAlt": "#3475a3",
+      "tint": "#bed9ec",
+      "highlight": "#f2dc8e",
+      "accent": "#d5654b"
+    },
+    "SUBJECT_COMPUTER_SCIENCE": {
+      "paperLight": "#f8faff",
+      "primary": "#253c68",
+      "primaryAlt": "#365a91",
+      "tint": "#c2d4ee",
+      "highlight": "#b8e5db",
+      "accent": "#da6e55"
+    },
+    "SUBJECT_HISTORY": {
+      "paperLight": "#fffaf4",
+      "primary": "#704a25",
+      "primaryAlt": "#996737",
+      "tint": "#e7cfaa",
+      "highlight": "#f0df95",
+      "accent": "#9d4d3e"
+    },
+    "SUBJECT_ECONOMICS": {
+      "paperLight": "#f6fcfb",
+      "primary": "#195b5c",
+      "primaryAlt": "#267d7f",
+      "tint": "#b7dddd",
+      "highlight": "#e3e79a",
+      "accent": "#d47d46"
+    },
+    "SUBJECT_LANGUAGE_ARTS": {
+      "paperLight": "#fff9fb",
+      "primary": "#6b3445",
+      "primaryAlt": "#955064",
+      "tint": "#e5c4ce",
+      "highlight": "#f0dd9b",
+      "accent": "#b96a45"
+    },
+    "SUBJECT_STATISTICS": {
+      "paperLight": "#fbfaff",
+      "primary": "#4c416f",
+      "primaryAlt": "#6c5e96",
+      "tint": "#d2cae8",
+      "highlight": "#bfe3d3",
+      "accent": "#db7653"
+    },
+    "SUBJECT_EARTH_SCIENCE": {
+      "paperLight": "#fbfcf6",
+      "primary": "#4f5a2e",
+      "primaryAlt": "#758045",
+      "tint": "#d4ddb8",
+      "highlight": "#eadb95",
+      "accent": "#b56a46"
+    },
+    "SUBJECT_PHILOSOPHY": {
+      "paperLight": "#f9fbfc",
+      "primary": "#344c58",
+      "primaryAlt": "#506f7c",
+      "tint": "#c8dbe1",
+      "highlight": "#e6df9b",
+      "accent": "#a96752"
+    }
+  },
   "packages": [
     {
       "id": "PACK_PREVIEW_CELL_BIOLOGY",

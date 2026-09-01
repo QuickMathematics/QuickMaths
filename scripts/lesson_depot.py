@@ -24,6 +24,12 @@ _LICENSE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 .+()/-]{0,119}$")
 _PACK_ID = re.compile(r"^PACK_[A-Z0-9_]+$")
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _SHOWCASE_FORMAT = "quickmaths.lesson-depot.showcase"
+_HEX_COLOR = re.compile(r"^#[0-9a-fA-F]{6}$")
+_CARD_THEME_KEYS = ("paperLight", "primary", "primaryAlt", "tint", "highlight", "accent")
+_MATH_CARD_THEME = {
+    "paperLight": "#fffdf8", "primary": "#153f36", "primaryAlt": "#205c4e",
+    "tint": "#b8d9c9", "highlight": "#dceca9", "accent": "#df755b",
+}
 
 
 class DepotError(ValueError):
@@ -91,6 +97,19 @@ def _community_count(value: Any, field: str) -> int:
     return max(0, min(1_000_000, count))
 
 
+def _card_theme(value: Any, subject_id: str) -> dict[str, str]:
+    source = _MATH_CARD_THEME if subject_id == "SUBJECT_MATH" and value is None else value
+    if not isinstance(source, dict):
+        raise DepotError(f"{subject_id} must provide a subject theme")
+    theme: dict[str, str] = {}
+    for key in _CARD_THEME_KEYS:
+        color = source.get(key)
+        if not isinstance(color, str) or not _HEX_COLOR.fullmatch(color):
+            raise DepotError(f"{subject_id} theme.{key} must be a six-digit hex color")
+        theme[key] = color.lower()
+    return theme
+
+
 def _showcase_packages(root: Path) -> list[dict[str, Any]]:
     """Load metadata-only concept cards that demonstrate a populated Depot.
 
@@ -106,6 +125,9 @@ def _showcase_packages(root: Path) -> list[dict[str, Any]]:
     entries = payload.get("packages")
     if not isinstance(entries, list) or len(entries) > 100:
         raise DepotError("showcase.json packages must be an array of at most 100 entries")
+    themes = payload.get("themes")
+    if not isinstance(themes, dict):
+        raise DepotError("showcase.json themes must be an object keyed by subject ID")
     packages: list[dict[str, Any]] = []
     for index, entry in enumerate(entries, start=1):
         if not isinstance(entry, dict):
@@ -122,6 +144,7 @@ def _showcase_packages(root: Path) -> list[dict[str, Any]]:
         tags = entry.get("tags", [])
         if not isinstance(tags, list) or len(tags) > 20 or any(not isinstance(tag, str) or not tag.strip() or len(tag.strip()) > 40 for tag in tags):
             raise DepotError(f"showcase package {package_id} has invalid tags")
+        subject_id = _text(entry.get("subject_id"), "subject_id")
         packages.append({
             "id": package_id,
             "slug": slug,
@@ -133,8 +156,9 @@ def _showcase_packages(root: Path) -> list[dict[str, Any]]:
             "availability": "preview",
             "skills": 0,
             "problems": 0,
-            "subject_id": _text(entry.get("subject_id"), "subject_id"),
+            "subject_id": subject_id,
             "subject_name": _text(entry.get("subject_name"), "subject_name"),
+            "subject_theme": _card_theme(themes.get(subject_id), subject_id),
             "tags": sorted({tag.strip().lower() for tag in tags}),
             "published_at": "",
             "updated_at": "",
@@ -217,14 +241,16 @@ def build_catalog(depot_dir: str | Path, output_dir: str | Path | None = None) -
             parsed_url = urlparse(discussion_url)
             if parsed_url.scheme != "https" or parsed_url.netloc.lower() != "github.com":
                 raise DepotError(f"community discussion URL for {lesson['id']} must use github.com")
+        subject_id = str(subject.get("id", "SUBJECT_MATH"))
         entry = {
             "id": lesson["id"], "slug": slug, "version": version, "name": _text(metadata.get("name", metadata.get("title")), "name"),
             "description": str(metadata.get("description", "")).strip(), "author": author,
             "license": license_name, "lesson_path": Path("lessons", slug, version, lesson_path.name).as_posix(),
             "sha256": hashlib.sha256(raw).hexdigest(), "schema_version": lesson["schema_version"],
             "skills": len(lesson["skills"]), "problems": sum(len(skill.get("problems", [])) for skill in lesson["skills"]),
-            "subject_id": str(subject.get("id", "SUBJECT_MATHEMATICS")),
+            "subject_id": subject_id,
             "subject_name": str(subject.get("name", "Mathematics")),
+            "subject_theme": _card_theme(subject.get("theme"), subject_id),
             "tags": sorted({tag.strip().lower() for tag in tags}),
             "published_at": published_at, "updated_at": updated_at,
             # These are periodically materialized from GitHub Discussions by a trusted workflow.

@@ -1,5 +1,5 @@
 import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260901-guided-studio";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260901-combined-map";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-showcase";
 import { createLessonStudio } from "./lesson-creator.js?v=20260901-proof-lifecycle";
 import {
   buildDepotSubmissionPrompt,
@@ -8,7 +8,7 @@ import {
   DEPOT_REPOSITORY_URL,
   DEPOT_SUBMISSION_URL,
   filterDepotPackages,
-} from "./lesson-depot.js";
+} from "./lesson-depot.js?v=20260902-subject-colors";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
@@ -959,7 +959,8 @@ function renderLessonDepot(snapshot) {
       const actions = isPreview
         ? `<button class="button button-outline" disabled>Concept preview</button><button class="button button-primary" disabled>Coming soon</button>`
         : `<button class="button button-outline" data-depot-action="preview" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed ? "disabled" : ""}>Preview</button><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed || busy ? "disabled" : ""}>${installed ? `Installed v${escapeHtml(installed.version)}` : busy ? "Checking…" : "Install"}</button>`;
-      return `<article class="depot-card${isPreview ? " is-preview" : ""}" data-depot-pack-id="${escapeHtml(pack.id)}"><div class="depot-card-top"><span class="depot-subject">${escapeHtml(pack.subjectName)}</span><span class="depot-version">${isPreview ? "Concept" : `v${escapeHtml(pack.version)}`}</span></div><h2>${escapeHtml(pack.name)}</h2><p>${escapeHtml(pack.description)}</p><div class="depot-tags">${pack.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div><dl><div><dt>Author</dt><dd>${escapeHtml(pack.author)}</dd></div><div><dt>Contents</dt><dd>${isPreview ? "Not authored yet" : `${pack.skills} lessons · ${pack.problems} questions`}</dd></div><div><dt>${isPreview ? "Status" : "License"}</dt><dd>${escapeHtml(isPreview ? "Roadmap concept" : pack.license)}</dd></div></dl><div class="depot-community">${communityControl}</div><div class="depot-card-actions">${actions}</div></article>`;
+      const cardTheme = `--depot-paper:${pack.theme.paperLight};--depot-primary:${pack.theme.primary};--depot-primary-alt:${pack.theme.primaryAlt};--depot-tint:${pack.theme.tint};--depot-highlight:${pack.theme.highlight};--depot-accent:${pack.theme.accent}`;
+      return `<article class="depot-card${isPreview ? " is-preview" : ""}" data-depot-pack-id="${escapeHtml(pack.id)}" style="${escapeHtml(cardTheme)}"><div class="depot-card-top"><span class="depot-subject">${escapeHtml(pack.subjectName)}</span><span class="depot-version">${isPreview ? "Concept" : `v${escapeHtml(pack.version)}`}</span></div><h2>${escapeHtml(pack.name)}</h2><p>${escapeHtml(pack.description)}</p><div class="depot-tags">${pack.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div><dl><div><dt>Author</dt><dd>${escapeHtml(pack.author)}</dd></div><div><dt>Contents</dt><dd>${isPreview ? "Not authored yet" : `${pack.skills} lessons · ${pack.problems} questions`}</dd></div><div><dt>${isPreview ? "Status" : "License"}</dt><dd>${escapeHtml(isPreview ? "Roadmap concept" : pack.license)}</dd></div></dl><div class="depot-community">${communityControl}</div><div class="depot-card-actions">${actions}</div></article>`;
     }).join("")}</section>${!packages.length ? `<section class="depot-state"><span>⌕</span><h2>No matching lessons yet</h2><p>Try another search—or publish the lesson you wish existed.</p></section>` : ""}` : ""}
     <section class="depot-contribute"><div><p class="eyebrow">Share what works</p><h2>Create a lesson. Help someone else learn it.</h2><p>Build in Lesson Studio, publish it for community review, or install lessons that other learners and teachers have shared. Every published pack is previewed and checked before it can join your curriculum.</p></div><div><button class="button button-primary" data-route="creator">Open Lesson Studio</button><button class="button button-outline" data-depot-action="copy-publish-prompt">Copy Codex publishing prompt</button><a class="button button-outline" href="${DEPOT_REPOSITORY_URL}/tree/main/docs/lesson-depot" target="_blank" rel="noopener">See how the Depot works ↗</a></div></section>`;
 }

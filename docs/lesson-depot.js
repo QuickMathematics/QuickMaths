@@ -1,6 +1,10 @@
 const CATALOG_FORMAT = "quickmaths.lesson-depot.catalog";
 const CATALOG_SCHEMA = "1.0";
 const MAX_PACKAGES = 1000;
+const DEFAULT_CARD_THEME = Object.freeze({
+  paperLight: "#fffdf8", primary: "#153f36", primaryAlt: "#205c4e",
+  tint: "#b8d9c9", highlight: "#dceca9", accent: "#df755b",
+});
 export const DEFAULT_DEPOT_CATALOG = "./lesson-depot/catalog.json";
 export const DEPOT_REPOSITORY_URL = "https://github.com/Srednjak/QuickMaths";
 export const DEPOT_SUBMISSION_URL = `${DEPOT_REPOSITORY_URL}/issues/new?template=lesson-submission.yml`;
@@ -26,6 +30,14 @@ function safeHttpUrl(value, base = "") {
 
 function cleanCount(value) {
   return Math.max(0, Math.min(1_000_000, Math.floor(Number(value) || 0)));
+}
+
+function normalizeCardTheme(value) {
+  const candidate = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return Object.fromEntries(Object.entries(DEFAULT_CARD_THEME).map(([key, fallback]) => [
+    key,
+    /^#[0-9a-f]{6}$/i.test(candidate[key] ?? "") ? candidate[key].toLowerCase() : fallback,
+  ]));
 }
 
 export function normalizeDepotCatalog(input, { catalogUrl = DEFAULT_DEPOT_CATALOG, baseUrl = globalThis.location?.href ?? "https://example.invalid/" } = {}) {
@@ -58,6 +70,7 @@ export function normalizeDepotCatalog(input, { catalogUrl = DEFAULT_DEPOT_CATALO
       license: text(entry.license, `${id} license`, 120),
       subjectId: optionalText(entry.subject_id, 60) || "SUBJECT_MATH",
       subjectName: optionalText(entry.subject_name, 160) || "Mathematics",
+      theme: normalizeCardTheme(entry.subject_theme),
       tags: Array.isArray(entry.tags) ? entry.tags.filter((tag) => typeof tag === "string").map((tag) => tag.trim().slice(0, 40)).filter(Boolean).slice(0, 20) : [],
       skills: cleanCount(entry.skills),
       problems: cleanCount(entry.problems),

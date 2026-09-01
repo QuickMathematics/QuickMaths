@@ -89,6 +89,10 @@ def test_showcase_entries_are_searchable_but_never_installable_packages(tmp_path
     (tmp_path / "showcase.json").write_text(json.dumps({
         "format": "quickmaths.lesson-depot.showcase",
         "schema_version": "1.0",
+        "themes": {"SUBJECT_BIOLOGY": {
+            "paperLight": "#f8fcf9", "primary": "#225c48", "primaryAlt": "#33765e",
+            "tint": "#bfe2ce", "highlight": "#e4ef9b", "accent": "#e06b54",
+        }},
         "packages": [{
             "id": "PACK_PREVIEW_CELL_BIOLOGY",
             "slug": "cell-biology",
@@ -103,6 +107,7 @@ def test_showcase_entries_are_searchable_but_never_installable_packages(tmp_path
     catalog, search = build_catalog(tmp_path)
     preview = next(item for item in catalog["packages"] if item["id"] == "PACK_PREVIEW_CELL_BIOLOGY")
     assert preview["availability"] == "preview"
+    assert preview["subject_theme"]["primary"] == "#225c48"
     assert "lesson_path" not in preview
     assert "sha256" not in preview
     assert preview["community"] == {"votes": 0, "comments": 0, "discussion_url": ""}
@@ -113,6 +118,7 @@ def test_showcase_rejects_entries_that_could_masquerade_as_published(tmp_path):
     (tmp_path / "showcase.json").write_text(json.dumps({
         "format": "quickmaths.lesson-depot.showcase",
         "schema_version": "1.0",
+        "themes": {},
         "packages": [{
             "id": "PACK_NOT_MARKED_PREVIEW",
             "slug": "not-preview",

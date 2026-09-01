@@ -19,6 +19,14 @@
       "slug": "academic-writing",
       "subject_id": "SUBJECT_LANGUAGE_ARTS",
       "subject_name": "Language Arts",
+      "subject_theme": {
+        "accent": "#b96a45",
+        "highlight": "#f0dd9b",
+        "paperLight": "#fff9fb",
+        "primary": "#6b3445",
+        "primaryAlt": "#955064",
+        "tint": "#e5c4ce"
+      },
       "tags": [
         "argument",
         "revision",
@@ -45,6 +53,14 @@
       "slug": "acids-bases-equilibria",
       "subject_id": "SUBJECT_CHEMISTRY",
       "subject_name": "Chemistry",
+      "subject_theme": {
+        "accent": "#c85c7a",
+        "highlight": "#efe3a2",
+        "paperLight": "#fcfaff",
+        "primary": "#523b70",
+        "primaryAlt": "#755a96",
+        "tint": "#d6c6e5"
+      },
       "tags": [
         "acids",
         "equilibrium",
@@ -71,6 +87,14 @@
       "slug": "algorithms-complexity",
       "subject_id": "SUBJECT_COMPUTER_SCIENCE",
       "subject_name": "Computer Science",
+      "subject_theme": {
+        "accent": "#da6e55",
+        "highlight": "#b8e5db",
+        "paperLight": "#f8faff",
+        "primary": "#253c68",
+        "primaryAlt": "#365a91",
+        "tint": "#c2d4ee"
+      },
       "tags": [
         "algorithms",
         "complexity",
@@ -97,6 +121,14 @@
       "slug": "ancient-civilizations",
       "subject_id": "SUBJECT_HISTORY",
       "subject_name": "History",
+      "subject_theme": {
+        "accent": "#9d4d3e",
+        "highlight": "#f0df95",
+        "paperLight": "#fffaf4",
+        "primary": "#704a25",
+        "primaryAlt": "#996737",
+        "tint": "#e7cfaa"
+      },
       "tags": [
         "ancient history",
         "civilizations",
@@ -123,6 +155,14 @@
       "slug": "atomic-structure",
       "subject_id": "SUBJECT_CHEMISTRY",
       "subject_name": "Chemistry",
+      "subject_theme": {
+        "accent": "#c85c7a",
+        "highlight": "#efe3a2",
+        "paperLight": "#fcfaff",
+        "primary": "#523b70",
+        "primaryAlt": "#755a96",
+        "tint": "#d6c6e5"
+      },
       "tags": [
         "atoms",
         "electrons",
@@ -149,6 +189,14 @@
       "slug": "cell-biology",
       "subject_id": "SUBJECT_BIOLOGY",
       "subject_name": "Biology",
+      "subject_theme": {
+        "accent": "#e06b54",
+        "highlight": "#e4ef9b",
+        "paperLight": "#f8fcf9",
+        "primary": "#225c48",
+        "primaryAlt": "#33765e",
+        "tint": "#bfe2ce"
+      },
       "tags": [
         "cells",
         "metabolism",
@@ -175,6 +223,14 @@
       "slug": "chemical-reactions",
       "subject_id": "SUBJECT_CHEMISTRY",
       "subject_name": "Chemistry",
+      "subject_theme": {
+        "accent": "#c85c7a",
+        "highlight": "#efe3a2",
+        "paperLight": "#fcfaff",
+        "primary": "#523b70",
+        "primaryAlt": "#755a96",
+        "tint": "#d6c6e5"
+      },
       "tags": [
         "kinetics",
         "reactions",
@@ -201,6 +257,14 @@
       "slug": "classical-mechanics",
       "subject_id": "SUBJECT_PHYSICS",
       "subject_name": "Physics",
+      "subject_theme": {
+        "accent": "#d5654b",
+        "highlight": "#f2dc8e",
+        "paperLight": "#f8fbfe",
+        "primary": "#244f73",
+        "primaryAlt": "#3475a3",
+        "tint": "#bed9ec"
+      },
       "tags": [
         "energy",
         "forces",
@@ -227,6 +291,14 @@
       "slug": "data-structures",
       "subject_id": "SUBJECT_COMPUTER_SCIENCE",
       "subject_name": "Computer Science",
+      "subject_theme": {
+        "accent": "#da6e55",
+        "highlight": "#b8e5db",
+        "paperLight": "#f8faff",
+        "primary": "#253c68",
+        "primaryAlt": "#365a91",
+        "tint": "#c2d4ee"
+      },
       "tags": [
         "data structures",
         "graphs",
@@ -253,6 +325,14 @@
       "slug": "data-visualization",
       "subject_id": "SUBJECT_STATISTICS",
       "subject_name": "Statistics",
+      "subject_theme": {
+        "accent": "#db7653",
+        "highlight": "#bfe3d3",
+        "paperLight": "#fbfaff",
+        "primary": "#4c416f",
+        "primaryAlt": "#6c5e96",
+        "tint": "#d2cae8"
+      },
       "tags": [
         "charts",
         "communication",
@@ -279,6 +359,14 @@
       "slug": "electricity-circuits",
       "subject_id": "SUBJECT_PHYSICS",
       "subject_name": "Physics",
+      "subject_theme": {
+        "accent": "#d5654b",
+        "highlight": "#f2dc8e",
+        "paperLight": "#f8fbfe",
+        "primary": "#244f73",
+        "primaryAlt": "#3475a3",
+        "tint": "#bed9ec"
+      },
       "tags": [
         "circuits",
         "electricity",
@@ -307,6 +395,14 @@
       "slug": "estimation-lab",
       "subject_id": "SUBJECT_MATH",
       "subject_name": "Mathematics",
+      "subject_theme": {
+        "accent": "#df755b",
+        "highlight": "#dceca9",
+        "paperLight": "#fffdf8",
+        "primary": "#153f36",
+        "primaryAlt": "#205c4e",
+        "tint": "#b8d9c9"
+      },
       "tags": [
         "estimation",
         "number sense",
@@ -333,6 +429,14 @@
       "slug": "genetics-inheritance",
       "subject_id": "SUBJECT_BIOLOGY",
       "subject_name": "Biology",
+      "subject_theme": {
+        "accent": "#e06b54",
+        "highlight": "#e4ef9b",
+        "paperLight": "#f8fcf9",
+        "primary": "#225c48",
+        "primaryAlt": "#33765e",
+        "tint": "#bfe2ce"
+      },
       "tags": [
         "dna",
         "genetics",
@@ -359,6 +463,14 @@
       "slug": "geology-earth-history",
       "subject_id": "SUBJECT_EARTH_SCIENCE",
       "subject_name": "Earth Science",
+      "subject_theme": {
+        "accent": "#b56a46",
+        "highlight": "#eadb95",
+        "paperLight": "#fbfcf6",
+        "primary": "#4f5a2e",
+        "primaryAlt": "#758045",
+        "tint": "#d4ddb8"
+      },
       "tags": [
         "deep time",
         "geology",
@@ -385,6 +497,14 @@
       "slug": "human-physiology",
       "subject_id": "SUBJECT_BIOLOGY",
       "subject_name": "Biology",
+      "subject_theme": {
+        "accent": "#e06b54",
+        "highlight": "#e4ef9b",
+        "paperLight": "#f8fcf9",
+        "primary": "#225c48",
+        "primaryAlt": "#33765e",
+        "tint": "#bfe2ce"
+      },
       "tags": [
         "homeostasis",
         "organ systems",
@@ -411,6 +531,14 @@
       "slug": "industrial-revolution",
       "subject_id": "SUBJECT_HISTORY",
       "subject_name": "History",
+      "subject_theme": {
+        "accent": "#9d4d3e",
+        "highlight": "#f0df95",
+        "paperLight": "#fffaf4",
+        "primary": "#704a25",
+        "primaryAlt": "#996737",
+        "tint": "#e7cfaa"
+      },
       "tags": [
         "industry",
         "labor",
@@ -437,6 +565,14 @@
       "slug": "literary-analysis",
       "subject_id": "SUBJECT_LANGUAGE_ARTS",
       "subject_name": "Language Arts",
+      "subject_theme": {
+        "accent": "#b96a45",
+        "highlight": "#f0dd9b",
+        "paperLight": "#fff9fb",
+        "primary": "#6b3445",
+        "primaryAlt": "#955064",
+        "tint": "#e5c4ce"
+      },
       "tags": [
         "close reading",
         "interpretation",
@@ -463,6 +599,14 @@
       "slug": "logic-argumentation",
       "subject_id": "SUBJECT_PHILOSOPHY",
       "subject_name": "Philosophy",
+      "subject_theme": {
+        "accent": "#a96752",
+        "highlight": "#e6df9b",
+        "paperLight": "#f9fbfc",
+        "primary": "#344c58",
+        "primaryAlt": "#506f7c",
+        "tint": "#c8dbe1"
+      },
       "tags": [
         "arguments",
         "logic",
@@ -489,6 +633,14 @@
       "slug": "macroeconomics",
       "subject_id": "SUBJECT_ECONOMICS",
       "subject_name": "Economics",
+      "subject_theme": {
+        "accent": "#d47d46",
+        "highlight": "#e3e79a",
+        "paperLight": "#f6fcfb",
+        "primary": "#195b5c",
+        "primaryAlt": "#267d7f",
+        "tint": "#b7dddd"
+      },
       "tags": [
         "growth",
         "inflation",
@@ -515,6 +667,14 @@
       "slug": "microeconomics",
       "subject_id": "SUBJECT_ECONOMICS",
       "subject_name": "Economics",
+      "subject_theme": {
+        "accent": "#d47d46",
+        "highlight": "#e3e79a",
+        "paperLight": "#f6fcfb",
+        "primary": "#195b5c",
+        "primaryAlt": "#267d7f",
+        "tint": "#b7dddd"
+      },
       "tags": [
         "incentives",
         "markets",
@@ -541,6 +701,14 @@
       "slug": "personal-finance",
       "subject_id": "SUBJECT_ECONOMICS",
       "subject_name": "Economics",
+      "subject_theme": {
+        "accent": "#d47d46",
+        "highlight": "#e3e79a",
+        "paperLight": "#f6fcfb",
+        "primary": "#195b5c",
+        "primaryAlt": "#267d7f",
+        "tint": "#b7dddd"
+      },
       "tags": [
         "credit",
         "money",
@@ -567,6 +735,14 @@
       "slug": "probability",
       "subject_id": "SUBJECT_STATISTICS",
       "subject_name": "Statistics",
+      "subject_theme": {
+        "accent": "#db7653",
+        "highlight": "#bfe3d3",
+        "paperLight": "#fbfaff",
+        "primary": "#4c416f",
+        "primaryAlt": "#6c5e96",
+        "tint": "#d2cae8"
+      },
       "tags": [
         "bayes",
         "probability",
@@ -593,6 +769,14 @@
       "slug": "programming-foundations",
       "subject_id": "SUBJECT_COMPUTER_SCIENCE",
       "subject_name": "Computer Science",
+      "subject_theme": {
+        "accent": "#da6e55",
+        "highlight": "#b8e5db",
+        "paperLight": "#f8faff",
+        "primary": "#253c68",
+        "primaryAlt": "#365a91",
+        "tint": "#c2d4ee"
+      },
       "tags": [
         "debugging",
         "functions",
@@ -619,6 +803,14 @@
       "slug": "twentieth-century-world",
       "subject_id": "SUBJECT_HISTORY",
       "subject_name": "History",
+      "subject_theme": {
+        "accent": "#9d4d3e",
+        "highlight": "#f0df95",
+        "paperLight": "#fffaf4",
+        "primary": "#704a25",
+        "primaryAlt": "#996737",
+        "tint": "#e7cfaa"
+      },
       "tags": [
         "decolonization",
         "globalization",
@@ -645,6 +837,14 @@
       "slug": "waves-optics-sound",
       "subject_id": "SUBJECT_PHYSICS",
       "subject_name": "Physics",
+      "subject_theme": {
+        "accent": "#d5654b",
+        "highlight": "#f2dc8e",
+        "paperLight": "#f8fbfe",
+        "primary": "#244f73",
+        "primaryAlt": "#3475a3",
+        "tint": "#bed9ec"
+      },
       "tags": [
         "optics",
         "sound",
@@ -671,6 +871,14 @@
       "slug": "weather-climate",
       "subject_id": "SUBJECT_EARTH_SCIENCE",
       "subject_name": "Earth Science",
+      "subject_theme": {
+        "accent": "#b56a46",
+        "highlight": "#eadb95",
+        "paperLight": "#fbfcf6",
+        "primary": "#4f5a2e",
+        "primaryAlt": "#758045",
+        "tint": "#d4ddb8"
+      },
       "tags": [
         "atmosphere",
         "climate",
