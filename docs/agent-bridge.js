@@ -118,7 +118,7 @@ async function connectFromForm(event) {
 
 async function boot() {
   const [curriculumResponse, manifestResponse] = await Promise.all([
-    fetch("./curriculum-data.json"),
+    fetch("./curriculum-data.json?v=20260901-geography"),
     fetch("./agent-manifest.json").catch(() => null),
   ]);
   if (!curriculumResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");

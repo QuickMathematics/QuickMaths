@@ -10,7 +10,7 @@ export const DEFAULT_SUBJECT = Object.freeze({
   name: "Mathematics",
   shortName: "Maths",
   icon: "∑",
-  description: "The built-in Algebra Foundations curriculum.",
+  description: "The built-in Mathematics curriculum, from algebra foundations through coordinate geometry.",
   builtIn: true,
   theme: Object.freeze({
     paper: "#f3eee3", paperDeep: "#e8dfce", paperLight: "#fffdf8", ink: "#16211d",
@@ -388,7 +388,7 @@ function sanitizeLessonPacks(value, curriculum, { strict = false } = {}) {
 }
 
 function validateCatalogGraph(curriculum, lessonPacks) {
-  const builtInSkills = curriculum.skills.map((skill) => ({ ...skill, subjectId: skill.subjectId ?? DEFAULT_SUBJECT_ID }));
+  const builtInSkills = curriculum.skills.map((skill) => ({ ...skill, subjectId: skill.subjectId ?? skill.subject_id ?? DEFAULT_SUBJECT_ID }));
   const skills = [...builtInSkills, ...lessonPacks.flatMap((pack) => pack.skills)];
   const byId = Object.fromEntries(skills.map((skill) => [skill.id, skill]));
   if (Object.keys(byId).length !== skills.length) throw new Error("The combined curriculum contains a duplicate skill ID.");
@@ -418,13 +418,23 @@ function validateCatalogGraph(curriculum, lessonPacks) {
 
 function mergeCurriculum(curriculum, lessonPacks) {
   validateCatalogGraph(curriculum, lessonPacks);
-  const builtInSkills = curriculum.skills.map((skill) => ({ ...skill, subjectId: skill.subjectId ?? DEFAULT_SUBJECT_ID }));
+  const builtInSkills = curriculum.skills.map((skill) => ({ ...skill, subjectId: skill.subjectId ?? skill.subject_id ?? DEFAULT_SUBJECT_ID }));
   const customSkills = lessonPacks.flatMap((pack) => pack.skills);
   const subjectMap = new Map([[DEFAULT_SUBJECT_ID, { ...clone(DEFAULT_SUBJECT), skillIds: [] }]]);
+  for (const candidate of curriculum.subjects ?? []) {
+    const subject = { ...normalizeSubject(candidate, "2.0"), builtIn: true, skillIds: [] };
+    if (subject.id === DEFAULT_SUBJECT_ID) subjectMap.set(DEFAULT_SUBJECT_ID, { ...subjectMap.get(DEFAULT_SUBJECT_ID), ...subject, skillIds: [] });
+    else if (subjectMap.has(subject.id)) throw new Error(`Duplicate built-in subject ID: ${subject.id}.`);
+    else subjectMap.set(subject.id, subject);
+  }
   for (const pack of lessonPacks) {
     if (!subjectMap.has(pack.subject.id)) subjectMap.set(pack.subject.id, { ...clone(pack.subject), skillIds: [] });
   }
-  for (const skill of [...builtInSkills, ...customSkills]) subjectMap.get(skill.subjectId)?.skillIds.push(skill.id);
+  for (const skill of [...builtInSkills, ...customSkills]) {
+    const subject = subjectMap.get(skill.subjectId);
+    if (!subject) throw new Error(`${skill.id} belongs to unknown subject ${skill.subjectId}.`);
+    subject.skillIds.push(skill.id);
+  }
   return {
     ...curriculum,
     track: {

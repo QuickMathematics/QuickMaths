@@ -1,6 +1,6 @@
 # QuickMaths WebMCP Challenge
 
-QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, read a lesson, follow the 25-skill prerequisite tree, take varied mastery tests, reflect, review past work, and move progress between devices.
+QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, switch between Mathematics and Geography, follow connected prerequisite maps, take varied mastery tests, reflect, review past work, and move progress between devices.
 
 The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page.
 
@@ -9,9 +9,9 @@ The app requires no OpenAI API key and sends no learner data to a hosted applica
 - Original logo landing page with multiple learner profiles and sample progress
 - Six-chapter onboarding tour for every new profile, with skip and persistent replay controls
 - Dashboard metrics, suggested next work, recent attempts, and continue flow
-- Full 25-skill Algebra Foundations prerequisite/mastery map
+- 43 first-party lessons: 28 Mathematics lessons and a 15-lesson Geography curriculum joined through coordinate geometry and geodesy
 - Theory, applications, prerequisites, unlocks, and worked examples for every skill
-- Five-question mastery tests drawn from 375 seeded problem variants
+- Five-question mastery tests drawn from 555 reviewed assessment questions
 - Multiple-choice, free-response, required shown work, local grading, and step checks
 - Results, reflection-based mastery updates, spaced review dates, and saved tutor/self reviews
 - Live analog clock plus per-session and cumulative profile timers
@@ -60,7 +60,7 @@ Tool inputs use closed JSON Schemas and runtime validation. Read-only tools do n
 Mobile learner browser                          Computer / remote Codex task
 ┌──────────────────────────┐                    ┌────────────────────────────┐
 │ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
-│ localStorage + WebMCP    │                    │ 18 WebMCP tools            │
+│ localStorage + WebMCP    │                    │ 20 WebMCP tools            │
 └────────────┬─────────────┘                    └──────────────┬─────────────┘
              │ debounced, complete state                       │ loopback CLI → host Git auth
              ▼                                                 ▼
@@ -75,7 +75,7 @@ Important files:
 
 - `docs/index.html` — landing page and persistent application shell
 - `docs/challenge.css` — responsive visual system and original-style clock
-- `docs/curriculum-data.json` — browser-ready 25-skill curriculum and 375 problem variants
+- `docs/curriculum-data.json` — browser-ready 43-lesson curriculum and 555 assessment questions
 - `docs/challenge-core.js` — profiles, mastery graph, grading, attempts, reviews, timers, and persistence
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports
 - `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio
@@ -90,7 +90,9 @@ Important files:
 - `docs/CUSTOM_LESSON_SETS.md` — Agent Lesson Authoring Guide
 - `docs/lesson-set-example.json` — installable worked example
 - `quickmaths/local_bridge.py` — loopback HTTP boundary and transactional Git adapter
-- `scripts/export_web_curriculum.py` — deterministic export from the original YAML curriculum
+- `content/geography/foundations/web-curriculum.json` — generated first-party Geography and Mathematics-bridge content
+- `scripts/build_geography_web_curriculum.mjs` — deterministic authoring source for the Geography expansion
+- `scripts/export_web_curriculum.py` — deterministic combined export from the original Mathematics YAML and first-party expansion
 
 ## Run and test
 
@@ -102,7 +104,7 @@ npm --prefix docs test
 pytest -q
 ```
 
-Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience. Open `http://localhost:8765/agent-bridge.html` for the separate 18-tool agent workspace.
+Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience. Open `http://localhost:8765/agent-bridge.html` for the separate 20-tool agent workspace.
 
 The browser contract suite covers profiles, subject filtering, Hard/Open progression, cross-subject bridges, themes, proof-review mastery gates, unlocks, timers, mastery updates, varied retakes, symbolic grading, procedural-work validation, answer-key privacy, agent policy, lesson-set staging and progress round-trips, malformed backups, CSV exports, strict tool inputs, navigation, visible follow-ups, feedback-to-attempt linkage, credential isolation, Unicode GitHub transport, optimistic write conflicts, revision-bound agent output, and protection for unsynced learner work.
 

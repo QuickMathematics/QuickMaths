@@ -28,6 +28,6 @@
 ## 0.4 QuickMaths Bridge
 
 - Optional GitHub-backed learner/agent checkpoints without an application server
-- Dedicated top-level agent workspace with 18 WebMCP tools
+- Dedicated top-level agent workspace with 20 WebMCP tools
 - Revision-bound agent publishing and optimistic conflict protection
 - Mobile setup, narrow-token security, and recovery guide

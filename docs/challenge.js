@@ -586,7 +586,7 @@ function renderLesson(snapshot) {
         <div class="lesson-score"><span>Mastery</span><strong>${Math.round(row.masteryScore)}</strong><small>/ 100</small></div>
         <div class="mastery-track"><i style="width:${Math.round(row.masteryScore)}%"></i></div>
         <dl class="skill-relations"><div><dt>${snapshot.progressionMode === "soft" ? "Recommended preparation" : "Prerequisites"}</dt><dd>${row.prerequisites.length ? row.prerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "None"}</dd></div><div><dt>Unlocks</dt><dd>${row.unlocks.length ? row.unlocks.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "Track complete"}</dd></div></dl>
-        ${row.status === "locked" ? `<div class="locked-note"><strong>Lesson available, test locked</strong><p>Prove the prerequisite skills or switch this profile to Open path.</p></div>` : `<button class="button button-primary" type="button" data-action="start-test" data-skill-id="${escapeHtml(skill.id)}">Start ${skill.problems.length}-question test</button>`}
+        ${row.status === "locked" ? `<div class="locked-note"><strong>Lesson available, test locked</strong><p>Prove the prerequisite skills or switch this profile to Open path.</p></div>` : `<button class="button button-primary" type="button" data-action="start-test" data-skill-id="${escapeHtml(skill.id)}">Start ${Math.min(5, skill.problems.length)}-question test</button>`}
       </div>
       <article class="theory-card">
         <p class="eyebrow">Core idea</p>
@@ -763,7 +763,7 @@ function renderSettings(snapshot) {
       ${snapshot.stagedLessonPack ? `<aside class="staged-pack"><span>Agent-staged</span><div><strong>${escapeHtml(snapshot.stagedLessonPack.name)}</strong><p>${escapeHtml(snapshot.stagedLessonPack.subjectName)} · ${snapshot.stagedLessonPack.skillCount} lessons · ${snapshot.stagedLessonPack.problemCount} questions · ${escapeHtml(snapshot.stagedLessonPack.author)}</p><small>An agent validated this file, but only you can install it.</small></div><button class="button button-primary" data-action="install-staged-pack">Install</button><button class="button button-outline" data-action="discard-staged-pack">Discard</button></aside>` : ""}
       <div class="lesson-pack-guide"><div><strong>Two ways to build</strong><p>Use the Human Lesson Creator for friendly forms, tooltips, themes, bridges, proofs, and rubrics—or give the machine-readable guide to an agent.</p></div><button class="button button-primary" data-route="creator">Open Human Lesson Creator</button><a class="button button-outline" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Agent Lesson Authoring Guide</a></div>
       <div class="installed-packs">
-        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></article>`).join("") : `<div class="empty-state">No custom sets installed. The built-in 25-skill Mathematics curriculum remains available.</div>`}
+        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></article>`).join("") : `<div class="empty-state">No custom sets installed. The built-in Mathematics and Geography curricula remain available.</div>`}
       </div>
       <p class="pack-security-note"><strong>Teacher-file warning:</strong> lesson-set JSON contains answer keys and solutions. Don’t paste the raw file into a learner tutoring conversation.</p>
     </section>
@@ -1278,7 +1278,7 @@ function initClock() {
 }
 
 async function boot() {
-  const response = await fetch("./curriculum-data.json");
+  const response = await fetch("./curriculum-data.json?v=20260901-geography");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let agentManifest = {};

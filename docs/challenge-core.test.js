@@ -82,14 +82,46 @@ function workFor(problem, final = String(problem.expected_answer)) {
   return Array.from({ length: Math.max(1, Number(problem.work?.minimum_steps ?? 1)) }, () => final).join("\n");
 }
 
-test("ships the complete 25-skill curriculum and opens at the profile picker", () => {
+test("ships the complete first-party Mathematics and Geography curriculum and opens at the profile picker", () => {
   const { store } = harness();
   const state = store.snapshot();
-  assert.equal(curriculum.skills.length, 25);
-  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0), 375);
+  assert.equal(curriculum.skills.length, 43);
+  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0), 555);
+  assert.equal(curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY").length, 15);
+  assert.equal(curriculum.skills.filter((skill) => skill.id.startsWith("MATH_GEOM_")).length, 3);
+  assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [
+    ["SUBJECT_MATH", 28],
+    ["SUBJECT_GEOGRAPHY", 15],
+  ]);
   assert.equal(state.profiles.length, 0);
   assert.equal(state.activeProfile, null);
   assert.equal(state.ui.route, "welcome");
+});
+
+test("first-party Geography is substantial and bridges through Mathematics coordinate geometry", () => {
+  const geography = curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY");
+  assert.equal(geography.length, 15);
+  assert.ok(geography.every((skill) => skill.theory.length > 2_200));
+  assert.ok(geography.every((skill) => skill.examples.length >= 4));
+  assert.ok(geography.every((skill) => skill.applications.length >= 3));
+  assert.ok(geography.every((skill) => skill.problems.length === 10));
+  assert.ok(geography.every((skill) => skill.problems.some((problem) => problem.work?.mode === "rubric_check")));
+
+  const bridge = curriculum.skills.find((skill) => skill.id === "GEO_CART_002");
+  assert.ok(bridge.prerequisites.includes("MATH_GEOM_003"));
+  assert.deepEqual(bridge.prerequisiteRefs, [{ subjectId: "SUBJECT_MATH", skillId: "MATH_GEOM_003" }]);
+
+  const { store } = harness();
+  store.createProfile("Geography Learner");
+  store.setLearningPreferences({ subjectId: "SUBJECT_GEOGRAPHY" });
+  let state = store.snapshot();
+  assert.equal(state.activeSubject.name, "Geography");
+  assert.equal(state.progressRows.length, 15);
+  assert.equal(state.progressRows.find((row) => row.id === "GEO_FOUND_001").status, "ready");
+  assert.deepEqual(state.progressRows.find((row) => row.id === "GEO_CART_002").unmetPrerequisites, ["GEO_CART_001", "MATH_GEOM_003"]);
+  assert.throws(() => store.startTest("GEO_CART_002"), /locked/i);
+  store.setLearningPreferences({ progressionMode: "soft" });
+  assert.doesNotThrow(() => store.startTest("GEO_CART_002"));
 });
 
 test("malformed storage falls back safely", () => {
@@ -229,13 +261,13 @@ test("a valid custom lesson set joins the real curriculum without replacing buil
   const preview = store.previewLessonPack(lessonSetExample);
   assert.equal(preview.id, "PACK_PERSONAL_FINANCE");
   assert.equal(preview.skillCount, 1);
-  assert.equal(store.snapshot().progressRows.length, 25, "preview must not mutate state");
+  assert.equal(store.snapshot().progressRows.length, 28, "preview must not mutate state");
 
   const installed = store.importLessonPack(lessonSetExample);
   const state = store.snapshot();
-  assert.equal(installed.totalSkillCount, 26);
+  assert.equal(installed.totalSkillCount, 44);
   assert.equal(state.lessonPacks.length, 1);
-  assert.equal(state.progressRows.length, 26);
+  assert.equal(state.progressRows.length, 29);
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "CUSTOM_FINANCE_DISCOUNTS").custom, true);
   assert.equal(store.statusForSkill("CUSTOM_FINANCE_DISCOUNTS"), "locked");
   assert.match(store.exportLessonPack("PACK_PERSONAL_FINANCE"), new RegExp(LESSON_SET_FORMAT));
@@ -250,9 +282,9 @@ test("subjects filter the visible map, apply bridge locks, and support per-profi
   store.importLessonPack(biologyLessonSet());
   let state = store.snapshot();
   assert.equal(state.activeSubject.id, "SUBJECT_BIOLOGY");
-  assert.equal(state.subjects.length, 2);
+  assert.equal(state.subjects.length, 3);
   assert.equal(state.progressRows.length, 1);
-  assert.equal(state.allProgressRows.length, 26);
+  assert.equal(state.allProgressRows.length, 44);
   assert.equal(state.progressRows[0].status, "locked");
   assert.deepEqual(state.progressRows[0].unmetPrerequisites, ["MATH_ARITH_005"]);
   store.setLearningPreferences({ progressionMode: "soft" });
@@ -374,7 +406,7 @@ test("custom progress and content round-trip together through a full backup", ()
   target.store.importBackup(raw);
   target.store.selectProfile(target.store.snapshot().profiles[0].id);
   const restored = target.store.snapshot();
-  assert.equal(restored.progressRows.length, 26);
+  assert.equal(restored.progressRows.length, 29);
   assert.equal(restored.attempts[0].skillId, "CUSTOM_FINANCE_DISCOUNTS");
   assert.equal(restored.progressRows.find((row) => row.id === "CUSTOM_FINANCE_DISCOUNTS").attemptCount, 1);
 });

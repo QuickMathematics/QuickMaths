@@ -16,6 +16,7 @@ from quickmaths.problem_generator import generate_test
 
 
 OUTPUT_PATH = PROJECT_ROOT / "docs" / "curriculum-data.json"
+FIRST_PARTY_EXPANSION_PATH = PROJECT_ROOT / "content" / "geography" / "foundations" / "web-curriculum.json"
 PROBLEMS_PER_SKILL = 15
 MAX_VARIANT_SEEDS = 12
 
@@ -78,10 +79,23 @@ def build_payload() -> dict:
                 "problems": problems,
             }
         )
+    track_row = asdict(track)
+    subjects = []
+    generated_from = ["content/math/algebra_foundations"]
+    if FIRST_PARTY_EXPANSION_PATH.exists():
+        expansion = json.loads(FIRST_PARTY_EXPANSION_PATH.read_text(encoding="utf-8"))
+        subjects.extend(expansion.get("subjects", []))
+        extension_track = expansion["track"]
+        track_row["skills"].extend(extension_track.get("skills", []))
+        track_row["entry_skills"].extend(extension_track.get("entry_skills", []))
+        track_row["exit_skills"].extend(extension_track.get("exit_skills", []))
+        skill_rows.extend(expansion.get("skills", []))
+        generated_from.append(str(FIRST_PARTY_EXPANSION_PATH.relative_to(PROJECT_ROOT)).replace("\\", "/"))
     return {
-        "schema_version": "1.0",
-        "generated_from": "content/math/algebra_foundations",
-        "track": asdict(track),
+        "schema_version": "2.0",
+        "generated_from": generated_from,
+        "subjects": subjects,
+        "track": track_row,
         "warnings": warnings,
         "skills": skill_rows,
     }

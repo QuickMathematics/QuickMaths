@@ -98,7 +98,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "get_curriculum_map",
       title: "Get curriculum map",
-      description: "Read the learner's 25-skill prerequisite map, including statuses and unlock relationships.",
+      description: "Read the learner's prerequisite map for any built-in or installed subject, including statuses and unlock relationships.",
       inputSchema: {
         type: "object",
         properties: {

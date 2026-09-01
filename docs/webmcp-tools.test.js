@@ -107,8 +107,8 @@ test("app, curriculum, and progress tools expose the full learner state", async 
   const summary = await tools.get_progress_summary.execute({});
   assert.equal(app.has_profile, true);
   assert.equal(app.view, "tutorial");
-  assert.equal(map.skills.length, 25);
-  assert.equal(summary.skills.length, 25);
+  assert.equal(map.skills.length, 28);
+  assert.equal(summary.skills.length, 28);
   assert.equal(summary.suggested_next.skill_id, "MATH_ARITH_001");
 });
 
@@ -171,9 +171,15 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
   const tools = toolsFor(store);
   const subjects = await tools.list_subjects.execute({});
   assert.equal(subjects.active_subject_id, "SUBJECT_MATH");
-  assert.equal(subjects.subjects[0].skill_count, 25);
+  assert.deepEqual(subjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [
+    ["SUBJECT_MATH", 28],
+    ["SUBJECT_GEOGRAPHY", 15],
+  ]);
   const changed = await tools.set_learning_preferences.execute({ progression_mode: "soft" });
   assert.equal(changed.progression_mode, "soft");
+  const geography = await tools.set_learning_preferences.execute({ subject_id: "SUBJECT_GEOGRAPHY" });
+  assert.equal(geography.subject_id, "SUBJECT_GEOGRAPHY");
+  assert.equal((await tools.get_curriculum_map.execute({})).skills.length, 15);
   const opened = await tools.open_lesson_creator.execute({ subject_id: "SUBJECT_MATH" });
   assert.equal(opened.visible_view, "creator");
   assert.equal(store.snapshot().ui.route, "creator");
