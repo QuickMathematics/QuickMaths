@@ -1,6 +1,12 @@
 name: Refresh Lesson Depot community totals
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/lesson-depot/catalog.json"
+      - "scripts/sync_depot_community.mjs"
+      - ".github/workflows/lesson-depot-community.yml"
   discussion:
     types: [created, edited, deleted]
   discussion_comment:
@@ -11,11 +17,11 @@ on:
 
 permissions:
   contents: write
-  discussions: read
+  discussions: write
 
 concurrency:
   group: lesson-depot-community
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   refresh:

@@ -26,7 +26,7 @@ cd docs
 npm test
 ```
 
-The catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. A least-privilege scheduled Action reads matching GitHub Discussions titled `[Lesson] PACK_ID` and materializes their 👍 reaction and comment totals into `community.json`; the public app never spends GitHub API quota per page view.
+The catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. A least-privilege Action creates a matching GitHub Discussion titled `[Lesson] PACK_ID` for each accepted catalog entry, then materializes its 👍 reaction and comment totals into `community.json`; the public app never spends GitHub API quota per page view.
 
 ## Community flow
 
