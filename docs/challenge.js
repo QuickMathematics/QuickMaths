@@ -426,6 +426,7 @@ function setupMapInteractions() {
   const pointers = new Map();
   let gesture = null;
   let suppressClickUntil = 0;
+  let wheelDelta = 0;
 
   const pointFrom = (event) => ({ x: event.clientX, y: event.clientY });
   const pair = () => Array.from(pointers.values()).slice(0, 2);
@@ -523,6 +524,24 @@ function setupMapInteractions() {
   scroller.addEventListener("pointerup", finishPointer);
   scroller.addEventListener("pointercancel", finishPointer);
   scroller.addEventListener("lostpointercapture", finishPointer);
+  scroller.addEventListener("wheel", (event) => {
+    if (!event.deltaY || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+    const direction = event.deltaY > 0 ? -1 : 1;
+    const zoom = currentZoom();
+    if ((direction < 0 && zoom <= MAP_ZOOM_MIN) || (direction > 0 && zoom >= MAP_ZOOM_MAX)) {
+      wheelDelta = 0;
+      return;
+    }
+    event.preventDefault();
+    const deltaUnit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? scroller.clientHeight : 1;
+    wheelDelta += event.deltaY * deltaUnit;
+    if (Math.abs(wheelDelta) < 40) return;
+    wheelDelta = 0;
+    applyMapZoom(store.setMapZoom(zoom + direction * MAP_ZOOM_STEP), {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
+  }, { passive: false });
   scroller.addEventListener("click", (event) => {
     if (Date.now() >= suppressClickUntil) return;
     event.preventDefault();
@@ -584,8 +603,8 @@ function renderMap(snapshot) {
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${combined ? `<span class="map-subject-key">Node color = subject · dot = status</span>` : ""}</div>
     <section class="map-layout">
-      <div class="map-scroll" aria-label="Interactive prerequisite map. Drag to move and pinch on a touchscreen to zoom.">
-        <div class="map-gesture-hint" aria-hidden="true">Drag to move <span>· Pinch to zoom</span></div>
+      <div class="map-scroll" aria-label="Interactive prerequisite map. Drag to move. Use the mouse wheel on desktop or pinch on a touchscreen to zoom.">
+        <div class="map-gesture-hint" aria-hidden="true">Drag to move <span class="map-hint-desktop">· Wheel to zoom</span><span class="map-hint-touch">· Pinch to zoom</span></div>
         <svg class="mastery-map" viewBox="0 0 ${width} ${height}" data-base-width="${width}" data-base-height="${height}" data-current-zoom="${zoom}" style="width:${Math.round(width * zoom)}px;height:${Math.round(height * zoom)}px">
           <g class="map-subject-lanes">${subjectLanes}</g>
           <g class="map-edges">${edges}</g>

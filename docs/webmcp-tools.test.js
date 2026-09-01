@@ -63,6 +63,10 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.studio-help\[aria-expanded="true"\]/);
   assert.match(css, /\.result-review-guide/);
   assert.match(css, /height: clamp\(300px, 60svh, 540px\); max-height: none; contain: layout paint/);
+  assert.match(js, /addEventListener\("wheel"/);
+  assert.match(js, /passive: false/);
+  assert.match(js, /map-hint-desktop/);
+  assert.match(js, /map-hint-touch/);
   assert.match(css, /\.agent-dock\.is-closed/);
   assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
   assert.match(js, /createGitHubSyncController/);
