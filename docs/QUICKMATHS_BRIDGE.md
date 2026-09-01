@@ -9,8 +9,9 @@ The learner page remains local-first. Normal actions save instantly in browser s
 - A GitHub account.
 - Your QuickMaths Pages fork, or the public QuickMaths site for testing.
 - A separate private repository such as `quickmaths-sync`, initialized with a README so its `main` branch exists.
-- A fine-grained GitHub personal access token limited to that one data repository with **Contents: Read and write**. No Actions, administration, account, or code-repository access is needed.
+- A fine-grained GitHub personal access token limited to that one data repository with **Contents: Read and write** for the learner phone. No Actions, administration, account, or source-repository access is needed.
 - For the remote-agent flow: a computer running a Codex task with its built-in browser open to the Agent Bridge. The computer and task must remain available while you continue it remotely from your phone.
+- The QuickMaths source checkout and Git command-line access to the private data repository on that computer. Git Credential Manager or `gh auth login` can supply the host credential.
 
 ## One-time setup
 
@@ -20,7 +21,15 @@ The learner page remains local-first. Normal actions save instantly in browser s
 4. Under repository permissions, set **Contents** to **Read and write**. Leave everything else at its minimum.
 5. In the learner app, open **Settings → QuickMaths Bridge**. Enter the owner, repository, `main`, and token. On a personal phone, **Remember token on this device** enables background reconnects. Leave it off on shared devices.
 6. The first connection asks which copy wins only when both the browser and GitHub already contain learner data. Read the labels carefully. Git history keeps the replaced remote version, but a downloaded JSON backup is still the easiest recovery file.
-7. On the agent computer, open `/agent-bridge.html` from the same QuickMaths Pages site in the Codex built-in browser. Connect the same repository. Remembering the token here is required for unattended reconnects after the browser restarts.
+7. On the agent computer, run the following from the QuickMaths source checkout, replacing the repository URL:
+
+   ```powershell
+   python -m quickmaths.cli agent-bridge --repo https://github.com/YOUR-NAME/quickmaths-sync.git
+   ```
+
+8. Open the printed `http://127.0.0.1:.../agent-bridge.html#local=...` URL as the top-level page in the Codex built-in browser. The fragment is a short-lived local capability, not a GitHub credential; the page immediately removes it from browser history. The workspace connects and pulls automatically.
+
+The older all-browser route remains available at `/agent-bridge.html`, but it needs a second copy of the fine-grained token in that browser. The CLI route is preferred for Codex because it reuses host Git authentication and never exposes the GitHub token to JavaScript or WebMCP.
 
 ## Start the agent task
 
@@ -49,7 +58,9 @@ If the bridge reports a conflict, stop editing on one side, click **Sync now** o
 
 ## Security model
 
-The token is a bearer credential. Anyone who obtains it can do whatever its GitHub permissions allow. Restricting it to a dedicated private data repository keeps the blast radius away from the QuickMaths source fork. QuickMaths stores the token in `sessionStorage` by default or `localStorage` only after the human checks **Remember**; it is never put in a cookie, app backup, lesson set, synced state file, URL, or WebMCP tool output.
+The phone token is a bearer credential. Anyone who obtains it can do whatever its GitHub permissions allow. Restricting it to a dedicated private data repository keeps the blast radius away from the QuickMaths source fork. The learner app stores the token in `sessionStorage` by default or `localStorage` only after the human checks **Remember**; it is never put in a cookie, app backup, lesson set, synced state file, URL, or WebMCP tool output.
+
+The local Codex transport binds only to `127.0.0.1`, accepts exactly `learner-state.json` and `agent-state.json`, requires an unguessable per-process capability, rejects cross-origin writes, and performs Git without shell execution or interactive prompts. Git credentials stay in the operating system's Git credential manager. Stop the command with `Ctrl+C` when the agent session is finished.
 
 Revoke the token from GitHub immediately if a device is lost or the token may have been exposed. Disconnecting QuickMaths removes its local copy but does not revoke the credential at GitHub.
 

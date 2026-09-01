@@ -6,6 +6,11 @@ import {
   createGitHubSyncController,
 } from "./github-sync.js";
 import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js";
+import {
+  createLocalBridgeCredentialStore,
+  createLocalGitContentsClient,
+  resolveLocalBridgeCapability,
+} from "./local-git-client.js";
 
 const elements = {
   liveStatus: document.querySelector("#live-status"),
@@ -31,6 +36,7 @@ let store;
 let sync;
 let credentialStore;
 let toastTimer;
+let localMode = false;
 
 function createAgentStateStorage(storage) {
   const prefix = "quickmaths.agent-bridge.";
@@ -73,16 +79,18 @@ function renderSync(status) {
     : working
       ? `${status.phase[0].toUpperCase()}${status.phase.slice(1)}…`
       : status.connected
-        ? `${status.config.owner}/${status.config.repo} · ${status.phase}`
+        ? `${localMode ? "Local Git · " : ""}${status.config.owner}/${status.config.repo} · ${status.phase}`
         : "GitHub bridge disconnected";
-  elements.disconnect.hidden = !status.connected;
+  elements.disconnect.hidden = localMode || !status.connected;
   elements.pull.disabled = !status.connected || working;
   elements.push.disabled = !status.connected || working || !store.snapshot().activeProfile;
   elements.stateNote.textContent = status.conflict
     ? `${status.conflict} Pull the learner again before publishing.`
     : status.connected
       ? `Last learner pull: ${formatDate(status.lastPulledAt)}. Last agent publish: ${formatDate(status.lastPushedAt)}.${status.dirty ? " Agent changes are waiting to publish." : ""}`
-      : "Connect the same repository used by the learner’s QuickMaths Settings page.";
+      : localMode
+        ? "Start the local Bridge command again if this host connection stops. GitHub credentials never enter this page."
+        : "Connect the same repository used by the learner’s QuickMaths Settings page.";
 }
 
 async function connectFromForm(event) {
@@ -115,14 +123,31 @@ async function boot() {
   const curriculum = await curriculumResponse.json();
   const manifest = manifestResponse?.ok ? await manifestResponse.json() : {};
   store = createQuickMathsStore({ storage: createAgentStateStorage(window.localStorage), curriculum });
-  credentialStore = createGitHubCredentialStore({
-    configStorage: window.localStorage,
-    sessionCredentialStorage: window.sessionStorage,
-    persistentCredentialStorage: window.localStorage,
-  });
+  const localCapability = resolveLocalBridgeCapability();
+  let bridgeClient;
+  let localRepository = null;
+  if (localCapability && ["127.0.0.1", "localhost"].includes(window.location.hostname)) {
+    bridgeClient = createLocalGitContentsClient({ capability: localCapability });
+    localRepository = await bridgeClient.verify();
+    credentialStore = createLocalBridgeCredentialStore({ repository: localRepository, metadataStorage: window.localStorage });
+    localMode = true;
+    document.body.dataset.transport = "local-git";
+    [...elements.form.children].forEach((child) => { if (child !== elements.message) child.hidden = true; });
+    elements.form.classList.add("local-connection");
+    document.querySelector(".connection-panel h2").textContent = "Host Git credential bridge";
+    document.querySelector(".connection-panel .eyebrow").textContent = "Local Codex transport";
+    elements.message.textContent = `${localRepository.owner}/${localRepository.repo} is connected through this computer's Git credential manager.`;
+  } else {
+    bridgeClient = createGitHubContentsClient();
+    credentialStore = createGitHubCredentialStore({
+      configStorage: window.localStorage,
+      sessionCredentialStorage: window.sessionStorage,
+      persistentCredentialStorage: window.localStorage,
+    });
+  }
   sync = createGitHubSyncController({
     role: "agent",
-    client: createGitHubContentsClient(),
+    client: bridgeClient,
     credentialStore,
     serializeState: () => store.exportSyncState(),
     applyState: (raw) => store.importSyncState(raw),
@@ -134,7 +159,7 @@ async function boot() {
   renderSync(sync.snapshot());
 
   const saved = credentialStore.load({ role: "agent" });
-  if (saved) {
+  if (saved && !localMode) {
     elements.form.elements.owner.value = saved.owner;
     elements.form.elements.repo.value = saved.repo;
     elements.form.elements.branch.value = saved.branch;
@@ -151,7 +176,7 @@ async function boot() {
     ? `${registeredCount} of ${toolNames.length} site tools registered in this browser.`
     : "Open this page in the built-in Codex or ChatGPT browser to expose its site tools.";
 
-  elements.form.addEventListener("submit", connectFromForm);
+  if (!localMode) elements.form.addEventListener("submit", connectFromForm);
   elements.pull.addEventListener("click", async () => {
     try { const result = await sync.pullNow(); toast(result.updated ? "Learner checkpoint applied." : "Learner checkpoint already current."); }
     catch (error) { toast(error instanceof Error ? error.message : String(error)); }
@@ -160,10 +185,24 @@ async function boot() {
     try { await sync.pushNow(); toast("Agent checkpoint published."); }
     catch (error) { toast(error instanceof Error ? error.message : String(error)); }
   });
-  elements.disconnect.addEventListener("click", () => { sync.disconnect(); toast("GitHub Bridge disconnected on this device."); });
+  if (!localMode) elements.disconnect.addEventListener("click", () => { sync.disconnect(); toast("GitHub Bridge disconnected on this device."); });
   window.addEventListener("pagehide", () => sync.stop());
 
-  if (saved?.token) {
+  if (localMode) {
+    try {
+      await sync.connect({
+        owner: localRepository.owner,
+        repo: localRepository.repo,
+        branch: localRepository.branch,
+        token: "local-git-transport",
+        rememberToken: false,
+      });
+      await sync.pullNow();
+      toast("Local Git Bridge connected and learner checkpoint pulled.");
+    } catch (error) {
+      elements.message.textContent = error instanceof Error ? error.message : String(error);
+    }
+  } else if (saved?.token) {
     try {
       await sync.resume();
       await sync.pullNow();

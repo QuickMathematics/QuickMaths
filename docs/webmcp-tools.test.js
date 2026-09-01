@@ -55,6 +55,8 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /registerBridgeWebMcpTools/);
   assert.match(js, /sync\.resume/);
   assert.match(js, /quickmaths\.agent-bridge/);
+  assert.match(js, /resolveLocalBridgeCapability/);
+  assert.match(js, /local-git-transport/);
 });
 
 test("registers all fifteen tools once with the WebMCP document context", async () => {

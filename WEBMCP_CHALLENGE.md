@@ -2,7 +2,7 @@
 
 QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, read a lesson, follow the 25-skill prerequisite tree, take varied mastery tests, reflect, review past work, and move progress between devices.
 
-The app requires no OpenAI API key and sends no learner data to an application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task.
+The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page.
 
 ## Product surface
 
@@ -20,7 +20,7 @@ The app requires no OpenAI API key and sends no learner data to an application s
 - Human Lesson Creator with tutorial, tooltips, multiple lessons, all graders, proof/rubric controls, validation, download, and install
 - Validated schema 2.0 lesson-set JSON with Agent Lesson Authoring Guide and full backup integration
 - Responsive desktop, tablet, and mobile navigation
-- Optional GitHub Bridge with debounced learner checkpoints, an agent-only workspace, revision-bound agent responses, conflict protection, and a mobile setup guide
+- Optional GitHub Bridge with debounced learner checkpoints, an agent-only workspace, a credential-free local Git transport for Codex, revision-bound agent responses, conflict protection, and a mobile setup guide
 
 ## WebMCP integration
 
@@ -62,7 +62,7 @@ Mobile learner browser                          Computer / remote Codex task
 │ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
 │ localStorage + WebMCP    │                    │ 18 WebMCP tools            │
 └────────────┬─────────────┘                    └──────────────┬─────────────┘
-             │ debounced, complete state                       │ pull first / publish last
+             │ debounced, complete state                       │ loopback CLI → host Git auth
              ▼                                                 ▼
         learner-state.json ◄──── private GitHub repo ────► agent-state.json
              │                    revision checks               │
@@ -81,6 +81,7 @@ Important files:
 - `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio
 - `docs/webmcp-tools.js` — WebMCP schemas, validation, registration, and execution
 - `docs/github-sync.js` — GitHub Contents transport, credential separation, revisions, polling, and conflict checks
+- `docs/local-git-client.js` — same-origin browser adapter for the credential-free loopback transport
 - `docs/agent-bridge.html` — top-level agent-only workspace with no learner-facing UI
 - `docs/bridge-webmcp-tools.js` — pull, publish, and bridge-status tools
 - `docs/bridge-guide.html` — human setup guide and copyable starting prompt
@@ -88,6 +89,7 @@ Important files:
 - `docs/agent-manifest.json` — machine-readable agent operating and backup policy
 - `docs/CUSTOM_LESSON_SETS.md` — Agent Lesson Authoring Guide
 - `docs/lesson-set-example.json` — installable worked example
+- `quickmaths/local_bridge.py` — loopback HTTP boundary and transactional Git adapter
 - `scripts/export_web_curriculum.py` — deterministic export from the original YAML curriculum
 
 ## Run and test
@@ -95,6 +97,7 @@ Important files:
 ```powershell
 python scripts\export_web_curriculum.py
 python -m http.server 8765 --directory docs
+python -m quickmaths.cli agent-bridge --repo https://github.com/YOUR-NAME/quickmaths-sync.git
 npm --prefix docs test
 pytest -q
 ```

@@ -8,7 +8,7 @@ Learners enter normal school-style math notation. The app separates final answer
 
 The zero-cost static app in [`docs/`](docs/) ports the complete 25-skill Algebra Foundations experience to the browser. It includes a replayable new-profile tutorial, learner landing page, profiles, dashboard, prerequisite mastery tree, lessons, five-question tests, results and reflection, tutor reviews, the original analog clock, JSON backup/load, and CSV exports. Schema 2.0 lesson sets can extend Mathematics or create themed subjects with cross-subject prerequisite bridges; each profile can choose an enforced Hard path or guideline-only Open path. A built-in Human Lesson Creator provides no-code authoring, while 15 WebMCP tools let a compatible ChatGPT or Codex browser inspect subjects and progress, navigate the visible app, tutor, validate lesson JSON, and stage content for human-controlled installation.
 
-QuickMaths Bridge adds an optional mobile-to-agent handoff without adding an application server. The learner app checkpoints complete state to `learner-state.json` in a dedicated private GitHub repository; a separate top-level Agent Bridge page exposes the learning tools plus three sync tools and returns revision-bound agent changes through `agent-state.json`. Stale responses and unsynced local overwrites are rejected. The token is kept out of cookies, backups, tools, and commits, and can be limited to Contents access on that one data repository.
+QuickMaths Bridge adds an optional mobile-to-agent handoff without adding a hosted application server. The learner app checkpoints complete state to `learner-state.json` in a dedicated private GitHub repository; a separate top-level Agent Bridge page exposes the learning tools plus three sync tools and returns revision-bound agent changes through `agent-state.json`. Stale responses and unsynced local overwrites are rejected. The preferred Codex transport is a loopback CLI that uses the host's existing Git credentials, so the agent browser never receives the GitHub token.
 
 Without Bridge, all state remains in browser `localStorage`; visible backup and restore controls in Settings make it portable between browsers. The static build needs no backend, model API, account, API key, or paid hosting. Bridge users supply their own narrow GitHub repository token. See the [QuickMaths Bridge guide](docs/QUICKMATHS_BRIDGE.md).
 
@@ -21,6 +21,14 @@ python -m http.server 8765 --directory docs
 Then open `http://localhost:8765/`. See [WEBMCP_CHALLENGE.md](WEBMCP_CHALLENGE.md) for architecture, testing, deployment, and the under-three-minute demo script.
 
 The dedicated agent workspace is at `http://localhost:8765/agent-bridge.html`, and the mobile setup guide is at `http://localhost:8765/bridge-guide.html`.
+
+For a Codex host already authenticated to the private data repository, run the WebMCP workspace over the local Git transport:
+
+```powershell
+python -m quickmaths.cli agent-bridge --repo https://github.com/YOUR-NAME/quickmaths-sync.git
+```
+
+Open the printed `127.0.0.1` URL in the compatible agent browser. The loopback server exposes only the two checkpoint files, uses SHA-checked Git commits, and stops with `Ctrl+C`. The learner phone still connects from **Settings → QuickMaths Bridge** with its repository-scoped fine-grained token.
 
 ## Version 0.2 Scope
 

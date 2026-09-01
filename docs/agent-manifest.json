@@ -21,8 +21,8 @@
     "optional": true,
     "human_setup_guide": "https://srednjak.github.io/QuickMaths/bridge-guide.html",
     "agent_workspace": "https://srednjak.github.io/QuickMaths/agent-bridge.html",
-    "transport": "GitHub Contents API using learner-state.json and agent-state.json in a dedicated data repository.",
-    "credentials": "Use a fine-grained token restricted to the data repository with Contents read/write. The browser stores it in sessionStorage unless the human explicitly enables remember-on-device; it is never stored in a cookie or committed.",
+    "transport": "learner-state.json and agent-state.json in a dedicated data repository. The learner browser uses GitHub's Contents API; the preferred Codex host path serves the same WebMCP workspace over loopback and performs Git operations through the host Git credential manager.",
+    "credentials": "The learner browser uses a fine-grained token restricted to the data repository with Contents read/write. The local Codex transport never sends a GitHub token to JavaScript: python -m quickmaths.cli agent-bridge uses the host's existing Git credentials, binds only to 127.0.0.1, and gives the browser a per-process capability. No credential is stored in learning files, backups, cookies, URLs sent to GitHub, WebMCP output, or commits.",
     "protocol": [
       "Call sync_from_learner before inspecting progress or making a recommendation.",
       "Make changes only through registered QuickMaths tools.",

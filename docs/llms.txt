@@ -8,5 +8,6 @@ Custom lesson-set example: /lesson-set-example.json
 Challenge architecture and demo: https://github.com/Srednjak/QuickMaths/blob/main/WEBMCP_CHALLENGE.md
 Mobile GitHub Bridge setup and safety protocol: /QUICKMATHS_BRIDGE.md
 Dedicated top-level agent workspace: /agent-bridge.html
+Preferred local Codex transport: from a QuickMaths checkout, run `python -m quickmaths.cli agent-bridge --repo https://github.com/OWNER/quickmaths-sync.git`; open the printed loopback URL in the compatible agent browser. GitHub credentials remain in the host Git credential manager.
 
 Use the registered get_agent_guide WebMCP tool for the in-context operating policy. In Agent Bridge, call sync_from_learner before inspecting or changing learning state and publish_agent_checkpoint after state-changing work. Never force a stale conflict. Use list_subjects before subject-aware work, validate_lesson_set before stage_custom_lesson_set, and leave final installation to the human's visible Install button. Never expose pre-submission answer keys. Recommend a portable JSON progress backup at natural stopping points, before imports or custom-content changes, and whenever get_app_state reports that a backup is recommended.

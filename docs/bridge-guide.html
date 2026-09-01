@@ -27,13 +27,20 @@
         <ol class="setup-steps">
           <li><span>1</span><div><h3>Create the data repository</h3><p>Make a private GitHub repository named <code>quickmaths-sync</code>. Check <strong>Add a README</strong> so the <code>main</code> branch exists.</p><a class="primary-button" href="https://github.com/new" target="_blank" rel="noopener">Create private repository ↗</a></div></li>
           <li><span>2</span><div><h3>Create a narrow token</h3><p>Create a fine-grained token, select only that data repository, and grant only <strong>Repository permissions → Contents → Read and write</strong>. Give it an expiry.</p><a class="primary-button" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create fine-grained token ↗</a></div></li>
-          <li><span>3</span><div><h3>Connect both sides</h3><p>Enter the repository and token in the learner's Settings page. On the computer running Codex, open Agent Bridge as the top-level built-in-browser page and connect the same repository.</p><div class="guide-actions"><a class="primary-button" href="./index.html#/settings">Open learner Settings</a><a class="quiet-button" href="./agent-bridge.html">Open Agent Bridge</a></div></div></li>
+          <li><span>3</span><div><h3>Connect the learner</h3><p>Enter the repository and token in the learner's Settings page. This is the only browser that needs the token in the preferred setup.</p><div class="guide-actions"><a class="primary-button" href="./index.html#/settings">Open learner Settings</a></div></div></li>
         </ol>
+      </section>
+
+      <section class="panel prompt-panel">
+        <p class="eyebrow">Preferred Codex transport</p><h2>Let the host Git client carry the agent side.</h2>
+        <p>From a QuickMaths source checkout on the computer running Codex, run this command with your private data-repository URL. Then open the printed loopback URL as the top-level page in the compatible agent browser.</p>
+        <pre>python -m quickmaths.cli agent-bridge --repo https://github.com/YOUR-NAME/quickmaths-sync.git</pre>
+        <p>The workspace connects and pulls automatically. Git credentials stay in Git Credential Manager; JavaScript and WebMCP receive only a short-lived loopback capability. Stop it with <code>Ctrl+C</code>.</p>
       </section>
 
       <section class="bridge-grid lower-grid guide-grid">
         <article class="panel protocol-panel"><p class="eyebrow">Every agent session</p><ol><li><span>1</span><p><strong>Pull first</strong>Call <code>sync_from_learner</code> before reading or changing learning state.</p></li><li><span>2</span><p><strong>Work through tools</strong>Use QuickMaths site tools so the checkpoint and activity record stay coherent.</p></li><li><span>3</span><p><strong>Publish changes</strong>Call <code>publish_agent_checkpoint</code> after state-changing work.</p></li></ol></article>
-        <article class="panel safety-panel"><p class="eyebrow">Token safety</p><h2>Keys never enter the learning files.</h2><p>The token lives in this browser session unless you explicitly remember it on the device. It is never put in cookies, URLs, backups, lesson sets, WebMCP outputs, or Git commits.</p><p>Because it is still a bearer credential, keep the repository private, limit the token to that repository, and revoke it immediately if a device is lost.</p></article>
+        <article class="panel safety-panel"><p class="eyebrow">Credential boundary</p><h2>Keys never enter the agent page or learning files.</h2><p>The learner token lives in its browser session unless you explicitly remember it on that device. The Codex CLI uses the computer's existing Git credentials and sends none of them to JavaScript.</p><p>Keep the repository private, limit the phone token to that repository, and revoke it immediately if the phone is lost.</p></article>
       </section>
 
       <section class="panel prompt-panel">

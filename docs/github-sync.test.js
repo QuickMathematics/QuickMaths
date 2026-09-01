@@ -88,6 +88,7 @@ test("normalizes repository configuration and rejects unsafe identifiers", () =>
   assert.throws(() => normalizeGitHubSyncConfig({ ...connection(), owner: "bad/owner" }), /owner is invalid/i);
   assert.throws(() => normalizeGitHubSyncConfig({ ...connection(), branch: "bad branch" }), /branch name/i);
   assert.throws(() => normalizeGitHubSyncConfig({ ...connection(), token: "" }), /token is required/i);
+  assert.throws(() => normalizeGitHubSyncConfig({ ...connection(), repo: "QuickMaths" }), /separate private data repository/i);
 });
 
 test("credential storage keeps repository config separate from the token", () => {

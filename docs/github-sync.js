@@ -51,9 +51,13 @@ export function normalizeGitHubSyncConfig(candidate, { requireToken = true } = {
   if (requireToken && !token) throw new GitHubSyncError("GitHub access token is required.", { code: "missing_token" });
   if (token.length > 500) throw new GitHubSyncError("GitHub access token is invalid.", { code: "invalid_config" });
   const role = candidate.role === "agent" ? "agent" : "learner";
+  const repo = cleanIdentifier(candidate.repo, "Repository name");
+  if (repo.toLowerCase() === "quickmaths") {
+    throw new GitHubSyncError("Use a separate private data repository, not the public QuickMaths source repository.", { code: "source_repository_forbidden" });
+  }
   return {
     owner: cleanIdentifier(candidate.owner, "Repository owner"),
-    repo: cleanIdentifier(candidate.repo, "Repository name"),
+    repo,
     branch: cleanBranch(candidate.branch),
     token,
     role,
