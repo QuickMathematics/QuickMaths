@@ -167,12 +167,14 @@ test("new-profile tutorial can be stepped, skipped, replayed, and completed", ()
   assert.equal(store.snapshot().activeProfile.tutorialSkipped, false);
 });
 
-test("Settings replaces the legacy data route and map zoom persists safely", () => {
+test("Settings, map zoom, and combined-subject map scope persist safely", () => {
   const { store, storage } = harness();
-  store.createProfile("Settings Learner");
+  const firstProfile = store.createProfile("Settings Learner");
   store.completeTutorial();
   store.navigate("data");
   assert.equal(store.snapshot().ui.route, "settings");
+  assert.equal(store.snapshot().mapScope, "subject");
+  assert.equal(store.setLearningPreferences({ mapScope: "all" }).map_scope, "all");
   assert.equal(store.setMapZoom(1.4), 1.4);
   assert.equal(store.setMapZoom(0.137), 0.14);
   assert.equal(store.setMapZoom(-10), 0.1);
@@ -181,6 +183,13 @@ test("Settings replaces the legacy data route and map zoom persists safely", () 
   const reloaded = createQuickMathsStore({ storage, curriculum, now: () => new Date("2026-09-01T09:41:00.000Z") });
   assert.equal(reloaded.snapshot().ui.route, "settings");
   assert.equal(reloaded.snapshot().ui.mapZoom, 1.6);
+  assert.equal(reloaded.snapshot().mapScope, "all");
+
+  reloaded.createProfile("Second Learner");
+  assert.equal(reloaded.snapshot().mapScope, "subject", "new profiles start with a focused map");
+  reloaded.selectProfile(firstProfile.id);
+  assert.equal(reloaded.snapshot().mapScope, "all", "map scope belongs to the learner profile");
+  assert.throws(() => reloaded.setLearningPreferences({ mapScope: "galaxy" }), /map_scope/);
 });
 
 test("profiles from older saves are treated as already onboarded", () => {

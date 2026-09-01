@@ -1,5 +1,5 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260901-geography-2";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260901-geography-2";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260901-combined-map";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260901-combined-map";
 import { createLessonStudio } from "./lesson-creator.js";
 import {
   buildDepotSubmissionPrompt,
@@ -292,7 +292,16 @@ function skillOptions(snapshot, selectedId) {
   return snapshot.curriculum.skills.map((skill) => `<option value="${escapeHtml(skill.id)}" ${skill.id === selectedId ? "selected" : ""}>${escapeHtml(skill.name)} · ${escapeHtml(skill.subdomain)}</option>`).join("");
 }
 
-function mapLayout(skills) {
+function mapSkillOptions(snapshot, rows, selectedId) {
+  const allSubjects = snapshot.mapScope === "all";
+  return rows.map((row) => {
+    const subject = snapshot.subjects.find((item) => item.id === row.subjectId);
+    const subjectLabel = allSubjects ? `${subject?.icon ?? "◇"} ${subject?.shortName ?? subject?.name ?? row.subjectId} · ` : "";
+    return `<option value="${escapeHtml(row.id)}" ${row.id === selectedId ? "selected" : ""}>${escapeHtml(subjectLabel)}${escapeHtml(row.name)} · ${escapeHtml(row.subdomain)}</option>`;
+  }).join("");
+}
+
+function mapLayout(skills, { subjects = [], combined = false } = {}) {
   const byId = Object.fromEntries(skills.map((skill) => [skill.id, skill]));
   const cache = {};
   const depthOf = (id, trail = new Set()) => {
@@ -303,17 +312,43 @@ function mapLayout(skills) {
     const nextTrail = new Set(trail).add(id);
     return (cache[id] = Math.max(...skill.prerequisites.map((prerequisite) => depthOf(prerequisite, nextTrail))) + 1);
   };
+  const depthById = Object.fromEntries(skills.map((skill) => [skill.id, depthOf(skill.id)]));
+  const maxDepth = Math.max(...Object.values(depthById), 0);
+  if (combined) {
+    const positions = {};
+    const lanes = [];
+    let laneTop = 24;
+    subjects.filter((subject) => skills.some((skill) => skill.subjectId === subject.id)).forEach((subject) => {
+      const subjectSkills = skills.filter((skill) => skill.subjectId === subject.id);
+      const groups = {};
+      subjectSkills.forEach((skill) => { (groups[depthById[skill.id]] ??= []).push(skill); });
+      const widest = Math.max(...Object.values(groups).map((group) => group.length), 1);
+      const laneHeight = Math.max(220, widest * 112 + 92);
+      Object.entries(groups).forEach(([depth, group]) => {
+        const columnHeight = group.length * 112;
+        const offset = laneTop + 68 + Math.max(0, (laneHeight - 92 - columnHeight) / 2);
+        group.forEach((skill, index) => { positions[skill.id] = { x: 54 + Number(depth) * 224, y: offset + index * 112 }; });
+      });
+      lanes.push({ subject, y: laneTop, height: laneHeight });
+      laneTop += laneHeight + 20;
+    });
+    return {
+      positions,
+      lanes,
+      width: Math.max(900, 108 + (maxDepth + 1) * 224),
+      height: Math.max(620, laneTop + 4),
+    };
+  }
   const groups = {};
-  skills.forEach((skill) => { const depth = depthOf(skill.id); (groups[depth] ??= []).push(skill); });
+  skills.forEach((skill) => { const depth = depthById[skill.id]; (groups[depth] ??= []).push(skill); });
   const positions = {};
-  const maxDepth = Math.max(...Object.keys(groups).map(Number), 0);
   const widest = Math.max(...Object.values(groups).map((group) => group.length), 1);
   Object.entries(groups).forEach(([depth, group]) => {
     const columnHeight = group.length * 112;
     const offset = Math.max(32, (widest * 112 - columnHeight) / 2 + 32);
     group.forEach((skill, index) => { positions[skill.id] = { x: 42 + Number(depth) * 224, y: offset + index * 112 }; });
   });
-  return { positions, width: Math.max(900, 84 + (maxDepth + 1) * 224), height: Math.max(620, widest * 112 + 64) };
+  return { positions, lanes: [], width: Math.max(900, 84 + (maxDepth + 1) * 224), height: Math.max(620, widest * 112 + 64) };
 }
 
 function splitLabel(value, max = 22) {
@@ -490,15 +525,19 @@ function setupMapInteractions() {
 }
 
 function renderMap(snapshot) {
-  const selected = rowForSkill(snapshot, snapshot.ui.selectedMapSkillId) ?? snapshot.progressRows[0];
+  const combined = snapshot.mapScope === "all";
+  const mapRows = combined ? snapshot.allProgressRows : snapshot.progressRows;
+  const mapSkills = combined ? snapshot.curriculum.allSkills : snapshot.curriculum.skills;
+  const selected = mapRows.find((row) => row.id === snapshot.ui.selectedMapSkillId) ?? mapRows[0];
   if (!selected) {
-    elements.view.innerHTML = `<section class="test-empty content-card"><h2>No lessons in ${escapeHtml(snapshot.activeSubject.name)}</h2><p>Use Lesson studio or load a custom set to add the first lesson.</p><button class="button button-primary" data-route="creator">Open Lesson studio</button></section>`;
+    elements.view.innerHTML = `<section class="test-empty content-card"><h2>${combined ? "No installed lessons" : `No lessons in ${escapeHtml(snapshot.activeSubject.name)}`}</h2><p>Use Lesson studio or load a custom set to add the first lesson.</p><button class="button button-primary" data-route="creator">Open Lesson studio</button></section>`;
     return;
   }
-  const selectedSkill = snapshot.curriculum.skills.find((skill) => skill.id === selected.id);
-  const { positions, width, height } = mapLayout(snapshot.curriculum.skills);
+  const selectedSkill = store.skillsById[selected.id];
+  const selectedSubject = snapshot.subjects.find((subject) => subject.id === selected.subjectId) ?? snapshot.activeSubject;
+  const { positions, lanes, width, height } = mapLayout(mapSkills, { subjects: snapshot.subjects, combined });
   const zoom = Number(snapshot.ui.mapZoom ?? 1);
-  const edges = snapshot.curriculum.skills.flatMap((skill) => skill.prerequisites.map((prerequisite) => {
+  const edges = mapSkills.flatMap((skill) => skill.prerequisites.map((prerequisite) => {
     const from = positions[prerequisite];
     const to = positions[skill.id];
     if (!from || !to) return "";
@@ -507,35 +546,45 @@ function renderMap(snapshot) {
     const x2 = to.x;
     const y2 = to.y + 35;
     const bend = Math.max(40, (x2 - x1) * .5);
-    return `<path d="M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}" />`;
+    const crossSubject = store.skillsById[prerequisite]?.subjectId !== skill.subjectId;
+    return `<path class="${crossSubject ? "is-cross-subject" : ""}" d="M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}" />`;
   })).join("");
-  const nodes = snapshot.progressRows.map((row) => {
+  const subjectLanes = lanes.map(({ subject, y, height: laneHeight }) => `<g class="map-subject-lane">
+    <rect x="12" y="${y}" width="${width - 24}" height="${laneHeight}" rx="22" fill="${escapeHtml(subject.theme?.tint ?? "#dceca9")}"></rect>
+    <line x1="28" y1="${y + 42}" x2="${width - 28}" y2="${y + 42}" stroke="${escapeHtml(subject.theme?.primary ?? "#153f36")}"></line>
+    <text x="30" y="${y + 29}" fill="${escapeHtml(subject.theme?.primary ?? "#153f36")}">${escapeHtml(subject.icon)} ${escapeHtml(subject.name)}</text>
+  </g>`).join("");
+  const nodes = mapRows.map((row) => {
     const position = positions[row.id];
     const lines = splitLabel(row.name);
+    const subject = snapshot.subjects.find((item) => item.id === row.subjectId);
     return `<g class="map-node ${row.id === selected.id ? "is-selected" : ""}" role="button" tabindex="0" data-map-skill="${escapeHtml(row.id)}" transform="translate(${position.x} ${position.y})">
+      <title>${escapeHtml(subject?.name ?? row.subjectId)}: ${escapeHtml(row.name)} · ${escapeHtml(row.status)}</title>
       <rect width="178" height="70" rx="13" fill="${STATUS_COLORS[row.status] ?? STATUS_COLORS.locked}"></rect>
       <text x="14" y="24">${lines.map((line, index) => `<tspan x="14" dy="${index ? 15 : 0}">${escapeHtml(line)}</tspan>`).join("")}</text>
       <text class="map-node-meta" x="14" y="58">${escapeHtml(row.status)} · ${Math.round(row.masteryScore)}/100</text>
+      ${combined ? `<text class="map-node-subject" x="164" y="58" text-anchor="end">${escapeHtml(subject?.icon ?? "◇")}</text>` : ""}
     </g>`;
   }).join("");
 
   elements.view.innerHTML = `
     <header class="page-head">
-      <div><p class="eyebrow">${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} · ${snapshot.progressRows.length} connected lessons</p><h1>Mastery map</h1><p>${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Cross-subject bridges still show what knowledge travels between curricula.</p></div>
-      <div class="page-actions map-toolbar"><label class="compact-select">Jump to skill<select id="map-skill-select">${skillOptions(snapshot, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
+      <div><p class="eyebrow">${combined ? `All subjects · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula` : `${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} · ${mapRows.length} connected lessons`}</p><h1>Mastery map</h1><p>${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} ${combined ? "Subject lanes and highlighted bridge lines show how knowledge travels across every installed curriculum." : "Cross-subject prerequisites stay listed in the detail panel; choose All subjects to draw them between curricula."}</p></div>
+      <div class="page-actions map-toolbar"><div class="map-scope-control" role="group" aria-label="Subjects shown on mastery map"><button type="button" data-map-scope="subject" aria-pressed="${!combined}">Current subject</button><button type="button" data-map-scope="all" aria-pressed="${combined}">All subjects</button></div><label class="compact-select">Jump to skill<select id="map-skill-select">${mapSkillOptions(snapshot, mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}</div>
     <section class="map-layout">
       <div class="map-scroll" aria-label="Interactive prerequisite map. Drag to move and pinch on a touchscreen to zoom.">
         <div class="map-gesture-hint" aria-hidden="true">Drag to move <span>· Pinch to zoom</span></div>
         <svg class="mastery-map" viewBox="0 0 ${width} ${height}" data-base-width="${width}" data-base-height="${height}" data-current-zoom="${zoom}" style="width:${Math.round(width * zoom)}px;height:${Math.round(height * zoom)}px">
+          <g class="map-subject-lanes">${subjectLanes}</g>
           <g class="map-edges">${edges}</g>
           <g>${nodes}</g>
         </svg>
       </div>
       <aside class="map-detail">
         <div class="map-detail-top">${statusChip(selected.status)}<code>${escapeHtml(selected.id)}</code></div>
-        <p class="eyebrow">${escapeHtml(selected.subdomain)}</p>
+        <p class="eyebrow">${combined ? `${escapeHtml(selectedSubject.icon)} ${escapeHtml(selectedSubject.name)} · ` : ""}${escapeHtml(selected.subdomain)}</p>
         <h2>${escapeHtml(selected.name)}</h2>
         <p>${escapeHtml(selected.description)}</p>
         <div class="detail-metrics">
@@ -544,8 +593,8 @@ function renderMap(snapshot) {
           <span>Confidence<strong>${selected.confidence == null ? "—" : `${selected.confidence}/5`}</strong></span>
         </div>
         <dl class="skill-relations">
-          <div><dt>${snapshot.progressionMode === "soft" ? "Recommended preparation" : "Prerequisites"}</dt><dd>${selected.prerequisites.length ? selected.prerequisites.map((id) => { const target = store.skillsById[id]; const subject = snapshot.subjects.find((item) => item.id === target?.subjectId); return `${escapeHtml(target?.name ?? id)}${target?.subjectId !== snapshot.activeSubject.id ? ` <small>(${escapeHtml(subject?.name ?? target?.subjectId)})</small>` : ""}`; }).join(", ") : "None"}</dd></div>
-          <div><dt>Unlocks</dt><dd>${selected.unlocks.length ? selected.unlocks.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "Track complete"}</dd></div>
+          <div><dt>${snapshot.progressionMode === "soft" ? "Recommended preparation" : "Prerequisites"}</dt><dd>${selected.prerequisites.length ? selected.prerequisites.map((id) => { const target = store.skillsById[id]; const subject = snapshot.subjects.find((item) => item.id === target?.subjectId); return `${escapeHtml(target?.name ?? id)}${target?.subjectId !== selected.subjectId ? ` <small>(${escapeHtml(subject?.name ?? target?.subjectId)})</small>` : ""}`; }).join(", ") : "None"}</dd></div>
+          <div><dt>Unlocks</dt><dd>${selected.unlocks.length ? selected.unlocks.map((id) => { const target = store.skillsById[id]; const subject = snapshot.subjects.find((item) => item.id === target?.subjectId); return `${escapeHtml(target?.name ?? id)}${target?.subjectId !== selected.subjectId ? ` <small>(${escapeHtml(subject?.name ?? target?.subjectId)})</small>` : ""}`; }).join(", ") : "Track complete"}</dd></div>
         </dl>
         ${selected.status === "locked" ? `<div class="locked-note"><strong>Why locked?</strong><p>Prove ${selected.unmetPrerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(" and ")} first, or switch this profile to Open path.</p></div>` : selected.unmetPrerequisites.length ? `<div class="guideline-note"><strong>Open-path guidance</strong><p>${selected.unmetPrerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(" and ")} would make this lesson easier, but they do not block you.</p></div>` : ""}
         ${selectedSkill.applications?.length ? `<div class="application-mini"><strong>Why this matters</strong>${selectedSkill.applications.slice(0, 2).map((item) => `<p>${escapeHtml(item.title)}: ${escapeHtml(item.description)}</p>`).join("")}</div>` : ""}
@@ -1095,6 +1144,12 @@ document.addEventListener("click", async (event) => {
   if (modeButton && currentSnapshot?.activeProfile) {
     store.setLearningPreferences({ progressionMode: modeButton.dataset.progressionMode });
     showToast(modeButton.dataset.progressionMode === "soft" ? "Open path enabled. Connections are now guidance." : "Hard path enabled. Prerequisites lock tests.");
+    return;
+  }
+  const mapScopeButton = event.target.closest?.("[data-map-scope]");
+  if (mapScopeButton && currentSnapshot?.ui.route === "map") {
+    store.setLearningPreferences({ mapScope: mapScopeButton.dataset.mapScope });
+    showToast(mapScopeButton.dataset.mapScope === "all" ? "Showing every installed subject and bridge." : `Showing ${store.snapshot().activeSubject.name} only.`);
     return;
   }
   const mapNode = event.target.closest?.("[data-map-skill]");

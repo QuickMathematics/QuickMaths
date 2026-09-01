@@ -1,6 +1,6 @@
 # QuickMaths WebMCP Challenge
 
-QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, switch between Mathematics and Geography, follow connected prerequisite maps, take varied mastery tests, reflect, review past work, and move progress between devices.
+QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, switch between Mathematics and Geography, inspect one curriculum or every installed subject in a combined bridge map, take varied mastery tests, reflect, review past work, and move progress between devices.
 
 The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page.
 
@@ -30,10 +30,10 @@ A compatible ChatGPT or Codex browser discovers seventeen page tools through `do
 | --- | --- |
 | `get_agent_guide` | Read operating, tutoring, privacy, backup, and custom lesson-set guidance. |
 | `get_app_state` | Read the visible view, learner, timers, mastery counts, and current suggestion. |
-| `get_curriculum_map` | Read one subject map with statuses, prerequisite bridges, and unlocks. |
+| `get_curriculum_map` | Read one subject map or the combined installed-subject map with statuses, prerequisite bridges, and unlocks. |
 | `get_progress_summary` | Read per-skill mastery, attempts, and misconception tags. |
 | `list_subjects` | Read installed subjects and lesson totals. |
-| `set_learning_preferences` | Change the visible subject and Hard/Open path mode. |
+| `set_learning_preferences` | Change the visible subject, Hard/Open path mode, and focused/combined map scope. |
 | `navigate_learning_app` | Open the dashboard, map, lesson, test, results, Lesson studio, or Settings. |
 | `open_lesson_creator` | Open the no-code Human Lesson Creator. |
 | `validate_lesson_set` | Validate schema 2.0 subjects, bridges, questions, proof/rubric policy, and safety limits. |

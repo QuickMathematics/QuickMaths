@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 9,
+  "app_version": 10,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://srednjak.github.io/QuickMaths/",
   "discovery": {
@@ -49,6 +49,7 @@
       "If the visible route is tutorial, let the human complete or skip onboarding; do not silently navigate them away from it.",
       "Respect the learner's path mode: Hard path enforces prerequisites; Open path treats the same connections as recommended preparation.",
       "Use list_subjects and set_learning_preferences when changing subject or path mode so the human sees the change.",
+      "The mastery map can show the current subject or every installed subject in labeled lanes. Use map_scope all when the learner wants to inspect cross-subject bridges together.",
       "Do not replace or reset learner data through ordinary browser actions."
     ],
     "custom_content": [
@@ -140,6 +141,7 @@
       "geography_bridge": "The built-in Latitude, longitude, and geodetic reference lesson depends on the Mathematics spherical-coordinates bridge, which grows from angles, arcs, and coordinate geometry.",
       "new_subjects": "Schema 2.0 lesson sets can create themed subjects or extend an installed subject.",
       "bridges": "Prerequisites may reference lessons in any installed subject by globally unique skill ID or explicit subject_id/skill_id object.",
+      "combined_map": "The map toggle can place every installed subject in a labeled lane and draw cross-subject prerequisite bridges between them.",
       "progression_modes": { "hard": "Prerequisites lock tests.", "soft": "Connections are guidance and all tests are open." },
       "theme_safety": "Only fixed six-digit color tokens are accepted; CSS, HTML, scripts, and URLs are rejected."
     },

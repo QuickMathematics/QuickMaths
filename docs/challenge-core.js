@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 9;
+export const APP_VERSION = 10;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -493,6 +493,7 @@ function sanitizeProfile(candidate) {
     demo: Boolean(candidate.demo),
     activeSubjectId: SUBJECT_ID.test(candidate.activeSubjectId) ? candidate.activeSubjectId : DEFAULT_SUBJECT_ID,
     progressionMode: candidate.progressionMode === "soft" ? "soft" : "hard",
+    mapScope: candidate.mapScope === "all" ? "all" : "subject",
     tutorialCompletedAt: candidate.tutorialCompletedAt === null ? null : cleanText(candidate.tutorialCompletedAt, 40) || createdAt,
     tutorialSkipped: Boolean(candidate.tutorialSkipped),
   };
@@ -741,7 +742,7 @@ function migrateLegacy(storage, curriculum) {
     if (!legacy || typeof legacy !== "object") return null;
     const state = initialState();
     const now = new Date().toISOString();
-    const profile = { id: "profile-migrated-demo", displayName: "Demo Learner", createdAt: now, totalLoggedSeconds: 0, demo: true, activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", tutorialCompletedAt: now, tutorialSkipped: false };
+    const profile = { id: "profile-migrated-demo", displayName: "Demo Learner", createdAt: now, totalLoggedSeconds: 0, demo: true, activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "subject", tutorialCompletedAt: now, tutorialSkipped: false };
     state.profiles = [profile];
     state.activeProfileId = profile.id;
     state.ui.route = "home";
@@ -1197,6 +1198,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       activeSubject: clone(catalog.subjects.find((subject) => subject.id === activeSubjectId()) ?? catalog.subjects[0]),
       subjects: clone(catalog.subjects),
       progressionMode: activeProfile()?.progressionMode ?? "hard",
+      mapScope: activeProfile()?.mapScope ?? "subject",
       profiles: clone(state.profiles),
       progressRows: clone(rows),
       allProgressRows: clone(allRows),
@@ -1289,7 +1291,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     if (name.length < 2) throw new Error("Profile name must contain at least 2 characters.");
     const profile = {
       id: makeId("profile"), displayName: name, createdAt: isoNow(), totalLoggedSeconds: 0, demo,
-      activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", tutorialCompletedAt: null, tutorialSkipped: false,
+      activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "subject", tutorialCompletedAt: null, tutorialSkipped: false,
     };
     state.profiles.push(profile);
     state.progress[profile.id] = {};
@@ -1385,7 +1387,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return state.ui.mapZoom;
   };
 
-  const setLearningPreferences = ({ subjectId = null, progressionMode = null, activityActor = "learner" } = {}) => {
+  const setLearningPreferences = ({ subjectId = null, progressionMode = null, mapScope = null, activityActor = "learner" } = {}) => {
     const profile = activeProfile();
     if (!profile) throw new Error("Select a profile first.");
     if (subjectId != null) {
@@ -1401,9 +1403,16 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       if (!["hard", "soft"].includes(progressionMode)) throw new Error("progression_mode must be hard or soft.");
       profile.progressionMode = progressionMode;
     }
-    addActivity("set_learning_preferences", `Using ${profile.progressionMode} progression in ${catalog.subjects.find((subject) => subject.id === profile.activeSubjectId)?.name ?? profile.activeSubjectId}.`, undefined, activityActor);
+    if (mapScope != null) {
+      if (!["subject", "all"].includes(mapScope)) throw new Error("map_scope must be subject or all.");
+      profile.mapScope = mapScope;
+      if (mapScope === "subject" && skillsById[state.ui.selectedMapSkillId]?.subjectId !== profile.activeSubjectId) {
+        state.ui.selectedMapSkillId = skillOrder.find((id) => skillsById[id]?.subjectId === profile.activeSubjectId) ?? state.ui.selectedMapSkillId;
+      }
+    }
+    addActivity("set_learning_preferences", `Using ${profile.progressionMode} progression in ${catalog.subjects.find((subject) => subject.id === profile.activeSubjectId)?.name ?? profile.activeSubjectId}; the map shows ${profile.mapScope === "all" ? "all installed subjects" : "the current subject"}.`, undefined, activityActor);
     notify();
-    return { ok: true, subject_id: profile.activeSubjectId, progression_mode: profile.progressionMode };
+    return { ok: true, subject_id: profile.activeSubjectId, progression_mode: profile.progressionMode, map_scope: profile.mapScope };
   };
 
   const startTest = (skillId, { force = false, activityActor = "learner" } = {}) => {

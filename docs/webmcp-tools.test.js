@@ -35,11 +35,15 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /renderLessonDepot/);
   assert.doesNotMatch(html, /class="mode-switch"|id="replay-tutorial"/);
   assert.match(js, /data-action="map-zoom-in"/);
+  assert.match(js, /data-map-scope="all"/);
+  assert.match(js, /map-subject-lane/);
   assert.match(js, /MAP_ZOOM_MIN = 0\.1/);
   assert.match(js, /addEventListener\("pointermove"/);
   assert.match(js, /startDistance/);
   assert.match(js, /data-tutorial-action="copy-agent-prompt"/);
   assert.match(css, /touch-action: none/);
+  assert.match(css, /\.map-scope-control/);
+  assert.match(css, /\.map-edges \.is-cross-subject/);
   assert.match(css, /height: clamp\(300px, 60svh, 540px\); max-height: none; contain: layout paint/);
   assert.match(css, /\.agent-dock\.is-closed/);
   assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
@@ -107,6 +111,7 @@ test("app, curriculum, and progress tools expose the full learner state", async 
   const summary = await tools.get_progress_summary.execute({});
   assert.equal(app.has_profile, true);
   assert.equal(app.view, "tutorial");
+  assert.equal(app.map_scope, "subject");
   assert.equal(map.skills.length, 28);
   assert.equal(summary.skills.length, 28);
   assert.equal(summary.suggested_next.skill_id, "MATH_ARITH_001");
@@ -180,6 +185,13 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
   const geography = await tools.set_learning_preferences.execute({ subject_id: "SUBJECT_GEOGRAPHY" });
   assert.equal(geography.subject_id, "SUBJECT_GEOGRAPHY");
   assert.equal((await tools.get_curriculum_map.execute({})).skills.length, 15);
+  const combinedPreference = await tools.set_learning_preferences.execute({ map_scope: "all" });
+  assert.equal(combinedPreference.map_scope, "all");
+  const combinedMap = await tools.get_curriculum_map.execute({});
+  assert.equal(combinedMap.scope, "all");
+  assert.equal(combinedMap.skills.length, 43);
+  assert.deepEqual(new Set(combinedMap.skills.map((skill) => skill.subject_id)), new Set(["SUBJECT_MATH", "SUBJECT_GEOGRAPHY"]));
+  await assert.rejects(tools.get_curriculum_map.execute({ subject_id: "SUBJECT_MATH", scope: "all" }), /cannot be combined/);
   const opened = await tools.open_lesson_creator.execute({ subject_id: "SUBJECT_MATH" });
   assert.equal(opened.visible_view, "creator");
   assert.equal(store.snapshot().ui.route, "creator");

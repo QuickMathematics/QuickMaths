@@ -81,6 +81,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           view: state.ui.route,
           subject: state.activeProfile ? { subject_id: state.activeSubject.id, name: state.activeSubject.name } : null,
           progression_mode: state.progressionMode,
+          map_scope: state.mapScope,
           timers: state.timers,
           mastery_counts: state.progressCounts,
           selected_skill: state.activeProfile ? { skill_id: state.selectedSkill.id, name: state.selectedSkill.name } : null,
@@ -98,31 +99,38 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "get_curriculum_map",
       title: "Get curriculum map",
-      description: "Read the learner's prerequisite map for any built-in or installed subject, including statuses and unlock relationships.",
+      description: "Read one installed subject map or the combined all-subject prerequisite map, including statuses, bridges, and unlock relationships.",
       inputSchema: {
         type: "object",
         properties: {
           include_locked: { type: "boolean", description: "Include locked skills; defaults to true." },
           subject_id: stringSchema("Optional subject to inspect; defaults to the learner's visible subject.", 60),
+          scope: { type: "string", enum: ["subject", "all"], description: "Read one subject or the combined installed-subject map; defaults to the visible map scope." },
         },
         additionalProperties: false,
       },
       annotations: { readOnlyHint: true },
       async execute(input = {}) {
-        requireObject(input); rejectUnknown(input, ["include_locked", "subject_id"]);
+        requireObject(input); rejectUnknown(input, ["include_locked", "subject_id", "scope"]);
         if (input.include_locked !== undefined && typeof input.include_locked !== "boolean") throw new Error("include_locked must be a boolean.");
+        if (input.scope !== undefined && !["subject", "all"].includes(input.scope)) throw new Error("scope must be subject or all.");
         const state = store.snapshot();
-        const subjectId = optionalString(input, "subject_id", 60) || state.activeSubject.id;
-        if (!state.subjects.some((subject) => subject.id === subjectId)) throw new Error("subject_id is unknown.");
-        const subjectRows = state.allProgressRows.filter((row) => row.subjectId === subjectId);
+        const requestedSubjectId = optionalString(input, "subject_id", 60) || null;
+        if (requestedSubjectId && input.scope === "all") throw new Error("subject_id cannot be combined with scope all.");
+        const scope = requestedSubjectId ? "subject" : input.scope ?? state.mapScope;
+        const subjectId = requestedSubjectId || state.activeSubject.id;
+        if (scope === "subject" && !state.subjects.some((subject) => subject.id === subjectId)) throw new Error("subject_id is unknown.");
+        const subjectRows = scope === "all" ? state.allProgressRows : state.allProgressRows.filter((row) => row.subjectId === subjectId);
         const rows = (input.include_locked ?? true) ? subjectRows : subjectRows.filter((row) => row.status !== "locked");
         return {
           ok: true,
-          subject: state.subjects.find((subject) => subject.id === subjectId),
+          scope,
+          subject: scope === "subject" ? state.subjects.find((subject) => subject.id === subjectId) : null,
+          subjects: scope === "all" ? state.subjects : undefined,
           progression_mode: state.progressionMode,
           custom_lesson_sets: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
           skills: rows.map((row) => ({
-            skill_id: row.id, name: row.name, subdomain: row.subdomain, status: row.status,
+            skill_id: row.id, subject_id: row.subjectId, name: row.name, subdomain: row.subdomain, status: row.status,
             mastery_score: row.masteryScore, prerequisites: row.prerequisites, unmet_prerequisites: row.unmetPrerequisites, unlocks: row.unlocks,
           })),
         };
@@ -152,6 +160,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           ok: true,
           active_subject_id: state.activeSubject?.id ?? null,
           progression_mode: state.progressionMode,
+          map_scope: state.mapScope,
           subjects: state.subjects.map((subject) => ({
             subject_id: subject.id, name: subject.name, short_name: subject.shortName, icon: subject.icon,
             description: subject.description, built_in: subject.builtIn, skill_count: subject.skillIds.length,
@@ -161,22 +170,24 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     },
     {
       name: "set_learning_preferences",
-      title: "Set subject and path mode",
-      description: "Change the learner's visible subject and/or choose Hard path (enforced prerequisites) or Open path (connections are guidance). This visibly updates the app.",
+      title: "Set learning and map preferences",
+      description: "Change the visible subject, choose Hard or Open path, and switch the mastery map between the current subject and all installed subjects. This visibly updates the app.",
       inputSchema: {
         type: "object",
         properties: {
           subject_id: stringSchema("An installed subject ID from list_subjects.", 60),
           progression_mode: { type: "string", enum: ["hard", "soft"] },
+          map_scope: { type: "string", enum: ["subject", "all"] },
         },
         additionalProperties: false,
       },
       async execute(input = {}) {
-        requireObject(input); rejectUnknown(input, ["subject_id", "progression_mode"]);
-        if (!input.subject_id && !input.progression_mode) throw new Error("Provide subject_id or progression_mode.");
+        requireObject(input); rejectUnknown(input, ["subject_id", "progression_mode", "map_scope"]);
+        if (!input.subject_id && !input.progression_mode && !input.map_scope) throw new Error("Provide subject_id, progression_mode, or map_scope.");
         return store.setLearningPreferences({
           subjectId: optionalString(input, "subject_id", 60) || null,
           progressionMode: input.progression_mode ?? null,
+          mapScope: input.map_scope ?? null,
           activityActor: "agent",
         });
       },
