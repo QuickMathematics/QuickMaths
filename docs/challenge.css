@@ -742,6 +742,7 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
   .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dashboard-grid { grid-template-columns: 1fr; }
   .map-layout { grid-template-columns: 1fr; }
+  .map-scroll { height: clamp(300px, 60svh, 540px); max-height: none; contain: layout paint; }
   .map-detail { position: relative; top: 0; }
   .lesson-overview { grid-template-columns: 1fr; }
   .lesson-status-card { position: relative; top: 0; }
@@ -801,7 +802,6 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
   .sidebar-profile small { display: none; }
   .page-head .compact-select, .page-head .compact-select select { width: 100%; max-width: none; }
   .map-layout { min-height: 0; }
-  .map-scroll { max-height: 68vh; }
   .application-grid { grid-template-columns: 1fr; }
   .application-grid article, .application-grid article:last-child { grid-column: auto; }
   .answer-options { grid-template-columns: 1fr; }

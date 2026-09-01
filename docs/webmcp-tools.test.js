@@ -40,6 +40,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /startDistance/);
   assert.match(js, /data-tutorial-action="copy-agent-prompt"/);
   assert.match(css, /touch-action: none/);
+  assert.match(css, /height: clamp\(300px, 60svh, 540px\); max-height: none; contain: layout paint/);
   assert.match(css, /\.agent-dock\.is-closed/);
   assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
   assert.match(js, /createGitHubSyncController/);
