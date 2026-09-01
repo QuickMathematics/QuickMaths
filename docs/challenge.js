@@ -1,6 +1,6 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260901-combined-map";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260901-guided-studio";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260901-combined-map";
-import { createLessonStudio } from "./lesson-creator.js";
+import { createLessonStudio } from "./lesson-creator.js?v=20260901-guided-studio";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
@@ -657,14 +657,23 @@ function renderLesson(snapshot) {
 function renderWorkGuide(problem) {
   const mode = problem.work?.mode;
   if (mode === "proof_obligations") {
+    const obligations = problem.work?.proof_policy?.obligations ?? [];
     const strategies = problem.work?.proof_policy?.accepted_strategies ?? [];
-    return `<details class="work-guide"><summary>Proof skeleton</summary>${strategies.map((strategy) => `<strong>${escapeHtml(strategy.name ?? strategy.id)}</strong><p>${escapeHtml(strategy.description ?? "")}</p>`).join("")}</details>`;
+    return `<details class="work-guide" open><summary>What your proof must cover</summary><p class="work-syntax-note">Write in plain text—no special proof syntax is required. One claim or reason per line is easiest to review.</p><ol>${obligations.map((item) => `<li>${escapeHtml(typeof item === "string" ? item : item.description ?? item.label ?? item.id)}</li>`).join("")}</ol>${strategies.length ? `<p><strong>Accepted approaches:</strong> ${strategies.map((item) => escapeHtml(typeof item === "string" ? item : item.name ?? item.id)).join(" · ")}</p>` : ""}</details>`;
   }
   if (mode === "rubric_check") {
     const criteria = problem.work?.rubric?.criteria ?? [];
-    return `<details class="work-guide"><summary>Rubric</summary><ul>${criteria.map((item) => `<li>${escapeHtml(item.label ?? item.id)} · ${escapeHtml(item.points)} pts</li>`).join("")}</ul></details>`;
+    return `<details class="work-guide" open><summary>How your response will be reviewed</summary><p class="work-syntax-note">Use normal prose, headings, or one point per line. Address every criterion below.</p><ul>${criteria.map((item) => `<li>${escapeHtml(item.description ?? item.label ?? item.id)}${item.weight && item.weight !== 1 ? ` · weight ${escapeHtml(item.weight)}` : ""}</li>`).join("")}</ul></details>`;
   }
   return "";
+}
+
+function workResponsePlaceholder(problem) {
+  const mode = problem.work?.mode;
+  if (mode === "procedural_steps") return "One mathematical step per line…";
+  if (mode === "proof_obligations") return "Claim: …\nReason: …\nTherefore: …";
+  if (mode === "rubric_check") return "Write a complete response that addresses each criterion…";
+  return "Write your reasoning here…";
 }
 
 function renderTest(snapshot) {
@@ -695,7 +704,7 @@ function renderTest(snapshot) {
           <h2>${escapeHtml(problem.prompt)}</h2>
           ${problem.options?.length ? `<fieldset class="answer-options"><legend>Final answer</legend>${problem.options.map((option) => `<label><input type="radio" name="answer-${escapeHtml(problem.template_id)}" value="${escapeHtml(option.id)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" ${response.finalAnswer === String(option.id) ? "checked" : ""}><span><b>${escapeHtml(option.id)}</b>${escapeHtml(option.label ?? option.id)}</span></label>`).join("")}</fieldset>` : `<label class="response-field"><span>Final answer</span><input type="text" value="${escapeHtml(response.finalAnswer)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" autocomplete="off" spellcheck="false" placeholder="Enter your answer"></label>`}
           ${renderWorkGuide(problem)}
-          ${problem.work?.mode && problem.work.mode !== "none" ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="4" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="One reasoning step per line…">${escapeHtml(response.work)}</textarea></label>` : ""}
+          ${problem.work?.mode && problem.work.mode !== "none" ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="${["proof_obligations", "rubric_check"].includes(problem.work.mode) ? 7 : 4}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="${escapeHtml(workResponsePlaceholder(problem))}">${escapeHtml(response.work)}</textarea></label>` : ""}
         </article>`;
       }).join("")}
       <p id="test-error" class="form-message" role="alert"></p>
@@ -704,11 +713,28 @@ function renderTest(snapshot) {
   `;
 }
 
+function resultReviewGuide(result) {
+  if (result.workMode === "proof_obligations" && result.proofObligations?.length) {
+    return `<section class="result-review-guide"><strong>Review this proof against</strong><ol>${result.proofObligations.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol></section>`;
+  }
+  if (result.workMode === "rubric_check" && result.rubricCriteria?.length) {
+    return `<section class="result-review-guide"><strong>Review this response against</strong><ul>${result.rubricCriteria.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`;
+  }
+  return "";
+}
+
 function resultDetails(results) {
-  return results.map((result, index) => `<details class="result-question" ${!result.correct ? "open" : ""}>
-    <summary><span class="result-icon ${result.correct ? "correct" : "incorrect"}">${result.correct ? "✓" : "×"}</span><span><strong>Question ${index + 1}</strong><small>${escapeHtml(result.prompt)}</small></span><b>${result.correct ? "Correct" : "Needs work"}</b></summary>
-    <div class="result-body"><dl><div><dt>Your answer</dt><dd>${escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
+  return results.map((result, index) => `<details class="result-question" ${!result.correct || result.reviewRequired ? "open" : ""}>
+    <summary><span class="result-icon ${result.correct ? "correct" : "incorrect"}">${result.correct ? "✓" : "×"}</span><span><strong>Question ${index + 1}</strong><small>${escapeHtml(result.prompt)}</small></span><b>${result.reviewRequired ? "Review required" : result.correct ? "Correct" : "Needs work"}</b></summary>
+    <div class="result-body"><dl><div><dt>Your answer</dt><dd>${escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
   </details>`).join("");
+}
+
+function renderAttemptReviewForm(attempt) {
+  const targets = attempt?.results?.filter((item) => item.work) ?? [];
+  if (!targets.length) return "";
+  const first = targets[0];
+  return `<section class="self-review content-card"><div class="card-heading"><div><p class="eyebrow">${attempt.hasPendingReview ? "Required sign-off" : "Optional review"}</p><h2>${attempt.hasPendingReview ? "Review the saved reasoning" : "Add tutor / self review"}</h2><p>Select the exact response, compare it with its proof checklist or rubric above, then save one overall verdict.</p></div></div><form id="self-review-form"><div class="review-form-grid"><label>Response<select id="review-question-select" name="question">${targets.map((result, index) => `<option value="${escapeHtml(result.questionId)}" data-allow-self="${result.allowSelfReview ? "true" : "false"}">Question ${index + 1} · ${escapeHtml(result.workMode?.replaceAll("_", " ") ?? "shown work")}</option>`).join("")}</select></label><label>Reviewer<select id="review-reviewer-select" name="reviewer"><option value="self" ${first.allowSelfReview ? "" : "disabled"}>Self</option><option value="human_tutor" ${first.allowSelfReview ? "" : "selected"}>Human tutor</option><option value="ai_tutor">AI tutor / agent</option></select></label><label>Verdict<select name="verdict"><option value="pass">Pass</option><option value="partial" selected>Partial</option><option value="needs_revision">Needs revision</option><option value="fail">Fail</option></select></label><label>Confidence<select name="confidence"><option>low</option><option selected>medium</option><option>high</option></select></label></div><p id="review-permission-note" class="review-permission-note">${first.allowSelfReview ? "This response allows self review." : "This response requires a tutor or connected agent."}</p><label>Feedback<textarea name="feedback" rows="3" required placeholder="Which requirements were met, and what needs revision?"></textarea></label><label>Next step<input name="next" required placeholder="One concrete action for the learner"></label><button class="button button-secondary" type="submit">Save review</button></form></section>`;
 }
 
 function renderResults(snapshot) {
@@ -739,7 +765,7 @@ function renderResults(snapshot) {
         ${reviews.length ? `<div class="saved-reviews"><p class="eyebrow">Saved review</p>${reviews.map((review) => `<article><strong>${escapeHtml(review.verdict)} · ${Math.round(review.score * 100)}%</strong><p>${escapeHtml(review.feedback)}</p><small>${escapeHtml(review.nextStep)}</small></article>`).join("")}</div>` : ""}
       </aside>
     </section>
-    ${!pending && attempt?.results?.some((item) => item.work) ? `<section class="self-review content-card"><div class="card-heading"><div><h2>Add tutor / self review</h2><p>Save a reasoning verdict beside this attempt.</p></div></div><form id="self-review-form"><div class="review-form-grid"><label>Reviewer<select name="reviewer"><option value="self">Self</option><option value="human_tutor">Human tutor</option><option value="ai_tutor">AI tutor</option></select></label><label>Verdict<select name="verdict"><option value="pass">Pass</option><option value="partial" selected>Partial</option><option value="needs_revision">Needs revision</option><option value="fail">Fail</option></select></label><label>Confidence<select name="confidence"><option>low</option><option selected>medium</option><option>high</option></select></label></div><label>Feedback<textarea name="feedback" rows="3" required></textarea></label><label>Next step<input name="next" required></label><button class="button button-secondary" type="submit">Save review</button></form></section>` : ""}
+    ${!pending ? renderAttemptReviewForm(attempt) : ""}
   `;
 }
 
@@ -1202,6 +1228,17 @@ document.addEventListener("click", async (event) => {
 });
 
 document.addEventListener("change", (event) => {
+  if (event.target.id === "review-question-select") {
+    const option = event.target.selectedOptions?.[0];
+    const reviewer = document.querySelector("#review-reviewer-select");
+    const selfOption = reviewer?.querySelector('option[value="self"]');
+    const allowSelf = option?.dataset.allowSelf === "true";
+    if (selfOption) selfOption.disabled = !allowSelf;
+    if (!allowSelf && reviewer?.value === "self") reviewer.value = "human_tutor";
+    const note = document.querySelector("#review-permission-note");
+    if (note) note.textContent = allowSelf ? "This response allows self review." : "This response requires a tutor or connected agent.";
+    return;
+  }
   if (event.target.id === "depot-subject" || event.target.id === "depot-sort") {
     lessonDepot.setFilters({ subject: document.querySelector("#depot-subject")?.value ?? "all", sort: document.querySelector("#depot-sort")?.value ?? "popular" });
     return;
@@ -1282,7 +1319,7 @@ document.addEventListener("submit", (event) => {
     event.preventDefault();
     const data = new FormData(event.target);
     const attempt = store.getAttempt();
-    const reviewed = attempt?.results?.find((result) => result.work) ?? attempt?.results?.[0];
+    const reviewed = attempt?.results?.find((result) => result.questionId === data.get("question")) ?? attempt?.results?.find((result) => result.work) ?? attempt?.results?.[0];
     store.recordTutorFeedback({
       questionId: reviewed?.questionId ?? "attempt", feedback: data.get("feedback"), nextStep: data.get("next"),
       confidence: data.get("confidence"), verdict: data.get("verdict"), reviewerType: data.get("reviewer"),

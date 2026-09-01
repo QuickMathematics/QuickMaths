@@ -347,9 +347,14 @@ test("proof and rubric authoring modes retain structured review policies", () =>
       work: item.work.mode === "proof_obligations" ? "The claim follows because the evidence connects each biological step." : item.work_required ? workFor(item) : "",
     });
   }
+  const inspection = store.inspectStudentWork({ questionId: draft.problems[0].template_id });
+  assert.equal(inspection.review_guide.mode, "proof_obligations");
+  assert.deepEqual(inspection.review_guide.proof_obligations, ["State the claim", "Connect evidence"]);
   assert.equal(store.submitTest().ok, true);
   const attempt = store.saveReflection({ confidenceRating: 4, difficultyFelt: "medium", hintsUsed: "none", guessed: "no" });
   assert.equal(attempt.hasPendingReview, true);
+  assert.equal(attempt.results[0].workMode, "proof_obligations");
+  assert.deepEqual(attempt.results[0].proofObligations, ["State the claim", "Connect evidence"]);
   assert.equal(store.snapshot().progressRows[0].status, "learning");
   store.recordTutorFeedback({
     questionId: draft.problems[0].template_id, feedback: "The proof addresses both obligations.", nextStep: "Continue to the next cell process.",

@@ -549,6 +549,10 @@ function sanitizeResult(candidate) {
     workRequired: Boolean(candidate.workRequired),
     reviewRequired: Boolean(candidate.reviewRequired),
     allowSelfReview: candidate.allowSelfReview !== false,
+    workMode: cleanText(candidate.workMode, 60) || "none",
+    proofObligations: Array.isArray(candidate.proofObligations) ? candidate.proofObligations.map((item) => cleanText(item, 500)).filter(Boolean).slice(0, 12) : [],
+    rubricCriteria: Array.isArray(candidate.rubricCriteria) ? candidate.rubricCriteria.map((item) => cleanText(item, 500)).filter(Boolean).slice(0, 12) : [],
+    reviewPolicy: cleanText(candidate.reviewPolicy, 60) || "none",
   };
 }
 
@@ -1476,6 +1480,10 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
         workRequired: Boolean(problem.work_required),
         reviewRequired: ["proof_obligations", "rubric_check"].includes(problem.work?.mode) || problem.review_policy?.mastery_requires_review_pass === true,
         allowSelfReview: problem.review_policy?.allow_self_review !== false,
+        workMode: problem.work?.mode ?? "none",
+        proofObligations: clone(problem.work?.proof_policy?.obligations ?? []),
+        rubricCriteria: clone((problem.work?.rubric?.criteria ?? []).map((criterion) => criterion.description)),
+        reviewPolicy: problem.review_policy?.work_review ?? "none",
       };
     });
     const rawScore = results.filter((result) => result.correct).length;
@@ -1601,6 +1609,13 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       work_lines: response.work.split(/\r?\n/).map((line) => line.trim()).filter(Boolean),
       final_answer_status: response.finalAnswer ? (grade.correct ? "correct" : "incorrect") : "missing",
       work_status: response.work ? "pending_review" : problem.work_required ? "missing" : "not_required",
+      review_guide: {
+        mode: problem.work?.mode ?? "none",
+        proof_obligations: clone(problem.work?.proof_policy?.obligations ?? []),
+        rubric_criteria: clone((problem.work?.rubric?.criteria ?? []).map((criterion) => criterion.description)),
+        review_policy: problem.review_policy?.work_review ?? "none",
+        mastery_requires_review_pass: problem.review_policy?.mastery_requires_review_pass === true,
+      },
       mistake_tag: mistakeTag,
       messages: [grade.correct ? "The final answer passes the local grader; review the reasoning quality." : "Use the mistake tag and shown work to give one Socratic next step."],
       inspected_at: isoNow(),

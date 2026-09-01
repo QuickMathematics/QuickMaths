@@ -123,6 +123,7 @@
     "example": "https://srednjak.github.io/QuickMaths/lesson-set-example.json",
     "install_route": "settings",
     "human_creator_route": "creator",
+    "human_creator_guidance": "Lesson Studio explains final-answer grading, shown work, and review as separate stages; advanced modes include editable examples and a learner-view preview. Proofs and rubrics use plain text, not special syntax, and remain pending until an allowed reviewer passes them.",
     "limits": { "file_bytes": 2000000, "sets": 10, "skills_per_set": 50, "problems_per_skill": 100 },
     "id_rules": { "pack_prefix": "PACK_", "skill_prefix": "CUSTOM_", "characters": "uppercase letters, numbers, and underscores" },
     "supported_grading": [

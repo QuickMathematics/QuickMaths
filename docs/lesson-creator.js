@@ -6,6 +6,47 @@ const DEFAULT_THEME = {
   tint: "#bfe2ce", highlight: "#e4ef9b", accent: "#e06b54",
 };
 
+const WORK_MODE_GUIDES = {
+  none: {
+    title: "Final answer only",
+    summary: "QuickMaths shows one final-answer field and grades it locally.",
+    syntax: "Best for numbers, equations, multiple choice, or short conclusions.",
+    flow: "Student answers → app grades → mastery updates after reflection.",
+  },
+  capture_only: {
+    title: "Written explanation",
+    summary: "Adds a plain-text reasoning box beneath the final answer.",
+    syntax: "No special syntax. The learner writes normal sentences or notes.",
+    flow: "Student answers and explains → app grades the final answer → the explanation is saved for review.",
+  },
+  procedural_steps: {
+    title: "Checked maths steps",
+    summary: "Asks for one mathematical step per line and checks the shape of each line before submission.",
+    syntax: "Use readable maths such as 2x + 5 = 13, one equation or expression per line.",
+    flow: "Student enters steps → app checks notation and step count → app grades the final answer.",
+  },
+  proof_obligations: {
+    title: "Structured proof",
+    summary: "Shows a required proof box plus a checklist of claims the proof must address.",
+    syntax: "Plain text—no JSON, LaTeX, or magic keywords. One claim or reason per line is easiest to review.",
+    flow: "Student writes proof → app checks that work was supplied → self, human, or agent review signs it off → mastery updates.",
+  },
+  rubric_check: {
+    title: "Rubric-reviewed response",
+    summary: "Shows a required response box and the exact criteria the reviewer will use.",
+    syntax: "Plain text. Paragraphs, labelled sections, or one point per line all work.",
+    flow: "Student responds → app checks that work was supplied → reviewer checks every criterion → mastery updates.",
+  },
+};
+
+const REVIEW_OPTIONS = [
+  ["none", "No separate review"],
+  ["optional", "Review can be added later"],
+  ["auto", "App checks the work format"],
+  ["self_review", "Learner signs off"],
+  ["tutor_required", "Tutor / agent signs off"],
+];
+
 function cleanId(value, prefix) {
   const body = String(value ?? "").toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 42);
   if (body.startsWith(prefix)) return body;
@@ -23,8 +64,8 @@ function blankProblem(skillId, index = 0) {
     gradingMethod: "exact_text", difficulty: "medium", tolerance: "0.001", options: "A | First choice\nB | Second choice",
     acceptedForms: "", solutionSteps: "Explain the key idea.\nComplete the calculation or reasoning.", mistakeTags: "concept_error",
     answerMode: "final_only", workMode: "none", workPrompt: "", minimumSteps: 2,
-    lineType: "expression", proofObligations: "State the claim\nJustify each inference", proofStrategies: "direct proof",
-    rubricCriteria: "Uses the central concept\nExplains the conclusion", workReview: "none", masteryRequiresReview: false, allowSelfReview: true,
+    lineType: "expression", proofObligations: "State the claim clearly\nName the facts or definitions you use\nJustify how they lead to the conclusion", proofStrategies: "Direct proof\nProof by contradiction\nProof by contrapositive",
+    rubricCriteria: "Makes a clear central claim\nUses relevant evidence or calculations\nExplains how the evidence supports the conclusion", workReview: "none", masteryRequiresReview: false, allowSelfReview: true,
   };
 }
 
@@ -67,16 +108,120 @@ function esc(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
 }
 
-function field(label, name, value, { type = "text", help = "", placeholder = "", min = "", max = "", step = "" } = {}) {
-  return `<label class="studio-field"><span>${esc(label)}${help ? `<i title="${esc(help)}" aria-label="${esc(help)}">?</i>` : ""}</span><input data-creator-field="${esc(name)}" type="${esc(type)}" value="${esc(value)}" placeholder="${esc(placeholder)}" ${min !== "" ? `min="${esc(min)}"` : ""} ${max !== "" ? `max="${esc(max)}"` : ""} ${step !== "" ? `step="${esc(step)}"` : ""}></label>`;
+function field(label, name, value, { type = "text", help = "", hint = "", placeholder = "", min = "", max = "", step = "" } = {}) {
+  return `<label class="studio-field"><span>${esc(label)}${help ? `<i title="${esc(help)}" aria-label="${esc(help)}">?</i>` : ""}</span><input data-creator-field="${esc(name)}" type="${esc(type)}" value="${esc(value)}" placeholder="${esc(placeholder)}" ${min !== "" ? `min="${esc(min)}"` : ""} ${max !== "" ? `max="${esc(max)}"` : ""} ${step !== "" ? `step="${esc(step)}"` : ""}>${hint ? `<small>${esc(hint)}</small>` : ""}</label>`;
 }
 
-function area(label, name, value, { help = "", rows = 4, placeholder = "" } = {}) {
-  return `<label class="studio-field studio-area"><span>${esc(label)}${help ? `<i title="${esc(help)}" aria-label="${esc(help)}">?</i>` : ""}</span><textarea data-creator-field="${esc(name)}" rows="${rows}" placeholder="${esc(placeholder)}">${esc(value)}</textarea></label>`;
+function area(label, name, value, { help = "", hint = "", rows = 4, placeholder = "" } = {}) {
+  return `<label class="studio-field studio-area"><span>${esc(label)}${help ? `<i title="${esc(help)}" aria-label="${esc(help)}">?</i>` : ""}</span><textarea data-creator-field="${esc(name)}" rows="${rows}" placeholder="${esc(placeholder)}">${esc(value)}</textarea>${hint ? `<small>${esc(hint)}</small>` : ""}</label>`;
 }
 
 function select(label, name, value, options, help = "") {
   return `<label class="studio-field"><span>${esc(label)}${help ? `<i title="${esc(help)}" aria-label="${esc(help)}">?</i>` : ""}</span><select data-creator-field="${esc(name)}">${options.map(([id, text]) => `<option value="${esc(id)}" ${id === value ? "selected" : ""}>${esc(text)}</option>`).join("")}</select></label>`;
+}
+
+function applyWorkModeDefaults(problem, mode) {
+  if (mode === "none") {
+    problem.answerMode = "final_only";
+    problem.workReview = "none";
+    problem.masteryRequiresReview = false;
+    return;
+  }
+  if (mode === "capture_only") {
+    if (problem.answerMode === "final_only") problem.answerMode = "final_plus_optional_work";
+    if (!problem.workPrompt) problem.workPrompt = "Explain how you reached your answer.";
+    return;
+  }
+  problem.answerMode = "final_plus_required_work";
+  if (mode === "procedural_steps") {
+    if (!problem.workPrompt) problem.workPrompt = "Show one mathematical step per line.";
+    problem.workReview = "auto";
+    problem.masteryRequiresReview = false;
+    return;
+  }
+  if (mode === "proof_obligations") {
+    problem.workPrompt = problem.workPrompt || "Write a proof that addresses every obligation below. Use one claim or reason per line.";
+  }
+  if (mode === "rubric_check") {
+    problem.workPrompt = problem.workPrompt || "Write a complete response that addresses every rubric criterion below.";
+  }
+  problem.workReview = "tutor_required";
+  problem.masteryRequiresReview = true;
+  problem.allowSelfReview = false;
+}
+
+function workPlaceholder(mode) {
+  if (mode === "procedural_steps") return "2x + 5 = 13\n2x = 8\nx = 4";
+  if (mode === "proof_obligations") return "Claim: ...\nReason: ...\nTherefore: ...";
+  if (mode === "rubric_check") return "My claim is ...\nThe evidence shows ...\nThis supports the conclusion because ...";
+  return "Write your reasoning here…";
+}
+
+function renderStudentPreview(problem) {
+  const guide = WORK_MODE_GUIDES[problem.workMode] ?? WORK_MODE_GUIDES.none;
+  const obligations = lines(problem.proofObligations);
+  const strategies = lines(problem.proofStrategies);
+  const criteria = lines(problem.rubricCriteria);
+  const required = ["procedural_steps", "proof_obligations", "rubric_check"].includes(problem.workMode) || problem.answerMode === "final_plus_required_work";
+  return `<section class="studio-student-preview" aria-label="Learner view preview">
+    <header><div><span>Learner view preview</span><strong>${esc(guide.title)}</strong></div><b>${required ? "Required work" : problem.answerMode === "final_plus_optional_work" ? "Optional work" : "Final answer"}</b></header>
+    <article>
+      <small>QUESTION</small><h4>${esc(problem.prompt || "Your learner-facing question appears here.")}</h4>
+      <label><span>Final answer</span><i>${esc(problem.expectedAnswer ? "Learner enters an answer here" : "Set the private expected answer above")}</i></label>
+      ${problem.workMode === "proof_obligations" ? `<div class="studio-preview-guide"><strong>Your proof must cover</strong><ol>${obligations.map((item) => `<li>${esc(item)}</li>`).join("") || "<li>Add at least one proof obligation.</li>"}</ol>${strategies.length ? `<p><b>Accepted approaches:</b> ${strategies.map(esc).join(" · ")}</p>` : ""}</div>` : ""}
+      ${problem.workMode === "rubric_check" ? `<div class="studio-preview-guide"><strong>Your response will be reviewed for</strong><ul>${criteria.map((item) => `<li>${esc(item)}</li>`).join("") || "<li>Add at least one rubric criterion.</li>"}</ul></div>` : ""}
+      ${problem.workMode !== "none" ? `<label class="studio-preview-work"><span>${esc(problem.workPrompt || "Show your work")} ${required ? "(required)" : "(optional)"}</span><i>${esc(workPlaceholder(problem.workMode)).replaceAll("\n", "<br>")}</i></label>` : ""}
+    </article>
+    <footer>${esc(guide.flow)}</footer>
+  </section>`;
+}
+
+function renderAdvancedWork(problem, index) {
+  const indexed = (markup) => markup.replaceAll("data-creator-field", `data-index="${index}" data-creator-field`);
+  const guide = WORK_MODE_GUIDES[problem.workMode] ?? WORK_MODE_GUIDES.none;
+  const reviewIsRequired = ["proof_obligations", "rubric_check"].includes(problem.workMode);
+  const reviewOptions = reviewIsRequired ? [["self_review", "Learner signs off"], ["tutor_required", "Tutor / agent signs off"]] : REVIEW_OPTIONS;
+  const reviewValue = reviewIsRequired && !["self_review", "tutor_required"].includes(problem.workReview) ? "tutor_required" : problem.workReview;
+  const answerOptions = problem.workMode === "none" ? [["final_only", "Final answer only"]]
+    : problem.workMode === "capture_only" ? [["final_plus_optional_work", "Final answer + optional explanation"], ["final_plus_required_work", "Final answer + required explanation"]]
+      : [["final_plus_required_work", "Final answer + required work"]];
+  const answerValue = problem.workMode === "none" ? "final_only"
+    : ["procedural_steps", "proof_obligations", "rubric_check"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
+  return `<details class="studio-advanced studio-work-authoring" ${problem.workMode !== "none" ? "open" : ""}>
+    <summary><span>How the learner answers</span><b>${esc(guide.title)}</b></summary>
+    <div class="studio-mode-guide"><span aria-hidden="true">${problem.workMode === "proof_obligations" ? "∴" : problem.workMode === "rubric_check" ? "☷" : problem.workMode === "procedural_steps" ? "=" : "✎"}</span><div><strong>${esc(guide.summary)}</strong><p>${esc(guide.syntax)}</p></div></div>
+    <div class="studio-three">${indexed(select("Answer layout", "problem.answerMode", answerValue, answerOptions, "Proofs, rubrics, and checked maths steps always require the work box; explanations may be optional."))}${indexed(select("Work type", "problem.workMode", problem.workMode, [["none","No shown work"],["capture_only","Written explanation"],["procedural_steps","Checked maths steps"],["proof_obligations","Structured proof"],["rubric_check","Rubric-reviewed response"]], "This choice creates the learner-facing work box, proof checklist, or rubric."))}${indexed(select(reviewIsRequired ? "Who signs it off?" : "After submission", "problem.workReview", reviewValue, reviewOptions, "Proofs and rubric responses are never semantically auto-graded; a reviewer must pass them."))}</div>
+    ${problem.workMode !== "none" ? indexed(area("Instruction above the learner's work box", "problem.workPrompt", problem.workPrompt, { rows: 2, hint: "This sentence appears verbatim above the learner's response box." })) : ""}
+    ${problem.workMode === "procedural_steps" ? `<div class="studio-two">${indexed(field("Minimum lines", "problem.minimumSteps", problem.minimumSteps, { type:"number", min:1, max:10, hint:"The app blocks submission until this many non-empty lines are present." }))}${indexed(select("Allowed line format", "problem.lineType", problem.lineType, [["expression","Expressions"],["equation","Equations / relations"],["mixed","Maths or explanatory text"],["text","Text only"]], "Equation mode expects =, <, >, ≤, or ≥ on every line."))}</div><button class="studio-example-button" type="button" data-creator-action="apply-procedural-example" data-index="${index}">Use a clear step-by-step instruction</button>` : ""}
+    ${problem.workMode === "proof_obligations" ? `<aside class="studio-syntax-note"><strong>No proof language to learn.</strong><p>The learner writes ordinary text in one box. Each line below becomes a visible checklist item; it is not a command or a hidden keyword.</p></aside>${indexed(area("What the proof must establish — one item per line", "problem.proofObligations", problem.proofObligations, { rows:5, hint:"Write outcomes, not instructions: “Defines continuity at x = a” is better than “Do the proof.”" }))}${indexed(area("Accepted proof approaches — one per line", "problem.proofStrategies", problem.proofStrategies, { rows:3, hint:"These are suggestions shown to the learner, not exact phrases they must type." }))}<button class="studio-example-button" type="button" data-creator-action="apply-proof-example" data-index="${index}">Fill with an editable proof example</button>` : ""}
+    ${problem.workMode === "rubric_check" ? `<aside class="studio-syntax-note"><strong>Describe observable qualities.</strong><p>Each line becomes one visible review criterion with equal weight. The learner can structure the response however the prompt asks.</p></aside>${indexed(area("Review criteria — one per line", "problem.rubricCriteria", problem.rubricCriteria, { rows:5, hint:"Use specific criteria such as “Uses two relevant sources” rather than “Good answer.”" }))}<button class="studio-example-button" type="button" data-creator-action="apply-rubric-example" data-index="${index}">Fill with an editable rubric example</button>` : ""}
+    ${reviewIsRequired ? `<div class="studio-review-lock"><span aria-hidden="true">✓</span><div><strong>Mastery waits for a passed review</strong><p>${problem.workReview === "self_review" ? "The learner can review this response on the Results page." : "A human tutor or connected agent reviews the saved response on the Results page."}</p></div></div>` : `<div class="studio-checks"><label><input type="checkbox" data-index="${index}" data-creator-field="problem.masteryRequiresReview" ${problem.masteryRequiresReview ? "checked" : ""}> Review must pass before mastery</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.allowSelfReview" ${problem.allowSelfReview ? "checked" : ""}> Allow self review</label></div>`}
+    ${renderStudentPreview(problem)}
+  </details>`;
+}
+
+function renderProblemEditor(skill, problem, index) {
+  const indexed = (markup) => markup.replaceAll("data-creator-field", `data-index="${index}" data-creator-field`);
+  const graderHelp = "This checks only the final-answer field. Proofs and long responses are handled separately under How the learner answers.";
+  return `<details ${index === 0 ? "open" : ""}>
+    <summary><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(problem.prompt || "Untitled question")}</b><small>${esc(problem.gradingMethod)} · ${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</small></summary>
+    <div class="studio-problem-body">
+      <div class="studio-repeat-head"><b>Question ${index + 1}</b>${skill.problems.length > 1 ? `<button data-creator-action="remove-problem" data-index="${index}">Remove</button>` : ""}</div>
+      ${indexed(field("Question ID", "problem.templateId", problem.templateId, { hint: "A stable internal name; learners do not see it." }))}
+      ${indexed(area("Learner prompt", "problem.prompt", problem.prompt, { rows: 3, hint: "Ask for both the final answer and reasoning here when reasoning matters." }))}
+      <div class="studio-three">
+        ${indexed(select("Difficulty", "problem.difficulty", problem.difficulty, [["easy","Easy"],["medium","Medium"],["hard","Hard"],["brutal","Brutal"]]))}
+        ${indexed(select("Final-answer grader", "problem.gradingMethod", problem.gradingMethod, [["exact_numeric","Exact number"],["numeric_with_tolerance","Number with tolerance"],["multiple_choice","Multiple choice"],["symbolic_expression","Equivalent expression"],["equation_solution","Equation solution"],["exact_text","Exact text"],["theorem_conclusion","Accepted conclusion"]], graderHelp))}
+        ${indexed(field("Private expected answer", "problem.expectedAnswer", problem.expectedAnswer, { help: "Never shown before submission. For multiple choice, enter the correct option ID.", hint: "The final-answer grader compares the learner's answer with this value." }))}
+      </div>
+      ${problem.gradingMethod === "multiple_choice" ? indexed(area("Choices — ID | label, one per line", "problem.options", problem.options, { rows: 4, hint: "Example: A | Pacific Ocean. Put the correct ID, such as A, in Private expected answer." })) : ""}
+      ${problem.gradingMethod === "numeric_with_tolerance" ? indexed(field("Allowed numerical difference", "problem.tolerance", problem.tolerance, { type: "number", min: 0, step: .001, hint: "0.01 accepts answers within ±0.01 of the expected number." })) : ""}
+      ${["theorem_conclusion", "symbolic_expression", "equation_solution"].includes(problem.gradingMethod) ? indexed(area("Other accepted final answers — one per line", "problem.acceptedForms", problem.acceptedForms, { rows: 3, hint: "These apply only to the short final answer, not the proof text." })) : ""}
+      ${indexed(area("Private solution outline — one step per line", "problem.solutionSteps", problem.solutionSteps, { rows: 4, hint: "Shown after submission; keep answer-key reasoning out of the learner prompt." }))}
+      ${indexed(area("Mistake tags — one per line", "problem.mistakeTags", problem.mistakeTags, { rows: 2, hint: "Short labels such as sign_error or missing_evidence help the tutor target follow-up work." }))}
+      ${renderAdvancedWork(problem, index)}
+    </div>
+  </details>`;
 }
 
 function buildPack(draft) {
@@ -95,6 +240,8 @@ function buildPack(draft) {
       examples: skill.examples.map((example) => ({ prompt: example.prompt, solution: example.solution, explanation: example.explanation })),
       applications: skill.applications.map((application) => ({ title: application.title, description: application.description })),
       problems: skill.problems.map((problem, problemIndex) => {
+        const answerMode = problem.workMode === "none" ? "final_only"
+          : ["procedural_steps", "proof_obligations", "rubric_check"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
         const work = {
           mode: problem.workMode, prompt: problem.workPrompt, minimum_steps: Number(problem.minimumSteps), line_type: problem.lineType,
           require_final_answer_match: true,
@@ -105,10 +252,11 @@ function buildPack(draft) {
           template_id: cleanId(problem.templateId || `${skillId}_Q${problemIndex + 1}`, "QUESTION_"), skill_id: skillId,
           difficulty: problem.difficulty, prompt: problem.prompt, expected_answer: problem.expectedAnswer,
           answer_type: problem.answerType, grading_method: problem.gradingMethod, solution_steps: lines(problem.solutionSteps),
-          mistake_tags: lines(problem.mistakeTags), answer_mode: problem.answerMode, work,
+          mistake_tags: lines(problem.mistakeTags), answer_mode: answerMode, work,
           review_policy: {
-            work_review: problem.workReview,
-            mastery_requires_review_pass: Boolean(problem.masteryRequiresReview), allow_self_review: Boolean(problem.allowSelfReview),
+            work_review: ["proof_obligations", "rubric_check"].includes(problem.workMode) ? (problem.workReview === "self_review" ? "self_review" : "tutor_required") : problem.workReview,
+            mastery_requires_review_pass: ["proof_obligations", "rubric_check"].includes(problem.workMode) || Boolean(problem.masteryRequiresReview),
+            allow_self_review: ["proof_obligations", "rubric_check"].includes(problem.workMode) ? problem.workReview === "self_review" : Boolean(problem.allowSelfReview),
           },
         };
         if (problem.gradingMethod === "numeric_with_tolerance") output.tolerance = Number(problem.tolerance);
@@ -181,6 +329,11 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     else if (path.startsWith("problem.")) skill.problems[Number(target.dataset.index)][path.slice(8)] = target.type === "checkbox" ? target.checked : value;
     else if (path.startsWith("example.")) skill.examples[Number(target.dataset.index)][path.slice(8)] = value;
     else if (path.startsWith("application.")) skill.applications[Number(target.dataset.index)][path.slice(12)] = value;
+    if (path === "problem.workMode") applyWorkModeDefaults(skill.problems[Number(target.dataset.index)], value);
+    if (path === "problem.workReview" && ["proof_obligations", "rubric_check"].includes(skill.problems[Number(target.dataset.index)].workMode)) {
+      skill.problems[Number(target.dataset.index)].masteryRequiresReview = true;
+      skill.problems[Number(target.dataset.index)].allowSelfReview = value === "self_review";
+    }
     if (path === "draft.subjectMode" && value === "create" && draft.subjectId === "SUBJECT_MATH") {
       draft.subjectId = "SUBJECT_MY_SUBJECT"; draft.subjectName = "My subject"; draft.subjectShortName = "Subject";
       draft.subjectIcon = "◇"; draft.subjectDescription = "A custom QuickMaths curriculum."; draft.theme = { ...DEFAULT_THEME };
@@ -246,8 +399,9 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
             <div class="studio-repeat"><h3>Real-world / cross-subject applications</h3>${skill.applications.map((application, index) => `<article><div class="studio-repeat-head"><b>Application ${index + 1}</b><button data-creator-action="remove-application" data-index="${index}">Remove</button></div>${field("Title", "application.title", application.title).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Description", "application.description", application.description, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}</article>`).join("")}<button class="button button-outline" data-creator-action="add-application">＋ Add application</button></div>
           </section>
           <section class="studio-card">
-            <div class="studio-section-title"><div><p class="eyebrow">3 · Mastery questions</p><h2>What proves this lesson?</h2><p>Each question includes the private answer key and a learner-facing prompt.</p></div><button class="button button-secondary" data-creator-action="add-problem">＋ Add question</button></div>
-            <div class="studio-problems">${skill.problems.map((problem, index) => `<details ${index === 0 ? "open" : ""}><summary><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(problem.prompt || "Untitled question")}</b><small>${esc(problem.gradingMethod)} · ${esc(problem.workMode)}</small></summary><div class="studio-problem-body"><div class="studio-repeat-head"><b>Question ${index + 1}</b>${skill.problems.length > 1 ? `<button data-creator-action="remove-problem" data-index="${index}">Remove</button>` : ""}</div>${field("Question ID", "problem.templateId", problem.templateId).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Learner prompt", "problem.prompt", problem.prompt, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}<div class="studio-three">${select("Difficulty", "problem.difficulty", problem.difficulty, [["easy","Easy"],["medium","Medium"],["hard","Hard"],["brutal","Brutal"]]).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${select("Grader", "problem.gradingMethod", problem.gradingMethod, [["exact_numeric","Exact number"],["numeric_with_tolerance","Number with tolerance"],["multiple_choice","Multiple choice"],["symbolic_expression","Equivalent expression"],["equation_solution","Equation solution"],["exact_text","Exact text"],["theorem_conclusion","Theorem / accepted conclusion"]], "How QuickMaths checks the final answer locally.").replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${field("Expected answer", "problem.expectedAnswer", problem.expectedAnswer, { help: "Private teacher data. For multiple choice, enter the correct option ID." }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}</div>${problem.gradingMethod === "multiple_choice" ? area("Choices (ID | label)", "problem.options", problem.options, { rows: 4 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`) : ""}${problem.gradingMethod === "numeric_with_tolerance" ? field("Tolerance", "problem.tolerance", problem.tolerance, { type: "number", min: 0, step: .001 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`) : ""}${["theorem_conclusion", "symbolic_expression", "equation_solution"].includes(problem.gradingMethod) ? area("Accepted forms, one per line", "problem.acceptedForms", problem.acceptedForms, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`) : ""}${area("Solution steps, one per line", "problem.solutionSteps", problem.solutionSteps, { rows: 4 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Mistake tags, one per line", "problem.mistakeTags", problem.mistakeTags, { rows: 2 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}<details class="studio-advanced"><summary>Shown work, proofs, rubrics, and review</summary><div class="studio-three">${select("Answer mode", "problem.answerMode", problem.answerMode, [["final_only","Final answer only"],["final_plus_optional_work","Optional shown work"],["final_plus_required_work","Required shown work"]]).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${select("Work mode", "problem.workMode", problem.workMode, [["none","None"],["capture_only","Capture explanation"],["procedural_steps","Check equation steps"],["proof_obligations","Proof obligations"],["rubric_check","Review rubric"]]).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${select("Review policy", "problem.workReview", problem.workReview, [["none","None"],["optional","Optional"],["auto","Automatic"],["self_review","Self review"],["tutor_required","Tutor required"]]).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}</div>${area("Work prompt", "problem.workPrompt", problem.workPrompt, { rows: 2 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${problem.workMode === "procedural_steps" ? `<div class="studio-two">${field("Minimum steps", "problem.minimumSteps", problem.minimumSteps, { type:"number", min:1, max:10 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${select("Line type", "problem.lineType", problem.lineType, [["expression","Expressions"],["equation","Equations"],["mixed","Mixed maths"],["text","Text"]]).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}</div>` : ""}${problem.workMode === "proof_obligations" ? `${area("Proof obligations, one per line", "problem.proofObligations", problem.proofObligations, { rows:4 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Accepted strategies, one per line", "problem.proofStrategies", problem.proofStrategies, { rows:3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}` : ""}${problem.workMode === "rubric_check" ? area("Rubric criteria, one per line", "problem.rubricCriteria", problem.rubricCriteria, { rows:4 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`) : ""}<div class="studio-checks"><label><input type="checkbox" data-index="${index}" data-creator-field="problem.masteryRequiresReview" ${problem.masteryRequiresReview ? "checked" : ""}> Review must pass before mastery</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.allowSelfReview" ${problem.allowSelfReview ? "checked" : ""}> Allow self review</label></div></details></div></details>`).join("")}</div>
+            <div class="studio-section-title"><div><p class="eyebrow">3 · Mastery questions</p><h2>What proves this lesson?</h2><p>Build the short answer, any required reasoning, and the sign-off rule as three separate pieces.</p></div><button class="button button-secondary" data-creator-action="add-problem">＋ Add question</button></div>
+            <div class="studio-question-roadmap"><article><span>1</span><div><strong>Final answer</strong><p>The local grader checks a number, choice, expression, or conclusion.</p></div></article><i>→</i><article><span>2</span><div><strong>Shown work</strong><p>Optional explanation, checked maths steps, a proof, or a rubric response.</p></div></article><i>→</i><article><span>3</span><div><strong>Review</strong><p>Proofs and rubric responses wait for a self, tutor, or agent verdict.</p></div></article></div>
+            <div class="studio-problems">${skill.problems.map((problem, index) => renderProblemEditor(skill, problem, index)).join("")}</div>
           </section>
           <section class="studio-card studio-publish">
             <div><p class="eyebrow">4 · Validate and publish</p><h2>Ready for the map?</h2><p>Validation uses the exact same safety and graph checks as file upload and WebMCP staging.</p></div>
@@ -292,6 +446,22 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     if (action === "remove-skill" && draft.skills.length > 1 && confirm("Remove this lesson from the studio draft?")) { draft.skills.splice(draft.activeSkill, 1); draft.activeSkill = Math.max(0, draft.activeSkill - 1); }
     if (action === "add-problem") skill.problems.push(blankProblem(cleanId(skill.id, "CUSTOM_"), skill.problems.length));
     if (action === "remove-problem" && skill.problems.length > 1) skill.problems.splice(index, 1);
+    if (action === "apply-procedural-example") {
+      const problem = skill.problems[index];
+      problem.workPrompt = "Show one mathematical step per line and keep each line equivalent to the one before it.";
+      problem.minimumSteps = 3; problem.lineType = "equation";
+    }
+    if (action === "apply-proof-example") {
+      const problem = skill.problems[index];
+      problem.workPrompt = "Write a proof in plain language. Address every requirement below and put each claim or reason on its own line.";
+      problem.proofObligations = "State the claim precisely\nName the definition, theorem, or evidence you rely on\nJustify the link between each step\nState why the conclusion follows";
+      problem.proofStrategies = "Direct proof\nProof by contradiction\nProof by contrapositive";
+    }
+    if (action === "apply-rubric-example") {
+      const problem = skill.problems[index];
+      problem.workPrompt = "Write a complete response that addresses every criterion below. Use headings or paragraphs if they make the argument clearer.";
+      problem.rubricCriteria = "Makes a precise, relevant claim\nUses accurate evidence, examples, or calculations\nExplains how the evidence supports the claim\nAcknowledges an important limitation or alternative\nEnds with a justified conclusion";
+    }
     if (action === "add-example") skill.examples.push({ prompt: "", solution: "", explanation: "" });
     if (action === "remove-example") skill.examples.splice(index, 1);
     if (action === "add-application") skill.applications.push({ title: "", description: "" });

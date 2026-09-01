@@ -263,9 +263,17 @@ Open **Lesson studio** in the left sidebar. It can:
 - add theory, examples, applications, tags, mastery thresholds, and review timing;
 - add fixed questions with all seven graders;
 - configure answer modes, capture/procedural/proof/rubric work, and review gates;
+- preview the exact answer box, proof checklist, rubric, and review path the learner will see;
+- start advanced question types from editable examples with plain-language explanations;
 - open an existing JSON file, autosave an author draft locally, validate, download, install, and prepare a public Lesson Depot submission.
 
 It is the preferred route for humans. This guide is the preferred route for agents and advanced source-control workflows.
+
+### Proofs and rubrics in Lesson Studio
+
+There is no special student proof syntax. Choose **Structured proof** under **How the learner answers**, then write one proof obligation per line. Each line becomes a visible checklist item above a required plain-text response box. Accepted proof approaches are suggestions, not exact phrases the learner must type. QuickMaths checks that a response was supplied, saves it with the attempt, and keeps the lesson in Learning until a permitted self, human, or agent review passes it.
+
+Choose **Rubric-reviewed response** for essays, investigations, interpretations, and other open reasoning. Write one observable criterion per line. The learner sees those criteria before answering, and the saved response waits for review in the same way as a proof. The local final-answer grader still checks the separate short answer field; it does not pretend to semantically grade the proof or long response.
 
 ## WebMCP workflow
 

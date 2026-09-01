@@ -38,6 +38,10 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /data-map-scope="all"/);
   assert.match(js, /map-subject-lane/);
   assert.match(js, /map-node-status-dot/);
+  assert.match(js, /What your proof must cover/);
+  assert.match(js, /workResponsePlaceholder/);
+  assert.match(js, /review-question-select/);
+  assert.match(js, /resultReviewGuide/);
   assert.match(js, /MAP_ZOOM_MIN = 0\.1/);
   assert.match(js, /addEventListener\("pointermove"/);
   assert.match(js, /startDistance/);
@@ -46,6 +50,9 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.map-scope-control/);
   assert.match(css, /\.map-edges \.is-cross-subject/);
   assert.match(css, /\.map-node \.map-node-subject-accent/);
+  assert.match(css, /\.studio-student-preview/);
+  assert.match(css, /\.studio-question-roadmap/);
+  assert.match(css, /\.result-review-guide/);
   assert.match(css, /height: clamp\(300px, 60svh, 540px\); max-height: none; contain: layout paint/);
   assert.match(css, /\.agent-dock\.is-closed/);
   assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
