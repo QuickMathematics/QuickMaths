@@ -557,12 +557,16 @@ function renderMap(snapshot) {
   const nodes = mapRows.map((row) => {
     const position = positions[row.id];
     const lines = splitLabel(row.name);
-    const subject = snapshot.subjects.find((item) => item.id === row.subjectId);
+    const subject = snapshot.subjects.find((item) => item.id === row.subjectId) ?? snapshot.activeSubject;
+    const nodeFill = combined ? subject.theme?.primary ?? STATUS_COLORS[row.status] : STATUS_COLORS[row.status] ?? STATUS_COLORS.locked;
+    const nodeAccent = subject.theme?.primaryAlt ?? subject.theme?.primary ?? "#ffffff";
     return `<g class="map-node ${row.id === selected.id ? "is-selected" : ""}" role="button" tabindex="0" data-map-skill="${escapeHtml(row.id)}" transform="translate(${position.x} ${position.y})">
       <title>${escapeHtml(subject?.name ?? row.subjectId)}: ${escapeHtml(row.name)} · ${escapeHtml(row.status)}</title>
-      <rect width="178" height="70" rx="13" fill="${STATUS_COLORS[row.status] ?? STATUS_COLORS.locked}"></rect>
+      <rect class="map-node-body" width="178" height="70" rx="13" fill="${escapeHtml(nodeFill)}"></rect>
+      ${combined ? `<rect class="map-node-subject-accent" x="13" y="8" width="152" height="4" rx="2" fill="${escapeHtml(nodeAccent)}"></rect>` : ""}
       <text x="14" y="24">${lines.map((line, index) => `<tspan x="14" dy="${index ? 15 : 0}">${escapeHtml(line)}</tspan>`).join("")}</text>
-      <text class="map-node-meta" x="14" y="58">${escapeHtml(row.status)} · ${Math.round(row.masteryScore)}/100</text>
+      ${combined ? `<circle class="map-node-status-dot" cx="17" cy="56" r="4" fill="${STATUS_COLORS[row.status] ?? STATUS_COLORS.locked}"></circle>` : ""}
+      <text class="map-node-meta" x="${combined ? 26 : 14}" y="58">${escapeHtml(row.status)} · ${Math.round(row.masteryScore)}/100</text>
       ${combined ? `<text class="map-node-subject" x="164" y="58" text-anchor="end">${escapeHtml(subject?.icon ?? "◇")}</text>` : ""}
     </g>`;
   }).join("");
@@ -572,7 +576,7 @@ function renderMap(snapshot) {
       <div><p class="eyebrow">${combined ? `All subjects · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula` : `${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} · ${mapRows.length} connected lessons`}</p><h1>Mastery map</h1><p>${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} ${combined ? "Subject lanes and highlighted bridge lines show how knowledge travels across every installed curriculum." : "Cross-subject prerequisites stay listed in the detail panel; choose All subjects to draw them between curricula."}</p></div>
       <div class="page-actions map-toolbar"><div class="map-scope-control" role="group" aria-label="Subjects shown on mastery map"><button type="button" data-map-scope="subject" aria-pressed="${!combined}">Current subject</button><button type="button" data-map-scope="all" aria-pressed="${combined}">All subjects</button></div><label class="compact-select">Jump to skill<select id="map-skill-select">${mapSkillOptions(snapshot, mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
     </header>
-    <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}</div>
+    <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${combined ? `<span class="map-subject-key">Node color = subject · dot = status</span>` : ""}</div>
     <section class="map-layout">
       <div class="map-scroll" aria-label="Interactive prerequisite map. Drag to move and pinch on a touchscreen to zoom.">
         <div class="map-gesture-hint" aria-hidden="true">Drag to move <span>· Pinch to zoom</span></div>

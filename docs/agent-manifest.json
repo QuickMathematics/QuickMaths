@@ -141,7 +141,7 @@
       "geography_bridge": "The built-in Latitude, longitude, and geodetic reference lesson depends on the Mathematics spherical-coordinates bridge, which grows from angles, arcs, and coordinate geometry.",
       "new_subjects": "Schema 2.0 lesson sets can create themed subjects or extend an installed subject.",
       "bridges": "Prerequisites may reference lessons in any installed subject by globally unique skill ID or explicit subject_id/skill_id object.",
-      "combined_map": "The map toggle can place every installed subject in a labeled lane and draw cross-subject prerequisite bridges between them.",
+      "combined_map": "The map toggle can place every installed subject in a labeled lane, color nodes from each subject theme, preserve mastery state as a status dot, and draw cross-subject prerequisite bridges between curricula.",
       "progression_modes": { "hard": "Prerequisites lock tests.", "soft": "Connections are guidance and all tests are open." },
       "theme_safety": "Only fixed six-digit color tokens are accepted; CSS, HTML, scripts, and URLs are rejected."
     },
