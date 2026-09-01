@@ -172,7 +172,11 @@ export function buildToolDefinitions(store, agentManifest = {}) {
       async execute(input = {}) {
         requireObject(input); rejectUnknown(input, ["subject_id", "progression_mode"]);
         if (!input.subject_id && !input.progression_mode) throw new Error("Provide subject_id or progression_mode.");
-        return store.setLearningPreferences({ subjectId: optionalString(input, "subject_id", 60) || null, progressionMode: input.progression_mode ?? null });
+        return store.setLearningPreferences({
+          subjectId: optionalString(input, "subject_id", 60) || null,
+          progressionMode: input.progression_mode ?? null,
+          activityActor: "agent",
+        });
       },
     },
     {
@@ -193,7 +197,7 @@ export function buildToolDefinitions(store, agentManifest = {}) {
         const view = requiredString(input, "view", 20);
         if (!["home", "map", "lesson", "test", "results", "creator", "data"].includes(view)) throw new Error("view is invalid.");
         const skillId = optionalString(input, "skill_id", 60) || null;
-        store.navigate(view, skillId);
+        store.navigate(view, skillId, { activityActor: "agent" });
         return { ok: true, visible_view: view, selected_skill_id: store.snapshot().ui.selectedSkillId };
       },
     },
@@ -209,8 +213,8 @@ export function buildToolDefinitions(store, agentManifest = {}) {
       async execute(input = {}) {
         requireObject(input); rejectUnknown(input, ["subject_id"]);
         const subjectId = optionalString(input, "subject_id", 60);
-        if (subjectId) store.setLearningPreferences({ subjectId });
-        store.navigate("creator");
+        if (subjectId) store.setLearningPreferences({ subjectId, activityActor: "agent" });
+        store.navigate("creator", null, { activityActor: "agent" });
         return { ok: true, visible_view: "creator", subject_id: store.snapshot().activeSubject.id };
       },
     },
@@ -244,7 +248,7 @@ export function buildToolDefinitions(store, agentManifest = {}) {
       annotations: { untrustedContentHint: true },
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["lesson_set_json"]);
-        return store.stageLessonPack(requiredString(input, "lesson_set_json", 1800000));
+        return store.stageLessonPack(requiredString(input, "lesson_set_json", 1800000), { activityActor: "agent" });
       },
     },
     {
@@ -276,7 +280,7 @@ export function buildToolDefinitions(store, agentManifest = {}) {
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["skill_id"]);
         const skillId = requiredString(input, "skill_id", 60);
-        const draft = store.startTest(skillId);
+        const draft = store.startTest(skillId, { activityActor: "agent" });
         return {
           ok: true,
           visible_view: "test",
@@ -328,6 +332,7 @@ export function buildToolDefinitions(store, agentManifest = {}) {
           confidence: input.confidence ?? "medium",
           verdict: input.verdict ?? "partial",
           reviewerType: "ai_tutor",
+          activityActor: "agent",
         });
       },
     },
@@ -346,7 +351,11 @@ export function buildToolDefinitions(store, agentManifest = {}) {
       },
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["skill_id", "focus"]);
-        const result = store.createFollowupProblem({ skillId: requiredString(input, "skill_id", 60), focus: optionalString(input, "focus", 80) });
+        const result = store.createFollowupProblem({
+          skillId: requiredString(input, "skill_id", 60),
+          focus: optionalString(input, "focus", 80),
+          activityActor: "agent",
+        });
         globalThis.document?.getElementById?.(`question-${result.problem.question_id}`)?.scrollIntoView?.({ behavior: "smooth", block: "center" });
         return result;
       },

@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 5;
+export const APP_VERSION = 6;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -693,6 +693,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
             tool: cleanText(item.tool, 80),
             message: cleanText(item.message, 200),
             profileId: profileIds.has(item.profileId) ? item.profileId : null,
+            actor: item.actor === "agent" ? "agent" : "learner",
           }))
           .filter((item) => item.at && item.tool && item.message)
           .slice(-MAX_ACTIVITY)
@@ -1049,8 +1050,10 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     listeners.forEach((listener) => listener(view));
   };
 
-  const addActivity = (tool, message, profileId = state.activeProfileId) => {
-    state.activity = [...state.activity, { at: isoNow(), tool, message, profileId: profileId ?? null }].slice(-MAX_ACTIVITY);
+  const addActivity = (tool, message, profileId = state.activeProfileId, actor = "learner") => {
+    state.activity = [...state.activity, {
+      at: isoNow(), tool, message, profileId: profileId ?? null, actor: actor === "agent" ? "agent" : "learner",
+    }].slice(-MAX_ACTIVITY);
   };
 
   const activeProfile = () => state.profiles.find((profile) => profile.id === state.activeProfileId) ?? null;
@@ -1169,7 +1172,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       reviews: clone(state.reviews.filter((review) => review.profileId === state.activeProfileId).slice().reverse()),
       ui: clone(state.ui),
       timers: timers(),
-      activity: clone(state.activity.filter((item) => item.profileId === state.activeProfileId)),
+      activity: clone(state.activity.filter((item) => item.profileId === state.activeProfileId && item.actor === "agent")),
       storageError,
       backupStatus: backupStatus(),
       stagedLessonPack: stagedLessonPack ? {
@@ -1290,7 +1293,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     notify();
   };
 
-  const navigate = (route, skillId = null) => {
+  const navigate = (route, skillId = null, { activityActor = "learner" } = {}) => {
     if (!ROUTES.has(route) || route === "welcome") throw new Error("Unknown app view.");
     if (!activeProfile()) throw new Error("Select a profile first.");
     if (skillId) {
@@ -1300,7 +1303,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       activeProfile().activeSubjectId = skillsById[skillId].subjectId;
     }
     state.ui.route = route;
-    addActivity("navigate_learning_app", `Opened ${route}${skillId ? ` for ${skillId}` : ""}.`);
+    addActivity("navigate_learning_app", `Opened ${route}${skillId ? ` for ${skillId}` : ""}.`, undefined, activityActor);
     notify();
   };
 
@@ -1340,7 +1343,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     notify();
   };
 
-  const setLearningPreferences = ({ subjectId = null, progressionMode = null } = {}) => {
+  const setLearningPreferences = ({ subjectId = null, progressionMode = null, activityActor = "learner" } = {}) => {
     const profile = activeProfile();
     if (!profile) throw new Error("Select a profile first.");
     if (subjectId != null) {
@@ -1356,12 +1359,12 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       if (!["hard", "soft"].includes(progressionMode)) throw new Error("progression_mode must be hard or soft.");
       profile.progressionMode = progressionMode;
     }
-    addActivity("set_learning_preferences", `Using ${profile.progressionMode} progression in ${catalog.subjects.find((subject) => subject.id === profile.activeSubjectId)?.name ?? profile.activeSubjectId}.`);
+    addActivity("set_learning_preferences", `Using ${profile.progressionMode} progression in ${catalog.subjects.find((subject) => subject.id === profile.activeSubjectId)?.name ?? profile.activeSubjectId}.`, undefined, activityActor);
     notify();
     return { ok: true, subject_id: profile.activeSubjectId, progression_mode: profile.progressionMode };
   };
 
-  const startTest = (skillId, { force = false } = {}) => {
+  const startTest = (skillId, { force = false, activityActor = "learner" } = {}) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     if (!skillsById[skillId]) throw new Error("Unknown skill_id.");
     if (state.ui.pendingResults) throw new Error("Save the current reflection before starting another test.");
@@ -1386,7 +1389,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     state.ui.selectedSkillId = skillId;
     state.ui.activeAttemptId = null;
     state.ui.route = "test";
-    addActivity("start_skill_test", `Prepared a mastery test for ${skillId}.`);
+    addActivity("start_skill_test", `Prepared a mastery test for ${skillId}.`, undefined, activityActor);
     notify();
     return clone(state.drafts[profileId][skillId]);
   };
@@ -1553,7 +1556,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     };
   };
 
-  const recordTutorFeedback = ({ questionId, feedback, mistakeTag = "", nextStep, confidence = "medium", verdict = "partial", reviewerType = "ai_tutor" }) => {
+  const recordTutorFeedback = ({ questionId, feedback, mistakeTag = "", nextStep, confidence = "medium", verdict = "partial", reviewerType = "ai_tutor", activityActor = "learner" }) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     const safeQuestionId = cleanText(questionId, 120);
     const activeDraft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
@@ -1605,7 +1608,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
         activeAttempt.reviewStatus = "needs_revision";
       }
     }
-    addActivity("record_tutor_feedback", "Saved visible tutor feedback to this profile.");
+    addActivity("record_tutor_feedback", "Saved visible tutor feedback to this profile.", undefined, activityActor);
     notify();
     return { ok: true, saved: true, review_id: review.reviewId, feedback: safeFeedback, next_step: safeNextStep };
   };
@@ -1652,8 +1655,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     };
   };
 
-  const createFollowupProblem = ({ skillId = state.ui.selectedSkillId, focus = "" } = {}) => {
-    const draft = startTest(skillId);
+  const createFollowupProblem = ({ skillId = state.ui.selectedSkillId, focus = "", activityActor = "learner" } = {}) => {
+    const draft = startTest(skillId, { activityActor });
     const safeFocus = cleanText(focus, 80);
     const matching = draft.problems.find((problem) => problem.mistake_tags?.includes(safeFocus)) ?? draft.problems[0];
     const liveDraft = state.drafts[state.activeProfileId]?.[skillId];
@@ -1661,7 +1664,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       liveDraft.problems = [matching, ...liveDraft.problems.filter((problem) => problem.template_id !== matching.template_id)];
     }
     state.ui.route = "test";
-    addActivity("create_followup_problem", `Prepared ${matching.template_id} for targeted practice.`);
+    addActivity("create_followup_problem", `Prepared ${matching.template_id} for targeted practice.`, undefined, activityActor);
     notify();
     return { ok: true, saved: true, problem: { question_id: matching.template_id, skill_id: skillId, prompt: matching.prompt, difficulty: matching.difficulty } };
   };
@@ -1711,11 +1714,11 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return { ok: true, id: pack.id, name: pack.name, subjectId: pack.subject.id, subjectName: pack.subject.name, skillCount: pack.skills.length, totalSkillCount: skillOrder.length };
   };
 
-  const stageLessonPack = (raw) => {
+  const stageLessonPack = (raw, { activityActor = "learner" } = {}) => {
     const pack = parseLessonPack(raw);
     stagedLessonPack = { raw: typeof raw === "string" ? raw : JSON.stringify(raw), pack };
     state.ui.route = "data";
-    addActivity("stage_custom_lesson_set", `Staged ${pack.name}; human confirmation is required to install it.`);
+    addActivity("stage_custom_lesson_set", `Staged ${pack.name}; human confirmation is required to install it.`, undefined, activityActor);
     notify();
     return { ok: true, status: "staged", requires_human_confirmation: true, preview: previewLessonPack(raw) };
   };

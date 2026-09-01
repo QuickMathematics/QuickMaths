@@ -29,6 +29,7 @@ const elements = {
 let store;
 let currentSnapshot;
 let toastTimer;
+let agentHighlightTimer;
 let routeHistoryReady = false;
 let applyingHistory = false;
 let lessonStudio;
@@ -71,6 +72,15 @@ function showToast(message) {
   elements.toast.hidden = false;
   window.clearTimeout(toastTimer);
   toastTimer = window.setTimeout(() => { elements.toast.hidden = true; }, 2800);
+}
+
+function openAgentStudio() {
+  elements.agentDock.classList.add("is-open", "is-highlighted");
+  elements.agentDock.focus({ preventScroll: true });
+  elements.agentDock.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  window.clearTimeout(agentHighlightTimer);
+  agentHighlightTimer = window.setTimeout(() => elements.agentDock.classList.remove("is-highlighted"), 1400);
+  showToast("Agent Studio opened.");
 }
 
 function renderProfiles(snapshot) {
@@ -144,7 +154,7 @@ const TUTORIAL_STEPS = [
 
 function tutorialVisual(type, snapshot) {
   if (type === "welcome") return `<div class="tour-profile-preview"><img src="./quickmaths-logo.png" alt="" width="88" height="82"><div><span>Profile ready</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>Autosaving on this device</small></div><i>✓</i></div><div class="tour-local-row"><span>Free</span><span>Local-first</span><span>No account</span></div>`;
-  if (type === "subjects") return `<div class="tour-subject-preview"><p>Visible subject</p><div><span>${escapeHtml(snapshot.activeSubject.icon)}</span><strong>${escapeHtml(snapshot.activeSubject.name)}</strong><b>⌄</b></div></div><div class="tour-mode-preview"><article class="${snapshot.progressionMode === "hard" ? "is-active" : ""}"><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small></article><article class="${snapshot.progressionMode === "soft" ? "is-active" : ""}"><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small></article></div>`;
+  if (type === "subjects") return `<div class="tour-subject-preview"><p>Visible subject</p><div><span>${escapeHtml(snapshot.activeSubject.icon)}</span><strong>${escapeHtml(snapshot.activeSubject.name)}</strong><b>⌄</b></div></div><div class="tour-mode-preview" aria-label="Choose a learning path"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}"><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}"><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>`;
   if (type === "map") return `<div class="tour-map-preview"><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
   if (type === "loop") return `<div class="tour-loop-preview"><article><span>01</span><b>Read</b><small>Theory and examples</small></article><i>→</i><article><span>02</span><b>Test</b><small>Answers and shown work</small></article><i>→</i><article><span>03</span><b>Reflect</b><small>Confidence and difficulty</small></article><i>→</i><article><span>04</span><b>Review</b><small>Mastery and next date</small></article></div><div class="tour-work-preview"><code>2x + 5 = 13<br>2x = 8<br>x = 4</code><span>Step check passed</span></div>`;
   if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent studio</small><strong>Tutor in the loop</strong></div><i>Connected</i></div><p>“Check my progress, choose the best next lesson, and tutor from the work I show.”</p><div class="tour-tool-row"><code>get_progress_summary</code><code>inspect_student_work</code><code>record_tutor_feedback</code></div><button class="button button-secondary" type="button" data-tutorial-action="open-agent">Open Agent Studio</button></div>`;
@@ -558,7 +568,9 @@ function render(snapshot) {
   else if (snapshot.ui.route === "results") renderResults(snapshot);
   else if (snapshot.ui.route === "data") renderData(snapshot);
   else if (snapshot.ui.route === "creator") elements.view.innerHTML = lessonStudio.render(snapshot);
-  const nextHash = snapshot.ui.route === "home" ? "#/home" : `#/${snapshot.ui.route}/${snapshot.ui.selectedSkillId}`;
+  const nextHash = ["map", "lesson", "test", "results"].includes(snapshot.ui.route)
+    ? `#/${snapshot.ui.route}/${snapshot.ui.selectedSkillId}`
+    : `#/${snapshot.ui.route}`;
   if (location.hash !== nextHash) {
     if (routeHistoryReady && !applyingHistory) history.pushState(null, "", nextHash);
     else history.replaceState(null, "", nextHash);
@@ -684,7 +696,7 @@ document.addEventListener("click", (event) => {
     if (action === "skip") { store.completeTutorial({ skipped: true }); showToast("Tour skipped. Replay it anytime from the sidebar."); }
     if (action === "finish") { store.completeTutorial(); showToast("Tour complete. Welcome to QuickMaths."); }
     if (action === "finish-creator") { store.completeTutorial(); store.navigate("creator"); }
-    if (action === "open-agent") elements.agentDock.classList.add("is-open");
+    if (action === "open-agent") openAgentStudio();
     return;
   }
   const creatorAction = event.target.closest?.("[data-creator-action]");
@@ -812,7 +824,10 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-document.querySelector("#agent-toggle").addEventListener("click", () => elements.agentDock.classList.toggle("is-open"));
+document.querySelector("#agent-toggle").addEventListener("click", () => {
+  if (elements.agentDock.classList.contains("is-open")) elements.agentDock.classList.remove("is-open");
+  else openAgentStudio();
+});
 document.querySelector("#agent-close").addEventListener("click", () => elements.agentDock.classList.remove("is-open"));
 document.querySelector("#copy-prompt").addEventListener("click", async () => {
   try {

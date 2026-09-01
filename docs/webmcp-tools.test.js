@@ -83,6 +83,21 @@ test("agent navigation updates the same visible route and selected skill", async
   assert.equal(store.snapshot().ui.route, "lesson");
 });
 
+test("Agent activity includes tool actions but excludes learner UI actions", async () => {
+  const store = createStore();
+  const tools = toolsFor(store);
+  assert.deepEqual(store.snapshot().activity, []);
+
+  store.setLearningPreferences({ progressionMode: "soft" });
+  assert.deepEqual(store.snapshot().activity, []);
+
+  await tools.set_learning_preferences.execute({ progression_mode: "hard" });
+  const activity = store.snapshot().activity;
+  assert.equal(activity.length, 1);
+  assert.equal(activity[0].actor, "agent");
+  assert.equal(activity[0].tool, "set_learning_preferences");
+});
+
 test("subject tools switch visible curricula and open the no-code creator", async () => {
   const store = createStore();
   const tools = toolsFor(store);
