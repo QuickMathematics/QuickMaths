@@ -5,9 +5,12 @@ from decimal import Decimal
 from quickmaths.math_syntax import (
     accepted_text_match,
     equation_solution_equal,
+    finite_set_equal,
     inequality_solution_equal,
+    interval_set_equal,
     numeric_equal,
     numeric_with_tolerance,
+    rational_expression_equal,
     symbolic_equal,
 )
 from quickmaths.models import FinalAnswerGrade, GradingResult, ProblemInstance, UserResponse
@@ -46,6 +49,22 @@ def grade_answer(instance: ProblemInstance, user_answer: str | UserResponse) -> 
         elif method == "inequality_solution":
             variable = str(instance.variable or instance.work.get("target_variable") or "x")
             correct = inequality_solution_equal(expected, user, variable)
+        elif method == "finite_set":
+            values = list(instance.answer_metadata.get("values", []))
+            correct = finite_set_equal(values, user, str(instance.variable or instance.answer_metadata.get("variable") or "x"))
+        elif method == "rational_expression":
+            structured = response.structured_work_json or {}
+            excluded_values = structured.get("excluded_values", "")
+            correct = rational_expression_equal(
+                expected,
+                list(instance.answer_metadata.get("excluded_values", [])),
+                user,
+                excluded_values,
+                variable=str(instance.variable or instance.answer_metadata.get("variable") or "x"),
+                require_reduced_form=bool(instance.grading_metadata.get("require_reduced_form", False)),
+            )
+        elif method == "interval_set":
+            correct = interval_set_equal(expected, user, str(instance.variable or instance.answer_metadata.get("variable") or "x"))
         elif method == "theorem_conclusion":
             accepted = instance.accepted_forms or [expected]
             correct = accepted_text_match(user, accepted)
@@ -92,7 +111,7 @@ def coerce_user_response(user_answer: str | UserResponse, instance: ProblemInsta
 def work_mode(instance: ProblemInstance) -> str:
     if instance.work:
         mode = str(instance.work.get("mode", "none"))
-        if mode in {"procedural_steps", "proof_obligations", "rubric_check", "capture_only"}:
+        if mode in {"procedural_steps", "proof_obligations", "rubric_check", "capture_only", "rational_equation_steps", "sign_chart_steps"}:
             return mode
         return {"optional": "optional", "required": "required", "structured": "structured"}.get(mode, mode)
     if instance.answer_mode == "final_plus_optional_work":

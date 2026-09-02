@@ -8,11 +8,12 @@
   "discovery": {
     "site_tools_api": "document.modelContext.registerTool",
     "guide_tool": "get_agent_guide",
+    "authoring_guide_tool": "get_lesson_authoring_guide",
     "educator_guide_tool": "get_educator_agent_manifest",
     "educator_manifest": "https://quickmathematics.github.io/QuickMaths/educator-agent-manifest.json",
     "student_documentation_pdf": "https://quickmathematics.github.io/QuickMaths/QuickMaths-Student-Guide.pdf",
     "educator_documentation_pdf": "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf",
-    "note": "WebMCP discovers registered page tools. get_agent_guide returns a compact summary by default and exposes detailed policy sections only when needed.",
+    "note": "WebMCP discovers registered page tools. get_agent_guide returns a compact operating summary; get_lesson_authoring_guide returns the bundled authoring manual by topic before an agent writes or modifies lesson content.",
     "guide_sections": ["summary", "tutoring", "navigation", "planning", "educator", "bridge", "custom_content", "backup", "all"]
   },
   "state_model": {
@@ -106,6 +107,7 @@
     ],
     "custom_content": [
       "Installed custom lesson sets and subjects are part of the same map, lesson, testing, progress, and backup model as built-in skills.",
+      "Before creating or modifying lesson content, call get_lesson_authoring_guide for the relevant sections. Use grading_and_work for finite sets, rational expressions, rational-equation ledgers, interval sets, sign charts, proof obligations, and rubrics.",
       "To improve a built-in lesson, call open_lesson_creator with its skill_id to visibly prefill Lesson Studio, or author schema 2.0 JSON with mode override. An override must keep the exact native skill ID and original subject, preserves completed learner progress and map identity, restarts affected unfinished tests, and is reversible from Settings.",
       "Use validate_lesson_set before stage_custom_lesson_set. Staging is visible but cannot install content.",
       "Use search_lesson_depot for public catalog metadata. Results with availability preview are roadmap concepts, not lesson content, and cannot be staged or installed. For published results, use stage_depot_lesson for one package or stage_depot_lessons for an ordered batch. Both hash-check and validate content and open visible human review; neither can install silently.",
@@ -132,6 +134,7 @@
   "routes": ["tutorial", "home", "map", "curriculum", "lesson", "test", "results", "depot", "creator", "settings"],
   "tools": [
     "get_agent_guide",
+    "get_lesson_authoring_guide",
     "get_educator_agent_manifest",
     "get_app_state",
     "get_curriculum_map",
@@ -189,7 +192,7 @@
     "example": "https://quickmathematics.github.io/QuickMaths/lesson-set-example.json",
     "install_route": "settings",
     "human_creator_route": "creator",
-    "human_creator_guidance": "Lesson Studio can create new sets or open a native lesson as an editable, reversible improvement. It explains final-answer grading, shown work, and review as separate stages; advanced modes include editable examples and a learner-view preview. Proofs and rubrics use plain text, not special syntax, and remain pending until an allowed reviewer passes them.",
+    "human_creator_guidance": "Lesson Studio can create new sets or open a native lesson as an editable, reversible improvement. It explains final-answer grading, shown work, and review as separate stages; advanced modes include finite sets, rational expressions with preserved exclusions, rational-equation candidate ledgers, interval sets, structured sign charts, proof obligations, rubrics, editable examples, and a learner-view preview. Learners use guided fields rather than raw JSON.",
     "limits": { "file_bytes": 2000000, "sets": 10, "skills_per_set": 50, "problems_per_skill": 100 },
     "id_rules": { "pack_prefix": "PACK_", "add_mode_skill_prefix": "CUSTOM_", "override_mode_skill_id": "the exact existing native skill ID", "characters": "uppercase letters, numbers, and underscores" },
     "native_improvements": {
@@ -208,10 +211,13 @@
       "symbolic_expression",
       "equation_solution",
       "inequality_solution",
+      "finite_set",
+      "rational_expression",
+      "interval_set",
       "exact_text",
       "theorem_conclusion"
     ],
-    "supported_work_modes": ["none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check"],
+    "supported_work_modes": ["none", "capture_only", "procedural_steps", "rational_equation_steps", "sign_chart_steps", "proof_obligations", "rubric_check"],
     "subject_system": {
       "default_subject_id": "SUBJECT_MATH",
       "built_in_subjects": ["SUBJECT_MATH"],

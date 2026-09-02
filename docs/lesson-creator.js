@@ -37,6 +37,18 @@ const WORK_MODE_GUIDES = {
     syntax: "Plain text. Paragraphs, labelled sections, or one point per line all work.",
     flow: "Student responds → app checks that work was supplied → reviewer checks every criterion → mastery updates.",
   },
+  rational_equation_steps: {
+    title: "Rational-equation workspace",
+    summary: "Gives the learner separate fields for original restrictions, algebra steps, candidate classifications, and substitution checks.",
+    syntax: "The student never writes JSON. QuickMaths stores the structured ledger, verifies the valid-candidate set, and requires original-equation checks when enabled.",
+    flow: "Student records restrictions → solves → classifies every candidate → checks the original equation → app validates the final finite set.",
+  },
+  sign_chart_steps: {
+    title: "Structured sign chart",
+    summary: "Builds a guided critical-point, interval-test, endpoint, and final interval-set editor.",
+    syntax: "Author the expression and its trusted critical-point model. Learners receive ordinary form fields for values, signs, selections, and endpoint decisions.",
+    flow: "Student factors → identifies critical points → tests each interval → decides endpoints → app checks the final interval set.",
+  },
 };
 
 const REVIEW_OPTIONS = [
@@ -67,6 +79,10 @@ function blankProblem(skillId, index = 0) {
     answerMode: "final_only", workMode: "none", workPrompt: "", minimumSteps: 2,
     lineType: "expression", proofObligations: "State the claim clearly\nName the facts or definitions you use\nJustify how they lead to the conclusion", proofStrategies: "Direct proof\nProof by contradiction\nProof by contrapositive",
     rubricCriteria: "Makes a clear central claim\nUses relevant evidence or calculations\nExplains how the evidence supports the conclusion", workReview: "none", masteryRequiresReview: false, allowSelfReview: true,
+    answerValues: "", excludedValues: "", answerVariable: "x", requireReducedForm: true,
+    targetVariable: "x", originalEquation: "", expectedRestrictions: "", requireRestrictions: true, requireOriginalEquationCheck: true,
+    signExpressionKind: "polynomial", signExpression: "", signRelation: ">", expectedFactorization: "", reducedExpression: "", requireFactorization: false,
+    criticalPoints: "", requireTestValues: true, requireIntervalSigns: true, requireEndpointDecisions: true, requireFinalAnswerMatch: true,
   };
 }
 
@@ -147,6 +163,12 @@ function applyWorkModeDefaults(problem, mode) {
     problem.masteryRequiresReview = false;
     return;
   }
+  if (["rational_equation_steps", "sign_chart_steps"].includes(mode)) {
+    if (!problem.workPrompt) problem.workPrompt = mode === "rational_equation_steps" ? "State the restrictions, show the solving steps, classify every candidate, and check candidates in the original equation." : "Factor or reduce, list every critical point, test each interval, decide endpoints, and enter the final interval set.";
+    problem.workReview = "auto";
+    problem.masteryRequiresReview = false;
+    return;
+  }
   if (mode === "proof_obligations") {
     problem.workPrompt = problem.workPrompt || "Write a proof that addresses every obligation below. Use one claim or reason per line.";
   }
@@ -162,6 +184,8 @@ function workPlaceholder(mode) {
   if (mode === "procedural_steps") return "2x + 5 = 13\n2x = 8\nx = 4";
   if (mode === "proof_obligations") return "Claim: ...\nReason: ...\nTherefore: ...";
   if (mode === "rubric_check") return "My claim is ...\nThe evidence shows ...\nThis supports the conclusion because ...";
+  if (mode === "rational_equation_steps") return "Restrictions → solving steps → candidate ledger → original-equation check";
+  if (mode === "sign_chart_steps") return "Critical points → interval test values and signs → endpoint decisions → interval notation";
   return "Write your reasoning here…";
 }
 
@@ -170,7 +194,7 @@ function renderStudentPreview(problem) {
   const obligations = lines(problem.proofObligations);
   const strategies = lines(problem.proofStrategies);
   const criteria = lines(problem.rubricCriteria);
-  const required = ["procedural_steps", "proof_obligations", "rubric_check"].includes(problem.workMode) || problem.answerMode === "final_plus_required_work";
+  const required = ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"].includes(problem.workMode) || problem.answerMode === "final_plus_required_work";
   return `<section class="studio-student-preview" aria-label="Learner view preview">
     <header><div><span>Learner view preview</span><strong>${esc(guide.title)}</strong></div><b>${required ? "Required work" : problem.answerMode === "final_plus_optional_work" ? "Optional work" : "Final answer"}</b></header>
     <article>
@@ -211,13 +235,15 @@ function renderAdvancedWork(problem, index) {
     : problem.workMode === "capture_only" ? [["final_plus_optional_work", "Final answer + optional explanation"], ["final_plus_required_work", "Final answer + required explanation"]]
       : [["final_plus_required_work", "Final answer + required work"]];
   const answerValue = problem.workMode === "none" ? "final_only"
-    : ["procedural_steps", "proof_obligations", "rubric_check"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
+    : ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
   return `<details class="studio-advanced studio-work-authoring" ${problem.workMode !== "none" ? "open" : ""}>
     <summary><span>How the learner answers</span><b>${esc(guide.title)}</b></summary>
     <div class="studio-mode-guide"><span aria-hidden="true">${problem.workMode === "proof_obligations" ? "∴" : problem.workMode === "rubric_check" ? "☷" : problem.workMode === "procedural_steps" ? "=" : "✎"}</span><div><strong>${esc(guide.summary)}</strong><p>${esc(guide.syntax)}</p></div></div>
     <div class="studio-two">${indexed(select("Answer layout", "problem.answerMode", answerValue, answerOptions, "Proofs, rubrics, and checked maths steps always require the work box; explanations may be optional."))}${indexed(select(reviewIsRequired ? "Who signs it off?" : "After submission", "problem.workReview", reviewValue, reviewOptions, "Proofs and rubric responses are never semantically auto-graded; a reviewer must pass them."))}</div>
     ${problem.workMode !== "none" ? indexed(area("Instruction above the learner's work box", "problem.workPrompt", problem.workPrompt, { rows: 2, hint: "This sentence appears verbatim above the learner's response box." })) : ""}
     ${problem.workMode === "procedural_steps" ? `<div class="studio-two">${indexed(field("Minimum lines", "problem.minimumSteps", problem.minimumSteps, { type:"number", min:1, max:10, hint:"The app blocks submission until this many non-empty lines are present." }))}${indexed(select("Allowed line format", "problem.lineType", problem.lineType, [["expression","Equivalent expressions"],["equation","Equivalent equations (=)"],["inequality","Equivalent inequalities (<, ≤, >, ≥)"],["mixed","Maths or explanatory text"],["text","Text only"]], "Choose Equations for = on every line. Choose Inequalities when every line must preserve the same one-variable solution set, including reversing the sign after multiplying or dividing by a negative."))}</div><button class="studio-example-button" type="button" data-creator-action="apply-procedural-example" data-index="${index}">Use a clear step-by-step instruction</button>` : ""}
+    ${problem.workMode === "rational_equation_steps" ? `<aside class="studio-syntax-note"><strong>The learner sees a form, not JSON.</strong><p>Restrictions, algebra lines, candidate values, classifications, and substitution checks are stored together. The app compares the submitted restriction set and candidate ledger with the trusted model below.</p></aside><div class="studio-three">${indexed(field("Target variable", "problem.targetVariable", problem.targetVariable, { hint:"Usually x." }))}<label class="studio-check"><input type="checkbox" data-index="${index}" data-creator-field="problem.requireRestrictions" ${problem.requireRestrictions ? "checked" : ""}> Require original restrictions</label><label class="studio-check"><input type="checkbox" data-index="${index}" data-creator-field="problem.requireOriginalEquationCheck" ${problem.requireOriginalEquationCheck ? "checked" : ""}> Require substitution checks</label></div><div class="studio-two">${indexed(field("Original equation", "problem.originalEquation", problem.originalEquation || problem.prompt.replace(/^.*?:\s*/, ""), { hint:"The equation used to classify valid and extraneous candidates." }))}${indexed(area("Expected restrictions — one value per line", "problem.expectedRestrictions", problem.expectedRestrictions, { rows:3, hint:"Every original denominator zero, including values from factors that later cancel." }))}</div>` : ""}
+    ${problem.workMode === "sign_chart_steps" ? `<aside class="studio-syntax-note"><strong>Author the trusted chart model.</strong><p>Critical point syntax is <code>value | kind | multiplicity | factor</code>, one point per line. Kind is <code>zero</code>, <code>undefined</code>, or <code>hole</code>. The learner receives a guided chart editor.</p></aside><div class="studio-three">${indexed(select("Expression kind", "problem.signExpressionKind", problem.signExpressionKind, [["polynomial","Polynomial"],["rational","Rational"]]))}${indexed(select("Relation", "problem.signRelation", problem.signRelation, [[">","> 0"],[">=","≥ 0"],["<","< 0"],["<=","≤ 0"]]))}${indexed(field("Target variable", "problem.targetVariable", problem.targetVariable))}</div>${indexed(field("Expression", "problem.signExpression", problem.signExpression, { hint:"Example: (x - 2)/(x + 1)." }))}<div class="studio-two">${indexed(field("Expected factorization", "problem.expectedFactorization", problem.expectedFactorization, { hint:"Equivalent factored form used when factorization is required." }))}${indexed(field("Reduced expression", "problem.reducedExpression", problem.reducedExpression, { hint:"Optional; use after canceled factors when holes must remain critical." }))}</div>${indexed(area("Critical points — value | kind | multiplicity | factor", "problem.criticalPoints", problem.criticalPoints, { rows:5, hint:"Example: 2 | zero | 1 | x - 2\n-1 | undefined | 1 | x + 1" }))}<div class="studio-checks"><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireFactorization" ${problem.requireFactorization ? "checked" : ""}> Require factorization</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireTestValues" ${problem.requireTestValues ? "checked" : ""}> Require test values</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireIntervalSigns" ${problem.requireIntervalSigns ? "checked" : ""}> Require interval signs</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireEndpointDecisions" ${problem.requireEndpointDecisions ? "checked" : ""}> Require endpoint decisions</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireFinalAnswerMatch" ${problem.requireFinalAnswerMatch ? "checked" : ""}> Match final interval set</label></div>` : ""}
     ${problem.workMode === "proof_obligations" ? `${renderProofAnatomy(problem)}<aside class="studio-syntax-note"><strong>Author a proof skeleton, not a secret answer.</strong><p>Each line below becomes one visible requirement for the learner and the Results/WebMCP reviewer. Use concrete logical milestones. Accepted approaches are suggestions, never exact phrases the learner must type.</p></aside>${indexed(area("Proof obligations — one logical milestone per line", "problem.proofObligations", problem.proofObligations, { rows:6, hint:"Example: “Derives p² = 2q²” or “Explains why both p and q being even contradicts lowest terms.”" }))}${indexed(area("Accepted proof approaches — one per line", "problem.proofStrategies", problem.proofStrategies, { rows:3, hint:"Name legitimate routes such as direct proof, contradiction, induction, or a subject-specific argument." }))}<button class="studio-example-button" type="button" data-creator-action="apply-proof-example" data-index="${index}">Load the complete editable √2 contradiction-proof example</button>` : ""}
     ${problem.workMode === "rubric_check" ? `<aside class="studio-syntax-note"><strong>Describe observable qualities.</strong><p>Each line becomes one visible review criterion with equal weight. The learner can structure the response however the prompt asks.</p></aside>${indexed(area("Review criteria — one per line", "problem.rubricCriteria", problem.rubricCriteria, { rows:5, hint:"Use specific criteria such as “Uses two relevant sources” rather than “Good answer.”" }))}<button class="studio-example-button" type="button" data-creator-action="apply-rubric-example" data-index="${index}">Fill with an editable rubric example</button>` : ""}
     ${reviewIsRequired ? `<div class="studio-review-lock"><span aria-hidden="true">✓</span><div><strong>Mastery waits for a passed review</strong><p>${problem.workReview === "self_review" ? "The learner can review this response on the Results page." : "A human tutor or connected agent reviews the saved response on the Results page."}</p></div></div>` : `<div class="studio-checks"><label><input type="checkbox" data-index="${index}" data-creator-field="problem.masteryRequiresReview" ${problem.masteryRequiresReview ? "checked" : ""}> Review must pass before mastery</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.allowSelfReview" ${problem.allowSelfReview ? "checked" : ""}> Allow self review</label></div>`}
@@ -235,20 +261,30 @@ function renderProblemEditor(skill, problem, index) {
       <div class="studio-repeat-head"><b>Question ${index + 1}</b>${skill.problems.length > 1 ? `<button data-creator-action="remove-problem" data-index="${index}">Remove</button>` : ""}</div>
       ${indexed(field("Question ID", "problem.templateId", problem.templateId, { hint: "A stable internal name; learners do not see it." }))}
       ${indexed(area("Learner prompt", "problem.prompt", problem.prompt, { rows: 3, hint: "Ask for both the final answer and reasoning here when reasoning matters." }))}
-      <div class="studio-response-picker"><div><strong>Question response type</strong><small>Proof requirements belong to each mastery question, so one lesson can mix ordinary answers, calculations, and proofs.</small></div>${indexed(select("What must the learner submit?", "problem.workMode", problem.workMode, [["none","Final answer only"],["capture_only","Final answer + written explanation"],["procedural_steps","Checked maths steps — Advanced Algebra style"],["proof_obligations","Formal proof required — reviewed before mastery"],["rubric_check","Required long response + rubric review"]], "Advanced Algebra-style steps are checked automatically. Formal proofs are stored for an obligation-by-obligation human or agent review before mastery can advance."))}<div class="studio-response-summary"><span aria-hidden="true">${problem.workMode === "proof_obligations" ? "∴" : problem.workMode === "procedural_steps" ? "=" : problem.workMode === "rubric_check" ? "☷" : "✎"}</span><div><strong>${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</strong><p>${esc(WORK_MODE_GUIDES[problem.workMode]?.summary ?? "")}</p></div></div></div>
+      <div class="studio-response-picker"><div><strong>Question response type</strong><small>Each question may use an ordinary answer, checked calculations, formal proof review, a rational-equation ledger, or a structured sign chart.</small></div>${indexed(select("What must the learner submit?", "problem.workMode", problem.workMode, [["none","Final answer only"],["capture_only","Final answer + written explanation"],["procedural_steps","Checked maths steps — Advanced Algebra style"],["rational_equation_steps","Rational equation — restrictions and candidate checks"],["sign_chart_steps","Sign chart — critical points and interval tests"],["proof_obligations","Formal proof required — reviewed before mastery"],["rubric_check","Required long response + rubric review"]], "Advanced Algebra-style steps are checked automatically. Rational equations and sign charts use guided form fields and app-side checks. Formal proofs are stored for obligation-by-obligation human or agent review."))}<div class="studio-response-summary"><span aria-hidden="true">${problem.workMode === "proof_obligations" ? "∴" : ["procedural_steps","rational_equation_steps","sign_chart_steps"].includes(problem.workMode) ? "=" : problem.workMode === "rubric_check" ? "☷" : "✎"}</span><div><strong>${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</strong><p>${esc(WORK_MODE_GUIDES[problem.workMode]?.summary ?? "")}</p></div></div></div>
       <div class="studio-three">
         ${indexed(select("Difficulty", "problem.difficulty", problem.difficulty, [["easy","Easy"],["medium","Medium"],["hard","Hard"],["brutal","Brutal"]]))}
-        ${indexed(select(isProof ? "Conclusion grader" : "Final-answer grader", "problem.gradingMethod", problem.gradingMethod, [["exact_numeric","Exact number"],["numeric_with_tolerance","Number with tolerance"],["multiple_choice","Multiple choice"],["symbolic_expression","Equivalent expression"],["equation_solution","Equation solution"],["inequality_solution","Inequality solution set"],["exact_text","Exact text"],["theorem_conclusion",isProof ? "Accepted conclusion · recommended" : "Accepted conclusion"]], graderHelp))}
+        ${indexed(select(isProof ? "Conclusion grader" : "Final-answer grader", "problem.gradingMethod", problem.gradingMethod, [["exact_numeric","Exact number"],["numeric_with_tolerance","Number with tolerance"],["multiple_choice","Multiple choice"],["symbolic_expression","Equivalent expression"],["equation_solution","Equation solution"],["inequality_solution","Linear inequality solution"],["finite_set","Finite solution set"],["rational_expression","Rational expression + exclusions"],["interval_set","Interval / union solution set"],["exact_text","Exact text"],["theorem_conclusion",isProof ? "Accepted conclusion · recommended" : "Accepted conclusion"]], graderHelp))}
         ${indexed(field(isProof ? "Private expected conclusion" : "Private expected answer", "problem.expectedAnswer", problem.expectedAnswer, { help: isProof ? "The short conclusion is graded separately from the proof. This value is never shown before submission." : "Never shown before submission. For multiple choice, enter the correct option ID.", hint: isProof ? "A correct conclusion still leaves the proof pending review." : "The final-answer grader compares the learner's answer with this value." }))}
       </div>
       ${problem.gradingMethod === "multiple_choice" ? indexed(area("Choices — ID | label, one per line", "problem.options", problem.options, { rows: 4, hint: "Example: A | Pacific Ocean. Put the correct ID, such as A, in Private expected answer." })) : ""}
       ${problem.gradingMethod === "numeric_with_tolerance" ? indexed(field("Allowed numerical difference", "problem.tolerance", problem.tolerance, { type: "number", min: 0, step: .001, hint: "0.01 accepts answers within ±0.01 of the expected number." })) : ""}
+      ${problem.gradingMethod === "finite_set" ? indexed(area("Expected members — one per line", "problem.answerValues", problem.answerValues, { rows:3, hint:"Order and duplicates do not matter. Leave empty for the empty set." })) : ""}
+      ${problem.gradingMethod === "rational_expression" ? `<div class="studio-two">${indexed(area("Excluded values — one per line", "problem.excludedValues", problem.excludedValues, { rows:3, hint:"Keep every zero of the original denominator, including holes that cancel from the formula." }))}${indexed(field("Target variable", "problem.answerVariable", problem.answerVariable, { hint:"Usually x." }))}</div><label class="studio-check"><input type="checkbox" data-index="${index}" data-creator-field="problem.requireReducedForm" ${problem.requireReducedForm ? "checked" : ""}> Require a reduced formula with no obvious common factor</label>` : ""}
+      ${problem.gradingMethod === "interval_set" ? indexed(field("Target variable", "problem.answerVariable", problem.answerVariable, { hint:"The learner may use interval notation, unions, a singleton [a,a], empty/all-real aliases, or equivalent inequalities." })) : ""}
       ${["theorem_conclusion", "symbolic_expression", "equation_solution", "inequality_solution"].includes(problem.gradingMethod) ? indexed(area(isProof ? "Other accepted conclusions — one per line" : "Other accepted final answers — one per line", "problem.acceptedForms", problem.acceptedForms, { rows: 3, hint: "These apply only to the short final answer, not the proof text." })) : ""}
       ${indexed(area("Private solution outline — one step per line", "problem.solutionSteps", problem.solutionSteps, { rows: 4, hint: "Shown after submission; keep answer-key reasoning out of the learner prompt." }))}
       ${indexed(area("Mistake tags — one per line", "problem.mistakeTags", problem.mistakeTags, { rows: 2, hint: "Short labels such as sign_error or missing_evidence help the tutor target follow-up work." }))}
       ${renderAdvancedWork(problem, index)}
     </div>
   </details>`;
+}
+
+function parseCriticalPoints(value) {
+  return lines(value).map((line) => {
+    const [point, kind = "zero", multiplicity = "1", ...factor] = line.split("|").map((item) => item.trim());
+    return { value: point, kind, multiplicity: Math.max(1, Number(multiplicity) || 1), factor: factor.join(" | ") };
+  });
 }
 
 function buildPack(draft) {
@@ -269,17 +305,40 @@ function buildPack(draft) {
       question_count: draft.mode === "override" ? Math.min(Number(skill.questionCount ?? skill.problems.length), skill.problems.length) : skill.problems.length,
       problems: skill.problems.map((problem, problemIndex) => {
         const answerMode = problem.workMode === "none" ? "final_only"
-          : ["procedural_steps", "proof_obligations", "rubric_check"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
+          : ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
         const work = {
           mode: problem.workMode, prompt: problem.workPrompt, minimum_steps: Number(problem.minimumSteps), line_type: problem.lineType,
           require_final_answer_match: true,
         };
         if (problem.workMode === "proof_obligations") work.proof_policy = { obligations: lines(problem.proofObligations), accepted_strategies: lines(problem.proofStrategies) };
         if (problem.workMode === "rubric_check") work.rubric = { criteria: lines(problem.rubricCriteria).map((description, index) => ({ id: `criterion_${index + 1}`, description, weight: 1 })) };
+        if (problem.workMode === "rational_equation_steps") {
+          work.target_variable = problem.targetVariable || "x";
+          work.original_equation = problem.originalEquation || problem.prompt.replace(/^.*?:\s*/, "");
+          work.expected_restrictions = lines(problem.expectedRestrictions);
+          work.require_restrictions = Boolean(problem.requireRestrictions);
+          work.require_original_equation_check = Boolean(problem.requireOriginalEquationCheck);
+        }
+        if (problem.workMode === "sign_chart_steps") {
+          work.target_variable = problem.targetVariable || "x";
+          work.sign_chart = {
+            expression_kind: problem.signExpressionKind,
+            expression: problem.signExpression,
+            relation: problem.signRelation,
+            expected_factorization: problem.expectedFactorization,
+            reduced_expression: problem.reducedExpression,
+            require_factorization: Boolean(problem.requireFactorization),
+            critical_points: parseCriticalPoints(problem.criticalPoints),
+            require_test_values: Boolean(problem.requireTestValues),
+            require_interval_signs: Boolean(problem.requireIntervalSigns),
+            require_endpoint_decisions: Boolean(problem.requireEndpointDecisions),
+            require_final_answer_match: Boolean(problem.requireFinalAnswerMatch),
+          };
+        }
         const templateId = draft.mode === "override" ? problem.templateId : cleanId(problem.templateId || `${skillId}_Q${problemIndex + 1}`, "QUESTION_");
         const output = {
           template_id: templateId, source_template_id: problem.sourceTemplateId || templateId, skill_id: skillId,
-          difficulty: problem.difficulty, prompt: problem.prompt, expected_answer: problem.expectedAnswer,
+          difficulty: problem.difficulty, prompt: problem.prompt, expected_answer: problem.gradingMethod === "finite_set" ? `{${lines(problem.answerValues).join(", ")}}` : problem.expectedAnswer,
           answer_type: problem.answerType, grading_method: problem.gradingMethod, solution_steps: lines(problem.solutionSteps),
           mistake_tags: lines(problem.mistakeTags), answer_mode: answerMode, work,
           review_policy: {
@@ -289,6 +348,12 @@ function buildPack(draft) {
           },
         };
         if (problem.gradingMethod === "numeric_with_tolerance") output.tolerance = Number(problem.tolerance);
+        if (problem.gradingMethod === "finite_set") output.answer_metadata = { type: "finite_set", variable: problem.answerVariable || "x", values: lines(problem.answerValues) };
+        if (problem.gradingMethod === "rational_expression") {
+          output.answer_metadata = { type: "rational_expression", variable: problem.answerVariable || "x", value: problem.expectedAnswer, excluded_values: lines(problem.excludedValues) };
+          output.grading_metadata = { require_reduced_form: Boolean(problem.requireReducedForm) };
+        }
+        if (problem.gradingMethod === "interval_set") output.answer_metadata = { type: "interval_set", variable: problem.answerVariable || "x", value: problem.expectedAnswer };
         if (problem.gradingMethod === "multiple_choice") output.options = lines(problem.options).map((line, index) => {
           const [rawId, ...rest] = line.split("|");
           return { id: (rawId || String.fromCharCode(65 + index)).trim(), label: (rest.join("|") || rawId).trim() };
@@ -341,6 +406,16 @@ function draftFromPack(pack, snapshot) {
       rubricCriteria: (problem.work?.rubric?.criteria ?? []).map((criterion) => criterion.description).join("\n"),
       workReview: problem.review_policy?.work_review ?? "none", masteryRequiresReview: Boolean(problem.review_policy?.mastery_requires_review_pass),
       allowSelfReview: problem.review_policy?.allow_self_review !== false,
+      answerValues: (problem.answer_metadata?.values ?? []).join("\n"), excludedValues: (problem.answer_metadata?.excluded_values ?? []).join("\n"),
+      answerVariable: problem.answer_metadata?.variable ?? problem.variable ?? "x", requireReducedForm: problem.grading_metadata?.require_reduced_form !== false,
+      targetVariable: problem.work?.target_variable ?? "x", originalEquation: problem.work?.original_equation ?? "", expectedRestrictions: (problem.work?.expected_restrictions ?? []).join("\n"), requireRestrictions: problem.work?.require_restrictions !== false,
+      requireOriginalEquationCheck: problem.work?.require_original_equation_check !== false,
+      signExpressionKind: problem.work?.sign_chart?.expression_kind ?? "polynomial", signExpression: problem.work?.sign_chart?.expression ?? "",
+      signRelation: problem.work?.sign_chart?.relation ?? ">", expectedFactorization: problem.work?.sign_chart?.expected_factorization ?? "",
+      reducedExpression: problem.work?.sign_chart?.reduced_expression ?? "", requireFactorization: problem.work?.sign_chart?.require_factorization === true,
+      criticalPoints: (problem.work?.sign_chart?.critical_points ?? []).map((point) => `${point.value} | ${point.kind} | ${point.multiplicity ?? 1} | ${point.factor ?? ""}`).join("\n"),
+      requireTestValues: problem.work?.sign_chart?.require_test_values !== false, requireIntervalSigns: problem.work?.sign_chart?.require_interval_signs !== false,
+      requireEndpointDecisions: problem.work?.sign_chart?.require_endpoint_decisions !== false, requireFinalAnswerMatch: problem.work?.sign_chart?.require_final_answer_match !== false,
     })),
   }));
   if (!base.skills.length) base.skills = [blankSkill(0)];

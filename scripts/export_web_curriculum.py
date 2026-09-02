@@ -58,6 +58,8 @@ def build_payload() -> dict:
                     "procedural_steps",
                     "proof_obligations",
                     "rubric_check",
+                    "rational_equation_steps",
+                    "sign_chart_steps",
                 }
                 problems.append(row)
             covered_template_ids = {problem["source_template_id"] for problem in problems}

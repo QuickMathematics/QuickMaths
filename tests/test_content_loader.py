@@ -10,7 +10,7 @@ def test_loads_valid_default_skills():
     assert track.id == "TRACK_MATH_ALGEBRA_FOUNDATIONS"
     assert track.schema_version == "0.2"
     assert "MATH_ALG_001" in skills
-    assert len(track.skills) == 41
+    assert len(track.skills) == 50
     assert skills["MATH_ALG_001"].test.question_count >= 1
     assert len(skills["MATH_ALG_001"].test.questions) >= skills["MATH_ALG_001"].test.question_count
     assert warnings == []
@@ -37,6 +37,21 @@ def test_default_content_uses_procedural_work_only_where_auto_checking_is_suppor
             elif mode == "capture_only":
                 assert question.answer_mode == "final_plus_required_work"
                 assert question.work.get("prompt", "").strip()
+                assert question.review_policy["mastery_requires_review_pass"] is False
+            elif mode == "rational_equation_steps":
+                assert question.answer_mode == "final_plus_required_work"
+                assert method == "finite_set"
+                assert question.work.get("target_variable")
+                assert question.review_policy["work_review"] == "auto"
+                assert question.review_policy["mastery_requires_review_pass"] is False
+            elif mode == "sign_chart_steps":
+                assert question.answer_mode == "final_plus_required_work"
+                assert method == "interval_set"
+                assert question.work.get("target_variable")
+                sign_chart = question.work.get("sign_chart", {})
+                assert sign_chart.get("expression")
+                assert isinstance(sign_chart.get("critical_points"), list)
+                assert question.review_policy["work_review"] == "auto"
                 assert question.review_policy["mastery_requires_review_pass"] is False
             else:
                 assert question.answer_mode == "final_only"

@@ -107,6 +107,8 @@ class ProblemInstance:
     work: dict[str, Any] = field(default_factory=dict)
     review_policy: dict[str, Any] = field(default_factory=dict)
     accepted_forms: list[str] = field(default_factory=list)
+    answer_metadata: dict[str, Any] = field(default_factory=dict)
+    grading_metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -142,6 +144,7 @@ class WorkCheckResult:
     detected_obligations: list[str] = field(default_factory=list)
     missing_obligations: list[str] = field(default_factory=list)
     flawed_obligations: list[str] = field(default_factory=list)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

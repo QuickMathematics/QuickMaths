@@ -8,6 +8,7 @@ import { buildToolDefinitions, registerWebMcpTools, TOOL_NAMES } from "./webmcp-
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const agentManifest = JSON.parse(readFileSync(new URL("./agent-manifest.json", import.meta.url), "utf8"));
 const educatorManifest = JSON.parse(readFileSync(new URL("./educator-agent-manifest.json", import.meta.url), "utf8"));
+const authoringGuide = readFileSync(new URL("./CUSTOM_LESSON_SETS.md", import.meta.url), "utf8");
 const geographyLessonSet = readFileSync(new URL("./lesson-depot/lessons/geography/1.0.0/lesson-set.json", import.meta.url), "utf8");
 
 function createStore({ profile = true } = {}) {
@@ -25,7 +26,7 @@ function createStore({ profile = true } = {}) {
 }
 
 function toolsFor(store) {
-  return Object.fromEntries(buildToolDefinitions(store, agentManifest, null, null, educatorManifest).map((tool) => [tool.name, tool]));
+  return Object.fromEntries(buildToolDefinitions(store, agentManifest, null, null, educatorManifest, authoringGuide).map((tool) => [tool.name, tool]));
 }
 
 function nativeImprovement(store) {
@@ -217,13 +218,13 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /local-git-transport/);
 });
 
-test("registers all twenty-eight tools once with the WebMCP document context", async () => {
+test("registers all twenty-nine tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
-  }, agentManifest, null, null, educatorManifest);
+  }, agentManifest, null, null, educatorManifest, authoringGuide);
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 28);
+  assert.equal(TOOL_NAMES.length, 29);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(result.failures, []);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
@@ -251,7 +252,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.equal(summary.guide.app, "QuickMaths Web");
   assert.equal(summary.guide.app_version, 21);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
-  assert.equal(summary.guide.tools.length, 28);
+  assert.equal(summary.guide.tools.length, 29);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent GitHub storage/);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
@@ -266,6 +267,17 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.equal(serialized.includes("expected_answer"), false);
   assert.equal(serialized.includes("finalAnswer"), false);
   await assert.rejects(tools.get_agent_guide.execute({ section: "everything" }), /section must be one of/i);
+});
+
+test("agent can pull the lesson authoring guide by section through WebMCP", async () => {
+  const tools = toolsFor(createStore());
+  const summary = await tools.get_lesson_authoring_guide.execute({});
+  const work = await tools.get_lesson_authoring_guide.execute({ section: "grading_and_work" });
+  assert.equal(summary.ok, true);
+  assert.match(summary.guide.markdown, /Agent Lesson Authoring Guide/);
+  assert.match(work.guide.markdown, /Answer and shown-work modes/);
+  assert.equal(work.guide.source_url, "./CUSTOM_LESSON_SETS.md");
+  await assert.rejects(tools.get_lesson_authoring_guide.execute({ section: "secrets" }), /section must be one of/i);
 });
 
 test("educator WebMCP tools compose curricula and inject the private learner policy", async () => {
@@ -284,7 +296,7 @@ test("educator WebMCP tools compose curricula and inject the private learner pol
   assert.equal(workspace.installed_packs[0].enabled, true);
 
   await tools.set_curriculum_pack_enabled.execute({ pack_id: "PACK_GEOGRAPHY", enabled: false });
-  assert.equal(store.snapshot().curriculum.allSkills.length, 44);
+  assert.equal(store.snapshot().curriculum.allSkills.length, 53);
   const updated = await tools.update_curriculum_settings.execute({
     student_name: "Ada",
     agent_enabled: false,
@@ -331,8 +343,8 @@ test("app, curriculum, and progress tools expose the full learner state", async 
   assert.equal(app.view, "tutorial");
   assert.equal(app.map_scope, "subject");
   assert.deepEqual(app.learning_plan, { plan_mode: false, selected_skill_ids: [], layouts: {}, paths: [], annotations: [] });
-  assert.equal(map.skills.length, 44);
-  assert.equal(summary.skills.length, 44);
+  assert.equal(map.skills.length, 53);
+  assert.equal(summary.skills.length, 53);
   assert.equal(summary.suggested_next.skill_id, "MATH_ARITH_001");
 });
 
@@ -403,12 +415,12 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
   let tools = toolsFor(store);
   const nativeSubjects = await tools.list_subjects.execute({});
   assert.equal(nativeSubjects.active_subject_id, "SUBJECT_MATH");
-  assert.deepEqual(nativeSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [["SUBJECT_MATH", 44]]);
+  assert.deepEqual(nativeSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [["SUBJECT_MATH", 53]]);
   store.importLessonPack(geographyLessonSet);
   tools = toolsFor(store);
   const installedSubjects = await tools.list_subjects.execute({});
   assert.deepEqual(installedSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [
-    ["SUBJECT_MATH", 44], ["SUBJECT_GEOGRAPHY", 15],
+    ["SUBJECT_MATH", 53], ["SUBJECT_GEOGRAPHY", 15],
   ]);
   const changed = await tools.set_learning_preferences.execute({ progression_mode: "soft" });
   assert.equal(changed.progression_mode, "soft");
@@ -419,7 +431,7 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
   assert.equal(combinedPreference.map_scope, "all");
   const combinedMap = await tools.get_curriculum_map.execute({});
   assert.equal(combinedMap.scope, "all");
-  assert.equal(combinedMap.skills.length, 59);
+  assert.equal(combinedMap.skills.length, 68);
   assert.deepEqual(new Set(combinedMap.skills.map((skill) => skill.subject_id)), new Set(["SUBJECT_MATH", "SUBJECT_GEOGRAPHY"]));
   await assert.rejects(tools.get_curriculum_map.execute({ subject_id: "SUBJECT_MATH", scope: "all" }), /cannot be combined/);
   const opened = await tools.open_lesson_creator.execute({ subject_id: "SUBJECT_MATH" });

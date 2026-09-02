@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from decimal import Decimal, InvalidOperation
 
-from sympy import E, Eq, FiniteSet, Ge, Gt, Le, Lt, N, S, Symbol, pi, simplify, solve, sqrt
+from sympy import E, Eq, FiniteSet, Ge, Gt, Interval, Le, Lt, N, S, Symbol, Union, fraction, gcd, oo, pi, simplify, solve, solveset, sqrt, together
 from sympy.parsing.sympy_parser import (
     convert_xor,
     implicit_multiplication_application,
@@ -139,6 +139,35 @@ def equations_equivalent_solution_set(a: str, b: str, variable: str) -> bool | N
         return None
 
 
+def equation_solution_set(text: str, variable: str = "x"):
+    """Return the real solution set for one learner-style equation."""
+    symbol = Symbol(variable, real=True)
+    return _equation_solution_set(parse_equation(text, [variable]), symbol)
+
+
+def equation_text_from_prompt(prompt: str) -> str:
+    """Extract the final equation after an instructional prompt prefix."""
+    source = str(prompt).strip()
+    if ":" in source:
+        source = source.split(":", 1)[1].strip()
+    source = source.rstrip(". ?")
+    # Several authored prompts use square brackets as visual grouping. SymPy
+    # expects ordinary parentheses for scalar expressions.
+    return source.replace("[", "(").replace("]", ")")
+
+
+def rational_equation_restrictions(text: str, variable: str = "x"):
+    """Derive the real zeros of every original equation denominator."""
+    symbol = Symbol(variable, real=True)
+    equation = parse_equation(equation_text_from_prompt(text), [variable])
+    restrictions = S.EmptySet
+    for side in (equation.lhs, equation.rhs):
+        _numerator, denominator = fraction(together(side))
+        if simplify(denominator) != 1:
+            restrictions = Union(restrictions, solveset(denominator, symbol, domain=S.Reals))
+    return restrictions
+
+
 def inequalities_equivalent_solution_set(a: str, b: str, variable: str) -> bool | None:
     try:
         symbol = Symbol(variable, real=True)
@@ -195,6 +224,203 @@ def inequality_solution_equal(expected: str, user: str, variable: str) -> bool:
     if equivalent is None:
         raise MathSyntaxError(f"Could not compare inequalities '{expected}' and '{user}'")
     return equivalent
+
+
+def parse_finite_set(value: str | list[str], variable: str = "x"):
+    if isinstance(value, list):
+        members = value
+    else:
+        source = normalize_math_text(str(value)).strip()
+        folded = source.casefold()
+        if folded in {"", "{}", "∅", "empty", "empty set", "no solution", "no solutions"}:
+            return S.EmptySet
+        if source.startswith("{") and source.endswith("}"):
+            source = source[1:-1].strip()
+        source = re.sub(r"\s+or\s+", ",", source, flags=re.IGNORECASE)
+        members = _split_top_level(source, ",")
+        if len(members) == 1 and ";" in source:
+            members = _split_top_level(source, ";")
+    parsed = []
+    for member in members:
+        text = str(member).strip()
+        if not text:
+            continue
+        parsed.append(simplify(parse_expression(extract_solution_value(text, variable), [variable])))
+    return FiniteSet(*parsed)
+
+
+def finite_set_equal(expected_values: list[str], user: str, variable: str = "x") -> bool:
+    return parse_finite_set(expected_values, variable) == parse_finite_set(user, variable)
+
+
+def rational_expression_equal(
+    expected_formula: str,
+    expected_excluded_values: list[str],
+    user_formula: str,
+    user_excluded_values: str | list[str],
+    *,
+    variable: str = "x",
+    require_reduced_form: bool = False,
+) -> bool:
+    expected = parse_expression(expected_formula, [variable])
+    user = parse_expression(user_formula, [variable])
+    if simplify(expected - user) != 0:
+        return False
+    if parse_finite_set(expected_excluded_values, variable) != parse_finite_set(user_excluded_values, variable):
+        return False
+    if require_reduced_form:
+        unevaluated = _parse_expression_unevaluated(user_formula, [variable])
+        numerator, denominator = fraction(unevaluated)
+        if simplify(gcd(numerator, denominator)) not in {S.One, S.NegativeOne}:
+            return False
+    return True
+
+
+def parse_interval_set(value: str, variable: str = "x"):
+    source = normalize_math_text(str(value)).strip()
+    source = source.replace("∞", "inf")
+    source = re.sub(r"\+?infinity", "inf", source, flags=re.IGNORECASE)
+    source = re.sub(r"-\s*inf", "-inf", source, flags=re.IGNORECASE)
+    folded = re.sub(r"\s+", " ", source).strip().casefold()
+    if folded in {"", "{}", "∅", "empty", "empty set", "no solution", "no solutions"}:
+        return S.EmptySet
+    if folded in {"r", "reals", "real numbers", "all reals", "all real numbers"}:
+        return S.Reals
+    if any(character in source for character in "[]()") and "," in source:
+        components = re.split(r"\s*(?:∪|\bU\b)\s*", source, flags=re.IGNORECASE)
+        parsed_components = [_parse_interval_component(component.strip()) for component in components if component.strip()]
+        if not parsed_components:
+            raise MathSyntaxError(f"Could not parse interval set '{value}'")
+        return Union(*parsed_components)
+    return _parse_inequality_set(source, variable)
+
+
+def interval_set_equal(expected: str, user: str, variable: str = "x") -> bool:
+    expected_set = parse_interval_set(expected, variable)
+    user_set = parse_interval_set(user, variable)
+    return expected_set.symmetric_difference(user_set) == S.EmptySet
+
+
+def _parse_interval_component(component: str):
+    if len(component) < 5 or component[0] not in "([" or component[-1] not in ")]":
+        raise MathSyntaxError(f"Malformed interval '{component}'")
+    members = _split_top_level(component[1:-1], ",")
+    if len(members) != 2:
+        raise MathSyntaxError(f"Malformed interval '{component}'")
+    lower = _parse_interval_endpoint(members[0])
+    upper = _parse_interval_endpoint(members[1])
+    left_open = component[0] == "("
+    right_open = component[-1] == ")"
+    if lower == -oo and not left_open:
+        raise MathSyntaxError("Negative infinity must use an open endpoint")
+    if upper == oo and not right_open:
+        raise MathSyntaxError("Positive infinity must use an open endpoint")
+    try:
+        if lower != -oo and upper != oo and float(N(lower)) > float(N(upper)):
+            raise MathSyntaxError(f"Interval endpoints are reversed in '{component}'")
+    except (TypeError, ValueError):
+        raise MathSyntaxError(f"Interval endpoints must be real constants in '{component}'")
+    if lower == upper and (left_open or right_open):
+        return S.EmptySet
+    return Interval(lower, upper, left_open=left_open, right_open=right_open)
+
+
+def _parse_interval_endpoint(value: str):
+    text = value.strip().casefold().replace("+", "")
+    if text in {"inf", "oo"}:
+        return oo
+    if text in {"-inf", "-oo"}:
+        return -oo
+    expression = simplify(parse_expression(value))
+    if expression.free_symbols or expression.is_real is False:
+        raise MathSyntaxError(f"Interval endpoint '{value}' must be a real constant")
+    return expression
+
+
+def _parse_inequality_set(source: str, variable: str):
+    symbol = Symbol(variable, real=True)
+    or_parts = re.split(r"\s+or\s+", source, flags=re.IGNORECASE)
+    if len(or_parts) > 1:
+        return Union(*(_parse_inequality_set(part, variable) for part in or_parts))
+    and_parts = re.split(r"\s+and\s+", source, flags=re.IGNORECASE)
+    if len(and_parts) > 1:
+        result = S.Reals
+        for part in and_parts:
+            result = result.intersect(_parse_inequality_set(part, variable))
+        return result
+    not_equal = re.fullmatch(r"\s*(.*?)\s*!=\s*(.*?)\s*", source)
+    if not_equal:
+        left, right = not_equal.groups()
+        if left.strip() == variable:
+            boundary = parse_expression(right, [variable])
+        elif right.strip() == variable:
+            boundary = parse_expression(left, [variable])
+        else:
+            raise MathSyntaxError(f"Expected {variable} in '{source}'")
+        return S.Reals - FiniteSet(simplify(boundary))
+    equal = re.fullmatch(r"\s*(.*?)\s*(?<![<>!])=(?!=)\s*(.*?)\s*", source)
+    if equal:
+        left, right = equal.groups()
+        if left.strip() == variable:
+            boundary = parse_expression(right, [variable])
+        elif right.strip() == variable:
+            boundary = parse_expression(left, [variable])
+        else:
+            raise MathSyntaxError(f"Expected {variable} in '{source}'")
+        return FiniteSet(simplify(boundary))
+    matches = list(re.finditer(r"<=|>=|<|>", source))
+    if len(matches) == 1:
+        relation = parse_inequality(source, [variable])
+        return solve_univariate_inequality(relation, symbol, relational=False)
+    if len(matches) == 2:
+        first, second = matches
+        left = source[: first.start()].strip()
+        middle = source[first.end() : second.start()].strip()
+        right = source[second.end() :].strip()
+        if middle != variable:
+            raise MathSyntaxError(f"Expected middle variable {variable} in '{source}'")
+        left_relation = parse_inequality(f"{left} {first.group(0)} {middle}", [variable])
+        right_relation = parse_inequality(f"{middle} {second.group(0)} {right}", [variable])
+        return solve_univariate_inequality(left_relation, symbol, relational=False).intersect(
+            solve_univariate_inequality(right_relation, symbol, relational=False)
+        )
+    raise MathSyntaxError(f"Could not parse interval or inequality set '{source}'")
+
+
+def _split_top_level(source: str, separator: str) -> list[str]:
+    parts: list[str] = []
+    depth = 0
+    start = 0
+    for index, character in enumerate(source):
+        if character in "([{":
+            depth += 1
+        elif character in ")]}":
+            depth = max(0, depth - 1)
+        elif character == separator and depth == 0:
+            parts.append(source[start:index].strip())
+            start = index + 1
+    parts.append(source[start:].strip())
+    return parts
+
+
+def _parse_expression_unevaluated(text: str, variables: list[str] | None = None):
+    local_dict = dict(LOCAL_DICT)
+    normalized = normalize_math_text(text)
+    symbol_names = set(variables or [])
+    for token in re.findall(r"[A-Za-z][A-Za-z0-9_]*", normalized):
+        if token not in LOCAL_DICT:
+            symbol_names.add(token)
+    for variable in symbol_names:
+        local_dict[variable] = Symbol(variable, real=True)
+    try:
+        return parse_expr(
+            normalized,
+            transformations=TRANSFORMATIONS,
+            local_dict=local_dict,
+            evaluate=False,
+        )
+    except Exception as exc:
+        raise MathSyntaxError(f"Could not parse math expression '{text}'") from exc
 
 
 def extract_solution_value(value: str, variable: str) -> str:

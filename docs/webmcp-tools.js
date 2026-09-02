@@ -1,5 +1,6 @@
 export const TOOL_NAMES = Object.freeze([
   "get_agent_guide",
+  "get_lesson_authoring_guide",
   "get_educator_agent_manifest",
   "get_app_state",
   "get_curriculum_map",
@@ -53,6 +54,36 @@ function optionalString(input, key, maxLength) {
 }
 
 const GUIDE_SECTIONS = Object.freeze(["summary", "tutoring", "navigation", "planning", "educator", "bridge", "custom_content", "backup", "all"]);
+const AUTHORING_GUIDE_SECTIONS = Object.freeze(["summary", "envelope", "native_improvements", "curriculum_graph", "questions", "grading_and_work", "studio", "webmcp", "publishing", "all"]);
+
+function authoringGuideSection(markdown, section) {
+  const source = String(markdown ?? "").trim();
+  if (!source) return { markdown: "The bundled authoring guide could not be loaded. Open ./CUSTOM_LESSON_SETS.md.", source_url: "./CUSTOM_LESSON_SETS.md" };
+  if (section === "all") return { markdown: source, source_url: "./CUSTOM_LESSON_SETS.md" };
+  if (section === "summary") return {
+    markdown: source.split(/^## /m)[0].trim(),
+    source_url: "./CUSTOM_LESSON_SETS.md",
+    available_sections: AUTHORING_GUIDE_SECTIONS,
+    recommended_next: ["envelope", "questions", "grading_and_work", "webmcp"],
+  };
+  const headings = {
+    envelope: "Envelope and subject",
+    native_improvements: "Improving a native QuickMaths lesson",
+    curriculum_graph: "Track and skills",
+    questions: "Fixed mastery questions",
+    grading_and_work: "Answer and shown-work modes",
+    studio: "Human Lesson Creator",
+    webmcp: "WebMCP workflow",
+    publishing: "Publishing to the Lesson Depot",
+  };
+  const heading = headings[section];
+  const pattern = new RegExp(`^## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "m");
+  const match = pattern.exec(source);
+  if (!match) return { markdown: `Section ${section} is unavailable.`, source_url: "./CUSTOM_LESSON_SETS.md" };
+  const tail = source.slice(match.index);
+  const next = tail.slice(match[0].length).search(/^## /m);
+  return { markdown: next < 0 ? tail.trim() : tail.slice(0, match[0].length + next).trim(), source_url: "./CUSTOM_LESSON_SETS.md" };
+}
 
 function activeCurriculumPolicy(store) {
   const state = store.snapshot();
@@ -163,7 +194,7 @@ function guideForSection(guide, section) {
   };
 }
 
-export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = null, lessonStudio = null, educatorManifest = {}) {
+export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = null, lessonStudio = null, educatorManifest = {}, authoringGuideMarkdown = "") {
   const guide = agentManifest && typeof agentManifest === "object" && !Array.isArray(agentManifest)
     ? JSON.parse(JSON.stringify(agentManifest))
     : {};
@@ -211,6 +242,19 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           guide: guideForSection(guide, section),
           active_curriculum_policy: activeCurriculumPolicy(store),
         };
+      },
+    },
+    {
+      name: "get_lesson_authoring_guide",
+      title: "Get QuickMaths lesson authoring guide",
+      description: "Read the bundled Agent Lesson Authoring Guide by topic before creating or modifying lesson packs, structured questions, subjects, bridges, or native improvements.",
+      inputSchema: { type: "object", properties: { section: { type: "string", enum: AUTHORING_GUIDE_SECTIONS, description: "Guide section; defaults to summary. Request all only for a full authoring pass." } }, additionalProperties: false },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      async execute(input = {}) {
+        requireObject(input); rejectUnknown(input, ["section"]);
+        const section = input.section ?? "summary";
+        if (!AUTHORING_GUIDE_SECTIONS.includes(section)) throw new Error(`section must be one of: ${AUTHORING_GUIDE_SECTIONS.join(", ")}`);
+        return { ok: true, section, guide: authoringGuideSection(authoringGuideMarkdown, section) };
       },
     },
     {
@@ -888,11 +932,11 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
   ];
 }
 
-export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext, agentManifest = {}, lessonDepot = null, lessonStudio = null, educatorManifest = {}) {
+export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext, agentManifest = {}, lessonDepot = null, lessonStudio = null, educatorManifest = {}, authoringGuideMarkdown = "") {
   if (!modelContext || typeof modelContext.registerTool !== "function") return { available: false, registered: [], failures: [], error: null };
   const registered = [];
   const failures = [];
-  for (const definition of buildToolDefinitions(store, agentManifest, lessonDepot, lessonStudio, educatorManifest)) {
+  for (const definition of buildToolDefinitions(store, agentManifest, lessonDepot, lessonStudio, educatorManifest, authoringGuideMarkdown)) {
     try {
       await modelContext.registerTool(definition);
       registered.push(definition.name);

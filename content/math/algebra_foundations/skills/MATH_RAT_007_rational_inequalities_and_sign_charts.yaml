@@ -1,0 +1,873 @@
+id: MATH_RAT_007
+schema_version: 0.2
+name: Rational inequalities and sign charts
+domain: Math
+subdomain: Rational Functions
+description: Solve rational inequalities by combining expressions, factoring numerators and denominators, marking zeros
+  and excluded values, completing sign charts, and reporting interval unions.
+prerequisites:
+- MATH_INEQ_002
+- MATH_RAT_006
+tags:
+- rational_inequalities
+- sign_charts
+- interval_notation
+- domain_restrictions
+- holes
+- vertical_asymptotes
+- factoring
+- critical_points
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A rational inequality compares a rational expression with zero or with another expression.
+
+  Examples:
+
+  (x - 2)/(x - 5) > 0
+
+  1/(x + 3) <= 1/(x - 4)
+
+  The reliable method is to move everything to one side, write one rational expression, and use a sign chart.
+
+  Critical points come from two places:
+  1. Numerator zeros make the rational expression equal zero.
+  2. Denominator zeros make the original expression undefined.
+
+  Both types divide the number line into sign intervals, but they behave differently at endpoints.
+
+  Endpoint rule:
+  - A numerator zero may be included when the inequality uses <= or >=.
+  - A denominator zero is never included.
+  - A canceled denominator factor creates a hole and is still never included.
+
+  General method:
+  1. Move every term to one side so the other side is 0.
+  2. Combine the left side into one rational expression.
+  3. Factor the numerator and denominator completely.
+  4. Record all original denominator restrictions.
+  5. Find numerator zeros.
+  6. Place zeros, poles, and holes in increasing order.
+  7. Test one value in every resulting interval.
+  8. Select intervals with the requested sign.
+  9. Include allowed numerator zeros for <= or >=.
+  10. Exclude every denominator zero and hole.
+  11. Write the final set as a union of intervals.
+
+  Example:
+  Solve (x - 2)/(x - 5) >= 0.
+
+  Critical points:
+  - x = 2 is a numerator zero.
+  - x = 5 is undefined.
+
+  Signs:
+  - x < 2: positive.
+  - 2 < x < 5: negative.
+  - x > 5: positive.
+
+  The symbol >= includes x = 2 but can never include x = 5.
+
+  Solution:
+
+  (-inf, 2] U (5, inf)
+
+  Canceled factors and holes:
+  Consider:
+
+  [(x - 1)(x + 4)] / [(x - 1)(x - 3)] > 0
+
+  The factor x - 1 cancels from the formula, but x = 1 remains excluded from the original domain. The hole can split an otherwise selected interval even though the sign does not change there.
+
+  Repeated factors:
+  An even power does not change sign across its zero or excluded value. A denominator factor with even multiplicity still creates an excluded point, but the signs on its two sides match.
+
+  Comparisons not already against zero:
+  Before drawing a sign chart, subtract one side from the other.
+
+  Example:
+
+  (x - 1)/(x - 4) >= 1
+
+  becomes:
+
+  (x - 1)/(x - 4) - 1 >= 0
+
+  3/(x - 4) >= 0
+
+  The only critical point is x = 4, which is excluded. The expression is positive for x > 4, so the solution is (4, inf).
+
+  Common mistake:
+  Do not cross multiply through an inequality unless you know the denominator's sign. A sign chart avoids that trap.
+
+  Another common mistake:
+  Do not include a denominator zero when the inequality uses <= or >=. Undefined is never part of the solution.
+
+  Another common mistake:
+  Do not erase a canceled hole from the number line. The formula may simplify, but the original domain restriction remains.
+examples:
+- prompt: Solve (x - 2)/(x - 5) > 0.
+  solution: (-inf, 2) U (5, inf)
+  explanation: The ratio is positive where numerator and denominator have the same sign.
+- prompt: Solve (x + 1)/(x - 4) <= 0.
+  solution: '[-1, 4)'
+  explanation: Include the numerator zero -1, but exclude the denominator zero 4.
+- prompt: Solve 1/[(x - 2)(x - 7)] > 0.
+  solution: (-inf, 2) U (7, inf)
+  explanation: The denominator product is positive outside its two zeros.
+- prompt: Solve (x - 1)^2/(x - 6) <= 0.
+  solution: (-inf, 6)
+  explanation: The square is nonnegative and the denominator is negative for x < 6; x = 1 is allowed and makes the expression
+    zero.
+- prompt: Solve (x - 1)/(x - 4)^2 >= 0.
+  solution: '[1, 4) U (4, inf)'
+  explanation: The squared denominator stays positive but x = 4 remains excluded.
+- prompt: Solve 1/(x - 3)^2 < 0.
+  solution: empty set
+  explanation: The expression is positive everywhere it is defined.
+- prompt: Solve 1/(x + 2) - 1/(x - 5) > 0.
+  solution: (-2, 5)
+  explanation: The combined numerator is negative, so the quotient is positive between the denominator zeros.
+- prompt: Why can an excluded hole split an interval?
+  solution: The original function is undefined there.
+  explanation: Cancellation changes the formula but not the original domain.
+applications:
+- title: Rational function graphs
+  description: Sign intervals show where a rational graph lies above or below the x-axis.
+- title: Rate constraints
+  description: Rational inequalities model when time, speed, efficiency, or cost remains within a limit.
+- title: Domain-aware algebra
+  description: The method keeps holes and vertical asymptotes separate from ordinary zeros.
+- title: Calculus preparation
+  description: Sign charts for rational expressions are later used in derivative and limit analysis.
+test:
+  question_count: 12
+  randomize_order: true
+  questions:
+  - id: RAT_INEQ_LINEAR_RATIO_POSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})/(x - {b}) > 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a}) U ({b}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: (x - {a})/(x - {b})
+        relation: '>'
+        expected_factorization: (x - {a})/(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: (x - {a})/(x - {b})
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The numerator is zero at x = {a}.
+      The denominator is zero at x = {b}, so {b} is excluded.
+      The ratio is positive on the two outside intervals.
+      The strict solution is (-inf, {a}) U ({b}, inf).
+    mistake_tags:
+    - rational_inequality_error
+    - sign_chart_error
+    - domain_restriction_error
+    - interval_notation
+    difficulty: easy
+  - id: RAT_INEQ_LINEAR_RATIO_NONPOSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})/(x - {b}) <= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{a}, {b})'
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: (x - {a})/(x - {b})
+        relation: <=
+        expected_factorization: (x - {a})/(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: (x - {a})/(x - {b})
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The ratio is negative between {a} and {b}.
+      It equals zero at x = {a}, so {a} is included.
+      It is undefined at x = {b}, so {b} is excluded.
+      The solution is [{a}, {b}).
+    mistake_tags:
+    - rational_inequality_error
+    - endpoint_inclusion_error
+    - domain_restriction_error
+    - sign_chart_error
+    difficulty: medium
+  - id: RAT_INEQ_RECIPROCAL_TWO_FACTORS_POSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: 1/[(x - {a})(x - {b})] > 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a}) U ({b}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: 1/((x - {a})*(x - {b}))
+        relation: '>'
+        expected_factorization: 1/((x - {a})*(x - {b}))
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: 1/((x - {a})*(x - {b}))
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The numerator is always positive.
+      The denominator product is positive outside {a} and {b}, and negative between them.
+      Both critical points are undefined and excluded.
+      The solution is (-inf, {a}) U ({b}, inf).
+    mistake_tags:
+    - rational_inequality_error
+    - denominator_sign_error
+    - domain_restriction_error
+    - union_error
+    difficulty: medium
+  - id: RAT_INEQ_REPEATED_NUMERATOR_NONPOSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})^2/(x - {b}) <= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 3
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {b})
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: (x - {a})^2/(x - {b})
+        relation: <=
+        expected_factorization: (x - {a})^2/(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 2
+          factor: x - {a}
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: (x - {a})^2/(x - {b})
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The squared numerator is positive except that it equals zero at {a}.
+      For every x < {b}, the denominator is negative, so the quotient is nonpositive; the zero at {a} is allowed.
+      At {b} the expression is undefined.
+      The solution is (-inf, {b}).
+    mistake_tags:
+    - multiplicity_error
+    - rational_inequality_error
+    - domain_restriction_error
+    - endpoint_inclusion_error
+    difficulty: hard
+  - id: RAT_INEQ_REPEATED_DENOMINATOR_NONNEGATIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})/(x - {b})^2 >= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 3
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{a}, {b}) U ({b}, inf)'
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: (x - {a})/(x - {b})^2
+        relation: '>='
+        expected_factorization: (x - {a})/(x - {b})^2
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 2
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: (x - {a})/(x - {b})^2
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The squared denominator is positive on both sides of {b}, but {b} itself is undefined.
+      The sign therefore follows x - {a}.
+      Include the zero {a}, exclude {b}, and take every value greater than or equal to {a} otherwise.
+      The solution is [{a}, {b}) U ({b}, inf).
+    mistake_tags:
+    - multiplicity_error
+    - rational_inequality_error
+    - hole_or_pole_inclusion_error
+    - union_error
+    difficulty: hard
+  - id: RAT_INEQ_CANCELED_HOLE_OUTSIDE_001
+    type: generated
+    prompt_template: 'Solve over the original domain: [(x - {h})(x - {a})]/[(x - {h})(x - {b})] > 0'
+    answer_mode: final_plus_required_work
+    variables:
+      h:
+        type: int
+        min: -12
+        max: -2
+      gap1:
+        type: int
+        min: 2
+        max: 5
+      gap2:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      a: h + gap1
+      b: h + gap1 + gap2
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {h}) U ({h}, {a}) U ({b}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: ((x - {h})*(x - {a}))/((x - {h})*(x - {b}))
+        relation: '>'
+        expected_factorization: ((x - {h})*(x - {a}))/((x - {h})*(x - {b}))
+        require_factorization: false
+        critical_points:
+        - value: '{h}'
+          kind: hole
+          multiplicity: 1
+          factor: x - {h}
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: (x - {a})/(x - {b})
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Canceling x - {h} gives the reduced formula (x - {a})/(x - {b}), but x = {h} remains a hole.
+      The reduced ratio is positive for x < {a} and x > {b}.
+      The excluded hole {h} splits the left selected interval.
+      The solution is (-inf, {h}) U ({h}, {a}) U ({b}, inf).
+    mistake_tags:
+    - canceled_hole_error
+    - domain_restriction_error
+    - rational_inequality_error
+    - interval_split_error
+    difficulty: hard
+  - id: RAT_INEQ_CANCELED_HOLE_INSIDE_001
+    type: generated
+    prompt_template: 'Solve over the original domain: [(x - {h})(x - {a})]/[(x - {h})(x - {b})] <= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 0
+      gap1:
+        type: int
+        min: 2
+        max: 5
+      gap2:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      h: a + gap1
+      b: a + gap1 + gap2
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{a}, {h}) U ({h}, {b})'
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: ((x - {h})*(x - {a}))/((x - {h})*(x - {b}))
+        relation: <=
+        expected_factorization: ((x - {h})*(x - {a}))/((x - {h})*(x - {b}))
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{h}'
+          kind: hole
+          multiplicity: 1
+          factor: x - {h}
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: (x - {a})/(x - {b})
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The reduced ratio is nonpositive from {a} through values below {b}.
+      The numerator zero {a} is included.
+      The canceled value {h} is a hole and must be removed, while {b} is also undefined.
+      The solution is [{a}, {h}) U ({h}, {b}).
+    mistake_tags:
+    - canceled_hole_error
+    - domain_restriction_error
+    - endpoint_inclusion_error
+    - interval_split_error
+    difficulty: hard
+  - id: RAT_INEQ_DIFFERENCE_RECIPROCALS_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: 1/(x - {a}) - 1/(x - {b}) > 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 3
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+      numerator: a - b
+    answer:
+      type: interval_set
+      variable: x
+      value: ({a}, {b})
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Combine the two fractions into one factored rational expression, list both restrictions, complete the sign
+        chart, and give the final interval.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: 1/(x - {a}) - 1/(x - {b})
+        relation: '>'
+        expected_factorization: '{numerator}/((x - {a})*(x - {b}))'
+        require_factorization: true
+        critical_points:
+        - value: '{a}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: '{numerator}/((x - {a})*(x - {b}))'
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Using the common denominator gives {numerator}/[(x - {a})(x - {b})].
+      The numerator {numerator} is negative.
+      The denominator product is negative between {a} and {b}, making the quotient positive there.
+      Both endpoints are undefined, so the solution is ({a}, {b}).
+    mistake_tags:
+    - combining_rational_expressions
+    - sign_chart_error
+    - domain_restriction_error
+    - rational_inequality_error
+    difficulty: hard
+  - id: RAT_INEQ_COMPARE_TO_ONE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})/(x - {b}) >= 1'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 3
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+      numerator: b - a
+    answer:
+      type: interval_set
+      variable: x
+      value: ({b}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Move 1 to the left, combine into one rational expression, complete the sign chart, and give the solution in
+        interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: (x - {a})/(x - {b}) - 1
+        relation: '>='
+        expected_factorization: '{numerator}/(x - {b})'
+        require_factorization: true
+        critical_points:
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: '{numerator}/(x - {b})'
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Subtract 1 and combine:
+      (x - {a})/(x - {b}) - 1 = {numerator}/(x - {b}).
+      The numerator is positive, so the expression is nonnegative exactly when x - {b} is positive.
+      The denominator cannot be zero, so the solution is ({b}, inf).
+    mistake_tags:
+    - move_to_zero_error
+    - combining_rational_expressions
+    - domain_restriction_error
+    - sign_chart_error
+    difficulty: hard
+  - id: RAT_INEQ_THREE_CRITICAL_POINTS_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: [(x - {a})(x - {c})]/(x - {b}) <= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 0
+      gap1:
+        type: int
+        min: 2
+        max: 5
+      gap2:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      b: a + gap1
+      c: a + gap1 + gap2
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a}] U ({b}, {c}]
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: ((x - {a})*(x - {c}))/(x - {b})
+        relation: <=
+        expected_factorization: ((x - {a})*(x - {c}))/(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: undefined
+          multiplicity: 1
+          factor: x - {b}
+        - value: '{c}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {c}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: ((x - {a})*(x - {c}))/(x - {b})
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The numerator zeros are {a} and {c}; the denominator is zero at {b}.
+      The signs from left to right are negative, positive, negative, positive.
+      Include the numerator zeros because the relation is <=, but exclude {b}.
+      The solution is (-inf, {a}] U ({b}, {c}].
+    mistake_tags:
+    - rational_inequality_error
+    - sign_chart_error
+    - endpoint_classification_error
+    - union_error
+    difficulty: hard
+  - id: RAT_INEQ_SQUARE_DENOMINATOR_NEGATIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: 1/(x - {a})^2 < 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -12
+        max: 12
+    answer:
+      type: interval_set
+      variable: x
+      value: empty set
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: 1/(x - {a})^2
+        relation: <
+        expected_factorization: 1/(x - {a})^2
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: undefined
+          multiplicity: 2
+          factor: x - {a}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: 1/(x - {a})^2
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A nonzero square is positive, so 1/(x - {a})^2 is positive everywhere it is defined.
+      At x = {a} it is undefined.
+      It is never negative, so the solution set is empty.
+    mistake_tags:
+    - even_multiplicity_error
+    - empty_set_error
+    - domain_restriction_error
+    - sign_chart_error
+    difficulty: medium
+  - id: RAT_INEQ_SQUARE_DENOMINATOR_POSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: 1/(x - {a})^2 > 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -12
+        max: 12
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a}) U ({a}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: rational
+        expression: 1/(x - {a})^2
+        relation: '>'
+        expected_factorization: 1/(x - {a})^2
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: undefined
+          multiplicity: 2
+          factor: x - {a}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+        reduced_expression: 1/(x - {a})^2
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The expression is positive for every x except the excluded value {a}.
+      The squared denominator does not change sign across {a}.
+      The solution is (-inf, {a}) U ({a}, inf).
+    mistake_tags:
+    - even_multiplicity_error
+    - domain_restriction_error
+    - union_error
+    - sign_chart_error
+    difficulty: medium

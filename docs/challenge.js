@@ -1246,6 +1246,81 @@ function workResponsePlaceholder(problem) {
   return "Write your reasoning here…";
 }
 
+function rationalCandidateRow(candidate = {}) {
+  return `<div class="structured-candidate-row" data-rational-candidate><input data-candidate-field="value" value="${escapeHtml(candidate.value ?? "")}" placeholder="Candidate value"><select data-candidate-field="status"><option value="valid" ${candidate.status === "valid" ? "selected" : ""}>Valid solution</option><option value="excluded" ${candidate.status === "excluded" ? "selected" : ""}>Excluded by domain</option><option value="extraneous" ${candidate.status === "extraneous" ? "selected" : ""}>Extraneous</option><option value="repeated" ${candidate.status === "repeated" ? "selected" : ""}>Repeated candidate</option><option value="non_real" ${candidate.status === "non_real" ? "selected" : ""}>Non-real</option></select><input data-candidate-field="original_check" value="${escapeHtml(candidate.original_check ?? "")}" placeholder="Original-equation check"><button type="button" class="quiet-button" data-action="remove-structured-row" aria-label="Remove candidate">×</button></div>`;
+}
+
+function renderStructuredWorkEditor(problem, response) {
+  const data = response.structuredWorkJson ?? {};
+  const pieces = [];
+  if (problem.grading_method === "rational_expression") {
+    const excluded = Array.isArray(data.excluded_values) ? data.excluded_values.join(", ") : data.excluded_values ?? "";
+    pieces.push(`<section class="structured-work-editor compact"><p class="eyebrow">Domain is part of the answer</p><label>Excluded x-values<input data-structured-field="excluded-values" value="${escapeHtml(excluded)}" placeholder="Example: -2, 3 or {}"><small>List every value excluded by the original denominator, including canceled holes.</small></label></section>`);
+  }
+  if (problem.work?.mode === "rational_equation_steps") {
+    const restrictions = Array.isArray(data.restrictions) ? data.restrictions.join(", ") : "";
+    const steps = Array.isArray(data.steps) ? data.steps.join("\n") : data.steps ?? response.work ?? "";
+    const candidates = Array.isArray(data.candidates) ? data.candidates : [];
+    pieces.push(`<section class="structured-work-editor" data-structured-mode="rational_equation_steps"><header><div><p class="eyebrow">Structured equation check</p><h3>Restrictions, candidates, verification</h3></div><span>Autosaved</span></header><label>Original denominator restrictions<input data-structured-field="restrictions" value="${escapeHtml(restrictions)}" placeholder="Example: -2, 5"><small>These survive denominator clearing and cancellation.</small></label><label>Algebra steps<textarea rows="5" data-structured-field="rational-steps" placeholder="One denominator-clearing or solving step per line">${escapeHtml(steps)}</textarea></label><fieldset><legend>Candidate ledger</legend><div data-rational-candidates>${Array.from({ length: Math.max(2, candidates.length) }, (_, index) => rationalCandidateRow(candidates[index] ?? {})).join("")}</div><button type="button" class="quiet-button" data-action="add-rational-candidate">+ Add candidate</button></fieldset></section>`);
+  }
+  if (problem.work?.mode === "sign_chart_steps") {
+    const chart = problem.work.sign_chart ?? {};
+    const expectedCount = chart.critical_points?.length ?? 0;
+    const points = Array.isArray(data.critical_points) ? data.critical_points : [];
+    const intervals = Array.isArray(data.intervals) ? data.intervals : [];
+    const endpoints = Array.isArray(data.endpoints) ? data.endpoints : [];
+    const layoutValues = points.map((point) => String(point?.value ?? "").trim()).filter(Boolean).sort((left, right) => structuredNumber(left) - structuredNumber(right));
+    pieces.push(`<section class="structured-work-editor sign-chart-editor" data-structured-mode="sign_chart_steps"><header><div><p class="eyebrow">Structured sign chart</p><h3>${escapeHtml(chart.expression ?? "Expression")} ${escapeHtml(chart.relation ?? "") } 0</h3></div><span>${expectedCount} critical point${expectedCount === 1 ? "" : "s"}</span></header>${chart.require_factorization ? `<label>Factorization<input data-structured-field="factorization" value="${escapeHtml(data.factorization ?? "")}" placeholder="Factor completely"></label>` : ""}<fieldset><legend>1. Critical points</legend><div class="structured-grid">${Array.from({ length: expectedCount }, (_, index) => { const point = points[index] ?? {}; return `<div data-sign-critical><input data-critical-field="value" value="${escapeHtml(point.value ?? "")}" placeholder="Value ${index + 1}"><select data-critical-field="kind"><option value="zero" ${point.kind === "zero" ? "selected" : ""}>Zero</option><option value="undefined" ${point.kind === "undefined" ? "selected" : ""}>Undefined / pole</option><option value="hole" ${point.kind === "hole" ? "selected" : ""}>Hole</option></select></div>`; }).join("") || "<p>No real critical points are expected; test the whole real line.</p>"}</div></fieldset><fieldset><legend>2. Interval tests</legend><p class="structured-hint">Interval boundaries follow your critical points automatically. Enter one test value and sign per row.</p><div class="sign-interval-list">${Array.from({ length: expectedCount + 1 }, (_, index) => { const row = intervals[index] ?? {}; const lower = index === 0 ? "" : (layoutValues[index - 1] ?? row.lower ?? ""); const upper = index === expectedCount ? "" : (layoutValues[index] ?? row.upper ?? ""); return `<div data-sign-interval><strong>Interval ${index + 1}</strong><input data-interval-field="lower" value="${escapeHtml(lower)}" placeholder="-inf" readonly><input data-interval-field="upper" value="${escapeHtml(upper)}" placeholder="inf" readonly><input data-interval-field="test_value" value="${escapeHtml(row.test_value ?? "")}" placeholder="Test value"><select data-interval-field="sign"><option value="positive" ${row.sign === "positive" ? "selected" : ""}>Positive</option><option value="negative" ${row.sign === "negative" ? "selected" : ""}>Negative</option><option value="zero" ${row.sign === "zero" ? "selected" : ""}>Zero</option></select><label class="check-field"><input type="checkbox" data-interval-field="selected" ${row.selected ? "checked" : ""}> Belongs in solution</label></div>`; }).join("")}</div></fieldset>${expectedCount ? `<fieldset><legend>3. Endpoint decisions</legend><div class="structured-grid">${Array.from({ length: expectedCount }, (_, index) => { const endpoint = endpoints[index] ?? {}; return `<div data-sign-endpoint><input data-endpoint-field="value" value="${escapeHtml(layoutValues[index] ?? endpoint.value ?? "")}" placeholder="Endpoint ${index + 1}" readonly><label class="check-field"><input type="checkbox" data-endpoint-field="included" ${endpoint.included ? "checked" : ""}> Include endpoint</label></div>`; }).join("")}</div></fieldset>` : ""}</section>`);
+  }
+  return pieces.join("");
+}
+
+function structuredNumber(value) {
+  const source = String(value ?? "").trim().toLowerCase();
+  if (!source) return Number.POSITIVE_INFINITY;
+  if (source === "pi" || source === "π") return Math.PI;
+  if (source === "e") return Math.E;
+  const fraction = source.match(/^(-?\d+)\s*\/\s*(-?\d+)$/);
+  if (fraction && Number(fraction[2])) return Number(fraction[1]) / Number(fraction[2]);
+  const radical = source.match(/^sqrt\s*\(\s*([\d.]+)\s*\)$/);
+  if (radical) return Math.sqrt(Number(radical[1]));
+  const numeric = Number(source);
+  return Number.isFinite(numeric) ? numeric : Number.POSITIVE_INFINITY;
+}
+
+function syncSignChartLayout(card) {
+  if (card?.dataset.workMode !== "sign_chart_steps") return;
+  const values = [...card.querySelectorAll('[data-critical-field="value"]')].map((input) => input.value.trim()).filter(Boolean).sort((left, right) => structuredNumber(left) - structuredNumber(right));
+  [...card.querySelectorAll("[data-sign-interval]")].forEach((row, index, rows) => {
+    const lower = row.querySelector('[data-interval-field="lower"]');
+    const upper = row.querySelector('[data-interval-field="upper"]');
+    if (lower) lower.value = index === 0 ? "" : (values[index - 1] ?? "");
+    if (upper) upper.value = index === rows.length - 1 ? "" : (values[index] ?? "");
+  });
+  [...card.querySelectorAll("[data-sign-endpoint]")].forEach((row, index) => {
+    const field = row.querySelector('[data-endpoint-field="value"]');
+    if (field) field.value = values[index] ?? "";
+  });
+}
+
+function collectStructuredWork(card) {
+  const output = {};
+  const exclusions = card.querySelector('[data-structured-field="excluded-values"]');
+  if (exclusions) output.excluded_values = exclusions.value;
+  if (card.dataset.workMode === "rational_equation_steps") {
+    output.restrictions = (card.querySelector('[data-structured-field="restrictions"]')?.value ?? "").split(/[,;\n]+/).map((item) => item.trim()).filter(Boolean);
+    output.steps = (card.querySelector('[data-structured-field="rational-steps"]')?.value ?? "").split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+    output.candidates = [...card.querySelectorAll("[data-rational-candidate]")].map((row) => Object.fromEntries([...row.querySelectorAll("[data-candidate-field]")].map((field) => [field.dataset.candidateField, field.value.trim()]))).filter((item) => item.value || item.original_check);
+  }
+  if (card.dataset.workMode === "sign_chart_steps") {
+    output.factorization = card.querySelector('[data-structured-field="factorization"]')?.value.trim() ?? "";
+    output.critical_points = [...card.querySelectorAll("[data-sign-critical]")].map((row) => Object.fromEntries([...row.querySelectorAll("[data-critical-field]")].map((field) => [field.dataset.criticalField, field.value.trim()])));
+    output.intervals = [...card.querySelectorAll("[data-sign-interval]")].map((row) => Object.fromEntries([...row.querySelectorAll("[data-interval-field]")].map((field) => [field.dataset.intervalField, field.type === "checkbox" ? field.checked : field.value.trim()])));
+    output.endpoints = [...card.querySelectorAll("[data-sign-endpoint]")].map((row) => Object.fromEntries([...row.querySelectorAll("[data-endpoint-field]")].map((field) => [field.dataset.endpointField, field.type === "checkbox" ? field.checked : field.value.trim()])));
+  }
+  return Object.keys(output).length ? output : null;
+}
+
 function renderTest(snapshot) {
   const skill = snapshot.selectedSkill;
   const row = rowForSkill(snapshot, skill.id);
@@ -1269,12 +1344,13 @@ function renderTest(snapshot) {
     <form id="test-form" class="test-form">
       ${draft.problems.map((problem, index) => {
         const response = draft.responses[problem.template_id] ?? { finalAnswer: "", work: "" };
-        return `<article class="question-card" id="question-${escapeHtml(problem.template_id)}">
+        return `<article class="question-card" id="question-${escapeHtml(problem.template_id)}" data-work-mode="${escapeHtml(problem.work?.mode ?? "none")}" data-grading-method="${escapeHtml(problem.grading_method)}">
           <div class="question-number"><span>${String(index + 1).padStart(2, "0")}</span><small>${escapeHtml(problem.difficulty)} · ${escapeHtml(problem.answer_mode.replaceAll("_", " "))}</small></div>
           <h2>${escapeHtml(problem.prompt)}</h2>
           ${problem.options?.length ? `<fieldset class="answer-options"><legend>Final answer</legend>${problem.options.map((option) => `<label><input type="radio" name="answer-${escapeHtml(problem.template_id)}" value="${escapeHtml(option.id)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" ${response.finalAnswer === String(option.id) ? "checked" : ""}><span><b>${escapeHtml(option.id)}</b>${escapeHtml(option.label ?? option.id)}</span></label>`).join("")}</fieldset>` : `<label class="response-field"><span>Final answer</span><input type="text" value="${escapeHtml(response.finalAnswer)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" autocomplete="off" spellcheck="false" placeholder="Enter your answer"></label>`}
           ${renderWorkGuide(problem)}
-          ${problem.work?.mode && problem.work.mode !== "none" ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="${["proof_obligations", "rubric_check"].includes(problem.work.mode) ? 7 : 4}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="${escapeHtml(workResponsePlaceholder(problem))}">${escapeHtml(response.work)}</textarea></label>` : ""}
+          ${renderStructuredWorkEditor(problem, response)}
+          ${problem.work?.mode && problem.work.mode !== "none" && !["rational_equation_steps", "sign_chart_steps"].includes(problem.work.mode) ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="${["proof_obligations", "rubric_check"].includes(problem.work.mode) ? 7 : 4}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="${escapeHtml(workResponsePlaceholder(problem))}">${escapeHtml(response.work)}</textarea></label>` : ""}
         </article>`;
       }).join("")}
       <p id="test-error" class="form-message" role="alert"></p>
@@ -1296,7 +1372,7 @@ function resultReviewGuide(result) {
 function resultDetails(results) {
   return results.map((result, index) => `<details class="result-question" ${!result.correct || result.reviewRequired ? "open" : ""}>
     <summary><span class="result-icon ${result.correct ? "correct" : "incorrect"}">${result.correct ? "✓" : "×"}</span><span><strong>Question ${index + 1}</strong><small>${escapeHtml(result.prompt)}</small></span><b>${result.reviewRequired ? "Review required" : result.correct ? "Correct" : "Needs work"}</b></summary>
-    <div class="result-body"><dl><div><dt>Your answer</dt><dd>${escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
+    <div class="result-body"><dl><div><dt>Your answer</dt><dd>${escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${result.structuredWorkJson ? `<div class="shown-work"><strong>Structured work</strong><pre>${escapeHtml(JSON.stringify(result.structuredWorkJson, null, 2))}</pre></div>` : ""}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
   </details>`).join("");
 }
 
@@ -2030,6 +2106,18 @@ elements.creatorFile.addEventListener("change", async () => {
 });
 
 document.addEventListener("click", async (event) => {
+  const structuredAction = event.target.closest?.('[data-action="add-rational-candidate"], [data-action="remove-structured-row"]');
+  if (structuredAction) {
+    event.preventDefault();
+    const card = structuredAction.closest(".question-card");
+    if (!card) return;
+    if (structuredAction.dataset.action === "add-rational-candidate") card.querySelector("[data-rational-candidates]")?.insertAdjacentHTML("beforeend", rationalCandidateRow());
+    else structuredAction.closest("[data-rational-candidate]")?.remove();
+    const answerField = card.querySelector('[data-response-kind="answer"]:checked') ?? card.querySelector('[data-response-kind="answer"]');
+    const workField = card.querySelector('[data-response-kind="work"]');
+    store.updateResponse(card.id.replace(/^question-/, ""), { finalAnswer: answerField?.value ?? "", work: workField?.value ?? "", structuredWorkJson: collectStructuredWork(card) });
+    return;
+  }
   const educatorWelcomeAction = event.target.closest?.("[data-action='copy-educator-prompt'], [data-action='dismiss-educator-welcome']");
   if (educatorWelcomeAction) {
     event.preventDefault();
@@ -2331,12 +2419,13 @@ document.addEventListener("input", (event) => {
     if (output) output.textContent = `${event.target.value} / 5`;
   }
   const responseInput = event.target.closest?.("[data-question-id][data-response-kind]");
-  if (!responseInput) return;
-  const questionId = responseInput.dataset.questionId;
-  const card = responseInput.closest(".question-card");
+  const card = responseInput?.closest(".question-card") ?? event.target.closest?.(".question-card");
+  if (!card || (!responseInput && !event.target.matches?.("[data-structured-field], [data-candidate-field], [data-critical-field], [data-interval-field], [data-endpoint-field]"))) return;
+  if (event.target.matches?.('[data-critical-field="value"]')) syncSignChartLayout(card);
+  const questionId = responseInput?.dataset.questionId ?? card.id.replace(/^question-/, "");
   const answerField = card.querySelector('[data-response-kind="answer"]:checked') ?? card.querySelector('[data-response-kind="answer"]');
   const workField = card.querySelector('[data-response-kind="work"]');
-  store.updateResponse(questionId, { finalAnswer: answerField?.value ?? "", work: workField?.value ?? "" });
+  store.updateResponse(questionId, { finalAnswer: answerField?.value ?? "", work: workField?.value ?? "", structuredWorkJson: collectStructuredWork(card) });
 });
 
 document.addEventListener("submit", (event) => {
@@ -2561,14 +2650,17 @@ async function boot() {
   const bundledLessonPacks = [await geographyResponse.text()];
   let agentManifest = {};
   let educatorManifest = {};
+  let authoringGuideMarkdown = "";
   let communityConfig = { enabled: false };
   try {
-    const [manifestResponse, educatorManifestResponse] = await Promise.all([
+    const [manifestResponse, educatorManifestResponse, authoringGuideResponse] = await Promise.all([
       fetch("./agent-manifest.json?v=20260902-student-docs-v1"),
       fetch("./educator-agent-manifest.json?v=20260902-student-docs-v1"),
+      fetch("./CUSTOM_LESSON_SETS.md?v=20260902-rational-signchart-authoring"),
     ]);
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
     if (educatorManifestResponse.ok) educatorManifest = await educatorManifestResponse.json();
+    if (authoringGuideResponse.ok) authoringGuideMarkdown = await authoringGuideResponse.text();
   } catch {
     // The tools still work if the optional human/machine-readable guide is unavailable.
   }
@@ -2627,7 +2719,7 @@ async function boot() {
   initClock();
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code>${name}</code>`).join("");
   document.querySelector("#tool-count").textContent = String(TOOL_NAMES.length);
-  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot, lessonStudio, educatorManifest);
+  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot, lessonStudio, educatorManifest, authoringGuideMarkdown);
   const failedTools = new Set(bridge.failures.map((failure) => failure.name));
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code class="${failedTools.has(name) ? "tool-failed" : ""}">${escapeHtml(name)}</code>`).join("");
   elements.bridgeCard.dataset.state = bridge.available && !bridge.error ? "ready" : bridge.error ? "warning" : "idle";

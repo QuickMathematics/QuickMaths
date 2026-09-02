@@ -14,4 +14,7 @@ SUPPORTED_GRADING_METHODS = {
     "equation_solution",
     "inequality_solution",
     "theorem_conclusion",
+    "finite_set",
+    "rational_expression",
+    "interval_set",
 }

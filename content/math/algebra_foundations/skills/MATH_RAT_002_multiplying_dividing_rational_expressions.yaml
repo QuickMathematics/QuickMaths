@@ -1,0 +1,619 @@
+id: MATH_RAT_002
+schema_version: 0.2
+name: Multiplying and dividing rational expressions
+domain: Math
+subdomain: Rational Expressions and Equations
+description: Multiply rational expressions by factoring and canceling, divide by multiplying by the reciprocal, and
+  track every denominator and zero-divisor restriction.
+prerequisites:
+- MATH_RAT_001
+tags:
+- rational_expressions
+- multiplying_rational_expressions
+- dividing_rational_expressions
+- reciprocal
+- factoring
+- cancellation
+- domain_restrictions
+- zero_divisor
+unlocks:
+- MATH_RAT_003
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  To multiply rational expressions, factor first and cancel common factors before multiplying what remains.
+
+  Multiplication method:
+  1. Record restrictions from every original denominator.
+  2. Factor every numerator and denominator completely.
+  3. Cancel factors that appear in both a numerator and a denominator.
+  4. Multiply the remaining factors.
+  5. Keep every original restriction.
+
+  Example:
+
+  (x + 2)/(x - 5) * (x - 5)/(x + 7)
+  = (x + 2)/(x + 7)
+
+  Restrictions:
+  x ≠ 5 and x ≠ -7
+
+  The factor x - 5 cancels, but x = 5 remains excluded because it made an original denominator zero.
+
+  To divide rational expressions, multiply by the reciprocal of the divisor.
+
+  Rule:
+
+  A/B ÷ C/D = A/B * D/C
+
+  The divisor C/D must itself be defined and nonzero. Therefore:
+  - D cannot equal zero because it is a denominator.
+  - C cannot equal zero because that would make the divisor equal zero.
+
+  Example:
+
+  (x + 1)/(x + 4) ÷ (x - 3)/(x + 4)
+  = (x + 1)/(x + 4) * (x + 4)/(x - 3)
+  = (x + 1)/(x - 3)
+
+  Restrictions:
+  x ≠ -4 from the original denominators, and x ≠ 3 because the divisor cannot be zero.
+
+  Monomial example:
+
+  (6x^2)/5 ÷ (3x)/10
+  = (6x^2)/5 * 10/(3x)
+  = 4x, with x ≠ 0
+
+  Factoring can reveal cancellations:
+
+  (x^2 - 9)/(x + 3) * 1/(x - 3)
+  = ((x - 3)(x + 3))/((x + 3)(x - 3))
+  = 1
+
+  The result is 1, but x ≠ -3 and x ≠ 3.
+
+  Sign care:
+  A factor such as -(x + 4) contributes a factor of -1. Canceling x + 4 does not cancel the negative sign unless another negative factor is present.
+
+  Common mistake:
+  When dividing, flip only the divisor. Do not take the reciprocal of the first expression.
+
+  Another common mistake:
+  Do not forget values that make the divisor equal zero. They become restrictions even if they were not denominator zeros before the reciprocal step.
+
+  Another common mistake:
+  Cancel factors, not terms. Factor polynomials before looking for cancellation.
+examples:
+- prompt: Multiply (x + 2)/(x - 5) by (x - 5)/(x + 7).
+  solution: (x + 2)/(x + 7), with x ≠ 5 and x ≠ -7
+  explanation: Cancel the common factor x - 5 and keep both original restrictions.
+- prompt: Simplify (x - 4)/(x + 4) * (x^2 - 16)/(x - 4)^2.
+  solution: 1, with x ≠ -4 and x ≠ 4
+  explanation: Factor x^2 - 16, then every remaining factor cancels.
+- prompt: Rewrite (x + 1)/(x + 4) ÷ (x - 3)/(x + 4) as multiplication.
+  solution: (x + 1)/(x + 4) * (x + 4)/(x - 3)
+  explanation: Multiply by the reciprocal of the divisor.
+- prompt: Why is x = 3 excluded in the previous division?
+  solution: The divisor would equal zero.
+  explanation: A rational expression cannot be divided by zero.
+- prompt: Simplify (6x^2)/5 ÷ (3x)/10.
+  solution: 4x, with x ≠ 0
+  explanation: Multiply by 10/(3x), then cancel 3 and one factor of x.
+- prompt: Simplify [-(x + 2)/(x + 5)] * [(x + 5)/(x + 2)].
+  solution: -1, with x ≠ -5 and x ≠ -2
+  explanation: The variable factors cancel, but the negative factor remains.
+- prompt: Can x + 2 cancel with x + 5?
+  solution: 'No'
+  explanation: Only identical nonzero factors cancel.
+- prompt: What must be checked before taking a reciprocal?
+  solution: The expression being inverted must not be zero.
+  explanation: A zero divisor has no reciprocal.
+applications:
+- title: Rates
+  description: Dividing rates and conversion factors naturally produces rational expressions and reciprocal operations.
+- title: Geometry formulas
+  description: Ratios of areas, lengths, and scale factors often simplify by canceling common factors.
+- title: Physics and engineering
+  description: Compound formulas frequently multiply or divide algebraic fractions while excluding zero denominators.
+- title: Rational functions
+  description: Factored products reveal holes, zeros, and vertical asymptotes.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: RAT_MULTIPLY_CANCEL_LINEAR_FACTORS_001
+    type: generated
+    prompt_template: Simplify [(x + {a})/(x - {b})] * [(x - {b})/(x + {c})] and keep all restrictions.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 10
+      b:
+        type: int
+        min: 2
+        max: 10
+      c:
+        type: int
+        min: 2
+        max: 10
+    constraints:
+    - a != c
+    - b != c
+    options:
+    - id: A
+      label: (x + {a})/(x + {c}), with x ≠ {b} and x ≠ {-c}
+    - id: B
+      label: (x + {a})/(x + {c}), with only x ≠ {-c}
+    - id: C
+      label: (x - {b})/(x + {c}), with x ≠ {b}
+    - id: D
+      label: (x + {c})/(x + {a}), with x ≠ {-a} and x ≠ {-c}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Factor if needed, cancel common factors, and list every original denominator restriction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Cancel the common factor x - {b}.
+      The product becomes (x + {a})/(x + {c}).
+      The original denominators exclude x = {b} and x = {-c}.
+    mistake_tags:
+    - rational_multiplication
+    - cancellation_error
+    - domain_restriction_error
+    difficulty: easy
+  - id: RAT_MULTIPLY_COEFFICIENT_AND_X_CANCEL_001
+    type: generated
+    prompt_template: Simplify [({a}x)/(x + {c})] * [(x + {c})/({d}x)] and keep all restrictions.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 8
+      d:
+        type: int
+        min: 3
+        max: 9
+      c:
+        type: int
+        min: 2
+        max: 12
+    constraints:
+    - a < d
+    - not (a % 2 == 0 and d % 2 == 0)
+    - not (a % 3 == 0 and d % 3 == 0)
+    - not (a % 5 == 0 and d % 5 == 0)
+    - not (a % 7 == 0 and d % 7 == 0)
+    options:
+    - id: A
+      label: '{d}/{a}, with x ≠ 0 and x ≠ {-c}'
+    - id: B
+      label: '{a}/{d}, with x ≠ 0 and x ≠ {-c}'
+    - id: C
+      label: '{a}/{d}, with only x ≠ {-c}'
+    - id: D
+      label: '{a}x/{d}, with x ≠ 0'
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Show the factor cancellations and keep restrictions from both original denominators.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Cancel x + {c} and x.
+      The remaining coefficient is {a}/{d}.
+      The original denominators require x ≠ {-c} and x ≠ 0.
+    mistake_tags:
+    - rational_multiplication
+    - coefficient_cancellation
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_MULTIPLY_DIFFERENCE_SQUARES_TO_ONE_001
+    type: generated
+    prompt_template: Simplify [(x - {a})/(x + {a})] * [(x^2 - {square})/(x - {a})^2].
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      square: a * a
+    options:
+    - id: A
+      label: (x + {a})/(x - {a}), with x ≠ {a}
+    - id: B
+      label: 1, with no restrictions
+    - id: C
+      label: 1, with x ≠ {a} and x ≠ {-a}
+    - id: D
+      label: -1, with x ≠ {a} and x ≠ {-a}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Factor the difference of squares, cancel factors, and retain every original restriction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Factor x^2 - {square} as (x - {a})(x + {a}).
+      Every remaining variable factor cancels, leaving 1.
+      The original denominators exclude x = {a} and x = {-a}.
+    mistake_tags:
+    - difference_of_squares
+    - rational_multiplication
+    - domain_restriction_error
+    difficulty: hard
+  - id: RAT_MULTIPLY_MONOMIAL_TWO_VARIABLES_001
+    type: generated
+    prompt_template: Simplify [({a}x^2)/({b}y)] * [({b}y^2)/({c}x)] and keep all restrictions.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 8
+      b:
+        type: int
+        min: 2
+        max: 9
+      c:
+        type: int
+        min: 3
+        max: 9
+    constraints:
+    - a < c
+    - not (a % 2 == 0 and c % 2 == 0)
+    - not (a % 3 == 0 and c % 3 == 0)
+    - not (a % 5 == 0 and c % 5 == 0)
+    - not (a % 7 == 0 and c % 7 == 0)
+    options:
+    - id: A
+      label: ({a}x^2y^2)/{c}, with only y ≠ 0
+    - id: B
+      label: ({a}x)/({c}y), with x ≠ 0 and y ≠ 0
+    - id: C
+      label: ({c}xy)/{a}, with x ≠ 0 and y ≠ 0
+    - id: D
+      label: ({a}xy)/{c}, with x ≠ 0 and y ≠ 0
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Cancel coefficient and variable factors carefully, then state restrictions from both denominators.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Cancel {b}, one factor of x, and one factor of y.
+      The product is ({a}xy)/{c}.
+      The original denominators require x ≠ 0 and y ≠ 0.
+    mistake_tags:
+    - monomial_exponents
+    - rational_multiplication
+    - cancellation_error
+    difficulty: hard
+  - id: RAT_DIVIDE_CANCEL_SHARED_DENOMINATOR_001
+    type: generated
+    prompt_template: Simplify [(x + {a})/(x + {b})] ÷ [(x + {c})/(x + {b})] and keep all restrictions.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 10
+      b:
+        type: int
+        min: 2
+        max: 10
+      c:
+        type: int
+        min: 2
+        max: 10
+    constraints:
+    - a != b
+    - a != c
+    - b != c
+    options:
+    - id: A
+      label: (x + {a})/(x + {c}), with x ≠ {-b} and x ≠ {-c}
+    - id: B
+      label: (x + {c})/(x + {a}), with x ≠ {-b} and x ≠ {-a}
+    - id: C
+      label: (x + {a})/(x + {c}), with only x ≠ {-b}
+    - id: D
+      label: 1, with x ≠ {-b}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Multiply by the reciprocal of the divisor, then identify denominator and zero-divisor restrictions.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Multiply by the reciprocal:
+      [(x + {a})/(x + {b})] * [(x + {b})/(x + {c})].
+      Cancel x + {b} to obtain (x + {a})/(x + {c}).
+      Exclude x = {-b} from the original denominators and x = {-c} because the divisor would be zero.
+    mistake_tags:
+    - reciprocal_error
+    - zero_divisor
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_DIVIDE_MONOMIAL_EXPRESSIONS_001
+    type: generated
+    prompt_template: Simplify [({p}x^2)/{q}] ÷ [({p}x)/{r}] and keep all restrictions.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 9
+      q:
+        type: int
+        min: 2
+        max: 9
+      r:
+        type: int
+        min: 2
+        max: 8
+    constraints:
+    - r < q
+    - not (r % 2 == 0 and q % 2 == 0)
+    - not (r % 3 == 0 and q % 3 == 0)
+    - not (r % 5 == 0 and q % 5 == 0)
+    - not (r % 7 == 0 and q % 7 == 0)
+    options:
+    - id: A
+      label: ({q}x)/{r}, with x ≠ 0
+    - id: B
+      label: ({r}x)/{q}, with x ≠ 0
+    - id: C
+      label: ({r}x^2)/{q}, with no restrictions
+    - id: D
+      label: '{r}/{q}, with x ≠ 0'
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Rewrite division as multiplication by the reciprocal, cancel common factors, and state why x cannot be
+        zero.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Multiply by the reciprocal:
+      ({p}x^2)/{q} * {r}/({p}x).
+      Cancel {p} and one factor of x.
+      The result is ({r}x)/{q}, with x ≠ 0 because the original divisor is zero at x = 0.
+    mistake_tags:
+    - reciprocal_error
+    - monomial_exponents
+    - zero_divisor
+    difficulty: medium
+  - id: RAT_DIVISION_ALL_RESTRICTIONS_001
+    type: generated
+    prompt_template: For [(x + {a})/(x - {b})] ÷ [(x - {c})/(x + {d})], which list contains every required restriction?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 10
+      b:
+        type: int
+        min: 2
+        max: 10
+      c:
+        type: int
+        min: 2
+        max: 10
+      d:
+        type: int
+        min: 2
+        max: 10
+    constraints:
+    - b != c
+    - b != d
+    - c != d
+    options:
+    - id: A
+      label: x ≠ {b} and x ≠ {-d}
+    - id: B
+      label: x ≠ {-b}, x ≠ {d}, and x ≠ {-c}
+    - id: C
+      label: x ≠ {b}, x ≠ {-d}, and x ≠ {c}
+    - id: D
+      label: Only x ≠ {c}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The original denominators exclude x = {b} and x = {-d}.
+      The divisor equals zero when its numerator x - {c} is zero, so x = {c} is also excluded.
+    mistake_tags:
+    - domain_restriction_error
+    - zero_divisor
+    - reciprocal_error
+    difficulty: hard
+  - id: RAT_MULTIPLY_NEGATIVE_FACTORS_001
+    type: generated
+    prompt_template: Simplify [-(x + {a})/(x + {b})] * [(x + {b})/(x + {a})].
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+      b:
+        type: int
+        min: 2
+        max: 12
+    constraints:
+    - a != b
+    options:
+    - id: A
+      label: 1, with x ≠ {-a} and x ≠ {-b}
+    - id: B
+      label: 0, with x ≠ {-a} and x ≠ {-b}
+    - id: C
+      label: -x, with x ≠ {-a} and x ≠ {-b}
+    - id: D
+      label: -1, with x ≠ {-a} and x ≠ {-b}
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Track the factor of -1 separately while canceling the common variable factors.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The factors x + {a} and x + {b} cancel.
+      The factor -1 remains, so the product is -1.
+      The original restrictions are x ≠ {-a} and x ≠ {-b}.
+    mistake_tags:
+    - sign_error
+    - rational_multiplication
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_MULTIPLY_EVALUATE_AFTER_CANCELING_001
+    type: generated
+    prompt_template: Evaluate [(x + {a})/(x + {b})] * [(x + {b})/(x + {c})] at x = {x_value}.
+    answer_mode: final_plus_required_work
+    max_attempts: 400
+    variables:
+      x_value:
+        type: int
+        min: -8
+        max: 8
+      b:
+        type: int
+        min: 2
+        max: 8
+      c:
+        type: int
+        min: 2
+        max: 8
+      result:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - -1
+        - 0
+        - 1
+    derived:
+      a: result * (x_value + c) - x_value
+      numerator: x_value + a
+      denominator: x_value + c
+    constraints:
+    - b != c
+    - x_value + b != 0
+    - x_value + c != 0
+    - a != b
+    - a != c
+    - a >= -20
+    - a <= 20
+    answer:
+      type: numeric
+      value: '{result}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Cancel common factors first, then substitute the input and evaluate equivalent expressions one line at a
+        time.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Cancel x + {b} to obtain (x + {a})/(x + {c}).
+      Substitute x = {x_value}.
+      The numerator is {numerator} and the denominator is {denominator}.
+      The value is {result}.
+    mistake_tags:
+    - rational_multiplication
+    - substitution_error
+    - cancellation_error
+    - division_error
+    difficulty: hard
+  - id: RAT_DIVISION_RECIPROCAL_FIRST_STEP_001
+    type: fixed
+    prompt: Which correctly rewrites A/B divided by C/D, assuming all required quantities are nonzero?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: (A/B) * (D/C)
+    - id: B
+      label: (B/A) * (C/D)
+    - id: C
+      label: (A/B) * (C/D)
+    - id: D
+      label: (B/A) * (D/C)
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Keep the first rational expression unchanged.
+      Replace division with multiplication.
+      Take the reciprocal of the divisor only: A/B * D/C.
+    mistake_tags:
+    - reciprocal_error
+    - division_rule_error
+    difficulty: easy

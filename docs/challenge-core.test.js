@@ -33,6 +33,8 @@ const AUTHORED_MATH_SCENARIO_COUNTS = Object.freeze({
   MATH_SEQ_001: 10, MATH_SEQ_002: 10, MATH_EXP_002: 12, MATH_EXP_003: 10,
   MATH_QUAD_001: 10, MATH_QUAD_002: 11, MATH_QUAD_003: 10,
   MATH_QUAD_004: 10, MATH_QUAD_005: 10,
+  MATH_RAT_001: 10, MATH_RAT_002: 10, MATH_RAT_003: 10, MATH_RAT_004: 10, MATH_RAT_005: 10,
+  MATH_RAT_006: 13, MATH_RAT_007: 12, MATH_INEQ_001: 12, MATH_INEQ_002: 12,
 });
 
 function memoryStorage(seed = {}) {
@@ -126,12 +128,12 @@ function workFor(problem, final = String(problem.expected_answer)) {
 test("ships the complete native Mathematics curriculum and opens at the profile picker", () => {
   const { store } = harness();
   const state = store.snapshot();
-  assert.equal(curriculum.skills.length, 44);
-  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 596);
-  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 596);
+  assert.equal(curriculum.skills.length, 53);
+  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 695);
+  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 695);
   assert.equal(curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY").length, 0);
   assert.equal(curriculum.skills.filter((skill) => skill.id.startsWith("MATH_GEOM_")).length, 3);
-  assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [["SUBJECT_MATH", 44]]);
+  assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [["SUBJECT_MATH", 53]]);
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "MATH_ARITH_002").questionCount, 16);
   assert.equal(state.profiles.length, 0);
   assert.equal(state.activeProfile, null);
@@ -139,7 +141,7 @@ test("ships the complete native Mathematics curriculum and opens at the profile 
 });
 
 test("every Mathematics test covers every authored scenario and keeps retake variants", () => {
-  assert.equal(Object.values(AUTHORED_MATH_SCENARIO_COUNTS).reduce((total, count) => total + count, 0), 566);
+  assert.equal(Object.values(AUTHORED_MATH_SCENARIO_COUNTS).reduce((total, count) => total + count, 0), 665);
   for (const [skillId, expectedLength] of Object.entries(AUTHORED_MATH_SCENARIO_COUNTS)) {
     const skill = curriculum.skills.find((candidate) => candidate.id === skillId);
     assert.ok(skill, `${skillId} must ship`);
@@ -159,7 +161,7 @@ test("every built-in assessment starts with exactly one problem from every autho
     const scenarioIds = draft.problems.map((problem) => problem.source_template_id ?? problem.template_id);
     assert.equal(draft.problems.length, skill.question_count, `${skill.id} configured length`);
     assert.equal(new Set(scenarioIds).size, skill.question_count, `${skill.id} unique scenario coverage`);
-    assert.ok(draft.problems.every((problem) => gradeProblem(problem, String(problem.expected_answer)).correct), `${skill.id} generated answers must pass their declared graders`);
+    assert.ok(draft.problems.every((problem) => gradeProblem(problem, String(problem.expected_answer), problem.grading_method === "rational_expression" ? { excluded_values: problem.answer_metadata?.excluded_values ?? [] } : null).correct), `${skill.id} generated answers must pass their declared graders`);
     if (skill.native_templates?.length) assert.ok(draft.problems.every((problem) => problem.template_id.includes("__RUNTIME_")), `${skill.id} should generate every native scenario in-browser without bank fallback`);
   }
 });
@@ -178,7 +180,7 @@ test("Depot Geography is substantial, installable, and bridges through native Ma
   store.createProfile("Geography Learner");
   assert.deepEqual(store.snapshot().subjects.map((subject) => subject.id), ["SUBJECT_MATH"]);
   const installed = store.importLessonPack(geographyLessonSet);
-  assert.equal(installed.totalSkillCount, 59);
+  assert.equal(installed.totalSkillCount, 68);
   const bridge = store.skillsById.GEO_CART_002;
   assert.ok(bridge.prerequisites.includes("MATH_GEOM_003"));
   assert.deepEqual(bridge.prerequisiteRefs, [
@@ -355,9 +357,9 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   assert.equal(welcome.ok, true);
   assert.match(store.snapshot().activeProfile.educatorGuideSeenAt, /^2026-/);
   store.importLessonPack(geographyLessonSet);
-  assert.equal(store.snapshot().curriculum.allSkills.length, 59);
+  assert.equal(store.snapshot().curriculum.allSkills.length, 68);
   store.setCurriculumPackEnabled("PACK_GEOGRAPHY", false);
-  assert.equal(store.snapshot().curriculum.allSkills.length, 44);
+  assert.equal(store.snapshot().curriculum.allSkills.length, 53);
   store.updateCurriculum({ name: "Ada's rigorous route", description: "A focused mathematics curriculum." });
   store.updateCurriculumSettings({
     studentName: "Ada",
@@ -382,7 +384,7 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   assert.equal("maxAttemptsPerLesson" in state.activeCurriculum.settings, false, "legacy retake caps are ignored");
   assert.equal("masteryEnabled" in state.activeCurriculum.settings, false);
   assert.equal(state.progressionMode, "soft");
-  assert.equal(state.curriculum.allSkills.length, 44);
+  assert.equal(state.curriculum.allSkills.length, 53);
   assert.equal(state.curriculumPlan.paths[0].name, "Arithmetic start");
   assert.deepEqual(state.curriculumPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: 120, y: 80 });
 
@@ -525,13 +527,13 @@ test("a valid custom lesson set joins the real curriculum without replacing buil
   const preview = store.previewLessonPack(lessonSetExample);
   assert.equal(preview.id, "PACK_PERSONAL_FINANCE");
   assert.equal(preview.skillCount, 1);
-  assert.equal(store.snapshot().progressRows.length, 44, "preview must not mutate state");
+  assert.equal(store.snapshot().progressRows.length, 53, "preview must not mutate state");
 
   const installed = store.importLessonPack(lessonSetExample);
   const state = store.snapshot();
-  assert.equal(installed.totalSkillCount, 45);
+  assert.equal(installed.totalSkillCount, 54);
   assert.equal(state.lessonPacks.length, 1);
-  assert.equal(state.progressRows.length, 45);
+  assert.equal(state.progressRows.length, 54);
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "CUSTOM_FINANCE_DISCOUNTS").custom, true);
   assert.equal(store.statusForSkill("CUSTOM_FINANCE_DISCOUNTS"), "locked");
   assert.match(store.exportLessonPack("PACK_PERSONAL_FINANCE"), new RegExp(LESSON_SET_FORMAT));
@@ -577,7 +579,7 @@ test("native lesson improvements replace content reversibly without moving IDs o
   const preview = store.previewLessonPack(nativeImprovement());
   assert.equal(preview.mode, "override");
   assert.deepEqual(preview.overridesNativeSkills, ["MATH_ARITH_001"]);
-  assert.equal(store.snapshot().curriculum.allSkills.length, 44, "preview must not mutate the curriculum");
+  assert.equal(store.snapshot().curriculum.allSkills.length, 53, "preview must not mutate the curriculum");
 
   const installed = store.importLessonPack(nativeImprovement());
   let state = store.snapshot();
@@ -585,8 +587,8 @@ test("native lesson improvements replace content reversibly without moving IDs o
   assert.equal(installed.mode, "override");
   assert.equal(installed.completedProgressPreserved, true);
   assert.equal(installed.restartedDraftCount, 1);
-  assert.equal(installed.totalSkillCount, 44);
-  assert.equal(state.curriculum.allSkills.length, 44);
+  assert.equal(installed.totalSkillCount, 53);
+  assert.equal(state.curriculum.allSkills.length, 53);
   assert.equal(improved.name, "Integer operations · revised");
   assert.equal(improved.native, true);
   assert.equal(improved.overridden, true);
@@ -632,7 +634,7 @@ test("native improvements enforce the built-in identity and round-trip through f
   target.store.selectProfile(target.store.snapshot().profiles[0].id);
   const restored = target.store.snapshot();
   assert.equal(restored.lessonPacks[0].mode, "override");
-  assert.equal(restored.curriculum.allSkills.length, 44);
+  assert.equal(restored.curriculum.allSkills.length, 53);
   assert.equal(restored.allProgressRows.find((row) => row.id === "MATH_ARITH_001").name, "Integer operations · revised");
 });
 
@@ -647,7 +649,7 @@ test("subjects filter the visible map, apply bridge locks, and support per-profi
   assert.equal(state.activeSubject.id, "SUBJECT_BIOLOGY");
   assert.equal(state.subjects.length, 2);
   assert.equal(state.progressRows.length, 1);
-  assert.equal(state.allProgressRows.length, 45);
+  assert.equal(state.allProgressRows.length, 54);
   assert.equal(state.progressRows[0].status, "locked");
   assert.deepEqual(state.progressRows[0].unmetPrerequisites, ["MATH_ARITH_005"]);
   store.setLearningPreferences({ progressionMode: "soft" });
@@ -826,7 +828,7 @@ test("custom progress and content round-trip together through a full backup", ()
   target.store.importBackup(raw);
   target.store.selectProfile(target.store.snapshot().profiles[0].id);
   const restored = target.store.snapshot();
-  assert.equal(restored.progressRows.length, 45);
+  assert.equal(restored.progressRows.length, 54);
   assert.equal(restored.attempts[0].skillId, "CUSTOM_FINANCE_DISCOUNTS");
   assert.equal(restored.progressRows.find((row) => row.id === "CUSTOM_FINANCE_DISCOUNTS").attemptCount, 1);
 });
@@ -920,6 +922,65 @@ test("the browser grader understands mathematical notation and reversed equation
   assert.equal(gradeProblem({ grading_method: "symbolic_expression", expected_answer: "(x + 1)^2" }, "x² + 2x + 1").correct, true);
   assert.equal(gradeProblem({ grading_method: "exact_text", expected_answer: "no solution", accepted_forms: ["none"] }, "none").correct, true);
   assert.equal(gradeProblem({ grading_method: "symbolic_expression", expected_answer: "x + x", accepted_forms: ["2y"] }, "2y").correct, true);
+});
+
+test("the browser grader handles finite sets, rational domains, and interval unions", () => {
+  assert.equal(gradeProblem({ grading_method: "finite_set", expected_answer: "{-2, 5}", answer_metadata: { values: ["-2", "5"] } }, "x = 5 or x = -2").correct, true);
+  assert.equal(gradeProblem({ grading_method: "finite_set", expected_answer: "{}", answer_metadata: { values: [] } }, "no solutions").correct, true);
+  const rational = { grading_method: "rational_expression", expected_answer: "(x+4)/(x-3)", answer_metadata: { excluded_values: ["-2", "3"] }, grading_metadata: { require_reduced_form: true } };
+  assert.equal(gradeProblem(rational, "(x+4)/(x-3)", { excluded_values: "3, -2" }).correct, true);
+  assert.equal(gradeProblem(rational, "(x+4)/(x-3)", { excluded_values: "3" }).correct, false);
+  assert.equal(gradeProblem({ grading_method: "interval_set", expected_answer: "(-inf, -2] U (5, inf)", variable: "x" }, "x <= -2 or x > 5").correct, true);
+  assert.equal(gradeProblem({ grading_method: "interval_set", expected_answer: "(-inf, 3) U (3, inf)", variable: "x" }, "x != 3").correct, true);
+  assert.equal(gradeProblem({ grading_method: "interval_set", expected_answer: "[-1, 4]", variable: "x" }, "-1 <= x <= 4").correct, true);
+  assert.equal(gradeProblem({ grading_method: "interval_set", expected_answer: "[3, 3]", variable: "x" }, "x = 3").correct, true);
+  assert.equal(gradeProblem({ grading_method: "interval_set", expected_answer: "(-inf, inf)", variable: "x" }, "[-inf, inf)").correct, false);
+});
+
+test("structured rational-equation and sign-chart work enforce the authored model", () => {
+  const rational = {
+    grading_method: "finite_set", expected_answer: "{2}", answer_metadata: { values: ["2"] }, variable: "x", work_required: true,
+    work: {
+      mode: "rational_equation_steps", target_variable: "x", minimum_steps: 2,
+      original_equation: "(x - 2)/(x - 5) = 0", expected_restrictions: ["5"],
+      require_restrictions: true, require_original_equation_check: true,
+    },
+  };
+  const rationalWork = {
+    restrictions: ["5"], steps: ["x - 2 = 0", "x = 2"],
+    candidates: [{ value: "2", status: "valid", original_check: "(2-2)/(2-5)=0" }],
+  };
+  assert.equal(validateProceduralWork(rational, "", rationalWork, "{2}"), null);
+  assert.match(validateProceduralWork(rational, "", { ...rationalWork, restrictions: ["4"] }, "{2}"), /restriction set/i);
+  assert.match(validateProceduralWork(rational, "", { ...rationalWork, candidates: [{ ...rationalWork.candidates[0], status: "extraneous" }] }, "{2}"), /classified as valid/i);
+
+  const signChart = {
+    grading_method: "interval_set", expected_answer: "(-inf, 2] U (5, inf)", variable: "x", work_required: true,
+    work: {
+      mode: "sign_chart_steps", target_variable: "x",
+      sign_chart: {
+        expression_kind: "rational", expression: "(x - 2)/(x - 5)", reduced_expression: "(x - 2)/(x - 5)", relation: ">=",
+        critical_points: [{ value: "2", kind: "zero", multiplicity: 1 }, { value: "5", kind: "undefined", multiplicity: 1 }],
+        require_test_values: true, require_interval_signs: true, require_endpoint_decisions: true, require_final_answer_match: true,
+      },
+    },
+  };
+  const chartWork = {
+    critical_points: [{ value: "5", kind: "undefined" }, { value: "2", kind: "zero" }],
+    intervals: [
+      { lower: "", upper: "2", test_value: "0", sign: "positive", selected: true },
+      { lower: "2", upper: "5", test_value: "3", sign: "negative", selected: false },
+      { lower: "5", upper: "", test_value: "6", sign: "positive", selected: true },
+    ],
+    endpoints: [{ value: "2", included: true }, { value: "5", included: false }],
+  };
+  assert.equal(validateProceduralWork(signChart, "", chartWork, "x <= 2 or x > 5"), null);
+  const wrongBoundary = structuredClone(chartWork);
+  wrongBoundary.intervals[1].upper = "6";
+  assert.match(validateProceduralWork(signChart, "", wrongBoundary, "(-inf, 2] U (5, inf)"), /boundaries/i);
+  const wrongSign = structuredClone(chartWork);
+  wrongSign.intervals[1].sign = "positive";
+  assert.match(validateProceduralWork(signChart, "", wrongSign, "(-inf, 2] U (5, inf)"), /sign in interval row 2/i);
 });
 
 test("inequality grading checks the complete solution set and sign reversals", () => {

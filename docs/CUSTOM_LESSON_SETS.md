@@ -231,6 +231,9 @@ Supported graders:
 - `symbolic_expression`
 - `equation_solution`
 - `inequality_solution` for equivalent one-variable linear solution sets (including reversed signs and strict versus inclusive boundaries)
+- `finite_set` for order-independent exact solution members; duplicates are ignored and empty-set aliases are accepted
+- `rational_expression` for an equivalent formula **and** the exact original excluded values, with optional reduced-form enforcement
+- `interval_set` for normalized intervals, unions, singletons, empty/all-real sets, or equivalent inequalities
 - `exact_text`
 - `theorem_conclusion`
 
@@ -245,8 +248,116 @@ Supported `answer_mode` values are `final_only`, `final_plus_optional_work`, and
 | Final answer only | `none` | No work field is required. |
 | Save an explanation | `capture_only` | Requires/stores text when the answer mode requires work. |
 | Check algebraic steps | `procedural_steps` | Checks line count, notation, equivalence/equation consistency, and optional final-line match. |
+| Solve a rational equation | `rational_equation_steps` | Shows structured restrictions, algebra steps, candidate classification, and original-equation checks. |
+| Build a sign chart | `sign_chart_steps` | Shows structured critical-point, interval-test, sign, selection, endpoint, and final-set fields. |
 | Structure a proof | `proof_obligations` | Shows obligations and strategies, captures the proof, and waits for review. |
 | Grade open reasoning | `rubric_check` | Shows rubric criteria, captures work, and waits for review. |
+
+### Finite sets, rational expressions, and interval sets
+
+Native YAML uses these answer blocks:
+
+```yaml
+answer:
+  type: finite_set
+  values: ["-2", "5"]
+grading:
+  method: finite_set
+```
+
+The learner may enter `{5, -2}`, `x = -2 or x = 5`, or the same members in another order. Use `values: []` for the empty set. Browser lesson packs store the same information in `answer_metadata.values`; `expected_answer` should be a readable copy such as `{-2, 5}`.
+
+```yaml
+answer:
+  type: rational_expression
+  value: "(x + 4)/(x - 3)"
+  excluded_values: ["-2", "3"]
+grading:
+  method: rational_expression
+  require_reduced_form: true
+```
+
+This is intentionally stricter than symbolic equivalence: the formula must be equivalent, every original denominator zero must remain excluded, and no extra exclusion may be invented. A canceled factor therefore remains a hole in the domain. In browser lesson packs put `value`, `variable`, and `excluded_values` in `answer_metadata`, and put `require_reduced_form` in `grading_metadata`. The learner sees a separate excluded-values field; they never edit metadata or JSON.
+
+```yaml
+answer:
+  type: interval_set
+  variable: x
+  value: "(-inf, -2] U (5, inf)"
+grading:
+  method: interval_set
+```
+
+The interval grader normalizes union order and merges intervals correctly. It accepts `U` or `∪`, `[3,3]` for a singleton, empty/all-real aliases, and equivalent input such as `x <= -2 or x > 5`, `-1 < x <= 4`, or `x != 5`. Infinity must always use an open endpoint. Endpoints may contain exact constants such as fractions, `sqrt(2)`, `pi`, and `e`.
+
+### Rational-equation structured work
+
+Use this mode when the reasoning itself must preserve restrictions and classify candidates:
+
+```yaml
+answer_mode: final_plus_required_work
+answer:
+  type: finite_set
+  values: ["4"]
+grading:
+  method: finite_set
+work:
+  mode: rational_equation_steps
+  prompt: State restrictions, clear denominators, solve, and check every candidate.
+  target_variable: x
+  original_equation: "1/(x - 1) = 1/3"
+  expected_restrictions: ["1"]
+  require_restrictions: true
+  require_original_equation_check: true
+review_policy:
+  work_review: auto
+```
+
+The learner UI collects:
+
+- original denominator restrictions;
+- one algebra step per line;
+- candidate values classified as `valid`, `excluded`, `extraneous`, `repeated`, or `non_real`;
+- an original-equation check for each valid or extraneous candidate.
+
+QuickMaths compares the submitted restrictions with `expected_restrictions`, checks that every algebra row is an equation, classifies candidates against `original_equation`, and compares candidates marked `valid` with the finite-set final answer. Trusted native YAML may omit `original_equation` and `expected_restrictions` because generation derives both from the rendered prompt; fixed browser/Depot packs must include them when the corresponding checks are required. Lesson Studio provides friendly fields for both. The learner's structured object persists inside the ordinary draft/attempt/backup pipeline as `structuredWorkJson`; authors and learners do not need to write that JSON manually.
+
+### Sign-chart structured work
+
+Use a sign chart when a polynomial or rational inequality is determined by critical points and interval signs:
+
+```yaml
+answer_mode: final_plus_required_work
+answer:
+  type: interval_set
+  variable: x
+  value: "(-inf, -1) U [2, inf)"
+grading:
+  method: interval_set
+work:
+  mode: sign_chart_steps
+  target_variable: x
+  sign_chart:
+    expression_kind: rational
+    expression: "(x - 2)/(x + 1)"
+    relation: ">="
+    expected_factorization: "(x - 2)/(x + 1)"
+    reduced_expression: "(x - 2)/(x + 1)"
+    require_factorization: false
+    critical_points:
+      - { value: "-1", kind: undefined, multiplicity: 1, factor: "x + 1" }
+      - { value: "2", kind: zero, multiplicity: 1, factor: "x - 2" }
+    require_test_values: true
+    require_interval_signs: true
+    require_endpoint_decisions: true
+    require_final_answer_match: true
+review_policy:
+  work_review: auto
+```
+
+`kind` must be `zero`, `undefined`, or `hole`. A zero may be included only for an inclusive relation; a pole or hole is never included. Multiplicity records whether a factor changes sign at that point. The learner editor asks for every critical point, a test value and sign in each interval, which intervals belong in the solution, endpoint decisions, and the final interval set. Interval boundaries are derived and sorted from the critical points. QuickMaths independently computes the sign in each interval, verifies that every learner test value lies strictly inside its row, checks endpoint inclusion, reconstructs the selected set, and compares it with the final authored interval set.
+
+Native templates may place placeholders anywhere inside `work.sign_chart`; the exporter renders that nested metadata recursively. Uploaded packs remain fixed data and never execute arbitrary template expressions.
 
 ### Checked maths steps are not formal proofs
 
@@ -343,7 +454,7 @@ The repository’s trusted built-in Mathematics YAML is exported as browser-safe
 | Random order / question count | Native Mathematics shuffles every authored scenario and draws fresh values. For uploaded sets, set `question_count` and optionally supply a larger fixed bank; QuickMaths rotates through a complete configured set. |
 | Explanation templates | Pre-render into literal `solution_steps`. |
 | Final-only, optional, or required work | `answer_mode` |
-| Capture, procedural, proof, and rubric workflows | All five browser `work.mode` values above |
+| Capture, procedural, rational-equation, sign-chart, proof, and rubric workflows | All seven browser `work.mode` values above |
 | Review policy and mastery gate | `review_policy` block |
 | Draft skills | Keep them in Lesson studio or outside an installed pack; installed packs accept live skills only. |
 | Deprecated/replacement skills | Publish a new stable skill ID and keep the old source file for backup compatibility. Browser packs do not silently redirect progress. |
@@ -358,7 +469,7 @@ Open **Lesson studio** in the left sidebar. It can:
 - create, remove, and switch between multiple lessons;
 - select prerequisites across every subject;
 - add theory, examples, applications, tags, mastery thresholds, and review timing;
-- add fixed questions with all eight graders;
+- add fixed questions with every supported grader;
 - configure answer modes, capture/procedural/proof/rubric work, and review gates;
 - preview the exact answer box, proof checklist, rubric, and review path the learner will see;
 - start advanced question types from editable examples with plain-language explanations;
@@ -376,14 +487,14 @@ Choose **Rubric-reviewed response** for essays, investigations, interpretations,
 
 Agents inside a compatible browser should use this sequence:
 
-1. `get_agent_guide`
+1. `get_lesson_authoring_guide` with the relevant section (normally `summary`, then `grading_and_work`)
 2. `list_subjects`
 3. Author a schema 2.0 JSON string
 4. `validate_lesson_set`
 5. `stage_custom_lesson_set`
 6. Tell the human to review the visible preview and click **Install**
 
-Agents cannot call the final install action. They should recommend a full JSON progress backup before curriculum changes and never quote expected answers or solution steps into learner tutoring.
+`get_lesson_authoring_guide` returns this bundled guide by topic, so an agent does not need a separate network fetch or the entire operating manifest for a small authoring task. Agents cannot call the final install action. They should recommend a full JSON progress backup before curriculum changes and never quote expected answers or solution steps into learner tutoring.
 
 For community lessons, agents can call `search_lesson_depot` to inspect catalog metadata and `stage_depot_lesson` to download, hash-check, validate, and visibly stage a chosen package. The second tool still cannot install anything; the human reviews it in Settings and clicks **Install**.
 

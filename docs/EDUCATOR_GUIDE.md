@@ -326,7 +326,19 @@ Each question separates three decisions:
 
 ### Final-answer grading
 
-Supported grading includes exact numeric, numeric tolerance, multiple choice, symbolic expression, equation solution, inequality solution, exact text, and theorem conclusion. The expected answer and accepted forms are private pre-submission values.
+Supported grading includes exact numeric, numeric tolerance, multiple choice, symbolic expression, finite set, rational expression with exact excluded values, equation solution, interval set, exact text, and theorem conclusion. The expected answer and accepted forms are private pre-submission values.
+
+### Finite sets
+
+Enter one expected member per line in Studio. Order and duplicates do not affect grading. The learner may use braces or an equivalent list of equations; an empty expected list represents the empty set.
+
+### Rational expressions and preserved restrictions
+
+Enter the expected simplified formula and one excluded value per line. The grader compares the formula symbolically and compares the exclusion set exactly, so a cancelled denominator factor still survives as a hole. Enable **Require reduced form** when the displayed expression must no longer contain an obvious common numerator/denominator factor. The learner receives a separate exclusions field.
+
+### Interval sets
+
+Enter a canonical answer such as `(-infinity, -1] U (3, infinity)`. The grader accepts equivalent standard intervals, unions, singletons, the empty set, all real numbers, and common one-variable inequality forms. Infinity endpoints are always open. Use exact constants such as fractions, `sqrt(2)`, `pi`, and `e` when appropriate.
 
 The final-answer grader never decides that a formal proof is logically valid.
 
@@ -337,12 +349,30 @@ The final-answer grader never decides that a formal proof is logically valid.
 | Final answer only | Answer field | Local final-answer grader |
 | Written explanation | Answer plus saved text | Optional later review |
 | Checked maths steps | Ordered equations, expressions, or inequalities | Local equivalence checks plus final answer |
+| Rational-equation ledger | Restrictions, algebra steps, and classified candidates | Local restriction, equivalence, original-equation, and final-set checks |
+| Structured sign chart | Critical points, interval signs, selections, endpoints, and final set | Local row diagnostics plus final interval-set check |
 | Formal proof required | Short conclusion plus ordinary-text proof | Conclusion auto-graded; obligations reviewed before mastery |
 | Required long response | Answer plus structured response | Rubric reviewed before mastery |
 
 ### Checked maths steps
 
 Choose a minimum number of non-empty lines and an allowed line format. Equivalent equations and expressions are checked line by line. Inequality checks preserve the same one-variable solution set, including reversing the sign after multiplication or division by a negative. Mixed/text modes capture work without pretending to validate unsupported semantics.
+
+### Rational-equation ledger
+
+Choose **Rational-equation ledger** when clearing denominators creates candidates that must be checked against the original equation. Configure whether restrictions, algebra steps, and candidate classifications are required, plus the minimum number of steps. The learner receives dedicated fields for restrictions, one statement per step, and a candidate table. Valid classifications are `valid`, `excluded`, `extraneous`, `repeated`, and `non-real`. The checker verifies original restrictions, step equivalence, candidate substitution into the original equation, and agreement between valid candidates and the final finite set.
+
+Use the ordinary-text final-answer field for the set of valid solutions and the structured ledger for the evidence. Do not put answer-key classifications in theory or the public prompt.
+
+### Structured sign chart
+
+Choose **Structured sign chart** for polynomial or rational inequalities. Enter the expression, relation (`>`, `>=`, `<`, or `<=`), optional factored or reduced form, and one expected critical-point record per line. The friendly critical-point format is:
+
+`value | kind | multiplicity | factor`
+
+For example, one row can read -2 | zero | 1 | x + 2. Another can read 3 | undefined | 1 | x - 3. The kind is `zero`, `undefined`, or `hole`; multiplicity is a positive integer; and factor names the corresponding numerator or denominator factor. Studio turns these lines into structured metadata and the learner sees a guided sign-chart editor. The checker derives endpoint inclusion from the relation and point kind, then validates sorted critical points, interval coverage, test-value signs, selected intervals, endpoint decisions, and the final interval set with row-specific diagnostics.
+
+Native sign-chart metadata supports the same trusted runtime placeholders as prompts and expected answers.
 
 ### Formal proof required
 
@@ -457,6 +487,7 @@ The dedicated command returns the educator operating contract and any active cur
 | Tool | Purpose |
 | --- | --- |
 | get_educator_agent_manifest | Dedicated workflow, boundaries, documentation, and active policy |
+| get_lesson_authoring_guide | Compact authoring overview or a focused section such as grading, Studio, graph design, or publishing |
 | get_app_state | Current profile, route, subject, scope, selection, plan, and status |
 | get_curriculum_workspace | Open curriculum identity, settings, enabled packs, and available library |
 | get_curriculum_map | Visible lesson graph and prerequisite relationships |
@@ -473,7 +504,7 @@ The dedicated command returns the educator operating contract and any active cur
 
 ### Content tools
 
-`open_lesson_creator` visibly opens a new draft or native improvement. `validate_lesson_set` checks authored JSON. `stage_custom_lesson_set` opens a local authored set for human review. `stage_depot_lesson` stages one published package. `stage_depot_lessons` builds an ordered human review queue.
+Call `get_lesson_authoring_guide` before creating or modifying lesson content; request `grading_and_work` for finite sets, rational expressions, rational-equation ledgers, interval sets, sign charts, proofs, and rubrics. `open_lesson_creator` visibly opens a new draft or native improvement. `validate_lesson_set` checks authored JSON. `stage_custom_lesson_set` opens a local authored set for human review. `stage_depot_lesson` stages one published package. `stage_depot_lessons` builds an ordered human review queue.
 
 No WebMCP content tool installs or publishes a package.
 

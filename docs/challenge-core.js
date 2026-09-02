@@ -53,12 +53,14 @@ const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 const GRADING_METHODS = new Set([
   "exact_numeric", "numeric_with_tolerance", "multiple_choice", "symbolic_expression",
   "equation_solution", "inequality_solution", "exact_text", "theorem_conclusion",
+  "finite_set", "rational_expression", "interval_set",
 ]);
 const EXPRESSION_FUNCTIONS = new Set(["sqrt"]);
 const EXPRESSION_CONSTANTS = Object.freeze({ pi: Math.PI, e: Math.E });
 const SUPERSCRIPT_DIGITS = Object.freeze({ "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-" });
 
 function clone(value) {
+  if (value === undefined) return undefined;
   return JSON.parse(JSON.stringify(value));
 }
 
@@ -204,6 +206,13 @@ function renderNativeTemplate(template, values) {
   return formatGeneratedMath(String(template ?? "").replace(/{([^{}]+)}/g, (_, expression) => stringifyTemplateValue(expression.trim() in values ? values[expression.trim()] : safeTemplateEval(expression, values))));
 }
 
+function renderNativeValue(value, values) {
+  if (typeof value === "string") return renderNativeTemplate(value, values);
+  if (Array.isArray(value)) return value.map((item) => renderNativeValue(item, values));
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, renderNativeValue(item, values)]));
+  return clone(value);
+}
+
 function generateNativeProblem(skill, template, attemptCount, templateIndex) {
   const seed = (stableTextSeed(`${skill.id}:${template.id}`) + Math.imul(attemptCount + 1, 104729) + Math.imul(templateIndex + 1, 8191)) >>> 0;
   const random = seededRandom(seed);
@@ -232,10 +241,13 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
       }
       for (const [name, expression] of Object.entries(template.derived ?? {})) values[name] = safeTemplateEval(expression, values);
       if (!(template.constraints ?? []).every((constraint) => Boolean(safeTemplateEval(constraint, values)))) continue;
-      const answer = template.answer ?? {};
+      const answer = renderNativeValue(template.answer ?? {}, values);
       const explanation = template.explanation_template ? renderNativeTemplate(template.explanation_template, values).split(/\r?\n/).map((line) => line.trim()).filter(Boolean) : clone(template.solution_steps ?? []);
       const answerMode = template.answer_mode ?? "final_only";
-      const work = clone(template.work ?? {});
+      const work = renderNativeValue(template.work ?? {}, values);
+      const expectedAnswer = answer.value == null && answer.type === "finite_set"
+        ? `{${(answer.values ?? []).join(", ")}}`
+        : String(answer.value ?? "");
       return {
         template_id: `${template.id}__RUNTIME_${attemptCount + 1}`,
         source_template_id: template.id,
@@ -244,7 +256,7 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
         difficulty: template.difficulty ?? "medium",
         values: Object.fromEntries(Object.entries(values).map(([key, value]) => [key, stringifyTemplateValue(value)])),
         prompt: renderNativeTemplate(template.prompt_template, values),
-        expected_answer: renderNativeTemplate(String(answer.value ?? ""), values),
+        expected_answer: expectedAnswer,
         answer_type: answer.type ?? "text",
         grading_method: template.grading?.method ?? "exact_text",
         solution_steps: explanation,
@@ -256,7 +268,9 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
         work,
         review_policy: clone(template.review_policy ?? {}),
         accepted_forms: clone(answer.accepted_forms ?? template.grading?.accepted_forms ?? []),
-        work_required: ["final_plus_required_work", "structured_steps", "proof_required"].includes(answerMode) || ["required", "procedural_steps", "proof_obligations", "rubric_check"].includes(work.mode ?? "none"),
+        answer_metadata: clone(answer),
+        grading_metadata: renderNativeValue(template.grading ?? {}, values),
+        work_required: ["final_plus_required_work", "structured_steps", "proof_required"].includes(answerMode) || ["required", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"].includes(work.mode ?? "none"),
       };
     } catch {
       // Try a fresh variable draw. Exported native templates are trusted, but every expression still uses the allowlisted parser above.
@@ -383,6 +397,40 @@ function normalizeSubject(candidate, schemaVersion) {
   };
 }
 
+function normalizeAnswerMetadata(candidate, templateId) {
+  const source = candidate && typeof candidate === "object" && !Array.isArray(candidate) ? candidate : {};
+  return {
+    type: optionalText(source.type, `${templateId} answer metadata type`, 60) || "text",
+    variable: optionalText(source.variable, `${templateId} answer metadata variable`, 40) || null,
+    value: source.value == null ? null : cleanText(String(source.value), 300),
+    values: Array.isArray(source.values) ? source.values.map((value) => cleanText(String(value), 120)).slice(0, 40) : [],
+    excluded_values: Array.isArray(source.excluded_values) ? source.excluded_values.map((value) => cleanText(String(value), 120)).slice(0, 40) : [],
+  };
+}
+
+function normalizeSignChart(candidate, templateId) {
+  const source = candidate && typeof candidate === "object" && !Array.isArray(candidate) ? candidate : {};
+  const points = Array.isArray(source.critical_points) ? source.critical_points.slice(0, 20).map((point, index) => ({
+    value: requiredText(String(point?.value ?? ""), `${templateId} critical point ${index + 1}`, 120),
+    kind: ["zero", "undefined", "hole"].includes(point?.kind) ? point.kind : "zero",
+    multiplicity: Math.floor(cleanNumber(Number(point?.multiplicity), 1, 1, 20)),
+    factor: cleanText(String(point?.factor ?? ""), 300),
+  })) : [];
+  return {
+    expression_kind: ["polynomial", "rational"].includes(source.expression_kind) ? source.expression_kind : "polynomial",
+    expression: cleanText(String(source.expression ?? ""), 1000),
+    relation: [">", ">=", "<", "<="].includes(source.relation) ? source.relation : ">",
+    expected_factorization: cleanText(String(source.expected_factorization ?? ""), 1000),
+    reduced_expression: cleanText(String(source.reduced_expression ?? ""), 1000),
+    require_factorization: source.require_factorization === true,
+    critical_points: points,
+    require_test_values: source.require_test_values !== false,
+    require_interval_signs: source.require_interval_signs !== false,
+    require_endpoint_decisions: source.require_endpoint_decisions !== false,
+    require_final_answer_match: source.require_final_answer_match !== false,
+  };
+}
+
 function normalizeProblem(candidate, skillId, questionIds) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${skillId} contains an invalid problem.`);
   const templateId = requiredText(candidate.template_id, `${skillId} problem ID`, 120);
@@ -413,7 +461,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
   }
   const workCandidate = candidate.work && typeof candidate.work === "object" && !Array.isArray(candidate.work) ? candidate.work : {};
   const workMode = workCandidate.mode ?? "none";
-  if (!["none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check"].includes(workMode)) throw new Error(`${templateId} uses unsupported work mode ${workMode}.`);
+  if (!["none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"].includes(workMode)) throw new Error(`${templateId} uses unsupported work mode ${workMode}.`);
   const answerMode = candidate.answer_mode ?? (workMode === "none" ? "final_only" : "final_plus_required_work");
   if (!["final_only", "final_plus_optional_work", "final_plus_required_work"].includes(answerMode)) throw new Error(`${templateId} uses unsupported answer_mode ${answerMode}.`);
   const minimumSteps = Math.floor(cleanNumber(Number(workCandidate.minimum_steps), workMode === "procedural_steps" ? 2 : 1, 1, 10));
@@ -443,8 +491,21 @@ function normalizeProblem(candidate, skillId, questionIds) {
     : [];
   if (workMode === "proof_obligations" && !obligations.length) throw new Error(`${templateId} proof_obligations needs at least one obligation.`);
   const reviewCandidate = candidate.review_policy && typeof candidate.review_policy === "object" && !Array.isArray(candidate.review_policy) ? candidate.review_policy : {};
-  const workReview = reviewCandidate.work_review ?? (["proof_obligations", "rubric_check"].includes(workMode) ? "tutor_required" : "none");
+  const workReview = reviewCandidate.work_review ?? (["proof_obligations", "rubric_check"].includes(workMode) ? "tutor_required" : ["rational_equation_steps", "sign_chart_steps"].includes(workMode) ? "auto" : "none");
   if (!["none", "optional", "auto", "tutor_required", "self_review"].includes(workReview)) throw new Error(`${templateId} uses unsupported work_review ${workReview}.`);
+  const signChart = normalizeSignChart(workCandidate.sign_chart, templateId);
+  if (workMode === "rational_equation_steps") {
+    if (!optionalText(workCandidate.target_variable, `${templateId} target_variable`, 40)) throw new Error(`${templateId} rational-equation work needs a target variable.`);
+    if (workCandidate.require_restrictions === true && (!Array.isArray(workCandidate.expected_restrictions) || !workCandidate.expected_restrictions.length)) throw new Error(`${templateId} must list the expected original denominator restrictions.`);
+    if (workCandidate.require_original_equation_check === true && parseRelation(String(workCandidate.original_equation ?? ""))?.relation !== "=") throw new Error(`${templateId} must provide the original equation used for candidate checks.`);
+  }
+  if (workMode === "sign_chart_steps") {
+    if (!signChart.expression) throw new Error(`${templateId} sign chart needs an expression.`);
+    if (![">", ">=", "<", "<="].includes(workCandidate.sign_chart?.relation)) throw new Error(`${templateId} sign chart relation is invalid.`);
+    if (signChart.require_factorization && !signChart.expected_factorization) throw new Error(`${templateId} must provide the expected factorization.`);
+    const pointKeys = signChart.critical_points.map((point) => `${point.value}`.trim());
+    if (new Set(pointKeys).size !== pointKeys.length) throw new Error(`${templateId} sign chart critical points must not be duplicated.`);
+  }
   return {
     template_id: templateId,
     source_template_id: sourceTemplateId,
@@ -476,6 +537,13 @@ function normalizeProblem(candidate, skillId, questionIds) {
           : [],
       },
       rubric: { criteria },
+      require_original_equation_check: workCandidate.require_original_equation_check === true,
+      require_restrictions: workCandidate.require_restrictions === true,
+      original_equation: optionalText(workCandidate.original_equation, `${templateId} original equation`, 1000) || null,
+      expected_restrictions: Array.isArray(workCandidate.expected_restrictions)
+        ? workCandidate.expected_restrictions.map((value, index) => requiredText(String(value), `${templateId} restriction ${index + 1}`, 120)).slice(0, 24)
+        : [],
+      sign_chart: signChart,
     },
     review_policy: {
       work_review: workReview,
@@ -483,6 +551,10 @@ function normalizeProblem(candidate, skillId, questionIds) {
       allow_self_review: reviewCandidate.allow_self_review !== false,
     },
     accepted_forms: Array.isArray(candidate.accepted_forms) ? candidate.accepted_forms.map((form) => requiredText(String(form), `${templateId} accepted form`, 300)).slice(0, 12) : [],
+    answer_metadata: normalizeAnswerMetadata(candidate.answer_metadata, templateId),
+    grading_metadata: {
+      require_reduced_form: candidate.grading_metadata?.require_reduced_form === true,
+    },
     work_required: candidate.work_required === true || answerMode === "final_plus_required_work",
   };
 }
@@ -1026,6 +1098,15 @@ function sanitizeRubricResult(item, index) {
   };
 }
 
+function sanitizeStructuredWork(candidate) {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return null;
+  try {
+    const serialized = JSON.stringify(candidate);
+    if (serialized.length > 30_000) return null;
+    return JSON.parse(serialized);
+  } catch { return null; }
+}
+
 function sanitizeResult(candidate) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return null;
   const questionId = cleanText(candidate.questionId ?? candidate.question_id, 120);
@@ -1035,6 +1116,7 @@ function sanitizeResult(candidate) {
     prompt: cleanText(candidate.prompt, 2000),
     finalAnswer: cleanText(candidate.finalAnswer, 300),
     work: cleanText(candidate.work, 5000),
+    structuredWorkJson: sanitizeStructuredWork(candidate.structuredWorkJson),
     expectedAnswer: cleanText(candidate.expectedAnswer, 300),
     correct: Boolean(candidate.correct),
     gradingMethod: cleanText(candidate.gradingMethod, 60),
@@ -1169,6 +1251,7 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
         responses: Object.fromEntries(problemIds.map((id) => [id, {
           finalAnswer: cleanText(responses[id]?.finalAnswer, 300),
           work: cleanText(responses[id]?.work, 5000),
+          structuredWorkJson: sanitizeStructuredWork(responses[id]?.structuredWorkJson),
         }])),
       };
     }
@@ -1629,7 +1712,167 @@ function extractSolutionValue(value, variable = "x") {
   return right;
 }
 
-export function gradeProblem(problem, answer) {
+function parseFiniteSetValues(value, variable = "x") {
+  if (Array.isArray(value)) return value.map((item) => extractSolutionValue(String(item), variable)).filter(Boolean);
+  let source = normalizeMathNotation(String(value ?? "")).trim();
+  if (["", "{}", "∅", "empty", "empty set", "no solution", "no solutions"].includes(source.toLowerCase())) return [];
+  if (source.startsWith("{") && source.endsWith("}")) source = source.slice(1, -1);
+  return source.replace(/\s+or\s+/gi, ",").split(/[,;]/).map((item) => extractSolutionValue(item.trim(), variable)).filter(Boolean);
+}
+
+function finiteSetsEquivalent(expectedValues, answer, variable = "x") {
+  const expected = parseFiniteSetValues(expectedValues, variable);
+  const actual = parseFiniteSetValues(answer, variable);
+  const unique = (items) => items.filter((item, index) => !items.slice(0, index).some((previous) => symbolicEquivalent(previous, item)));
+  const left = unique(expected);
+  const right = unique(actual);
+  if (left.length !== right.length) return false;
+  const unmatched = [...right];
+  for (const item of left) {
+    const index = unmatched.findIndex((candidate) => symbolicEquivalent(item, candidate));
+    if (index < 0) return false;
+    unmatched.splice(index, 1);
+  }
+  return true;
+}
+
+function expressionHasObviousCancellation(source) {
+  const compact = normalizeMathNotation(String(source ?? "")).replace(/\s+/g, "");
+  const slash = compact.indexOf("/");
+  if (slash < 0) return false;
+  const factors = (text) => text.replace(/^\(+|\)+$/g, "").split("*").map((item) => item.replace(/^\(+|\)+$/g, "")).filter(Boolean);
+  const numerator = factors(compact.slice(0, slash));
+  const denominator = factors(compact.slice(slash + 1));
+  return numerator.some((factor) => denominator.includes(factor));
+}
+
+function intervalEndpoint(source) {
+  const value = normalizeMathNotation(String(source ?? "")).trim().toLowerCase().replace(/^\+/, "");
+  if (["inf", "infinity", "oo", "∞"].includes(value)) return Infinity;
+  if (["-inf", "-infinity", "-oo", "-∞"].includes(value)) return -Infinity;
+  const parsed = numericValue(value);
+  if (!Number.isFinite(parsed)) throw new Error("Interval endpoint is not a real constant.");
+  return parsed;
+}
+
+function relationInterval(variableSide, relation, boundary, variableOnLeft) {
+  let operator = relation;
+  if (!variableOnLeft) operator = { "<": ">", "<=": ">=", ">": "<", ">=": "<=" }[relation];
+  if (operator === "<") return { lo: -Infinity, hi: boundary, leftClosed: false, rightClosed: false };
+  if (operator === "<=") return { lo: -Infinity, hi: boundary, leftClosed: false, rightClosed: true };
+  if (operator === ">") return { lo: boundary, hi: Infinity, leftClosed: false, rightClosed: false };
+  return { lo: boundary, hi: Infinity, leftClosed: true, rightClosed: false };
+}
+
+function intersectIntervals(left, right) {
+  const lo = Math.max(left.lo, right.lo);
+  const hi = Math.min(left.hi, right.hi);
+  const leftClosed = (lo === left.lo ? left.leftClosed : right.leftClosed) && (lo !== left.lo || lo !== right.lo || (left.leftClosed && right.leftClosed));
+  const rightClosed = (hi === left.hi ? left.rightClosed : right.rightClosed) && (hi !== left.hi || hi !== right.hi || (left.rightClosed && right.rightClosed));
+  if (lo > hi || (lo === hi && !(leftClosed && rightClosed))) return null;
+  return { lo, hi, leftClosed, rightClosed };
+}
+
+function normalizeIntervals(intervals) {
+  const sorted = intervals.filter(Boolean).sort((a, b) => a.lo - b.lo || Number(b.leftClosed) - Number(a.leftClosed));
+  const merged = [];
+  for (const current of sorted) {
+    const previous = merged.at(-1);
+    const joins = previous && (current.lo < previous.hi || (current.lo === previous.hi && (previous.rightClosed || current.leftClosed)));
+    if (!joins) { merged.push({ ...current }); continue; }
+    if (current.hi > previous.hi) {
+      previous.hi = current.hi;
+      previous.rightClosed = current.rightClosed;
+    } else if (current.hi === previous.hi) previous.rightClosed ||= current.rightClosed;
+  }
+  return merged;
+}
+
+function parseIntervalSet(source, variable = "x") {
+  const text = normalizeMathNotation(String(source ?? "")).replace(/∞/g, "inf").trim();
+  const folded = text.replace(/\s+/g, " ").toLowerCase();
+  if (["", "{}", "∅", "empty", "empty set", "no solution", "no solutions"].includes(folded)) return [];
+  if (["r", "ℝ", "reals", "real numbers", "all reals", "all real numbers"].includes(folded)) return [{ lo: -Infinity, hi: Infinity, leftClosed: false, rightClosed: false }];
+  const unionParts = text.split(/\s*(?:∪|\bU\b|\bor\b)\s*/i).filter(Boolean);
+  const parseOne = (part) => {
+    const interval = part.match(/^\s*([[(])\s*(.+?)\s*,\s*(.+?)\s*([\])])\s*$/);
+    if (interval) {
+      const lo = intervalEndpoint(interval[2]);
+      const hi = intervalEndpoint(interval[3]);
+      const leftClosed = interval[1] === "[";
+      const rightClosed = interval[4] === "]";
+      if ((lo === -Infinity && leftClosed) || (hi === Infinity && rightClosed) || lo > hi || (lo === hi && !(leftClosed && rightClosed))) throw new Error("Invalid interval endpoints.");
+      return [{ lo, hi, leftClosed, rightClosed }];
+    }
+    const notEqual = part.match(new RegExp(`^\\s*${variable}\\s*!=\\s*(.+)$`, "i"));
+    if (notEqual) {
+      const boundary = intervalEndpoint(notEqual[1]);
+      return [{ lo: -Infinity, hi: boundary, leftClosed: false, rightClosed: false }, { lo: boundary, hi: Infinity, leftClosed: false, rightClosed: false }];
+    }
+    const equal = part.match(new RegExp(`^\\s*${variable}\\s*=\\s*(.+)$`, "i"));
+    if (equal) {
+      const boundary = intervalEndpoint(equal[1]);
+      return [{ lo: boundary, hi: boundary, leftClosed: true, rightClosed: true }];
+    }
+    const chained = part.match(new RegExp(`^\\s*(.+?)\\s*(<=|>=|<|>)\\s*${variable}\\s*(<=|>=|<|>)\\s*(.+?)\\s*$`, "i"));
+    if (chained) {
+      const first = relationInterval(variable, chained[2], intervalEndpoint(chained[1]), false);
+      const second = relationInterval(variable, chained[3], intervalEndpoint(chained[4]), true);
+      const result = intersectIntervals(first, second);
+      return result ? [result] : [];
+    }
+    const single = part.match(/^\s*(.+?)\s*(<=|>=|<|>)\s*(.+?)\s*$/);
+    if (single) {
+      const leftIsVariable = single[1].trim().toLowerCase() === variable.toLowerCase();
+      const rightIsVariable = single[3].trim().toLowerCase() === variable.toLowerCase();
+      if (leftIsVariable === rightIsVariable) throw new Error("Inequality must contain the target variable once.");
+      return [relationInterval(variable, single[2], intervalEndpoint(leftIsVariable ? single[3] : single[1]), leftIsVariable)];
+    }
+    throw new Error("Could not parse interval set.");
+  };
+  return normalizeIntervals(unionParts.flatMap(parseOne));
+}
+
+function intervalSetsEquivalent(left, right, variable = "x") {
+  try {
+    const a = parseIntervalSet(left, variable);
+    const b = parseIntervalSet(right, variable);
+    return normalizedIntervalArraysEquivalent(a, b);
+  } catch { return false; }
+}
+
+function normalizedIntervalArraysEquivalent(a, b) {
+  if (a.length !== b.length) return false;
+  const close = (x, y) => x === y || (Number.isFinite(x) && Number.isFinite(y) && Math.abs(x - y) <= 1e-9 * Math.max(1, Math.abs(x), Math.abs(y)));
+  return a.every((interval, index) => {
+    const other = b[index];
+    return close(interval.lo, other.lo) && close(interval.hi, other.hi) && interval.leftClosed === other.leftClosed && interval.rightClosed === other.rightClosed;
+  });
+}
+
+function equationAcceptsCandidate(equation, variable, candidate) {
+  const parsed = parseRelation(equation);
+  const value = numericValue(candidate);
+  if (!parsed || parsed.relation !== "=" || !Number.isFinite(value)) return null;
+  try {
+    const left = evaluateExpression(parsed.leftTokens, { [variable]: value });
+    const right = evaluateExpression(parsed.rightTokens, { [variable]: value });
+    if (!Number.isFinite(left) || !Number.isFinite(right)) return false;
+    return Math.abs(left - right) <= 1e-8 * Math.max(1, Math.abs(left), Math.abs(right));
+  } catch { return false; }
+}
+
+function signChartBoundaryMatches(actual, expected, side) {
+  const source = String(actual ?? "").trim().toLowerCase();
+  if (!Number.isFinite(expected)) {
+    if (!source) return true;
+    return side === "lower" ? ["-inf", "-infinity", "-∞"].includes(source) : ["inf", "+inf", "infinity", "+infinity", "∞", "+∞"].includes(source);
+  }
+  const value = numericValue(source);
+  return Number.isFinite(value) && Math.abs(value - expected) <= 1e-9 * Math.max(1, Math.abs(value), Math.abs(expected));
+}
+
+export function gradeProblem(problem, answer, structuredWork = null) {
   const expected = String(problem.expected_answer ?? "");
   const acceptedForms = [expected, ...(problem.accepted_forms ?? [])].map(String);
   const method = problem.grading_method;
@@ -1654,6 +1897,16 @@ export function gradeProblem(problem, answer) {
   } else if (method === "theorem_conclusion") {
     const accepted = acceptedForms.map(normalizeAnswer);
     correct = accepted.includes(normalizedAnswer);
+  } else if (method === "finite_set") {
+    correct = finiteSetsEquivalent(problem.answer_metadata?.values ?? parseFiniteSetValues(expected), answer, problem.variable ?? problem.answer_metadata?.variable ?? "x");
+  } else if (method === "rational_expression") {
+    const expectedExcluded = problem.answer_metadata?.excluded_values ?? [];
+    const actualExcluded = structuredWork?.excluded_values ?? "";
+    correct = symbolicEquivalent(answer, expected)
+      && finiteSetsEquivalent(expectedExcluded, actualExcluded, problem.variable ?? problem.answer_metadata?.variable ?? "x")
+      && !(problem.grading_metadata?.require_reduced_form && expressionHasObviousCancellation(answer));
+  } else if (method === "interval_set") {
+    correct = intervalSetsEquivalent(expected, answer, problem.variable ?? problem.answer_metadata?.variable ?? "x");
   } else {
     correct = acceptedForms.map(normalizeAnswer).includes(normalizedAnswer);
   }
@@ -1661,11 +1914,98 @@ export function gradeProblem(problem, answer) {
   return { correct, expected, method };
 }
 
-export function validateProceduralWork(problem, work) {
+export function validateProceduralWork(problem, work, structuredWork = null, finalAnswer = "") {
   if (!problem.work_required) return null;
   const lines = String(work ?? "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const minimumSteps = Math.max(1, Number(problem.work?.minimum_steps ?? 1));
   const mode = problem.work?.mode ?? "none";
+  if (mode === "rational_equation_steps") {
+    const data = structuredWork && typeof structuredWork === "object" ? structuredWork : {};
+    const restrictions = Array.isArray(data.restrictions) ? data.restrictions.filter((item) => String(item).trim()) : [];
+    const steps = Array.isArray(data.steps) ? data.steps.filter((item) => String(item).trim()) : String(data.steps ?? "").split(/\r?\n/).filter((item) => item.trim());
+    const candidates = Array.isArray(data.candidates) ? data.candidates : [];
+    const variable = problem.variable ?? problem.work?.target_variable ?? "x";
+    const expectedRestrictions = problem.work?.expected_restrictions ?? [];
+    if (problem.work?.require_restrictions && !restrictions.length) return "List every original denominator restriction.";
+    if (expectedRestrictions.length && !finiteSetsEquivalent(expectedRestrictions, restrictions, variable)) return "The original denominator restriction set is incomplete or contains an extra value.";
+    const minimumSteps = Math.max(1, Number(problem.work?.minimum_steps ?? 1));
+    if (steps.length < minimumSteps) return `Add at least ${minimumSteps} denominator-clearing or solving step(s).`;
+    if (steps.some((step) => parseRelation(step)?.relation !== "=")) return "Enter one valid equation per algebra-step line.";
+    if (!candidates.length) return "Add and classify each candidate solution.";
+    if (candidates.some((item) => !String(item?.value ?? "").trim() || !["valid", "excluded", "extraneous", "repeated", "non_real"].includes(item?.status))) return "Each candidate needs a value and classification.";
+    const expectedValues = problem.answer_metadata?.values ?? parseFiniteSetValues(problem.expected_answer, variable);
+    const seen = [];
+    for (const [index, candidate] of candidates.entries()) {
+      const value = String(candidate.value).trim();
+      const repeated = seen.some((previous) => symbolicEquivalent(previous, value));
+      let expectedStatus;
+      if (repeated) expectedStatus = "repeated";
+      else if (expectedRestrictions.some((restriction) => symbolicEquivalent(String(restriction), value))) expectedStatus = "excluded";
+      else if (expectedValues.some((expected) => symbolicEquivalent(String(expected), value))) expectedStatus = "valid";
+      else {
+        const accepted = equationAcceptsCandidate(problem.work?.original_equation ?? problem.prompt.replace(/^.*?:\s*/, ""), variable, value);
+        expectedStatus = accepted === true ? "valid" : accepted === false ? "extraneous" : /(?:\bi\b|sqrt\s*\(\s*-)/i.test(value) ? "non_real" : "extraneous";
+      }
+      seen.push(value);
+      if (candidate.status !== expectedStatus) return `Candidate row ${index + 1} should be classified as ${expectedStatus.replaceAll("_", "-")}.`;
+    }
+    if (problem.work?.require_original_equation_check && candidates.some((item) => ["valid", "extraneous"].includes(item.status) && !String(item.original_check ?? "").trim())) return "Check every valid or extraneous candidate in the original equation.";
+    const valid = candidates.filter((item) => item.status === "valid").map((item) => item.value);
+    if (!finiteSetsEquivalent(expectedValues, valid, variable)) return "Candidates marked valid do not match the final solution set.";
+    return null;
+  }
+  if (mode === "sign_chart_steps") {
+    const data = structuredWork && typeof structuredWork === "object" ? structuredWork : {};
+    const chart = problem.work?.sign_chart ?? {};
+    const target = problem.work?.target_variable ?? problem.variable ?? "x";
+    const expectedPoints = [...(chart.critical_points ?? [])].sort((left, right) => intervalEndpoint(left.value) - intervalEndpoint(right.value));
+    const points = Array.isArray(data.critical_points) ? data.critical_points : [];
+    const intervals = Array.isArray(data.intervals) ? data.intervals : [];
+    const endpoints = Array.isArray(data.endpoints) ? data.endpoints : [];
+    if (points.length !== expectedPoints.length) return `Enter all ${expectedPoints.length} critical point(s).`;
+    for (const expectedPoint of expectedPoints) {
+      const point = points.find((item) => symbolicEquivalent(String(item?.value ?? ""), String(expectedPoint.value ?? "")));
+      if (!point || point.kind !== expectedPoint.kind) return `Classify critical point ${expectedPoint.value} correctly.`;
+    }
+    if (chart.require_factorization && !symbolicEquivalent(String(data.factorization ?? ""), String(chart.expected_factorization ?? chart.expression ?? ""))) return "Enter an equivalent factorization.";
+    if (chart.require_interval_signs && intervals.length !== expectedPoints.length + 1) return `Complete all ${expectedPoints.length + 1} sign-chart interval rows.`;
+    const expression = chart.reduced_expression || chart.expression;
+    const expressionTokenList = expressionTokens(expression);
+    if (!expressionTokenList) return "The authored sign-chart expression could not be parsed.";
+    const pointValues = expectedPoints.map((point) => intervalEndpoint(point.value));
+    const selectedIntervals = [];
+    for (const [index, row] of intervals.entries()) {
+      const lower = index === 0 ? -Infinity : pointValues[index - 1];
+      const upper = index === pointValues.length ? Infinity : pointValues[index];
+      if (!signChartBoundaryMatches(row?.lower, lower, "lower") || !signChartBoundaryMatches(row?.upper, upper, "upper")) return `The boundaries in interval row ${index + 1} do not match the ordered critical points.`;
+      if (chart.require_test_values && !String(row?.test_value ?? "").trim()) return `Choose a test value for interval row ${index + 1}.`;
+      try {
+        const test = numericValue(row.test_value);
+        if (!Number.isFinite(test) || !(test > lower && test < upper)) return `The test value in interval row ${index + 1} must lie strictly inside that interval.`;
+        const learnerValue = evaluateExpression(expressionTokenList, { [target]: test });
+        if (!Number.isFinite(learnerValue)) return `The expression is undefined at the test value in interval row ${index + 1}.`;
+        const safeTest = !Number.isFinite(lower) && !Number.isFinite(upper) ? 0 : !Number.isFinite(lower) ? upper - 1 : !Number.isFinite(upper) ? lower + 1 : (lower + upper) / 2;
+        const safeValue = evaluateExpression(expressionTokenList, { [target]: safeTest });
+        const expectedSign = safeValue > 0 ? "positive" : safeValue < 0 ? "negative" : "zero";
+        const learnerSign = learnerValue > 0 ? "positive" : learnerValue < 0 ? "negative" : "zero";
+        if (learnerSign !== expectedSign || row.sign !== expectedSign) return `The sign in interval row ${index + 1} is ${expectedSign}.`;
+        const selected = [">", ">="].includes(chart.relation) ? expectedSign === "positive" : expectedSign === "negative";
+        if (Boolean(row.selected) !== selected) return `The selection in interval row ${index + 1} does not match ${chart.relation}.`;
+        if (selected) selectedIntervals.push({ lo: lower, hi: upper, leftClosed: false, rightClosed: false });
+      } catch { return `The test value in interval row ${index + 1} could not be evaluated.`; }
+    }
+    if (chart.require_endpoint_decisions) {
+      for (const point of expectedPoints) {
+        const endpoint = endpoints.find((item) => symbolicEquivalent(String(item?.value ?? ""), String(point.value ?? "")));
+        const shouldInclude = point.kind === "zero" && [">=", "<="].includes(chart.relation);
+        if (!endpoint || Boolean(endpoint.included) !== shouldInclude) return `Fix the endpoint decision for ${point.value}.`;
+        if (shouldInclude) selectedIntervals.push({ lo: intervalEndpoint(point.value), hi: intervalEndpoint(point.value), leftClosed: true, rightClosed: true });
+      }
+    }
+    if (!normalizedIntervalArraysEquivalent(normalizeIntervals(selectedIntervals), parseIntervalSet(problem.expected_answer, target))) return "The selected intervals and endpoint decisions do not form the authored solution set.";
+    if (chart.require_final_answer_match && !intervalSetsEquivalent(problem.expected_answer, finalAnswer, target)) return "The final interval answer does not match the completed sign chart.";
+    return null;
+  }
   if (mode === "capture_only" && !lines.length) return "Add your reasoning or notes before submitting.";
   if (mode === "proof_obligations") {
     if (!lines.length || lines.join(" ").length < 20) return "Write a proof that addresses the listed obligations before submitting.";
@@ -2695,7 +3035,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         skillId,
         startedAt: isoNow(),
         problems: clone(problems),
-        responses: Object.fromEntries(problems.map((problem) => [problem.template_id, { finalAnswer: "", work: "" }])),
+        responses: Object.fromEntries(problems.map((problem) => [problem.template_id, { finalAnswer: "", work: "", structuredWorkJson: null }])),
       };
     }
     state.ui.selectedSkillId = skillId;
@@ -2706,10 +3046,10 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return clone(state.drafts[profileId][skillId]);
   };
 
-  const updateResponse = (questionId, { finalAnswer, work }) => {
+  const updateResponse = (questionId, { finalAnswer, work, structuredWorkJson = null }) => {
     const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
     if (!draft || !draft.responses[questionId]) throw new Error("Question is not in the active test.");
-    draft.responses[questionId] = { finalAnswer: cleanText(finalAnswer, 300), work: cleanText(work, 5000) };
+    draft.responses[questionId] = { finalAnswer: cleanText(finalAnswer, 300), work: cleanText(work, 5000), structuredWorkJson: sanitizeStructuredWork(structuredWorkJson) };
     persist();
   };
 
@@ -2718,17 +3058,18 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!draft) throw new Error("No active test.");
     const workIssues = draft.problems.map((problem) => ({
       questionId: problem.template_id,
-      message: validateProceduralWork(problem, draft.responses[problem.template_id]?.work),
+      message: validateProceduralWork(problem, draft.responses[problem.template_id]?.work, draft.responses[problem.template_id]?.structuredWorkJson, draft.responses[problem.template_id]?.finalAnswer),
     })).filter((issue) => issue.message);
     if (workIssues.length) return { ok: false, missingWork: workIssues.map((issue) => issue.questionId), workIssues };
     const results = draft.problems.map((problem) => {
       const response = draft.responses[problem.template_id] ?? { finalAnswer: "", work: "" };
-      const grade = gradeProblem(problem, response.finalAnswer);
+      const grade = gradeProblem(problem, response.finalAnswer, response.structuredWorkJson);
       return {
         questionId: problem.template_id,
         prompt: problem.prompt,
         finalAnswer: response.finalAnswer,
         work: response.work,
+        structuredWorkJson: clone(response.structuredWorkJson),
         expectedAnswer: grade.expected,
         correct: grade.correct,
         gradingMethod: grade.method,
@@ -2932,8 +3273,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!item) throw new Error("question_id is not in the visible test or saved attempt.");
     const saved = Boolean(attempt);
     const questionKey = item.template_id ?? item.questionId;
-    const response = saved ? { finalAnswer: item.finalAnswer, work: item.work } : draft.responses[questionKey] ?? { finalAnswer: "", work: "" };
-    const correct = saved ? item.correct : response.finalAnswer ? gradeProblem(item, response.finalAnswer).correct : false;
+    const response = saved ? { finalAnswer: item.finalAnswer, work: item.work, structuredWorkJson: item.structuredWorkJson } : draft.responses[questionKey] ?? { finalAnswer: "", work: "", structuredWorkJson: null };
+    const correct = saved ? item.correct : response.finalAnswer ? gradeProblem(item, response.finalAnswer, response.structuredWorkJson).correct : false;
     const mode = saved ? item.workMode : item.work?.mode ?? "none";
     const proofObligations = saved ? item.proofObligations : (item.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation);
     const rubricCriteria = saved ? item.rubricCriteria : (item.work?.rubric?.criteria ?? []).map(normalizeReviewCriterion);
@@ -2947,9 +3288,10 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       prompt: item.prompt,
       final_answer: response.finalAnswer,
       work: response.work,
+      structured_work_json: clone(response.structuredWorkJson),
       work_lines: response.work.split(/\r?\n/).map((line) => line.trim()).filter(Boolean),
       final_answer_status: response.finalAnswer ? (correct ? "correct" : "incorrect") : "missing",
-      work_status: response.work ? (latest ? latest.verdict : "pending_review") : (saved ? item.workRequired : item.work_required) ? "missing" : "not_required",
+      work_status: response.work || response.structuredWorkJson ? (latest ? latest.verdict : ["rational_equation_steps", "sign_chart_steps"].includes(mode) ? "auto_checked" : "pending_review") : (saved ? item.workRequired : item.work_required) ? "missing" : "not_required",
       review_guide: {
         mode,
         proof_obligations: clone(proofObligations),

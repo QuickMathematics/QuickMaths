@@ -57,6 +57,10 @@ function changeWorkMode(studio, value) {
   });
 }
 
+function changeProblemField(studio, field, value, { type = "text", checked = false } = {}) {
+  return studio.handleInput({ value, type, checked, dataset: { creatorField: `problem.${field}`, index: "0" }, matches() { return false; } });
+}
+
 test("Lesson Studio explains proof syntax and builds a required reviewed proof", () => {
   const { studio, state } = studioHarness();
   assert.equal(changeWorkMode(studio, "proof_obligations"), true);
@@ -109,6 +113,39 @@ test("advanced authoring examples populate readable proof and rubric guidance", 
   assert.match(html, /response will be reviewed for/i);
   assert.equal(problem.work.rubric.criteria.length, 5);
   assert.equal(problem.review_policy.mastery_requires_review_pass, true);
+});
+
+test("Lesson Studio authors rational-equation and sign-chart contracts without raw JSON", () => {
+  const { studio, state } = studioHarness();
+  changeProblemField(studio, "gradingMethod", "finite_set");
+  changeProblemField(studio, "answerValues", "-2\n5");
+  changeWorkMode(studio, "rational_equation_steps");
+  changeProblemField(studio, "originalEquation", "(x - 5)/(x + 2) = 0");
+  changeProblemField(studio, "expectedRestrictions", "-2");
+  let problem = studio.buildPack().skills[0].problems[0];
+  assert.equal(problem.grading_method, "finite_set");
+  assert.deepEqual(problem.answer_metadata.values, ["-2", "5"]);
+  assert.equal(problem.work.mode, "rational_equation_steps");
+  assert.equal(problem.work.require_restrictions, true);
+  assert.equal(problem.work.require_original_equation_check, true);
+  assert.equal(problem.work.original_equation, "(x - 5)/(x + 2) = 0");
+  assert.deepEqual(problem.work.expected_restrictions, ["-2"]);
+  assert.equal(problem.review_policy.work_review, "auto");
+  assert.match(studio.render(state), /learner sees a form, not JSON/i);
+
+  changeProblemField(studio, "gradingMethod", "interval_set");
+  changeProblemField(studio, "expectedAnswer", "(-inf, 2] U (5, inf)");
+  changeWorkMode(studio, "sign_chart_steps");
+  changeProblemField(studio, "signExpressionKind", "rational");
+  changeProblemField(studio, "signExpression", "(x - 2)\/(x - 5)");
+  changeProblemField(studio, "signRelation", ">=");
+  changeProblemField(studio, "criticalPoints", "2 | zero | 1 | x - 2\n5 | undefined | 1 | x - 5");
+  problem = studio.buildPack().skills[0].problems[0];
+  assert.equal(problem.grading_method, "interval_set");
+  assert.equal(problem.work.mode, "sign_chart_steps");
+  assert.equal(problem.work.sign_chart.expression_kind, "rational");
+  assert.deepEqual(problem.work.sign_chart.critical_points.map(({ value, kind }) => ({ value, kind })), [{ value: "2", kind: "zero" }, { value: "5", kind: "undefined" }]);
+  assert.match(studio.render(state), /value \| kind \| multiplicity \| factor/);
 });
 
 test("Lesson Studio opens native lessons as reversible overrides without changing identity", () => {

@@ -1,0 +1,590 @@
+id: MATH_RAT_003
+schema_version: 0.2
+name: Adding and subtracting rational expressions
+domain: Math
+subdomain: Rational Expressions and Equations
+description: Find least common denominators, combine rational expressions, simplify the result, and preserve
+  restrictions from every original denominator.
+prerequisites:
+- MATH_RAT_002
+tags:
+- rational_expressions
+- adding_rational_expressions
+- subtracting_rational_expressions
+- least_common_denominator
+- common_denominator
+- factoring
+- domain_restrictions
+- combined_rates
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Rational expressions can be added or subtracted only after they have a common denominator.
+
+  Same denominator:
+  When denominators are already the same, combine the numerators and keep the denominator.
+
+  Example:
+
+  3/(x + 4) + 5/(x + 4)
+  = 8/(x + 4), with x ≠ -4
+
+  Subtraction example:
+
+  7/(x - 2) - 3/(x - 2)
+  = 4/(x - 2), with x ≠ 2
+
+  Different denominators:
+  Use the least common denominator, or LCD.
+
+  Example:
+
+  2/x + 3/(x + 5)
+
+  The LCD is x(x + 5).
+
+  2/x = 2(x + 5)/[x(x + 5)]
+
+  3/(x + 5) = 3x/[x(x + 5)]
+
+  Therefore:
+
+  2/x + 3/(x + 5)
+  = [2(x + 5) + 3x]/[x(x + 5)]
+  = (5x + 10)/[x(x + 5)]
+
+  Restrictions:
+  x ≠ 0 and x ≠ -5
+
+  Factoring the LCD:
+  Factor every denominator first. The LCD contains each distinct factor at the greatest power needed.
+
+  Example:
+  The denominators x - 3 and x^2 - 9 factor as:
+
+  x - 3
+
+  (x - 3)(x + 3)
+
+  The LCD is x^2 - 9 because it already contains both factors.
+
+  Subtracting carefully:
+  A subtraction sign applies to the entire second numerator.
+
+  Example:
+
+  1/(x - a) - 1/(x + a)
+  = [(x + a) - (x - a)]/[(x - a)(x + a)]
+  = 2a/(x^2 - a^2)
+
+  The parentheses prevent a sign mistake.
+
+  Simplify after combining:
+  Sometimes the combined numerator shares a factor with the denominator.
+
+  Example:
+
+  x/(x + 6) + 6/(x + 6)
+  = (x + 6)/(x + 6)
+  = 1, with x ≠ -6
+
+  The original restriction remains even though the final formula is 1.
+
+  Combined rates:
+  If one machine completes 1/a of a job per hour and another completes 1/b, their combined rate is:
+
+  1/a + 1/b
+
+  Adding rates uses the same common-denominator reasoning as algebraic rational expressions.
+
+  Method:
+  1. Record all original restrictions.
+  2. Factor denominators.
+  3. Find the LCD.
+  4. Rewrite every fraction with the LCD.
+  5. Combine the numerators using parentheses where needed.
+  6. Simplify the numerator.
+  7. Factor and cancel only after combining.
+  8. Keep every original restriction.
+
+  Common mistake:
+  Do not add denominators. In general, a/b + c/d is not (a + c)/(b + d).
+
+  Another common mistake:
+  When subtracting, distribute the negative sign across the entire second numerator.
+
+  Another common mistake:
+  Do not forget restrictions from a denominator that later cancels.
+examples:
+- prompt: Add 3/(x + 4) + 5/(x + 4).
+  solution: 8/(x + 4), with x ≠ -4
+  explanation: The denominators match, so add the numerators.
+- prompt: Subtract 9/(x - 2) - 4/(x - 2).
+  solution: 5/(x - 2), with x ≠ 2
+  explanation: Keep the common denominator and subtract the numerators.
+- prompt: Find the LCD of 1/x and 1/(x + 5).
+  solution: x(x + 5)
+  explanation: The denominator factors are different, so the LCD needs both.
+- prompt: Add 2/x + 3/(x + 5).
+  solution: (5x + 10)/[x(x + 5)]
+  explanation: Rewrite both fractions over x(x + 5), then combine numerators.
+- prompt: Subtract 1/(x - 3) - 1/(x + 3).
+  solution: 6/(x^2 - 9)
+  explanation: The combined numerator is (x + 3) - (x - 3) = 6.
+- prompt: Simplify x/(x + 6) + 6/(x + 6).
+  solution: 1, with x ≠ -6
+  explanation: The combined numerator equals the denominator, but the original restriction remains.
+- prompt: Find the LCD of x - 4 and x^2 - 16.
+  solution: x^2 - 16
+  explanation: x^2 - 16 already contains factors x - 4 and x + 4.
+- prompt: Two machines complete 1/6 and 1/3 of a job per hour. Find their combined rate.
+  solution: 1/2 job per hour
+  explanation: 1/6 + 1/3 = 1/6 + 2/6 = 3/6 = 1/2.
+applications:
+- title: Combined work
+  description: Work rates add when people or machines operate at the same time.
+- title: Electrical networks
+  description: Parallel-resistance formulas combine reciprocals using common denominators.
+- title: Mixtures and averages
+  description: Weighted rates and concentrations often lead to sums of rational expressions.
+- title: Algebraic formulas
+  description: Combining separate fractional terms can reveal a simpler single formula.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: RAT_ADD_SAME_DENOMINATOR_001
+    type: generated
+    prompt_template: Simplify {a}/(x + {b}) + {c}/(x + {b}) and keep the restriction.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+      b:
+        type: int
+        min: 2
+        max: 12
+      c:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      sum_value: a + c
+    options:
+    - id: A
+      label: '{sum_value}/(x + {b}), with x ≠ {-b}'
+    - id: B
+      label: '{sum_value}/(2x + {2 * b}), with x ≠ {-b}'
+    - id: C
+      label: '{a + c}/(x + {2 * b}), with x ≠ {-b}'
+    - id: D
+      label: ({a}x + {c})/(x + {b}), with x ≠ {-b}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Because the denominators match, combine only the numerators and retain the denominator restriction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The denominators are already equal.
+      Add the numerators: {a} + {c} = {sum_value}.
+      The result is {sum_value}/(x + {b}), with x ≠ {-b}.
+    mistake_tags:
+    - common_denominator_error
+    - adding_denominators
+    - domain_restriction_error
+    difficulty: easy
+  - id: RAT_SUBTRACT_SAME_DENOMINATOR_001
+    type: generated
+    prompt_template: Simplify {a}/(x - {b}) - {c}/(x - {b}) and keep the restriction.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      a:
+        type: int
+        min: 5
+        max: 18
+      b:
+        type: int
+        min: 2
+        max: 12
+      c:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      difference: a - c
+    constraints:
+    - a > c
+    - difference != 1
+    options:
+    - id: A
+      label: '{a + c}/(x - {b}), with x ≠ {b}'
+    - id: B
+      label: '{difference}/(x - {b}), with x ≠ {b}'
+    - id: C
+      label: '{difference}/(2x - {2 * b}), with x ≠ {b}'
+    - id: D
+      label: '{difference}/(x + {b}), with x ≠ {-b}'
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Subtract the numerators while keeping the common denominator unchanged.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The denominators match.
+      Subtract the numerators: {a} - {c} = {difference}.
+      The result is {difference}/(x - {b}), with x ≠ {b}.
+    mistake_tags:
+    - common_denominator_error
+    - subtraction_error
+    - domain_restriction_error
+    difficulty: easy
+  - id: RAT_ADD_LINEAR_DENOMINATORS_001
+    type: generated
+    prompt_template: Simplify {a}/x + {b}/(x + {c}) and keep all restrictions.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 9
+      b:
+        type: int
+        min: 2
+        max: 9
+      c:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      x_coeff: a + b
+      constant: a * c
+    options:
+    - id: A
+      label: ({x_coeff}x + {constant})/(2x + {c}), with x ≠ 0 and x ≠ {-c}
+    - id: B
+      label: ({a + b})/[x(x + {c})], with x ≠ 0 and x ≠ {-c}
+    - id: C
+      label: ({x_coeff}x + {constant})/[x(x + {c})], with x ≠ 0 and x ≠ {-c}
+    - id: D
+      label: ({a}x + {b})/[x(x + {c})], with x ≠ 0 and x ≠ {-c}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Use the product of the two denominator factors as the LCD, rewrite both fractions, and combine the
+        expanded numerator.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The LCD is x(x + {c}).
+      Rewrite the numerator as {a}(x + {c}) + {b}x.
+      This simplifies to {x_coeff}x + {constant}.
+      The restrictions are x ≠ 0 and x ≠ {-c}.
+    mistake_tags:
+    - least_common_denominator
+    - numerator_distribution
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_SUBTRACT_SYMMETRIC_DENOMINATORS_001
+    type: generated
+    prompt_template: Simplify {a}/(x - {c}) - {a}/(x + {c}) and keep all restrictions.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 9
+      c:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      numerator: 2 * a * c
+      square: c * c
+    options:
+    - id: A
+      label: '{2 * a}x/(x^2 - {square}), with x ≠ {c} and x ≠ {-c}'
+    - id: B
+      label: 0, with x ≠ {c} and x ≠ {-c}
+    - id: C
+      label: (-{numerator})/(x^2 - {square}), with x ≠ {c} and x ≠ {-c}
+    - id: D
+      label: '{numerator}/(x^2 - {square}), with x ≠ {c} and x ≠ {-c}'
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Use parentheses around the entire second numerator when subtracting over the LCD.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The LCD is (x - {c})(x + {c}) = x^2 - {square}.
+      The combined numerator is {a}(x + {c}) - {a}(x - {c}).
+      The x-terms cancel and the numerator becomes {numerator}.
+      Exclude x = {c} and x = {-c}.
+    mistake_tags:
+    - least_common_denominator
+    - subtraction_distribution
+    - difference_of_squares
+    difficulty: hard
+  - id: RAT_ADD_COLLAPSES_TO_ONE_001
+    type: generated
+    prompt_template: Simplify x/(x + {a}) + {a}/(x + {a}) and keep the restriction.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 15
+    options:
+    - id: A
+      label: 1, with x ≠ {-a}
+    - id: B
+      label: 1, with no restrictions
+    - id: C
+      label: x + {a}, with x ≠ {-a}
+    - id: D
+      label: 2x/(x + {a}), with x ≠ {-a}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Combine the numerators, then simplify the resulting common factor without losing the restriction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The combined numerator is x + {a}, which matches the denominator.
+      The expression simplifies to 1.
+      The original denominator is zero at x = {-a}, so that value remains excluded.
+    mistake_tags:
+    - common_denominator_error
+    - canceled_factor
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_SUBTRACT_COLLAPSES_TO_ONE_001
+    type: generated
+    prompt_template: Simplify x/(x - {a}) - {a}/(x - {a}) and keep the restriction.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 15
+    options:
+    - id: A
+      label: 1, with no restrictions
+    - id: B
+      label: 1, with x ≠ {a}
+    - id: C
+      label: (x + {a})/(x - {a}), with x ≠ {a}
+    - id: D
+      label: 0, with x ≠ {a}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Combine the numerators first, then cancel the common factor and retain the original restriction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The combined numerator is x - {a}.
+      It cancels with the denominator, leaving 1.
+      The original restriction is x ≠ {a}.
+    mistake_tags:
+    - subtraction_error
+    - canceled_factor
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_IDENTIFY_LCD_LINEAR_FACTORS_001
+    type: generated
+    prompt_template: What is the least common denominator of 1/x and 1/(x + {a})?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 15
+    options:
+    - id: A
+      label: x + {a}
+    - id: B
+      label: 2x + {a}
+    - id: C
+      label: x(x + {a})
+    - id: D
+      label: x^2 + {a}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The denominators contain distinct factors x and x + {a}.
+      The LCD needs both factors: x(x + {a}).
+    mistake_tags:
+    - least_common_denominator
+    - adding_denominators
+    - factoring_error
+    difficulty: easy
+  - id: RAT_IDENTIFY_LCD_CONTAINED_FACTOR_001
+    type: generated
+    prompt_template: What is the least common denominator of 1/(x - {a}) and 1/(x^2 - {square})?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      square: a * a
+    options:
+    - id: A
+      label: 2x - {a}
+    - id: B
+      label: (x - {a})(x^2 - {square})
+    - id: C
+      label: x + {a}
+    - id: D
+      label: x^2 - {square}
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Factor x^2 - {square} as (x - {a})(x + {a}).
+      It already contains the factor x - {a}.
+      Therefore the LCD is x^2 - {square}.
+    mistake_tags:
+    - least_common_denominator
+    - difference_of_squares
+    - overcounted_factor
+    difficulty: medium
+  - id: RAT_ADD_POLYNOMIAL_NUMERATORS_001
+    type: generated
+    prompt_template: Simplify x^2/(x + {b}) + ({c}x + {d})/(x + {b}) and keep the restriction.
+    answer_mode: final_plus_required_work
+    variables:
+      b:
+        type: int
+        min: 2
+        max: 12
+      c:
+        type: int
+        min: 2
+        max: 9
+      d:
+        type: int
+        min: 2
+        max: 15
+    options:
+    - id: A
+      label: (x^2 + {c}x + {d})/(x + {b}), with x ≠ {-b}
+    - id: B
+      label: (x^2 + {c}x + {d})/(2x + {2 * b}), with x ≠ {-b}
+    - id: C
+      label: (x^2 + {c + d}x)/(x + {b}), with x ≠ {-b}
+    - id: D
+      label: (x^2 + {c}x + {d})/(x + {2 * b}), with x ≠ {-b}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: The denominators already match; combine the entire polynomial numerators term by term.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Keep the common denominator x + {b}.
+      Add the numerators: x^2 + ({c}x + {d}) = x^2 + {c}x + {d}.
+      The restriction is x ≠ {-b}.
+    mistake_tags:
+    - polynomial_addition
+    - common_denominator_error
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_COMBINED_WORK_RATE_001
+    type: generated
+    prompt_template: One machine completes 1/{time_a} of a job per hour and another completes 1/{time_b}. What fraction
+      of the job do they complete together in one hour?
+    answer_mode: final_plus_required_work
+    variables:
+      k:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      time_a: 3 * k
+      time_b: 6 * k
+      combined_denominator: 2 * k
+    answer:
+      type: numeric
+      value: 1/{combined_denominator}
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Add the two fractional rates using a common denominator, then simplify the combined rate.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The combined rate is 1/{time_a} + 1/{time_b}.
+      Using denominator {time_b}, the sum is 2/{time_b} + 1/{time_b} = 3/{time_b}.
+      This simplifies to 1/{combined_denominator} of the job per hour.
+    mistake_tags:
+    - combined_rate
+    - least_common_denominator
+    - fraction_addition
+    difficulty: hard

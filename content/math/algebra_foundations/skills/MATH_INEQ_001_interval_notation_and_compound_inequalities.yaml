@@ -1,0 +1,593 @@
+id: MATH_INEQ_001
+schema_version: 0.2
+name: Interval notation and compound inequalities
+domain: Math
+subdomain: Inequalities and Solution Sets
+description: Represent real solution sets with interval notation and solve compound and absolute-value inequalities involving
+  unions, intersections, empty sets, and all real numbers.
+prerequisites:
+- MATH_ALG_007
+- MATH_ALG_008
+tags:
+- inequalities
+- interval_notation
+- compound_inequalities
+- unions
+- intersections
+- number_lines
+- absolute_value_inequalities
+- solution_sets
+unlocks:
+- MATH_INEQ_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  An inequality solution is a set of real numbers. Interval notation is a compact way to write that set.
+
+  Endpoint symbols:
+  - Use a parenthesis when an endpoint is not included.
+  - Use a bracket when a finite endpoint is included.
+  - Infinity is never an included endpoint, so always use a parenthesis beside -inf or inf.
+
+  Examples:
+  - x < 4 becomes (-inf, 4).
+  - x >= -2 becomes [-2, inf).
+  - -3 < x <= 5 becomes (-3, 5].
+
+  Union means OR:
+  A union combines values from either set.
+
+  x <= -1 or x > 4
+
+  becomes:
+
+  (-inf, -1] U (4, inf)
+
+  Intersection means AND:
+  An intersection keeps only values that satisfy both conditions.
+
+  x > -2 and x <= 6
+
+  becomes:
+
+  (-2, 6]
+
+  Empty and universal solution sets:
+  - If no real number satisfies every required condition, the solution set is empty.
+  - If every real number satisfies the condition, write (-inf, inf).
+
+  Solving compound inequalities:
+  Treat a three-part inequality as one balanced statement. Perform the same operation on all three parts.
+
+  Example:
+
+  -5 < 2x + 1 <= 9
+
+  Subtract 1 everywhere:
+
+  -6 < 2x <= 8
+
+  Divide every part by 2:
+
+  -3 < x <= 4
+
+  The interval is (-3, 4].
+
+  Negative coefficients:
+  When dividing every part of a compound inequality by a negative number, reverse both inequality signs and reorder the final statement so the smaller endpoint comes first.
+
+  Absolute value inequalities:
+  Absolute value describes distance.
+
+  |x - c| <= r
+
+  means x is at most r units from c, so the solution is the inside interval:
+
+  [c - r, c + r]
+
+  |x - c| > r
+
+  means x is more than r units from c, so the solution is outside:
+
+  (-inf, c - r) U (c + r, inf)
+
+  Method:
+  1. Solve each inequality or all parts of the compound inequality.
+  2. Decide whether the condition is AND or OR.
+  3. Mark each endpoint open or closed.
+  4. Write intervals from left to right.
+  5. Join separate pieces with U.
+  6. Check infinities use parentheses.
+  7. Check whether the result is empty or all real numbers.
+
+  Common mistake:
+  Do not use a bracket next to infinity. Infinity is a direction, not a reachable endpoint.
+
+  Another common mistake:
+  Do not confuse AND with OR. AND usually produces overlap; OR usually combines separate regions.
+
+  Another common mistake:
+  A strict inequality excludes its boundary. x < 3 uses a parenthesis at 3, while x <= 3 uses a bracket.
+examples:
+- prompt: Write x < 7 in interval notation.
+  solution: (-inf, 7)
+  explanation: Values extend left forever and 7 is excluded.
+- prompt: Write x >= -4 in interval notation.
+  solution: '[-4, inf)'
+  explanation: -4 is included and the set extends right forever.
+- prompt: Write -2 < x <= 5 in interval notation.
+  solution: (-2, 5]
+  explanation: -2 is open because the inequality is strict; 5 is closed.
+- prompt: Write x <= 1 or x > 6 in interval notation.
+  solution: (-inf, 1] U (6, inf)
+  explanation: OR combines the left and right rays.
+- prompt: Solve -5 < 2x + 1 <= 9.
+  solution: (-3, 4]
+  explanation: Subtract 1 from all parts, then divide all parts by 2.
+- prompt: Solve |x - 3| <= 5.
+  solution: '[-2, 8]'
+  explanation: The values are at most 5 units from 3.
+- prompt: Solve |x + 1| > 4.
+  solution: (-inf, -5) U (3, inf)
+  explanation: The values lie more than 4 units from -1.
+- prompt: Solve x > 8 and x < 2.
+  solution: empty set
+  explanation: No real number can satisfy both conditions.
+applications:
+- title: Measurement tolerances
+  description: Intervals describe acceptable ranges and maximum allowed error.
+- title: Programming conditions
+  description: AND and OR conditions define which numerical inputs are accepted.
+- title: Domain and range
+  description: Functions often use intervals to describe allowed inputs and possible outputs.
+- title: Optimization constraints
+  description: Feasible values are commonly intersections or unions of inequality solution sets.
+test:
+  question_count: 12
+  randomize_order: true
+  questions:
+  - id: INTERVAL_SINGLE_LESS_THAN_001
+    type: generated
+    prompt_template: Write the solution set x < {a} in interval notation.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -15
+        max: 15
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a})
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The inequality is strict, so {a} is not included.
+      The set extends without bound to the left.
+      The interval is (-inf, {a}).
+    mistake_tags:
+    - interval_notation
+    - open_endpoint_error
+    - infinity_parenthesis_error
+    difficulty: easy
+  - id: INTERVAL_SINGLE_GREATER_EQUAL_001
+    type: generated
+    prompt_template: Write the solution set x >= {a} in interval notation.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -15
+        max: 15
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{a}, inf)'
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The endpoint {a} is included because the inequality uses >=.
+      The set extends without bound to the right.
+      The interval is [{a}, inf).
+    mistake_tags:
+    - interval_notation
+    - closed_endpoint_error
+    - infinity_parenthesis_error
+    difficulty: easy
+  - id: INTERVAL_BOUNDED_MIXED_ENDPOINTS_001
+    type: generated
+    prompt_template: Write the solution set {a} < x <= {b} in interval notation.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -12
+        max: 5
+      gap:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: ({a}, {b}]
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The boundary {a} is excluded, so use a parenthesis there.
+      The boundary {b} is included, so use a bracket there.
+      The interval is ({a}, {b}].
+    mistake_tags:
+    - interval_notation
+    - endpoint_inclusion_error
+    - endpoint_order_error
+    difficulty: easy
+  - id: INTERVAL_UNION_TWO_RAYS_001
+    type: generated
+    prompt_template: Write the solution set x <= {a} or x > {b} in interval notation.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -12
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a}] U ({b}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The word or means take the union of the two rays.
+      x <= {a} gives (-inf, {a}].
+      x > {b} gives ({b}, inf).
+      Together: (-inf, {a}] U ({b}, inf).
+    mistake_tags:
+    - interval_notation
+    - union_error
+    - endpoint_inclusion_error
+    difficulty: medium
+  - id: INTERVAL_NUMBER_LINE_DESCRIPTION_001
+    type: generated
+    prompt_template: A number line is shaded from {a} to {b}, with a closed point at {a} and an open point at {b}. Write
+      the set in interval notation.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -12
+        max: 5
+      gap:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{a}, {b})'
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A closed point includes {a}, so use a bracket.
+      An open point excludes {b}, so use a parenthesis.
+      The interval is [{a}, {b}).
+    mistake_tags:
+    - number_line_error
+    - interval_notation
+    - endpoint_inclusion_error
+    difficulty: medium
+  - id: COMPOUND_POSITIVE_COEFFICIENT_001
+    type: generated
+    max_attempts: 300
+    prompt_template: 'Solve and write the answer in interval notation: {low_value} < {coefficient}x + {offset} <= {high_value}'
+    answer_mode: final_plus_required_work
+    variables:
+      lower:
+        type: int
+        min: -8
+        max: 3
+      gap:
+        type: int
+        min: 2
+        max: 7
+      coefficient:
+        type: int
+        min: 2
+        max: 6
+      offset:
+        type: int
+        min: -9
+        max: 9
+    derived:
+      upper: lower + gap
+      low_value: coefficient * lower + offset
+      high_value: coefficient * upper + offset
+    answer:
+      type: interval_set
+      variable: x
+      value: ({lower}, {upper}]
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: Apply each inverse operation to all three parts, then explain which endpoints are included.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Subtract {offset} from all three parts.
+      Then divide all three parts by positive {coefficient}, so the signs keep their directions.
+      The result is {lower} < x <= {upper}.
+      The interval is ({lower}, {upper}].
+    mistake_tags:
+    - compound_inequality_error
+    - inverse_operations
+    - endpoint_inclusion_error
+    - interval_notation
+    difficulty: medium
+  - id: COMPOUND_NEGATIVE_COEFFICIENT_001
+    type: generated
+    max_attempts: 300
+    prompt_template: 'Solve and write the answer in interval notation: {low_value} < {coefficient}x + {offset} <= {high_value}'
+    answer_mode: final_plus_required_work
+    variables:
+      lower:
+        type: int
+        min: -8
+        max: 3
+      gap:
+        type: int
+        min: 2
+        max: 7
+      magnitude:
+        type: int
+        min: 2
+        max: 6
+      offset:
+        type: int
+        min: -9
+        max: 9
+    derived:
+      upper: lower + gap
+      coefficient: 0 - magnitude
+      low_value: coefficient * upper + offset
+      high_value: coefficient * lower + offset
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{lower}, {upper})'
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: Apply each inverse operation to all three parts. When dividing by the negative coefficient, reverse both inequality
+        signs and reorder the final statement.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Remove the constant term from all three parts.
+      Divide all three parts by negative {coefficient}, reversing both inequality signs.
+      After writing the smaller endpoint first, the result is {lower} <= x < {upper}.
+      The interval is [{lower}, {upper}).
+    mistake_tags:
+    - compound_inequality_error
+    - sign_reversal
+    - endpoint_order_error
+    - interval_notation
+    difficulty: hard
+  - id: INTERVAL_INTERSECTION_CONSTRAINTS_001
+    type: generated
+    prompt_template: 'Find the intersection and write it in interval notation: x > {a} and x <= {b}'
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -12
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: ({a}, {b}]
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      AND means keep only the overlap.
+      The values must be greater than {a} and at most {b}.
+      The intersection is ({a}, {b}].
+    mistake_tags:
+    - intersection_error
+    - compound_inequality_error
+    - endpoint_inclusion_error
+    difficulty: medium
+  - id: INTERVAL_EMPTY_INTERSECTION_001
+    type: generated
+    prompt_template: 'Solve over the real numbers and write the result in interval notation: x > {b} and x < {a}'
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 5
+      gap:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: empty set
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The conditions require x to be greater than {b} and less than {a}.
+      Because {b} is greater than {a}, no real number satisfies both.
+      The solution set is empty.
+    mistake_tags:
+    - empty_set_error
+    - intersection_error
+    - endpoint_order_error
+    difficulty: medium
+  - id: INTERVAL_ALL_REAL_UNION_001
+    type: generated
+    prompt_template: 'Solve over the real numbers and write the result in interval notation: x < {a} or x >= {a}'
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -15
+        max: 15
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Every real number is either less than {a} or at least {a}.
+      The two rays cover the entire real line.
+      The solution is (-inf, inf).
+    mistake_tags:
+    - all_real_numbers_error
+    - union_error
+    - interval_notation
+    difficulty: medium
+  - id: ABSOLUTE_VALUE_INSIDE_INTERVAL_001
+    type: generated
+    prompt_template: 'Solve and write the answer in interval notation: |x - ({center})| <= {radius}'
+    answer_mode: final_plus_required_work
+    variables:
+      center:
+        type: int
+        min: -10
+        max: 10
+      radius:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      lower: center - radius
+      upper: center + radius
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{lower}, {upper}]'
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: Interpret the absolute value as distance, write the equivalent compound inequality, and identify both included
+        endpoints.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The inequality means x is at most {radius} units from {center}.
+      Therefore {lower} <= x <= {upper}.
+      Both boundaries are included, so the interval is [{lower}, {upper}].
+    mistake_tags:
+    - absolute_value_inequality
+    - distance_error
+    - endpoint_inclusion_error
+    - interval_notation
+    difficulty: hard
+  - id: ABSOLUTE_VALUE_OUTSIDE_INTERVAL_001
+    type: generated
+    prompt_template: 'Solve and write the answer in interval notation: |x - ({center})| > {radius}'
+    answer_mode: final_plus_required_work
+    variables:
+      center:
+        type: int
+        min: -10
+        max: 10
+      radius:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      lower: center - radius
+      upper: center + radius
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {lower}) U ({upper}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: Interpret the absolute value as distance, write the two outside inequalities, and join their intervals with
+        a union.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The inequality means x is more than {radius} units from {center}.
+      Therefore x < {lower} or x > {upper}.
+      Both boundaries are excluded, so the solution is (-inf, {lower}) U ({upper}, inf).
+    mistake_tags:
+    - absolute_value_inequality
+    - distance_error
+    - union_error
+    - endpoint_inclusion_error
+    difficulty: hard

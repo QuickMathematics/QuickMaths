@@ -1,0 +1,792 @@
+id: MATH_RAT_006
+schema_version: 0.2
+name: Rational functions, holes, and asymptotes
+domain: Math
+subdomain: Rational Functions
+description: Analyze rational functions by reducing formulas while preserving domains, locating holes and asymptotes,
+  and finding intercepts and end behavior.
+prerequisites:
+- MATH_RAT_005
+- MATH_FUNC_001
+- MATH_GRAPH_005
+tags:
+- rational_functions
+- holes
+- vertical_asymptotes
+- horizontal_asymptotes
+- domain_restrictions
+- intercepts
+- function_graphs
+- end_behavior
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A rational function is a function whose rule is a ratio of polynomials.
+
+  Example:
+
+  f(x) = (x + 2)/(x - 5)
+
+  The denominator restriction x != 5 is part of the function's domain.
+
+  Holes and vertical asymptotes:
+  Factor the numerator and denominator before deciding what happens at an excluded value.
+
+  If a denominator factor cancels, its zero creates a hole, also called a removable discontinuity.
+
+  If a denominator factor remains after reduction, its zero usually creates a vertical asymptote.
+
+  Example:
+
+  f(x) = [(x - 2)(x + 1)] / [(x - 2)(x - 4)]
+
+  Original restrictions: x != 2 and x != 4.
+
+  Reduced formula:
+
+  f(x) = (x + 1)/(x - 4)
+
+  The canceled factor x - 2 creates a hole at x = 2.
+  The uncanceled factor x - 4 creates a vertical asymptote at x = 4.
+
+  Finding the hole's y-coordinate:
+  Substitute the hole's x-value into the reduced formula, not the original undefined formula.
+
+  For the example above:
+
+  (2 + 1)/(2 - 4) = -3/2
+
+  So the hole is at (2, -3/2).
+
+  Intercepts:
+  An x-intercept occurs where the reduced numerator is zero and the denominator is nonzero.
+
+  A y-intercept occurs at x = 0 when 0 is in the domain. Evaluate f(0).
+
+  For f(x) = (x + 1)/(x - 4):
+  - x-intercept: x = -1;
+  - y-intercept: f(0) = 1/(-4) = -1/4.
+
+  Transformed reciprocal functions:
+
+  f(x) = a/(x - h) + k
+
+  When a is nonzero:
+  - vertical asymptote: x = h;
+  - horizontal asymptote: y = k.
+
+  The graph is a shifted and scaled version of y = 1/x.
+
+  Horizontal asymptotes from degrees:
+  For a reduced rational function P(x)/Q(x):
+  1. If degree(P) < degree(Q), the horizontal asymptote is y = 0.
+  2. If degree(P) = degree(Q), the horizontal asymptote is the ratio of leading coefficients.
+  3. If degree(P) > degree(Q), there is no horizontal asymptote. Polynomial division may reveal a slant or higher-degree asymptote.
+
+  Example:
+
+  f(x) = (6x - 1)/(3x + 8)
+
+  The degrees are equal, so the horizontal asymptote is y = 6/3 = 2.
+
+  Domain-aware equivalence:
+  A reduced formula alone does not completely describe the original rational function.
+
+  The expressions:
+
+  [(x - 2)(x + 1)] / [(x - 2)(x - 4)]
+
+  and
+
+  (x + 1)/(x - 4)
+
+  agree wherever both are defined, but the first function also excludes x = 2. A correct reduced answer must preserve that hole.
+
+  Method:
+  1. Factor numerator and denominator.
+  2. Record every original excluded value.
+  3. Cancel common factors to obtain the reduced formula.
+  4. Mark canceled denominator zeros as holes.
+  5. Mark remaining denominator zeros as vertical asymptotes.
+  6. Find x-intercepts from the reduced numerator.
+  7. Find the y-intercept by evaluating at x = 0 when allowed.
+  8. Use degrees or transformed form to find horizontal behavior.
+
+  Common mistake:
+  Do not call every excluded value a vertical asymptote. A canceled factor creates a hole.
+
+  Another common mistake:
+  Do not erase a hole from the domain when writing the reduced function.
+
+  Another common mistake:
+  Do not use an original undefined expression to find a hole's y-coordinate. Use the reduced formula.
+
+  Another common mistake:
+  For equal degrees, use the ratio of leading coefficients, not the ratio of constant terms.
+examples:
+- prompt: Reduce [(x - 2)(x + 1)]/[(x - 2)(x - 4)] with its full domain.
+  solution: (x + 1)/(x - 4), excluding x = 2 and x = 4
+  explanation: The x - 2 factor cancels from the formula but not from the original domain.
+- prompt: For the same function, where is the hole?
+  solution: x = 2
+  explanation: The canceled denominator factor x - 2 creates the hole.
+- prompt: For the same function, where is the vertical asymptote?
+  solution: x = 4
+  explanation: The factor x - 4 remains in the reduced denominator.
+- prompt: Find the hole coordinate for [(x - 2)(x + 1)]/[(x - 2)(x - 4)].
+  solution: (2, -3/2)
+  explanation: Substitute x = 2 into the reduced formula (x + 1)/(x - 4).
+- prompt: Find the x-intercept of (x + 1)/(x - 4).
+  solution: x = -1
+  explanation: Set the reduced numerator x + 1 equal to zero.
+- prompt: Find the y-intercept of (x + 1)/(x - 4).
+  solution: -1/4
+  explanation: Evaluate f(0) = 1/(-4) = -1/4.
+- prompt: Find the asymptotes of f(x) = 3/(x - 5) - 2.
+  solution: x = 5 and y = -2
+  explanation: The graph of 1/x is shifted right 5 and down 2.
+- prompt: Find the horizontal asymptote of (6x - 1)/(3x + 8).
+  solution: y = 2
+  explanation: The degrees match, so use the ratio 6/3.
+applications:
+- title: Reciprocal models
+  description: Inverse relationships in rates, intensity, and cost often produce rational-function graphs.
+- title: Discontinuities
+  description: Holes and asymptotes describe different ways a formula can fail or grow without bound.
+- title: Approximation and end behavior
+  description: Horizontal asymptotes show the long-run value approached by a rational model.
+- title: Calculus preparation
+  description: Domains, limits, discontinuities, and end behavior are foundations for later calculus.
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: RAT_FUNC_REDUCE_HOLE_ASYMPTOTE_001
+    type: generated
+    max_attempts: 300
+    prompt_template: Reduce f(x) = [(x - {a})*(x - {b})]/[(x - {a})*(x - {c})] and preserve every original excluded value.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+    constraints:
+    - a != b
+    - a != c
+    - b != c
+    answer:
+      type: rational_expression
+      value: (x - {b})/(x - {c})
+      excluded_values:
+      - '{a}'
+      - '{c}'
+    grading:
+      method: rational_expression
+      require_reduced_form: true
+    work:
+      mode: capture_only
+      prompt: Factor, cancel only common factors, and explain why both original denominator zeros remain excluded.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The original denominator is zero at x = {a} and x = {c}.
+      Cancel the common factor x - {a} from the formula.
+      The reduced formula is (x - {b})/(x - {c}).
+      The full domain still excludes both {a} and {c}.
+    mistake_tags:
+    - rational_expression_error
+    - domain_restriction_error
+    - canceled_hole_error
+    - reduced_form_error
+    difficulty: medium
+  - id: RAT_FUNC_REDUCE_DIFFERENCE_SQUARES_001
+    type: generated
+    prompt_template: Reduce f(x) = (x^2 - {square})/(x - {a}) and preserve the original excluded value.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+    derived:
+      square: a * a
+    answer:
+      type: rational_expression
+      value: x + {a}
+      excluded_values:
+      - '{a}'
+    grading:
+      method: rational_expression
+      require_reduced_form: true
+    work:
+      mode: capture_only
+      prompt: Factor the difference of squares, cancel the common factor, and retain the original denominator restriction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Factor x^2 - {square} as (x - {a})(x + {a}).
+      Cancel x - {a} from the formula.
+      The reduced formula is x + {a}, but x = {a} remains excluded because it was not in the original domain.
+    mistake_tags:
+    - difference_of_squares
+    - domain_restriction_error
+    - hole_error
+    - reduced_form_error
+    difficulty: easy
+  - id: RAT_FUNC_EXCLUDED_VALUES_001
+    type: generated
+    max_attempts: 200
+    prompt_template: For f(x) = [(x - {a})*(x - {b})]/[(x - {a})*(x - {c})], enter the unordered set of all excluded
+      x-values.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    constraints:
+    - a != b
+    - a != c
+    - b != c
+    answer:
+      type: finite_set
+      values:
+      - '{a}'
+      - '{c}'
+    grading:
+      method: finite_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The original denominator contains x - {a} and x - {c}.
+      It is zero at {a} and {c}.
+      Both values remain excluded even though x - {a} cancels.
+    mistake_tags:
+    - domain_restriction_error
+    - canceled_hole_error
+    - finite_set_error
+    difficulty: easy
+  - id: RAT_FUNC_HOLE_X_VALUE_001
+    type: generated
+    max_attempts: 200
+    prompt_template: For f(x) = [(x - {a})*(x - {b})]/[(x - {a})*(x - {c})], enter the unordered set of x-values where
+      f has holes.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    constraints:
+    - a != b
+    - a != c
+    - b != c
+    answer:
+      type: finite_set
+      values:
+      - '{a}'
+    grading:
+      method: finite_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The factor x - {a} appears in both numerator and denominator, so it cancels.
+      Its zero x = {a} creates a hole.
+    mistake_tags:
+    - hole_error
+    - canceled_factor
+    - vertical_asymptote_error
+    difficulty: easy
+  - id: RAT_FUNC_VERTICAL_ASYMPTOTE_X_001
+    type: generated
+    max_attempts: 200
+    prompt_template: For f(x) = [(x - {a})*(x - {b})]/[(x - {a})*(x - {c})], enter the unordered set of vertical-asymptote
+      x-values.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    constraints:
+    - a != b
+    - a != c
+    - b != c
+    answer:
+      type: finite_set
+      values:
+      - '{c}'
+    grading:
+      method: finite_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      After canceling x - {a}, the reduced denominator is x - {c}.
+      That remaining factor is zero at x = {c}, so x = {c} is the vertical asymptote.
+    mistake_tags:
+    - vertical_asymptote_error
+    - hole_error
+    - factoring_error
+    difficulty: easy
+  - id: RAT_FUNC_HOLE_Y_VALUE_001
+    type: generated
+    max_attempts: 300
+    prompt_template: The function f(x) = [(x - {a})*(x - {b})]/[(x - {a})*(x - {c})] has a hole at x = {a}. What is the
+      hole's y-coordinate?
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      q:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+        - 1
+    derived:
+      b: a - q * (a - c)
+      hole_num: a - b
+      hole_den: a - c
+    constraints:
+    - a != c
+    - abs(b) <= 30
+    answer:
+      type: numeric
+      value: '{q}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Reduce the function, substitute the hole x-value into the reduced formula, and simplify the numerical result.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Cancel x - {a} to get (x - {b})/(x - {c}).
+      Substitute x = {a}: ({a} - {b})/({a} - {c}) = {hole_num}/{hole_den} = {q}.
+      So the hole's y-coordinate is {q}.
+    mistake_tags:
+    - hole_coordinate_error
+    - using_original_undefined_formula
+    - substitution_error
+    - fraction_error
+    difficulty: medium
+  - id: RAT_FUNC_X_INTERCEPT_001
+    type: generated
+    max_attempts: 200
+    prompt_template: For f(x) = [(x - {a})*(x - {b})]/[(x - {a})*(x - {c})], enter the unordered set of x-intercepts.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    constraints:
+    - a != b
+    - a != c
+    - b != c
+    answer:
+      type: finite_set
+      values:
+      - '{b}'
+    grading:
+      method: finite_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The reduced numerator is x - {b}.
+      It is zero at x = {b}, and that value does not make the reduced denominator zero.
+      The canceled root x = {a} is a hole, not an x-intercept.
+    mistake_tags:
+    - x_intercept_error
+    - hole_error
+    - zero_numerator_rule
+    difficulty: medium
+  - id: RAT_FUNC_Y_INTERCEPT_001
+    type: generated
+    max_attempts: 300
+    prompt_template: For f(x) = [(x - {a})*(x - {b})]/[(x - {a})*(x - {c})], what is the y-intercept?
+    answer_mode: final_plus_required_work
+    variables:
+      c:
+        type: int
+        min: 2
+        max: 6
+      q:
+        type: int
+        min: -4
+        max: 4
+        exclude:
+        - 0
+        - 1
+      a:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    derived:
+      b: c * q
+    constraints:
+    - a != c
+    - a != b
+    answer:
+      type: numeric
+      value: '{q}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Reduce the function, substitute x = 0, and simplify to the y-intercept.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      After cancellation, f(x) = (x - {b})/(x - {c}).
+      At x = 0, f(0) = (-{b})/(-{c}) = {b}/{c} = {q}.
+      So the y-intercept is {q}.
+    mistake_tags:
+    - y_intercept_error
+    - substitution_error
+    - fraction_error
+    - domain_error
+    difficulty: medium
+  - id: RAT_FUNC_TRANSFORM_VERTICAL_ASYMPTOTE_001
+    type: generated
+    prompt_template: For f(x) = {a}/(x - {h}) + {k}, enter the unordered set of vertical-asymptote x-values.
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      h:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      k:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    answer:
+      type: finite_set
+      values:
+      - '{h}'
+    grading:
+      method: finite_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The denominator x - {h} is zero at x = {h}.
+      Because {a} is nonzero and no factor cancels, x = {h} is the vertical asymptote.
+    mistake_tags:
+    - vertical_asymptote_error
+    - horizontal_asymptote_error
+    - transformation_error
+    difficulty: easy
+  - id: RAT_FUNC_TRANSFORM_HORIZONTAL_ASYMPTOTE_001
+    type: generated
+    prompt_template: For f(x) = {a}/(x - {h}) + {k}, what is the horizontal-asymptote y-value?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      h:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      k:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    answer:
+      type: numeric
+      value: '{k}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The reciprocal term {a}/(x - {h}) approaches 0 as |x| grows.
+      Therefore f(x) approaches {k}, so the horizontal asymptote is y = {k}.
+    mistake_tags:
+    - horizontal_asymptote_error
+    - vertical_asymptote_error
+    - transformation_error
+    difficulty: easy
+  - id: RAT_FUNC_EQUAL_DEGREE_HORIZONTAL_001
+    type: generated
+    max_attempts: 300
+    prompt_template: What is the horizontal-asymptote y-value of f(x) = ({lead_num}x + {b})/({lead_den}x + {d})?
+    answer_mode: final_plus_required_work
+    variables:
+      lead_den:
+        type: int
+        min: 2
+        max: 7
+      ratio:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+        - 1
+      b:
+        type: int
+        min: -15
+        max: 15
+        exclude:
+        - 0
+      d:
+        type: int
+        min: -15
+        max: 15
+        exclude:
+        - 0
+    derived:
+      lead_num: lead_den * ratio
+    constraints:
+    - b != ratio * d
+    answer:
+      type: numeric
+      value: '{ratio}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Compare the numerator and denominator degrees and use the ratio of their leading coefficients.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Both numerator and denominator have degree 1.
+      The leading-coefficient ratio is {lead_num}/{lead_den} = {ratio}.
+      Therefore the horizontal asymptote is y = {ratio}.
+    mistake_tags:
+    - horizontal_asymptote_error
+    - leading_coefficient_error
+    - degree_error
+    difficulty: medium
+  - id: RAT_FUNC_LOWER_DEGREE_HORIZONTAL_001
+    type: generated
+    prompt_template: What is the horizontal-asymptote y-value of f(x) = ({a}x + {b})/(x^2 + {c})?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      c:
+        type: int
+        min: 2
+        max: 15
+    answer:
+      type: numeric
+      value: '0'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The numerator has degree 1 and the denominator has degree 2.
+      Because the numerator degree is smaller, the function approaches 0 as |x| grows.
+      The horizontal asymptote is y = 0.
+    mistake_tags:
+    - horizontal_asymptote_error
+    - degree_error
+    - end_behavior_error
+    difficulty: medium
+  - id: RAT_FUNC_HOLE_VS_ASYMPTOTE_001
+    type: generated
+    max_attempts: 200
+    prompt_template: For f(x) = [(x - {a})*(x - {b})]/[(x - {a})*(x - {c})], which statement is correct?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    constraints:
+    - a != b
+    - a != c
+    - b != c
+    options:
+    - id: A
+      label: There are holes at both x = {a} and x = {c}.
+    - id: B
+      label: There is a vertical asymptote at x = {a} and a hole at x = {c}.
+    - id: C
+      label: There is a hole at x = {a} and a vertical asymptote at x = {c}.
+    - id: D
+      label: There are vertical asymptotes at both x = {a} and x = {c}.
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The factor x - {a} cancels, so x = {a} is a hole.
+      The factor x - {c} remains in the denominator, so x = {c} is a vertical asymptote.
+    mistake_tags:
+    - hole_error
+    - vertical_asymptote_error
+    - canceled_factor
+    difficulty: hard

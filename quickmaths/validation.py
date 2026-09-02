@@ -4,11 +4,14 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from sympy import FiniteSet, Interval, N, S, Union, fraction, simplify, together
+
 from quickmaths.config import DEFAULT_TRACK_DIR, SUPPORTED_GRADING_METHODS
 from quickmaths.content_loader import ContentError, load_curriculum
 from quickmaths.grading import grade_answer
 from quickmaths.graph_engine import GraphError, build_graph
-from quickmaths.models import ProblemTemplate, Skill
+from quickmaths.models import ProblemTemplate, Skill, UserResponse
+from quickmaths.math_syntax import expressions_equivalent, parse_expression, parse_interval_set
 from quickmaths.problem_generator import GenerationError, generate_problem
 
 SUPPORTED_VARIABLE_TYPES = {"int", "decimal", "fraction", "choice"}
@@ -20,7 +23,7 @@ SUPPORTED_ANSWER_MODES = {
     "structured_steps",
     "proof_required",
 }
-SUPPORTED_WORK_MODES = {"none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check"}
+SUPPORTED_WORK_MODES = {"none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"}
 SUPPORTED_WORK_GRADING = {"not_graded", "tutor_review", "self_review"}
 SUPPORTED_WORK_REVIEW = {"optional", "none", "auto", "tutor_required", "self_review"}
 SUPPORTED_SCHEMA_VERSIONS = {"0.2"}
@@ -158,7 +161,7 @@ def _validate_question(skill: Skill, question: ProblemTemplate, report: Validati
         report.add_error("Question prompt/prompt_template is required", skill, question)
     if not question.answer:
         report.add_error("Question answer block is required", skill, question)
-    if "value" not in question.answer:
+    if "value" not in question.answer and not (question.answer.get("type") == "finite_set" and "values" in question.answer):
         report.add_error("answer.value is required", skill, question)
     method = question.grading.get("method")
     if method not in SUPPORTED_GRADING_METHODS:
@@ -167,6 +170,12 @@ def _validate_question(skill: Skill, question: ProblemTemplate, report: Validati
         report.add_error("equation_solution answers must declare answer.variable", skill, question)
     if method == "numeric_with_tolerance" and "tolerance" not in question.grading:
         report.add_warning("numeric_with_tolerance should declare grading.tolerance", skill, question)
+    if method == "finite_set" and not isinstance(question.answer.get("values"), list):
+        report.add_error("finite_set answers must declare answer.values as a list", skill, question)
+    if method == "rational_expression" and not isinstance(question.answer.get("excluded_values"), list):
+        report.add_error("rational_expression answers must declare answer.excluded_values as a list", skill, question)
+    if method == "interval_set" and not question.answer.get("variable"):
+        report.add_error("interval_set answers must declare answer.variable", skill, question)
     if question.answer_mode not in SUPPORTED_ANSWER_MODES:
         report.add_error(f"Unsupported answer_mode '{question.answer_mode}'", skill, question)
     _validate_work_block(skill, question, report)
@@ -227,9 +236,9 @@ def _validate_work_block(skill: Skill, question: ProblemTemplate, report: Valida
         report.add_error(f"Unsupported review_policy.work_review '{work_review}'", skill, question)
     if review_policy.get("mastery_requires_review_pass") and work_review not in {"tutor_required", "self_review"}:
         report.add_error("mastery_requires_review_pass requires tutor_required or self_review", skill, question)
-    if work_review == "auto" and mode not in {"procedural_steps", "none"}:
+    if work_review == "auto" and mode not in {"procedural_steps", "rational_equation_steps", "sign_chart_steps", "none"}:
         report.add_error(f"review_policy.work_review auto has no checker for work.mode '{mode}'", skill, question)
-    if mode in {"optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check"} and not str(question.work.get("prompt", "")).strip():
+    if mode in {"optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"} and not str(question.work.get("prompt", "")).strip():
         report.add_warning("work.prompt should be set when work is shown to learners", skill, question)
     if mode == "procedural_steps":
         _validate_procedural_work(skill, question, report)
@@ -237,6 +246,42 @@ def _validate_work_block(skill: Skill, question: ProblemTemplate, report: Valida
         _validate_proof_obligations(skill, question, report)
     elif mode == "rubric_check":
         _validate_rubric(skill, question, report)
+    elif mode == "rational_equation_steps":
+        if not question.work.get("target_variable"):
+            report.add_error("rational_equation_steps requires work.target_variable", skill, question)
+    elif mode == "sign_chart_steps":
+        _validate_sign_chart_work(skill, question, report)
+
+
+def _validate_sign_chart_work(skill: Skill, question: ProblemTemplate, report: ValidationReport) -> None:
+    chart = question.work.get("sign_chart")
+    if not isinstance(chart, dict):
+        report.add_error("sign_chart_steps requires work.sign_chart", skill, question)
+        return
+    if chart.get("expression_kind") not in {"polynomial", "rational"}:
+        report.add_error("sign_chart.expression_kind must be polynomial or rational", skill, question)
+    if not str(chart.get("expression", "")).strip():
+        report.add_error("sign_chart.expression is required", skill, question)
+    if chart.get("relation") not in {">", ">=", "<", "<="}:
+        report.add_error("sign_chart.relation must be >, >=, <, or <=", skill, question)
+    points = chart.get("critical_points")
+    if not isinstance(points, list):
+        report.add_error("sign_chart.critical_points must be a list", skill, question)
+        return
+    for point in points:
+        if not isinstance(point, dict) or "value" not in point or point.get("kind") not in {"zero", "undefined", "hole"}:
+            report.add_error("Each sign_chart critical point needs value and kind zero, undefined, or hole", skill, question)
+            continue
+        try:
+            if int(point.get("multiplicity", 1)) < 1:
+                raise ValueError
+        except (TypeError, ValueError):
+            report.add_error("Each sign_chart critical point multiplicity must be a positive integer", skill, question)
+    authored_values = [str(point.get("value", "")).strip() for point in points if isinstance(point, dict)]
+    if len(set(authored_values)) != len(authored_values):
+        report.add_error("sign_chart critical-point values must not be duplicated", skill, question)
+    if chart.get("require_factorization") and not str(chart.get("expected_factorization", "")).strip():
+        report.add_error("sign_chart.expected_factorization is required when factorization is checked", skill, question)
 
 
 def _validate_procedural_work(skill: Skill, question: ProblemTemplate, report: ValidationReport) -> None:
@@ -338,13 +383,72 @@ def _dry_run_question(skill: Skill, question: ProblemTemplate, report: Validatio
     except GenerationError as exc:
         report.add_error(f"Could not generate sample problem: {exc}", skill, question)
         return
-    result = grade_answer(instance, instance.expected_answer)
+    structured = None
+    if instance.grading_method == "rational_expression":
+        structured = {"excluded_values": list(instance.answer_metadata.get("excluded_values", []))}
+    result = grade_answer(instance, UserResponse(final_answer=instance.expected_answer, structured_work_json=structured))
     if not result.is_correct:
         report.add_error(
             f"Generated expected answer does not grade as correct with method '{instance.grading_method}': {result.message}",
             skill,
             question,
         )
+    if instance.work.get("mode") == "sign_chart_steps":
+        _dry_run_sign_chart(skill, question, instance, report)
+
+
+def _dry_run_sign_chart(skill: Skill, question: ProblemTemplate, instance, report: ValidationReport) -> None:
+    chart = instance.work.get("sign_chart", {})
+    variable = str(instance.work.get("target_variable") or instance.variable or "x")
+    if _contains_unresolved_template(instance.work):
+        report.add_error("Generated sign_chart metadata contains an unresolved template placeholder", skill, question)
+        return
+    try:
+        expression = str(chart.get("reduced_expression") or chart.get("expression"))
+        parsed_expression = parse_expression(expression, [variable])
+        symbol = next((item for item in parsed_expression.free_symbols if item.name == variable), None)
+        points = sorted(chart.get("critical_points", []), key=lambda point: float(N(parse_expression(str(point["value"]), [variable]))))
+        point_values = [parse_expression(str(point["value"]), [variable]) for point in points]
+        if len(set(map(str, point_values))) != len(point_values):
+            raise ValueError("critical points are duplicated after rendering")
+        if chart.get("require_factorization") and expressions_equivalent(str(chart.get("expected_factorization", "")), str(chart.get("expression", "")), [variable]) is not True:
+            raise ValueError("expected factorization is not equivalent to the authored expression")
+        numerator, denominator = fraction(together(parsed_expression))
+        for point, value in zip(points, point_values):
+            numerator_value = simplify(numerator.subs({symbol: value})) if symbol is not None else simplify(numerator)
+            denominator_value = simplify(denominator.subs({symbol: value})) if symbol is not None else simplify(denominator)
+            if point.get("kind") == "zero" and not (numerator_value == 0 and denominator_value != 0):
+                raise ValueError(f"critical point {point['value']} is not a defined zero")
+            if point.get("kind") == "undefined" and denominator_value != 0:
+                raise ValueError(f"critical point {point['value']} is not undefined in the reduced expression")
+            if point.get("kind") == "hole" and denominator_value == 0:
+                raise ValueError(f"hole {point['value']} must be defined in reduced_expression")
+        selected = S.EmptySet
+        relation = str(chart.get("relation"))
+        bounds = [(None if index == 0 else point_values[index - 1], None if index == len(point_values) else point_values[index]) for index in range(len(point_values) + 1)]
+        for lower, upper in bounds:
+            sample = S.Zero if lower is None and upper is None else simplify(upper - 1) if lower is None else simplify(lower + 1) if upper is None else simplify((lower + upper) / 2)
+            value = parsed_expression.subs({symbol: sample}) if symbol is not None else parsed_expression
+            numeric = float(N(value))
+            keep = numeric > 0 if relation in {">", ">="} else numeric < 0
+            if keep:
+                selected = Union(selected, Interval(lower if lower is not None else S.NegativeInfinity, upper if upper is not None else S.Infinity, left_open=True, right_open=True))
+        if relation in {">=", "<="}:
+            selected = Union(selected, FiniteSet(*(value for point, value in zip(points, point_values) if point.get("kind") == "zero")))
+        if selected != parse_interval_set(instance.expected_answer, variable):
+            raise ValueError("authored interval answer disagrees with the sign chart")
+    except Exception as exc:
+        report.add_error(f"Generated sign_chart metadata is inconsistent: {exc}", skill, question)
+
+
+def _contains_unresolved_template(value) -> bool:
+    if isinstance(value, str):
+        return bool(re.search(r"\{[^{}]+\}", value))
+    if isinstance(value, list):
+        return any(_contains_unresolved_template(item) for item in value)
+    if isinstance(value, dict):
+        return any(_contains_unresolved_template(item) for item in value.values())
+    return False
 
 
 def _issue(

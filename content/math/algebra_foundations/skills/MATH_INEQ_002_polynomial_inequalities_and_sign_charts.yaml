@@ -1,0 +1,835 @@
+id: MATH_INEQ_002
+schema_version: 0.2
+name: Polynomial inequalities and sign charts
+domain: Math
+subdomain: Inequalities and Solution Sets
+description: Solve factored and factorable polynomial inequalities by finding real zeros, building sign charts, tracking
+  multiplicity, and selecting intervals with the required sign.
+prerequisites:
+- MATH_INEQ_001
+- MATH_QUAD_001
+tags:
+- polynomial_inequalities
+- sign_charts
+- interval_notation
+- factoring
+- zeros
+- multiplicity
+- quadratic_inequalities
+- cubic_inequalities
+unlocks:
+- MATH_RAT_007
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A polynomial inequality asks where a polynomial is positive, negative, nonnegative, or nonpositive.
+
+  Examples:
+
+  (x - 2)(x + 5) > 0
+
+  x^2 - 7x + 10 <= 0
+
+  The zeros divide the number line into intervals. A polynomial cannot change sign inside one of those intervals unless it crosses another zero, so one test value determines the sign throughout each interval.
+
+  Sign-chart method:
+  1. Move every term to one side so the other side is 0.
+  2. Factor the polynomial completely over the real numbers when possible.
+  3. Set each factor equal to 0 to find the real zeros.
+  4. Place the zeros in increasing order.
+  5. Test one value in every open interval between consecutive zeros.
+  6. Record whether the polynomial is positive or negative there.
+  7. Select intervals matching the inequality symbol.
+  8. Include zeros for <= or >=.
+  9. Exclude zeros for < or >.
+  10. Write the final union in interval notation.
+
+  Example:
+  Solve (x - 2)(x - 6) > 0.
+
+  Critical points: 2 and 6.
+
+  - For x < 2, both factors are negative, so the product is positive.
+  - For 2 < x < 6, one factor is positive and one is negative, so the product is negative.
+  - For x > 6, both factors are positive, so the product is positive.
+
+  The inequality asks for positive values and is strict, so the solution is:
+
+  (-inf, 2) U (6, inf)
+
+  Repeated zeros and multiplicity:
+  An odd-multiplicity zero changes the sign. An even-multiplicity zero touches zero and keeps the same sign on both sides.
+
+  Example:
+
+  (x - 1)^2(x - 4)
+
+  The zero x = 1 has multiplicity 2, so the sign does not flip there. The zero x = 4 has multiplicity 1, so the sign does flip there.
+
+  Leading negative signs:
+  A negative factor reverses every interval sign. Factor out -1 explicitly so it is not forgotten.
+
+  No real zeros:
+  A polynomial such as x^2 + 4 is positive for every real x. Its sign chart has one interval and no critical points.
+
+  Method for standard form:
+  If the inequality is not already factored, factor first.
+
+  x^2 - 5x + 6 < 0
+
+  becomes:
+
+  (x - 2)(x - 3) < 0
+
+  The product is negative between its two simple zeros, so the solution is (2, 3).
+
+  Common mistake:
+  Do not solve only the matching equation and list its roots. Inequalities ask for entire intervals.
+
+  Another common mistake:
+  Do not include a zero in a strict inequality.
+
+  Another common mistake:
+  Do not automatically alternate signs at every zero. An even multiplicity does not flip the sign.
+examples:
+- prompt: Solve (x - 2)(x - 5) > 0.
+  solution: (-inf, 2) U (5, inf)
+  explanation: The product is positive outside the two simple zeros.
+- prompt: Solve (x + 3)(x - 4) <= 0.
+  solution: '[-3, 4]'
+  explanation: The product is nonpositive between the zeros and both zeros are included.
+- prompt: Solve -(x - 1)(x - 7) > 0.
+  solution: (1, 7)
+  explanation: The leading negative reverses the usual quadratic signs.
+- prompt: Solve (x - 2)^2(x - 5) < 0.
+  solution: (-inf, 2) U (2, 5)
+  explanation: The sign stays negative across the double zero 2, but the strict inequality excludes 2.
+- prompt: Solve (x + 2)(x - 1)(x - 4) > 0.
+  solution: (-2, 1) U (4, inf)
+  explanation: A positive-leading cubic alternates signs across its three simple zeros.
+- prompt: Solve x^2 - 7x + 12 < 0.
+  solution: (3, 4)
+  explanation: Factor as (x - 3)(x - 4), then choose the negative interval.
+- prompt: Solve (x - 6)^2 <= 0.
+  solution: '[6, 6]'
+  explanation: A square is never negative and equals zero only at x = 6.
+- prompt: Solve x^2 + 9 > 0.
+  solution: (-inf, inf)
+  explanation: The expression is positive for every real input.
+applications:
+- title: Function sign
+  description: Sign charts show where a polynomial graph lies above or below the x-axis.
+- title: Optimization constraints
+  description: Polynomial inequalities describe where profit, area, or energy stays above or below a target.
+- title: Calculus preparation
+  description: Sign analysis is later used for derivative tests and intervals of increase or decrease.
+- title: Algebraic reasoning
+  description: Multiplicity explains whether a graph crosses or only touches the axis at a zero.
+test:
+  question_count: 12
+  randomize_order: true
+  questions:
+  - id: POLY_INEQ_TWO_SIMPLE_ROOTS_POSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})(x - {b}) > 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a}) U ({b}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: (x - {a})*(x - {b})
+        relation: '>'
+        expected_factorization: (x - {a})*(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The simple zeros are x = {a} and x = {b}.
+      The product is positive to the left of {a}, negative between the zeros, and positive to the right of {b}.
+      The strict inequality excludes both zeros.
+      The solution is (-inf, {a}) U ({b}, inf).
+    mistake_tags:
+    - polynomial_inequality_error
+    - sign_chart_error
+    - strict_endpoint_error
+    - interval_notation
+    difficulty: easy
+  - id: POLY_INEQ_TWO_SIMPLE_ROOTS_NEGATIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})(x - {b}) < 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: ({a}, {b})
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: (x - {a})*(x - {b})
+        relation: <
+        expected_factorization: (x - {a})*(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The product is negative only between the two simple zeros.
+      Because the inequality is strict, neither zero is included.
+      The solution is ({a}, {b}).
+    mistake_tags:
+    - polynomial_inequality_error
+    - sign_chart_error
+    - inside_outside_error
+    - interval_notation
+    difficulty: easy
+  - id: POLY_INEQ_TWO_SIMPLE_ROOTS_NONNEGATIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})(x - {b}) >= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a}] U [{b}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: (x - {a})*(x - {b})
+        relation: '>='
+        expected_factorization: (x - {a})*(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The product is positive outside the zeros and equals zero at x = {a} and x = {b}.
+      The symbol >= includes both zeros.
+      The solution is (-inf, {a}] U [{b}, inf).
+    mistake_tags:
+    - polynomial_inequality_error
+    - sign_chart_error
+    - endpoint_inclusion_error
+    - union_error
+    difficulty: medium
+  - id: POLY_INEQ_TWO_SIMPLE_ROOTS_NONPOSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})(x - {b}) <= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{a}, {b}]'
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: (x - {a})*(x - {b})
+        relation: <=
+        expected_factorization: (x - {a})*(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The product is negative between the zeros and equals zero at the endpoints.
+      The symbol <= includes both zeros.
+      The solution is [{a}, {b}].
+    mistake_tags:
+    - polynomial_inequality_error
+    - sign_chart_error
+    - endpoint_inclusion_error
+    - inside_outside_error
+    difficulty: medium
+  - id: POLY_INEQ_NEGATIVE_LEADING_FACTOR_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: -(x - {a})(x - {b}) > 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 4
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: ({a}, {b})
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: -(x - {a})*(x - {b})
+        relation: '>'
+        expected_factorization: -(x - {a})*(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Without the leading negative, the product is negative between the roots.
+      The factor -1 reverses every sign, so the full expression is positive between {a} and {b}.
+      The strict solution is ({a}, {b}).
+    mistake_tags:
+    - leading_sign_error
+    - polynomial_inequality_error
+    - sign_chart_error
+    - strict_endpoint_error
+    difficulty: medium
+  - id: POLY_INEQ_EVEN_ROOT_STRICT_NEGATIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})^2(x - {b}) < 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 3
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a}) U ({a}, {b})
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: (x - {a})^2*(x - {b})
+        relation: <
+        expected_factorization: (x - {a})^2*(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 2
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The zero x = {a} has even multiplicity, so the sign does not change there.
+      The expression is negative on both intervals to the left of {b}, except it equals zero at {a}.
+      The strict inequality excludes {a} and {b}.
+      The solution is (-inf, {a}) U ({a}, {b}).
+    mistake_tags:
+    - multiplicity_error
+    - sign_chart_error
+    - isolated_exclusion_error
+    - interval_notation
+    difficulty: hard
+  - id: POLY_INEQ_EVEN_ROOT_NONNEGATIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})^2(x - {b}) >= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 3
+      gap:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      b: a + gap
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{a}, {a}] U [{b}, inf)'
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: (x - {a})^2*(x - {b})
+        relation: '>='
+        expected_factorization: (x - {a})^2*(x - {b})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 2
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The expression is negative on either side of the double zero {a} until it reaches {b}.
+      It equals zero at both {a} and {b}, and it is positive for x > {b}.
+      Therefore the nonnegative set is the isolated point {a} together with [{b}, inf).
+    mistake_tags:
+    - multiplicity_error
+    - singleton_set_error
+    - endpoint_inclusion_error
+    - sign_chart_error
+    difficulty: hard
+  - id: POLY_INEQ_CUBIC_POSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})(x - {b})(x - {c}) > 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 0
+      gap1:
+        type: int
+        min: 2
+        max: 6
+      gap2:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      b: a + gap1
+      c: a + gap1 + gap2
+    answer:
+      type: interval_set
+      variable: x
+      value: ({a}, {b}) U ({c}, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: (x - {a})*(x - {b})*(x - {c})
+        relation: '>'
+        expected_factorization: (x - {a})*(x - {b})*(x - {c})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        - value: '{c}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {c}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The three simple zeros are {a}, {b}, and {c}.
+      A positive-leading cubic is positive on ({a}, {b}) and ({c}, inf).
+      The strict inequality excludes all three zeros.
+      The solution is ({a}, {b}) U ({c}, inf).
+    mistake_tags:
+    - cubic_inequality_error
+    - sign_chart_error
+    - union_error
+    - endpoint_inclusion_error
+    difficulty: hard
+  - id: POLY_INEQ_CUBIC_NONPOSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})(x - {b})(x - {c}) <= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 0
+      gap1:
+        type: int
+        min: 2
+        max: 6
+      gap2:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      b: a + gap1
+      c: a + gap1 + gap2
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, {a}] U [{b}, {c}]
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: (x - {a})*(x - {b})*(x - {c})
+        relation: <=
+        expected_factorization: (x - {a})*(x - {b})*(x - {c})
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        - value: '{c}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {c}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The cubic is negative on (-inf, {a}) and ({b}, {c}).
+      It equals zero at all three roots.
+      The symbol <= includes each root, giving (-inf, {a}] U [{b}, {c}].
+    mistake_tags:
+    - cubic_inequality_error
+    - sign_chart_error
+    - endpoint_inclusion_error
+    - union_error
+    difficulty: hard
+  - id: POLY_INEQ_FACTOR_STANDARD_FORM_001
+    type: generated
+    max_attempts: 300
+    prompt_template: 'Solve over the real numbers: x^2 - {sum_roots}x + {product_roots} < 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -8
+        max: 3
+        exclude:
+        - 0
+      gap:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      b: a + gap
+      sum_roots: a + b
+      product_roots: a * b
+    constraints:
+    - b != 0
+    - sum_roots != 0
+    answer:
+      type: interval_set
+      variable: x
+      value: ({a}, {b})
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor the quadratic, list its real zeros, complete the sign chart, and give the negative interval in interval
+        notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: x^2 - {sum_roots}x + {product_roots}
+        relation: <
+        expected_factorization: (x - {a})*(x - {b})
+        require_factorization: true
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {a}
+        - value: '{b}'
+          kind: zero
+          multiplicity: 1
+          factor: x - {b}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The quadratic factors as (x - {a})(x - {b}).
+      Its simple zeros are {a} and {b}.
+      A positive-leading quadratic is negative between its distinct real zeros.
+      The solution is ({a}, {b}).
+    mistake_tags:
+    - factoring_error
+    - polynomial_inequality_error
+    - sign_chart_error
+    - interval_notation
+    difficulty: hard
+  - id: POLY_INEQ_PERFECT_SQUARE_NONPOSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x - {a})^2 <= 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -12
+        max: 12
+    answer:
+      type: interval_set
+      variable: x
+      value: '[{a}, {a}]'
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: (x - {a})^2
+        relation: <=
+        expected_factorization: (x - {a})^2
+        require_factorization: false
+        critical_points:
+        - value: '{a}'
+          kind: zero
+          multiplicity: 2
+          factor: x - {a}
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A square is never negative.
+      It equals zero only when x = {a}.
+      Therefore the nonpositive solution set is the singleton [{a}, {a}].
+    mistake_tags:
+    - perfect_square_error
+    - singleton_set_error
+    - multiplicity_error
+    - interval_notation
+    difficulty: medium
+  - id: POLY_INEQ_NO_REAL_ZEROS_POSITIVE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: x^2 + {k} > 0'
+    answer_mode: final_plus_required_work
+    variables:
+      k:
+        type: int
+        min: 1
+        max: 20
+    answer:
+      type: interval_set
+      variable: x
+      value: (-inf, inf)
+    grading:
+      method: interval_set
+    work:
+      mode: sign_chart_steps
+      prompt: Factor or combine as needed, list every critical point, complete the sign chart, decide endpoint inclusion,
+        and enter the final solution in interval notation.
+      target_variable: x
+      sign_chart:
+        expression_kind: polynomial
+        expression: x^2 + {k}
+        relation: '>'
+        expected_factorization: x^2 + {k}
+        require_factorization: false
+        critical_points: []
+        require_test_values: true
+        require_interval_signs: true
+        require_endpoint_decisions: true
+        require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      For every real x, x^2 >= 0.
+      Adding positive {k} makes the expression strictly positive.
+      There are no real critical points, and the solution is (-inf, inf).
+    mistake_tags:
+    - no_real_zeros_error
+    - all_real_numbers_error
+    - sign_chart_error
+    difficulty: hard

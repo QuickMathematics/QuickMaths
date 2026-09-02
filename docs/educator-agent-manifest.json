@@ -9,6 +9,7 @@
   "documentation_pdf": "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf",
   "discovery": {
     "command": "get_educator_agent_manifest",
+    "authoring_guide": "get_lesson_authoring_guide",
     "workspace_read": "get_curriculum_workspace",
     "state_read": "get_app_state",
     "note": "Read this manifest first in an educator profile. The active curriculum policy returned by WebMCP is private curriculum configuration and must be followed without repeating it into public content."
@@ -17,6 +18,7 @@
     "Call get_educator_agent_manifest.",
     "Call get_curriculum_workspace and get_app_state before proposing changes.",
     "Confirm which curriculum is open and what outcome the educator wants.",
+    "Before creating or modifying lesson content, call get_lesson_authoring_guide for the relevant authoring sections.",
     "Search or stage content only when requested. Use stage_depot_lessons for a sequential review queue; installation remains a separate human approval for every pack.",
     "Use curriculum and planning tools for explicit, visible changes only.",
     "Summarize what changed and recommend exporting the focused curriculum plus a full backup at a natural stopping point."
@@ -41,7 +43,7 @@
     "search": "search_lesson_depot returns public metadata only. Popularity is not a correctness guarantee.",
     "single_review": "stage_depot_lesson opens one published pack for human review.",
     "batch_review": "stage_depot_lessons accepts ordered package IDs and opens them sequentially. Approving one package never authorizes the next.",
-    "authoring": "open_lesson_creator can start a new set or load a native lesson as a reversible improvement. validate_lesson_set checks schema and safety before stage_custom_lesson_set opens visible review.",
+    "authoring": "Call get_lesson_authoring_guide before authoring. open_lesson_creator can start a new set or load a native lesson as a reversible improvement, including finite sets, rational expressions and equations, interval sets, and structured sign charts. validate_lesson_set checks schema and safety before stage_custom_lesson_set opens visible review.",
     "publication": "Downloading, installing, Depot publication, GitHub submission, and public community actions remain direct human controls."
   },
   "frontend_surfaces": {
@@ -53,7 +55,7 @@
     "agent_studio": "WebMCP registration status, suggested prompt, available tools, and attributed agent activity."
   },
   "tools": {
-    "read": ["get_educator_agent_manifest", "get_app_state", "get_curriculum_workspace", "get_curriculum_map", "list_subjects", "search_lesson_depot"],
+    "read": ["get_educator_agent_manifest", "get_lesson_authoring_guide", "get_app_state", "get_curriculum_workspace", "get_curriculum_map", "list_subjects", "search_lesson_depot"],
     "curriculum": ["create_curriculum", "select_curriculum", "update_curriculum_settings", "set_curriculum_pack_enabled"],
     "planning": ["set_map_plan_mode", "arrange_map_plan_nodes", "create_map_plan_path", "add_map_plan_annotation"],
     "content": ["open_lesson_creator", "validate_lesson_set", "stage_custom_lesson_set", "stage_depot_lesson", "stage_depot_lessons"],

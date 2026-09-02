@@ -4,6 +4,7 @@ import random
 from copy import deepcopy
 from fractions import Fraction
 
+from quickmaths.math_syntax import equation_text_from_prompt, rational_equation_restrictions
 from quickmaths.models import ProblemInstance, ProblemTemplate, Skill
 from quickmaths.utils import SafeExpressionError, render_template, safe_eval, stringify_value
 
@@ -92,9 +93,11 @@ def _generate_values(rules: dict[str, dict], rng: random.Random) -> dict[str, ob
 
 
 def _build_instance(skill_id: str, template: ProblemTemplate, seed: int, values: dict[str, object]) -> ProblemInstance:
-    answer = template.answer
-    expected = render_template(str(answer.get("value", "")), values)
-    solution_steps = template.solution_steps
+    answer = _render_nested(template.answer, values)
+    expected = _expected_answer_text(answer)
+    prompt = render_template(template.prompt_template, values)
+    work = _enrich_structured_work(_render_nested(template.work, values), prompt)
+    solution_steps = [render_template(str(step), values) for step in template.solution_steps]
     if template.explanation_template:
         solution_steps = [line.strip() for line in render_template(template.explanation_template, values).splitlines() if line.strip()]
     return ProblemInstance(
@@ -103,7 +106,7 @@ def _build_instance(skill_id: str, template: ProblemTemplate, seed: int, values:
         seed=seed,
         difficulty=template.difficulty,
         values={key: stringify_value(value) for key, value in values.items()},
-        prompt=render_template(template.prompt_template, values),
+        prompt=prompt,
         expected_answer=expected,
         answer_type=answer.get("type", "text"),
         grading_method=template.grading.get("method", "exact_text"),
@@ -113,14 +116,17 @@ def _build_instance(skill_id: str, template: ProblemTemplate, seed: int, values:
         tolerance=template.grading.get("tolerance"),
         options=_render_options(template.options, values),
         answer_mode=template.answer_mode,
-        work=deepcopy(template.work),
-        review_policy=deepcopy(template.review_policy),
+        work=work,
+        review_policy=_render_nested(template.review_policy, values),
         accepted_forms=list(answer.get("accepted_forms", template.grading.get("accepted_forms", []))),
+        answer_metadata=deepcopy(answer),
+        grading_metadata=deepcopy(template.grading),
     )
 
 
 def _fixed_problem(skill_id: str, template: ProblemTemplate, seed: int) -> ProblemInstance:
-    answer = template.answer
+    answer = _render_nested(template.answer, {})
+    work = _enrich_structured_work(_render_nested(template.work, {}), template.prompt_template)
     return ProblemInstance(
         template_id=template.id,
         skill_id=skill_id,
@@ -128,7 +134,7 @@ def _fixed_problem(skill_id: str, template: ProblemTemplate, seed: int) -> Probl
         difficulty=template.difficulty,
         values={},
         prompt=template.prompt_template,
-        expected_answer=str(answer.get("value", "")),
+        expected_answer=_expected_answer_text(answer),
         answer_type=answer.get("type", "text"),
         grading_method=template.grading.get("method", "exact_text"),
         solution_steps=template.solution_steps or ([template.explanation_template] if template.explanation_template else []),
@@ -137,9 +143,11 @@ def _fixed_problem(skill_id: str, template: ProblemTemplate, seed: int) -> Probl
         tolerance=template.grading.get("tolerance"),
         options=deepcopy(template.options),
         answer_mode=template.answer_mode,
-        work=deepcopy(template.work),
-        review_policy=deepcopy(template.review_policy),
+        work=work,
+        review_policy=_render_nested(template.review_policy, {}),
         accepted_forms=list(answer.get("accepted_forms", template.grading.get("accepted_forms", []))),
+        answer_metadata=deepcopy(answer),
+        grading_metadata=deepcopy(template.grading),
     )
 
 
@@ -149,3 +157,40 @@ def _render_options(options: list[dict], values: dict[str, object]) -> list[dict
         if "label" in option:
             option["label"] = render_template(str(option["label"]), values)
     return rendered_options
+
+
+def _enrich_structured_work(work: dict, prompt: str) -> dict:
+    """Attach deterministic native-only metadata used by structured checkers."""
+    enriched = deepcopy(work)
+    if enriched.get("mode") != "rational_equation_steps":
+        return enriched
+    variable = str(enriched.get("target_variable") or "x")
+    enriched.setdefault("original_equation", equation_text_from_prompt(prompt))
+    try:
+        restrictions = rational_equation_restrictions(prompt, variable)
+        if getattr(restrictions, "is_FiniteSet", False):
+            enriched.setdefault("expected_restrictions", [str(value) for value in sorted(restrictions, key=str)])
+    except Exception:
+        # Authoring validation reports malformed equations. Generation remains
+        # compatible with older fixed packs that only request captured work.
+        pass
+    return enriched
+
+
+def _render_nested(value, values: dict[str, object]):
+    """Render trusted native template placeholders at any metadata depth."""
+    if isinstance(value, str):
+        return render_template(value, values)
+    if isinstance(value, list):
+        return [_render_nested(item, values) for item in value]
+    if isinstance(value, dict):
+        return {key: _render_nested(item, values) for key, item in value.items()}
+    return deepcopy(value)
+
+
+def _expected_answer_text(answer: dict) -> str:
+    if "value" in answer:
+        return str(answer.get("value", ""))
+    if answer.get("type") == "finite_set":
+        return "{" + ", ".join(str(value) for value in answer.get("values", [])) + "}"
+    return ""

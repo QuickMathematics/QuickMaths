@@ -12,7 +12,7 @@ QuickMaths existed before the WebMCP Challenge. The official submission period b
 | --- | --- |
 | Python/Streamlit desktop-style application | Complete static browser application deployed on GitHub Pages |
 | 25-lesson Mathematics YAML curriculum | Browser-ready native Mathematics runtime, an installable 15-lesson Geography Depot package, coordinate-geometry bridges, and combined subject maps |
-| Existing mastery, grading, profile, review, and export foundations | Twenty-one page-level WebMCP learning tools operating on the same visible human state |
+| Existing mastery, grading, profile, review, and export foundations | Twenty-nine page-level WebMCP learning and curriculum tools operating on the same visible human state |
 | Human-only navigation and learner workflows | Shared human-agent navigation, tutoring, saved-work inspection, structured reviews, and activity attribution |
 | Local/Drive-oriented persistence in the original application | Browser autosave, portable backups, GitHub learner storage, and a revision-safe remote Agent Bridge |
 | YAML authoring and developer preview utilities | Human Lesson Studio, agent lesson validation/staging, reversible native improvements, and answer-key-safe tutoring boundaries |
@@ -34,7 +34,7 @@ Challenge-period milestone evidence:
 - Original logo landing page with multiple learner profiles and sample progress
 - Seven-chapter onboarding tour for every new profile, with skip and persistent replay controls
 - Dashboard metrics, suggested next work, recent attempts, and continue flow
-- 44 native Mathematics lessons plus a first-party 15-lesson Geography package in the Lesson Depot, joined through coordinate geometry and geodesy
+- 53 native Mathematics lessons plus a first-party 15-lesson Geography package in the Lesson Depot, joined through coordinate geometry and geodesy
 - Theory, applications, prerequisites, unlocks, and worked examples for every skill
 - Scenario-complete mastery tests: every authored assessment case appears once per attempt (8–25 questions in the original Mathematics curriculum), while retakes rotate generated variants
 - Multiple-choice, free-response, required shown work, local grading, and step checks
@@ -50,12 +50,13 @@ Challenge-period milestone evidence:
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers twenty-eight page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact learner/tutor operating summary by default; `get_educator_agent_manifest` returns the dedicated curriculum-design contract and active curriculum policy. The complete sources remain the machine-readable `agent-manifest.json` and `educator-agent-manifest.json`.
+A compatible ChatGPT or Codex browser discovers twenty-nine page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact learner/tutor operating summary by default; `get_educator_agent_manifest` returns the dedicated curriculum-design contract and active curriculum policy; and `get_lesson_authoring_guide` returns the bundled authoring contract by topic. The complete sources remain the machine-readable `agent-manifest.json` and `educator-agent-manifest.json`.
 
 | Tool | Purpose |
 | --- | --- |
 | `get_agent_guide` | Read a compact operating summary or one detailed policy section on demand. |
 | `get_educator_agent_manifest` | Read the dedicated educator workflow, human-control boundaries, documentation link, and active curriculum policy. |
+| `get_lesson_authoring_guide` | Read a compact lesson-authoring overview or one focused authoring section on demand. |
 | `get_app_state` | Read the visible view, learner, timers, mastery counts, and current suggestion. |
 | `get_curriculum_map` | Read one subject map or the combined installed-subject map with statuses, prerequisite bridges, and unlocks. |
 | `get_progress_summary` | Read per-skill mastery, attempts, and misconception tags. |
@@ -83,7 +84,7 @@ A compatible ChatGPT or Codex browser discovers twenty-eight page tools through 
 | `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
-The top-level `agent-bridge.html` workspace registers the same twenty-eight learning tools plus three transport tools:
+The top-level `agent-bridge.html` workspace registers the same twenty-nine learning tools plus three transport tools:
 
 | Bridge tool | Purpose |
 | --- | --- |
@@ -99,7 +100,7 @@ Tool inputs use closed JSON Schemas and runtime validation. Read-only tools do n
 Mobile learner browser                          Computer / remote Codex task
 ┌──────────────────────────┐                    ┌────────────────────────────┐
 │ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
-│ localStorage + WebMCP    │                    │ 31 WebMCP tools            │
+│ localStorage + WebMCP    │                    │ 32 WebMCP tools            │
 └────────────┬─────────────┘                    └──────────────┬─────────────┘
              │ debounced, complete state                       │ explicit publish → host Git auth
              ▼                                                 ▼
@@ -114,7 +115,7 @@ Important files:
 
 - `docs/index.html` — landing page and persistent application shell
 - `docs/challenge.css` — responsive visual system and original-style clock
-- `docs/curriculum-data.json` — browser-ready 44-lesson native Mathematics curriculum with comprehensive assessments and rotating retake variants
+- `docs/curriculum-data.json` — browser-ready 53-lesson native Mathematics curriculum with comprehensive assessments and rotating retake variants
 - `docs/lesson-depot/lessons/geography/1.0.0/lesson-set.json` — installable first-party 15-lesson Geography curriculum
 - `docs/challenge-core.js` — profiles, mastery graph, grading, attempts, reviews, timers, and persistence
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports
@@ -149,7 +150,7 @@ npm --prefix docs test
 pytest -q
 ```
 
-Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience. Open `http://localhost:8765/agent-bridge.html` for the separate 24-tool agent workspace.
+Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience. Open `http://localhost:8765/agent-bridge.html` for the separate 32-tool agent workspace.
 
 The browser contract suite covers profiles, subject filtering, Hard/Open progression, cross-subject bridges, themes, proof-review mastery gates, unlocks, timers, mastery updates, varied retakes, symbolic grading, procedural-work validation, answer-key privacy, agent policy, lesson-set staging and progress round-trips, malformed backups, CSV exports, strict tool inputs, navigation, visible follow-ups, feedback-to-attempt linkage, credential isolation, Unicode GitHub transport, optimistic write conflicts, revision-bound agent output, and protection for unsynced learner work.
 

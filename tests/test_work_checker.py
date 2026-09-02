@@ -209,6 +209,110 @@ def test_proof_obligation_work_still_becomes_pending_review():
     assert result.work_check_result.status == "pending_review"
 
 
+def test_rational_equation_ledger_checks_restrictions_steps_classifications_and_original_checks():
+    problem = ProblemInstance(
+        template_id="RAT",
+        skill_id="S",
+        seed=1,
+        difficulty="hard",
+        values={},
+        prompt="Solve over the real numbers: (x - 2)/(x - 5) = 0",
+        expected_answer="{2}",
+        answer_type="finite_set",
+        grading_method="finite_set",
+        solution_steps=[],
+        mistake_tags=[],
+        variable="x",
+        answer_mode="final_plus_required_work",
+        answer_metadata={"values": ["2"]},
+        work={
+            "mode": "rational_equation_steps",
+            "target_variable": "x",
+            "require_restrictions": True,
+            "require_original_equation_check": True,
+            "original_equation": "(x - 2)/(x - 5) = 0",
+            "expected_restrictions": ["5"],
+        },
+        review_policy={"work_review": "auto"},
+    )
+    correct = UserResponse(
+        final_answer="{2}",
+        structured_work_json={
+            "restrictions": ["5"],
+            "steps": ["x - 2 = 0", "x = 2"],
+            "candidates": [{"value": "2", "status": "valid", "original_check": "(2-2)/(2-5)=0"}],
+        },
+    )
+    assert check_work(problem, correct).status == "correct"
+
+    wrong = UserResponse(
+        final_answer="{2}",
+        structured_work_json={
+            "restrictions": ["4"],
+            "steps": ["x - 2 = 0", "x = 2"],
+            "candidates": [{"value": "2", "status": "extraneous", "original_check": "checked"}],
+        },
+    )
+    result = check_work(problem, wrong)
+    assert result.status == "incorrect"
+    assert any("restriction" in message for message in result.messages)
+    assert any("classified" in message for message in result.messages)
+
+
+def test_sign_chart_checker_validates_boundaries_signs_endpoints_and_selected_set():
+    problem = ProblemInstance(
+        template_id="SIGN",
+        skill_id="S",
+        seed=1,
+        difficulty="hard",
+        values={},
+        prompt="Solve: (x - 2)/(x - 5) >= 0",
+        expected_answer="(-inf, 2] U (5, inf)",
+        answer_type="interval_set",
+        grading_method="interval_set",
+        solution_steps=[],
+        mistake_tags=[],
+        variable="x",
+        answer_mode="final_plus_required_work",
+        work={
+            "mode": "sign_chart_steps",
+            "target_variable": "x",
+            "sign_chart": {
+                "expression_kind": "rational",
+                "expression": "(x - 2)/(x - 5)",
+                "reduced_expression": "(x - 2)/(x - 5)",
+                "relation": ">=",
+                "critical_points": [
+                    {"value": "2", "kind": "zero", "multiplicity": 1},
+                    {"value": "5", "kind": "undefined", "multiplicity": 1},
+                ],
+                "require_test_values": True,
+                "require_interval_signs": True,
+                "require_endpoint_decisions": True,
+                "require_final_answer_match": True,
+            },
+        },
+        review_policy={"work_review": "auto"},
+    )
+    chart = {
+        "critical_points": [{"value": "5", "kind": "undefined"}, {"value": "2", "kind": "zero"}],
+        "intervals": [
+            {"lower": "", "upper": "2", "test_value": "0", "sign": "positive", "selected": True},
+            {"lower": "2", "upper": "5", "test_value": "3", "sign": "negative", "selected": False},
+            {"lower": "5", "upper": "", "test_value": "6", "sign": "positive", "selected": True},
+        ],
+        "endpoints": [{"value": "2", "included": True}, {"value": "5", "included": False}],
+    }
+    correct_result = check_work(problem, UserResponse(final_answer="x <= 2 or x > 5", structured_work_json=chart))
+    assert correct_result.status == "correct", correct_result
+
+    bad_chart = {**chart, "intervals": [dict(row) for row in chart["intervals"]]}
+    bad_chart["intervals"][1]["upper"] = "6"
+    result = check_work(problem, UserResponse(final_answer="(-inf, 2] U (5, inf)", structured_work_json=bad_chart))
+    assert result.status == "incorrect"
+    assert result.details["intervals"][1]["ok"] is False
+
+
 def _problem(expected: str, work: dict, variable: str | None = None, grading_method: str = "symbolic_expression") -> ProblemInstance:
     return ProblemInstance(
         template_id="T",

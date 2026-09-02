@@ -1,0 +1,611 @@
+id: MATH_RAT_005
+schema_version: 0.2
+name: Extraneous solutions in rational equations
+domain: Math
+subdomain: Rational Expressions and Equations
+description: Solve rational equations that produce multiple candidates, reject excluded or non-real candidates, and distinguish
+  valid roots from extraneous solutions.
+prerequisites:
+- MATH_RAT_004
+- MATH_QUAD_003
+tags:
+- rational_equations
+- extraneous_solutions
+- candidate_solutions
+- domain_restrictions
+- finite_solution_sets
+- quadratic_equations
+- checking_solutions
+- empty_set
+unlocks:
+- MATH_RAT_006
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Clearing denominators can produce candidate solutions that are not solutions of the original rational equation.
+
+  An extraneous solution is a value obtained during algebra that must be rejected because it does not satisfy the original equation.
+
+  The most common cause in rational equations is an excluded denominator value.
+
+  Example:
+
+  3(x - 2) / [x(x - 2)] = 1
+
+  Restrictions: x != 0 and x != 2.
+
+  Multiply by x(x - 2):
+
+  3(x - 2) = x(x - 2)
+
+  Move all terms to one side and factor:
+
+  (x - 2)(x - 3) = 0
+
+  Candidates: x = 2 and x = 3.
+
+  x = 2 is excluded by the original denominator, so it is extraneous.
+
+  x = 3 is allowed and checks.
+
+  The solution set is {3}.
+
+  Why the extra candidate appears:
+  Both sides were multiplied by an expression that equals zero at x = 2. That multiplication is only reversible under the restriction x != 2. The restriction preserves the information lost when the denominator is cleared.
+
+  Quadratic outcomes:
+  A rational equation can become a quadratic after denominators are cleared. The transformed quadratic may have:
+  - two valid real candidates;
+  - one repeated valid candidate;
+  - one valid and one extraneous candidate;
+  - only extraneous candidates;
+  - no real candidates.
+
+  Method:
+  1. Factor every denominator.
+  2. Record all original restrictions.
+  3. Clear denominators with the LCD.
+  4. Simplify the resulting equation.
+  5. Solve for every real candidate.
+  6. Compare candidates with the restriction set.
+  7. Substitute each remaining candidate into the original equation.
+  8. Report the unordered set of valid solutions.
+
+  Zero numerator rule:
+  A rational expression equals zero only when its numerator equals zero and its denominator is nonzero.
+
+  Example:
+
+  [(x - 4)(x + 1)] / [(x - 4)(x - 7)] = 0
+
+  Restrictions: x != 4 and x != 7.
+
+  The numerator gives candidates x = 4 and x = -1.
+
+  x = 4 is excluded, but x = -1 is allowed. The solution set is {-1}.
+
+  No-real-solution example:
+
+  -9/x = x
+
+  Restriction: x != 0.
+
+  Clearing the denominator gives x^2 = -9, which has no real solutions. The real solution set is empty.
+
+  Repeated-root example:
+
+  -16/(x - 8) = x
+
+  Restriction: x != 8.
+
+  The transformed equation is x^2 - 8x + 16 = 0, or (x - 4)^2 = 0.
+
+  The only candidate is x = 4, and it checks.
+
+  Common mistake:
+  Do not erase restrictions after a common factor cancels.
+
+  Another common mistake:
+  Do not report every root of the transformed quadratic. Check each root in the original rational equation.
+
+  Another common mistake:
+  Do not count a repeated root twice. A solution set lists distinct values only.
+
+  Another common mistake:
+  An empty solution set can result either from excluded candidates or from a transformed equation with no real roots. Explain which happened.
+examples:
+- prompt: Solve 3(x - 2)/[x(x - 2)] = 1.
+  solution: '{3}'
+  explanation: The transformed equation gives candidates 2 and 3. The restriction x != 2 removes 2.
+- prompt: Solve (x - 5)(x + 2)/[(x - 5)(x - 1)] = 0.
+  solution: '{-2}'
+  explanation: The numerator gives 5 and -2, but 5 is excluded.
+- prompt: Solve (x^2 - 16)/(x - 4) = 8.
+  solution: empty set
+  explanation: Simplifying gives x + 4 = 8, so the only candidate is x = 4, which is excluded.
+- prompt: Solve (x^2 - 16)/(x - 4) = 10.
+  solution: '{6}'
+  explanation: The candidate x = 6 is allowed and checks.
+- prompt: Solve -6/(x - 5) = x.
+  solution: '{2, 3}'
+  explanation: Clearing the denominator gives x^2 - 5x + 6 = 0.
+- prompt: Solve -16/(x - 8) = x.
+  solution: '{4}'
+  explanation: The transformed equation is (x - 4)^2 = 0, so the repeated root appears once.
+- prompt: Solve 25/x = x.
+  solution: '{-5, 5}'
+  explanation: Clearing x gives x^2 = 25. Both nonzero roots check.
+- prompt: Solve -25/x = x over the real numbers.
+  solution: empty set
+  explanation: The transformed equation x^2 = -25 has no real roots.
+applications:
+- title: Formula validation
+  description: Clearing fractions in formulas can introduce candidates that must be checked against original restrictions.
+- title: Rate models
+  description: Time, speed, and work equations often produce quadratics and require rejecting impossible candidates.
+- title: Computer algebra
+  description: Symbolic solvers attach conditions to transformations so denominator zeros are not accepted accidentally.
+- title: Mathematical proof habits
+  description: Candidate generation and candidate verification are separate logical steps.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: RAT_EXTRA_CANCELED_FACTOR_ONE_VALID_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {c}*(x - {a})/[x*(x - {a})] = 1'
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+    constraints:
+    - a != c
+    answer:
+      type: finite_set
+      values:
+      - '{c}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: Record both restrictions, clear denominators, factor the candidate equation, and check each candidate in
+        the original equation.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restrictions: x != 0 and x != {a}.
+      Clearing denominators gives {c}(x - {a}) = x(x - {a}).
+      Factor: (x - {a})(x - {c}) = 0.
+      The candidates are {a} and {c}. The value {a} is excluded; {c} is allowed and checks.
+      The solution set contains only x = {c}.
+    mistake_tags:
+    - extraneous_solution
+    - canceled_factor
+    - domain_restriction_error
+    - candidate_check_error
+    difficulty: medium
+  - id: RAT_EXTRA_ZERO_NUMERATOR_ONE_VALID_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: [(x - {a})*(x - {b})]/[(x - {a})*(x - {c})] = 0'
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      a:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    constraints:
+    - a != b
+    - a != c
+    - b != c
+    answer:
+      type: finite_set
+      values:
+      - '{b}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: Record the denominator restrictions, solve the numerator equation, and test each numerator root against
+        the original denominator.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restrictions: x != {a} and x != {c}.
+      A rational expression equals zero when its numerator is zero and its denominator is nonzero.
+      The numerator gives candidates x = {a} and x = {b}.
+      The candidate {a} is excluded. The candidate {b} is allowed.
+      The solution set contains only x = {b}.
+    mistake_tags:
+    - zero_numerator_rule
+    - extraneous_solution
+    - domain_restriction_error
+    - factoring_error
+    difficulty: medium
+  - id: RAT_EXTRA_DIFFERENCE_SQUARES_EMPTY_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x^2 - {square})/(x - {a}) = {twice_a}'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    derived:
+      square: a * a
+      twice_a: 2 * a
+    answer:
+      type: finite_set
+      values: []
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: Factor the numerator, record the restriction, solve the reduced equation, and check the resulting candidate
+        in the original expression.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Factor x^2 - {square} as (x - {a})(x + {a}).
+      The original restriction is x != {a}.
+      For allowed x, the equation reduces to x + {a} = {twice_a}, giving candidate x = {a}.
+      That candidate is excluded, so the solution set is empty.
+    mistake_tags:
+    - extraneous_solution
+    - difference_of_squares
+    - domain_restriction_error
+    - empty_set
+    difficulty: medium
+  - id: RAT_EXTRA_DIFFERENCE_SQUARES_VALID_001
+    type: generated
+    max_attempts: 200
+    prompt_template: 'Solve over the real numbers: (x^2 - {square})/(x - {a}) = {c}'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -14
+        max: 14
+        exclude:
+        - 0
+    derived:
+      square: a * a
+      solution: c - a
+    constraints:
+    - c != 2 * a
+    - solution != 0
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: Factor, record the restriction, solve the reduced linear equation, and verify the candidate in the original
+        equation.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The numerator factors as (x - {a})(x + {a}), and x != {a}.
+      For allowed x, the equation becomes x + {a} = {c}.
+      Thus x = {solution}.
+      Because {solution} is not the excluded value {a}, it checks and belongs to the solution set.
+    mistake_tags:
+    - difference_of_squares
+    - domain_restriction_error
+    - checking_solution
+    - sign_error
+    difficulty: medium
+  - id: RAT_EXTRA_TWO_VALID_ROOTS_001
+    type: generated
+    max_attempts: 300
+    prompt_template: 'Solve over the real numbers: {numerator}/(x - {sum_roots}) = x'
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      q:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    derived:
+      sum_roots: p + q
+      numerator: 0 - p * q
+    constraints:
+    - p != q
+    - sum_roots != 0
+    answer:
+      type: finite_set
+      values:
+      - '{p}'
+      - '{q}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: Record the denominator restriction, clear it, solve the resulting quadratic for every candidate, and check
+        both in the original equation.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != {sum_roots}.
+      Clearing the denominator gives {numerator} = x(x - {sum_roots}).
+      Rearranging gives x^2 - {sum_roots}x + {p * q} = 0.
+      This factors as (x - {p})(x - {q}) = 0.
+      Both {p} and {q} are allowed and check, so the solution set contains x = {p} and x = {q}.
+    mistake_tags:
+    - quadratic_equation_error
+    - finite_set_error
+    - domain_restriction_error
+    - checking_solution
+    difficulty: hard
+  - id: RAT_EXTRA_REPEATED_VALID_ROOT_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {numerator}/(x - {twice_r}) = x'
+    answer_mode: final_plus_required_work
+    variables:
+      r:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    derived:
+      numerator: 0 - r * r
+      twice_r: 2 * r
+    answer:
+      type: finite_set
+      values:
+      - '{r}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: Record the restriction, clear the denominator, solve the quadratic, treat the repeated root as one candidate,
+        and check it.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != {twice_r}.
+      Clearing the denominator gives {numerator} = x(x - {twice_r}).
+      The quadratic becomes x^2 - {twice_r}x + {r * r} = 0, or (x - {r})^2 = 0.
+      The only distinct candidate is {r}, which is allowed and checks.
+    mistake_tags:
+    - repeated_root
+    - finite_set_error
+    - quadratic_equation_error
+    - domain_restriction_error
+    difficulty: hard
+  - id: RAT_EXTRA_BOTH_CANDIDATES_EXCLUDED_001
+    type: generated
+    max_attempts: 200
+    prompt_template: 'Solve over the real numbers: [(x - {a})*(x - {b})]/[(x - {a})*(x - {b})] = 0'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+    constraints:
+    - a != b
+    answer:
+      type: finite_set
+      values: []
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: Record both restrictions, identify the numerator candidates, and explain why neither is defined in the
+        original equation.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restrictions: x != {a} and x != {b}.
+      The numerator equation gives candidates {a} and {b}.
+      Both values make the original denominator zero, so both candidates are extraneous.
+      The solution set is empty.
+    mistake_tags:
+    - extraneous_solution
+    - empty_set
+    - domain_restriction_error
+    - zero_numerator_rule
+    difficulty: hard
+  - id: RAT_EXTRA_SYMMETRIC_ROOTS_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {square}/x = x'
+    answer_mode: final_plus_required_work
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      square: r * r
+      neg_r: 0 - r
+    answer:
+      type: finite_set
+      values:
+      - '{neg_r}'
+      - '{r}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State x != 0, clear the denominator, solve x^2 = the constant, and verify both nonzero roots.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != 0.
+      Multiplying by x gives x^2 = {square}.
+      The real candidates are x = {neg_r} and x = {r}.
+      Both are nonzero and check, so the solution set contains x = {neg_r} and x = {r}.
+    mistake_tags:
+    - missing_negative_root
+    - finite_set_error
+    - domain_restriction_error
+    - square_root_error
+    difficulty: medium
+  - id: RAT_EXTRA_NO_REAL_ROOTS_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {negative_square}/x = x'
+    answer_mode: final_plus_required_work
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      negative_square: 0 - r * r
+    answer:
+      type: finite_set
+      values: []
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State x != 0, clear the denominator, and explain why the resulting quadratic has no real roots.
+      target_variable: x
+      require_original_equation_check: false
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != 0.
+      Multiplying by x gives x^2 = {negative_square}.
+      A real square cannot be negative, so there are no real candidates.
+      The real solution set is empty.
+    mistake_tags:
+    - no_real_solution
+    - empty_set
+    - quadratic_equation_error
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_EXTRA_LINEAR_EXCLUDED_CANDIDATE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x + {b})/(x - {a}) = {sum_ab}/(x - {a})'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    derived:
+      sum_ab: a + b
+    answer:
+      type: finite_set
+      values: []
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State the restriction, clear the common denominator, solve for the candidate, and reject it after checking
+        the original equation.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != {a}.
+      Clearing the denominator gives x + {b} = {sum_ab}.
+      The candidate is x = {a}.
+      That value is excluded from the original equation, so the solution set is empty.
+    mistake_tags:
+    - extraneous_solution
+    - linear_equation_error
+    - domain_restriction_error
+    - candidate_check_error
+    difficulty: hard

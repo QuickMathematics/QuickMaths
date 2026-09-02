@@ -1,0 +1,579 @@
+id: MATH_RAT_001
+schema_version: 0.2
+name: Rational expressions and domain restrictions
+domain: Math
+subdomain: Rational Expressions and Equations
+description: Identify excluded values, factor rational expressions, cancel common factors correctly, and preserve the
+  original domain after simplification.
+prerequisites:
+- MATH_ARITH_004
+- MATH_EXP_001
+- MATH_POLY_004
+tags:
+- rational_expressions
+- domain_restrictions
+- excluded_values
+- factoring
+- common_factors
+- simplifying_rational_expressions
+- undefined
+- equivalent_expressions
+unlocks:
+- MATH_RAT_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A rational expression is a fraction whose numerator, denominator, or both contain algebraic expressions.
+
+  Examples:
+
+  (x + 3)/(x - 5)
+
+  (x^2 - 9)/(x + 3)
+
+  4x/(6x^2)
+
+  The denominator cannot equal zero. Any value that makes the original denominator zero is excluded from the domain.
+
+  Example:
+  For R(x) = (x + 3)/(x - 5), x = 5 is excluded because the denominator would be zero.
+
+  Finding restrictions:
+  1. Set each denominator factor equal to zero.
+  2. Solve for the value that makes that factor zero.
+  3. Record every excluded value before simplifying.
+  4. Keep those original restrictions even if a factor later cancels.
+
+  Factoring before canceling:
+  You may cancel common factors, but you may not cancel terms that are joined by addition or subtraction.
+
+  Valid cancellation:
+
+  (x^2 - 9)/(x - 3)
+  = ((x - 3)(x + 3))/(x - 3)
+  = x + 3, with x ≠ 3
+
+  The factor x - 3 cancels. The original expression was still undefined at x = 3, so the simplified expression must keep that restriction.
+
+  Another example:
+
+  (x^2 + 5x)/x
+  = x(x + 5)/x
+  = x + 5, with x ≠ 0
+
+  Invalid cancellation:
+
+  (x + 5)/x
+
+  The x in the denominator is not a factor of the entire numerator. The expression can be rewritten as:
+
+  x/x + 5/x = 1 + 5/x
+
+  but the x cannot be canceled across x + 5.
+
+  Equivalent formulas can have different domains:
+  The expressions (x^2 - 9)/(x - 3) and x + 3 produce the same output whenever x ≠ 3. They are not identical as functions on all real numbers because the first expression is undefined at x = 3.
+
+  Simplifying method:
+  1. Find and record the original excluded values.
+  2. Factor the numerator and denominator completely.
+  3. Cancel only common factors.
+  4. Rewrite what remains.
+  5. Attach all original restrictions to the simplified result.
+  6. Check by substituting an allowed value into both forms.
+
+  Common mistake:
+  Do not cancel across addition. In (x + 4)/x, the x does not cancel with the x term alone.
+
+  Another common mistake:
+  Do not erase a restriction when its factor cancels. Cancellation changes the formula, not the original domain.
+
+  Another common mistake:
+  A rational expression may have more than one excluded value when the denominator has several factors.
+examples:
+- prompt: Find the excluded value for (x + 2)/(x - 7).
+  solution: x ≠ 7
+  explanation: The denominator is zero when x - 7 = 0.
+- prompt: Find the excluded values for 1/((x - 4)(x + 3)).
+  solution: x ≠ 4 and x ≠ -3
+  explanation: Either denominator factor can become zero.
+- prompt: Simplify (x^2 - 16)/(x - 4).
+  solution: x + 4, with x ≠ 4
+  explanation: Factor the numerator as (x - 4)(x + 4), then cancel the common factor while keeping the restriction.
+- prompt: Simplify (x^2 + 6x)/x.
+  solution: x + 6, with x ≠ 0
+  explanation: Factor x from the numerator, then cancel it.
+- prompt: Can x cancel in (x + 8)/x?
+  solution: 'No'
+  explanation: The numerator is a sum. x is not a factor of the entire numerator.
+- prompt: Rewrite (x + 8)/x without a single fraction.
+  solution: 1 + 8/x
+  explanation: 'Split the numerator: x/x + 8/x.'
+- prompt: Simplify (x^2 + 7x + 12)/(x + 3).
+  solution: x + 4, with x ≠ -3
+  explanation: Factor the numerator as (x + 3)(x + 4).
+- prompt: Why is x = 3 still excluded after (x^2 - 9)/(x - 3) simplifies?
+  solution: The original denominator was zero at x = 3.
+  explanation: A canceled factor still records a hole in the original domain.
+applications:
+- title: Rates and unit formulas
+  description: Rates often place variable expressions in denominators, so domain restrictions identify impossible
+    inputs.
+- title: Rational functions
+  description: Canceled factors create holes, while uncanceled denominator factors create vertical asymptotes.
+- title: Algebraic modeling
+  description: Simplifying a formula can make it easier to evaluate without changing which original inputs are allowed.
+- title: Solving equations
+  description: Restrictions must be recorded before clearing denominators so invalid solutions can be rejected later.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: RAT_DOMAIN_LINEAR_DENOMINATOR_001
+    type: generated
+    prompt_template: For R(x) = (x + {a})/(x - {b}), which value is excluded from the domain?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+      b:
+        type: int
+        min: 2
+        max: 12
+    constraints:
+    - a != b
+    options:
+    - id: A
+      label: x = {b}
+    - id: B
+      label: x = {-b}
+    - id: C
+      label: x = {a}
+    - id: D
+      label: x = {-a}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The denominator is x - {b}.
+      Set it equal to zero: x - {b} = 0.
+      The excluded value is x = {b}.
+    mistake_tags:
+    - domain_restriction_error
+    - denominator_zero
+    - sign_error
+    difficulty: easy
+  - id: RAT_DOMAIN_FACTORED_DENOMINATOR_001
+    type: generated
+    prompt_template: Which values are excluded from the domain of 1/((x - {p})(x + {q}))?
+    answer_mode: final_only
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 12
+      q:
+        type: int
+        min: 2
+        max: 12
+    constraints:
+    - p != q
+    options:
+    - id: A
+      label: x = {-p} or x = {q}
+    - id: B
+      label: x = {p} or x = {-q}
+    - id: C
+      label: x = {p} or x = {q}
+    - id: D
+      label: x = {-p} or x = {-q}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The denominator is zero when either factor is zero.
+      x - {p} = 0 gives x = {p}.
+      x + {q} = 0 gives x = {-q}.
+    mistake_tags:
+    - domain_restriction_error
+    - factored_denominator
+    - sign_error
+    difficulty: medium
+  - id: RAT_SIMPLIFY_COMMON_MONOMIAL_001
+    type: generated
+    prompt_template: Simplify ({num_coeff}x)/({den_coeff}x) and keep the original domain restriction.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      p:
+        type: int
+        min: 1
+        max: 7
+      q:
+        type: int
+        min: 2
+        max: 9
+      k:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      num_coeff: p * k
+      den_coeff: q * k
+    constraints:
+    - p < q
+    - not (p % 2 == 0 and q % 2 == 0)
+    - not (p % 3 == 0 and q % 3 == 0)
+    - not (p % 5 == 0 and q % 5 == 0)
+    - not (p % 7 == 0 and q % 7 == 0)
+    options:
+    - id: A
+      label: '{p}/{q}'
+    - id: B
+      label: '{q}/{p}, with x ≠ 0'
+    - id: C
+      label: '{p}/{q}, with x ≠ 0'
+    - id: D
+      label: ({p}x)/{q}, with no restrictions
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Explain which factors cancel and why x = 0 remains excluded.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Both coefficients contain the common factor {k}, and x is also common.
+      Cancel {k}x to obtain {p}/{q}.
+      The original denominator contained x, so x = 0 remains excluded.
+    mistake_tags:
+    - cancellation_error
+    - domain_restriction_error
+    - fraction_reduction_error
+    difficulty: medium
+  - id: RAT_CANCEL_DIFFERENCE_OF_SQUARES_001
+    type: generated
+    prompt_template: Simplify (x^2 - {square})/(x - {a}) and keep the original restriction.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      square: a * a
+    options:
+    - id: A
+      label: x - {a}, with x ≠ {a}
+    - id: B
+      label: x + {a}, with x ≠ {-a}
+    - id: C
+      label: 1, with x ≠ {a}
+    - id: D
+      label: x + {a}, with x ≠ {a}
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Factor the numerator, identify the common factor, and state the original restriction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Factor the numerator:
+      x^2 - {square} = (x - {a})(x + {a}).
+      Cancel x - {a} to obtain x + {a}.
+      The original denominator was zero at x = {a}, so x ≠ {a}.
+    mistake_tags:
+    - difference_of_squares
+    - cancellation_error
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_CANCEL_MONIC_TRINOMIAL_001
+    type: generated
+    prompt_template: Simplify (x^2 + {sum_value}x + {product})/(x + {p}) and keep the original restriction.
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 10
+      q:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      sum_value: p + q
+      product: p * q
+    constraints:
+    - p != q
+    options:
+    - id: A
+      label: x + {q}, with x ≠ {-p}
+    - id: B
+      label: x - {q}, with x ≠ {-p}
+    - id: C
+      label: x + {q}, with x ≠ {p}
+    - id: D
+      label: x + {p}, with x ≠ {-q}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Factor the trinomial, cancel only a common factor, and preserve the original restriction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The numerator factors as (x + {p})(x + {q}).
+      Cancel x + {p} to obtain x + {q}.
+      The original denominator was zero at x = {-p}.
+    mistake_tags:
+    - trinomial_factoring
+    - cancellation_error
+    - domain_restriction_error
+    difficulty: hard
+  - id: RAT_CANCEL_SHARED_X_FACTOR_001
+    type: generated
+    prompt_template: Simplify (x^2 + {a}x)/x and keep the original restriction.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 15
+    options:
+    - id: A
+      label: x, with x ≠ 0
+    - id: B
+      label: x + {a}, with x ≠ 0
+    - id: C
+      label: x + {a}
+    - id: D
+      label: x^2 + {a}, with x ≠ 0
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Factor the entire numerator before canceling, then state the excluded value.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Factor x from the numerator:
+      x^2 + {a}x = x(x + {a}).
+      Cancel the common factor x to obtain x + {a}.
+      Because the original denominator was x, x ≠ 0.
+    mistake_tags:
+    - gcf_factoring
+    - cancellation_error
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_DO_NOT_CANCEL_ACROSS_ADDITION_001
+    type: generated
+    prompt_template: Which is a valid rewrite of (x + {a})/x?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 15
+    options:
+    - id: A
+      label: '{a}'
+    - id: B
+      label: 1 + {a}
+    - id: C
+      label: 1 + {a}/x, with x ≠ 0
+    - id: D
+      label: x + {a}, with x ≠ 0
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Split the numerator over the common denominator:
+      (x + {a})/x = x/x + {a}/x = 1 + {a}/x.
+      The x cannot cancel across the addition in x + {a}.
+    mistake_tags:
+    - illegal_cancellation
+    - addition_in_numerator
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_EQUIVALENT_FORM_DIFFERENT_DOMAIN_001
+    type: generated
+    prompt_template: After (x^2 - {square})/(x - {a}) simplifies to x + {a}, which statement is correct?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      square: a * a
+    options:
+    - id: A
+      label: The two expressions agree for every real x, including x = {a}.
+    - id: B
+      label: Canceling the factor makes x = {a} allowed again.
+    - id: C
+      label: The simplified expression is undefined at x = {-a}.
+    - id: D
+      label: The two expressions agree for every x except x = {a}.
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The original expression is undefined at x = {a}.
+      For every other input, the canceled and simplified forms have the same value.
+      The canceled factor creates a hole at x = {a}.
+    mistake_tags:
+    - domain_restriction_error
+    - equivalent_expression_error
+    - canceled_factor
+    difficulty: hard
+  - id: RAT_EVALUATE_ALLOWED_INPUT_001
+    type: generated
+    prompt_template: Evaluate R(x) = (x + {a})/(x - {b}) at x = {x_value}.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      x_value:
+        type: int
+        min: -8
+        max: 8
+      b:
+        type: int
+        min: -6
+        max: 6
+      result:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - -1
+        - 0
+        - 1
+    derived:
+      gap: x_value - b
+      a: result * gap - x_value
+      numerator: x_value + a
+    constraints:
+    - x_value != b
+    - a != 0
+    - a >= -20
+    - a <= 20
+    answer:
+      type: numeric
+      value: '{result}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Substitute the input, simplify the numerator and denominator, then evaluate the quotient.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Substitute x = {x_value}:
+      ({x_value} + {a})/({x_value} - {b}).
+      The numerator is {numerator} and the denominator is {gap}.
+      The value is {result}.
+    mistake_tags:
+    - substitution_error
+    - rational_evaluation
+    - sign_error
+    - division_error
+    difficulty: medium
+  - id: RAT_SIMPLIFY_MULTIPLE_RESTRICTIONS_001
+    type: generated
+    prompt_template: Simplify x(x + {a})/[x(x + {b})] and keep every original restriction.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+      b:
+        type: int
+        min: 2
+        max: 12
+    constraints:
+    - a != b
+    options:
+    - id: A
+      label: (x + {a})/(x + {b}), with x ≠ 0 and x ≠ {-b}
+    - id: B
+      label: (x + {a})/(x + {b}), with only x ≠ {-b}
+    - id: C
+      label: (x + {b})/(x + {a}), with x ≠ 0 and x ≠ {-a}
+    - id: D
+      label: 1, with x ≠ 0
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Identify every value that makes the original denominator zero, then cancel the common factor.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The original denominator x(x + {b}) is zero at x = 0 and x = {-b}.
+      Cancel the common factor x.
+      The simplified expression is (x + {a})/(x + {b}), with both original restrictions.
+    mistake_tags:
+    - multiple_restrictions
+    - cancellation_error
+    - domain_restriction_error
+    difficulty: hard

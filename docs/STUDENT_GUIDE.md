@@ -295,7 +295,11 @@ The page shows question number, total authored scenarios, prompt, response type,
 
 ### Final-answer types
 
-Questions may accept numeric answers, tolerance ranges, multiple-choice options, symbolic expressions, equation solutions, inequality solution sets, exact text, or theorem conclusions. Follow the notation instructions in the prompt.
+Questions may accept numeric answers, tolerance ranges, multiple-choice options, symbolic expressions, finite sets, rational expressions with domain exclusions, equation solutions, interval sets, exact text, or theorem conclusions. Follow the notation instructions in the prompt.
+
+Finite sets are order-independent and ignore repeated entries. You can usually write `{ -2, 5 }` or `x = -2 or x = 5`; use `{}` or `no solution` for the empty set. Interval answers accept standard interval/union notation such as `(-infinity, -1] U (3, infinity)`, and many equivalent inequality forms. Infinity endpoints must always be open.
+
+For a rational-expression question, the simplified formula and its excluded input values are graded together. A cancelled factor can leave a hole, so enter every original domain restriction in the separate **Excluded values** field even when that factor is no longer visible in the final formula.
 
 ### Written explanations
 
@@ -306,6 +310,14 @@ A separate work box can capture your reasoning even when the final answer self-g
 Some advanced algebra questions require ordered steps. Put one equation, expression, or inequality per line. QuickMaths checks whether successive lines remain equivalent and whether the final line matches the answer. For inequalities, sign reversal and the full solution set matter.
 
 This subsystem checks supported mathematical transformations. It is not a formal-proof judge.
+
+### Rational-equation ledger
+
+Some rational equations open a guided work area for original restrictions, algebra steps, and candidate classifications. Record values excluded by the original denominators before clearing fractions. Then enter one algebraic statement per line and classify each candidate as valid, excluded, extraneous, repeated, or non-real. QuickMaths checks the restrictions, the algebraic progression, each candidate against the original equation, and whether the valid candidates match the submitted solution set.
+
+### Sign-chart workspace
+
+Polynomial and rational inequalities can open a structured sign chart. Enter critical points, one test value and sign for each interval, selected intervals, endpoint decisions, and the final interval set. The page presents normal fields rather than JSON. QuickMaths reports errors by row, including a misplaced critical point, an incorrect test sign, a wrongly selected interval, or an endpoint that should be included or excluded.
 
 ### Formal proof required
 
@@ -391,7 +403,7 @@ Choose a subject, write one or more lessons, add theory, worked examples, applic
 
 ### Response and review design
 
-Studio separates final-answer grading, shown work, and review. It explains ordinary answers, explanations, checked maths steps, formal proof obligations, and rubric responses with learner previews and editable examples.
+Studio separates final-answer grading, shown work, and review. It explains ordinary answers, finite sets, rational formulas and exclusions, interval sets, checked maths steps, rational-equation ledgers, sign charts, formal proof obligations, and rubric responses with learner previews and editable examples.
 
 ### Native improvements
 
@@ -410,6 +422,8 @@ WebMCP lets a compatible browser agent inspect the same visible QuickMaths state
 `Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.`
 
 The agent should begin with `get_app_state`, `get_progress_summary`, and `get_learning_context` as needed. It can see active curriculum policy without exposing private educator instructions as page content.
+
+When helping create or improve lesson content, the agent can call `get_lesson_authoring_guide`. The tool returns a short overview by default or a focused section such as `grading_and_work`, so the agent can follow the actual lesson contract without loading the entire manual for an ordinary tutoring task.
 
 ### What a tutor agent can do
 

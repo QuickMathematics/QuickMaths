@@ -46,8 +46,31 @@
               "variables": { "type": "object" },
               "derived": { "type": "object" },
               "constraints": { "type": "array", "items": { "type": "string" } },
-              "answer": { "type": "object" },
-              "grading": { "type": "object" },
+              "answer": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["text", "numeric", "expression", "equation_solution", "inequality_solution", "multiple_choice", "theorem_conclusion", "finite_set", "rational_expression", "interval_set"]
+                  },
+                  "value": { "type": ["string", "number"] },
+                  "values": { "type": "array", "items": { "type": ["string", "number"] } },
+                  "variable": { "type": "string" },
+                  "excluded_values": { "type": "array", "items": { "type": ["string", "number"] } },
+                  "accepted_forms": { "type": "array", "items": { "type": "string" } }
+                }
+              },
+              "grading": {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "enum": ["exact_text", "exact_numeric", "numeric_with_tolerance", "multiple_choice", "symbolic_expression", "equation_solution", "inequality_solution", "theorem_conclusion", "finite_set", "rational_expression", "interval_set"]
+                  },
+                  "tolerance": { "type": "number" },
+                  "require_reduced_form": { "type": "boolean" }
+                }
+              },
               "answer_mode": {
                 "type": "string",
                 "enum": [
@@ -64,15 +87,50 @@
                 "properties": {
                   "mode": {
                     "type": "string",
-                    "enum": ["none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check"]
+                    "enum": ["none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"]
                   },
                   "prompt": { "type": "string" },
-                  "line_type": { "type": "string", "enum": ["expression", "equation"] },
+                  "line_type": { "type": "string", "enum": ["expression", "equation", "inequality"] },
                   "target_variable": { "type": "string" },
                   "minimum_steps": { "type": "integer", "minimum": 0 },
                   "require_final_answer_match": { "type": "boolean" },
                   "proof_policy": { "type": "object" },
                   "rubric": { "type": "object" },
+                  "require_original_equation_check": { "type": "boolean" },
+                  "require_restrictions": { "type": "boolean" },
+                  "original_equation": { "type": "string" },
+                  "expected_restrictions": {
+                    "type": "array",
+                    "items": { "type": ["string", "number"] }
+                  },
+                  "sign_chart": {
+                    "type": "object",
+                    "properties": {
+                      "expression_kind": { "type": "string", "enum": ["polynomial", "rational"] },
+                      "expression": { "type": "string" },
+                      "relation": { "type": "string", "enum": [">", ">=", "<", "<="] },
+                      "expected_factorization": { "type": "string" },
+                      "reduced_expression": { "type": "string" },
+                      "require_factorization": { "type": "boolean" },
+                      "critical_points": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["value", "kind"],
+                          "properties": {
+                            "value": { "type": ["string", "number"] },
+                            "kind": { "type": "string", "enum": ["zero", "undefined", "hole"] },
+                            "multiplicity": { "type": "integer", "minimum": 1 },
+                            "factor": { "type": "string" }
+                          }
+                        }
+                      },
+                      "require_test_values": { "type": "boolean" },
+                      "require_interval_signs": { "type": "boolean" },
+                      "require_endpoint_decisions": { "type": "boolean" },
+                      "require_final_answer_match": { "type": "boolean" }
+                    }
+                  },
                   "grading": {
                     "type": "string",
                     "enum": ["not_graded", "tutor_review", "self_review"]

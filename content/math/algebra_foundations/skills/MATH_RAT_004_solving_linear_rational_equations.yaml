@@ -1,0 +1,656 @@
+id: MATH_RAT_004
+schema_version: 0.2
+name: Solving linear rational equations
+domain: Math
+subdomain: Rational Expressions and Equations
+description: Solve rational equations that reduce to linear equations by recording restrictions, clearing denominators,
+  solving, and checking the original equation.
+prerequisites:
+- MATH_RAT_003
+- MATH_ALG_003
+tags:
+- rational_equations
+- linear_rational_equations
+- least_common_denominator
+- domain_restrictions
+- finite_solution_sets
+- cross_multiplication
+- checking_solutions
+- combined_work
+unlocks:
+- MATH_RAT_005
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A rational equation contains one or more rational expressions.
+
+  Examples:
+
+  1/(x - 3) = 1/5
+
+  4/(x + 2) + 1 = 3
+
+  2/x = 5/(x + 6)
+
+  A value that makes any original denominator zero is not allowed. Record restrictions before doing algebra.
+
+  Why restrictions come first:
+  Multiplying by a denominator is only valid where that denominator is nonzero. Writing the restrictions keeps the transformed equation connected to the original one.
+
+  General method:
+  1. Factor every denominator when needed.
+  2. Record every value excluded by an original denominator.
+  3. Find the least common denominator, or LCD.
+  4. Multiply every term on both sides by the LCD.
+  5. Simplify the resulting equation.
+  6. Solve for all candidates.
+  7. Check each candidate in the original equation.
+  8. Report only allowed candidates in the solution set.
+
+  Example:
+  Solve 1/(x - 3) = 1/5.
+
+  Restriction: x != 3.
+
+  Multiply both sides by 5(x - 3):
+
+  5 = x - 3
+
+  x = 8
+
+  The candidate 8 is allowed and makes both sides equal 1/5, so the solution set is {8}.
+
+  Cross multiplication:
+  For a proportion a/b = c/d, with b and d nonzero, multiplying both sides by bd gives:
+
+  ad = bc
+
+  Cross multiplication is not a separate magic rule. It is the result of clearing both denominators with the LCD.
+
+  Example:
+  Solve 2/x = 5/(x + 6).
+
+  Restrictions: x != 0 and x != -6.
+
+  2(x + 6) = 5x
+
+  2x + 12 = 5x
+
+  12 = 3x
+
+  x = 4
+
+  The candidate 4 is allowed, so the solution set is {4}.
+
+  No-solution cases:
+  A rational equation may reduce to a contradiction.
+
+  Example:
+  3/(x - 1) = 7/(x - 1)
+
+  Restriction: x != 1.
+
+  Clearing the common denominator gives 3 = 7, which is false. The solution set is empty.
+
+  A nonzero rational expression cannot equal zero when its numerator is a nonzero constant.
+
+  Example:
+  5/(x + 4) = 0 has no solution.
+
+  Combined rates:
+  Rational equations model rates because time and speed often appear in denominators.
+
+  If two identical machines each take 12 hours to complete one job, their combined time x satisfies:
+
+  1/x = 1/12 + 1/12
+
+  1/x = 1/6
+
+  x = 6
+
+  Common mistake:
+  Do not cancel terms across addition. Clear denominators by multiplying every term by the LCD.
+
+  Another common mistake:
+  Do not forget a denominator restriction after it disappears from the transformed equation.
+
+  Another common mistake:
+  Do not stop after finding a candidate. Substitute it into the original equation before placing it in the final set.
+examples:
+- prompt: Solve 1/(x - 4) = 1/7.
+  solution: '{11}'
+  explanation: Restrict x != 4, clear denominators, solve x - 4 = 7, and check x = 11.
+- prompt: Solve 12/(x + 2) = 3.
+  solution: '{2}'
+  explanation: Restrict x != -2. Then 12 = 3(x + 2), so x = 2.
+- prompt: Solve 8/(x - 5) + 1 = 3.
+  solution: '{9}'
+  explanation: Subtract 1, then solve 8/(x - 5) = 2. The candidate 9 is allowed.
+- prompt: Solve 2/x = 5/(x + 6).
+  solution: '{4}'
+  explanation: Restrictions are x != 0 and x != -6. Cross multiplication gives 2(x + 6) = 5x.
+- prompt: Solve (x + 5)/(x - 2) = 3.
+  solution: '{11/2}'
+  explanation: Restrict x != 2. Then x + 5 = 3x - 6, so 11 = 2x.
+- prompt: Solve 5/(x - 3) = 0.
+  solution: empty set
+  explanation: A fraction with nonzero numerator cannot equal zero.
+- prompt: Solve 4/(x + 1) = 9/(x + 1).
+  solution: empty set
+  explanation: Clearing the common denominator produces the contradiction 4 = 9.
+- prompt: Two identical pumps each take 10 hours alone. How long together?
+  solution: 5 hours
+  explanation: Solve 1/x = 1/10 + 1/10 = 1/5.
+applications:
+- title: Combined work
+  description: Rates from workers, pumps, and machines add as reciprocals of completion times.
+- title: Travel
+  description: The relationship time = distance/speed creates rational equations when speed is unknown.
+- title: Electrical networks
+  description: Equivalent resistance in parallel circuits uses equations involving reciprocals.
+- title: Formula solving
+  description: Clearing denominators is essential when an unknown appears below a fraction bar.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: RAT_EQ_RECIPROCAL_SHIFT_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: 1/(x - {a}) = 1/{b}'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      b:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      solution: a + b
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State the restriction, clear the denominators, solve for the candidate, and verify it in the original equation.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The original denominator requires x != {a}.
+      Multiply by {b}(x - {a}): {b} = x - {a}.
+      Therefore x = {solution}.
+      The candidate is not excluded and checks in the original equation, so the solution set contains only x = {solution}.
+    mistake_tags:
+    - rational_equation_error
+    - domain_restriction_error
+    - clearing_denominators
+    - checking_solution
+    difficulty: easy
+  - id: RAT_EQ_LINEAR_DENOMINATOR_CONSTANT_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {numerator}/(x - {a}) = {c}'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      c:
+        type: int
+        min: 2
+        max: 9
+      t:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    derived:
+      numerator: c * t
+      solution: a + t
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: Record the excluded denominator value, clear the denominator, solve, and check the candidate in the original
+        equation.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != {a}.
+      Multiply by x - {a}: {numerator} = {c}(x - {a}).
+      Divide by {c}: {t} = x - {a}.
+      Thus x = {solution}, which is allowed and checks.
+    mistake_tags:
+    - rational_equation_error
+    - distribution_error
+    - domain_restriction_error
+    - arithmetic_error
+    difficulty: easy
+  - id: RAT_EQ_OUTSIDE_CONSTANT_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {numerator}/(x - {a}) + {c} = {d}'
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      delta:
+        type: int
+        min: 2
+        max: 8
+      t:
+        type: int
+        min: -7
+        max: 7
+        exclude:
+        - 0
+    derived:
+      numerator: delta * t
+      d: c + delta
+      solution: a + t
+    constraints:
+    - d != 0
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State the restriction, isolate the rational term, clear its denominator, solve, and check the candidate.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != {a}.
+      Subtract {c}: {numerator}/(x - {a}) = {delta}.
+      Clear the denominator: {numerator} = {delta}(x - {a}).
+      This gives x = {solution}. The candidate is allowed and checks.
+    mistake_tags:
+    - rational_equation_error
+    - inverse_operations
+    - domain_restriction_error
+    - checking_solution
+    difficulty: medium
+  - id: RAT_EQ_COMBINE_SAME_DENOMINATOR_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {p}/(x - {a}) + ({q})/(x - {a}) = {c}'
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      a:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      c:
+        type: int
+        min: 2
+        max: 8
+      t:
+        type: int
+        min: 2
+        max: 8
+      p:
+        type: int
+        min: 2
+        max: 20
+    derived:
+      total: c * t
+      q: total - p
+      solution: a + t
+    constraints:
+    - q != 0
+    - abs(q) <= 20
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: Record the restriction, combine the equal-denominator terms, clear the denominator, solve, and check.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != {a}.
+      Combine numerators: {p} + ({q}) = {total}.
+      The equation becomes {total}/(x - {a}) = {c}.
+      Clearing the denominator gives x - {a} = {t}, so x = {solution}.
+    mistake_tags:
+    - rational_equation_error
+    - combining_numerators
+    - adding_denominators
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_EQ_CROSS_MULTIPLY_SHIFTED_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {left_num}/(x - {b}) = {right_num}/(x - {d})'
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      left_num:
+        type: int
+        min: 2
+        max: 9
+      right_num:
+        type: int
+        min: 2
+        max: 9
+      b:
+        type: int
+        min: -8
+        max: 8
+      t:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+    derived:
+      solution: b + left_num * t
+      d: b + (left_num - right_num) * t
+    constraints:
+    - left_num != right_num
+    - b != d
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: List both restrictions, clear both denominators, solve the resulting linear equation, and check the candidate.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restrictions: x != {b} and x != {d}.
+      Cross multiplication gives {left_num}(x - {d}) = {right_num}(x - {b}).
+      Solving this linear equation gives x = {solution}.
+      The candidate is different from both excluded values and checks in the original proportion.
+    mistake_tags:
+    - cross_multiplication_error
+    - domain_restriction_error
+    - distribution_error
+    - linear_equation_error
+    difficulty: hard
+  - id: RAT_EQ_CROSS_MULTIPLY_X_AND_SHIFT_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {a}/x = {b}/(x + {shift})'
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 8
+      gap:
+        type: int
+        min: 1
+        max: 5
+      t:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+    derived:
+      b: a + gap
+      shift: gap * t
+      solution: a * t
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State both restrictions, cross multiply, solve the linear equation, and check the candidate in both denominators.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restrictions: x != 0 and x != {-shift}.
+      Cross multiply: {a}(x + {shift}) = {b}x.
+      Solving gives x = {solution}.
+      The candidate is allowed and makes both ratios equal.
+    mistake_tags:
+    - cross_multiplication_error
+    - domain_restriction_error
+    - distribution_error
+    - sign_error
+    difficulty: hard
+  - id: RAT_EQ_VARIABLE_NUMERATOR_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: (x + {p})/(x - {a}) = {k}'
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 6
+      a:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      solution:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    derived:
+      p: (k - 1) * solution - k * a
+    constraints:
+    - solution != a
+    - abs(p) <= 40
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State the restriction, multiply through by the denominator, solve the resulting linear equation, and check
+        the candidate.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != {a}.
+      Multiply by x - {a}: x + {p} = {k}(x - {a}).
+      Collect the x-terms and constants to obtain x = {solution}.
+      The candidate is allowed and checks in the original equation.
+    mistake_tags:
+    - rational_equation_error
+    - distribution_error
+    - variables_on_both_sides
+    - domain_restriction_error
+    difficulty: hard
+  - id: RAT_EQ_NONZERO_NUMERATOR_EQUALS_ZERO_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {c}/(x - {a}) = 0'
+    answer_mode: final_plus_required_work
+    variables:
+      c:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      a:
+        type: int
+        min: -10
+        max: 10
+    answer:
+      type: finite_set
+      values: []
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State the restriction and explain what clearing the denominator says about the nonzero numerator.
+      target_variable: x
+      require_original_equation_check: false
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != {a}.
+      Clearing the denominator would require {c} = 0.
+      Because {c} is nonzero, the equation is impossible.
+      The solution set is empty.
+    mistake_tags:
+    - no_solution
+    - zero_numerator_rule
+    - domain_restriction_error
+    - rational_equation_error
+    difficulty: medium
+  - id: RAT_EQ_UNEQUAL_NUMERATORS_SAME_DENOM_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {p}/(x - {a}) = {q}/(x - {a})'
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      p:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      q:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      a:
+        type: int
+        min: -10
+        max: 10
+    constraints:
+    - p != q
+    answer:
+      type: finite_set
+      values: []
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State the restriction, clear the common denominator, and show why the remaining statement is a contradiction.
+      target_variable: x
+      require_original_equation_check: false
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != {a}.
+      Clearing the common denominator gives {p} = {q}.
+      That statement is false because the numerators are different.
+      The solution set is empty.
+    mistake_tags:
+    - no_solution
+    - clearing_denominators
+    - equation_classification
+    - domain_restriction_error
+    difficulty: medium
+  - id: RAT_EQ_EQUAL_WORK_RATES_001
+    type: generated
+    prompt_template: Two identical machines each take {hours} hours to complete a job alone. Their combined time x satisfies
+      1/x = 1/{hours} + 1/{hours}. Solve for x.
+    answer_mode: final_plus_required_work
+    variables:
+      solution:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      hours: 2 * solution
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: rational_equation_steps
+      prompt: State x != 0, combine the rates, clear denominators, solve for x, and interpret the positive time.
+      target_variable: x
+      require_original_equation_check: true
+      require_restrictions: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Restriction: x != 0.
+      The combined rate is 1/{hours} + 1/{hours} = 2/{hours} = 1/{solution}.
+      Thus 1/x = 1/{solution}, so x = {solution}.
+      The machines complete the job together in {solution} hours.
+    mistake_tags:
+    - combined_work_error
+    - rate_equation_error
+    - adding_fractions
+    - unit_interpretation
+    difficulty: hard
