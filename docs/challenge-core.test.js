@@ -310,17 +310,25 @@ test("retakes rotate through fresh comprehensive sets from the seeded variant ba
   assert.equal(new Set([...firstIds, ...secondIds]).size, 20);
 });
 
-test("a comprehensive in-progress test survives local-state sanitization", () => {
+test("saved five-question drafts expand in place without losing existing answers", () => {
   const { store, storage } = harness();
   store.createProfile("Persistent Test Learner");
   store.startTest("MATH_ALG_002", { force: true });
   assert.equal(store.snapshot().activeTest.problems.length, 24);
+  const saved = JSON.parse(storage.value(STORAGE_KEY));
+  const profileId = saved.activeProfileId;
+  const legacyDraft = saved.drafts[profileId].MATH_ALG_002;
+  legacyDraft.problems = legacyDraft.problems.slice(0, 5);
+  const firstQuestionId = legacyDraft.problems[0].template_id;
+  legacyDraft.responses[firstQuestionId].finalAnswer = "preserved answer";
+  storage.setItem(STORAGE_KEY, JSON.stringify(saved));
   const reloaded = createQuickMathsStore({
     storage,
     curriculum,
     now: () => new Date("2026-09-01T09:42:00.000Z"),
   });
   assert.equal(reloaded.snapshot().activeTest.problems.length, 24);
+  assert.equal(reloaded.snapshot().activeTest.responses[firstQuestionId].finalAnswer, "preserved answer");
 });
 
 test("a valid custom lesson set joins the real curriculum without replacing built-in skills", () => {

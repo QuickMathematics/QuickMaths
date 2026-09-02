@@ -685,10 +685,18 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
       const skill = skillsById[skillId];
       if (!skill || !rawDraft || typeof rawDraft !== "object" || Array.isArray(rawDraft)) continue;
       const canonical = Object.fromEntries(skill.problems.map((problem) => [problem.template_id, problem]));
+      const targetLength = assessmentLength(skill);
       const problemIds = Array.isArray(rawDraft.problems)
-        ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => canonical[id]).slice(0, assessmentLength(skill))
+        ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => canonical[id]).slice(0, targetLength)
         : [];
       if (!problemIds.length) continue;
+      const included = new Set(problemIds);
+      for (const problem of skill.problems) {
+        if (problemIds.length >= targetLength) break;
+        if (included.has(problem.template_id)) continue;
+        problemIds.push(problem.template_id);
+        included.add(problem.template_id);
+      }
       const responses = rawDraft.responses && typeof rawDraft.responses === "object" ? rawDraft.responses : {};
       output[profileId][skillId] = {
         draftId: cleanText(rawDraft.draftId, 120) || `draft-imported-${profileId}-${skillId}`,

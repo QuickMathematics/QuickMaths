@@ -1,4 +1,4 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-comprehensive-tests";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-comprehensive-tests-v2";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-native-improvements-v2";
 import { createLessonStudio } from "./lesson-creator.js?v=20260902-comprehensive-tests";
 import {
