@@ -77,7 +77,7 @@ function blankSkill(index = 0) {
     prerequisites: [], passingScore: 0.8, minimumConfidence: 3, reviewMasteredDays: 7, reviewLearningDays: 2,
     examples: [{ prompt: "A worked example", solution: "Show the result", explanation: "Explain why each step works." }],
     applications: [{ title: "Why it matters", description: "Connect this lesson to a real problem or another subject." }],
-    problems: [blankProblem(id, 0)],
+    activeProblem: 0, problems: [blankProblem(id, 0)],
   };
 }
 
@@ -85,6 +85,7 @@ function blankDraft(snapshot) {
   const subject = snapshot?.activeSubject;
   return {
     tutorialOpen: true, activeSkill: 0, lastValidation: null,
+    mode: "add", nativeSkillId: snapshot?.selectedSkill?.custom ? "" : (snapshot?.selectedSkill?.id ?? ""),
     id: "PACK_MY_LESSONS", name: "My lesson set", description: "A custom curriculum built in QuickMaths.", author: "", version: "1.0.0",
     subjectMode: "extend", subjectId: subject?.id ?? "SUBJECT_MATH", subjectName: subject?.name ?? "Mathematics",
     subjectShortName: subject?.shortName ?? "Maths", subjectIcon: subject?.icon ?? "∑", subjectDescription: subject?.description ?? "",
@@ -95,7 +96,7 @@ function blankDraft(snapshot) {
 function restoreDraft(snapshot) {
   try {
     const parsed = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "null");
-    if (parsed && Array.isArray(parsed.skills) && parsed.skills.length) return parsed;
+    if (parsed && Array.isArray(parsed.skills) && parsed.skills.length) return { mode: "add", nativeSkillId: "", ...parsed };
   } catch { /* Start from a clean author draft. */ }
   return blankDraft(snapshot);
 }
@@ -113,8 +114,8 @@ function helpButton(help) {
   return `<button class="studio-help" type="button" data-studio-help data-tooltip="${esc(help)}" aria-label="Help: ${esc(help)}" aria-expanded="false">?</button>`;
 }
 
-function field(label, name, value, { type = "text", help = "", hint = "", placeholder = "", min = "", max = "", step = "" } = {}) {
-  return `<label class="studio-field"><span>${esc(label)}${helpButton(help)}</span><input data-creator-field="${esc(name)}" type="${esc(type)}" value="${esc(value)}" placeholder="${esc(placeholder)}" ${min !== "" ? `min="${esc(min)}"` : ""} ${max !== "" ? `max="${esc(max)}"` : ""} ${step !== "" ? `step="${esc(step)}"` : ""}>${hint ? `<small>${esc(hint)}</small>` : ""}</label>`;
+function field(label, name, value, { type = "text", help = "", hint = "", placeholder = "", min = "", max = "", step = "", readonly = false } = {}) {
+  return `<label class="studio-field"><span>${esc(label)}${helpButton(help)}</span><input data-creator-field="${esc(name)}" type="${esc(type)}" value="${esc(value)}" placeholder="${esc(placeholder)}" ${min !== "" ? `min="${esc(min)}"` : ""} ${max !== "" ? `max="${esc(max)}"` : ""} ${step !== "" ? `step="${esc(step)}"` : ""} ${readonly ? "readonly" : ""}>${hint ? `<small>${esc(hint)}</small>` : ""}</label>`;
 }
 
 function area(label, name, value, { help = "", hint = "", rows = 4, placeholder = "" } = {}) {
@@ -226,7 +227,7 @@ function renderProblemEditor(skill, problem, index) {
   const indexed = (markup) => markup.replaceAll("data-creator-field", `data-index="${index}" data-creator-field`);
   const isProof = problem.workMode === "proof_obligations";
   const graderHelp = isProof ? "This grades only the short conclusion. It never decides whether the proof is valid; that happens through the obligation review below." : "This checks only the final-answer field. Proofs and long responses are handled separately under How the learner answers.";
-  return `<details ${index === 0 ? "open" : ""}>
+  return `<details open>
     <summary><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(problem.prompt || "Untitled question")}</b><small>${esc(problem.gradingMethod)} · ${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</small></summary>
     <div class="studio-problem-body">
       <div class="studio-repeat-head"><b>Question ${index + 1}</b>${skill.problems.length > 1 ? `<button data-creator-action="remove-problem" data-index="${index}">Remove</button>` : ""}</div>
@@ -250,7 +251,7 @@ function renderProblemEditor(skill, problem, index) {
 
 function buildPack(draft) {
   const subjectId = draft.subjectMode === "extend" ? draft.subjectId : cleanId(draft.subjectId, "SUBJECT_");
-  const skillIds = draft.skills.map((skill) => cleanId(skill.id, "CUSTOM_"));
+  const skillIds = draft.skills.map((skill) => draft.mode === "override" ? skill.id : cleanId(skill.id, "CUSTOM_"));
   const skills = draft.skills.map((skill, skillIndex) => {
     const skillId = skillIds[skillIndex];
     return {
@@ -273,7 +274,7 @@ function buildPack(draft) {
         if (problem.workMode === "proof_obligations") work.proof_policy = { obligations: lines(problem.proofObligations), accepted_strategies: lines(problem.proofStrategies) };
         if (problem.workMode === "rubric_check") work.rubric = { criteria: lines(problem.rubricCriteria).map((description, index) => ({ id: `criterion_${index + 1}`, description, weight: 1 })) };
         const output = {
-          template_id: cleanId(problem.templateId || `${skillId}_Q${problemIndex + 1}`, "QUESTION_"), skill_id: skillId,
+          template_id: draft.mode === "override" ? problem.templateId : cleanId(problem.templateId || `${skillId}_Q${problemIndex + 1}`, "QUESTION_"), skill_id: skillId,
           difficulty: problem.difficulty, prompt: problem.prompt, expected_answer: problem.expectedAnswer,
           answer_type: problem.answerType, grading_method: problem.gradingMethod, solution_steps: lines(problem.solutionSteps),
           mistake_tags: lines(problem.mistakeTags), answer_mode: answerMode, work,
@@ -294,7 +295,7 @@ function buildPack(draft) {
     };
   });
   return {
-    format: "quickmaths.lesson-set", schema_version: "2.0", id: cleanId(draft.id, "PACK_"), name: draft.name,
+    format: "quickmaths.lesson-set", schema_version: "2.0", mode: draft.mode === "override" ? "override" : "add", id: cleanId(draft.id, "PACK_"), name: draft.name,
     description: draft.description, author: draft.author || "QuickMaths Lesson Studio", version: draft.version,
     subject: {
       id: subjectId, name: draft.subjectName, short_name: draft.subjectShortName, icon: draft.subjectIcon,
@@ -307,6 +308,8 @@ function buildPack(draft) {
 
 function draftFromPack(pack, snapshot) {
   const base = blankDraft(snapshot);
+  base.mode = pack.mode === "override" ? "override" : "add";
+  base.nativeSkillId = base.mode === "override" ? (pack.skills?.[0]?.id ?? "") : "";
   base.id = pack.id ?? base.id; base.name = pack.name ?? base.name; base.description = pack.description ?? base.description;
   base.author = pack.author ?? ""; base.version = pack.version ?? "1.0.0";
   if (pack.subject) {
@@ -317,7 +320,7 @@ function draftFromPack(pack, snapshot) {
     base.subjectMode = snapshot.subjects.some((subject) => subject.id === base.subjectId) ? "extend" : "create";
   }
   base.skills = (pack.skills ?? []).map((skill, skillIndex) => ({
-    ...blankSkill(skillIndex), id: skill.id, name: skill.name, description: skill.description, subdomain: skill.subdomain ?? "Foundations",
+    ...blankSkill(skillIndex), activeProblem: 0, id: skill.id, name: skill.name, description: skill.description, subdomain: skill.subdomain ?? "Foundations",
     theory: skill.theory, tags: (skill.tags ?? []).join("\n"), prerequisites: (skill.prerequisites ?? []).map((ref) => typeof ref === "string" ? ref : ref.skill_id),
     passingScore: skill.mastery?.passing_score ?? .8, minimumConfidence: skill.mastery?.minimum_confidence ?? 3,
     reviewMasteredDays: skill.mastery?.review_after_days_if_mastered ?? 7, reviewLearningDays: skill.mastery?.review_after_days_if_learning ?? 2,
@@ -344,6 +347,29 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
 
   const save = () => persist(draft);
   const currentSkill = () => draft.skills[Math.max(0, Math.min(draft.activeSkill, draft.skills.length - 1))];
+  const loadNativeLesson = (skillId, { announce = true } = {}) => {
+    const snapshot = getSnapshot();
+    const source = store.skillsById[skillId];
+    if (!source || source.custom) throw new Error("Choose a native QuickMaths lesson to improve.");
+    if (source.overridden) throw new Error("Restore this lesson's installed improvement in Settings before creating a replacement.");
+    const subject = snapshot.subjects.find((item) => item.id === source.subjectId);
+    if (!subject) throw new Error("The native lesson subject is unavailable.");
+    draft = draftFromPack({
+      format: "quickmaths.lesson-set", schema_version: "2.0", mode: "override",
+      id: cleanId(`IMPROVE_${source.id}`, "PACK_"),
+      name: `Improvement · ${source.name}`,
+      description: `A reversible improvement to the native QuickMaths lesson ${source.name}.`,
+      author: "", version: "1.0.0",
+      subject: { ...subject, short_name: subject.shortName },
+      track: { id: `TRACK_IMPROVE_${source.id}`, name: `Improvement · ${source.name}`, skills: [source.id] },
+      skills: [source],
+    }, snapshot);
+    draft.tutorialOpen = false;
+    draft.nativeSkillId = source.id;
+    save();
+    if (announce) showToast(`${source.name} opened as an editable native improvement.`);
+    return { ok: true, mode: "override", skillId: source.id, completedProgressPreserved: true };
+  };
 
   const setField = (path, value, target) => {
     const skill = currentSkill();
@@ -380,14 +406,20 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
 
   const render = (snapshot) => {
     const skill = currentSkill();
+    skill.activeProblem = Math.max(0, Math.min(Number(skill.activeProblem) || 0, skill.problems.length - 1));
+    const activeProblem = skill.problems[skill.activeProblem];
+    const nativeSkills = snapshot.curriculum.allSkills.filter((item) => item.native && !item.custom && !item.overridden);
+    if (!draft.nativeSkillId || !nativeSkills.some((item) => item.id === draft.nativeSkillId)) draft.nativeSkillId = snapshot.selectedSkill?.custom ? (nativeSkills[0]?.id ?? "") : (snapshot.selectedSkill?.id ?? nativeSkills[0]?.id ?? "");
+    const currentDraftSkillId = draft.mode === "override" ? skill.id : cleanId(skill.id, "CUSTOM_");
     const allSkills = [
       ...snapshot.curriculum.allSkills.map((item) => ({ id: item.id, name: item.name, subjectId: item.subjectId })),
       ...draft.skills.map((item) => ({ id: cleanId(item.id, "CUSTOM_"), name: item.name, subjectId: draft.subjectId })),
-    ].filter((item, index, rows) => rows.findIndex((candidate) => candidate.id === item.id) === index && item.id !== cleanId(skill.id, "CUSTOM_"));
+    ].filter((item, index, rows) => rows.findIndex((candidate) => candidate.id === item.id) === index && item.id !== currentDraftSkillId);
     const validation = draft.lastValidation;
     const subjectOptions = snapshot.subjects.map((subject) => [subject.id, `${subject.icon} ${subject.name} · ${subject.skillIds.length} lessons`]);
     return `
-      <header class="page-head studio-head"><div><p class="eyebrow">Human Lesson Creator</p><h1>Build a curriculum without writing JSON.</h1><p>QuickMaths turns these friendly forms into the same validated lesson-set format an agent authors directly.</p></div><div class="page-actions"><button class="button button-outline" data-creator-action="import">Open JSON</button><button class="button button-primary" data-creator-action="download">Download lesson set</button></div></header>
+      <header class="page-head studio-head"><div><p class="eyebrow">Human Lesson Creator</p><h1>Create something new—or improve what ships with QuickMaths.</h1><p>These friendly forms produce the same validated add-on and native-improvement formats an agent can author directly.</p></div><div class="page-actions"><button class="button button-outline" data-creator-action="import">Open JSON</button><button class="button button-primary" data-creator-action="download">Download lesson set</button></div></header>
+      <section class="studio-native-picker"><div><p class="eyebrow">Improve our work</p><h2>Edit a native lesson</h2><p>Open any built-in lesson as a reversible override. Its ID and completed learner progress stay intact; unfinished tests restart on install, and restoring the original later does not erase mastery.</p></div><label><span>Native lesson</span><select data-creator-field="draft.nativeSkillId">${nativeSkills.map((item) => `<option value="${esc(item.id)}" ${item.id === draft.nativeSkillId ? "selected" : ""}>${esc(snapshot.subjects.find((subject) => subject.id === item.subjectId)?.name ?? "QuickMaths")} › ${esc(item.name)}</option>`).join("")}</select></label><button class="button button-secondary" data-creator-action="load-native">Open editable copy</button></section>
       ${draft.tutorialOpen ? `<section class="studio-tutorial"><div><p class="eyebrow">Two-minute tour</p><h2>Word for lesson files, basically.</h2><p>Pick a subject, write one or more lessons, add mastery questions, then validate and install. Tap or hover any <i aria-hidden="true">?</i> for a plain-English explanation.</p></div><ol><li><b>1</b><span>Subject<small>Extend Maths or start Biology, Physics, anything.</small></span></li><li><b>2</b><span>Lessons<small>Theory, examples, applications, and bridge prerequisites.</small></span></li><li><b>3</b><span>Questions<small>Answers, graders, shown work, proof, and review rules.</small></span></li><li><b>4</b><span>Publish<small>Validate, download, and install into the same save pipeline.</small></span></li></ol><button class="quiet-button" data-creator-action="close-tutorial">Got it — hide the tour</button></section>` : `<button class="quiet-button studio-tour-open" data-creator-action="open-tutorial">Show the two-minute tour</button>`}
       <section class="studio-grid">
         <aside class="studio-rail">
@@ -398,19 +430,18 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
           ${field("Author", "draft.author", draft.author, { placeholder: "Your name" })}
           ${field("Version", "draft.version", draft.version)}
           <hr>
-          <div class="studio-section-title"><div><p class="eyebrow">Lessons</p><strong>${draft.skills.length} in this set</strong></div><button data-creator-action="add-skill" title="Add another lesson">＋</button></div>
+          <div class="studio-section-title"><div><p class="eyebrow">Lessons</p><strong>${draft.mode === "override" ? "Native improvement" : `${draft.skills.length} in this set`}</strong></div>${draft.mode === "override" ? "" : `<button data-creator-action="add-skill" title="Add another lesson">＋</button>`}</div>
           <div class="studio-skill-list">${draft.skills.map((item, index) => `<button data-creator-action="select-skill" data-index="${index}" class="${index === draft.activeSkill ? "is-active" : ""}"><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(item.name || "Untitled lesson")}</b><small>${esc(item.id)}</small></button>`).join("")}</div>
           <button class="button button-outline studio-reset" data-creator-action="reset">Reset studio draft</button>
         </aside>
         <div class="studio-canvas">
           <section class="studio-card">
-            <div class="studio-section-title"><div><p class="eyebrow">1 · Subject</p><h2>Where does this set live?</h2></div></div>
-            <div class="studio-choice"><label><input type="radio" data-creator-field="draft.subjectMode" value="extend" ${draft.subjectMode === "extend" ? "checked" : ""}><span><b>Extend a subject</b><small>Add these lessons into an existing curriculum.</small></span></label><label><input type="radio" data-creator-field="draft.subjectMode" value="create" ${draft.subjectMode === "create" ? "checked" : ""}><span><b>Create a subject</b><small>Start a separate curriculum with its own colors.</small></span></label></div>
-            ${draft.subjectMode === "extend" ? select("Existing subject", "draft.subjectId", draft.subjectId, subjectOptions, "The subject dropdown and mastery map will show these lessons here.") : `<div class="studio-two">${field("Subject ID", "draft.subjectId", draft.subjectId, { help: "A stable ID such as SUBJECT_BIOLOGY." })}${field("Subject name", "draft.subjectName", draft.subjectName)}</div><div class="studio-three">${field("Short name", "draft.subjectShortName", draft.subjectShortName)}${field("Icon", "draft.subjectIcon", draft.subjectIcon, { help: "One short symbol or emoji used in the subject picker." })}${field("Description", "draft.subjectDescription", draft.subjectDescription)}</div><div class="theme-palette">${Object.entries(draft.theme).map(([key, value]) => `<label title="${esc(key)}"><input data-creator-field="theme.${esc(key)}" type="color" value="${esc(value)}"><span>${esc(key.replace(/[A-Z]/g, (letter) => ` ${letter.toLowerCase()}`))}</span></label>`).join("")}</div>`}
+            <div class="studio-section-title"><div><p class="eyebrow">1 · Subject</p><h2>${draft.mode === "override" ? "Native lesson location" : "Where does this set live?"}</h2></div></div>
+            ${draft.mode === "override" ? `<div class="studio-override-note"><span>↻</span><div><strong>${esc(draft.subjectName)} · ${esc(skill.id)}</strong><p>This improvement replaces the lesson content only while installed. The native ID, map position, and every learner’s completed progress remain preserved; unfinished tests restart when the improvement is installed or restored.</p></div></div>` : `<div class="studio-choice"><label><input type="radio" data-creator-field="draft.subjectMode" value="extend" ${draft.subjectMode === "extend" ? "checked" : ""}><span><b>Extend a subject</b><small>Add these lessons into an existing curriculum.</small></span></label><label><input type="radio" data-creator-field="draft.subjectMode" value="create" ${draft.subjectMode === "create" ? "checked" : ""}><span><b>Create a subject</b><small>Start a separate curriculum with its own colors.</small></span></label></div>${draft.subjectMode === "extend" ? select("Existing subject", "draft.subjectId", draft.subjectId, subjectOptions, "The subject dropdown and mastery map will show these lessons here.") : `<div class="studio-two">${field("Subject ID", "draft.subjectId", draft.subjectId, { help: "A stable ID such as SUBJECT_BIOLOGY." })}${field("Subject name", "draft.subjectName", draft.subjectName)}</div><div class="studio-three">${field("Short name", "draft.subjectShortName", draft.subjectShortName)}${field("Icon", "draft.subjectIcon", draft.subjectIcon, { help: "One short symbol or emoji used in the subject picker." })}${field("Description", "draft.subjectDescription", draft.subjectDescription)}</div><div class="theme-palette">${Object.entries(draft.theme).map(([key, value]) => `<label title="${esc(key)}"><input data-creator-field="theme.${esc(key)}" type="color" value="${esc(value)}"><span>${esc(key.replace(/[A-Z]/g, (letter) => ` ${letter.toLowerCase()}`))}</span></label>`).join("")}</div>`}`}
           </section>
           <section class="studio-card">
             <div class="studio-section-title"><div><p class="eyebrow">2 · Lesson ${draft.activeSkill + 1}</p><h2>${esc(skill.name)}</h2></div>${draft.skills.length > 1 ? `<button class="danger-link" data-creator-action="remove-skill">Remove lesson</button>` : ""}</div>
-            <div class="studio-two">${field("Lesson name", "skill.name", skill.name)}${field("Lesson ID", "skill.id", skill.id, { help: "Stable and globally unique. The studio enforces the CUSTOM_ prefix." })}</div>
+            <div class="studio-two">${field("Lesson name", "skill.name", skill.name)}${field("Lesson ID", "skill.id", skill.id, { readonly: draft.mode === "override", help: draft.mode === "override" ? "Locked so existing learner progress remains attached to this native lesson." : "Stable and globally unique. The studio enforces the CUSTOM_ prefix." })}</div>
             <div class="studio-two">${field("Topic / subdomain", "skill.subdomain", skill.subdomain)}${field("Tags, one per line", "skill.tags", skill.tags)}</div>
             ${area("What will learners master?", "skill.description", skill.description, { rows: 3 })}
             ${area("Lesson theory", "skill.theory", skill.theory, { rows: 9, help: "Plain text only. Blank lines make paragraphs; lines beginning with - make lists." })}
@@ -425,12 +456,14 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
           <section class="studio-card">
             <div class="studio-section-title"><div><p class="eyebrow">3 · Mastery questions</p><h2>What proves this lesson?</h2><p>Build the short answer, any required reasoning, and the sign-off rule as three separate pieces.</p></div><button class="button button-secondary" data-creator-action="add-problem">＋ Add question</button></div>
             <div class="studio-question-roadmap"><article><span>1</span><div><strong>Final answer</strong><p>The local grader checks a number, choice, expression, or conclusion.</p></div></article><i>→</i><article><span>2</span><div><strong>Shown work</strong><p>Optional explanation, checked maths steps, a proof, or a rubric response.</p></div></article><i>→</i><article><span>3</span><div><strong>Review</strong><p>Proofs and rubric responses wait for a self, tutor, or agent verdict.</p></div></article></div>
-            <div class="studio-problems">${skill.problems.map((problem, index) => renderProblemEditor(skill, problem, index)).join("")}</div>
+            <nav class="studio-question-tabs" aria-label="Mastery question bank">${skill.problems.map((problem, index) => `<button type="button" data-creator-action="select-problem" data-index="${index}" aria-current="${index === skill.activeProblem ? "true" : "false"}"><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(problem.prompt || "Untitled question")}</b><small>${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</small></button>`).join("")}</nav>
+            <p class="studio-question-count">Editing question ${skill.activeProblem + 1} of ${skill.problems.length}. Only the selected editor is rendered, so large native question banks stay fast.</p>
+            <div class="studio-problems">${renderProblemEditor(skill, activeProblem, skill.activeProblem)}</div>
           </section>
           <section class="studio-card studio-publish">
             <div><p class="eyebrow">4 · Validate and publish</p><h2>Ready for the map?</h2><p>Validation uses the exact same safety and graph checks as file upload and WebMCP staging.</p></div>
             ${validation ? `<div class="studio-validation ${validation.ok ? "is-valid" : "is-error"}"><strong>${validation.ok ? "✓ Valid lesson set" : "Needs a little work"}</strong><p>${esc(validation.message)}</p>${validation.ok ? `<small>${validation.skillCount} lessons · ${validation.problemCount} questions · ${esc(validation.subjectName)}</small>` : ""}</div>` : `<div class="studio-validation"><strong>Not checked yet</strong><p>Validate before downloading or installing.</p></div>`}
-            <div class="studio-publish-actions"><button class="button button-outline" data-creator-action="validate">Validate preview</button><button class="button button-secondary" data-creator-action="download">Download JSON</button><button class="button button-primary" data-creator-action="install">Install into QuickMaths</button><button class="button button-outline" data-creator-action="publish-depot">Publish to Lesson Depot ↗</button></div>
+            <div class="studio-publish-actions"><button class="button button-outline" data-creator-action="validate">Validate preview</button><button class="button button-secondary" data-creator-action="download">Download JSON</button><button class="button button-primary" data-creator-action="install">${draft.mode === "override" ? "Install improvement" : "Install into QuickMaths"}</button><button class="button button-outline" data-creator-action="publish-depot">Publish to Lesson Depot ↗</button></div>
             <p class="pack-security-note"><strong>Answer-key warning:</strong> the downloaded file contains expected answers and solutions. Treat it as an author file, not a learner worksheet.</p>
           </section>
         </div>
@@ -461,6 +494,12 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
   const handleAction = (target) => {
     const action = target.dataset.creatorAction;
     if (!action) return false;
+    if (action === "load-native") {
+      const source = store.skillsById[draft.nativeSkillId];
+      if (!source) { showToast("Choose a native lesson first."); return true; }
+      if (confirm(`Open ${source.name} as an editable native improvement?\n\nThis replaces the current Studio draft. Nothing in the curriculum changes until you validate and install the improvement.`)) loadNativeLesson(source.id);
+      return true;
+    }
     const skill = currentSkill();
     const index = Number(target.dataset.index);
     if (action === "close-tutorial") draft.tutorialOpen = false;
@@ -468,8 +507,9 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     if (action === "select-skill") draft.activeSkill = index;
     if (action === "add-skill") { draft.skills.push(blankSkill(draft.skills.length)); draft.activeSkill = draft.skills.length - 1; }
     if (action === "remove-skill" && draft.skills.length > 1 && confirm("Remove this lesson from the studio draft?")) { draft.skills.splice(draft.activeSkill, 1); draft.activeSkill = Math.max(0, draft.activeSkill - 1); }
-    if (action === "add-problem") skill.problems.push(blankProblem(cleanId(skill.id, "CUSTOM_"), skill.problems.length));
-    if (action === "remove-problem" && skill.problems.length > 1) skill.problems.splice(index, 1);
+    if (action === "select-problem") skill.activeProblem = index;
+    if (action === "add-problem") { skill.problems.push(blankProblem(cleanId(skill.id, "CUSTOM_"), skill.problems.length)); skill.activeProblem = skill.problems.length - 1; }
+    if (action === "remove-problem" && skill.problems.length > 1) { skill.problems.splice(index, 1); skill.activeProblem = Math.max(0, Math.min(skill.activeProblem, skill.problems.length - 1)); }
     if (action === "apply-procedural-example") {
       const problem = skill.problems[index];
       problem.workPrompt = "Show one mathematical step per line and keep each line equivalent to the one before it.";
@@ -507,8 +547,11 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     }
     if (action === "install") {
       const preview = validate();
-      if (preview && confirm(`Install ${preview.name}?\n\n${preview.skillCount} lessons · ${preview.problemCount} questions · ${preview.subjectName}\n\nIt will join the mastery map and be included in future progress backups.`)) {
-        const result = store.importLessonPack(JSON.stringify(buildPack(draft))); showToast(`${result.name} installed in ${result.subjectName}.`);
+      const installNote = preview?.mode === "override"
+        ? "This replaces the native lesson content while keeping its ID, map position, and completed learner progress. Unfinished tests for the lesson restart so answers cannot cross between question-bank versions. You can restore the original from Settings."
+        : "It will join the mastery map and be included in future progress backups.";
+      if (preview && confirm(`Install ${preview.name}?\n\n${preview.skillCount} lessons · ${preview.problemCount} questions · ${preview.subjectName}\n\n${installNote}`)) {
+        const result = store.importLessonPack(JSON.stringify(buildPack(draft))); showToast(result.mode === "override" ? `${result.name} installed. Completed progress was preserved${result.restartedDraftCount ? `; ${result.restartedDraftCount} unfinished test${result.restartedDraftCount === 1 ? " restarted" : "s restarted"}` : ""}.` : `${result.name} installed in ${result.subjectName}.`);
       }
     }
     if (action === "publish-depot") {
@@ -529,5 +572,5 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     } catch (error) { showToast(error instanceof Error ? error.message : String(error)); return false; }
   };
 
-  return { render, handleInput, handleAction, loadRaw, buildPack: () => buildPack(draft) };
+  return { render, handleInput, handleAction, loadRaw, loadNativeLesson, buildPack: () => buildPack(draft) };
 }

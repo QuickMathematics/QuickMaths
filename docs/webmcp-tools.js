@@ -41,7 +41,7 @@ function optionalString(input, key, maxLength) {
   return requiredString(input, key, maxLength);
 }
 
-export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = null) {
+export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = null, lessonStudio = null) {
   const guide = agentManifest && typeof agentManifest === "object" && !Array.isArray(agentManifest)
     ? JSON.parse(JSON.stringify(agentManifest))
     : {};
@@ -91,7 +91,8 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
             recommended: state.backupStatus.recommended,
             reason: state.backupStatus.reason,
           },
-          custom_lesson_sets: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
+          custom_lesson_sets: state.lessonPacks.filter((pack) => pack.mode !== "override").map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
+          lesson_changes: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, mode: pack.mode, skill_count: pack.skillCount, overrides_native_skills: pack.overridesNativeSkills })),
           staged_lesson_set: state.stagedLessonPack,
         };
       },
@@ -128,9 +129,11 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           subject: scope === "subject" ? state.subjects.find((subject) => subject.id === subjectId) : null,
           subjects: scope === "all" ? state.subjects : undefined,
           progression_mode: state.progressionMode,
-          custom_lesson_sets: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
+          custom_lesson_sets: state.lessonPacks.filter((pack) => pack.mode !== "override").map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
+          lesson_changes: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, mode: pack.mode, skill_count: pack.skillCount, overrides_native_skills: pack.overridesNativeSkills })),
           skills: rows.map((row) => ({
             skill_id: row.id, subject_id: row.subjectId, name: row.name, subdomain: row.subdomain, status: row.status,
+            native: row.native, overridden: row.overridden, pack_id: row.packId,
             mastery_score: row.masteryScore, prerequisites: row.prerequisites, unmet_prerequisites: row.unmetPrerequisites, unlocks: row.unlocks,
           })),
         };
@@ -217,24 +220,38 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "open_lesson_creator",
       title: "Open Human Lesson Creator",
-      description: "Open the visible no-code Lesson studio, optionally preselecting an installed subject. The human remains in control of validation and installation.",
+      description: "Open the visible no-code Lesson Studio to create lessons, or prefill an editable native lesson improvement while preserving its ID and completed learner progress. Installing an improvement restarts affected unfinished tests; the human remains in control of validation and installation.",
       inputSchema: {
         type: "object",
-        properties: { subject_id: stringSchema("Optional installed subject ID.", 60) },
+        properties: {
+          subject_id: stringSchema("Optional installed subject ID for a new lesson set.", 60),
+          skill_id: stringSchema("Optional native lesson ID to open as a reversible editable improvement. Do not use for custom lessons.", 60),
+        },
         additionalProperties: false,
       },
       async execute(input = {}) {
-        requireObject(input); rejectUnknown(input, ["subject_id"]);
+        requireObject(input); rejectUnknown(input, ["subject_id", "skill_id"]);
         const subjectId = optionalString(input, "subject_id", 60);
+        const skillId = optionalString(input, "skill_id", 60);
+        if (skillId) {
+          const skill = store.skillsById[skillId];
+          if (!skill || skill.custom) throw new Error("skill_id must identify a native QuickMaths lesson.");
+          if (skill.overridden) throw new Error("Restore this lesson's installed improvement in Settings before authoring a replacement.");
+          if (!lessonStudio?.loadNativeLesson) throw new Error("Native lesson editing is unavailable in this build.");
+          store.setLearningPreferences({ subjectId: skill.subjectId, activityActor: "agent" });
+          const result = lessonStudio.loadNativeLesson(skillId, { announce: false });
+          store.navigate("creator", skillId, { activityActor: "agent" });
+          return { ok: true, visible_view: "creator", subject_id: skill.subjectId, skill_id: skillId, editing_mode: "native_override", completed_progress_preserved: result.completedProgressPreserved, unfinished_tests_restart_on_install: true };
+        }
         if (subjectId) store.setLearningPreferences({ subjectId, activityActor: "agent" });
         store.navigate("creator", null, { activityActor: "agent" });
-        return { ok: true, visible_view: "creator", subject_id: store.snapshot().activeSubject.id };
+        return { ok: true, visible_view: "creator", subject_id: store.snapshot().activeSubject.id, editing_mode: "new_lesson_set" };
       },
     },
     {
       name: "validate_lesson_set",
-      title: "Validate a custom lesson set",
-      description: "Validate declarative QuickMaths lesson-set JSON, including subjects, cross-subject prerequisite bridges, graders, proof/rubric policies, graph cycles, and safety limits. This does not install anything.",
+      title: "Validate a lesson set or native improvement",
+      description: "Validate declarative QuickMaths lesson-set JSON for new lessons or reversible native improvements, including subjects, bridges, graders, proof/rubric policies, graph cycles, and safety limits. This does not install anything.",
       inputSchema: {
         type: "object",
         properties: { lesson_set_json: stringSchema("Declarative QuickMaths lesson-set JSON. No scripts, HTML, generators, or executable code.", 1800000) },
@@ -250,8 +267,8 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     },
     {
       name: "stage_custom_lesson_set",
-      title: "Stage a custom lesson set",
-      description: "Validate and stage declarative lesson-set JSON in Settings. This cannot install it: a human must review the visible preview and click Install.",
+      title: "Stage a lesson set or native improvement",
+      description: "Validate and stage declarative lesson-set JSON in Settings, including mode override improvements to built-in lessons. This cannot install it: a human must review the visible preview and click Install.",
       inputSchema: {
         type: "object",
         properties: { lesson_set_json: stringSchema("Declarative QuickMaths lesson-set JSON to stage for human review.", 1800000) },
@@ -421,11 +438,11 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
   ];
 }
 
-export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext, agentManifest = {}, lessonDepot = null) {
+export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext, agentManifest = {}, lessonDepot = null, lessonStudio = null) {
   if (!modelContext || typeof modelContext.registerTool !== "function") return { available: false, registered: [], error: null };
   const registered = [];
   try {
-    for (const definition of buildToolDefinitions(store, agentManifest, lessonDepot)) {
+    for (const definition of buildToolDefinitions(store, agentManifest, lessonDepot, lessonStudio)) {
       await modelContext.registerTool(definition);
       registered.push(definition.name);
     }

@@ -44,7 +44,7 @@ Schema 2.0 adds subjects, themes, and cross-subject prerequisite bridges:
 }
 ```
 
-- Pack IDs start with `PACK_`; skill IDs start with `CUSTOM_`; subject IDs start with `SUBJECT_`.
+- Pack IDs start with `PACK_`; new skill IDs in the default `add` mode start with `CUSTOM_`; subject IDs start with `SUBJECT_`.
 - IDs use uppercase letters, numbers, and underscores. Never change a published ID if learner progress may already reference it.
 - Use `SUBJECT_MATH` to append lessons to the built-in Mathematics curriculum. Its built-in theme is preserved.
 - Reuse an installed custom subject ID to append another pack to that subject. Include the same subject name and theme in the source file so the file stays portable.
@@ -53,6 +53,84 @@ Schema 2.0 adds subjects, themes, and cross-subject prerequisite bridges:
 - Schema 1.0 files still load and are migrated into `SUBJECT_MATH`.
 
 Limits: 2 MB per set, 10 installed sets, 50 skills per set, 100 fixed questions per skill, 20 examples, 20 applications, 20 solution steps, 12 tags per field, and 8 multiple-choice options.
+
+## Improving a native QuickMaths lesson
+
+Schema 2.0 also supports a reversible `override` mode for improving a built-in lesson. This is not a new map node: it temporarily replaces the native lesson content under the **same lesson ID**, so completed attempts, mastery, and reviews stay attached. Any unfinished test for an affected lesson restarts at installation or restoration; this prevents answers from one question-bank version crossing into another.
+
+In Lesson Studio, choose **Edit a native lesson**, select the lesson, and click **Open editable copy**. The Studio locks the lesson ID, copies every authoring field, validates the result, and labels the install as a native improvement. In Settings, **Restore original** removes the improvement while preserving completed learner progress.
+
+An agent has the same safe pipeline:
+
+1. Call `open_lesson_creator` with `skill_id` when the human wants to edit visibly in Lesson Studio; or author an override file directly.
+2. Keep the exact native lesson ID, its original subject, and every required problem field.
+3. Call `validate_lesson_set`, then `stage_custom_lesson_set`.
+4. Ask the human to review the staged improvement and click **Install improvement**. The agent cannot install or restore it silently.
+
+The override envelope differs only in `mode` and its IDs:
+
+```json
+{
+  "format": "quickmaths.lesson-set",
+  "schema_version": "2.0",
+  "mode": "override",
+  "id": "PACK_IMPROVE_MATH_ARITH_001",
+  "name": "Improved integer operations",
+  "description": "A clearer native lesson with stronger examples.",
+  "author": "Your name",
+  "version": "1.0.0",
+  "subject": {
+    "id": "SUBJECT_MATH",
+    "name": "Mathematics",
+    "short_name": "Maths",
+    "icon": "Σ",
+    "description": "The built-in Mathematics curriculum."
+  },
+  "track": { "skills": ["MATH_ARITH_001"] },
+  "skills": [
+    {
+      "id": "MATH_ARITH_001",
+      "name": "Integer operations",
+      "domain": "Mathematics",
+      "subdomain": "Arithmetic",
+      "description": "Revised learner-facing description.",
+      "prerequisites": [],
+      "unlocks": ["MATH_ARITH_002"],
+      "tags": ["integers"],
+      "mastery": {
+        "passing_score": 0.8,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "maybe",
+        "review_after_days_if_mastered": 7,
+        "review_after_days_if_learning": 2
+      },
+      "theory": "Revised plain-text theory.",
+      "examples": [],
+      "applications": [],
+      "problems": [
+        {
+          "template_id": "INTEGER_ADD_REVISED_001",
+          "skill_id": "MATH_ARITH_001",
+          "difficulty": "easy",
+          "prompt": "Compute -6 + 4.",
+          "expected_answer": "-2",
+          "answer_type": "integer",
+          "grading_method": "exact_numeric",
+          "solution_steps": ["The signs differ, so subtract 4 from 6 and keep the negative sign."],
+          "mistake_tags": ["signed_addition"],
+          "answer_mode": "final_only",
+          "work": { "mode": "none" },
+          "review_policy": { "work_review": "none", "mastery_requires_review_pass": false }
+        }
+      ]
+    }
+  ]
+}
+```
+
+Guardrails are strict: override mode accepts only IDs from the built-in curriculum, rejects a changed subject, rejects two installed improvements targeting the same native lesson, and never changes the total lesson count. New/custom lessons still use `mode: "add"` (or omit `mode`) and must use `CUSTOM_` IDs. To revise an already installed improvement, download its source, restore the original in Settings, then validate and install the replacement.
+
+Lesson files contain private answer-key fields. Even while helping an author, an agent must not return `expected_answer` or `solution_steps` through learner-facing tool results or tutoring conversation.
 
 ## Track and skills
 

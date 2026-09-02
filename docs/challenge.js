@@ -1,6 +1,6 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-tour-refresh";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-showcase";
-import { createLessonStudio } from "./lesson-creator.js?v=20260901-proof-lifecycle";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-native-improvements-v2";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-native-improvements-v2";
+import { createLessonStudio } from "./lesson-creator.js?v=20260902-native-improvements-v2";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
@@ -25,7 +25,6 @@ const elements = {
   shell: document.querySelector("#app-shell"),
   profiles: document.querySelector("#profile-list"),
   profileError: document.querySelector("#profile-error"),
-  welcomeLede: document.querySelector("#welcome-lede"),
   welcomeLessonCount: document.querySelector("#welcome-lesson-count"),
   welcomeQuestionCount: document.querySelector("#welcome-question-count"),
   welcomeToolCount: document.querySelector("#welcome-tool-count"),
@@ -158,7 +157,6 @@ function renderWelcomeSummary(snapshot) {
   const lessonCount = snapshot.curriculum.allSkills.length;
   const subjectCount = snapshot.subjects.length;
   const questionCount = Object.values(store.skillsById).reduce((total, skill) => total + (skill.problems?.length ?? 0), 0);
-  elements.welcomeLede.textContent = `QuickMaths turns ${lessonCount} connected lessons across ${subjectCount} installed subject${subjectCount === 1 ? "" : "s"} into living mastery maps. Practice, reflect, save your progress, and let a browser agent tutor from the work actually on screen.`;
   elements.welcomeLessonCount.textContent = String(lessonCount);
   elements.welcomeQuestionCount.textContent = String(questionCount);
   elements.welcomeToolCount.textContent = String(TOOL_NAMES.length);
@@ -205,7 +203,7 @@ const TUTORIAL_STEPS = [
     eyebrow: "Lesson Depot",
     title: "Find lessons—and join the conversation.",
     lede: "Browse published lesson packs and clearly labelled roadmap concepts. Every card follows its subject’s color scheme, and published packages can carry live GitHub-backed upvotes and discussion.",
-    points: ["Preview, hash-check, and validate a published pack before installing it.", "Connect GitHub Community to upvote and comment without leaving the app.", "Open Lesson Studio from the Depot to build a lesson or an entirely new subject."],
+    points: ["Preview, hash-check, and validate a published pack before installing it.", "Connect GitHub Community to upvote and comment without leaving the app.", "Open Lesson Studio from the Depot to build new lessons or improve a native one."],
     tip: "Community authorization is separate from learner storage. Installing content and posting publicly always remain human-controlled actions.",
     visual: "depot",
   },
@@ -213,28 +211,28 @@ const TUTORIAL_STEPS = [
     eyebrow: "Agent-assisted learning",
     title: "Bring a tutor into the same live workspace.",
     lede: "In a compatible Codex or ChatGPT browser, WebMCP gives the agent narrow QuickMaths tools—not raw browser storage or hidden answer keys. The manifest teaches it the rules and available workflow.",
-    points: ["The agent can inspect progress, navigate, recommend a lesson, and tutor from visible work.", "It can save Socratic feedback and prepare targeted follow-up practice without revealing answer keys.", "Agent Activity records tool actions only, so your own clicks are never mislabelled as the agent’s."],
+    points: ["The agent can inspect progress, navigate, recommend a lesson, and tutor from visible work.", "It can save Socratic feedback, prepare follow-up practice, and open a native lesson as an editable Studio improvement.", "Agent Activity records tool actions only, so your own clicks are never mislabelled as the agent’s."],
     tip: "The short starter prompt is enough: WebMCP provides the detailed operating guide when the agent begins.",
     visual: "agent",
   },
   {
     eyebrow: "Settings, sync, and creation",
     title: "Keep it portable. Extend it when you are ready.",
-    lede: "Settings brings together learning-path controls, JSON save and load, the optional GitHub Bridge, and this replayable tour. Lesson Studio creates full curricula without requiring raw JSON.",
-    points: ["Download full backups containing profiles, progress, custom subjects, lessons, reviews, and timers.", "Optionally sync learner and remote-agent checkpoints through your own GitHub repository.", "Use Lesson Studio for themes, cross-subject bridges, graders, proofs, rubrics, and multi-lesson packs."],
-    tip: "Agents may validate and stage content, but only you can install it. Replay this tour anytime from Settings.",
+    lede: "Settings brings together learning-path controls, JSON save and load, the optional GitHub Bridge, and this replayable tour. Lesson Studio creates curricula and safely improves built-in lessons without requiring raw JSON.",
+    points: ["Download full backups containing profiles, progress, subjects, lessons, improvements, reviews, and timers.", "Optionally sync learner and remote-agent checkpoints through your own GitHub repository.", "Create new lessons—or edit a native lesson while keeping its ID, map position, and completed learner progress."],
+    tip: "Agents may validate and stage content, but only you can install it. Native improvements are reversible from Settings without erasing progress.",
     visual: "ownership",
   },
 ];
 
 function tutorialVisual(type, snapshot) {
   if (type === "welcome") return `<div class="tour-profile-preview"><img src="./quickmaths-logo.png" alt="" width="88" height="82"><div><span>Profile ready</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>Autosaving on this device</small></div><i>✓</i></div><div class="tour-local-row"><span>Free</span><span>Local-first</span><span>No account</span></div>`;
-  if (type === "subjects") return `<div class="tour-subject-preview"><p>Visible subject</p><div><span>${escapeHtml(snapshot.activeSubject.icon)}</span><strong>${escapeHtml(snapshot.activeSubject.name)}</strong><b>⌄</b></div></div><div class="tour-mode-preview" aria-label="Choose a learning path"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}"><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}"><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>`;
+  if (type === "subjects") return `<div class="tour-subject-preview"><p>Subject selector</p><div><span>${escapeHtml(snapshot.activeSubject.icon)}</span><strong>${escapeHtml(snapshot.activeSubject.name)}</strong><b>⌄</b></div><small>Changes the visible curriculum, mastery map, and color theme.</small></div><div class="tour-mode-preview" aria-label="Choose a learning path"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}"><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}"><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>`;
   if (type === "map") return `<div class="tour-map-preview"><div class="tour-map-controls"><span>Current subject</span><strong>All subjects</strong><i>− &nbsp; 100% &nbsp; +</i></div><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
   if (type === "loop") return `<div class="tour-loop-preview"><article><span>01</span><b>Read</b><small>Theory and examples</small></article><i>→</i><article><span>02</span><b>Test</b><small>Answers and shown work</small></article><i>→</i><article><span>03</span><b>Reflect</b><small>Confidence and difficulty</small></article><i>→</i><article><span>04</span><b>Review</b><small>Mastery and next date</small></article></div><div class="tour-work-preview"><code>2x + 5 = 13<br>2x = 8<br>x = 4</code><span>Step check passed</span></div>`;
   if (type === "depot") return `<div class="tour-depot-preview"><header><div><small>Community curriculum</small><strong>Lesson Depot</strong></div><span>Browse · discuss · install</span></header><div><article class="is-geography"><span>Geography</span><strong>Field Cartography</strong><small>3 lessons · Published</small><footer><b>👍 18</b><b>◯ 6</b></footer></article><article class="is-biology"><span>Biology</span><strong>Cell Systems</strong><small>Concept preview</small><footer><b>Roadmap</b></footer></article></div><p><b>✓</b> Packages are hash-checked and validated before installation.</p></div>`;
   if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent studio</small><strong>Tutor in the loop</strong></div><i>Connected</i></div><div class="tour-agent-prompt"><span>Suggested starting prompt</span><p>${escapeHtml(AGENT_STARTER_PROMPT)}</p><button class="button button-secondary" type="button" data-tutorial-action="copy-agent-prompt">Copy to clipboard</button></div><div class="tour-tool-row"><code>get_progress_summary</code><code>inspect_student_work</code><code>record_tutor_feedback</code></div></div>`;
-  return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, subjects, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>↔</span><div><strong>Optional GitHub Bridge</strong><small>Checkpoint learner state and exchange agent updates across sessions</small></div><b>Sync</b></article><article><span>✎</span><div><strong>Lesson Studio</strong><small>No-code subjects, bridges, questions, proofs, rubrics, and themes</small></div><b>Create</b></article></div>`;
+  return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, subjects, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>↔</span><div><strong>Optional GitHub Bridge</strong><small>Checkpoint learner state and exchange agent updates across sessions</small></div><b>Sync</b></article><article><span>✎</span><div><strong>Lesson Studio</strong><small>Create new curricula or install reversible improvements over native lessons</small></div><b>Create / improve</b></article></div>`;
 }
 
 function renderTutorial(snapshot) {
@@ -867,11 +865,17 @@ function renderGitHubBridge(snapshot) {
 
 function renderSettings(snapshot) {
   const backup = snapshot.backupStatus;
+  const improvementPacks = snapshot.lessonPacks.filter((pack) => pack.mode === "override");
+  const addedLessonCount = snapshot.lessonPacks.filter((pack) => pack.mode !== "override").reduce((count, pack) => count + pack.skillCount, 0);
+  const lessonPackDetail = [
+    addedLessonCount ? `${addedLessonCount} added lesson${addedLessonCount === 1 ? "" : "s"}` : "",
+    improvementPacks.length ? `${improvementPacks.length} native improvement${improvementPacks.length === 1 ? "" : "s"}` : "",
+  ].filter(Boolean).join(" · ") || "Built-ins unchanged";
   elements.view.innerHTML = `
     <header class="page-head"><div><p class="eyebrow">Profile preferences & data</p><h1>Settings</h1><p>Choose how this profile moves through the curriculum, replay the guided tour, and manage every save, export, custom lesson, and restore point.</p></div><div class="page-actions"><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
     <section class="settings-controls">
       <article class="settings-control-card"><h2>Learning path</h2><p>This setting belongs to ${escapeHtml(snapshot.activeProfile.displayName)} and travels inside full backups.</p><div class="settings-mode-grid" role="group" aria-label="Progression mode"><button type="button" data-progression-mode="hard" aria-pressed="${snapshot.progressionMode === "hard"}"><strong>Hard path</strong><small>Prerequisites must be proven before connected mastery tests unlock.</small></button><button type="button" data-progression-mode="soft" aria-pressed="${snapshot.progressionMode === "soft"}"><strong>Open path</strong><small>Connections remain guidance, while every lesson and test stays available.</small></button></div></article>
-      <article class="settings-control-card settings-tour-action"><div><h2>App tutorial</h2><p>Replay all six chapters without resetting progress, subjects, lessons, or preferences.</p></div><button class="button button-secondary" type="button" data-action="replay-tutorial">Replay app tour</button></article>
+      <article class="settings-control-card settings-tour-action"><div><h2>App tutorial</h2><p>Replay all seven chapters without resetting progress, subjects, lessons, or preferences.</p></div><button class="button button-secondary" type="button" data-action="replay-tutorial">Replay app tour</button></article>
     </section>
     ${renderGitHubBridge(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
@@ -879,18 +883,18 @@ function renderSettings(snapshot) {
       <article><span>Storage</span><strong>${snapshot.storageError ? "Needs backup" : "Autosaving"}</strong><small>${snapshot.storageError ? escapeHtml(snapshot.storageError) : "Browser local storage"}</small></article>
       <article><span>Current profile</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>${snapshot.attempts.length} saved attempts</small></article>
       <article><span>Portable backup</span><strong>${backup.lastExportAt ? escapeHtml(formatDate(backup.lastExportAt)) : "Not yet"}</strong><small>${backup.recommended ? `${backup.attemptsSinceExport} new attempt${backup.attemptsSinceExport === 1 ? "" : "s"}` : "Up to date"}</small></article>
-      <article><span>Custom lesson sets</span><strong>${snapshot.lessonPacks.length}</strong><small>${snapshot.lessonPacks.reduce((count, pack) => count + pack.skillCount, 0)} added skills</small></article>
+      <article><span>Lesson changes</span><strong>${snapshot.lessonPacks.length}</strong><small>${escapeHtml(lessonPackDetail)}</small></article>
     </section>
     <section class="data-grid">
       <article class="content-card"><div class="card-heading"><div><h2>Full progress backup</h2><p>Includes installed lesson sets and every learner record.</p></div></div><div class="backup-flow"><span>1<strong>Autosave</strong><small>Every edit stays here</small></span><b>→</b><span>2<strong>Download</strong><small>Keep the JSON file</small></span><b>→</b><span>3<strong>Load</strong><small>Confirmed full restore</small></span></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download JSON backup</button><button class="button button-outline" data-action="load-backup">Choose backup file</button></div></article>
       <article class="content-card"><div class="card-heading"><div><h2>Spreadsheet exports</h2><p>Human-readable snapshots for analysis.</p></div></div><div class="export-list"><button data-action="download-csv" data-kind="progress"><span>Progress</span><small>Status, mastery, scores, confidence</small><b>CSV ↓</b></button><button data-action="download-csv" data-kind="attempts"><span>Attempts</span><small>Scores, dates, mastery updates</small><b>CSV ↓</b></button><button data-action="download-csv" data-kind="reviews"><span>Reviews</span><small>Verdicts, feedback, next steps</small><b>CSV ↓</b></button></div></article>
     </section>
     <section class="content-card lesson-packs-card">
-      <div class="card-heading"><div><p class="eyebrow">Extend the curriculum</p><h2>Custom lesson sets</h2><p>Load validated JSON lessons into the same map, testing, progress, and backup pipeline.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson set</button></div>
-      ${snapshot.stagedLessonPack ? `<aside class="staged-pack"><span>Agent-staged</span><div><strong>${escapeHtml(snapshot.stagedLessonPack.name)}</strong><p>${escapeHtml(snapshot.stagedLessonPack.subjectName)} · ${snapshot.stagedLessonPack.skillCount} lessons · ${snapshot.stagedLessonPack.problemCount} questions · ${escapeHtml(snapshot.stagedLessonPack.author)}</p><small>An agent validated this file, but only you can install it.</small></div><button class="button button-primary" data-action="install-staged-pack">Install</button><button class="button button-outline" data-action="discard-staged-pack">Discard</button></aside>` : ""}
-      <div class="lesson-pack-guide"><div><strong>Two ways to build</strong><p>Use the Human Lesson Creator for friendly forms, tooltips, themes, bridges, proofs, and rubrics—or give the machine-readable guide to an agent.</p></div><button class="button button-primary" data-route="creator">Open Human Lesson Creator</button><a class="button button-outline" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Agent Lesson Authoring Guide</a></div>
+      <div class="card-heading"><div><p class="eyebrow">Extend or improve the curriculum</p><h2>Lesson sets and native improvements</h2><p>Add validated lessons, or install a reversible improvement over a built-in lesson without losing its ID, map position, or completed learner progress.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson file</button></div>
+      ${snapshot.stagedLessonPack ? `<aside class="staged-pack"><span>${snapshot.stagedLessonPack.mode === "override" ? "Native improvement" : "Agent-staged"}</span><div><strong>${escapeHtml(snapshot.stagedLessonPack.name)}</strong><p>${escapeHtml(snapshot.stagedLessonPack.subjectName)} · ${snapshot.stagedLessonPack.skillCount} lesson${snapshot.stagedLessonPack.skillCount === 1 ? "" : "s"} · ${snapshot.stagedLessonPack.problemCount} questions · ${escapeHtml(snapshot.stagedLessonPack.author)}</p><small>${snapshot.stagedLessonPack.mode === "override" ? "Validated and staged by an agent. Installing keeps completed progress, restarts affected unfinished tests, and can be undone from Settings." : "An agent validated this file, but only you can install it."}</small></div><button class="button button-primary" data-action="install-staged-pack">${snapshot.stagedLessonPack.mode === "override" ? "Install improvement" : "Install"}</button><button class="button button-outline" data-action="discard-staged-pack">Discard</button></aside>` : ""}
+      <div class="lesson-pack-guide"><div><strong>Two ways to build</strong><p>Use Lesson Studio to create a curriculum or open a native lesson as an editable copy—or give the machine-readable guide to an agent.</p></div><button class="button button-primary" data-route="creator">Open Lesson Studio</button><a class="button button-outline" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Agent Lesson Authoring Guide</a></div>
       <div class="installed-packs">
-        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></article>`).join("") : `<div class="empty-state">No custom sets installed. The built-in Mathematics and Geography curricula remain available.</div>`}
+        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.mode === "override" ? `Native improvement · ${pack.overridesNativeSkills.map((id) => escapeHtml(id)).join(", ")} · completed progress preserved` : `${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"}`} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button>${pack.mode === "override" ? `<button class="quiet-button danger-link" data-action="restore-native-lessons" data-pack-id="${escapeHtml(pack.id)}">Restore original</button>` : ""}</div></article>`).join("") : `<div class="empty-state">No lesson sets or improvements installed. The built-in Mathematics and Geography curricula remain unchanged.</div>`}
       </div>
       <p class="pack-security-note"><strong>Teacher-file warning:</strong> lesson-set JSON contains answer keys and solutions. Don’t paste the raw file into a learner tutoring conversation.</p>
     </section>
@@ -1244,12 +1248,15 @@ elements.lessonSetFile.addEventListener("change", async () => {
   try {
     const raw = await file.text();
     const preview = store.previewLessonPack(raw);
+    const installDetail = preview.mode === "override"
+      ? `Native lessons improved: ${preview.overridesNativeSkills.join(", ")}\n\nTheir IDs, map positions, and completed learner progress stay intact. Any unfinished tests for those lessons restart so answers cannot cross between question-bank versions. The original content can be restored later from Settings.`
+      : "The set will be added to the mastery map and embedded in future full backups. Download a progress backup first if you want a restore point before changing installed content.";
     const confirmed = window.confirm(
-      `Install ${preview.name}?\n\nSubject: ${preview.subjectName}${preview.createsSubject ? " (new subject)" : ""}\n${preview.skillCount} lesson(s) · ${preview.problemCount} questions\nAuthor: ${preview.author}\nVersion: ${preview.version}\n\nThe set will be added to the mastery map and embedded in future full backups. Download a progress backup first if you want a restore point before changing installed content.`,
+      `Install ${preview.name}?\n\nSubject: ${preview.subjectName}${preview.createsSubject ? " (new subject)" : ""}\n${preview.skillCount} lesson(s) · ${preview.problemCount} questions\nAuthor: ${preview.author}\nVersion: ${preview.version}\n\n${installDetail}`,
     );
     if (!confirmed) return;
     const result = store.importLessonPack(raw);
-    showToast(`${result.name} installed. ${result.totalSkillCount} skills are now available.`);
+    showToast(result.mode === "override" ? `${result.name} installed. Completed progress was preserved${result.restartedDraftCount ? `; ${result.restartedDraftCount} unfinished test${result.restartedDraftCount === 1 ? " restarted" : "s restarted"}` : ""}.` : `${result.name} installed. ${result.totalSkillCount} skills are now available.`);
   } catch (error) {
     showToast(error instanceof Error ? error.message : String(error));
   } finally {
@@ -1375,12 +1382,23 @@ document.addEventListener("click", async (event) => {
   if (action.dataset.action === "map-zoom-in") changeMapZoom(MAP_ZOOM_STEP);
   if (action.dataset.action === "install-staged-pack") {
     const staged = store.snapshot().stagedLessonPack;
-    if (staged && window.confirm(`Install ${staged.name}?\n\n${staged.skillCount} lessons · ${staged.problemCount} questions · ${staged.subjectName}\n\nThis agent-staged set passed validation, but installation changes your curriculum.`)) {
+    const installNote = staged?.mode === "override"
+      ? "This replaces native lesson content while preserving lesson IDs, map positions, and completed learner progress. Unfinished tests for affected lessons restart so answers cannot cross between question-bank versions. You can restore the original here later."
+      : "This agent-staged set passed validation, but installation changes your curriculum.";
+    if (staged && window.confirm(`Install ${staged.name}?\n\n${staged.skillCount} lessons · ${staged.problemCount} questions · ${staged.subjectName}\n\n${installNote}`)) {
       const result = store.installStagedLessonPack();
-      showToast(`${result.name} installed.`);
+      showToast(result.mode === "override" ? `${result.name} installed. Completed progress was preserved${result.restartedDraftCount ? `; ${result.restartedDraftCount} unfinished test${result.restartedDraftCount === 1 ? " restarted" : "s restarted"}` : ""}.` : `${result.name} installed.`);
     }
   }
   if (action.dataset.action === "discard-staged-pack") store.discardStagedLessonPack();
+  if (action.dataset.action === "restore-native-lessons") {
+    const packId = action.dataset.packId;
+    const pack = store.snapshot().lessonPacks.find((item) => item.id === packId);
+    if (pack && window.confirm(`Restore the original QuickMaths version of ${pack.overridesNativeSkills.join(", ")}?\n\nThe installed improvement will be removed, but every learner's completed progress remains attached to the native lesson. Unfinished tests for the affected lessons restart.`)) {
+      const result = store.restoreNativeLessons(packId);
+      showToast(`${result.restored.length} native lesson${result.restored.length === 1 ? "" : "s"} restored. Completed progress was preserved${result.restartedDraftCount ? `; ${result.restartedDraftCount} unfinished test${result.restartedDraftCount === 1 ? " restarted" : "s restarted"}` : ""}.`);
+    }
+  }
   if (action.dataset.action === "export-lesson-set") {
     const packId = action.dataset.packId;
     download(`${packId.toLowerCase().replaceAll("_", "-")}.json`, store.exportLessonPack(packId), "application/json");
@@ -1573,7 +1591,7 @@ async function boot() {
   let agentManifest = {};
   let communityConfig = { enabled: false };
   try {
-    const manifestResponse = await fetch("./agent-manifest.json");
+    const manifestResponse = await fetch("./agent-manifest.json?v=20260902-native-improvements-v2");
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
   } catch {
     // The tools still work if the optional human/machine-readable guide is unavailable.
@@ -1634,7 +1652,7 @@ async function boot() {
   initClock();
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code>${name}</code>`).join("");
   document.querySelector("#tool-count").textContent = String(TOOL_NAMES.length);
-  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot);
+  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot, lessonStudio);
   elements.bridgeCard.dataset.state = bridge.available && !bridge.error ? "ready" : bridge.error ? "warning" : "idle";
   elements.bridgeStatus.textContent = bridge.error ? "WebMCP partly connected" : bridge.available ? "Agent tools connected" : "Ready for a WebMCP browser";
   elements.bridgeDetail.textContent = bridge.error

@@ -226,7 +226,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
   };
 }
 
-export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
+export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = [] } = {}) {
   let candidate = input;
   if (typeof input === "string") {
     if (input.length > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
@@ -236,6 +236,9 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
   if (candidate.format !== LESSON_SET_FORMAT) throw new Error(`Lesson set format must be ${LESSON_SET_FORMAT}.`);
   const schemaVersion = candidate.schema_version;
   if (!["1.0", LESSON_SET_SCHEMA_VERSION].includes(schemaVersion)) throw new Error(`Unsupported lesson set schema_version ${schemaVersion ?? "missing"}.`);
+  const mode = candidate.mode == null || candidate.mode === "add" ? "add" : candidate.mode === "override" ? "override" : null;
+  if (!mode) throw new Error("Lesson set mode must be add or override.");
+  if (mode === "override" && schemaVersion !== LESSON_SET_SCHEMA_VERSION) throw new Error("Native lesson improvements require schema_version 2.0.");
   const subject = normalizeSubject(candidate.subject, schemaVersion);
   const id = requiredText(candidate.id, "Lesson set ID", 60);
   if (!LESSON_SET_ID.test(id)) throw new Error("Lesson set ID must start with PACK_ and use uppercase letters, numbers, and underscores.");
@@ -243,11 +246,19 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
     throw new Error(`Lesson set must contain 1 to ${MAX_LESSON_SET_SKILLS} skills.`);
   }
   const usedSkillIds = new Set(knownSkillIds);
+  const nativeById = new Map(nativeSkills.map((skill) => [skill.id, skill]));
   const packSkillIds = candidate.skills.map((skill) => requiredText(skill?.id, "Skill ID", 60));
   if (new Set(packSkillIds).size !== packSkillIds.length) throw new Error("Lesson set contains duplicate skill IDs.");
   for (const skillId of packSkillIds) {
-    if (!CUSTOM_SKILL_ID.test(skillId)) throw new Error(`${skillId} must start with CUSTOM_ and use uppercase letters, numbers, and underscores.`);
-    if (usedSkillIds.has(skillId)) throw new Error(`Skill ID ${skillId} is already installed.`);
+    if (mode === "add") {
+      if (!CUSTOM_SKILL_ID.test(skillId)) throw new Error(`${skillId} must start with CUSTOM_ and use uppercase letters, numbers, and underscores.`);
+      if (usedSkillIds.has(skillId)) throw new Error(`Skill ID ${skillId} is already installed.`);
+    } else {
+      const nativeSkill = nativeById.get(skillId);
+      if (!nativeSkill) throw new Error(`${skillId} is not a native QuickMaths lesson and cannot be overridden.`);
+      const nativeSubjectId = nativeSkill.subjectId ?? nativeSkill.subject_id ?? DEFAULT_SUBJECT_ID;
+      if (nativeSubjectId !== subject.id) throw new Error(`${skillId} belongs to ${nativeSubjectId}; a native improvement cannot move it to ${subject.id}.`);
+    }
   }
   const packSkillSet = new Set(packSkillIds);
   const allKnown = new Set([...usedSkillIds, ...packSkillIds]);
@@ -258,7 +269,10 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
     const prerequisites = prerequisiteRefs.map((ref) => ref.skillId);
     const unlocks = idList(skillCandidate.unlocks, `${skillId} unlocks`);
     for (const prerequisite of prerequisites) if (!allKnown.has(prerequisite)) throw new Error(`${skillId} references missing prerequisite ${prerequisite}.`);
-    for (const unlock of unlocks) if (!packSkillSet.has(unlock)) throw new Error(`${skillId} unlock ${unlock} must belong to the same lesson set.`);
+    for (const unlock of unlocks) {
+      if (mode === "add" && !packSkillSet.has(unlock)) throw new Error(`${skillId} unlock ${unlock} must belong to the same lesson set.`);
+      if (mode === "override" && !allKnown.has(unlock)) throw new Error(`${skillId} references missing unlock ${unlock}.`);
+    }
     if (!Array.isArray(skillCandidate.problems) || !skillCandidate.problems.length || skillCandidate.problems.length > MAX_PROBLEMS_PER_SKILL) {
       throw new Error(`${skillId} must contain 1 to ${MAX_PROBLEMS_PER_SKILL} problems.`);
     }
@@ -275,7 +289,9 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
     return {
       id: skillId,
       packId: id,
-      custom: true,
+      custom: mode === "add",
+      native: mode === "override",
+      overridden: mode === "override",
       subjectId: subject.id,
       prerequisiteRefs,
       name: requiredText(skillCandidate.name, `${skillId} name`, 160),
@@ -319,6 +335,7 @@ export function normalizeLessonPack(input, { knownSkillIds = [] } = {}) {
   return {
     format: LESSON_SET_FORMAT,
     schema_version: LESSON_SET_SCHEMA_VERSION,
+    mode,
     id,
     name: requiredText(candidate.name, "Lesson set name", 160),
     description: requiredText(candidate.description, "Lesson set description", 1000),
@@ -356,6 +373,7 @@ export function normalizeLessonPackCollection(inputs, curriculum) {
   const builtInIds = curriculum.skills.map((skill) => skill.id);
   const packs = candidates.map((candidate, index) => normalizeLessonPack(candidate, {
     knownSkillIds: [...builtInIds, ...skillIdsByPack.flatMap((ids, otherIndex) => otherIndex === index ? [] : ids)],
+    nativeSkills: curriculum.skills,
   }));
   if (new Set(packs.map((pack) => pack.id)).size !== packs.length) throw new Error("Lesson pack collection contains duplicate pack IDs.");
   validateCatalogGraph(curriculum, packs);
@@ -374,7 +392,7 @@ function sanitizeLessonPacks(value, curriculum, { strict = false } = {}) {
   const packIds = new Set();
   for (const candidate of value.slice(0, MAX_LESSON_SETS)) {
     try {
-      const pack = normalizeLessonPack(candidate, { knownSkillIds: known });
+      const pack = normalizeLessonPack(candidate, { knownSkillIds: known, nativeSkills: curriculum.skills });
       if (packIds.has(pack.id)) throw new Error(`Duplicate lesson set ID: ${pack.id}.`);
       validateCatalogGraph(curriculum, [...output, pack]);
       output.push(pack);
@@ -387,11 +405,37 @@ function sanitizeLessonPacks(value, curriculum, { strict = false } = {}) {
   return output;
 }
 
+function resolveCatalogSkills(curriculum, lessonPacks) {
+  const builtInSkills = curriculum.skills.map((skill) => ({
+    ...skill, subjectId: skill.subjectId ?? skill.subject_id ?? DEFAULT_SUBJECT_ID,
+    custom: false, native: true, overridden: false,
+  }));
+  const nativeById = new Map(builtInSkills.map((skill) => [skill.id, skill]));
+  const overrideTargets = new Set();
+  const additions = [];
+  const installedIds = new Set(nativeById.keys());
+  for (const pack of lessonPacks) {
+    if (pack.mode === "override") {
+      for (const skill of pack.skills) {
+        if (!nativeById.has(skill.id)) throw new Error(`${skill.id} is not a native QuickMaths lesson and cannot be overridden.`);
+        if (overrideTargets.has(skill.id)) throw new Error(`Native lesson ${skill.id} already has an installed improvement.`);
+        overrideTargets.add(skill.id);
+        nativeById.set(skill.id, { ...skill, custom: false, native: true, overridden: true, packId: pack.id });
+      }
+      continue;
+    }
+    for (const skill of pack.skills) {
+      if (installedIds.has(skill.id)) throw new Error(`The combined curriculum contains duplicate skill ID ${skill.id}.`);
+      installedIds.add(skill.id);
+      additions.push(skill);
+    }
+  }
+  return [...builtInSkills.map((skill) => nativeById.get(skill.id)), ...additions];
+}
+
 function validateCatalogGraph(curriculum, lessonPacks) {
-  const builtInSkills = curriculum.skills.map((skill) => ({ ...skill, subjectId: skill.subjectId ?? skill.subject_id ?? DEFAULT_SUBJECT_ID }));
-  const skills = [...builtInSkills, ...lessonPacks.flatMap((pack) => pack.skills)];
+  const skills = resolveCatalogSkills(curriculum, lessonPacks);
   const byId = Object.fromEntries(skills.map((skill) => [skill.id, skill]));
-  if (Object.keys(byId).length !== skills.length) throw new Error("The combined curriculum contains a duplicate skill ID.");
   for (const skill of skills) {
     for (const prerequisite of skill.prerequisites ?? []) {
       if (!byId[prerequisite]) throw new Error(`${skill.id} references missing prerequisite ${prerequisite}.`);
@@ -418,8 +462,8 @@ function validateCatalogGraph(curriculum, lessonPacks) {
 
 function mergeCurriculum(curriculum, lessonPacks) {
   validateCatalogGraph(curriculum, lessonPacks);
-  const builtInSkills = curriculum.skills.map((skill) => ({ ...skill, subjectId: skill.subjectId ?? skill.subject_id ?? DEFAULT_SUBJECT_ID }));
-  const customSkills = lessonPacks.flatMap((pack) => pack.skills);
+  const skills = resolveCatalogSkills(curriculum, lessonPacks);
+  const additivePacks = lessonPacks.filter((pack) => pack.mode !== "override");
   const subjectMap = new Map([[DEFAULT_SUBJECT_ID, { ...clone(DEFAULT_SUBJECT), skillIds: [] }]]);
   for (const candidate of curriculum.subjects ?? []) {
     const subject = { ...normalizeSubject(candidate, "2.0"), builtIn: true, skillIds: [] };
@@ -430,7 +474,7 @@ function mergeCurriculum(curriculum, lessonPacks) {
   for (const pack of lessonPacks) {
     if (!subjectMap.has(pack.subject.id)) subjectMap.set(pack.subject.id, { ...clone(pack.subject), skillIds: [] });
   }
-  for (const skill of [...builtInSkills, ...customSkills]) {
+  for (const skill of skills) {
     const subject = subjectMap.get(skill.subjectId);
     if (!subject) throw new Error(`${skill.id} belongs to unknown subject ${skill.subjectId}.`);
     subject.skillIds.push(skill.id);
@@ -439,10 +483,10 @@ function mergeCurriculum(curriculum, lessonPacks) {
     ...curriculum,
     track: {
       ...curriculum.track,
-      skills: [...curriculum.track.skills, ...lessonPacks.flatMap((pack) => pack.track.skills)],
-      exit_skills: [...curriculum.track.exit_skills, ...lessonPacks.flatMap((pack) => pack.track.exit_skills)],
+      skills: [...curriculum.track.skills, ...additivePacks.flatMap((pack) => pack.track.skills)],
+      exit_skills: [...curriculum.track.exit_skills, ...additivePacks.flatMap((pack) => pack.track.exit_skills)],
     },
-    skills: [...builtInSkills, ...customSkills],
+    skills,
     subjects: [...subjectMap.values()],
   };
 }
@@ -1132,6 +1176,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       id: skill.id,
       packId: skill.packId ?? null,
       custom: Boolean(skill.custom),
+      native: Boolean(skill.native),
+      overridden: Boolean(skill.overridden),
       subjectId: skill.subjectId,
       name: skill.name,
       subdomain: skill.subdomain,
@@ -1218,6 +1264,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       stagedLessonPack: stagedLessonPack ? {
         id: stagedLessonPack.pack.id,
         name: stagedLessonPack.pack.name,
+        mode: stagedLessonPack.pack.mode,
         author: stagedLessonPack.pack.author,
         version: stagedLessonPack.pack.version,
         subjectId: stagedLessonPack.pack.subject.id,
@@ -1227,6 +1274,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       } : null,
       lessonPacks: state.lessonPacks.map((pack) => ({
         id: pack.id,
+        mode: pack.mode,
         name: pack.name,
         description: pack.description,
         author: pack.author,
@@ -1234,6 +1282,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
         importedAt: pack.importedAt,
         skillCount: pack.skills.length,
         problemCount: pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
+        overridesNativeSkills: pack.mode === "override" ? pack.skills.map((skill) => skill.id) : [],
         subjectId: pack.subject.id,
         subjectName: pack.subject.name,
       })),
@@ -1244,11 +1293,13 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       curriculum: {
         track: clone(catalog.track),
         subjects: clone(catalog.subjects),
-        lessonPacks: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, skill_ids: [...pack.track.skills] })),
+        lessonPacks: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, mode: pack.mode, skill_ids: [...pack.track.skills] })),
         skills: catalog.skills.filter((skill) => skill.subjectId === activeSubjectId()).map((skill) => ({
           id: skill.id,
           packId: skill.packId ?? null,
           custom: Boolean(skill.custom),
+          native: Boolean(skill.native),
+          overridden: Boolean(skill.overridden),
           subjectId: skill.subjectId,
           name: skill.name,
           subdomain: skill.subdomain,
@@ -1258,7 +1309,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
           applications: clone(skill.applications),
         })),
         allSkills: catalog.skills.map((skill) => ({
-          id: skill.id, packId: skill.packId ?? null, custom: Boolean(skill.custom), subjectId: skill.subjectId,
+          id: skill.id, packId: skill.packId ?? null, custom: Boolean(skill.custom), native: Boolean(skill.native), overridden: Boolean(skill.overridden), subjectId: skill.subjectId,
           name: skill.name, subdomain: skill.subdomain, description: skill.description,
           prerequisites: [...skill.prerequisites], unlocks: [...(unlocks[skill.id] ?? [])],
         })),
@@ -1736,14 +1787,14 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
   };
 
   const parseLessonPack = (raw) => {
-    if (state.lessonPacks.length >= MAX_LESSON_SETS) throw new Error(`QuickMaths supports at most ${MAX_LESSON_SETS} custom lesson sets.`);
+    if (state.lessonPacks.length >= MAX_LESSON_SETS) throw new Error(`QuickMaths supports at most ${MAX_LESSON_SETS} installed lesson sets and improvements.`);
     let candidate = raw;
     if (typeof raw === "string") {
       if (raw.length > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
       try { candidate = JSON.parse(raw); } catch { throw new Error("Lesson set is not valid JSON."); }
     }
     if (state.lessonPacks.some((pack) => pack.id === candidate?.id)) throw new Error(`Lesson set ${candidate.id} is already installed.`);
-    const pack = normalizeLessonPack(candidate, { knownSkillIds: Object.keys(skillsById) });
+    const pack = normalizeLessonPack(candidate, { knownSkillIds: Object.keys(skillsById), nativeSkills: curriculum.skills });
     validateCatalogGraph(curriculum, [...state.lessonPacks, pack]);
     return pack;
   };
@@ -1757,17 +1808,30 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       description: pack.description,
       author: pack.author,
       version: pack.version,
+      mode: pack.mode,
       subjectId: pack.subject.id,
       subjectName: pack.subject.name,
       createsSubject: !catalog.subjects.some((subject) => subject.id === pack.subject.id),
       skillCount: pack.skills.length,
       problemCount: pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
+      overridesNativeSkills: pack.mode === "override" ? pack.skills.map((skill) => skill.id) : [],
       prerequisiteLinksToBuiltIn: pack.skills.reduce((count, skill) => count + skill.prerequisites.filter((id) => !id.startsWith("CUSTOM_")).length, 0),
     };
   };
 
   const importLessonPack = (raw) => {
     const pack = parseLessonPack(raw);
+    let restartedDraftCount = 0;
+    if (pack.mode === "override") {
+      const targets = new Set(pack.skills.map((skill) => skill.id));
+      for (const profileDrafts of Object.values(state.drafts)) {
+        for (const skillId of targets) {
+          if (!profileDrafts?.[skillId]) continue;
+          delete profileDrafts[skillId];
+          restartedDraftCount += 1;
+        }
+      }
+    }
     state.lessonPacks.push(pack);
     rebuildCatalog();
     if (activeProfile()) {
@@ -1775,9 +1839,11 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       state.ui.selectedSkillId = pack.track.skills[0];
       state.ui.selectedMapSkillId = pack.track.skills[0];
     }
-    addActivity("load_lesson_set", `Installed ${pack.name} with ${pack.skills.length} skills.`);
+    addActivity("load_lesson_set", pack.mode === "override"
+      ? `Installed ${pack.name}; ${pack.skills.length} native lesson${pack.skills.length === 1 ? "" : "s"} improved without resetting completed progress.${restartedDraftCount ? ` ${restartedDraftCount} unfinished test${restartedDraftCount === 1 ? " was" : "s were"} restarted.` : ""}`
+      : `Installed ${pack.name} with ${pack.skills.length} skills.`);
     notify();
-    return { ok: true, id: pack.id, name: pack.name, subjectId: pack.subject.id, subjectName: pack.subject.name, skillCount: pack.skills.length, totalSkillCount: skillOrder.length };
+    return { ok: true, id: pack.id, name: pack.name, mode: pack.mode, subjectId: pack.subject.id, subjectName: pack.subject.name, skillCount: pack.skills.length, totalSkillCount: skillOrder.length, completedProgressPreserved: pack.mode === "override", restartedDraftCount };
   };
 
   const stageLessonPack = (raw, { activityActor = "learner" } = {}) => {
@@ -1804,6 +1870,27 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     addActivity("discard_staged_lesson_set", `Discarded staged lesson set ${name}.`);
     notify();
     return { ok: true, discarded: true };
+  };
+
+  const restoreNativeLessons = (packId) => {
+    const index = state.lessonPacks.findIndex((pack) => pack.id === packId);
+    if (index < 0) throw new Error("Lesson improvement not found.");
+    const pack = state.lessonPacks[index];
+    if (pack.mode !== "override") throw new Error("Only a native lesson improvement can be restored this way.");
+    let restartedDraftCount = 0;
+    const targets = new Set(pack.skills.map((skill) => skill.id));
+    for (const profileDrafts of Object.values(state.drafts)) {
+      for (const skillId of targets) {
+        if (!profileDrafts?.[skillId]) continue;
+        delete profileDrafts[skillId];
+        restartedDraftCount += 1;
+      }
+    }
+    state.lessonPacks.splice(index, 1);
+    rebuildCatalog();
+    addActivity("restore_native_lessons", `Restored the original ${pack.skills.map((skill) => skill.name).join(", ")} lesson content. Completed learner progress was preserved.${restartedDraftCount ? ` ${restartedDraftCount} unfinished test${restartedDraftCount === 1 ? " was" : "s were"} restarted.` : ""}`);
+    notify();
+    return { ok: true, restored: pack.skills.map((skill) => skill.id), completedProgressPreserved: true, restartedDraftCount };
   };
 
   const exportLessonPack = (packId) => {
@@ -1954,6 +2041,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     stageLessonPack,
     installStagedLessonPack,
     discardStagedLessonPack,
+    restoreNativeLessons,
     importLessonPack,
     exportLessonPack,
     exportBackup,

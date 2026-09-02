@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-import { createQuickMathsStore } from "./challenge-core.js";
+import { DEFAULT_SUBJECT, LESSON_SET_FORMAT, createQuickMathsStore } from "./challenge-core.js";
 import { buildToolDefinitions, registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
@@ -24,6 +24,18 @@ function createStore({ profile = true } = {}) {
 
 function toolsFor(store) {
   return Object.fromEntries(buildToolDefinitions(store, agentManifest).map((tool) => [tool.name, tool]));
+}
+
+function nativeImprovement(store) {
+  const source = structuredClone(store.skillsById.MATH_ARITH_001);
+  return {
+    format: LESSON_SET_FORMAT, schema_version: "2.0", mode: "override",
+    id: "PACK_IMPROVE_MATH_ARITH_001", name: "Improved integer operations",
+    description: "A reversible native lesson improvement.", author: "Agent author", version: "1.0.0",
+    subject: { ...structuredClone(DEFAULT_SUBJECT), short_name: DEFAULT_SUBJECT.shortName },
+    track: { skills: [source.id] },
+    skills: [{ ...source, name: "Integer operations · improved" }],
+  };
 }
 
 test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and persistent Agent Studio controls", () => {
@@ -52,11 +64,19 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /data-tutorial-action="copy-agent-prompt"/);
   assert.match(html, /id="welcome-lesson-count">…<\/strong> connected lessons/);
   assert.doesNotMatch(html, /<strong>25<\/strong> connected skills/);
+  assert.match(html, /Local-first mastery learning/);
+  assert.doesNotMatch(html, /QuickMaths turns \d+ connected lessons across \d+ installed subjects/);
   assert.match(js, /snapshot\.curriculum\.allSkills\.length/);
   assert.match(js, /Read the QuickMaths agent manifest through WebMCP/);
   assert.match(js, /visual: "depot"/);
   assert.match(js, /GitHub Bridge/);
   assert.match(css, /\.tour-depot-preview/);
+  assert.match(js, /Subject selector/);
+  assert.match(js, /Changes the visible curriculum, mastery map, and color theme/);
+  assert.match(js, /Native improvements are reversible from Settings without erasing progress/);
+  assert.match(js, /Create \/ improve/);
+  assert.match(css, /\.welcome-brand \{[^}]*"Times New Roman"/);
+  assert.match(css, /\.sidebar-brand strong \{[^}]*"Times New Roman"/);
   assert.match(css, /touch-action: none/);
   assert.match(css, /\.map-scope-control/);
   assert.match(css, /\.map-edges \.is-cross-subject/);
@@ -67,6 +87,10 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.studio-response-picker/);
   assert.match(css, /\.studio-proof-anatomy/);
   assert.match(css, /\.studio-proof-contrast/);
+  assert.match(css, /\.studio-native-picker/);
+  assert.match(css, /\.studio-override-note/);
+  assert.match(js, /restore-native-lessons/);
+  assert.match(js, /Lesson sets and native improvements/);
   assert.match(css, /\.studio-help\[aria-expanded="true"\]/);
   assert.match(css, /\.result-review-guide/);
   assert.match(css, /\.map-layout \{[^}]*align-items: start;[^}]*min-height: 0;/);
@@ -145,6 +169,10 @@ test("agent lesson authoring guide distinguishes checked steps from reviewed pro
   assert.match(guide, /Checked maths steps are not formal proofs/);
   assert.match(guide, /two deliberately separate judgments/);
   assert.match(guide, /mastery remains unchanged until that review passes/);
+  assert.match(guide, /Improving a native QuickMaths lesson/);
+  assert.match(guide, /same lesson ID/);
+  assert.match(guide, /open_lesson_creator/);
+  assert.match(guide, /Restore original/);
 });
 
 test("schemas reject unknown properties and invalid navigation values", async () => {
@@ -246,6 +274,26 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
   assert.equal(store.snapshot().ui.route, "creator");
 });
 
+test("agent can visibly prefill a native lesson improvement without installing it", async () => {
+  const store = createStore();
+  const calls = [];
+  const lessonStudio = {
+    loadNativeLesson(skillId, options) {
+      calls.push({ skillId, options });
+      return { ok: true, mode: "override", skillId, completedProgressPreserved: true };
+    },
+  };
+  const tools = Object.fromEntries(buildToolDefinitions(store, agentManifest, null, lessonStudio).map((tool) => [tool.name, tool]));
+  const opened = await tools.open_lesson_creator.execute({ skill_id: "MATH_ARITH_001" });
+  assert.equal(opened.visible_view, "creator");
+  assert.equal(opened.editing_mode, "native_override");
+  assert.equal(opened.completed_progress_preserved, true);
+  assert.equal(opened.unfinished_tests_restart_on_install, true);
+  assert.deepEqual(calls, [{ skillId: "MATH_ARITH_001", options: { announce: false } }]);
+  assert.equal(store.snapshot().lessonPacks.length, 0);
+  assert.equal(JSON.stringify(opened).includes("expected_answer"), false);
+});
+
 test("lesson-set tools validate and stage content but cannot install it", async () => {
   const store = createStore();
   const tools = toolsFor(store);
@@ -259,6 +307,36 @@ test("lesson-set tools validate and stage content but cannot install it", async 
   assert.equal(store.snapshot().stagedLessonPack.id, "PACK_PERSONAL_FINANCE");
   assert.equal(store.snapshot().lessonPacks.length, 0);
   assert.equal(tools.confirm_lesson_set_install, undefined);
+});
+
+test("lesson-set tools validate and stage native improvements for human confirmation", async () => {
+  const store = createStore();
+  const tools = toolsFor(store);
+  const raw = JSON.stringify(nativeImprovement(store));
+  const validated = await tools.validate_lesson_set.execute({ lesson_set_json: raw });
+  assert.equal(validated.preview.mode, "override");
+  assert.deepEqual(validated.preview.overridesNativeSkills, ["MATH_ARITH_001"]);
+  const staged = await tools.stage_custom_lesson_set.execute({ lesson_set_json: raw });
+  assert.equal(staged.requires_human_confirmation, true);
+  assert.equal(store.snapshot().stagedLessonPack.mode, "override");
+  assert.equal(store.snapshot().lessonPacks.length, 0);
+  assert.equal(JSON.stringify({ validated, staged }).includes("expected_answer"), false);
+});
+
+test("agent state identifies installed native improvements without exposing their answer keys", async () => {
+  const store = createStore();
+  store.importLessonPack(nativeImprovement(store));
+  const tools = toolsFor(store);
+  const app = await tools.get_app_state.execute({});
+  const map = await tools.get_curriculum_map.execute({ subject_id: "SUBJECT_MATH" });
+  const improved = map.skills.find((skill) => skill.skill_id === "MATH_ARITH_001");
+  assert.equal(app.custom_lesson_sets.length, 0);
+  assert.equal(app.lesson_changes[0].mode, "override");
+  assert.deepEqual(app.lesson_changes[0].overrides_native_skills, ["MATH_ARITH_001"]);
+  assert.equal(improved.native, true);
+  assert.equal(improved.overridden, true);
+  assert.equal(improved.pack_id, "PACK_IMPROVE_MATH_ARITH_001");
+  assert.equal(JSON.stringify({ app, map }).includes("expected_answer"), false);
 });
 
 test("starting a test exposes prompts but not expected answers", async () => {

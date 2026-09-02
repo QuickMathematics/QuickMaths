@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 import {
   APP_VERSION,
+  DEFAULT_SUBJECT,
   LEGACY_STORAGE_KEY,
   LESSON_SET_FORMAT,
   STORAGE_KEY,
@@ -64,6 +65,27 @@ function biologyLessonSet() {
   skill.prerequisites = [{ subject_id: "SUBJECT_MATH", skill_id: "MATH_ARITH_005" }];
   skill.problems = skill.problems.map((problem, index) => ({ ...problem, template_id: `CUSTOM_BIO_CELL_Q${String(index + 1).padStart(2, "0")}`, skill_id: skill.id }));
   return pack;
+}
+
+function nativeImprovement(skillId = "MATH_ARITH_001", name = "Integer operations · revised") {
+  const source = structuredClone(curriculum.skills.find((skill) => skill.id === skillId));
+  const sourceSubjectId = source.subjectId ?? DEFAULT_SUBJECT.id;
+  const sourceSubject = sourceSubjectId === DEFAULT_SUBJECT.id
+    ? DEFAULT_SUBJECT
+    : curriculum.subjects.find((subject) => subject.id === sourceSubjectId);
+  return {
+    format: LESSON_SET_FORMAT,
+    schema_version: "2.0",
+    mode: "override",
+    id: `PACK_IMPROVE_${skillId}`,
+    name: `Improvement · ${source.name}`,
+    description: `A reversible improvement to ${source.name}.`,
+    author: "QuickMaths test author",
+    version: "1.0.0",
+    subject: { ...structuredClone(sourceSubject), short_name: sourceSubject.shortName ?? sourceSubject.short_name },
+    track: { id: `TRACK_IMPROVE_${skillId}`, name: `Improvement · ${source.name}`, skills: [skillId] },
+    skills: [{ ...source, name }],
+  };
 }
 
 function answerActiveTestCorrectly(store) {
@@ -280,6 +302,77 @@ test("a valid custom lesson set joins the real curriculum without replacing buil
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "CUSTOM_FINANCE_DISCOUNTS").custom, true);
   assert.equal(store.statusForSkill("CUSTOM_FINANCE_DISCOUNTS"), "locked");
   assert.match(store.exportLessonPack("PACK_PERSONAL_FINANCE"), new RegExp(LESSON_SET_FORMAT));
+});
+
+test("native lesson improvements replace content reversibly without moving IDs or completed learner progress", () => {
+  const { store } = harness();
+  store.createProfile("Native Editor");
+  store.startTest("MATH_ARITH_001", { force: true });
+  answerActiveTestCorrectly(store);
+  store.submitTest();
+  store.saveReflection({ confidenceRating: 4, difficultyFelt: "medium", hintsUsed: "none", guessed: "no" });
+  const before = store.snapshot().progressRows.find((row) => row.id === "MATH_ARITH_001");
+  store.startTest("MATH_ARITH_001", { force: true });
+
+  const preview = store.previewLessonPack(nativeImprovement());
+  assert.equal(preview.mode, "override");
+  assert.deepEqual(preview.overridesNativeSkills, ["MATH_ARITH_001"]);
+  assert.equal(store.snapshot().curriculum.allSkills.length, 43, "preview must not mutate the curriculum");
+
+  const installed = store.importLessonPack(nativeImprovement());
+  let state = store.snapshot();
+  const improved = state.progressRows.find((row) => row.id === "MATH_ARITH_001");
+  assert.equal(installed.mode, "override");
+  assert.equal(installed.completedProgressPreserved, true);
+  assert.equal(installed.restartedDraftCount, 1);
+  assert.equal(installed.totalSkillCount, 43);
+  assert.equal(state.curriculum.allSkills.length, 43);
+  assert.equal(improved.name, "Integer operations · revised");
+  assert.equal(improved.native, true);
+  assert.equal(improved.overridden, true);
+  assert.equal(improved.attemptCount, before.attemptCount);
+  assert.equal(improved.masteryScore, before.masteryScore);
+  assert.equal(state.activeTest, null);
+
+  store.startTest("MATH_ARITH_001", { force: true });
+  const restored = store.restoreNativeLessons("PACK_IMPROVE_MATH_ARITH_001");
+  state = store.snapshot();
+  const original = state.progressRows.find((row) => row.id === "MATH_ARITH_001");
+  assert.deepEqual(restored.restored, ["MATH_ARITH_001"]);
+  assert.equal(restored.completedProgressPreserved, true);
+  assert.equal(restored.restartedDraftCount, 1);
+  assert.equal(original.name, "Integer operations");
+  assert.equal(original.overridden, false);
+  assert.equal(original.attemptCount, before.attemptCount);
+  assert.equal(original.masteryScore, before.masteryScore);
+  assert.equal(state.activeTest, null);
+});
+
+test("native improvements enforce the built-in identity and round-trip through full backups", () => {
+  const source = harness();
+  source.store.createProfile("Portable Improvement");
+  source.store.importLessonPack(nativeImprovement());
+  assert.throws(() => source.store.importLessonPack({ ...nativeImprovement(), id: "PACK_IMPROVE_MATH_ARITH_001_AGAIN" }), /already has an installed improvement/i);
+
+  const missing = nativeImprovement();
+  missing.id = "PACK_IMPROVE_MISSING_NATIVE";
+  missing.skills[0].id = "MATH_NOT_NATIVE_999";
+  missing.track.skills = ["MATH_NOT_NATIVE_999"];
+  assert.throws(() => source.store.previewLessonPack(missing), /not a native QuickMaths lesson/i);
+
+  const moved = nativeImprovement();
+  moved.id = "PACK_IMPROVE_MOVED_NATIVE";
+  const geography = curriculum.subjects.find((subject) => subject.id === "SUBJECT_GEOGRAPHY");
+  moved.subject = structuredClone(geography);
+  assert.throws(() => source.store.previewLessonPack(moved), /belongs to SUBJECT_MATH/i);
+
+  const target = harness();
+  target.store.importBackup(source.store.exportBackup());
+  target.store.selectProfile(target.store.snapshot().profiles[0].id);
+  const restored = target.store.snapshot();
+  assert.equal(restored.lessonPacks[0].mode, "override");
+  assert.equal(restored.curriculum.allSkills.length, 43);
+  assert.equal(restored.allProgressRows.find((row) => row.id === "MATH_ARITH_001").name, "Integer operations · revised");
 });
 
 test("subjects filter the visible map, apply bridge locks, and support per-profile Open path", () => {
