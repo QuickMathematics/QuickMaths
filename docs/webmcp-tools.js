@@ -1,5 +1,6 @@
 export const TOOL_NAMES = Object.freeze([
   "get_agent_guide",
+  "get_educator_agent_manifest",
   "get_app_state",
   "get_curriculum_map",
   "get_progress_summary",
@@ -162,9 +163,12 @@ function guideForSection(guide, section) {
   };
 }
 
-export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = null, lessonStudio = null) {
+export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = null, lessonStudio = null, educatorManifest = {}) {
   const guide = agentManifest && typeof agentManifest === "object" && !Array.isArray(agentManifest)
     ? JSON.parse(JSON.stringify(agentManifest))
+    : {};
+  const educatorGuide = educatorManifest && typeof educatorManifest === "object" && !Array.isArray(educatorManifest)
+    ? JSON.parse(JSON.stringify(educatorManifest))
     : {};
   const preparePlanMap = ({ skillIds = [], mapScope = null, subjectId = null, enablePlanMode = true } = {}) => {
     let state = store.snapshot();
@@ -205,6 +209,27 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           ok: true,
           section,
           guide: guideForSection(guide, section),
+          active_curriculum_policy: activeCurriculumPolicy(store),
+        };
+      },
+    },
+    {
+      name: "get_educator_agent_manifest",
+      title: "Get QuickMaths educator agent manifest",
+      description: "Read the dedicated curriculum-design operating manifest, educator workflow, human approval boundaries, documentation link, and any active curriculum agent policy.",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      async execute(input = {}) {
+        requireObject(input); rejectUnknown(input, []);
+        return {
+          ok: true,
+          manifest: Object.keys(educatorGuide).length ? educatorGuide : {
+            app: "QuickMaths Educator Workspace",
+            role: "educator",
+            documentation_pdf: "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf",
+            recommended_sequence: ["get_curriculum_workspace", "search_lesson_depot", "stage_depot_lessons"],
+            boundary: "Make curriculum changes only from explicit educator instructions. Stage lesson packs for ordered human review and approval before installation.",
+          },
           active_curriculum_policy: activeCurriculumPolicy(store),
         };
       },
@@ -863,11 +888,11 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
   ];
 }
 
-export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext, agentManifest = {}, lessonDepot = null, lessonStudio = null) {
+export async function registerWebMcpTools(store, modelContext = globalThis.document?.modelContext, agentManifest = {}, lessonDepot = null, lessonStudio = null, educatorManifest = {}) {
   if (!modelContext || typeof modelContext.registerTool !== "function") return { available: false, registered: [], failures: [], error: null };
   const registered = [];
   const failures = [];
-  for (const definition of buildToolDefinitions(store, agentManifest, lessonDepot, lessonStudio)) {
+  for (const definition of buildToolDefinitions(store, agentManifest, lessonDepot, lessonStudio, educatorManifest)) {
     try {
       await modelContext.registerTool(definition);
       registered.push(definition.name);

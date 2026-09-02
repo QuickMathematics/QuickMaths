@@ -350,6 +350,10 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   store.createProfile("Curriculum Educator", { role: "educator" });
   assert.equal(store.snapshot().ui.route, "curriculum");
   assert.equal(store.snapshot().activeProfile.role, "educator");
+  assert.equal(store.snapshot().activeProfile.educatorGuideSeenAt, null);
+  const welcome = store.completeEducatorWelcome();
+  assert.equal(welcome.ok, true);
+  assert.match(store.snapshot().activeProfile.educatorGuideSeenAt, /^2026-/);
   store.importLessonPack(geographyLessonSet);
   assert.equal(store.snapshot().curriculum.allSkills.length, 59);
   store.setCurriculumPackEnabled("PACK_GEOGRAPHY", false);

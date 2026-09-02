@@ -25,7 +25,7 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 - Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, and review gates
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
 - Public Lesson Depot with optional GitHub Discussion upvotes and comments
-- Twenty-seven WebMCP tools for visible navigation, tutoring, educator curriculum design, mastery-map planning, curriculum inspection, and single or batch human-controlled lesson staging
+- Twenty-eight WebMCP tools for visible navigation, tutoring, dedicated educator guidance, curriculum design, mastery-map planning, curriculum inspection, and single or batch human-controlled lesson staging
 - Optional GitHub Bridge for revision-safe mobile/remote-agent checkpoints
 
 ## Run the web app locally
@@ -36,7 +36,7 @@ python -m http.server 8765 --directory docs
 
 Open `http://localhost:8765/`.
 
-The learner app is `docs/index.html`; the dedicated WebMCP agent workspace is `docs/agent-bridge.html`; the mobile/storage walkthrough is `docs/bridge-guide.html`.
+The learner app is `docs/index.html`; the dedicated WebMCP agent workspace is `docs/agent-bridge.html`; the mobile/storage walkthrough is `docs/bridge-guide.html`; and the complete educator manual is `docs/QuickMaths-Educator-Guide.pdf`.
 
 ## Local Git Bridge for Codex
 

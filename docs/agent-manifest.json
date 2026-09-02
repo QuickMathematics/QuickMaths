@@ -2,12 +2,15 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 20,
+  "app_version": 21,
   "description": "Operating guide for an agent tutoring learners or helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
     "site_tools_api": "document.modelContext.registerTool",
     "guide_tool": "get_agent_guide",
+    "educator_guide_tool": "get_educator_agent_manifest",
+    "educator_manifest": "https://quickmathematics.github.io/QuickMaths/educator-agent-manifest.json",
+    "educator_documentation_pdf": "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf",
     "note": "WebMCP discovers registered page tools. get_agent_guide returns a compact summary by default and exposes detailed policy sections only when needed.",
     "guide_sections": ["summary", "tutoring", "navigation", "planning", "educator", "bridge", "custom_content", "backup", "all"]
   },
@@ -128,6 +131,7 @@
   "routes": ["tutorial", "home", "map", "curriculum", "lesson", "test", "results", "depot", "creator", "settings"],
   "tools": [
     "get_agent_guide",
+    "get_educator_agent_manifest",
     "get_app_state",
     "get_curriculum_map",
     "get_progress_summary",

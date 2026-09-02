@@ -1,5 +1,5 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-depot-batch-review-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-depot-batch-review-v1";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-educator-docs-v3";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-educator-docs-v3";
 import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
 import {
   buildDepotSubmissionPrompt,
@@ -56,6 +56,7 @@ const elements = {
   curriculumFile: document.querySelector("#curriculum-file"),
   subjectSelect: document.querySelector("#subject-select"),
   toast: document.querySelector("#toast"),
+  educatorWelcome: document.querySelector("#educator-welcome-root"),
 };
 
 let store;
@@ -79,6 +80,8 @@ let pendingLandingCurriculumId = null;
 const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
 
 const AGENT_STARTER_PROMPT = "Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.";
+const EDUCATOR_GUIDE_URL = "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf";
+const EDUCATOR_STARTER_PROMPT = "Visit https://quickmathematics.github.io/QuickMaths/ and call get_educator_agent_manifest through WebMCP. Read the educator manifest, inspect my open curriculum with get_curriculum_workspace, and help me design it while keeping every lesson installation, learner-policy change, and publication step visible and human-approved.";
 const MAP_ZOOM_MIN = 0.1;
 const MAP_ZOOM_MAX = 1.6;
 const MAP_ZOOM_STEP = 0.1;
@@ -1007,7 +1010,7 @@ function renderEducatorDashboard(snapshot) {
   const workspace = snapshot.activeCurriculum;
   const enabled = snapshot.lessonPacks.filter((pack) => pack.enabledForCurriculum && pack.mode !== "override");
   elements.view.innerHTML = `
-    <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace</p><h1>${escapeHtml(workspace?.name ?? "Curriculum workspace")}</h1><p>Shape the content, map, learning rules, and agent boundaries that travel with this curriculum.</p></div><div class="page-actions"><button class="button button-outline" data-action="export-curriculum">Export curriculum</button><button class="button button-primary" data-route="curriculum">Open designer</button></div></header>
+    <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace</p><h1>${escapeHtml(workspace?.name ?? "Curriculum workspace")}</h1><p>Shape the content, map, learning rules, and agent boundaries that travel with this curriculum.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Educator guide ↗</a><button class="button button-outline" data-action="export-curriculum">Export curriculum</button><button class="button button-primary" data-route="curriculum">Open designer</button></div></header>
     <section class="metric-grid educator-metrics"><article class="metric-card"><span>Curricula</span><strong>${snapshot.curricula.length}</strong><small>Owned by this educator</small></article><article class="metric-card"><span>Visible lessons</span><strong>${snapshot.curriculum.allSkills.length}</strong><small>Native + enabled packs</small></article><article class="metric-card"><span>Enabled packs</span><strong>${enabled.length}</strong><small>Chosen from the Depot library</small></article><article class="metric-card"><span>Agent</span><strong>${workspace?.settings.agentEnabled ? "On" : "Off"}</strong><small>${workspace?.settings.progressionMode === "soft" ? "Open path" : "Hard path"}</small></article></section>
     <section class="dashboard-grid"><article class="suggested-card educator-next"><p class="eyebrow">Curriculum design loop</p><h2>Compose, arrange, constrain, share.</h2><p>Enable lesson packs, drag the canonical map into shape, create highlighted learning paths, annotate decisions, then export one portable curriculum file for the learner.</p><div class="suggested-actions"><button class="button button-primary" data-route="curriculum">Continue designing</button><button class="button button-outline" data-route="depot">Browse lesson Depot</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current learner policy</h2><p>These rules are enforced by the app and exposed privately to a compatible agent.</p></div></div><dl class="educator-policy-summary"><div><dt>Student</dt><dd>${escapeHtml(workspace?.settings.studentName || "Not named yet")}</dd></div><div><dt>Learning path</dt><dd>${workspace?.settings.progressionMode === "soft" ? "Open" : "Hard"}</dd></div><div><dt>Agent</dt><dd>${workspace?.settings.agentEnabled ? "In the loop" : "Off"}</dd></div><div><dt>Proof contact</dt><dd>${escapeHtml(workspace?.settings.contactEmail || "Not set")}</dd></div></dl><aside class="assessment-disclaimer"><strong>Learning, not exam supervision</strong><p>QuickMaths is a learning and practice tool. It is not a substitute for supervised, identity-verified, or high-stakes tests.</p></aside></article></section>`;
 }
@@ -1017,7 +1020,7 @@ function renderCurriculumWorkspace(snapshot) {
   if (!workspace) return `<section class="content-card educator-empty"><p class="eyebrow">Curriculum designer</p><h1>Create your first curriculum.</h1><p>A curriculum keeps its own enabled Depot packs, canonical map, annotations, paths, and learner policy.</p><form id="create-curriculum-form" class="educator-inline-form"><input name="name" maxlength="100" placeholder="Curriculum name" required><button class="button button-primary" type="submit">Create curriculum</button></form></section>`;
   const settings = workspace.settings;
   return `<section class="curriculum-workspace" aria-labelledby="curriculum-workspace-title">
-    <header class="curriculum-workspace-head"><div><p class="eyebrow">Open curriculum</p><h1 id="curriculum-workspace-title">${escapeHtml(workspace.name)}</h1><p>${escapeHtml(workspace.description || "A portable, educator-authored learning plan.")}</p></div><div class="curriculum-workspace-actions"><label>Switch curriculum<select id="curriculum-select">${snapshot.curricula.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === workspace.id ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></label><button class="button button-outline" data-action="import-curriculum">Import</button><button class="button button-outline" data-action="export-curriculum">Export</button></div></header>
+    <header class="curriculum-workspace-head"><div><p class="eyebrow">Open curriculum</p><h1 id="curriculum-workspace-title">${escapeHtml(workspace.name)}</h1><p>${escapeHtml(workspace.description || "A portable, educator-authored learning plan.")}</p></div><div class="curriculum-workspace-actions"><label>Switch curriculum<select id="curriculum-select">${snapshot.curricula.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === workspace.id ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></label><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Guide ↗</a><button class="button button-outline" data-action="import-curriculum">Import</button><button class="button button-outline" data-action="export-curriculum">Export</button></div></header>
     <div class="curriculum-editor-grid">
       <form id="curriculum-identity-form" class="curriculum-editor-card"><div class="card-heading"><div><h2>Curriculum profile</h2><p>Name and describe this particular course of study.</p></div></div><label>Name<input name="name" maxlength="100" value="${escapeHtml(workspace.name)}" required></label><label>Description<textarea name="description" maxlength="1000" rows="3" placeholder="Purpose, audience, and intended outcome…">${escapeHtml(workspace.description)}</textarea></label><div class="form-actions"><button class="button button-secondary" type="submit">Save profile</button><button class="quiet-button" type="button" data-action="create-curriculum">New curriculum</button></div></form>
       <form id="curriculum-settings-form" class="curriculum-editor-card curriculum-policy-card"><div class="card-heading"><div><h2>Learner & agent policy</h2><p>These rules travel inside the curriculum and are exposed to WebMCP without cluttering the learner interface.</p></div></div><div class="curriculum-field-grid"><label>Student name<input name="studentName" maxlength="60" value="${escapeHtml(settings.studentName)}" placeholder="Optional learner name"></label><label>Proof / completion email<input name="contactEmail" type="email" maxlength="160" value="${escapeHtml(settings.contactEmail)}" placeholder="educator@example.com"></label><label>Learning path<select name="progressionMode"><option value="hard" ${settings.progressionMode === "hard" ? "selected" : ""}>Hard · enforce prerequisites</option><option value="soft" ${settings.progressionMode === "soft" ? "selected" : ""}>Open · connections are guidance</option></select></label></div><label class="curriculum-agent-toggle"><input name="agentEnabled" type="checkbox" ${settings.agentEnabled ? "checked" : ""}><span><strong>Agent in the loop</strong><small>Permit the curriculum’s tutoring policy to guide a connected browser agent.</small></span></label><label>Private agent instructions<textarea name="agentInstructions" maxlength="4000" rows="5" placeholder="For example: never solve assessed tasks; ask one targeted question at a time…">${escapeHtml(settings.agentInstructions)}</textarea></label><div class="agent-policy-preview"><strong>Agent-visible policy</strong><p>This text is injected into WebMCP context throughout the app. Learners do not see it as page content.</p></div><aside class="assessment-disclaimer"><strong>QuickMaths is for learning and practice</strong><p>It does not replace supervised, identity-verified, or high-stakes assessment. Use appropriate human supervision when results must establish who completed the work.</p></aside><button class="button button-secondary" type="submit">Save learner policy</button></form>
@@ -1468,7 +1471,7 @@ function renderEducatorSettings(snapshot) {
   const backup = snapshot.backupStatus;
   const workspace = snapshot.activeCurriculum;
   elements.view.innerHTML = `
-    <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace & data</p><h1>Settings</h1><p>Manage portable backups, GitHub storage, curriculum files, and installed lesson sources.</p></div><div class="page-actions"><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
+    <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace & data</p><h1>Settings</h1><p>Manage portable backups, GitHub storage, curriculum files, and installed lesson sources.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Educator guide ↗</a><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
     ${renderGitHubBridge(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum file</h2><p>A focused file for a learner: enabled packs, canonical map, and learning policy.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download curriculum</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
@@ -1661,6 +1664,26 @@ function syncNavigation(route) {
   });
 }
 
+function renderEducatorWelcome(snapshot) {
+  const show = snapshot.activeProfile?.role === "educator" && !snapshot.activeProfile.educatorGuideSeenAt;
+  if (!show) {
+    elements.educatorWelcome.innerHTML = "";
+    return;
+  }
+  elements.educatorWelcome.innerHTML = `<section class="educator-welcome-backdrop" role="presentation">
+    <article class="educator-welcome-dialog" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="educator-welcome-title" aria-describedby="educator-welcome-copy">
+      <div class="educator-welcome-mark" aria-hidden="true">QM</div>
+      <p class="eyebrow">Educator setup</p>
+      <h1 id="educator-welcome-title">Bring an agent into Curriculum Designer.</h1>
+      <p id="educator-welcome-copy">The educator guide explains every control, workflow, safety boundary, file format, and recovery path in the workspace.</p>
+      <a class="educator-guide-link" href="${escapeHtml(EDUCATOR_GUIDE_URL)}" target="_blank" rel="noopener"><span><small>Complete product documentation</small><strong>Open the educator guide PDF</strong></span><b aria-hidden="true">↗</b></a>
+      <section class="educator-prompt-card" aria-labelledby="educator-prompt-title"><div><span id="educator-prompt-title">Suggested agent prompt</span><button type="button" data-action="copy-educator-prompt">Copy</button></div><p>${escapeHtml(EDUCATOR_STARTER_PROMPT)}</p></section>
+      <button class="button button-primary educator-welcome-ok" type="button" data-action="dismiss-educator-welcome">OK, open Curriculum Designer</button>
+    </article>
+  </section>`;
+  requestAnimationFrame(() => elements.educatorWelcome.querySelector(".educator-welcome-dialog")?.focus({ preventScroll: true }));
+}
+
 function render(snapshot) {
   captureBridgeFormDraft();
   const welcomeStorageDetails = document.querySelector("#welcome-storage-details");
@@ -1671,6 +1694,7 @@ function render(snapshot) {
   const signedIn = Boolean(snapshot.activeProfile);
   elements.welcome.hidden = signedIn;
   elements.shell.hidden = !signedIn;
+  renderEducatorWelcome(snapshot);
   renderWelcomeSummary(snapshot);
   if (!signedIn) {
     renderProfiles(snapshot);
@@ -2005,6 +2029,18 @@ elements.creatorFile.addEventListener("change", async () => {
 });
 
 document.addEventListener("click", async (event) => {
+  const educatorWelcomeAction = event.target.closest?.("[data-action='copy-educator-prompt'], [data-action='dismiss-educator-welcome']");
+  if (educatorWelcomeAction) {
+    event.preventDefault();
+    if (educatorWelcomeAction.dataset.action === "copy-educator-prompt") {
+      try { await navigator.clipboard.writeText(EDUCATOR_STARTER_PROMPT); showToast("Educator agent prompt copied."); }
+      catch { showToast("Copy was blocked. Select the prompt text manually."); }
+    } else {
+      store.completeEducatorWelcome();
+      showToast("Educator setup complete. The guide remains available in your workspace.");
+    }
+    return;
+  }
   const studioHelp = event.target.closest?.("[data-studio-help]");
   const openStudioHelp = document.querySelectorAll?.('[data-studio-help][aria-expanded="true"]') ?? [];
   openStudioHelp.forEach((button) => {
@@ -2523,10 +2559,15 @@ async function boot() {
   const curriculum = await response.json();
   const bundledLessonPacks = [await geographyResponse.text()];
   let agentManifest = {};
+  let educatorManifest = {};
   let communityConfig = { enabled: false };
   try {
-    const manifestResponse = await fetch("./agent-manifest.json?v=20260902-depot-batch-review-v1");
+    const [manifestResponse, educatorManifestResponse] = await Promise.all([
+      fetch("./agent-manifest.json?v=20260902-educator-docs-v3"),
+      fetch("./educator-agent-manifest.json?v=20260902-educator-docs-v3"),
+    ]);
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
+    if (educatorManifestResponse.ok) educatorManifest = await educatorManifestResponse.json();
   } catch {
     // The tools still work if the optional human/machine-readable guide is unavailable.
   }
@@ -2585,7 +2626,7 @@ async function boot() {
   initClock();
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code>${name}</code>`).join("");
   document.querySelector("#tool-count").textContent = String(TOOL_NAMES.length);
-  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot, lessonStudio);
+  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot, lessonStudio, educatorManifest);
   const failedTools = new Set(bridge.failures.map((failure) => failure.name));
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code class="${failedTools.has(name) ? "tool-failed" : ""}">${escapeHtml(name)}</code>`).join("");
   elements.bridgeCard.dataset.state = bridge.available && !bridge.error ? "ready" : bridge.error ? "warning" : "idle";

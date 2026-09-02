@@ -947,6 +947,9 @@ function sanitizeProfile(candidate) {
     activeSubjectId: SUBJECT_ID.test(candidate.activeSubjectId) ? candidate.activeSubjectId : DEFAULT_SUBJECT_ID,
     progressionMode: candidate.progressionMode === "soft" ? "soft" : "hard",
     mapScope: candidate.mapScope === "all" ? "all" : "subject",
+    educatorGuideSeenAt: role === "educator"
+      ? candidate.educatorGuideSeenAt === null ? null : cleanText(candidate.educatorGuideSeenAt, 40) || null
+      : null,
     tutorialCompletedAt: role === "educator" ? cleanText(candidate.tutorialCompletedAt, 40) || createdAt : candidate.tutorialCompletedAt === null ? null : cleanText(candidate.tutorialCompletedAt, 40) || createdAt,
     tutorialSkipped: Boolean(candidate.tutorialSkipped),
   };
@@ -2091,6 +2094,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       role: safeRole, curriculumId: safeRole === "learner" && state.curricula.some((item) => item.id === curriculumId) ? curriculumId : null,
       activeCurriculumId: null,
       activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "subject", tutorialCompletedAt: safeRole === "educator" ? isoNow() : null, tutorialSkipped: false,
+      educatorGuideSeenAt: null,
     };
     state.profiles.push(profile);
     state.progress[profile.id] = {};
@@ -2188,6 +2192,15 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     addActivity(skipped ? "skip_tutorial" : "complete_tutorial", skipped ? "Skipped the app tour." : "Completed the app tour.");
     notify();
     return { ok: true, skipped: Boolean(skipped), completed_at: profile.tutorialCompletedAt };
+  };
+
+  const completeEducatorWelcome = () => {
+    const profile = activeProfile();
+    if (!profile || profile.role !== "educator") throw new Error("Select an educator profile first.");
+    profile.educatorGuideSeenAt = isoNow();
+    addActivity("complete_educator_welcome", "Opened the educator workspace guide and dismissed setup.");
+    notify();
+    return { ok: true, completed_at: profile.educatorGuideSeenAt };
   };
 
   const selectMapSkill = (skillId) => {
@@ -3408,6 +3421,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     startTutorial,
     setTutorialStep,
     completeTutorial,
+    completeEducatorWelcome,
     selectMapSkill,
     setMapZoom,
     setMapPlanMode,

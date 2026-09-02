@@ -1,12 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 
 import { DEFAULT_SUBJECT, LESSON_SET_FORMAT, createQuickMathsStore } from "./challenge-core.js";
 import { buildToolDefinitions, registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const agentManifest = JSON.parse(readFileSync(new URL("./agent-manifest.json", import.meta.url), "utf8"));
+const educatorManifest = JSON.parse(readFileSync(new URL("./educator-agent-manifest.json", import.meta.url), "utf8"));
 const geographyLessonSet = readFileSync(new URL("./lesson-depot/lessons/geography/1.0.0/lesson-set.json", import.meta.url), "utf8");
 
 function createStore({ profile = true } = {}) {
@@ -24,7 +25,7 @@ function createStore({ profile = true } = {}) {
 }
 
 function toolsFor(store) {
-  return Object.fromEntries(buildToolDefinitions(store, agentManifest).map((tool) => [tool.name, tool]));
+  return Object.fromEntries(buildToolDefinitions(store, agentManifest, null, null, educatorManifest).map((tool) => [tool.name, tool]));
 }
 
 function nativeImprovement(store) {
@@ -45,6 +46,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   const css = readFileSync(new URL("./challenge.css", import.meta.url), "utf8");
   const community = readFileSync(new URL("./github-community.js", import.meta.url), "utf8");
   const communityCallback = readFileSync(new URL("./community-auth.html", import.meta.url), "utf8");
+  const educatorGuideSource = readFileSync(new URL("./EDUCATOR_GUIDE.md", import.meta.url), "utf8");
+  const educatorPdfUrl = new URL("./QuickMaths-Educator-Guide.pdf", import.meta.url);
   assert.match(html, /data-route="settings"/);
   assert.match(html, /data-route="depot"/);
   assert.match(js, /renderLessonDepot/);
@@ -71,11 +74,18 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(html, /Local-first mastery learning/);
   assert.match(html, /id="welcome-storage-restore"/);
   assert.match(html, /id="welcome-educator-path"/);
+  assert.match(html, /id="educator-welcome-root"/);
+  assert.match(html, /QuickMaths-Educator-Guide\.pdf/);
+  assert.match(html, /educator-agent-manifest\.json/);
   assert.match(html, /id="welcome-curriculum-url-form"/);
   assert.match(html, /data-route="curriculum"/);
   assert.match(css, /\.welcome-storage-restore \{[^}]*border-radius: 14px;[^}]*background:/);
   assert.match(css, /\.welcome-storage-restore > summary strong \{ font-size: 15px/);
   assert.match(js, /QuickMaths is for learning and practice/);
+  assert.match(js, /get_educator_agent_manifest/);
+  assert.match(js, /data-action="copy-educator-prompt"/);
+  assert.match(js, /data-action="dismiss-educator-welcome"/);
+  assert.match(js, /completeEducatorWelcome/);
   assert.doesNotMatch(js, /Attempts per lesson/);
   assert.match(html, /id="app-shell" class="app-shell agent-collapsed"/);
   assert.match(html, /id="agent-dock" class="agent-dock is-closed"/);
@@ -141,6 +151,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.map-plan-panel\.is-composer-open \{ position: fixed;/);
   assert.match(css, /\.agent-dock\.is-closed/);
   assert.match(css, /\.app-shell\.is-educator/);
+  assert.match(css, /\.educator-welcome-backdrop/);
+  assert.match(css, /\.educator-prompt-card/);
   assert.match(css, /\.curriculum-editor-grid/);
   assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
   assert.match(js, /createGitHubSyncController/);
@@ -165,6 +177,10 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(community, /quickmaths\.github-community\.credential\.session/);
   assert.doesNotMatch(community, /client_secret/);
   assert.match(communityCallback, /community-auth\.js/);
+  assert.match(educatorGuideSource, /complete visible product: educator setup, every educator control/i);
+  assert.match(educatorGuideSource, /get_educator_agent_manifest/);
+  assert.ok(statSync(educatorPdfUrl).size > 50_000);
+  assert.equal(readFileSync(educatorPdfUrl).subarray(0, 5).toString(), "%PDF-");
 });
 
 test("challenge documentation lists every advertised page tool and the dated delta evidence", () => {
@@ -194,13 +210,13 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /local-git-transport/);
 });
 
-test("registers all twenty-seven tools once with the WebMCP document context", async () => {
+test("registers all twenty-eight tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
-  }, agentManifest);
+  }, agentManifest, null, null, educatorManifest);
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 27);
+  assert.equal(TOOL_NAMES.length, 28);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(result.failures, []);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
@@ -226,9 +242,9 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 20);
+  assert.equal(summary.guide.app_version, 21);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
-  assert.equal(summary.guide.tools.length, 27);
+  assert.equal(summary.guide.tools.length, 28);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent GitHub storage/);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
@@ -250,6 +266,12 @@ test("educator WebMCP tools compose curricula and inject the private learner pol
   store.createProfile("Agent Educator", { role: "educator" });
   store.importLessonPack(geographyLessonSet);
   const tools = toolsFor(store);
+  const educatorGuide = await tools.get_educator_agent_manifest.execute({});
+  assert.equal(educatorGuide.manifest.role, "educator");
+  assert.equal(educatorGuide.manifest.discovery.command, "get_educator_agent_manifest");
+  assert.match(educatorGuide.manifest.documentation_pdf, /QuickMaths-Educator-Guide\.pdf/);
+  assert.equal(educatorGuide.manifest.lesson_content_workflow.batch_review.includes("sequential"), true);
+  assert.equal(JSON.stringify(educatorGuide).includes("expected_answer"), false);
   const workspace = await tools.get_curriculum_workspace.execute({});
   assert.equal(workspace.active_curriculum.ownerProfileId, store.snapshot().activeProfile.id);
   assert.equal(workspace.installed_packs[0].enabled, true);

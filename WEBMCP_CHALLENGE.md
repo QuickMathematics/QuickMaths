@@ -50,11 +50,12 @@ Challenge-period milestone evidence:
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers twenty-seven page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact operating summary by default; an agent can request `tutoring`, `navigation`, `planning`, `educator`, `bridge`, `custom_content`, `backup`, or `all` only when that policy is relevant. The complete source remains the machine-readable `agent-manifest.json`.
+A compatible ChatGPT or Codex browser discovers twenty-eight page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact learner/tutor operating summary by default; `get_educator_agent_manifest` returns the dedicated curriculum-design contract and active curriculum policy. The complete sources remain the machine-readable `agent-manifest.json` and `educator-agent-manifest.json`.
 
 | Tool | Purpose |
 | --- | --- |
 | `get_agent_guide` | Read a compact operating summary or one detailed policy section on demand. |
+| `get_educator_agent_manifest` | Read the dedicated educator workflow, human-control boundaries, documentation link, and active curriculum policy. |
 | `get_app_state` | Read the visible view, learner, timers, mastery counts, and current suggestion. |
 | `get_curriculum_map` | Read one subject map or the combined installed-subject map with statuses, prerequisite bridges, and unlocks. |
 | `get_progress_summary` | Read per-skill mastery, attempts, and misconception tags. |
@@ -82,7 +83,7 @@ A compatible ChatGPT or Codex browser discovers twenty-seven page tools through 
 | `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
-The top-level `agent-bridge.html` workspace registers the same twenty-seven learning tools plus three transport tools:
+The top-level `agent-bridge.html` workspace registers the same twenty-eight learning tools plus three transport tools:
 
 | Bridge tool | Purpose |
 | --- | --- |
@@ -98,7 +99,7 @@ Tool inputs use closed JSON Schemas and runtime validation. Read-only tools do n
 Mobile learner browser                          Computer / remote Codex task
 ┌──────────────────────────┐                    ┌────────────────────────────┐
 │ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
-│ localStorage + WebMCP    │                    │ 30 WebMCP tools            │
+│ localStorage + WebMCP    │                    │ 31 WebMCP tools            │
 └────────────┬─────────────┘                    └──────────────┬─────────────┘
              │ debounced, complete state                       │ explicit publish → host Git auth
              ▼                                                 ▼
@@ -128,6 +129,8 @@ Important files:
 - `docs/bridge-guide.html` — human setup guide and copyable starting prompt
 - `docs/QUICKMATHS_BRIDGE.md` — complete setup, security, and recovery protocol
 - `docs/agent-manifest.json` — machine-readable agent operating and backup policy
+- `docs/educator-agent-manifest.json` — dedicated educator agent contract and curriculum-design workflow
+- `docs/QuickMaths-Educator-Guide.pdf` — complete human-facing frontend and educator workflow manual
 - `docs/CUSTOM_LESSON_SETS.md` — Agent Lesson Authoring Guide
 - `docs/lesson-set-example.json` — installable worked example
 - `quickmaths/local_bridge.py` — loopback HTTP boundary and transactional Git adapter

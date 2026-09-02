@@ -5,6 +5,7 @@ __pycache__/
 venv/
 dist/
 build/
+/output/
 node_modules/
 *.egg-info/
 .bridge-runtime/

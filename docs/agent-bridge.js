@@ -1,5 +1,5 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260902-depot-batch-review-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-depot-batch-review-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260902-educator-docs-v3";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-educator-docs-v3";
 import { createLessonDepot } from "./lesson-depot.js?v=20260902-geography-depot-v2";
 import {
   createGitHubContentsClient,
@@ -117,15 +117,17 @@ async function connectFromForm(event) {
 }
 
 async function boot() {
-  const [curriculumResponse, geographyResponse, manifestResponse] = await Promise.all([
+  const [curriculumResponse, geographyResponse, manifestResponse, educatorManifestResponse] = await Promise.all([
     fetch("./curriculum-data.json?v=20260902-native-math-expansion"),
     fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
-    fetch("./agent-manifest.json?v=20260902-depot-batch-review-v1").catch(() => null),
+    fetch("./agent-manifest.json?v=20260902-educator-docs-v3").catch(() => null),
+    fetch("./educator-agent-manifest.json?v=20260902-educator-docs-v3").catch(() => null),
   ]);
   if (!curriculumResponse.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await curriculumResponse.json();
   const bundledLessonPacks = [await geographyResponse.text()];
   const manifest = manifestResponse?.ok ? await manifestResponse.json() : {};
+  const educatorManifest = educatorManifestResponse?.ok ? await educatorManifestResponse.json() : {};
   store = createQuickMathsStore({ storage: createAgentStateStorage(window.localStorage), curriculum, bundledLessonPacks });
   lessonDepot = createLessonDepot({ store, showToast: toast });
   lessonDepot.load();
@@ -172,7 +174,7 @@ async function boot() {
     elements.form.elements.remember.checked = saved.rememberToken;
   }
 
-  const siteTools = await registerWebMcpTools(store, document.modelContext, manifest, lessonDepot);
+  const siteTools = await registerWebMcpTools(store, document.modelContext, manifest, lessonDepot, null, educatorManifest);
   const bridgeTools = await registerBridgeWebMcpTools(sync, document.modelContext);
   const toolNames = [...TOOL_NAMES, ...BRIDGE_TOOL_NAMES];
   elements.toolCount.textContent = String(toolNames.length);
