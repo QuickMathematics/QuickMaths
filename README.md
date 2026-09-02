@@ -1,12 +1,19 @@
 # QuickMaths
 
+[![Full test suite](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml/badge.svg)](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml)
+[![Live app](https://img.shields.io/badge/live-QuickMaths-123f35)](https://quickmathematics.github.io/QuickMaths/)
+
 QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, substantial Mathematics and Geography curricula, structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
+
+[![QuickMaths combined Mathematics and Geography mastery map](docs/assets/quickmaths-mastery-map.png)](https://quickmathematics.github.io/QuickMaths/#/map)
 
 The public app runs entirely from GitHub Pages:
 
 **https://quickmathematics.github.io/QuickMaths/**
 
 No QuickMaths account, model API key, or paid application server is required. Learner state autosaves in the browser and can be moved with full JSON backups or the optional GitHub Bridge.
+
+QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLENGE.md#challenge-period-delta) separates the original application from the challenge-period extension and links the dated commit evidence.
 
 ## What is in the app
 

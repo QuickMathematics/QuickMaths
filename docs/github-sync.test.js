@@ -189,6 +189,41 @@ test("agent pulls learner state, publishes a based response, and learner applies
   assert.equal(learnerState.read().tutorNote, "Try the inequality lesson next.");
 });
 
+test("agent changes stay dirty until an explicit checkpoint is published", async () => {
+  const github = fakeGitHub();
+  const learnerState = stateHarness("Learner");
+  const agentState = stateHarness("Empty agent");
+  const learner = controller({ role: "learner", client: github, harness: learnerState });
+  const scheduled = [];
+  const agent = createGitHubSyncController({
+    role: "agent",
+    client: github,
+    credentialStore: credentials(),
+    serializeState: agentState.serialize,
+    applyState: agentState.apply,
+    subscribeToState: agentState.subscribe,
+    now: () => new Date("2026-09-01T12:00:00.000Z"),
+    deviceId: "agent-device",
+    setTimer(callback) { scheduled.push(callback); return scheduled.length; },
+    clearTimer() {},
+  });
+
+  await learner.connect(connection(), { startPolling: false });
+  await learner.pushNow();
+  await agent.connect(connection("agent"), { startPolling: false });
+  await agent.pullNow();
+  agentState.mutate({ tutorNote: "Work through the next example." });
+
+  assert.equal(agent.snapshot().dirty, true);
+  assert.equal(scheduled.length, 0);
+  for (const callback of scheduled) await callback();
+  assert.equal(github.files.has(AGENT_STATE_PATH), false);
+
+  await agent.pushNow();
+  assert.equal(github.files.has(AGENT_STATE_PATH), true);
+  assert.equal(JSON.parse(parseBridgeEnvelope(github.files.get(AGENT_STATE_PATH).content).stateJson).tutorNote, "Work through the next example.");
+});
+
 test("stale agent output is rejected before it can overwrite newer learner work", async () => {
   const github = fakeGitHub();
   const learnerState = stateHarness("Learner");

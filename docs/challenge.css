@@ -223,6 +223,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .agent-tools summary strong { color: var(--lime); }
 #tool-list { display: grid; gap: 7px; margin-top: 13px; }
 #tool-list code { overflow: hidden; color: #bdd4c6; font-size: 8px; text-overflow: ellipsis; }
+#tool-list code.tool-failed { color: #ffb3a5; text-decoration: line-through; text-decoration-thickness: 1px; }
 .agent-activity ol { max-height: 260px; margin: 12px 0 0; padding: 0; overflow: auto; list-style: none; }
 .agent-activity li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 8px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.08); }
 .agent-activity time { color: #7f9f8d; font-size: 8px; }

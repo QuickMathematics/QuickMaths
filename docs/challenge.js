@@ -73,7 +73,7 @@ let bridgeFormDraft = null;
 let welcomeStorageOpen = false;
 const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
 
-const AGENT_STARTER_PROMPT = "Read the QuickMaths agent manifest through WebMCP, then guide me through the learning experience.";
+const AGENT_STARTER_PROMPT = "Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.";
 const MAP_ZOOM_MIN = 0.1;
 const MAP_ZOOM_MAX = 1.6;
 const MAP_ZOOM_STEP = 0.1;
@@ -1824,10 +1824,12 @@ async function boot() {
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code>${name}</code>`).join("");
   document.querySelector("#tool-count").textContent = String(TOOL_NAMES.length);
   const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot, lessonStudio);
+  const failedTools = new Set(bridge.failures.map((failure) => failure.name));
+  document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code class="${failedTools.has(name) ? "tool-failed" : ""}">${escapeHtml(name)}</code>`).join("");
   elements.bridgeCard.dataset.state = bridge.available && !bridge.error ? "ready" : bridge.error ? "warning" : "idle";
   elements.bridgeStatus.textContent = bridge.error ? "WebMCP partly connected" : bridge.available ? "Agent tools connected" : "Ready for a WebMCP browser";
   elements.bridgeDetail.textContent = bridge.error
-    ? `${bridge.registered.length} of ${TOOL_NAMES.length} tools registered.`
+    ? `${bridge.registered.length} of ${TOOL_NAMES.length} tools registered. Failed: ${bridge.failures.map((failure) => failure.name).join(", ")}.`
     : bridge.available
       ? `${bridge.registered.length} tools can navigate and tutor across QuickMaths.`
       : "Open this site in a compatible ChatGPT or Codex browser to expose the tools.";

@@ -432,6 +432,9 @@ export function createGitHubSyncController({
   const schedulePush = () => {
     if (suppressStateChange || !config?.token) return;
     update({ dirty: true });
+    // Agent work is deliberately transactional: tools may make several related
+    // state changes before publish_agent_checkpoint commits one coherent result.
+    if (role === "agent") return;
     if (!status.connected || stopped) return;
     if (debounceTimer) clearTimer(debounceTimer);
     debounceTimer = setTimer(async () => {

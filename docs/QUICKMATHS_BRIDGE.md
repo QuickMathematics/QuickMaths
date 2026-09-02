@@ -4,6 +4,8 @@ QuickMaths Bridge turns a free GitHub repository into a small, auditable handoff
 
 The learner page remains local-first. Normal actions save instantly in browser storage, then a short debounce writes a complete checkpoint to `learner-state.json`. The agent workspace pulls that exact revision, works through QuickMaths WebMCP tools, and publishes `agent-state.json`. The learner accepts it only when it was based on the current learner revision and no local changes are waiting to sync.
 
+Agent-side changes are transactional: tool calls mark the workspace dirty but never trigger the learner's automatic debounce. Nothing reaches `agent-state.json` until the agent or human explicitly calls `publish_agent_checkpoint` / **Publish agent checkpoint**.
+
 ## What you need
 
 - A GitHub account.
@@ -68,4 +70,4 @@ Revoke the token from GitHub immediately if a device is lost or the token may ha
 
 ## Cost and limits
 
-The bridge has no QuickMaths server or model API bill. It uses static GitHub Pages and ordinary Git commits in the selected repository. Checkpoint writes are debounced to avoid one commit per keystroke, and polling backs off when nothing changes. GitHub's current account and API limits still apply.
+The bridge has no QuickMaths server or model API bill. It uses static GitHub Pages and ordinary Git commits in the selected repository. Learner checkpoint writes are debounced to avoid one commit per keystroke; agent publication remains explicit. Polling backs off when nothing changes. GitHub's current account and API limits still apply.

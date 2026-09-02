@@ -68,17 +68,21 @@ export function buildBridgeToolDefinitions(controller) {
 }
 
 export async function registerBridgeWebMcpTools(controller, modelContext = globalThis.document?.modelContext) {
-  if (!modelContext || typeof modelContext.registerTool !== "function") return { available: false, registered: [], error: null };
+  if (!modelContext || typeof modelContext.registerTool !== "function") return { available: false, registered: [], failures: [], error: null };
   const registered = [];
-  let error = null;
+  const failures = [];
   for (const definition of buildBridgeToolDefinitions(controller)) {
     try {
       await modelContext.registerTool(definition);
       registered.push(definition.name);
     } catch (cause) {
-      error = cause instanceof Error ? cause.message : String(cause);
-      break;
+      failures.push({ name: definition.name, error: cause instanceof Error ? cause.message : String(cause) });
     }
   }
-  return { available: true, registered, error };
+  return {
+    available: true,
+    registered,
+    failures,
+    error: failures.length ? `${failures.length} bridge tool${failures.length === 1 ? "" : "s"} failed to register: ${failures.map((failure) => failure.name).join(", ")}` : null,
+  };
 }

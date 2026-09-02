@@ -46,6 +46,22 @@ test("registers all agent bridge tools and degrades without WebMCP", async () =>
   const result = await registerBridgeWebMcpTools(controller, { async registerTool(tool) { registered.push(tool.name); } });
   assert.equal(result.available, true);
   assert.deepEqual(registered, BRIDGE_TOOL_NAMES);
+  assert.deepEqual(result.failures, []);
   assert.ok(BRIDGE_TOOL_NAMES.every((name) => registered.includes(name)));
-  assert.deepEqual(await registerBridgeWebMcpTools(controller, undefined), { available: false, registered: [], error: null });
+  assert.deepEqual(await registerBridgeWebMcpTools(controller, undefined), { available: false, registered: [], failures: [], error: null });
+});
+
+test("bridge registration continues after one rejected definition", async () => {
+  const { controller } = harness();
+  const registered = [];
+  const rejected = BRIDGE_TOOL_NAMES[1];
+  const result = await registerBridgeWebMcpTools(controller, {
+    async registerTool(tool) {
+      if (tool.name === rejected) throw new Error("unsupported definition");
+      registered.push(tool.name);
+    },
+  });
+  assert.deepEqual(registered, BRIDGE_TOOL_NAMES.filter((name) => name !== rejected));
+  assert.deepEqual(result.failures, [{ name: rejected, error: "unsupported definition" }]);
+  assert.match(result.error, new RegExp(rejected));
 });

@@ -73,6 +73,7 @@ body[data-transport="local-git"] .connection-panel .local-connection { display: 
 .tool-panel .panel-heading > strong { display: grid; place-items: center; min-width: 45px; height: 45px; border-radius: 12px; background: var(--mint); font-size: 19px; }
 .tool-list { display: flex; flex-wrap: wrap; gap: 7px; }
 .tool-list code { padding: 6px 8px; border-radius: 7px; background: #ece7da; color: var(--pine); font-size: 10px; }
+.tool-list code.tool-failed { background: #fbe2dc; color: #a53f2f; text-decoration: line-through; }
 .protocol-panel ol { display: grid; gap: 17px; margin: 23px 0 0; padding: 0; list-style: none; }
 .protocol-panel li { display: flex; gap: 13px; }
 .protocol-panel li > span { display: grid; place-items: center; flex: 0 0 30px; height: 30px; border-radius: 50%; background: var(--lime); font-weight: 850; }

@@ -4,6 +4,31 @@ QuickMaths is now a complete, zero-cost, agent-native learning app rather than a
 
 The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page. A separate optional Community GitHub App enables in-app public Discussion votes via 👍 reactions and comments. Its stateless OAuth callback worker stores no data and is isolated from learner state and Bridge credentials.
 
+## Challenge-period delta
+
+QuickMaths existed before the WebMCP Challenge. The official submission period began on **August 25, 2026 at 11:00 a.m. Pacific Time**. The last pre-challenge commit is [`4c173a7`](https://github.com/QuickMathematics/QuickMaths/commit/4c173a7a9f32e741904cfe965f268d4cb9684771), dated July 10. The first WebMCP implementation commit is [`80738f6`](https://github.com/QuickMathematics/QuickMaths/commit/80738f6), dated September 1. The complete extension is visible in the [pre-challenge baseline → current challenge branch comparison](https://github.com/QuickMathematics/QuickMaths/compare/4c173a7...main).
+
+| Before August 25, 2026 | Added during the challenge submission period |
+| --- | --- |
+| Python/Streamlit desktop-style application | Complete static browser application deployed on GitHub Pages |
+| 25-lesson Mathematics YAML curriculum | Browser-ready Mathematics runtime plus Geography, coordinate-geometry bridges, and combined subject maps |
+| Existing mastery, grading, profile, review, and export foundations | Seventeen page-level WebMCP learning tools operating on the same visible human state |
+| Human-only navigation and learner workflows | Shared human-agent navigation, tutoring, saved-work inspection, structured reviews, and activity attribution |
+| Local/Drive-oriented persistence in the original application | Browser autosave, portable backups, GitHub learner storage, and a revision-safe remote Agent Bridge |
+| YAML authoring and developer preview utilities | Human Lesson Studio, agent lesson validation/staging, reversible native improvements, and answer-key-safe tutoring boundaries |
+| No WebMCP transport or public curriculum exchange | Three explicit Bridge tools plus the Lesson Depot, safe package staging, and optional in-app community participation |
+
+Challenge-period milestone evidence:
+
+- [`80738f6`](https://github.com/QuickMathematics/QuickMaths/commit/80738f6) — first agent-native WebMCP workspace
+- [`eb67d95`](https://github.com/QuickMathematics/QuickMaths/commit/eb67d95) — complete browser learning application
+- [`18d0f02`](https://github.com/QuickMathematics/QuickMaths/commit/18d0f02) — revision-safe mobile/remote Agent Bridge
+- [`a7daaae`](https://github.com/QuickMathematics/QuickMaths/commit/a7daaae) — public Lesson Depot
+- [`5ad140c`](https://github.com/QuickMathematics/QuickMaths/commit/5ad140c) — in-app GitHub community participation
+- [`dff92ed`](https://github.com/QuickMathematics/QuickMaths/commit/dff92ed) — substantial first-party Geography curriculum
+- [`3caa0c9`](https://github.com/QuickMathematics/QuickMaths/commit/3caa0c9) — reversible native lesson improvements
+- [`3f385ed`](https://github.com/QuickMathematics/QuickMaths/commit/3f385ed) — full-depth native assessment and structured review parity
+
 ## Product surface
 
 - Original logo landing page with multiple learner profiles and sample progress
@@ -25,11 +50,11 @@ The app requires no OpenAI API key and sends no learner data to a hosted applica
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers seventeen page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A machine-readable `agent-manifest.json` is exposed through the read-only `get_agent_guide` tool so backup, tutoring, privacy, navigation, subjects, Lesson Depot, custom-content, and Bridge policy are available in context.
+A compatible ChatGPT or Codex browser discovers seventeen page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact operating summary by default; an agent can request `tutoring`, `navigation`, `bridge`, `custom_content`, `backup`, or `all` only when that policy is relevant. The complete source remains the machine-readable `agent-manifest.json`.
 
 | Tool | Purpose |
 | --- | --- |
-| `get_agent_guide` | Read operating, tutoring, privacy, backup, and custom lesson-set guidance. |
+| `get_agent_guide` | Read a compact operating summary or one detailed policy section on demand. |
 | `get_app_state` | Read the visible view, learner, timers, mastery counts, and current suggestion. |
 | `get_curriculum_map` | Read one subject map or the combined installed-subject map with statuses, prerequisite bridges, and unlocks. |
 | `get_progress_summary` | Read per-skill mastery, attempts, and misconception tags. |
@@ -39,6 +64,8 @@ A compatible ChatGPT or Codex browser discovers seventeen page tools through `do
 | `open_lesson_creator` | Open the no-code Human Lesson Creator. |
 | `validate_lesson_set` | Validate schema 2.0 subjects, bridges, questions, proof/rubric policy, and safety limits. |
 | `stage_custom_lesson_set` | Stage validated content in the visible UI; only the human can install it. |
+| `search_lesson_depot` | Search published packages and clearly labeled roadmap previews without exposing answer keys. |
+| `stage_depot_lesson` | Hash-check, validate, and visibly stage one published package for human review. |
 | `get_learning_context` | Read the selected lesson or active test without answer keys. |
 | `start_skill_test` | Create or resume a test for an unlocked skill and show it on screen. |
 | `inspect_student_work` | Inspect one visible response without returning its expected answer. |
@@ -63,7 +90,7 @@ Mobile learner browser                          Computer / remote Codex task
 │ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
 │ localStorage + WebMCP    │                    │ 20 WebMCP tools            │
 └────────────┬─────────────┘                    └──────────────┬─────────────┘
-             │ debounced, complete state                       │ loopback CLI → host Git auth
+             │ debounced, complete state                       │ explicit publish → host Git auth
              ▼                                                 ▼
         learner-state.json ◄──── private GitHub repo ────► agent-state.json
              │                    revision checks               │

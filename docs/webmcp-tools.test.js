@@ -75,7 +75,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(html, /id="agent-dock" class="agent-dock is-closed"/);
   assert.doesNotMatch(html, /QuickMaths turns \d+ connected lessons across \d+ installed subjects/);
   assert.match(js, /snapshot\.curriculum\.allSkills\.length/);
-  assert.match(js, /Read the QuickMaths agent manifest through WebMCP/);
+  assert.match(js, /Get the QuickMaths agent guide summary/);
   assert.match(js, /visual: "depot"/);
   assert.match(js, /GitHub Bridge/);
   assert.match(css, /\.tour-depot-preview/);
@@ -97,6 +97,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.studio-proof-contrast/);
   assert.match(css, /\.studio-native-picker/);
   assert.match(css, /\.studio-override-note/);
+  assert.match(css, /tool-failed/);
   assert.match(js, /restore-native-lessons/);
   assert.match(js, /Lesson sets and native improvements/);
   assert.match(css, /\.studio-help\[aria-expanded="true"\]/);
@@ -139,6 +140,15 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(communityCallback, /community-auth\.js/);
 });
 
+test("challenge documentation lists every advertised page tool and the dated delta evidence", () => {
+  const challenge = readFileSync(new URL("../WEBMCP_CHALLENGE.md", import.meta.url), "utf8");
+  for (const name of TOOL_NAMES) assert.equal(challenge.includes(`| \`${name}\` |`), true, `${name} is missing from the challenge tool table`);
+  assert.match(challenge, /Challenge-period delta/);
+  assert.match(challenge, /4c173a7/);
+  assert.match(challenge, /80738f6/);
+  assert.match(challenge, /compare\/4c173a7\.\.\.main/);
+});
+
 test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   const html = readFileSync(new URL("./agent-bridge.html", import.meta.url), "utf8");
   const js = readFileSync(new URL("./agent-bridge.js", import.meta.url), "utf8");
@@ -165,6 +175,7 @@ test("registers all seventeen tools once with the WebMCP document context", asyn
   assert.equal(result.available, true);
   assert.equal(TOOL_NAMES.length, 17);
   assert.deepEqual(result.registered, TOOL_NAMES);
+  assert.deepEqual(result.failures, []);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
   assert.ok(registered.every(({ description }) => description.length > 0));
   assert.ok(registered.every(({ inputSchema }) => inputSchema.additionalProperties === false));
@@ -172,27 +183,36 @@ test("registers all seventeen tools once with the WebMCP document context", asyn
 
 test("degrades cleanly when WebMCP is unavailable", async () => {
   const result = await registerWebMcpTools(createStore(), undefined);
-  assert.deepEqual(result, { available: false, registered: [], error: null });
+  assert.deepEqual(result, { available: false, registered: [], failures: [], error: null });
 });
 
 test("agent guide exposes operating, backup, and custom-content policy without learner answers", async () => {
   const store = createStore();
   store.startTest("MATH_ARITH_001");
-  const guide = await toolsFor(store).get_agent_guide.execute({});
-  const serialized = JSON.stringify(guide);
-  assert.equal(guide.guide.app, "QuickMaths Web");
-  assert.equal(guide.guide.backup_policy.recommend, true);
-  assert.equal(guide.guide.app_version, 13);
-  assert.match(guide.guide.github_bridge.setup_recommendation, /persistent GitHub storage/);
-  assert.match(guide.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
-  assert.match(guide.guide.github_community.setup_recommendation, /separate from learner storage/);
-  assert.ok(guide.guide.agent_policy.start.some((item) => item.includes("cross-device recovery")));
-  assert.ok(guide.guide.agent_policy.start.some((item) => item.includes("GitHub Community authorization")));
-  assert.equal(guide.guide.custom_lesson_sets.format, "quickmaths.lesson-set");
-  assert.equal(guide.guide.tools.length, 17);
-  assert.equal(guide.guide.lesson_depot.route, "depot");
+  const tools = toolsFor(store);
+  const summary = await tools.get_agent_guide.execute({});
+  const bridge = await tools.get_agent_guide.execute({ section: "bridge" });
+  const custom = await tools.get_agent_guide.execute({ section: "custom_content" });
+  const backup = await tools.get_agent_guide.execute({ section: "backup" });
+  const full = await tools.get_agent_guide.execute({ section: "all" });
+  const serialized = JSON.stringify(full);
+  assert.equal(summary.section, "summary");
+  assert.equal(summary.guide.app, "QuickMaths Web");
+  assert.equal(summary.guide.app_version, 14);
+  assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
+  assert.equal(summary.guide.tools.length, 17);
+  assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
+  assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent GitHub storage/);
+  assert.match(bridge.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
+  assert.match(custom.guide.github_community.setup_recommendation, /separate from learner storage/);
+  assert.equal(custom.guide.custom_lesson_sets.format, "quickmaths.lesson-set");
+  assert.equal(custom.guide.lesson_depot.route, "depot");
+  assert.equal(backup.guide.backup_policy.recommend, true);
+  assert.equal(full.guide.agent_policy.start.some((item) => item.includes("cross-device recovery")), true);
+  assert.equal(full.guide.agent_policy.start.some((item) => item.includes("GitHub Community authorization")), true);
   assert.equal(serialized.includes("expected_answer"), false);
   assert.equal(serialized.includes("finalAnswer"), false);
+  await assert.rejects(tools.get_agent_guide.execute({ section: "everything" }), /section must be one of/i);
 });
 
 test("agent lesson authoring guide distinguishes checked steps from reviewed proofs", () => {
@@ -459,11 +479,12 @@ test("registration reports partial failure without duplicating names", async () 
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) {
-      if (registered.length === 3) throw new Error("registration stopped");
+      if (definition.name === TOOL_NAMES[3]) throw new Error("unsupported schema keyword");
       registered.push(definition.name);
     },
   }, agentManifest);
   assert.equal(result.available, true);
-  assert.deepEqual(result.registered, TOOL_NAMES.slice(0, 3));
-  assert.match(result.error, /registration stopped/);
+  assert.deepEqual(result.registered, TOOL_NAMES.filter((name) => name !== TOOL_NAMES[3]));
+  assert.deepEqual(result.failures, [{ name: TOOL_NAMES[3], error: "unsupported schema keyword" }]);
+  assert.match(result.error, new RegExp(TOOL_NAMES[3]));
 });

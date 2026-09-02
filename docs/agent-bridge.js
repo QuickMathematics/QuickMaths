@@ -174,10 +174,13 @@ async function boot() {
   const bridgeTools = await registerBridgeWebMcpTools(sync, document.modelContext);
   const toolNames = [...TOOL_NAMES, ...BRIDGE_TOOL_NAMES];
   elements.toolCount.textContent = String(toolNames.length);
-  elements.toolList.innerHTML = toolNames.map((name) => `<code>${name}</code>`).join("");
+  const failedToolNames = new Set([...siteTools.failures, ...bridgeTools.failures].map((failure) => failure.name));
+  elements.toolList.innerHTML = toolNames.map((name) => `<code class="${failedToolNames.has(name) ? "tool-failed" : ""}">${name}</code>`).join("");
   const registeredCount = siteTools.registered.length + bridgeTools.registered.length;
   elements.toolStatus.textContent = siteTools.available || bridgeTools.available
-    ? `${registeredCount} of ${toolNames.length} site tools registered in this browser.`
+    ? failedToolNames.size
+      ? `${registeredCount} of ${toolNames.length} site tools registered. Failed: ${[...failedToolNames].join(", ")}.`
+      : `${registeredCount} of ${toolNames.length} site tools registered in this browser.`
     : "Open this page in the built-in Codex or ChatGPT browser to expose its site tools.";
 
   if (!localMode) elements.form.addEventListener("submit", connectFromForm);

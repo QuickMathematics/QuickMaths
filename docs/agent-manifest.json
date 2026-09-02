@@ -2,13 +2,14 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 13,
+  "app_version": 14,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
     "site_tools_api": "document.modelContext.registerTool",
     "guide_tool": "get_agent_guide",
-    "note": "WebMCP discovers registered page tools. This manifest is also exposed through get_agent_guide so the operating policy is available in-context."
+    "note": "WebMCP discovers registered page tools. get_agent_guide returns a compact summary by default and exposes detailed policy sections only when needed.",
+    "guide_sections": ["summary", "tutoring", "navigation", "bridge", "custom_content", "backup", "all"]
   },
   "state_model": {
     "scope": "All profiles, progress, attempts, reviews, drafts, timers, installed lesson sets, and activity are browser state. QuickMaths Bridge can optionally checkpoint complete state to a dedicated GitHub data repository.",
@@ -27,6 +28,7 @@
     "protocol": [
       "Call sync_from_learner before inspecting progress or making a recommendation.",
       "Make changes only through registered QuickMaths tools.",
+      "Agent-side changes remain local and dirty until explicitly published; they are never sent by the learner-style debounce.",
       "Call publish_agent_checkpoint after state-changing work.",
       "If either sync tool reports a conflict, do not force or retry blindly. Pull the learner again and repeat the intended change from current state.",
       "The learner page is authoritative. It safely acknowledges and ignores agent output based on an older learner revision, refuses to overwrite unsynced local work, and requires the agent to pull current learner state before publishing again."
