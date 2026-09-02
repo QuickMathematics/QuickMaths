@@ -8,7 +8,7 @@ import {
   DEPOT_REPOSITORY_URL,
   DEPOT_SUBMISSION_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260902-subject-colors";
+} from "./lesson-depot.js?v=20260902-geography-depot-v2";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,

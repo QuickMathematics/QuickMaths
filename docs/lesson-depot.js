@@ -5,7 +5,7 @@ const DEFAULT_CARD_THEME = Object.freeze({
   paperLight: "#fffdf8", primary: "#153f36", primaryAlt: "#205c4e",
   tint: "#b8d9c9", highlight: "#dceca9", accent: "#df755b",
 });
-export const DEFAULT_DEPOT_CATALOG = "./lesson-depot/catalog.json";
+export const DEFAULT_DEPOT_CATALOG = "./lesson-depot/catalog.json?v=20260902-geography-depot-v2";
 export const DEPOT_REPOSITORY_URL = "https://github.com/QuickMathematics/QuickMaths";
 export const DEPOT_SUBMISSION_URL = `${DEPOT_REPOSITORY_URL}/issues/new?template=lesson-submission.yml`;
 export const DEPOT_DISCUSSIONS_URL = `${DEPOT_REPOSITORY_URL}/discussions`;
