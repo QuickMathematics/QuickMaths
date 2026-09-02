@@ -2,7 +2,7 @@ const GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token";
 const MAX_BODY_BYTES = 12_000;
 
 function allowedOrigins(env) {
-  return new Set(String(env.ALLOWED_ORIGINS ?? "https://srednjak.github.io")
+  return new Set(String(env.ALLOWED_ORIGINS ?? "https://quickmathematics.github.io")
     .split(",")
     .map((origin) => origin.trim().replace(/\/$/, ""))
     .filter(Boolean));
@@ -37,7 +37,7 @@ function validRedirect(value, env) {
   if (typeof value !== "string" || value.length > 500) return false;
   try {
     const url = new URL(value);
-    const configured = new Set(String(env.ALLOWED_CALLBACKS ?? "https://srednjak.github.io/QuickMaths/community-auth.html")
+    const configured = new Set(String(env.ALLOWED_CALLBACKS ?? "https://quickmathematics.github.io/QuickMaths/community-auth.html")
       .split(",").map((entry) => entry.trim()).filter(Boolean));
     return configured.has(url.href);
   } catch { return false; }

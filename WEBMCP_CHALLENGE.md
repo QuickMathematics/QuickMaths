@@ -124,8 +124,8 @@ The browser contract suite covers profiles, subject filtering, Hard/Open progres
 
 GitHub Pages publishes the repository's `main` branch from `/docs` at:
 
-- Live app: `https://srednjak.github.io/QuickMaths/`
-- Source: `https://github.com/Srednjak/QuickMaths`
+- Live app: `https://quickmathematics.github.io/QuickMaths/`
+- Source: `https://github.com/QuickMathematics/QuickMaths`
 
 Remaining human-only submission steps:
 

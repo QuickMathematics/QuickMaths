@@ -19,9 +19,9 @@ const config = {
   enabled: true,
   client_id: "Iv1.quickmaths123",
   broker_url: "https://auth.example.test",
-  callback_url: "https://srednjak.github.io/QuickMaths/community-auth.html",
+  callback_url: "https://quickmathematics.github.io/QuickMaths/community-auth.html",
   graphql_url: "https://api.example.test/graphql",
-  repository: { owner: "Srednjak", name: "QuickMaths" },
+  repository: { owner: "QuickMathematics", name: "QuickMaths" },
 };
 
 function credentialStore({ accessToken = "ghu_access", refreshToken = "ghr_refresh", expiresAt = 0, remembered = false } = {}) {
@@ -35,13 +35,13 @@ function credentialStore({ accessToken = "ghu_access", refreshToken = "ghr_refre
 test("community config is least-privilege HTTPS metadata", () => {
   assert.deepEqual(normalizeGitHubCommunityConfig({ enabled: false }), { enabled: false });
   const result = normalizeGitHubCommunityConfig(config);
-  assert.equal(result.repository.owner, "Srednjak");
+  assert.equal(result.repository.owner, "QuickMathematics");
   assert.equal(result.brokerUrl, "https://auth.example.test");
   assert.throws(() => normalizeGitHubCommunityConfig({ ...config, broker_url: "http://evil.example" }), /HTTPS/);
 });
 
 test("discussion links are restricted to the configured GitHub repository", () => {
-  assert.equal(parseDiscussionNumber("https://github.com/Srednjak/QuickMaths/discussions/42", config.repository), 42);
+  assert.equal(parseDiscussionNumber("https://github.com/QuickMathematics/QuickMaths/discussions/42", config.repository), 42);
   assert.equal(parseDiscussionNumber("https://github.com/other/QuickMaths/discussions/42", config.repository), null);
   assert.equal(parseDiscussionNumber("javascript:alert(1)", config.repository), null);
 });
@@ -95,8 +95,8 @@ test("OAuth callback rejects mismatched state before contacting the broker", asy
 test("authenticated community client loads live votes/comments and writes both actions", async () => {
   const calls = [];
   const responses = [
-    { data: { viewer: { login: "ada", avatarUrl: "https://avatars.example/ada", url: "https://github.com/ada" }, repository: { id: "R_repo", nameWithOwner: "Srednjak/QuickMaths", hasDiscussionsEnabled: true } } },
-    { data: { repository: { discussion: { id: "D_1", number: 1, title: "Estimation Lab", url: "https://github.com/Srednjak/QuickMaths/discussions/1", viewerCanReact: true, reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: false, users: { totalCount: 3 } }], comments: { totalCount: 1, nodes: [{ id: "C_1", bodyText: "Useful pack", createdAt: "2026-09-01T10:00:00Z", updatedAt: "2026-09-01T10:00:00Z", url: "https://github.com/comment", author: { login: "bo", avatarUrl: "", url: "https://github.com/bo" } }] } } } } },
+    { data: { viewer: { login: "ada", avatarUrl: "https://avatars.example/ada", url: "https://github.com/ada" }, repository: { id: "R_repo", nameWithOwner: "QuickMathematics/QuickMaths", hasDiscussionsEnabled: true } } },
+    { data: { repository: { discussion: { id: "D_1", number: 1, title: "Estimation Lab", url: "https://github.com/QuickMathematics/QuickMaths/discussions/1", viewerCanReact: true, reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: false, users: { totalCount: 3 } }], comments: { totalCount: 1, nodes: [{ id: "C_1", bodyText: "Useful pack", createdAt: "2026-09-01T10:00:00Z", updatedAt: "2026-09-01T10:00:00Z", url: "https://github.com/comment", author: { login: "bo", avatarUrl: "", url: "https://github.com/bo" } }] } } } } },
     { data: { addReaction: { subject: { reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: true, users: { totalCount: 4 } }] } } } },
     { data: { addDiscussionComment: { comment: { id: "C_2", bodyText: "My note", createdAt: "2026-09-01T11:00:00Z", updatedAt: "2026-09-01T11:00:00Z", url: "https://github.com/comment2", author: { login: "ada", avatarUrl: "", url: "https://github.com/ada" } } } } },
   ];
@@ -107,7 +107,7 @@ test("authenticated community client loads live votes/comments and writes both a
     fetchImpl: async (url, options) => { calls.push({ url, options, body: JSON.parse(options.body) }); return Response.json(responses.shift()); },
     cryptoImpl: crypto,
   });
-  const discussion = await client.loadDiscussion("https://github.com/Srednjak/QuickMaths/discussions/1");
+  const discussion = await client.loadDiscussion("https://github.com/QuickMathematics/QuickMaths/discussions/1");
   assert.equal(discussion.votes, 3);
   assert.equal(discussion.comments[0].body, "Useful pack");
   const vote = await client.setVote(discussion.id, true);

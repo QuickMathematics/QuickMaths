@@ -5,7 +5,7 @@
   "compatibility_date": "2026-09-01",
   "vars": {
     "GITHUB_CLIENT_ID": "Iv23liFyhyHpuKkdDrlT",
-    "ALLOWED_ORIGINS": "https://srednjak.github.io,http://127.0.0.1:8765,http://localhost:8765",
-    "ALLOWED_CALLBACKS": "https://srednjak.github.io/QuickMaths/community-auth.html,http://127.0.0.1:8765/community-auth.html,http://localhost:8765/community-auth.html"
+    "ALLOWED_ORIGINS": "https://quickmathematics.github.io,http://127.0.0.1:8765,http://localhost:8765",
+    "ALLOWED_CALLBACKS": "https://quickmathematics.github.io/QuickMaths/community-auth.html,http://127.0.0.1:8765/community-auth.html,http://localhost:8765/community-auth.html"
   }
 }

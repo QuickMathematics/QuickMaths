@@ -2,10 +2,10 @@
   "enabled": true,
   "client_id": "Iv23liFyhyHpuKkdDrlT",
   "broker_url": "https://quickmaths-community-auth.quickmaths-community-auth.workers.dev",
-  "callback_url": "https://srednjak.github.io/QuickMaths/community-auth.html",
+  "callback_url": "https://quickmathematics.github.io/QuickMaths/community-auth.html",
   "graphql_url": "https://api.github.com/graphql",
   "repository": {
-    "owner": "Srednjak",
+    "owner": "QuickMathematics",
     "name": "QuickMaths"
   }
 }

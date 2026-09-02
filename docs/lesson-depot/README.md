@@ -40,7 +40,7 @@ The catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks th
 
 ## In-app community authorization
 
-The Community GitHub App is installed only on `Srednjak/QuickMaths` and requests only repository Discussions read/write. The user access token is separate from the optional learner-storage bridge token. QuickMaths keeps it in `sessionStorage` by default, or in `localStorage` only when the user explicitly chooses to remain connected. It is never placed in a lesson file, learner backup, WebMCP response, URL, or Git commit.
+The Community GitHub App is installed only on `QuickMathematics/QuickMaths` and requests only repository Discussions read/write. The user access token is separate from the optional learner-storage bridge token. QuickMaths keeps it in `sessionStorage` by default, or in `localStorage` only when the user explicitly chooses to remain connected. It is never placed in a lesson file, learner backup, WebMCP response, URL, or Git commit.
 
 The static callback uses the OAuth authorization-code flow with state and PKCE. A free, stateless Cloudflare Worker holds the GitHub App client secret and performs only code exchange and token refresh; it has no database and retains no user token. Comments and 👍 votes are public GitHub actions attributed to the authorizing GitHub account. Disconnecting clears the browser copy, and GitHub authorization can also be revoked from GitHub settings.
 

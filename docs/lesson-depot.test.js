@@ -20,7 +20,7 @@ const catalog = {
 test("normalizes safe static catalog URLs and community data", () => {
   const result = normalizeDepotCatalog(catalog, { catalogUrl: "./lesson-depot/catalog.json", baseUrl: "https://example.com/app/" });
   assert.equal(result.packages[0].lessonUrl, "https://example.com/app/lesson-depot/lessons/bio.json");
-  assert.equal(result.packages[0].discussionUrl, "https://github.com/Srednjak/QuickMaths/discussions");
+  assert.equal(result.packages[0].discussionUrl, "https://github.com/QuickMathematics/QuickMaths/discussions");
   assert.equal(result.packages[1].votes, 9);
 });
 

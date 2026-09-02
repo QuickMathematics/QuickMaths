@@ -63,14 +63,14 @@ def seed_remote(tmp_path: Path) -> Path:
 
 
 def test_repository_and_branch_validation_is_narrow() -> None:
-    identity = parse_github_repository_url("https://github.com/Srednjak/quickmaths-sync.git", branch="main")
-    assert identity.owner == "Srednjak"
+    identity = parse_github_repository_url("https://github.com/QuickMathematics/quickmaths-sync.git", branch="main")
+    assert identity.owner == "QuickMathematics"
     assert identity.repo == "quickmaths-sync"
-    assert identity.url == "https://github.com/Srednjak/quickmaths-sync.git"
+    assert identity.url == "https://github.com/QuickMathematics/quickmaths-sync.git"
     with pytest.raises(LocalBridgeError, match="embedded credentials"):
-        parse_github_repository_url("https://token@github.com/Srednjak/quickmaths-sync.git")
+        parse_github_repository_url("https://token@github.com/QuickMathematics/quickmaths-sync.git")
     with pytest.raises(LocalBridgeError, match="separate private data repository"):
-        parse_github_repository_url("https://github.com/Srednjak/QuickMaths.git")
+        parse_github_repository_url("https://github.com/QuickMathematics/QuickMaths.git")
     with pytest.raises(LocalBridgeError, match="Branch name"):
         validate_branch("bad branch")
 
@@ -102,17 +102,17 @@ def test_git_repository_reads_and_transactionally_writes_checkpoints(tmp_path: P
 
 class FakeRepository:
     identity = RepositoryIdentity(
-        owner="Srednjak",
+        owner="QuickMathematics",
         repo="quickmaths-sync",
         branch="main",
-        url="https://github.com/Srednjak/quickmaths-sync.git",
+        url="https://github.com/QuickMathematics/quickmaths-sync.git",
     )
 
     def __init__(self) -> None:
         self.files = {"learner-state.json": {"exists": True, "sha": "a" * 40, "content": envelope("learner")}}
 
     def info(self) -> dict[str, object]:
-        return {"transport": "local-git", "owner": "Srednjak", "repo": "quickmaths-sync", "branch": "main", "revision": "c" * 40}
+        return {"transport": "local-git", "owner": "QuickMathematics", "repo": "quickmaths-sync", "branch": "main", "revision": "c" * 40}
 
     def read_file(self, path: str) -> dict[str, object]:
         if path not in {"learner-state.json", "agent-state.json"}:

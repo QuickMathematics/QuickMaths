@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 
 import { createCommunityAuthHandler } from "./worker.js";
 
-const origin = "https://srednjak.github.io";
+const origin = "https://quickmathematics.github.io";
 const env = {
   ALLOWED_ORIGINS: origin,
-  ALLOWED_CALLBACKS: "https://srednjak.github.io/QuickMaths/community-auth.html",
+  ALLOWED_CALLBACKS: "https://quickmathematics.github.io/QuickMaths/community-auth.html",
   GITHUB_CLIENT_ID: "Iv1.quickmaths",
   GITHUB_CLIENT_SECRET: "secret-never-returned",
 };

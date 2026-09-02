@@ -4,8 +4,8 @@ This stateless Cloudflare Worker keeps the GitHub App client secret out of the p
 
 ## One-time deployment
 
-1. Register the public QuickMaths GitHub App with **Discussions: read and write**, no webhooks, and callback URL `https://srednjak.github.io/QuickMaths/community-auth.html`.
-2. Install the app only on `Srednjak/QuickMaths`.
+1. Register the public QuickMaths GitHub App with **Discussions: read and write**, no webhooks, and callback URL `https://quickmathematics.github.io/QuickMaths/community-auth.html`.
+2. Install the app only on `QuickMathematics/QuickMaths`.
 3. Put the public client ID in `wrangler.jsonc`, then set only the private client secret through Wrangler's encrypted secret prompt:
 
    ```powershell

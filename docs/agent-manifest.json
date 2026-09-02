@@ -4,7 +4,7 @@
   "app": "QuickMaths Web",
   "app_version": 12,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app, its public Lesson Depot, and its optional GitHub Bridge.",
-  "homepage": "https://srednjak.github.io/QuickMaths/",
+  "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
     "site_tools_api": "document.modelContext.registerTool",
     "guide_tool": "get_agent_guide",
@@ -19,8 +19,8 @@
   },
   "github_bridge": {
     "optional": true,
-    "human_setup_guide": "https://srednjak.github.io/QuickMaths/bridge-guide.html",
-    "agent_workspace": "https://srednjak.github.io/QuickMaths/agent-bridge.html",
+    "human_setup_guide": "https://quickmathematics.github.io/QuickMaths/bridge-guide.html",
+    "agent_workspace": "https://quickmathematics.github.io/QuickMaths/agent-bridge.html",
     "transport": "learner-state.json and agent-state.json in a dedicated data repository. The learner browser uses GitHub's Contents API; the preferred Codex host path serves the same WebMCP workspace over loopback and performs Git operations through the host Git credential manager.",
     "credentials": "The learner browser uses a fine-grained token restricted to the data repository with Contents read/write. The local Codex transport never sends a GitHub token to JavaScript: python -m quickmaths.cli agent-bridge uses the host's existing Git credentials, binds only to 127.0.0.1, and gives the browser a per-process capability. No credential is stored in learning files, backups, cookies, URLs sent to GitHub, WebMCP output, or commits.",
     "protocol": [
@@ -35,7 +35,7 @@
   "github_community": {
     "optional": true,
     "purpose": "Lets a human vote with a 👍 reaction and comment on a lesson package's public GitHub Discussion without leaving the Lesson Depot.",
-    "permissions": "The GitHub App is installed only on Srednjak/QuickMaths and requests repository Discussions read/write. It cannot read learner progress, edit lesson files, or access a learner's bridge repository.",
+    "permissions": "The GitHub App is installed only on QuickMathematics/QuickMaths and requests repository Discussions read/write. It cannot read learner progress, edit lesson files, or access a learner's bridge repository.",
     "credential_separation": "The GitHub App user token is unrelated to the fine-grained learner-storage token. It is held in sessionStorage by default or localStorage only after the human chooses Keep me connected, and is excluded from backups, bridge checkpoints, WebMCP results, URLs, logs, and commits.",
     "oauth_boundary": "Authorization uses state and PKCE. A stateless callback worker holds the GitHub App client secret and exchanges or refreshes tokens without a database or retained user state.",
     "public_actions": "Votes use GitHub's public 👍 reaction and comments are public; both are attributed to the authorizing GitHub identity. Community write actions remain direct human UI controls and are intentionally not exposed as WebMCP tools.",
@@ -108,8 +108,8 @@
   ],
   "lesson_depot": {
     "route": "depot",
-    "catalog": "https://srednjak.github.io/QuickMaths/lesson-depot/catalog.json",
-    "repository": "https://github.com/Srednjak/QuickMaths",
+    "catalog": "https://quickmathematics.github.io/QuickMaths/lesson-depot/catalog.json",
+    "repository": "https://github.com/QuickMathematics/QuickMaths",
     "submission": "GitHub issue or pull request. Browsing, validation, staging, and installation do not require community authorization.",
     "community": "GitHub Discussions provides voting and comments. Catalog totals are cached for anonymous browsing; a human may separately authorize the least-privilege Community GitHub App to open the selected live thread and participate in-app.",
     "install_pipeline": [
@@ -130,8 +130,8 @@
   "custom_lesson_sets": {
     "format": "quickmaths.lesson-set",
     "schema_version": "2.0",
-    "authoring_guide": "https://srednjak.github.io/QuickMaths/CUSTOM_LESSON_SETS.md",
-    "example": "https://srednjak.github.io/QuickMaths/lesson-set-example.json",
+    "authoring_guide": "https://quickmathematics.github.io/QuickMaths/CUSTOM_LESSON_SETS.md",
+    "example": "https://quickmathematics.github.io/QuickMaths/lesson-set-example.json",
     "install_route": "settings",
     "human_creator_route": "creator",
     "human_creator_guidance": "Lesson Studio can create new sets or open a native lesson as an editable, reversible improvement. It explains final-answer grading, shown work, and review as separate stages; advanced modes include editable examples and a learner-view preview. Proofs and rubrics use plain text, not special syntax, and remain pending until an allowed reviewer passes them.",
