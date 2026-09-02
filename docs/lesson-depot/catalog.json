@@ -793,7 +793,7 @@
       "author": "QuickMaths",
       "community": {
         "comments": 0,
-        "discussion_url": "",
+        "discussion_url": "https://github.com/QuickMathematics/QuickMaths/discussions/3",
         "votes": 0
       },
       "description": "A rigorous 25-lesson beginner-to-advanced-beginner curriculum in algorithms, Python values and control flow, functions, text and collections, files and exceptions, modules, object-oriented design, algorithmic efficiency, software architecture, and two tested application capstones. This release adds formatted code, structured trace tables, and sandboxed pure-function grading.",
