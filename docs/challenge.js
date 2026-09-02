@@ -1,4 +1,4 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-scenario-coverage-v2";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-map-selection-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-native-improvements-v2";
 import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
 import {
@@ -465,13 +465,14 @@ function setupMapInteractions() {
   const distance = ([first, second]) => Math.hypot(second.x - first.x, second.y - first.y);
   const currentZoom = () => Number(svg.dataset.currentZoom ?? store.snapshot().ui.mapZoom ?? 1);
 
-  const beginPan = (pointer) => {
+  const beginPan = (pointer, pressedSkillId = null) => {
     gesture = {
       mode: "pan",
       startX: pointer.x,
       startY: pointer.y,
       startScrollLeft: scroller.scrollLeft,
       startScrollTop: scroller.scrollTop,
+      pressedSkillId,
       moved: false,
     };
   };
@@ -495,6 +496,7 @@ function setupMapInteractions() {
 
   const finishPointer = (event) => {
     if (!pointers.has(event.pointerId)) return;
+    const selectedSkillId = gesture?.mode === "pan" && !gesture.moved ? gesture.pressedSkillId : null;
     pointers.delete(event.pointerId);
     if (gesture?.mode === "pinch") {
       applyMapZoom(store.setMapZoom(currentZoom()));
@@ -505,13 +507,18 @@ function setupMapInteractions() {
       gesture = null;
       scroller.classList.remove("is-panning", "is-pinching");
     }
+    if (selectedSkillId) {
+      suppressClickUntil = Date.now() + 300;
+      store.selectMapSkill(selectedSkillId);
+    }
   };
 
   scroller.addEventListener("pointerdown", (event) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
-    pointers.set(event.pointerId, pointFrom(event));
+    const pointer = pointFrom(event);
+    pointers.set(event.pointerId, pointer);
     try { scroller.setPointerCapture(event.pointerId); } catch { /* Capture is best-effort. */ }
-    if (pointers.size === 1) beginPan(pointFrom(event));
+    if (pointers.size === 1) beginPan(pointer, event.target.closest?.("[data-map-skill]")?.dataset.mapSkill ?? null);
     else {
       beginPinch();
       scroller.classList.remove("is-panning");
@@ -541,7 +548,7 @@ function setupMapInteractions() {
     const pointer = pointFrom(event);
     const deltaX = pointer.x - gesture.startX;
     const deltaY = pointer.y - gesture.startY;
-    if (!gesture.moved && Math.hypot(deltaX, deltaY) > 4) {
+    if (!gesture.moved && Math.hypot(deltaX, deltaY) > 8) {
       gesture.moved = true;
       scroller.classList.add("is-panning");
     }

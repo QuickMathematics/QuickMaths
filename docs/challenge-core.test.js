@@ -250,6 +250,21 @@ test("Settings, map zoom, and combined-subject map scope persist safely", () => 
   assert.throws(() => reloaded.setLearningPreferences({ mapScope: "galaxy" }), /map_scope/);
 });
 
+test("selecting a mastery-map node updates both the detail card and routed skill", () => {
+  const { store } = harness();
+  store.createProfile("Map Learner");
+  store.completeTutorial();
+  store.navigate("map", "MATH_ARITH_001");
+
+  store.selectMapSkill("MATH_PREALG_003");
+
+  const state = store.snapshot();
+  assert.equal(state.ui.selectedMapSkillId, "MATH_PREALG_003");
+  assert.equal(state.ui.selectedSkillId, "MATH_PREALG_003");
+  assert.equal(state.selectedMapSkill.id, "MATH_PREALG_003");
+  assert.equal(state.selectedSkill.id, "MATH_PREALG_003");
+});
+
 test("profiles from older saves are treated as already onboarded", () => {
   const storage = memoryStorage({
     [STORAGE_KEY]: JSON.stringify({

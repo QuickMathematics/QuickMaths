@@ -1478,8 +1478,12 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
 
   const selectMapSkill = (skillId) => {
     if (!skillsById[skillId]) throw new Error("Unknown skill_id.");
-    activeProfile().activeSubjectId = skillsById[skillId].subjectId;
+    const profile = activeProfile();
+    const subjectId = skillsById[skillId].subjectId;
+    if (profile.activeSubjectId === subjectId && state.ui.selectedMapSkillId === skillId && state.ui.selectedSkillId === skillId) return;
+    profile.activeSubjectId = subjectId;
     state.ui.selectedMapSkillId = skillId;
+    state.ui.selectedSkillId = skillId;
     notify();
   };
 
