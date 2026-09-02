@@ -59,6 +59,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /review-question-select/);
   assert.match(js, /resultReviewGuide/);
   assert.match(js, /MAP_ZOOM_MIN = 0\.1/);
+  assert.doesNotMatch(js, /Math\.min\(5/);
+  assert.match(js, /authored scenarios are included/);
   assert.match(js, /addEventListener\("pointermove"/);
   assert.match(js, /startDistance/);
   assert.match(js, /data-tutorial-action="copy-agent-prompt"/);

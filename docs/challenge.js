@@ -325,7 +325,7 @@ function rowForSkill(snapshot, skillId) {
 }
 
 function skillOptions(snapshot, selectedId) {
-  return snapshot.curriculum.skills.map((skill) => `<option value="${escapeHtml(skill.id)}" ${skill.id === selectedId ? "selected" : ""}>${escapeHtml(skill.name)} · ${escapeHtml(skill.subdomain)}</option>`).join("");
+  return snapshot.curriculum.skills.map((skill) => `<option value="${escapeHtml(skill.id)}" ${skill.id === selectedId ? "selected" : ""}>${escapeHtml(skill.name)} · ${escapeHtml(skill.subdomain)} · ${assessmentCount(skill)} scenarios</option>`).join("");
 }
 
 function mapSkillOptions(snapshot, rows, selectedId) {
@@ -659,7 +659,7 @@ function renderMap(snapshot) {
         ${selectedSkill.applications?.length ? `<div class="application-mini"><strong>Why this matters</strong>${selectedSkill.applications.slice(0, 2).map((item) => `<p>${escapeHtml(item.title)}: ${escapeHtml(item.description)}</p>`).join("")}</div>` : ""}
         <div class="map-detail-actions">
           <button class="button button-secondary" type="button" data-route="lesson" data-skill-id="${escapeHtml(selected.id)}">Open lesson</button>
-          <button class="button button-primary" type="button" data-action="start-test" data-skill-id="${escapeHtml(selected.id)}" ${selected.status === "locked" ? "disabled" : ""}>Take test</button>
+          <button class="button button-primary" type="button" data-action="start-test" data-skill-id="${escapeHtml(selected.id)}" ${selected.status === "locked" ? "disabled" : ""}>Take ${assessmentCount(selectedSkill)}-scenario test</button>
         </div>
       </aside>
     </section>
@@ -747,8 +747,8 @@ function renderTest(snapshot) {
   const latestReview = snapshot.reviews.find((review) => questionIds.has(review.questionId));
   elements.view.innerHTML = `
     <header class="page-head">
-      <div><p class="eyebrow">Mastery test · autosaved</p><h1>${escapeHtml(skill.name)}</h1><p>Final answers are graded locally. Your shown work stays available for tutor or self review.</p></div>
-      <div class="test-progress"><span>${answered} / ${draft.problems.length} answered</span><i><b style="width:${draft.problems.length ? answered / draft.problems.length * 100 : 0}%"></b></i></div>
+      <div><p class="eyebrow">Mastery test · autosaved</p><h1>${escapeHtml(skill.name)}</h1><p>All ${draft.problems.length} authored scenarios are included. Retakes rotate available variants; shown work stays available for tutor or self review.</p></div>
+      <div class="test-progress"><span>${answered} / ${draft.problems.length} scenarios answered</span><i><b style="width:${draft.problems.length ? answered / draft.problems.length * 100 : 0}%"></b></i></div>
     </header>
     ${latestReview ? `<aside class="inline-feedback"><span aria-hidden="true">✦</span><div><p class="eyebrow">Latest tutor note</p><strong>${escapeHtml(latestReview.feedback)}</strong><p>${escapeHtml(latestReview.nextStep)}</p></div></aside>` : ""}
     <form id="test-form" class="test-form">
