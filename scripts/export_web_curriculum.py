@@ -17,7 +17,6 @@ from quickmaths.problem_generator import generate_test
 
 OUTPUT_PATH = PROJECT_ROOT / "docs" / "curriculum-data.json"
 FIRST_PARTY_EXPANSION_PATH = PROJECT_ROOT / "content" / "geography" / "foundations" / "web-curriculum.json"
-PROBLEMS_PER_SKILL = 15
 MAX_VARIANT_SEEDS = 12
 
 
@@ -31,6 +30,8 @@ def build_payload() -> dict:
     skill_rows = []
     for skill_id in track.skills:
         skill = skills[skill_id]
+        question_count = skill.test.question_count
+        target_bank_size = min(question_count * 2, 100)
         problems = []
         signatures: set[str] = set()
         for variant_index in range(MAX_VARIANT_SEEDS):
@@ -58,10 +59,15 @@ def build_payload() -> dict:
                     "rubric_check",
                 }
                 problems.append(row)
-                if len(problems) >= PROBLEMS_PER_SKILL:
+                if len(problems) >= target_bank_size:
                     break
-            if len(problems) >= PROBLEMS_PER_SKILL:
+            if len(problems) >= target_bank_size:
                 break
+        if len(problems) < question_count:
+            raise RuntimeError(
+                f"{skill.id} produced only {len(problems)} unique problems for a "
+                f"{question_count}-question mastery test."
+            )
         skill_rows.append(
             {
                 "id": skill.id,
@@ -76,6 +82,7 @@ def build_payload() -> dict:
                 "theory": skill.theory,
                 "examples": [asdict(example) for example in skill.examples],
                 "applications": skill.applications,
+                "question_count": question_count,
                 "problems": problems,
             }
         )

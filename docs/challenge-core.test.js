@@ -16,6 +16,16 @@ import {
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const lessonSetExample = readFileSync(new URL("./lesson-set-example.json", import.meta.url), "utf8");
+const ORIGINAL_MATH_TEST_LENGTHS = Object.freeze({
+  MATH_ALG_001: 20, MATH_ALG_002: 24, MATH_ALG_003: 22, MATH_ALG_004: 24,
+  MATH_ALG_005: 20, MATH_ALG_006: 24, MATH_ALG_007: 8, MATH_ALG_008: 8,
+  MATH_ARITH_001: 10, MATH_ARITH_002: 15, MATH_ARITH_003: 20,
+  MATH_ARITH_004: 22, MATH_ARITH_005: 26,
+  MATH_GRAPH_001: 8, MATH_GRAPH_002: 8, MATH_GRAPH_003: 8,
+  MATH_GRAPH_004: 8, MATH_GRAPH_005: 8, MATH_GRAPH_006: 8,
+  MATH_PREALG_001: 20, MATH_PREALG_002: 18, MATH_PREALG_003: 20,
+  MATH_PREALG_004: 20, MATH_PREALG_005: 22, MATH_SYS_001: 8,
+});
 
 function memoryStorage(seed = {}) {
   const values = new Map(Object.entries(seed));
@@ -90,7 +100,8 @@ function nativeImprovement(skillId = "MATH_ARITH_001", name = "Integer operation
 
 function answerActiveTestCorrectly(store) {
   const draft = store.snapshot().activeTest;
-  assert.equal(draft.problems.length, 5);
+  const configuredLength = store.skillsById[draft.skillId].question_count ?? store.skillsById[draft.skillId].problems.length;
+  assert.equal(draft.problems.length, configuredLength);
   for (const problem of draft.problems) {
     store.updateResponse(problem.template_id, {
       finalAnswer: String(problem.expected_answer),
@@ -108,7 +119,8 @@ test("ships the complete first-party Mathematics and Geography curriculum and op
   const { store } = harness();
   const state = store.snapshot();
   assert.equal(curriculum.skills.length, 43);
-  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0), 555);
+  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 579);
+  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 579);
   assert.equal(curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY").length, 15);
   assert.equal(curriculum.skills.filter((skill) => skill.id.startsWith("MATH_GEOM_")).length, 3);
   assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [
@@ -118,6 +130,16 @@ test("ships the complete first-party Mathematics and Geography curriculum and op
   assert.equal(state.profiles.length, 0);
   assert.equal(state.activeProfile, null);
   assert.equal(state.ui.route, "welcome");
+});
+
+test("restores the original comprehensive Mathematics test lengths and keeps enough retake variants", () => {
+  assert.equal(Object.values(ORIGINAL_MATH_TEST_LENGTHS).reduce((total, count) => total + count, 0), 399);
+  for (const [skillId, expectedLength] of Object.entries(ORIGINAL_MATH_TEST_LENGTHS)) {
+    const skill = curriculum.skills.find((candidate) => candidate.id === skillId);
+    assert.ok(skill, `${skillId} must ship`);
+    assert.equal(skill.question_count, expectedLength, `${skillId} assessment length`);
+    assert.ok(skill.problems.length >= expectedLength, `${skillId} needs a complete question bank`);
+  }
 });
 
 test("first-party Geography is substantial and bridges through Mathematics coordinate geometry", () => {
@@ -255,7 +277,7 @@ test("a complete mastery-test reflection records an attempt and unlocks dependen
   answerActiveTestCorrectly(store);
   const submitted = store.submitTest();
   assert.equal(submitted.ok, true);
-  assert.equal(submitted.results.rawScore, 5);
+  assert.equal(submitted.results.rawScore, 10);
 
   const attempt = store.saveReflection({
     confidenceRating: 4,
@@ -273,7 +295,7 @@ test("a complete mastery-test reflection records an attempt and unlocks dependen
   assert.equal(store.snapshot().activeTest, null);
 });
 
-test("retakes draw a fresh five-question set from the seeded variant bank", () => {
+test("retakes rotate through fresh comprehensive sets from the seeded variant bank", () => {
   const { store } = harness();
   store.createProfile("Retake Learner");
   store.startTest("MATH_ARITH_001");
@@ -283,7 +305,22 @@ test("retakes draw a fresh five-question set from the seeded variant bank", () =
   store.saveReflection({ confidenceRating: 4, difficultyFelt: "medium", hintsUsed: "none", guessed: "no" });
   store.startTest("MATH_ARITH_001");
   const secondIds = store.snapshot().activeTest.problems.map((problem) => problem.template_id);
-  assert.equal(new Set([...firstIds, ...secondIds]).size, 10);
+  assert.equal(firstIds.length, 10);
+  assert.equal(secondIds.length, 10);
+  assert.equal(new Set([...firstIds, ...secondIds]).size, 20);
+});
+
+test("a comprehensive in-progress test survives local-state sanitization", () => {
+  const { store, storage } = harness();
+  store.createProfile("Persistent Test Learner");
+  store.startTest("MATH_ALG_002", { force: true });
+  assert.equal(store.snapshot().activeTest.problems.length, 24);
+  const reloaded = createQuickMathsStore({
+    storage,
+    curriculum,
+    now: () => new Date("2026-09-01T09:42:00.000Z"),
+  });
+  assert.equal(reloaded.snapshot().activeTest.problems.length, 24);
 });
 
 test("a valid custom lesson set joins the real curriculum without replacing built-in skills", () => {
@@ -573,7 +610,8 @@ test("symbolic grading accepts equivalent forms and rejects correlated-sample tr
       work: workFor(problem),
     });
   }
-  assert.equal(equivalent.store.submitTest().results.rawScore, 5);
+  const equivalentResult = equivalent.store.submitTest().results;
+  assert.equal(equivalentResult.rawScore, equivalentResult.scoreTotal);
 
   const adversarial = harness();
   adversarial.store.createProfile("Independent Samples");
@@ -584,7 +622,8 @@ test("symbolic grading accepts equivalent forms and rejects correlated-sample tr
       work: workFor(problem),
     });
   }
-  assert.equal(adversarial.store.submitTest().results.rawScore, 4);
+  const adversarialResult = adversarial.store.submitTest().results;
+  assert.equal(adversarialResult.rawScore, adversarialResult.scoreTotal - 1);
 });
 
 test("procedural work rejects a broken middle equation even when the final answer is right", () => {
@@ -614,7 +653,7 @@ test("learning context exposes prompts and student state but never answer keys",
   store.startTest("MATH_ARITH_001");
   const context = store.getLearningContext({ includeHistory: true });
   const serialized = JSON.stringify(context);
-  assert.equal(context.active_test.question_count, 5);
+  assert.equal(context.active_test.question_count, 10);
   assert.equal(serialized.includes("expected_answer"), false);
   assert.equal(serialized.includes("solution_steps"), false);
 });

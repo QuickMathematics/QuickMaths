@@ -107,6 +107,7 @@ The override envelope differs only in `mode` and its IDs:
       "theory": "Revised plain-text theory.",
       "examples": [],
       "applications": [],
+      "question_count": 1,
       "problems": [
         {
           "template_id": "INTEGER_ADD_REVISED_001",
@@ -162,9 +163,12 @@ Each skill supports:
   "applications": [
     { "title": "Medicine", "description": "How the idea travels into another context." }
   ],
+  "question_count": 10,
   "problems": []
 }
 ```
+
+`question_count` is the number of questions in one mastery attempt. It must be a whole number from 1 through the number of entries in `problems`; when omitted, QuickMaths uses the complete bank. Supplying a larger bank than `question_count` gives comprehensive retakes fresh variants without making one attempt endless. The Lesson Studio uses the complete bank for new lessons and preserves the original assessment length when improving a native lesson.
 
 `unlocks` is optional and may contain only skills from the same pack. QuickMaths also derives unlock relationships from prerequisites, including cross-subject links.
 
@@ -334,7 +338,7 @@ The repository’s original YAML engine remains richer because it runs trusted l
 | Final answer block and accepted forms | Flattened `expected_answer`, `answer_type`, grader, tolerance, and `accepted_forms` |
 | Fixed tests | Direct `problems` entries |
 | Generated tests: variables, derived expressions, constraints, prompt/answer templates, retry limits | Run the trusted YAML generator during authoring, inspect samples, then export the generated results as fixed browser `problems`. Uploaded browser files never execute expressions. |
-| Random order / question count | Supply a larger fixed bank; QuickMaths rotates through up to five questions per attempt. |
+| Random order / question count | Set `question_count` and optionally supply a larger fixed bank; QuickMaths rotates through a complete configured set on each attempt. Omit the field to test the entire bank. |
 | Explanation templates | Pre-render into literal `solution_steps`. |
 | Final-only, optional, or required work | `answer_mode` |
 | Capture, procedural, proof, and rubric workflows | All five browser `work.mode` values above |

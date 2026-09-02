@@ -117,6 +117,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "MATH_GEOM_001_Q01",
@@ -590,6 +591,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "MATH_GEOM_002_Q01",
@@ -1064,6 +1066,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "MATH_GEOM_003_Q01",
@@ -1566,6 +1569,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_FOUND_001_Q01",
@@ -2116,6 +2120,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_CART_001_Q01",
@@ -2660,6 +2665,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_CART_002_Q01",
@@ -3165,6 +3171,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_GIS_001_Q01",
@@ -3717,6 +3724,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_PHYS_001_Q01",
@@ -4268,6 +4276,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_PHYS_002_Q01",
@@ -4821,6 +4830,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_PHYS_003_Q01",
@@ -5357,6 +5367,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_PHYS_004_Q01",
@@ -5909,6 +5920,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_HUMAN_001_Q01",
@@ -6445,6 +6457,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_HUMAN_002_Q01",
@@ -6998,6 +7011,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_URBAN_001_Q01",
@@ -7551,6 +7565,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_ECON_001_Q01",
@@ -8103,6 +8118,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_POL_001_Q01",
@@ -8657,6 +8673,7 @@
         "review_after_days_if_mastered": 10,
         "review_after_days_if_learning": 3
       },
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_RISK_001_Q01",
@@ -9198,6 +9215,7 @@
       ],
       "subjectId": "SUBJECT_GEOGRAPHY",
       "unlocks": [],
+      "question_count": 10,
       "problems": [
         {
           "template_id": "GEO_SYNTH_001_Q01",

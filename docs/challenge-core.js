@@ -60,6 +60,14 @@ function cleanNumber(value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER
   return Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
 }
 
+function assessmentLength(skill) {
+  const bankLength = Array.isArray(skill?.problems) ? skill.problems.length : 0;
+  if (!bankLength) return 0;
+  const configured = Number(skill.question_count ?? skill.questionCount);
+  if (!Number.isInteger(configured)) return bankLength;
+  return Math.max(1, Math.min(bankLength, configured));
+}
+
 function makeId(prefix = "id") {
   if (globalThis.crypto?.randomUUID) return `${prefix}-${globalThis.crypto.randomUUID()}`;
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -276,6 +284,10 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
     if (!Array.isArray(skillCandidate.problems) || !skillCandidate.problems.length || skillCandidate.problems.length > MAX_PROBLEMS_PER_SKILL) {
       throw new Error(`${skillId} must contain 1 to ${MAX_PROBLEMS_PER_SKILL} problems.`);
     }
+    const questionCount = Number(skillCandidate.question_count ?? skillCandidate.questionCount ?? skillCandidate.problems.length);
+    if (!Number.isInteger(questionCount) || questionCount < 1 || questionCount > skillCandidate.problems.length) {
+      throw new Error(`${skillId} question_count must be a whole number from 1 to ${skillCandidate.problems.length}.`);
+    }
     const mastery = skillCandidate.mastery && typeof skillCandidate.mastery === "object" ? skillCandidate.mastery : {};
     const examples = Array.isArray(skillCandidate.examples) ? skillCandidate.examples.slice(0, 20).map((example, index) => ({
       prompt: requiredText(example?.prompt, `${skillId} example ${index + 1} prompt`, 1000),
@@ -311,6 +323,7 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
       theory: requiredText(skillCandidate.theory, `${skillId} theory`, 15_000),
       examples,
       applications,
+      question_count: questionCount,
       problems: skillCandidate.problems.map((problem) => normalizeProblem(problem, skillId, questionIds)),
     };
   });
@@ -606,7 +619,7 @@ function sanitizeAttempt(candidate, profileIds, skillIds) {
   const profileId = cleanText(candidate.profileId, 100);
   const skillId = cleanText(candidate.skillId, 60);
   if (!attemptId || !profileIds.has(profileId) || !skillIds.has(skillId)) return null;
-  const results = Array.isArray(candidate.results) ? candidate.results.map(sanitizeResult).filter(Boolean).slice(0, 20) : [];
+  const results = Array.isArray(candidate.results) ? candidate.results.map(sanitizeResult).filter(Boolean).slice(0, MAX_PROBLEMS_PER_SKILL) : [];
   const reflection = candidate.reflection && typeof candidate.reflection === "object" ? candidate.reflection : {};
   const masteryUpdate = candidate.masteryUpdate && typeof candidate.masteryUpdate === "object" ? candidate.masteryUpdate : {};
   return {
@@ -617,7 +630,7 @@ function sanitizeAttempt(candidate, profileIds, skillIds) {
     startedAt: cleanText(candidate.startedAt, 40),
     completedAt: cleanText(candidate.completedAt, 40),
     rawScore: Math.floor(cleanNumber(candidate.rawScore, 0, 0, results.length)),
-    scoreTotal: Math.floor(cleanNumber(candidate.scoreTotal, results.length, 0, 20)),
+    scoreTotal: Math.floor(cleanNumber(candidate.scoreTotal, results.length, 0, MAX_PROBLEMS_PER_SKILL)),
     percentScore: cleanNumber(candidate.percentScore, 0, 0, 1),
     reflection: {
       confidenceRating: Math.round(cleanNumber(reflection.confidenceRating, 3, 1, 5)),
@@ -673,7 +686,7 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
       if (!skill || !rawDraft || typeof rawDraft !== "object" || Array.isArray(rawDraft)) continue;
       const canonical = Object.fromEntries(skill.problems.map((problem) => [problem.template_id, problem]));
       const problemIds = Array.isArray(rawDraft.problems)
-        ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => canonical[id]).slice(0, 5)
+        ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => canonical[id]).slice(0, assessmentLength(skill))
         : [];
       if (!problemIds.length) continue;
       const responses = rawDraft.responses && typeof rawDraft.responses === "object" ? rawDraft.responses : {};
@@ -697,7 +710,7 @@ function sanitizePendingResults(candidate, skillIds) {
   const skillId = cleanText(candidate.skillId, 60);
   const draftId = cleanText(candidate.draftId, 120);
   if (!skillIds.has(skillId) || !draftId || !Array.isArray(candidate.results)) return null;
-  const results = candidate.results.map(sanitizeResult).filter(Boolean).slice(0, 20);
+  const results = candidate.results.map(sanitizeResult).filter(Boolean).slice(0, MAX_PROBLEMS_PER_SKILL);
   if (!results.length) return null;
   return {
     draftId,
@@ -1482,8 +1495,9 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     if (!existing) {
       const attemptCount = activeProgress()[skillId]?.attemptCount ?? 0;
       const bank = skillsById[skillId].problems;
-      const offset = (attemptCount * 5) % Math.max(1, bank.length);
-      const problems = [...bank.slice(offset), ...bank.slice(0, offset)].slice(0, Math.min(5, bank.length));
+      const questionCount = assessmentLength(skillsById[skillId]);
+      const offset = (attemptCount * questionCount) % Math.max(1, bank.length);
+      const problems = [...bank.slice(offset), ...bank.slice(0, offset)].slice(0, questionCount);
       state.drafts[profileId][skillId] = {
         draftId: makeId("draft"),
         skillId,

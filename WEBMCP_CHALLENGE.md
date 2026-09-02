@@ -11,7 +11,7 @@ The app requires no OpenAI API key and sends no learner data to a hosted applica
 - Dashboard metrics, suggested next work, recent attempts, and continue flow
 - 43 first-party lessons: 28 Mathematics lessons and a 15-lesson Geography curriculum joined through coordinate geometry and geodesy
 - Theory, applications, prerequisites, unlocks, and worked examples for every skill
-- Five-question mastery tests drawn from 555 reviewed assessment questions
+- Lesson-defined comprehensive mastery tests: 8–26 questions in the original Mathematics curriculum and full assessment banks in newer subjects
 - Multiple-choice, free-response, required shown work, local grading, and step checks
 - Results, reflection-based mastery updates, spaced review dates, and saved tutor/self reviews
 - Live analog clock plus per-session and cumulative profile timers
@@ -76,7 +76,7 @@ Important files:
 
 - `docs/index.html` — landing page and persistent application shell
 - `docs/challenge.css` — responsive visual system and original-style clock
-- `docs/curriculum-data.json` — browser-ready 43-lesson curriculum and 555 assessment questions
+- `docs/curriculum-data.json` — browser-ready 43-lesson curriculum with comprehensive assessments and rotating retake variants
 - `docs/challenge-core.js` — profiles, mastery graph, grading, attempts, reviews, timers, and persistence
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports
 - `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio

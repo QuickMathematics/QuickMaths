@@ -13,7 +13,7 @@ No QuickMaths account, model API key, or paid application server is required. Le
 - Multiple learner profiles with separate progress, attempts, reviews, timers, and preferences
 - Mathematics and Geography mastery maps, including cross-subject prerequisite bridges
 - Enforced Hard path and guideline-only Open path
-- Five-question mastery tests with generated variants, required work, proofs, and review gates
+- Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, and review gates
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
 - Public Lesson Depot with optional GitHub Discussion upvotes and comments
 - Seventeen WebMCP tools for visible navigation, tutoring, curriculum inspection, and human-controlled lesson staging

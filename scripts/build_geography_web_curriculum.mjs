@@ -113,6 +113,7 @@ function addLesson(candidate) {
     unlocks: candidate.unlocks ?? [],
     tags: candidate.tags ?? [],
     mastery: { ...mastery, ...(candidate.mastery ?? {}) },
+    question_count: candidate.questions.length,
     problems: candidate.questions.map((question, index) => buildProblem(question, candidate.id, index)),
   });
 }

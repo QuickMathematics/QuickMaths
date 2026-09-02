@@ -369,7 +369,7 @@ test("starting a test exposes prompts but not expected answers", async () => {
   const started = await tools.start_skill_test.execute({ skill_id: "MATH_ARITH_001" });
   const context = await tools.get_learning_context.execute({ include_history: true });
   const serialized = JSON.stringify({ started, context });
-  assert.equal(started.question_count, 5);
+  assert.equal(started.question_count, 10);
   assert.equal(store.snapshot().ui.route, "test");
   assert.equal(serialized.includes("expected_answer"), false);
   assert.equal(serialized.includes("solution_steps"), false);

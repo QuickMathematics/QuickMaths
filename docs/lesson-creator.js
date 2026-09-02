@@ -264,6 +264,7 @@ function buildPack(draft) {
       theory: skill.theory,
       examples: skill.examples.map((example) => ({ prompt: example.prompt, solution: example.solution, explanation: example.explanation })),
       applications: skill.applications.map((application) => ({ title: application.title, description: application.description })),
+      question_count: draft.mode === "override" ? Math.min(Number(skill.questionCount ?? skill.problems.length), skill.problems.length) : skill.problems.length,
       problems: skill.problems.map((problem, problemIndex) => {
         const answerMode = problem.workMode === "none" ? "final_only"
           : ["procedural_steps", "proof_obligations", "rubric_check"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
@@ -324,6 +325,7 @@ function draftFromPack(pack, snapshot) {
     theory: skill.theory, tags: (skill.tags ?? []).join("\n"), prerequisites: (skill.prerequisites ?? []).map((ref) => typeof ref === "string" ? ref : ref.skill_id),
     passingScore: skill.mastery?.passing_score ?? .8, minimumConfidence: skill.mastery?.minimum_confidence ?? 3,
     reviewMasteredDays: skill.mastery?.review_after_days_if_mastered ?? 7, reviewLearningDays: skill.mastery?.review_after_days_if_learning ?? 2,
+    questionCount: skill.question_count ?? skill.problems?.length ?? 1,
     examples: skill.examples?.length ? skill.examples : [], applications: skill.applications?.length ? skill.applications : [],
     problems: (skill.problems ?? []).map((problem, problemIndex) => ({
       ...blankProblem(skill.id, problemIndex), templateId: problem.template_id, prompt: problem.prompt, expectedAnswer: String(problem.expected_answer ?? ""),
@@ -457,7 +459,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
             <div class="studio-section-title"><div><p class="eyebrow">3 · Mastery questions</p><h2>What proves this lesson?</h2><p>Build the short answer, any required reasoning, and the sign-off rule as three separate pieces.</p></div><button class="button button-secondary" data-creator-action="add-problem">＋ Add question</button></div>
             <div class="studio-question-roadmap"><article><span>1</span><div><strong>Final answer</strong><p>The local grader checks a number, choice, expression, or conclusion.</p></div></article><i>→</i><article><span>2</span><div><strong>Shown work</strong><p>Optional explanation, checked maths steps, a proof, or a rubric response.</p></div></article><i>→</i><article><span>3</span><div><strong>Review</strong><p>Proofs and rubric responses wait for a self, tutor, or agent verdict.</p></div></article></div>
             <nav class="studio-question-tabs" aria-label="Mastery question bank">${skill.problems.map((problem, index) => `<button type="button" data-creator-action="select-problem" data-index="${index}" aria-current="${index === skill.activeProblem ? "true" : "false"}"><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(problem.prompt || "Untitled question")}</b><small>${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</small></button>`).join("")}</nav>
-            <p class="studio-question-count">Editing question ${skill.activeProblem + 1} of ${skill.problems.length}. Only the selected editor is rendered, so large native question banks stay fast.</p>
+            <p class="studio-question-count">Editing question ${skill.activeProblem + 1} of ${skill.problems.length}. ${draft.mode === "override" ? `The original comprehensive test length (${Math.min(Number(skill.questionCount ?? skill.problems.length), skill.problems.length)}) is preserved while the bank contains enough questions.` : "Every question in this bank becomes part of the mastery test."} Only the selected editor is rendered, so large native question banks stay fast.</p>
             <div class="studio-problems">${renderProblemEditor(skill, activeProblem, skill.activeProblem)}</div>
           </section>
           <section class="studio-card studio-publish">
