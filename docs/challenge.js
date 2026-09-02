@@ -1,5 +1,5 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-plan-mode-v2";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-native-improvements-v2";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-agent-planning-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-agent-planning-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
 import {
   buildDepotSubmissionPrompt,
@@ -198,7 +198,7 @@ const TUTORIAL_STEPS = [
     title: "Read the map before picking your next lesson.",
     lede: "Every node is a lesson. Connections show prerequisite knowledge—including bridges between Mathematics, Geography, and any subjects you install.",
     points: ["Switch between the current subject and an All subjects map.", "Drag in either direction; use the mouse wheel on desktop or pinch on mobile to zoom.", "Turn on Plan mode to rearrange a private copy, draw colored study paths, and place draggable free or lesson-connected comment nodes without changing the canonical map."],
-    tip: "In Plan mode, use Ctrl or a selection rectangle on desktop; touch and hold lessons on mobile. Your plan autosaves with this profile and travels in full backups.",
+    tip: "In Plan mode, use Ctrl or a selection rectangle on desktop; touch and hold lessons on mobile, or hold empty map space to clear the selection. Your plan autosaves with this profile and travels in full backups.",
     visual: "map",
   },
   {
@@ -595,6 +595,11 @@ function setupMapInteractions({ planMode = false, layoutKey = "", positions = {}
       }
       suppressClickUntil = Date.now() + 300;
     }
+    if (planMode && finishedGesture?.mode === "plan-empty-touch" && finishedGesture.longPressed) {
+      updateSelectionClasses();
+      commitPlanner();
+      suppressClickUntil = Date.now() + 300;
+    }
     if (planMode && finishedGesture?.mode === "plan-comment") {
       if (finishedGesture.moved) {
         store.updateMapPlanAnnotationPosition(finishedGesture.annotationId, {
@@ -713,7 +718,23 @@ function setupMapInteractions({ planMode = false, layoutKey = "", positions = {}
         rect: { x1: start.x, y1: start.y, x2: start.x, y2: start.y },
       };
       scroller.classList.add("is-selecting");
-    } else beginPan(pointer);
+    } else {
+      gesture = {
+        mode: "plan-empty-touch",
+        startX: pointer.x,
+        startY: pointer.y,
+        longPressed: false,
+      };
+      longPressTimer = window.setTimeout(() => {
+        if (gesture?.mode !== "plan-empty-touch") return;
+        gesture.longPressed = true;
+        if (workingSelection.length) {
+          workingSelection = [];
+          updateSelectionClasses();
+          if (navigator.vibrate) navigator.vibrate(18);
+        }
+      }, 480);
+    }
   });
 
   scroller.addEventListener("pointermove", (event) => {
@@ -745,6 +766,16 @@ function setupMapInteractions({ planMode = false, layoutKey = "", positions = {}
       marquee?.setAttribute("height", String(Math.abs(current.y - gesture.rect.y1)));
       event.preventDefault();
       return;
+    }
+    if (planMode && gesture?.mode === "plan-empty-touch") {
+      const pointer = pointFrom(event);
+      if (gesture.longPressed) {
+        event.preventDefault();
+        return;
+      }
+      if (Math.hypot(pointer.x - gesture.startX, pointer.y - gesture.startY) <= 8) return;
+      clearLongPress();
+      beginPan({ x: gesture.startX, y: gesture.startY });
     }
     if (planMode && gesture?.mode === "plan-comment") {
       const pointer = pointFrom(event);
@@ -923,7 +954,7 @@ function renderMapPlanPanel(snapshot, mapRows, layoutKey) {
     </form>`;
   const management = `<div class="map-plan-help">
       <p class="map-plan-desktop-help"><strong>Desktop</strong> Drag nodes to move them. Drag empty space to box-select. Ctrl-click or Ctrl-drag adds; Shift-drag empty space pans.</p>
-      <p class="map-plan-touch-help"><strong>Phone</strong> Hold a node to select it; hold again to deselect. Drag selected nodes to move them. Drag empty space to pan.</p>
+      <p class="map-plan-touch-help"><strong>Phone</strong> Hold a node to select it; hold again to deselect. Hold empty space to clear the selection. Drag selected nodes to move them; drag empty space to pan.</p>
     </div>
     ${selectionCard}
     <section class="map-plan-paths">
@@ -1054,8 +1085,8 @@ function renderMap(snapshot) {
         <button type="button" data-action="plan-open-path"><span>↝</span><strong>Custom path</strong><small>${snapshot.ui.mapPlanSelection.length > 1 ? `${snapshot.ui.mapPlanSelection.length} lessons selected` : "Select multiple lessons"}</small></button>
         <button type="button" data-action="plan-open-manage"><span>•••</span><strong>Plan details</strong><small>${snapshot.mapPlan.paths.length} paths · ${snapshot.mapPlan.annotations.length} comments</small></button>
       </div>` : ""}
-      <div class="map-scroll ${planMode ? "is-plan-mode" : ""}" data-map-viewport-key="${escapeHtml(viewportKey)}" aria-label="${planMode ? "Plan mode mastery map. Drag lessons to move them. On desktop, drag empty space to select. On touch, hold lessons to select." : "Interactive prerequisite map. Drag to move. Use the mouse wheel on desktop or pinch on a touchscreen to zoom."}">
-        <div class="map-gesture-hint" aria-hidden="true">${planMode ? `<span class="map-hint-desktop">Box-select · Ctrl adds · Drag nodes</span><span class="map-hint-touch">Hold to select · Drag to move · Pinch to zoom</span>` : `Drag to move <span class="map-hint-desktop">· Wheel to zoom</span><span class="map-hint-touch">· Pinch to zoom</span>`}</div>
+      <div class="map-scroll ${planMode ? "is-plan-mode" : ""}" data-map-viewport-key="${escapeHtml(viewportKey)}" aria-label="${planMode ? "Plan mode mastery map. Drag lessons to move them. On desktop, drag empty space to select. On touch, hold lessons to select and hold empty space to clear the selection." : "Interactive prerequisite map. Drag to move. Use the mouse wheel on desktop or pinch on a touchscreen to zoom."}">
+        <div class="map-gesture-hint" aria-hidden="true">${planMode ? `<span class="map-hint-desktop">Box-select · Ctrl adds · Drag nodes</span><span class="map-hint-touch">Hold node to select · Hold empty to clear · Pinch to zoom</span>` : `Drag to move <span class="map-hint-desktop">· Wheel to zoom</span><span class="map-hint-touch">· Pinch to zoom</span>`}</div>
         <svg class="mastery-map" viewBox="0 0 ${width} ${height}" data-base-width="${width}" data-base-height="${height}" data-current-zoom="${zoom}" style="width:${Math.round(width * zoom)}px;height:${Math.round(height * zoom)}px">
           <g class="map-subject-lanes">${subjectLanes}</g>
           <g class="map-edges">${edges}</g>

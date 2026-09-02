@@ -12,7 +12,7 @@ QuickMaths existed before the WebMCP Challenge. The official submission period b
 | --- | --- |
 | Python/Streamlit desktop-style application | Complete static browser application deployed on GitHub Pages |
 | 25-lesson Mathematics YAML curriculum | Browser-ready Mathematics runtime plus Geography, coordinate-geometry bridges, and combined subject maps |
-| Existing mastery, grading, profile, review, and export foundations | Seventeen page-level WebMCP learning tools operating on the same visible human state |
+| Existing mastery, grading, profile, review, and export foundations | Twenty-one page-level WebMCP learning tools operating on the same visible human state |
 | Human-only navigation and learner workflows | Shared human-agent navigation, tutoring, saved-work inspection, structured reviews, and activity attribution |
 | Local/Drive-oriented persistence in the original application | Browser autosave, portable backups, GitHub learner storage, and a revision-safe remote Agent Bridge |
 | YAML authoring and developer preview utilities | Human Lesson Studio, agent lesson validation/staging, reversible native improvements, and answer-key-safe tutoring boundaries |
@@ -50,7 +50,7 @@ Challenge-period milestone evidence:
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers seventeen page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact operating summary by default; an agent can request `tutoring`, `navigation`, `bridge`, `custom_content`, `backup`, or `all` only when that policy is relevant. The complete source remains the machine-readable `agent-manifest.json`.
+A compatible ChatGPT or Codex browser discovers twenty-one page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact operating summary by default; an agent can request `tutoring`, `navigation`, `planning`, `bridge`, `custom_content`, `backup`, or `all` only when that policy is relevant. The complete source remains the machine-readable `agent-manifest.json`.
 
 | Tool | Purpose |
 | --- | --- |
@@ -61,6 +61,10 @@ A compatible ChatGPT or Codex browser discovers seventeen page tools through `do
 | `list_subjects` | Read installed subjects and lesson totals. |
 | `set_learning_preferences` | Change the visible subject, Hard/Open path mode, and focused/combined map scope. |
 | `navigate_learning_app` | Open the dashboard, map, lesson, test, results, Lesson studio, or Settings. |
+| `set_map_plan_mode` | Visibly open the persistent editable mastery-map plan or return to the untouched canonical map. |
+| `arrange_map_plan_nodes` | Move lesson nodes to absolute positions in a subject or combined Plan mode layout. |
+| `create_map_plan_path` | Create an ordered, colored study path through two or more installed lessons. |
+| `add_map_plan_annotation` | Add a free, lesson-connected, or path-connected comment node to the visible plan. |
 | `open_lesson_creator` | Open the no-code Human Lesson Creator. |
 | `validate_lesson_set` | Validate schema 2.0 subjects, bridges, questions, proof/rubric policy, and safety limits. |
 | `stage_custom_lesson_set` | Stage validated content in the visible UI; only the human can install it. |
@@ -72,7 +76,7 @@ A compatible ChatGPT or Codex browser discovers seventeen page tools through `do
 | `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
-The top-level `agent-bridge.html` workspace registers the same seventeen learning tools plus three transport tools:
+The top-level `agent-bridge.html` workspace registers the same twenty-one learning tools plus three transport tools:
 
 | Bridge tool | Purpose |
 | --- | --- |
@@ -88,7 +92,7 @@ Tool inputs use closed JSON Schemas and runtime validation. Read-only tools do n
 Mobile learner browser                          Computer / remote Codex task
 ┌──────────────────────────┐                    ┌────────────────────────────┐
 │ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
-│ localStorage + WebMCP    │                    │ 20 WebMCP tools            │
+│ localStorage + WebMCP    │                    │ 24 WebMCP tools            │
 └────────────┬─────────────┘                    └──────────────┬─────────────┘
              │ debounced, complete state                       │ explicit publish → host Git auth
              ▼                                                 ▼
@@ -134,7 +138,7 @@ npm --prefix docs test
 pytest -q
 ```
 
-Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience. Open `http://localhost:8765/agent-bridge.html` for the separate 20-tool agent workspace.
+Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience. Open `http://localhost:8765/agent-bridge.html` for the separate 24-tool agent workspace.
 
 The browser contract suite covers profiles, subject filtering, Hard/Open progression, cross-subject bridges, themes, proof-review mastery gates, unlocks, timers, mastery updates, varied retakes, symbolic grading, procedural-work validation, answer-key privacy, agent policy, lesson-set staging and progress round-trips, malformed backups, CSV exports, strict tool inputs, navigation, visible follow-ups, feedback-to-attempt linkage, credential isolation, Unicode GitHub transport, optimistic write conflicts, revision-bound agent output, and protection for unsynced learner work.
 

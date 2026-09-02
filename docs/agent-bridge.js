@@ -1,5 +1,5 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260901-combined-map";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260901-combined-map";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260902-agent-planning-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-agent-planning-v1";
 import { createLessonDepot } from "./lesson-depot.js";
 import {
   createGitHubContentsClient,

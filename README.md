@@ -24,7 +24,7 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 - Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, and review gates
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
 - Public Lesson Depot with optional GitHub Discussion upvotes and comments
-- Seventeen WebMCP tools for visible navigation, tutoring, curriculum inspection, and human-controlled lesson staging
+- Twenty-one WebMCP tools for visible navigation, tutoring, mastery-map planning, curriculum inspection, and human-controlled lesson staging
 - Optional GitHub Bridge for revision-safe mobile/remote-agent checkpoints
 
 ## Run the web app locally

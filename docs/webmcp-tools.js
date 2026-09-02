@@ -6,6 +6,10 @@ export const TOOL_NAMES = Object.freeze([
   "list_subjects",
   "set_learning_preferences",
   "navigate_learning_app",
+  "set_map_plan_mode",
+  "arrange_map_plan_nodes",
+  "create_map_plan_path",
+  "add_map_plan_annotation",
   "open_lesson_creator",
   "validate_lesson_set",
   "stage_custom_lesson_set",
@@ -41,7 +45,18 @@ function optionalString(input, key, maxLength) {
   return requiredString(input, key, maxLength);
 }
 
-const GUIDE_SECTIONS = Object.freeze(["summary", "tutoring", "navigation", "bridge", "custom_content", "backup", "all"]);
+const GUIDE_SECTIONS = Object.freeze(["summary", "tutoring", "navigation", "planning", "bridge", "custom_content", "backup", "all"]);
+
+function requiredSkillIds(store, input, key, minimum = 1) {
+  const value = input[key];
+  if (!Array.isArray(value)) throw new Error(`${key} must be an array.`);
+  const ids = [...new Set(value.map((item) => typeof item === "string" ? item.trim() : "").filter(Boolean))];
+  if (ids.length < minimum) throw new Error(`${key} must contain at least ${minimum} skill${minimum === 1 ? "" : "s"}.`);
+  if (ids.length > 80) throw new Error(`${key} can contain at most 80 skills.`);
+  const unknown = ids.find((id) => !store.skillsById[id]);
+  if (unknown) throw new Error(`Unknown skill_id: ${unknown}`);
+  return ids;
+}
 
 function guideForSection(guide, section) {
   if (!Object.keys(guide).length) return {
@@ -68,6 +83,12 @@ function guideForSection(guide, section) {
     navigation_policy: guide.agent_policy?.navigation ?? [],
     subject_system: guide.custom_lesson_sets?.subject_system ?? {},
     tools: ["get_app_state", "navigate_learning_app", "list_subjects", "set_learning_preferences", "get_curriculum_map"],
+  };
+  if (section === "planning") return {
+    ...base,
+    planning_policy: guide.agent_policy?.planning ?? [],
+    state_model: guide.state_model?.mastery_map_plans,
+    tools: ["get_app_state", "get_curriculum_map", "set_map_plan_mode", "arrange_map_plan_nodes", "create_map_plan_path", "add_map_plan_annotation"],
   };
   if (section === "bridge") return { ...base, github_bridge: guide.github_bridge ?? {} };
   if (section === "custom_content") return {
@@ -108,6 +129,29 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
   const guide = agentManifest && typeof agentManifest === "object" && !Array.isArray(agentManifest)
     ? JSON.parse(JSON.stringify(agentManifest))
     : {};
+  const preparePlanMap = ({ skillIds = [], mapScope = null, subjectId = null, enablePlanMode = true } = {}) => {
+    let state = store.snapshot();
+    if (!state.activeProfile) throw new Error("Select a profile first.");
+    if (mapScope != null && !["subject", "all"].includes(mapScope)) throw new Error("map_scope must be subject or all.");
+    if (subjectId && !state.subjects.some((subject) => subject.id === subjectId)) throw new Error("subject_id is unknown.");
+    if (subjectId && mapScope === "all") throw new Error("subject_id cannot be combined with map_scope all.");
+    const skillSubjectIds = [...new Set(skillIds.map((id) => store.skillsById[id]?.subjectId).filter(Boolean))];
+    const scope = subjectId ? "subject" : mapScope ?? (skillSubjectIds.length > 1 ? "all" : state.mapScope);
+    const targetSubjectId = subjectId || (scope === "subject" && skillSubjectIds.length === 1 ? skillSubjectIds[0] : state.activeSubject.id);
+    if (scope === "subject" && skillSubjectIds.some((id) => id !== targetSubjectId)) {
+      throw new Error("Every skill_id must belong to the visible subject, or use map_scope all.");
+    }
+    if (state.mapScope !== scope || (scope === "subject" && state.activeSubject.id !== targetSubjectId)) {
+      store.setLearningPreferences({ subjectId: scope === "subject" ? targetSubjectId : null, mapScope: scope, activityActor: "agent" });
+      state = store.snapshot();
+    }
+    if (state.ui.route !== "map") {
+      store.navigate("map", null, { activityActor: "agent" });
+      state = store.snapshot();
+    }
+    if (enablePlanMode && !state.ui.mapPlanMode) store.setMapPlanMode(true, { activityActor: "agent" });
+    return { mapScope: scope, subjectId: scope === "subject" ? targetSubjectId : null, layoutKey: scope === "all" ? "all-subjects" : `subject:${targetSubjectId}` };
+  };
   return [
     {
       name: "get_agent_guide",
@@ -129,7 +173,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "get_app_state",
       title: "Get QuickMaths app state",
-      description: "Read the current QuickMaths view, selected learner, timers, mastery counts, and selected skill.",
+      description: "Read the current QuickMaths view, selected learner, timers, mastery counts, selected skill, and saved Plan mode layouts, paths, and annotations.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: true, untrustedContentHint: true },
       async execute(input = {}) {
@@ -146,10 +190,12 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           learning_plan: state.activeProfile ? {
             plan_mode: state.ui.mapPlanMode,
             selected_skill_ids: state.ui.mapPlanSelection,
+            layouts: state.mapPlan.layouts,
             paths: state.mapPlan.paths.map((path) => ({ path_id: path.id, name: path.name, color: path.color, skill_ids: path.skillIds })),
             annotations: state.mapPlan.annotations.map((annotation) => ({
               annotation_id: annotation.id,
               target: annotation.pathId ? { path_id: annotation.pathId } : annotation.skillIds.length ? { skill_ids: annotation.skillIds } : { map_comment: true },
+              positions: annotation.positions,
               body: annotation.body,
             })),
           } : null,
@@ -286,6 +332,130 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         const skillId = optionalString(input, "skill_id", 60) || null;
         store.navigate(view, skillId, { activityActor: "agent" });
         return { ok: true, visible_view: store.snapshot().ui.route, selected_skill_id: store.snapshot().ui.selectedSkillId };
+      },
+    },
+    {
+      name: "set_map_plan_mode",
+      title: "Open or close mastery-map Plan mode",
+      description: "Show the visible mastery map in its persistent editable Plan mode, or return to the untouched canonical map. Optional subject and scope inputs choose which map the human sees.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          enabled: { type: "boolean", description: "True opens the editable plan; false restores the canonical map view." },
+          map_scope: { type: "string", enum: ["subject", "all"], description: "Show one subject or every installed subject." },
+          subject_id: stringSchema("Installed subject ID when map_scope is subject.", 60),
+        },
+        required: ["enabled"],
+        additionalProperties: false,
+      },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["enabled", "map_scope", "subject_id"]);
+        if (typeof input.enabled !== "boolean") throw new Error("enabled must be a boolean.");
+        const context = preparePlanMap({ mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null, enablePlanMode: false });
+        if (store.snapshot().ui.mapPlanMode !== input.enabled) store.setMapPlanMode(input.enabled, { activityActor: "agent" });
+        const state = store.snapshot();
+        return { ok: true, visible_view: state.ui.route, plan_mode: state.ui.mapPlanMode, map_scope: context.mapScope, subject_id: context.subjectId };
+      },
+    },
+    {
+      name: "arrange_map_plan_nodes",
+      title: "Arrange mastery-map plan nodes",
+      description: "Move one or more lessons to absolute x/y canvas coordinates in the persistent visible Plan mode layout. Read current overrides from get_app_state.learning_plan.layouts.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          positions: {
+            type: "array", minItems: 1, maxItems: 80,
+            description: "Lesson positions in map canvas units; x and y must be between 0 and 20000.",
+            items: { type: "object", properties: { skill_id: stringSchema("Installed lesson ID.", 60), x: { type: "number", minimum: 0, maximum: 20000 }, y: { type: "number", minimum: 0, maximum: 20000 } }, required: ["skill_id", "x", "y"], additionalProperties: false },
+          },
+          map_scope: { type: "string", enum: ["subject", "all"] },
+          subject_id: stringSchema("Installed subject ID when arranging a subject-only map.", 60),
+        },
+        required: ["positions"],
+        additionalProperties: false,
+      },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["positions", "map_scope", "subject_id"]);
+        if (!Array.isArray(input.positions) || !input.positions.length || input.positions.length > 80) throw new Error("positions must contain between 1 and 80 items.");
+        const positions = {};
+        for (const item of input.positions) {
+          requireObject(item); rejectUnknown(item, ["skill_id", "x", "y"]);
+          const skillId = requiredString(item, "skill_id", 60);
+          if (!store.skillsById[skillId]) throw new Error(`Unknown skill_id: ${skillId}`);
+          if (!Number.isFinite(item.x) || item.x < 0 || item.x > 20000 || !Number.isFinite(item.y) || item.y < 0 || item.y > 20000) throw new Error("x and y must be finite numbers from 0 to 20000.");
+          positions[skillId] = { x: item.x, y: item.y };
+        }
+        const skillIds = Object.keys(positions);
+        const context = preparePlanMap({ skillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
+        const result = store.updateMapPlanLayout({ layoutKey: context.layoutKey, positions, selectedSkillIds: skillIds, activityActor: "agent" });
+        return { ok: true, visible_view: "map", plan_mode: true, map_scope: context.mapScope, layout_key: result.layoutKey, moved: result.moved, selected_skill_ids: result.selectedSkillIds, positions };
+      },
+    },
+    {
+      name: "create_map_plan_path",
+      title: "Create a mastery-map study path",
+      description: "Create a persistent colored outline path through two or more installed lessons, in the supplied order, and show it selected in visible Plan mode.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          skill_ids: { type: "array", minItems: 2, maxItems: 80, description: "Ordered lesson IDs; order becomes path order.", items: stringSchema("Installed lesson ID.", 60) },
+          name: stringSchema("Optional path name; a numbered name is used when omitted.", 80),
+          color: { type: "string", pattern: "^#[0-9A-Fa-f]{6}$", description: "Six-digit outline color; defaults to #df755b." },
+          map_scope: { type: "string", enum: ["subject", "all"] },
+          subject_id: stringSchema("Installed subject ID when creating a subject-only path.", 60),
+        },
+        required: ["skill_ids"],
+        additionalProperties: false,
+      },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["skill_ids", "name", "color", "map_scope", "subject_id"]);
+        const skillIds = requiredSkillIds(store, input, "skill_ids", 2);
+        const context = preparePlanMap({ skillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
+        store.setMapPlanSelection(skillIds);
+        const path = store.createMapPlanPath({ name: optionalString(input, "name", 80), color: input.color ?? "#df755b", skillIds, activityActor: "agent" });
+        return { ok: true, visible_view: "map", plan_mode: true, map_scope: context.mapScope, path: { path_id: path.id, name: path.name, color: path.color, skill_ids: path.skillIds } };
+      },
+    },
+    {
+      name: "add_map_plan_annotation",
+      title: "Add a mastery-map annotation",
+      description: "Add a persistent visible comment node connected to selected lessons, connected to a saved path, or free on the map. A free comment defaults near the upper-left canvas when position is omitted.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          body: stringSchema("Annotation text shown on the map; plain text only.", 1200),
+          skill_ids: { type: "array", maxItems: 80, description: "Optional lesson IDs to connect to the comment.", items: stringSchema("Installed lesson ID.", 60) },
+          path_id: stringSchema("Optional saved Plan mode path ID. Do not combine with skill_ids.", 120),
+          position: { type: "object", description: "Optional absolute comment position in map canvas units.", properties: { x: { type: "number", minimum: 0, maximum: 20000 }, y: { type: "number", minimum: 0, maximum: 20000 } }, required: ["x", "y"], additionalProperties: false },
+          map_scope: { type: "string", enum: ["subject", "all"] },
+          subject_id: stringSchema("Installed subject ID when annotating a subject-only map.", 60),
+        },
+        required: ["body"],
+        additionalProperties: false,
+      },
+      annotations: { untrustedContentHint: true },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["body", "skill_ids", "path_id", "position", "map_scope", "subject_id"]);
+        const body = requiredString(input, "body", 1200);
+        const pathId = optionalString(input, "path_id", 120) || null;
+        if (input.skill_ids != null && !Array.isArray(input.skill_ids)) throw new Error("skill_ids must be an array.");
+        const suppliedSkillIds = input.skill_ids?.length ? requiredSkillIds(store, input, "skill_ids", 1) : [];
+        if (pathId && suppliedSkillIds.length) throw new Error("path_id cannot be combined with skill_ids.");
+        const currentPlan = store.snapshot().mapPlan;
+        const targetPath = pathId ? currentPlan.paths.find((path) => path.id === pathId) : null;
+        if (pathId && !targetPath) throw new Error("Plan path not found.");
+        const contextSkillIds = targetPath?.skillIds ?? suppliedSkillIds;
+        const context = preparePlanMap({ skillIds: contextSkillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
+        if (pathId) store.selectMapPlanPath(pathId);
+        else store.setMapPlanSelection(suppliedSkillIds);
+        let position = input.position ?? null;
+        if (position) {
+          requireObject(position); rejectUnknown(position, ["x", "y"]);
+          if (!Number.isFinite(position.x) || position.x < 0 || position.x > 20000 || !Number.isFinite(position.y) || position.y < 0 || position.y > 20000) throw new Error("position x and y must be finite numbers from 0 to 20000.");
+        } else if (!pathId && !suppliedSkillIds.length) position = { x: 320, y: 160 };
+        const annotation = store.addMapPlanAnnotation({ body, pathId, skillIds: suppliedSkillIds, layoutKey: context.layoutKey, position, activityActor: "agent" });
+        return { ok: true, visible_view: "map", plan_mode: true, map_scope: context.mapScope, annotation: { annotation_id: annotation.id, target: annotation.pathId ? { path_id: annotation.pathId } : annotation.skillIds.length ? { skill_ids: annotation.skillIds } : { map_comment: true }, positions: annotation.positions, body: annotation.body } };
       },
     },
     {

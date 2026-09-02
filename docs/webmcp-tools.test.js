@@ -118,6 +118,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /class=\"map-selection-marquee\"/);
   assert.match(js, /event\.ctrlKey \|\| event\.metaKey/);
   assert.match(js, /navigator\.vibrate/);
+  assert.match(js, /mode: "plan-empty-touch"/);
+  assert.match(js, /Hold empty space to clear the selection/);
   assert.match(js, /map-plan-path-form/);
   assert.match(js, /map-plan-annotation-form/);
   assert.match(js, /Select multiple nodes to create a custom path\./);
@@ -184,13 +186,13 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /local-git-transport/);
 });
 
-test("registers all seventeen tools once with the WebMCP document context", async () => {
+test("registers all twenty-one tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
   }, agentManifest);
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 17);
+  assert.equal(TOOL_NAMES.length, 21);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(result.failures, []);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
@@ -210,20 +212,23 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const summary = await tools.get_agent_guide.execute({});
   const bridge = await tools.get_agent_guide.execute({ section: "bridge" });
   const custom = await tools.get_agent_guide.execute({ section: "custom_content" });
+  const planning = await tools.get_agent_guide.execute({ section: "planning" });
   const backup = await tools.get_agent_guide.execute({ section: "backup" });
   const full = await tools.get_agent_guide.execute({ section: "all" });
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 16);
+  assert.equal(summary.guide.app_version, 17);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
-  assert.equal(summary.guide.tools.length, 17);
+  assert.equal(summary.guide.tools.length, 21);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent GitHub storage/);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
   assert.match(custom.guide.github_community.setup_recommendation, /separate from learner storage/);
   assert.equal(custom.guide.custom_lesson_sets.format, "quickmaths.lesson-set");
   assert.equal(custom.guide.lesson_depot.route, "depot");
+  assert.equal(planning.guide.tools.includes("create_map_plan_path"), true);
+  assert.match(planning.guide.state_model.canonical_boundary, /canonical prerequisite map/);
   assert.equal(backup.guide.backup_policy.recommend, true);
   assert.equal(full.guide.agent_policy.start.some((item) => item.includes("cross-device recovery")), true);
   assert.equal(full.guide.agent_policy.start.some((item) => item.includes("GitHub Community authorization")), true);
@@ -258,7 +263,7 @@ test("app, curriculum, and progress tools expose the full learner state", async 
   assert.equal(app.has_profile, true);
   assert.equal(app.view, "tutorial");
   assert.equal(app.map_scope, "subject");
-  assert.deepEqual(app.learning_plan, { plan_mode: false, selected_skill_ids: [], paths: [], annotations: [] });
+  assert.deepEqual(app.learning_plan, { plan_mode: false, selected_skill_ids: [], layouts: {}, paths: [], annotations: [] });
   assert.equal(map.skills.length, 28);
   assert.equal(summary.skills.length, 28);
   assert.equal(summary.suggested_next.skill_id, "MATH_ARITH_001");
@@ -342,6 +347,75 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
   const opened = await tools.open_lesson_creator.execute({ subject_id: "SUBJECT_MATH" });
   assert.equal(opened.visible_view, "creator");
   assert.equal(store.snapshot().ui.route, "creator");
+});
+
+test("agent planning tools visibly arrange nodes, create paths, and add connected or free comments", async () => {
+  const store = createStore();
+  const tools = toolsFor(store);
+  const opened = await tools.set_map_plan_mode.execute({ enabled: true, map_scope: "subject", subject_id: "SUBJECT_MATH" });
+  assert.equal(opened.visible_view, "map");
+  assert.equal(opened.plan_mode, true);
+
+  const arranged = await tools.arrange_map_plan_nodes.execute({
+    positions: [
+      { skill_id: "MATH_ARITH_001", x: 140, y: 180 },
+      { skill_id: "MATH_ARITH_002", x: 420, y: 180 },
+    ],
+  });
+  assert.equal(arranged.layout_key, "subject:SUBJECT_MATH");
+  assert.equal(arranged.moved, 2);
+
+  const created = await tools.create_map_plan_path.execute({
+    skill_ids: ["MATH_ARITH_001", "MATH_ARITH_002"],
+    name: "Arithmetic route",
+    color: "#3366aa",
+  });
+  assert.equal(created.path.name, "Arithmetic route");
+  assert.equal(created.path.color, "#3366aa");
+
+  const connected = await tools.add_map_plan_annotation.execute({
+    body: "Revisit the sign rules before moving on.",
+    path_id: created.path.path_id,
+  });
+  assert.deepEqual(connected.annotation.target, { path_id: created.path.path_id });
+  const free = await tools.add_map_plan_annotation.execute({ body: "Exam week starts here." });
+  assert.deepEqual(free.annotation.target, { map_comment: true });
+  assert.deepEqual(free.annotation.positions["subject:SUBJECT_MATH"], { x: 320, y: 160 });
+
+  const app = await tools.get_app_state.execute({});
+  assert.deepEqual(app.learning_plan.layouts["subject:SUBJECT_MATH"], {
+    MATH_ARITH_001: { x: 140, y: 180 },
+    MATH_ARITH_002: { x: 420, y: 180 },
+  });
+  assert.equal(app.learning_plan.paths.length, 1);
+  assert.equal(app.learning_plan.annotations.length, 2);
+  assert.ok(store.snapshot().activity.some((item) => item.tool === "arrange_map_plan_nodes"));
+  assert.ok(store.snapshot().activity.some((item) => item.tool === "create_map_plan_path"));
+  assert.ok(store.snapshot().activity.some((item) => item.tool === "add_map_plan_annotation"));
+
+  const closed = await tools.set_map_plan_mode.execute({ enabled: false });
+  assert.equal(closed.plan_mode, false);
+  assert.equal(store.snapshot().mapPlan.paths.length, 1);
+});
+
+test("agent planning schemas reject unknown nodes, invalid coordinates, and ambiguous annotation targets", async () => {
+  const tools = toolsFor(createStore());
+  await assert.rejects(tools.create_map_plan_path.execute({ skill_ids: ["MATH_ARITH_001"] }), /at least 2 skills/);
+  await assert.rejects(tools.create_map_plan_path.execute({ skill_ids: ["MATH_ARITH_001", "NOT_A_SKILL"] }), /Unknown skill_id/);
+  await assert.rejects(tools.arrange_map_plan_nodes.execute({ positions: [{ skill_id: "MATH_ARITH_001", x: -1, y: 20 }] }), /0 to 20000/);
+  const path = await tools.create_map_plan_path.execute({ skill_ids: ["MATH_ARITH_001", "MATH_ARITH_002"] });
+  await assert.rejects(tools.add_map_plan_annotation.execute({ body: "Ambiguous", path_id: path.path.path_id, skill_ids: ["MATH_ARITH_001"] }), /cannot be combined/);
+});
+
+test("cross-subject agent paths automatically use the combined mastery map", async () => {
+  const store = createStore();
+  const created = await toolsFor(store).create_map_plan_path.execute({
+    skill_ids: ["MATH_GEOM_003", "GEO_FOUND_001"],
+    name: "Coordinates into geography",
+  });
+  assert.equal(created.map_scope, "all");
+  assert.equal(store.snapshot().mapScope, "all");
+  assert.deepEqual(created.path.skill_ids, ["MATH_GEOM_003", "GEO_FOUND_001"]);
 });
 
 test("agent can visibly prefill a native lesson improvement without installing it", async () => {

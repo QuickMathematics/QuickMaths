@@ -2035,13 +2035,14 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     ? [...new Set(skillIds.filter((id) => skillsById[id]))].slice(0, 80)
     : [];
 
-  const setMapPlanMode = (enabled) => {
+  const setMapPlanMode = (enabled, { activityActor = "learner" } = {}) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     state.ui.mapPlanMode = Boolean(enabled);
     if (!state.ui.mapPlanMode) {
       state.ui.selectedMapPlanPathId = null;
       state.ui.mapPlanComposer = null;
     }
+    addActivity("set_map_plan_mode", `${state.ui.mapPlanMode ? "Opened" : "Closed"} Plan mode.`, undefined, activityActor);
     notify();
     return { ok: true, enabled: state.ui.mapPlanMode };
   };
@@ -2065,7 +2066,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return { ok: true, skillIds: [...selection], selectedPathId: state.ui.selectedMapPlanPathId };
   };
 
-  const updateMapPlanLayout = ({ layoutKey, positions = {}, selectedSkillIds = state.ui.mapPlanSelection } = {}) => {
+  const updateMapPlanLayout = ({ layoutKey, positions = {}, selectedSkillIds = state.ui.mapPlanSelection, activityActor = "learner" } = {}) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     const allowed = new Set(["all-subjects", ...catalog.subjects.map((subject) => `subject:${subject.id}`)]);
     if (!allowed.has(layoutKey)) throw new Error("Unknown mastery-map layout.");
@@ -2082,6 +2083,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     }
     state.ui.mapPlanSelection = normalizeMapPlanSelection(selectedSkillIds);
     state.ui.selectedMapPlanPathId = null;
+    addActivity("arrange_map_plan_nodes", `Moved ${Object.keys(positions).length} lesson${Object.keys(positions).length === 1 ? "" : "s"} in ${layoutKey}.`, undefined, activityActor);
     notify();
     return { ok: true, layoutKey, moved: Object.keys(positions).length, selectedSkillIds: [...state.ui.mapPlanSelection] };
   };
@@ -2101,7 +2103,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return { ok: true, reset };
   };
 
-  const createMapPlanPath = ({ name = "", color = "#df755b", skillIds = state.ui.mapPlanSelection } = {}) => {
+  const createMapPlanPath = ({ name = "", color = "#df755b", skillIds = state.ui.mapPlanSelection, activityActor = "learner" } = {}) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     const plan = activeMapPlan();
     if (plan.paths.length >= MAX_MAP_PLAN_PATHS) throw new Error(`A learning plan can contain at most ${MAX_MAP_PLAN_PATHS} paths.`);
@@ -2119,7 +2121,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     plan.paths.push(path);
     state.ui.mapPlanSelection = [...pathSkillIds];
     state.ui.selectedMapPlanPathId = path.id;
-    addActivity("create_map_plan_path", `Created ${path.name} with ${path.skillIds.length} lessons.`);
+    addActivity("create_map_plan_path", `Created ${path.name} with ${path.skillIds.length} lessons.`, undefined, activityActor);
     notify();
     return clone(path);
   };
@@ -2161,7 +2163,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return { ok: true, id: pathId };
   };
 
-  const addMapPlanAnnotation = ({ body, pathId = null, skillIds = state.ui.mapPlanSelection, layoutKey = null, position = null } = {}) => {
+  const addMapPlanAnnotation = ({ body, pathId = null, skillIds = state.ui.mapPlanSelection, layoutKey = null, position = null, activityActor = "learner" } = {}) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     const plan = activeMapPlan();
     if (plan.annotations.length >= MAX_MAP_PLAN_ANNOTATIONS) throw new Error(`A learning plan can contain at most ${MAX_MAP_PLAN_ANNOTATIONS} annotations.`);
@@ -2192,7 +2194,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       updatedAt: isoNow(),
     };
     plan.annotations.push(annotation);
-    addActivity("add_map_plan_annotation", `Added a note to ${targetPath?.name ?? (targetSkillIds.length ? `${targetSkillIds.length} selected lesson${targetSkillIds.length === 1 ? "" : "s"}` : "the mastery map")}.`);
+    addActivity("add_map_plan_annotation", `Added a note to ${targetPath?.name ?? (targetSkillIds.length ? `${targetSkillIds.length} selected lesson${targetSkillIds.length === 1 ? "" : "s"}` : "the mastery map")}.`, undefined, activityActor);
     notify();
     return clone(annotation);
   };
