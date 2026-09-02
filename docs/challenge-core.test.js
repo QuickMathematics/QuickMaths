@@ -127,6 +127,7 @@ test("ships the complete first-party Mathematics and Geography curriculum and op
     ["SUBJECT_MATH", 28],
     ["SUBJECT_GEOGRAPHY", 15],
   ]);
+  assert.equal(state.curriculum.skills.find((skill) => skill.id === "MATH_ARITH_002").questionCount, 16);
   assert.equal(state.profiles.length, 0);
   assert.equal(state.activeProfile, null);
   assert.equal(state.ui.route, "welcome");

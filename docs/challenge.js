@@ -1,4 +1,4 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-scenario-coverage";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-scenario-coverage-v2";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-native-improvements-v2";
 import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
 import {
@@ -22,7 +22,8 @@ import {
 function assessmentCount(skill) {
   const bankLength = skill?.problems?.length ?? 0;
   const configured = Number(skill?.question_count ?? skill?.questionCount);
-  return Number.isInteger(configured) ? Math.max(1, Math.min(bankLength, configured)) : bankLength;
+  if (!Number.isInteger(configured)) return bankLength;
+  return bankLength ? Math.max(1, Math.min(bankLength, configured)) : Math.max(1, configured);
 }
 
 const elements = {
