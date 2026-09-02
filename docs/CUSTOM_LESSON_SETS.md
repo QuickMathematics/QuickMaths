@@ -230,6 +230,7 @@ Supported graders:
 - `multiple_choice` with 2–8 unique `{ "id", "label" }` options
 - `symbolic_expression`
 - `equation_solution`
+- `inequality_solution` for equivalent one-variable linear solution sets (including reversed signs and strict versus inclusive boundaries)
 - `exact_text`
 - `theorem_conclusion`
 
@@ -249,14 +250,15 @@ Supported `answer_mode` values are `final_only`, `final_plus_optional_work`, and
 
 ### Checked maths steps are not formal proofs
 
-The Advanced Algebra curriculum primarily uses `procedural_steps`. The learner writes one equivalent equation or expression per line, and QuickMaths conservatively checks each transition plus the final-line match. That workflow can finish automatically.
+The Advanced Algebra curriculum primarily uses `procedural_steps`. The learner writes one equivalent equation, inequality, or expression per line, and QuickMaths conservatively checks each transition plus the final-line match. Use `line_type: "equation"` for `=` steps and `line_type: "inequality"` for `<`, `<=`, `>`, or `>=` steps; inequality mode checks the complete one-variable solution set, including sign reversals. That workflow can finish automatically.
 
 `proof_obligations` is a different system. A proof question has two deliberately separate judgments:
 
 1. The short final conclusion is graded with the selected final-answer grader and `accepted_forms`.
 2. The proof text is required and stored with the exact obligation checklist shown to the learner.
 3. QuickMaths checks that a meaningful submission exists, but never treats a correct conclusion or matching keywords as proof validity.
-4. A self, human, or WebMCP tutor reviews the reasoning against every obligation. When `mastery_requires_review_pass` is true, mastery remains unchanged until that review passes.
+4. A self, human, or WebMCP tutor records `satisfied`, `flawed`, `missing`, or (for optional items) `not_applicable` for every obligation, with an evidence note. Rubrics receive awarded points and a note for every weighted criterion.
+5. QuickMaths derives the review score and verdict from those item-level results. Pending review initially freezes mastery; a completed pass/partial/revision/fail resolution applies +12/+3/0/−6 mastery points, and replacing a review replaces that delta instead of stacking it. A required review must pass before the skill can become Proven.
 
 Author obligations as concrete logical milestones—such as “Derives p² = 2q²” and “Explains the contradiction with lowest terms”—rather than vague instructions such as “Shows good reasoning.” Accepted strategies are legitimate routes the learner may take, not phrases they must reproduce.
 
@@ -328,7 +330,7 @@ Supported `work_review` values are `none`, `optional`, `auto`, `self_review`, an
 
 ## How the original advanced YAML maps to the web format
 
-The repository’s original YAML engine remains richer because it runs trusted local Python. Every original authoring concern has an explicit web path:
+The repository’s trusted built-in Mathematics YAML is exported as browser-safe runtime templates, preserving fresh generated values and comprehensive scenario coverage without executing arbitrary code. Uploaded lesson sets deliberately use the fixed-data web format below. Every original authoring concern has an explicit browser path:
 
 | Original YAML capability | Web lesson-set path |
 | --- | --- |
@@ -337,8 +339,8 @@ The repository’s original YAML engine remains richer because it runs trusted l
 | Mastery thresholds and review intervals | `mastery` block |
 | Final answer block and accepted forms | Flattened `expected_answer`, `answer_type`, grader, tolerance, and `accepted_forms` |
 | Fixed tests | Direct `problems` entries |
-| Generated tests: variables, derived expressions, constraints, prompt/answer templates, retry limits | Run the trusted YAML generator during authoring, inspect samples, then export the generated results as fixed browser `problems`. Uploaded browser files never execute expressions. |
-| Random order / question count | Set `question_count` and optionally supply a larger fixed bank; QuickMaths rotates through a complete configured set on each attempt. Omit the field to test the entire bank. |
+| Generated tests: variables, derived expressions, constraints, prompt/answer templates, retry limits | Trusted built-in Mathematics templates run through the allowlisted browser generator and can be rerolled/audited in Lesson Studio. Uploaded browser files never execute expressions; author them as explicit fixed `problems`. |
+| Random order / question count | Native Mathematics shuffles every authored scenario and draws fresh values. For uploaded sets, set `question_count` and optionally supply a larger fixed bank; QuickMaths rotates through a complete configured set. |
 | Explanation templates | Pre-render into literal `solution_steps`. |
 | Final-only, optional, or required work | `answer_mode` |
 | Capture, procedural, proof, and rubric workflows | All five browser `work.mode` values above |
@@ -356,7 +358,7 @@ Open **Lesson studio** in the left sidebar. It can:
 - create, remove, and switch between multiple lessons;
 - select prerequisites across every subject;
 - add theory, examples, applications, tags, mastery thresholds, and review timing;
-- add fixed questions with all seven graders;
+- add fixed questions with all eight graders;
 - configure answer modes, capture/procedural/proof/rubric work, and review gates;
 - preview the exact answer box, proof checklist, rubric, and review path the learner will see;
 - start advanced question types from editable examples with plain-language explanations;
@@ -412,3 +414,5 @@ Catalog metadata and community reactions are untrusted signals. Every installati
 Installed lesson content, subject metadata/themes, per-profile subject and path choices, progress, drafts, attempts, reviews, and timers are included in full JSON backups. CSV files are analysis-only.
 
 Import is rejected without changing state when a file has an unsupported version, duplicate IDs, missing or mislabelled prerequisite bridges, a cycle anywhere in the combined graph, mismatched question/skill IDs, unsupported grading/work/review modes, malformed choices/rubrics/proof obligations, executable content, or exceeded safety limits.
+
+Built-in Mathematics lessons use trusted runtime templates shipped with QuickMaths, so each retake draws fresh values while still covering every authored scenario. Uploaded, Depot, and Studio-authored lesson sets are deliberately fixed-data packages: they may contain large validated question banks, but they cannot ship or execute generator code. When editing a native Mathematics lesson, Lesson Studio includes a rerollable author preview and downloadable audit of the original runtime generator before you install a fixed reversible override.

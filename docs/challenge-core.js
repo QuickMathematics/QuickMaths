@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 10;
+export const APP_VERSION = 11;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -45,8 +45,11 @@ const SAFE_ID = /^[A-Z][A-Z0-9_]{2,119}$/;
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 const GRADING_METHODS = new Set([
   "exact_numeric", "numeric_with_tolerance", "multiple_choice", "symbolic_expression",
-  "equation_solution", "exact_text", "theorem_conclusion",
+  "equation_solution", "inequality_solution", "exact_text", "theorem_conclusion",
 ]);
+const EXPRESSION_FUNCTIONS = new Set(["sqrt"]);
+const EXPRESSION_CONSTANTS = Object.freeze({ pi: Math.PI, e: Math.E });
+const SUPERSCRIPT_DIGITS = Object.freeze({ "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-" });
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -72,7 +75,214 @@ function assessmentGroupKey(problem) {
   return problem?.source_template_id ?? problem?.template_id;
 }
 
+function stableTextSeed(value) {
+  let hash = 2166136261;
+  for (const character of String(value)) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0 || 1;
+}
+
+function seededRandom(seed) {
+  let state = seed >>> 0 || 1;
+  return () => {
+    state += 0x6D2B79F5;
+    let value = state;
+    value = Math.imul(value ^ value >>> 15, value | 1);
+    value ^= value + Math.imul(value ^ value >>> 7, value | 61);
+    return ((value ^ value >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function safeTemplateTokens(expression) {
+  const source = String(expression ?? "");
+  if (!source.trim() || source.length > 500) throw new Error("Unsafe template expression.");
+  const tokens = [];
+  for (let index = 0; index < source.length;) {
+    if (/\s/.test(source[index])) { index += 1; continue; }
+    const rest = source.slice(index);
+    const number = rest.match(/^(?:\d+(?:\.\d*)?|\.\d+)/);
+    const identifier = rest.match(/^[A-Za-z_][A-Za-z0-9_]*/);
+    const operator = rest.match(/^(?:\*\*|\/\/|==|!=|<=|>=|[+\-*/%(),<>])/);
+    if (number) { tokens.push({ type: "number", value: Number(number[0]) }); index += number[0].length; }
+    else if (identifier) { tokens.push({ type: "identifier", value: identifier[0] }); index += identifier[0].length; }
+    else if (operator) { tokens.push({ type: "operator", value: operator[0] }); index += operator[0].length; }
+    else throw new Error("Unsupported template expression.");
+    if (tokens.length > 250) throw new Error("Template expression is too complex.");
+  }
+  return tokens;
+}
+
+function safeTemplateEval(expression, variables) {
+  const tokens = safeTemplateTokens(expression);
+  let index = 0;
+  const peek = (value) => tokens[index]?.value === value;
+  const take = () => tokens[index++];
+  const primary = () => {
+    const token = take();
+    if (!token) throw new Error("Unexpected end of template expression.");
+    if (token.type === "number") return token.value;
+    if (token.value === "(") { const value = logicalOr(); if (!peek(")")) throw new Error("Missing parenthesis."); take(); return value; }
+    if (token.type !== "identifier") throw new Error("Expected a value.");
+    if (["true", "false"].includes(token.value)) return token.value === "true";
+    if (peek("(")) {
+      if (!["abs", "min", "max", "round"].includes(token.value)) throw new Error("Unsupported template function.");
+      take();
+      const args = [];
+      if (!peek(")")) {
+        do { args.push(logicalOr()); if (!peek(",")) break; take(); } while (!peek(")"));
+      }
+      if (!peek(")")) throw new Error("Missing function parenthesis.");
+      take();
+      return { abs: Math.abs, min: Math.min, max: Math.max, round: Math.round }[token.value](...args);
+    }
+    if (!(token.value in variables)) throw new Error(`Unknown template name ${token.value}.`);
+    return variables[token.value];
+  };
+  const power = () => { const left = primary(); return peek("**") ? (take(), left ** unary()) : left; };
+  const unary = () => {
+    if (peek("+")) { take(); return +unary(); }
+    if (peek("-")) { take(); return -unary(); }
+    return power();
+  };
+  const multiply = () => {
+    let value = unary();
+    while (["*", "/", "//", "%"].includes(tokens[index]?.value)) {
+      const operator = take().value;
+      const right = unary();
+      if (operator === "*") value *= right;
+      else if (operator === "/") value /= right;
+      else if (operator === "//") value = Math.floor(value / right);
+      else value -= Math.floor(value / right) * right;
+    }
+    return value;
+  };
+  const add = () => {
+    let value = multiply();
+    while (["+", "-"].includes(tokens[index]?.value)) value = take().value === "+" ? value + multiply() : value - multiply();
+    return value;
+  };
+  const comparison = () => {
+    let left = add();
+    let compared = false;
+    let result = true;
+    while (["==", "!=", "<", "<=", ">", ">="].includes(tokens[index]?.value)) {
+      compared = true;
+      const operator = take().value;
+      const right = add();
+      result &&= { "==": left === right, "!=": left !== right, "<": left < right, "<=": left <= right, ">": left > right, ">=": left >= right }[operator];
+      left = right;
+    }
+    return compared ? result : left;
+  };
+  const logicalNot = () => { if (peek("not")) { take(); return !logicalNot(); } return comparison(); };
+  const logicalAnd = () => { let value = logicalNot(); while (peek("and")) { take(); const right = logicalNot(); value = Boolean(value) && Boolean(right); } return value; };
+  const logicalOr = () => { let value = logicalAnd(); while (peek("or")) { take(); const right = logicalAnd(); value = Boolean(value) || Boolean(right); } return value; };
+  const value = logicalOr();
+  if (index !== tokens.length || (typeof value === "number" && !Number.isFinite(value)) || !["number", "boolean", "string"].includes(typeof value)) throw new Error("Template expression did not resolve safely.");
+  return value;
+}
+
+function stringifyTemplateValue(value) {
+  if (typeof value === "number" && Number.isInteger(value)) return String(value);
+  return String(value);
+}
+
+function formatGeneratedMath(value) {
+  return String(value).replace(/\s+/g, " ").replace(/\+\s*-/g, "- ").replace(/-\s*-/g, "+ ").replace(/\b1([A-Za-z])/g, "$1").replace(/(?<!\d)-1([A-Za-z])/g, "-$1").replace(/\(\+\s*/g, "(").trim();
+}
+
+function renderNativeTemplate(template, values) {
+  return formatGeneratedMath(String(template ?? "").replace(/{([^{}]+)}/g, (_, expression) => stringifyTemplateValue(expression.trim() in values ? values[expression.trim()] : safeTemplateEval(expression, values))));
+}
+
+function generateNativeProblem(skill, template, attemptCount, templateIndex) {
+  const seed = (stableTextSeed(`${skill.id}:${template.id}`) + Math.imul(attemptCount + 1, 104729) + Math.imul(templateIndex + 1, 8191)) >>> 0;
+  const random = seededRandom(seed);
+  const tries = Math.max(1, Math.min(500, Number(template.max_attempts ?? 100)));
+  for (let attempt = 0; attempt < tries; attempt += 1) {
+    const values = {};
+    try {
+      for (const [name, rule] of Object.entries(template.variables ?? {})) {
+        const excluded = new Set(rule.exclude ?? []);
+        if (rule.type === "int") {
+          const candidates = [];
+          for (let value = Number(rule.min); value <= Number(rule.max); value += 1) if (!excluded.has(value)) candidates.push(value);
+          if (!candidates.length) throw new Error("No integer candidates.");
+          values[name] = candidates[Math.floor(random() * candidates.length)];
+        } else if (rule.type === "decimal") {
+          const scale = 10 ** Number(rule.places ?? 1);
+          const candidates = [];
+          for (let value = Math.round(Number(rule.min) * scale); value <= Math.round(Number(rule.max) * scale); value += 1) if (!excluded.has(value / scale)) candidates.push(value / scale);
+          if (!candidates.length) throw new Error("No decimal candidates.");
+          values[name] = candidates[Math.floor(random() * candidates.length)];
+        } else if (rule.type === "choice") {
+          const candidates = (rule.values ?? []).filter((value) => !excluded.has(value));
+          if (!candidates.length) throw new Error("No choice candidates.");
+          values[name] = candidates[Math.floor(random() * candidates.length)];
+        } else throw new Error("Unsupported native variable type.");
+      }
+      for (const [name, expression] of Object.entries(template.derived ?? {})) values[name] = safeTemplateEval(expression, values);
+      if (!(template.constraints ?? []).every((constraint) => Boolean(safeTemplateEval(constraint, values)))) continue;
+      const answer = template.answer ?? {};
+      const explanation = template.explanation_template ? renderNativeTemplate(template.explanation_template, values).split(/\r?\n/).map((line) => line.trim()).filter(Boolean) : clone(template.solution_steps ?? []);
+      const answerMode = template.answer_mode ?? "final_only";
+      const work = clone(template.work ?? {});
+      return {
+        template_id: `${template.id}__RUNTIME_${attemptCount + 1}`,
+        source_template_id: template.id,
+        skill_id: skill.id,
+        seed,
+        difficulty: template.difficulty ?? "medium",
+        values: Object.fromEntries(Object.entries(values).map(([key, value]) => [key, stringifyTemplateValue(value)])),
+        prompt: renderNativeTemplate(template.prompt_template, values),
+        expected_answer: renderNativeTemplate(String(answer.value ?? ""), values),
+        answer_type: answer.type ?? "text",
+        grading_method: template.grading?.method ?? "exact_text",
+        solution_steps: explanation,
+        mistake_tags: clone(template.mistake_tags ?? []),
+        variable: answer.variable ?? null,
+        tolerance: template.grading?.tolerance ?? null,
+        options: (template.options ?? []).map((option) => ({ ...clone(option), label: option.label == null ? option.label : renderNativeTemplate(String(option.label), values) })),
+        answer_mode: answerMode,
+        work,
+        review_policy: clone(template.review_policy ?? {}),
+        accepted_forms: clone(answer.accepted_forms ?? template.grading?.accepted_forms ?? []),
+        work_required: ["final_plus_required_work", "structured_steps", "proof_required"].includes(answerMode) || ["required", "procedural_steps", "proof_obligations", "rubric_check"].includes(work.mode ?? "none"),
+      };
+    } catch {
+      // Try a fresh variable draw. Exported native templates are trusted, but every expression still uses the allowlisted parser above.
+    }
+  }
+  throw new Error(`Could not generate ${skill.id}/${template.id}.`);
+}
+
+function generateNativeAssessment(skill, attemptCount) {
+  const templates = [...skill.native_templates];
+  if (skill.native_randomize_order !== false) {
+    const random = seededRandom(stableTextSeed(`${skill.id}:order:${attemptCount}`));
+    for (let index = templates.length - 1; index > 0; index -= 1) {
+      const swap = Math.floor(random() * (index + 1));
+      [templates[index], templates[swap]] = [templates[swap], templates[index]];
+    }
+  }
+  return templates.map((template, index) => {
+    if (template.type === "fixed") {
+      const fixed = skill.problems.find((problem) => assessmentGroupKey(problem) === template.id);
+      if (fixed) return { ...clone(fixed), template_id: `${template.id}__RUNTIME_${attemptCount + 1}` };
+    }
+    try { return generateNativeProblem(skill, template, attemptCount, index); }
+    catch {
+      const variants = skill.problems.filter((problem) => assessmentGroupKey(problem) === template.id);
+      if (!variants.length) throw new Error(`Native assessment scenario ${template.id} is unavailable.`);
+      return clone(variants[attemptCount % variants.length]);
+    }
+  });
+}
+
 function selectAssessmentProblems(skill, attemptCount = 0) {
+  if (!skill?.overridden && Array.isArray(skill?.native_templates) && skill.native_templates.length) return generateNativeAssessment(skill, attemptCount);
   const bank = Array.isArray(skill?.problems) ? skill.problems : [];
   const questionCount = assessmentLength(skill);
   const groupMap = new Map();
@@ -213,7 +423,16 @@ function normalizeProblem(candidate, skillId, questionIds) {
   })) : [];
   if (workMode === "rubric_check" && !criteria.length) throw new Error(`${templateId} rubric_check needs at least one rubric criterion.`);
   const obligations = Array.isArray(proofCandidate.obligations)
-    ? proofCandidate.obligations.map((item) => requiredText(String(item), `${templateId} proof obligation`, 500)).slice(0, 12)
+    ? proofCandidate.obligations.map((item, index) => {
+      if (item && typeof item === "object" && !Array.isArray(item)) {
+        return {
+          id: optionalText(item.id, `${templateId} proof obligation ${index + 1} ID`, 80) || `obligation_${index + 1}`,
+          description: requiredText(item.description ?? item.label, `${templateId} proof obligation ${index + 1}`, 500),
+          required: item.required !== false,
+        };
+      }
+      return requiredText(String(item), `${templateId} proof obligation`, 500);
+    }).slice(0, 12)
     : [];
   if (workMode === "proof_obligations" && !obligations.length) throw new Error(`${templateId} proof_obligations needs at least one obligation.`);
   const reviewCandidate = candidate.review_policy && typeof candidate.review_policy === "object" && !Array.isArray(candidate.review_policy) ? candidate.review_policy : {};
@@ -232,14 +451,14 @@ function normalizeProblem(candidate, skillId, questionIds) {
     grading_method: gradingMethod,
     solution_steps: solutionSteps,
     mistake_tags: Array.isArray(candidate.mistake_tags) ? candidate.mistake_tags.map((tag) => requiredText(String(tag), `${templateId} mistake tag`, 80)).slice(0, 12) : [],
-    variable: null,
+    variable: optionalText(candidate.variable, `${templateId} variable`, 40) || null,
     tolerance: candidate.tolerance == null ? null : cleanNumber(Number(candidate.tolerance), 0.001, 0, 1_000_000),
     options: normalizedOptions,
     answer_mode: answerMode,
     work: {
       mode: workMode,
       prompt: optionalText(workCandidate.prompt, `${templateId} work prompt`, 500) || (workMode === "procedural_steps" ? "Show one mathematical step per line." : workMode === "none" ? "" : "Explain your reasoning clearly."),
-      line_type: ["expression", "equation", "mixed", "text"].includes(workCandidate.line_type) ? workCandidate.line_type : "expression",
+      line_type: ["expression", "equation", "inequality", "mixed", "text"].includes(workCandidate.line_type) ? workCandidate.line_type : "expression",
       target_variable: optionalText(workCandidate.target_variable, `${templateId} target_variable`, 40) || null,
       minimum_steps: minimumSteps,
       require_final_answer_match: workCandidate.require_final_answer_match !== false,
@@ -616,6 +835,44 @@ function sanitizeProgress(progress, profileIds, skillIds) {
   return output;
 }
 
+function normalizeReviewObligation(item, index) {
+  if (item && typeof item === "object" && !Array.isArray(item)) {
+    return {
+      id: cleanText(item.id, 80) || `obligation_${index + 1}`,
+      description: cleanText(item.description ?? item.label, 500) || `Obligation ${index + 1}`,
+      required: item.required !== false,
+    };
+  }
+  return { id: `obligation_${index + 1}`, description: cleanText(item, 500) || `Obligation ${index + 1}`, required: true };
+}
+
+function normalizeReviewCriterion(item, index) {
+  if (item && typeof item === "object" && !Array.isArray(item)) {
+    return {
+      id: cleanText(item.id, 80) || `criterion_${index + 1}`,
+      description: cleanText(item.description ?? item.label, 500) || `Criterion ${index + 1}`,
+      weight: cleanNumber(Number(item.weight ?? item.maxPoints), 1, 0.01, 100),
+    };
+  }
+  return { id: `criterion_${index + 1}`, description: cleanText(item, 500) || `Criterion ${index + 1}`, weight: 1 };
+}
+
+function sanitizeObligationResult(item, index) {
+  if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+  const status = ["satisfied", "flawed", "missing", "not_applicable"].includes(item.status) ? item.status : "missing";
+  return { id: cleanText(item.id, 80) || `obligation_${index + 1}`, status, note: cleanText(item.note, 500) };
+}
+
+function sanitizeRubricResult(item, index) {
+  if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+  return {
+    id: cleanText(item.id, 80) || `criterion_${index + 1}`,
+    awardedPoints: cleanNumber(Number(item.awardedPoints ?? item.awarded_points), 0, 0, 100),
+    maxPoints: cleanNumber(Number(item.maxPoints ?? item.max_points), 1, 0.01, 100),
+    note: cleanText(item.note, 500),
+  };
+}
+
 function sanitizeResult(candidate) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return null;
   const questionId = cleanText(candidate.questionId ?? candidate.question_id, 120);
@@ -634,8 +891,8 @@ function sanitizeResult(candidate) {
     reviewRequired: Boolean(candidate.reviewRequired),
     allowSelfReview: candidate.allowSelfReview !== false,
     workMode: cleanText(candidate.workMode, 60) || "none",
-    proofObligations: Array.isArray(candidate.proofObligations) ? candidate.proofObligations.map((item) => cleanText(item, 500)).filter(Boolean).slice(0, 12) : [],
-    rubricCriteria: Array.isArray(candidate.rubricCriteria) ? candidate.rubricCriteria.map((item) => cleanText(item, 500)).filter(Boolean).slice(0, 12) : [],
+    proofObligations: Array.isArray(candidate.proofObligations) ? candidate.proofObligations.map(normalizeReviewObligation).slice(0, 12) : [],
+    rubricCriteria: Array.isArray(candidate.rubricCriteria) ? candidate.rubricCriteria.map(normalizeReviewCriterion).slice(0, 12) : [],
     reviewPolicy: cleanText(candidate.reviewPolicy, 60) || "none",
   };
 }
@@ -675,6 +932,12 @@ function sanitizeAttempt(candidate, profileIds, skillIds) {
     },
     reviewStatus: cleanText(candidate.reviewStatus, 60) || "graded",
     hasPendingReview: Boolean(candidate.hasPendingReview),
+    reviewMasteryDeltaApplied: cleanNumber(candidate.reviewMasteryDeltaApplied, 0, -20, 20),
+    reviewResolution: candidate.reviewResolution && typeof candidate.reviewResolution === "object" ? {
+      verdict: ["pass", "partial", "needs_revision", "fail"].includes(candidate.reviewResolution.verdict) ? candidate.reviewResolution.verdict : "partial",
+      score: cleanNumber(candidate.reviewResolution.score, 0, 0, 1),
+      reviewIds: Array.isArray(candidate.reviewResolution.reviewIds) ? candidate.reviewResolution.reviewIds.map((id) => cleanText(id, 120)).filter(Boolean).slice(0, MAX_PROBLEMS_PER_SKILL) : [],
+    } : null,
   };
 }
 
@@ -696,6 +959,8 @@ function sanitizeReview(candidate, profileIds) {
     mistakeTag: cleanText(candidate.mistakeTag, 80),
     feedback: cleanText(candidate.feedback, 1500),
     nextStep: cleanText(candidate.nextStep, 300),
+    obligationResults: Array.isArray(candidate.obligationResults) ? candidate.obligationResults.map(sanitizeObligationResult).filter(Boolean).slice(0, 12) : [],
+    rubricResults: Array.isArray(candidate.rubricResults) ? candidate.rubricResults.map(sanitizeRubricResult).filter(Boolean).slice(0, 12) : [],
     createdAt: cleanText(candidate.createdAt, 40),
   };
 }
@@ -712,14 +977,32 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
       const skill = skillsById[skillId];
       if (!skill || !rawDraft || typeof rawDraft !== "object" || Array.isArray(rawDraft)) continue;
       const canonical = Object.fromEntries(skill.problems.map((problem) => [problem.template_id, problem]));
+      const safeProblems = new Map(Object.entries(canonical));
+      const nativeTemplateIds = new Set((skill.native_templates ?? []).map((template) => template.id));
+      if (Array.isArray(rawDraft.problems) && nativeTemplateIds.size) {
+        const generatedByVariation = new Map();
+        for (const rawProblem of rawDraft.problems) {
+          const id = cleanText(rawProblem?.template_id, 120);
+          const sourceId = cleanText(rawProblem?.source_template_id, 120);
+          if (!id || safeProblems.has(id) || !nativeTemplateIds.has(sourceId) || !id.startsWith(`${sourceId}__RUNTIME_`)) continue;
+          const variation = Number(id.slice(`${sourceId}__RUNTIME_`.length)) - 1;
+          if (!Number.isInteger(variation) || variation < 0 || variation > 10_000) continue;
+          try {
+            if (!generatedByVariation.has(variation)) generatedByVariation.set(variation, generateNativeAssessment(skill, variation));
+            const regenerated = generatedByVariation.get(variation).find((problem) => problem.template_id === id && assessmentGroupKey(problem) === sourceId);
+            if (regenerated) safeProblems.set(id, regenerated);
+          } catch { /* Discard malformed or non-reproducible runtime problems. */ }
+        }
+      }
       const problemIds = Array.isArray(rawDraft.problems)
-        ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => canonical[id]).slice(0, MAX_PROBLEMS_PER_SKILL)
+        ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => safeProblems.has(id)).slice(0, MAX_PROBLEMS_PER_SKILL)
         : [];
       if (!problemIds.length) continue;
-      const included = new Set(problemIds.map((id) => assessmentGroupKey(canonical[id])));
+      const included = new Set(problemIds.map((id) => assessmentGroupKey(safeProblems.get(id))));
       for (const problem of selectAssessmentProblems(skill)) {
         const groupKey = assessmentGroupKey(problem);
         if (included.has(groupKey)) continue;
+        safeProblems.set(problem.template_id, problem);
         problemIds.push(problem.template_id);
         included.add(groupKey);
       }
@@ -728,7 +1011,7 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
         draftId: cleanText(rawDraft.draftId, 120) || `draft-imported-${profileId}-${skillId}`,
         skillId,
         startedAt: cleanText(rawDraft.startedAt, 40) || new Date().toISOString(),
-        problems: problemIds.map((id) => clone(canonical[id])),
+        problems: problemIds.map((id) => clone(safeProblems.get(id))),
         responses: Object.fromEntries(problemIds.map((id) => [id, {
           finalAnswer: cleanText(responses[id]?.finalAnswer, 300),
           work: cleanText(responses[id]?.work, 5000),
@@ -873,17 +1156,31 @@ export function loadState(storage, curriculum) {
   return migrateLegacy(storage, curriculum) ?? initialState();
 }
 
-function normalizeAnswer(value) {
-  return String(value ?? "")
+function normalizeMathNotation(value) {
+  let source = String(value ?? "")
     .trim()
+    .replace(/[−–—]/g, "-")
+    .replace(/[×·]/g, "*")
+    .replace(/÷/g, "/")
+    .replace(/π/g, "pi")
+    .replace(/≤/g, "<=")
+    .replace(/≥/g, ">=")
+    .replace(/\*\*/g, "^");
+  source = source.replace(/([A-Za-z0-9_)])([⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+)/g, (_, base, exponent) => `${base}^${[...exponent].map((digit) => SUPERSCRIPT_DIGITS[digit]).join("")}`);
+  source = source.replace(/√\s*\(([^()]*)\)/g, "sqrt($1)");
+  source = source.replace(/√\s*([A-Za-z0-9_.]+)/g, "sqrt($1)");
+  return source;
+}
+
+function normalizeAnswer(value) {
+  return normalizeMathNotation(value)
     .toLowerCase()
-    .replace(/[−–]/g, "-")
     .replace(/\s+/g, "")
     .replace(/[.]+$/, "");
 }
 
 function numericValue(value) {
-  const clean = normalizeAnswer(value).replace(/^[a-z]=/, "");
+  const clean = normalizeAnswer(value).replace(/^[a-z][a-z0-9_]*=/, "");
   if (/^-?\d+(\.\d+)?\/-?\d+(\.\d+)?$/.test(clean)) {
     const [numerator, denominator] = clean.split("/").map(Number);
     return denominator ? numerator / denominator : Number.NaN;
@@ -893,11 +1190,20 @@ function numericValue(value) {
     const [numerator, denominator] = fraction.split("/").map(Number);
     return Number(whole) + Math.sign(Number(whole) || 1) * numerator / denominator;
   }
-  return Number(clean);
+  const direct = Number(clean);
+  if (Number.isFinite(direct)) return direct;
+  const tokens = expressionTokens(clean);
+  if (!tokens || tokens.some((token) => token.type === "identifier" && !(token.value in EXPRESSION_CONSTANTS) && !EXPRESSION_FUNCTIONS.has(token.value))) return Number.NaN;
+  try {
+    const evaluated = evaluateExpression(tokens, {});
+    return Number.isFinite(evaluated) ? evaluated : Number.NaN;
+  } catch {
+    return Number.NaN;
+  }
 }
 
 function expressionTokens(value) {
-  const source = String(value ?? "").replace(/[−–]/g, "-").replace(/\s+/g, "");
+  const source = normalizeMathNotation(value).replace(/\s+/g, "");
   if (!source || source.length > 300) return null;
   const raw = [];
   for (let index = 0; index < source.length;) {
@@ -908,7 +1214,9 @@ function expressionTokens(value) {
       raw.push({ type: "number", value: Number(number[0]) });
       index += number[0].length;
     } else if (identifier) {
-      raw.push({ type: "identifier", value: identifier[0] });
+      const value = identifier[0].toLowerCase();
+      const conventionalProduct = /^[a-z]+$/.test(value) && value.length > 1 && !EXPRESSION_FUNCTIONS.has(value) && !(value in EXPRESSION_CONSTANTS);
+      raw.push(...(conventionalProduct ? [...value].map((letter) => ({ type: "identifier", value: letter })) : [{ type: "identifier", value }]));
       index += identifier[0].length;
     } else if ("+-*/^()".includes(source[index])) {
       raw.push({ type: "operator", value: source[index] });
@@ -922,7 +1230,9 @@ function expressionTokens(value) {
   const endsValue = (token) => token && (token.type === "number" || token.type === "identifier" || token.value === ")");
   const startsValue = (token) => token && (token.type === "number" || token.type === "identifier" || token.value === "(");
   for (const token of raw) {
-    if (endsValue(tokens.at(-1)) && startsValue(token)) tokens.push({ type: "operator", value: "*" });
+    const previous = tokens.at(-1);
+    const isFunctionCall = previous?.type === "identifier" && EXPRESSION_FUNCTIONS.has(previous.value) && token.value === "(";
+    if (!isFunctionCall && endsValue(previous) && startsValue(token)) tokens.push({ type: "operator", value: "*" });
     tokens.push(token);
   }
   return tokens;
@@ -937,6 +1247,15 @@ function evaluateExpression(tokens, variables) {
     if (!token) throw new Error("Unexpected end of expression.");
     if (token.type === "number") return token.value;
     if (token.type === "identifier") {
+      if (EXPRESSION_FUNCTIONS.has(token.value)) {
+        if (!peek("(")) throw new Error("Function argument is missing.");
+        take();
+        const argument = addSubtract();
+        if (!peek(")")) throw new Error("Missing closing parenthesis.");
+        take();
+        return token.value === "sqrt" ? Math.sqrt(argument) : Number.NaN;
+      }
+      if (token.value in EXPRESSION_CONSTANTS) return EXPRESSION_CONSTANTS[token.value];
       if (!(token.value in variables)) throw new Error("Unknown variable.");
       return variables[token.value];
     }
@@ -984,20 +1303,118 @@ function evaluateExpression(tokens, variables) {
   return result;
 }
 
+function expressionVariableNames(...tokenSets) {
+  return [...new Set(tokenSets.flat().filter((token) => token?.type === "identifier" && !(token.value in EXPRESSION_CONSTANTS) && !EXPRESSION_FUNCTIONS.has(token.value)).map((token) => token.value))];
+}
+
+function sampledVariables(names, sample) {
+  return Object.fromEntries(names.map((name, variableIndex) => {
+    let seed = (((sample + 1) * 2654435761) ^ ((variableIndex + 11) * 2246822519)) >>> 0;
+    seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5;
+    const magnitude = 2 + ((seed >>> 1) % 17);
+    return [name, seed & 1 ? -magnitude : magnitude];
+  }));
+}
+
+function parseRelation(value) {
+  const source = normalizeMathNotation(value).trim();
+  const matches = [...source.matchAll(/<=|>=|=|<|>/g)];
+  if (matches.length !== 1) return null;
+  const match = matches[0];
+  const left = source.slice(0, match.index).trim();
+  const right = source.slice(match.index + match[0].length).trim();
+  const leftTokens = expressionTokens(left);
+  const rightTokens = expressionTokens(right);
+  if (!leftTokens || !rightTokens) return null;
+  return { left, right, leftTokens, rightTokens, relation: match[0] };
+}
+
+function relationHolds(value, relation) {
+  const epsilon = 1e-9 * Math.max(1, Math.abs(value));
+  if (relation === "=") return Math.abs(value) <= epsilon;
+  if (relation === "<") return value < -epsilon;
+  if (relation === "<=") return value <= epsilon;
+  if (relation === ">") return value > epsilon;
+  if (relation === ">=") return value >= -epsilon;
+  return false;
+}
+
+function linearRelationSignature(parsed, targetVariable, variables) {
+  try {
+    const difference = (target) => evaluateExpression(parsed.leftTokens, { ...variables, [targetVariable]: target })
+      - evaluateExpression(parsed.rightTokens, { ...variables, [targetVariable]: target });
+    const atZero = difference(0);
+    const atOne = difference(1);
+    const atTwo = difference(2);
+    const slope = atOne - atZero;
+    const scale = Math.max(1, Math.abs(atZero), Math.abs(atOne), Math.abs(atTwo));
+    if (![atZero, atOne, atTwo].every(Number.isFinite) || Math.abs(atTwo - (atZero + 2 * slope)) > 1e-8 * scale) return null;
+    if (Math.abs(slope) <= 1e-10 * scale) return { kind: relationHolds(atZero, parsed.relation) ? "all" : "none" };
+    const boundary = -atZero / slope;
+    if (parsed.relation === "=") return { kind: "point", boundary };
+    const flip = { "<": ">", "<=": ">=", ">": "<", ">=": "<=" };
+    return { kind: "range", relation: slope < 0 ? flip[parsed.relation] : parsed.relation, boundary };
+  } catch {
+    return null;
+  }
+}
+
+function sameRelationSignature(left, right) {
+  if (!left || !right || left.kind !== right.kind) return false;
+  if (["all", "none"].includes(left.kind)) return true;
+  if (left.relation !== right.relation) return false;
+  return Math.abs(left.boundary - right.boundary) <= 1e-8 * Math.max(1, Math.abs(left.boundary), Math.abs(right.boundary));
+}
+
+function relationsEquivalent(leftValue, rightValue, targetVariable, expectedRelation) {
+  const left = parseRelation(leftValue);
+  const right = parseRelation(rightValue);
+  if (!left || !right || left.relation !== expectedRelation || right.relation !== expectedRelation) return false;
+  const names = expressionVariableNames(left.leftTokens, left.rightTokens, right.leftTokens, right.rightTokens).filter((name) => name !== targetVariable);
+  if (names.length > 12) return false;
+  let successfulSamples = 0;
+  for (let sample = 0; sample < 8; sample += 1) {
+    const variables = sampledVariables(names, sample);
+    const leftSignature = linearRelationSignature(left, targetVariable, variables);
+    const rightSignature = linearRelationSignature(right, targetVariable, variables);
+    if (!leftSignature || !rightSignature) continue;
+    if (!sameRelationSignature(leftSignature, rightSignature)) return false;
+    successfulSamples += 1;
+  }
+  return successfulSamples >= 3;
+}
+
+function equationStepsEquivalent(left, right, targetVariable) {
+  return relationsEquivalent(left, right, targetVariable, "=");
+}
+
+function inequalitySolutionsEquivalent(left, right, targetVariable) {
+  const leftParsed = parseRelation(left);
+  const rightParsed = parseRelation(right);
+  if (!leftParsed || !rightParsed || leftParsed.relation === "=" || rightParsed.relation === "=") return false;
+  const names = expressionVariableNames(leftParsed.leftTokens, leftParsed.rightTokens, rightParsed.leftTokens, rightParsed.rightTokens).filter((name) => name !== targetVariable);
+  if (names.length > 12) return false;
+  let successfulSamples = 0;
+  for (let sample = 0; sample < 8; sample += 1) {
+    const variables = sampledVariables(names, sample);
+    const leftSignature = linearRelationSignature(leftParsed, targetVariable, variables);
+    const rightSignature = linearRelationSignature(rightParsed, targetVariable, variables);
+    if (!leftSignature || !rightSignature) continue;
+    if (!sameRelationSignature(leftSignature, rightSignature)) return false;
+    successfulSamples += 1;
+  }
+  return successfulSamples >= 3;
+}
+
 function symbolicEquivalent(left, right) {
   const leftTokens = expressionTokens(left);
   const rightTokens = expressionTokens(right);
   if (!leftTokens || !rightTokens) return false;
-  const names = [...new Set([...leftTokens, ...rightTokens].filter((token) => token.type === "identifier").map((token) => token.value))];
+  const names = expressionVariableNames(leftTokens, rightTokens);
   if (names.length > 12) return false;
   let successfulSamples = 0;
   for (let sample = 0; sample < 8; sample += 1) {
-    const variables = Object.fromEntries(names.map((name, variableIndex) => {
-      let seed = (((sample + 1) * 2654435761) ^ ((variableIndex + 11) * 2246822519)) >>> 0;
-      seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5;
-      const magnitude = 2 + ((seed >>> 1) % 17);
-      return [name, seed & 1 ? -magnitude : magnitude];
-    }));
+    const variables = sampledVariables(names, sample);
     try {
       const leftValue = evaluateExpression(leftTokens, variables);
       const rightValue = evaluateExpression(rightTokens, variables);
@@ -1012,8 +1429,19 @@ function symbolicEquivalent(left, right) {
   return successfulSamples >= 3;
 }
 
-function gradeProblem(problem, answer) {
+function extractSolutionValue(value, variable = "x") {
+  const source = normalizeMathNotation(value).trim();
+  const parts = source.split("=");
+  if (parts.length !== 2) return source;
+  const [left, right] = parts.map((part) => part.trim());
+  if (left.toLowerCase() === variable.toLowerCase()) return right;
+  if (right.toLowerCase() === variable.toLowerCase()) return left;
+  return right;
+}
+
+export function gradeProblem(problem, answer) {
   const expected = String(problem.expected_answer ?? "");
+  const acceptedForms = [expected, ...(problem.accepted_forms ?? [])].map(String);
   const method = problem.grading_method;
   const normalizedExpected = normalizeAnswer(expected);
   const normalizedAnswer = normalizeAnswer(answer);
@@ -1025,21 +1453,25 @@ function gradeProblem(problem, answer) {
     const tolerance = method === "numeric_with_tolerance" ? Number(problem.tolerance ?? 0.001) : 1e-9;
     correct = Number.isFinite(expectedNumber) && Number.isFinite(answerNumber) && Math.abs(expectedNumber - answerNumber) <= tolerance;
   } else if (method === "equation_solution") {
-    correct = normalizedAnswer === normalizedExpected
-      || (Number.isFinite(numericValue(answer)) && Math.abs(numericValue(answer) - numericValue(expected)) < 1e-9);
+    correct = acceptedForms.some((form) => symbolicEquivalent(
+      extractSolutionValue(answer, problem.variable ?? "x"),
+      extractSolutionValue(form, problem.variable ?? "x"),
+    ));
+  } else if (method === "inequality_solution") {
+    correct = acceptedForms.some((form) => inequalitySolutionsEquivalent(answer, form, problem.variable ?? problem.work?.target_variable ?? "x"));
   } else if (method === "symbolic_expression") {
-    correct = symbolicEquivalent(answer, expected);
+    correct = acceptedForms.some((form) => symbolicEquivalent(answer, form));
   } else if (method === "theorem_conclusion") {
-    const accepted = [expected, ...(problem.accepted_forms ?? [])].map(normalizeAnswer);
+    const accepted = acceptedForms.map(normalizeAnswer);
     correct = accepted.includes(normalizedAnswer);
   } else {
-    correct = normalizedAnswer === normalizedExpected;
+    correct = acceptedForms.map(normalizeAnswer).includes(normalizedAnswer);
   }
 
   return { correct, expected, method };
 }
 
-function validateProceduralWork(problem, work) {
+export function validateProceduralWork(problem, work) {
   if (!problem.work_required) return null;
   const lines = String(work ?? "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const minimumSteps = Math.max(1, Number(problem.work?.minimum_steps ?? 1));
@@ -1057,7 +1489,8 @@ function validateProceduralWork(problem, work) {
   if (lines.length < minimumSteps) return `Show at least ${minimumSteps} mathematical steps.`;
   const lineType = problem.work?.line_type ?? "expression";
   if (lineType === "text") return null;
-  if (lineType === "equation" && lines.some((line) => !/[=<>≤≥]/.test(line))) return "Each work line needs an equation or relation.";
+  if (lineType === "equation" && lines.some((line) => parseRelation(line)?.relation !== "=")) return "Each work line needs one equation sign.";
+  if (lineType === "inequality" && lines.some((line) => !["<", "<=", ">", ">="].includes(parseRelation(line)?.relation))) return "Each work line needs one inequality sign.";
   if (problem.work?.target_variable && !lines.some((line) => line.includes(problem.work.target_variable))) return `Shown work needs to use ${problem.work.target_variable}.`;
   const partsFor = (line) => line.split(/<=|>=|≤|≥|=|<|>/).map((part) => part.trim()).filter(Boolean);
   for (const line of lines) {
@@ -1070,35 +1503,25 @@ function validateProceduralWork(problem, work) {
     const match = line.match(/^(.*?)(<=|>=|≤|≥|=|<|>)(.*)$/);
     return match ? { left: match[1].trim(), relation: match[2], right: match[3].trim() } : { expression: line };
   });
-  const equationRoot = (line, variable) => {
-    const leftTokens = expressionTokens(line.left);
-    const rightTokens = expressionTokens(line.right);
-    const difference = (value) => evaluateExpression(leftTokens, { [variable]: value }) - evaluateExpression(rightTokens, { [variable]: value });
-    const atZero = difference(0);
-    const slope = difference(1) - atZero;
-    if (Math.abs(slope) < 1e-10) return Math.abs(atZero) < 1e-10 ? { all: true } : { none: true };
-    return { root: -atZero / slope };
-  };
   for (let index = 1; index < parsedLines.length; index += 1) {
     const previous = parsedLines[index - 1];
     const current = parsedLines[index];
     if (previous.expression && current.expression && !symbolicEquivalent(previous.expression, current.expression)) {
       return `Step ${index + 1} is not equivalent to the step before it.`;
     }
-    if (previous.relation === "=" && current.relation === "=") {
-      const tokens = [previous.left, previous.right, current.left, current.right].flatMap((part) => expressionTokens(part) ?? []);
-      const variables = [...new Set(tokens.filter((token) => token.type === "identifier").map((token) => token.value))];
-      if (variables.length === 1) {
-        const first = equationRoot(previous, variables[0]);
-        const second = equationRoot(current, variables[0]);
-        const sameSpecial = (first.all && second.all) || (first.none && second.none);
-        const sameRoot = Number.isFinite(first.root) && Number.isFinite(second.root) && Math.abs(first.root - second.root) < 1e-8 * Math.max(1, Math.abs(first.root), Math.abs(second.root));
-        if (!sameSpecial && !sameRoot) return `Step ${index + 1} changes the solution from the step before it.`;
-      }
+    if (lineType === "equation" && !equationStepsEquivalent(lines[index - 1], lines[index], problem.work?.target_variable ?? problem.variable ?? "x")) {
+      return `Step ${index + 1} changes the solution from the step before it.`;
+    }
+    if (lineType === "inequality" && !inequalitySolutionsEquivalent(lines[index - 1], lines[index], problem.work?.target_variable ?? problem.variable ?? "x")) {
+      return `Step ${index + 1} changes the inequality solution set.`;
     }
   }
   if (problem.work?.require_final_answer_match) {
     const lastLine = lines.at(-1);
+    if (lineType === "inequality") {
+      if (!inequalitySolutionsEquivalent(lastLine, problem.expected_answer, problem.work?.target_variable ?? problem.variable ?? "x")) return "The final work line needs to match the final answer.";
+      return null;
+    }
     const candidates = [lastLine, partsFor(lastLine).at(-1)].filter(Boolean);
     if (!candidates.some((candidate) => gradeProblem(problem, candidate).correct)) return "The final work line needs to match the final answer.";
   }
@@ -1582,8 +2005,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
         reviewRequired: ["proof_obligations", "rubric_check"].includes(problem.work?.mode) || problem.review_policy?.mastery_requires_review_pass === true,
         allowSelfReview: problem.review_policy?.allow_self_review !== false,
         workMode: problem.work?.mode ?? "none",
-        proofObligations: clone(problem.work?.proof_policy?.obligations ?? []),
-        rubricCriteria: clone((problem.work?.rubric?.criteria ?? []).map((criterion) => criterion.description)),
+        proofObligations: clone((problem.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation)),
+        rubricCriteria: clone((problem.work?.rubric?.criteria ?? []).map(normalizeReviewCriterion)),
         reviewPolicy: problem.review_policy?.work_review ?? "none",
       };
     });
@@ -1660,6 +2083,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       masteryUpdate: { status, masteryScore: mastery },
       reviewStatus: hasPendingReview ? "pending_review" : "graded",
       hasPendingReview,
+      reviewMasteryDeltaApplied: 0,
+      reviewResolution: null,
     };
     for (const review of state.reviews) {
       if (review.profileId === state.activeProfileId && review.draftId === pending.draftId && !review.attemptId) {
@@ -1667,6 +2092,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       }
     }
     state.attempts = [...state.attempts, attempt].slice(-MAX_ATTEMPTS);
+    resolveAttemptReview(attempt);
     delete state.drafts[state.activeProfileId][skill.id];
     state.ui.pendingResults = null;
     state.ui.activeAttemptId = attempt.attemptId;
@@ -1690,40 +2116,121 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return clone(attempt);
   };
 
+  const reviewAssessment = (target, { obligationResults = [], rubricResults = [], verdict = "partial" } = {}) => {
+    const fallbackScores = { pass: 1, partial: 0.6, needs_revision: 0.35, fail: 0 };
+    const obligations = (target.proofObligations ?? []).map(normalizeReviewObligation);
+    const criteria = (target.rubricCriteria ?? []).map(normalizeReviewCriterion);
+    if (obligations.length) {
+      if (!obligationResults.length) {
+        const status = verdict === "pass" ? "satisfied" : verdict === "fail" ? "missing" : "flawed";
+        return { verdict, score: fallbackScores[verdict], obligationResults: obligations.map((item) => ({ id: item.id, status, note: "" })), rubricResults: [] };
+      }
+      const supplied = obligationResults.map(sanitizeObligationResult).filter(Boolean);
+      if (supplied.length !== obligations.length || new Set(supplied.map((item) => item.id)).size !== obligations.length) throw new Error("Provide one unique status for every proof obligation.");
+      const byId = Object.fromEntries(supplied.map((item) => [item.id, item]));
+      if (obligations.some((item) => !byId[item.id])) throw new Error("Proof-obligation IDs do not match this question.");
+      const applicable = obligations.filter((item) => item.required || byId[item.id].status !== "not_applicable");
+      if (applicable.some((item) => item.required && byId[item.id].status === "not_applicable")) throw new Error("A required proof obligation cannot be marked not applicable.");
+      const score = applicable.length ? applicable.reduce((total, item) => total + ({ satisfied: 1, flawed: 0.5, missing: 0, not_applicable: 0 }[byId[item.id].status]), 0) / applicable.length : 0;
+      const missingCount = applicable.filter((item) => byId[item.id].status === "missing").length;
+      const derivedVerdict = applicable.length && applicable.every((item) => byId[item.id].status === "satisfied") ? "pass" : score < 0.4 || missingCount >= Math.max(2, Math.floor(applicable.length / 2)) ? "fail" : score < 0.7 ? "needs_revision" : "partial";
+      return { verdict: derivedVerdict, score, obligationResults: obligations.map((item) => byId[item.id]), rubricResults: [] };
+    }
+    if (criteria.length) {
+      if (!rubricResults.length) {
+        return { verdict, score: fallbackScores[verdict], obligationResults: [], rubricResults: criteria.map((item) => ({ id: item.id, awardedPoints: fallbackScores[verdict] * item.weight, maxPoints: item.weight, note: "" })) };
+      }
+      const supplied = rubricResults.map(sanitizeRubricResult).filter(Boolean);
+      if (supplied.length !== criteria.length || new Set(supplied.map((item) => item.id)).size !== criteria.length) throw new Error("Provide one score for every rubric criterion.");
+      const byId = Object.fromEntries(supplied.map((item) => [item.id, item]));
+      if (criteria.some((item) => !byId[item.id])) throw new Error("Rubric-criterion IDs do not match this question.");
+      const normalized = criteria.map((item) => {
+        const awardedPoints = cleanNumber(byId[item.id].awardedPoints, 0, 0, item.weight);
+        return { id: item.id, awardedPoints, maxPoints: item.weight, note: byId[item.id].note };
+      });
+      const possible = normalized.reduce((total, item) => total + item.maxPoints, 0);
+      const score = possible ? normalized.reduce((total, item) => total + item.awardedPoints, 0) / possible : 0;
+      const derivedVerdict = score >= 0.8 ? "pass" : score >= 0.6 ? "partial" : score >= 0.35 ? "needs_revision" : "fail";
+      return { verdict: derivedVerdict, score, obligationResults: [], rubricResults: normalized };
+    }
+    return { verdict, score: fallbackScores[verdict], obligationResults: [], rubricResults: [] };
+  };
+
+  const resolveAttemptReview = (attempt) => {
+    if (!attempt?.hasPendingReview && !attempt?.reviewResolution) return;
+    const required = attempt.results.filter((result) => result.reviewRequired);
+    const latest = required.map((result) => state.reviews.filter((item) => item.attemptId === attempt.attemptId && item.questionId === result.questionId).at(-1) ?? null);
+    if (!latest.length || latest.some((review) => !review)) return;
+    const score = latest.reduce((total, review) => total + review.score, 0) / latest.length;
+    const verdict = latest.every((review) => review.verdict === "pass") ? "pass" : score >= 0.6 ? "partial" : score >= 0.35 ? "needs_revision" : "fail";
+    const reviewIds = latest.map((review) => review.reviewId);
+    if (attempt.reviewResolution?.reviewIds?.join("|") === reviewIds.join("|")) return;
+    const desiredDelta = { pass: 12, partial: 3, needs_revision: 0, fail: -6 }[verdict];
+    const record = activeProgress()[attempt.skillId];
+    if (!record) return;
+    record.masteryScore = Math.max(0, Math.min(100, record.masteryScore - Number(attempt.reviewMasteryDeltaApplied ?? 0) + desiredDelta));
+    const skill = skillsById[attempt.skillId];
+    const prerequisitesMet = activeProfile()?.progressionMode === "soft" || skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status));
+    const passed = verdict === "pass" && prerequisitesMet
+      && attempt.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
+      && attempt.reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
+      && attempt.reflection.guessed !== "yes";
+    record.status = passed ? (record.status === "proven" ? "mastered" : "proven") : "learning";
+    record.nextReviewAt = reviewDate(record.status, attempt.percentScore, attempt.reflection.confidenceRating, now());
+    record.updatedAt = isoNow();
+    attempt.masteryUpdate = { status: record.status, masteryScore: record.masteryScore };
+    attempt.reviewStatus = verdict === "pass" ? "review_passed" : verdict;
+    attempt.hasPendingReview = verdict !== "pass";
+    attempt.reviewMasteryDeltaApplied = desiredDelta;
+    attempt.reviewResolution = { verdict, score, reviewIds };
+  };
+
   const inspectStudentWork = ({ questionId = "" } = {}) => {
     const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
-    if (!draft) throw new Error("Open or start a mastery test first.");
-    const problem = questionId
-      ? draft.problems.find((item) => item.template_id === questionId)
-      : draft.problems.find((item) => draft.responses[item.template_id]?.finalAnswer || draft.responses[item.template_id]?.work) ?? draft.problems[0];
-    if (!problem) throw new Error("question_id is not in the active test.");
-    const response = draft.responses[problem.template_id] ?? { finalAnswer: "", work: "" };
-    const grade = response.finalAnswer ? gradeProblem(problem, response.finalAnswer) : { correct: false, method: problem.grading_method };
-    const mistakeTag = grade.correct ? "none" : problem.mistake_tags?.[0] ?? "needs_explanation";
+    const attempt = !draft && state.ui.activeAttemptId ? getAttempt(state.ui.activeAttemptId) : null;
+    if (!draft && !attempt) throw new Error("Open a mastery test or a saved attempt first.");
+    const sourceItems = draft?.problems ?? attempt.results;
+    const item = questionId
+      ? sourceItems.find((candidate) => (candidate.template_id ?? candidate.questionId) === questionId)
+      : draft
+        ? sourceItems.find((candidate) => draft.responses[candidate.template_id]?.finalAnswer || draft.responses[candidate.template_id]?.work) ?? sourceItems[0]
+        : sourceItems.find((candidate) => candidate.work) ?? sourceItems[0];
+    if (!item) throw new Error("question_id is not in the visible test or saved attempt.");
+    const saved = Boolean(attempt);
+    const questionKey = item.template_id ?? item.questionId;
+    const response = saved ? { finalAnswer: item.finalAnswer, work: item.work } : draft.responses[questionKey] ?? { finalAnswer: "", work: "" };
+    const correct = saved ? item.correct : response.finalAnswer ? gradeProblem(item, response.finalAnswer).correct : false;
+    const mode = saved ? item.workMode : item.work?.mode ?? "none";
+    const proofObligations = saved ? item.proofObligations : (item.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation);
+    const rubricCriteria = saved ? item.rubricCriteria : (item.work?.rubric?.criteria ?? []).map(normalizeReviewCriterion);
+    const latest = state.reviews.filter((review) => review.profileId === state.activeProfileId && review.questionId === questionKey && (!attempt || review.attemptId === attempt.attemptId)).at(-1) ?? null;
     return {
       ok: true,
-      question_id: problem.template_id,
-      skill_id: problem.skill_id,
-      prompt: problem.prompt,
+      source: saved ? "saved_attempt" : "active_draft",
+      attempt_id: attempt?.attemptId ?? null,
+      question_id: questionKey,
+      skill_id: saved ? attempt.skillId : item.skill_id,
+      prompt: item.prompt,
       final_answer: response.finalAnswer,
       work: response.work,
       work_lines: response.work.split(/\r?\n/).map((line) => line.trim()).filter(Boolean),
-      final_answer_status: response.finalAnswer ? (grade.correct ? "correct" : "incorrect") : "missing",
-      work_status: response.work ? "pending_review" : problem.work_required ? "missing" : "not_required",
+      final_answer_status: response.finalAnswer ? (correct ? "correct" : "incorrect") : "missing",
+      work_status: response.work ? (latest ? latest.verdict : "pending_review") : (saved ? item.workRequired : item.work_required) ? "missing" : "not_required",
       review_guide: {
-        mode: problem.work?.mode ?? "none",
-        proof_obligations: clone(problem.work?.proof_policy?.obligations ?? []),
-        rubric_criteria: clone((problem.work?.rubric?.criteria ?? []).map((criterion) => criterion.description)),
-        review_policy: problem.review_policy?.work_review ?? "none",
-        mastery_requires_review_pass: problem.review_policy?.mastery_requires_review_pass === true,
+        mode,
+        proof_obligations: clone(proofObligations),
+        rubric_criteria: clone(rubricCriteria),
+        review_policy: saved ? item.reviewPolicy : item.review_policy?.work_review ?? "none",
+        mastery_requires_review_pass: saved ? item.reviewRequired : item.review_policy?.mastery_requires_review_pass === true,
       },
-      mistake_tag: mistakeTag,
-      messages: [grade.correct ? "The final answer passes the local grader; review the reasoning quality." : "Use the mistake tag and shown work to give one Socratic next step."],
+      latest_review: latest ? clone(latest) : null,
+      mistake_tag: correct ? "none" : (saved ? item.mistakeTags : item.mistake_tags)?.[0] ?? "needs_explanation",
+      messages: [correct ? "The final answer passes the local grader; review each reasoning requirement." : "Use the mistake tag and shown work to give one Socratic next step."],
       inspected_at: isoNow(),
     };
   };
 
-  const recordTutorFeedback = ({ questionId, feedback, mistakeTag = "", nextStep, confidence = "medium", verdict = "partial", reviewerType = "ai_tutor", activityActor = "learner" }) => {
+  const recordTutorFeedback = ({ questionId, feedback, mistakeTag = "", nextStep, confidence = "medium", verdict = "partial", reviewerType = "ai_tutor", obligationResults = [], rubricResults = [], activityActor = "learner" }) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     const safeQuestionId = cleanText(questionId, 120);
     const activeDraft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
@@ -1739,45 +2246,31 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     if (!["low", "medium", "high"].includes(confidence)) throw new Error("confidence is invalid.");
     if (!["pass", "partial", "needs_revision", "fail"].includes(verdict)) throw new Error("verdict is invalid.");
     const activeResult = activeAttempt?.results?.find((result) => result.questionId === safeQuestionId);
-    if (reviewerType === "self" && activeResult?.allowSelfReview === false) throw new Error("This question requires tutor review and does not allow self review.");
+    const activeProblem = activeDraft?.problems?.find((problem) => problem.template_id === safeQuestionId);
+    const target = activeResult ?? (activeProblem ? {
+      proofObligations: (activeProblem.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation),
+      rubricCriteria: (activeProblem.work?.rubric?.criteria ?? []).map(normalizeReviewCriterion),
+      allowSelfReview: activeProblem.review_policy?.allow_self_review !== false,
+    } : null);
+    if (reviewerType === "self" && target?.allowSelfReview === false) throw new Error("This question requires tutor review and does not allow self review.");
+    const assessment = reviewAssessment(target ?? {}, { obligationResults, rubricResults, verdict });
     const review = {
       reviewId: makeId("review"), profileId: state.activeProfileId, attemptId: state.ui.activeAttemptId,
       draftId: state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId]?.draftId ?? null,
-      questionId: safeQuestionId, reviewerType: ["ai_tutor", "human_tutor", "self"].includes(reviewerType) ? reviewerType : "ai_tutor", verdict,
-      score: { pass: 1, partial: 0.6, needs_revision: 0.35, fail: 0 }[verdict],
+      questionId: safeQuestionId, reviewerType: ["ai_tutor", "human_tutor", "self"].includes(reviewerType) ? reviewerType : "ai_tutor", verdict: assessment.verdict,
+      score: assessment.score,
       reviewerConfidence: confidence, mistakeTag: cleanText(mistakeTag, 80), feedback: safeFeedback,
-      nextStep: safeNextStep, createdAt: isoNow(),
+      nextStep: safeNextStep, obligationResults: assessment.obligationResults, rubricResults: assessment.rubricResults, createdAt: isoNow(),
     };
     state.reviews = [...state.reviews, review].slice(-MAX_REVIEWS);
     if (review.mistakeTag && review.mistakeTag !== "none") {
       const record = activeProgress()[state.ui.selectedSkillId];
       if (record) record.mistakeTags = [review.mistakeTag, ...(record.mistakeTags ?? []).filter((tag) => tag !== review.mistakeTag)].slice(0, 12);
     }
-    if (activeAttempt?.hasPendingReview) {
-      const required = activeAttempt.results.filter((result) => result.reviewRequired);
-      const verdicts = required.map((result) => state.reviews.filter((item) => item.attemptId === activeAttempt.attemptId && item.questionId === result.questionId).at(-1)?.verdict ?? null);
-      if (verdicts.every((item) => item === "pass")) {
-        const skill = skillsById[activeAttempt.skillId];
-        const record = activeProgress()[activeAttempt.skillId];
-        const prerequisitesMet = activeProfile()?.progressionMode === "soft" || skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status));
-        const passed = prerequisitesMet
-          && activeAttempt.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
-          && activeAttempt.reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
-          && activeAttempt.reflection.guessed !== "yes";
-        record.masteryScore = updateMastery(record.masteryScore, activeAttempt.percentScore, activeAttempt.reflection);
-        record.status = passed ? (record.status === "proven" ? "mastered" : "proven") : "learning";
-        record.nextReviewAt = reviewDate(record.status, activeAttempt.percentScore, activeAttempt.reflection.confidenceRating, now());
-        record.updatedAt = isoNow();
-        activeAttempt.masteryUpdate = { status: record.status, masteryScore: record.masteryScore };
-        activeAttempt.reviewStatus = "review_passed";
-        activeAttempt.hasPendingReview = false;
-      } else if (verdicts.every(Boolean) && verdicts.some((item) => item !== "pass")) {
-        activeAttempt.reviewStatus = "needs_revision";
-      }
-    }
+    if (activeAttempt) resolveAttemptReview(activeAttempt);
     addActivity("record_tutor_feedback", "Saved visible tutor feedback to this profile.", undefined, activityActor);
     notify();
-    return { ok: true, saved: true, review_id: review.reviewId, feedback: safeFeedback, next_step: safeNextStep };
+    return { ok: true, saved: true, review_id: review.reviewId, verdict: review.verdict, score: review.score, feedback: safeFeedback, next_step: safeNextStep };
   };
 
   const latestReview = () => state.reviews.filter((review) => review.profileId === state.activeProfileId).at(-1) ?? null;
@@ -1787,6 +2280,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     const skill = skillsById[state.ui.selectedSkillId];
     const row = progressRows().find((item) => item.id === skill.id);
     const draft = state.drafts[state.activeProfileId]?.[skill.id];
+    const attempt = state.ui.activeAttemptId ? getAttempt(state.ui.activeAttemptId) : null;
     return {
       ok: true,
       route: state.ui.route,
@@ -1795,6 +2289,15 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
         question_count: draft.problems.length,
         answered_count: Object.values(draft.responses).filter((response) => response.finalAnswer).length,
         questions: draft.problems.map((problem) => ({ question_id: problem.template_id, prompt: problem.prompt, difficulty: problem.difficulty, answer_mode: problem.answer_mode })),
+      } : null,
+      active_attempt: attempt ? {
+        attempt_id: attempt.attemptId,
+        skill_id: attempt.skillId,
+        completed_at: attempt.completedAt,
+        percent_score: attempt.percentScore,
+        review_status: attempt.reviewStatus,
+        pending_review: attempt.hasPendingReview,
+        questions: attempt.results.map((result) => ({ question_id: result.questionId, prompt: result.prompt, final_answer_status: result.correct ? "correct" : "incorrect", work_mode: result.workMode, review_required: result.reviewRequired })),
       } : null,
       progress: { mastery_score: row.masteryScore, attempt_count: row.attemptCount, mistake_tags: row.mistakeTags },
       recent_attempts: includeHistory ? profileAttempts().slice(-5).map((attempt) => ({ skill_id: attempt.skillId, percent_score: attempt.percentScore, completed_at: attempt.completedAt })) : [],
@@ -1949,6 +2452,14 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return JSON.stringify(pack, null, 2);
   };
 
+  const previewNativeAssessment = (skillId, variation = 0) => {
+    const skill = curriculum.skills.find((item) => item.id === skillId);
+    if (!skill?.native_templates?.length) throw new Error("This lesson does not have native runtime templates.");
+    const safeVariation = Math.floor(cleanNumber(Number(variation), 0, 0, 10_000));
+    const problems = generateNativeAssessment({ ...skill, overridden: false }, safeVariation);
+    return { ok: true, skillId: skill.id, skillName: skill.name, variation: safeVariation, templateCount: skill.native_templates.length, problems: clone(problems) };
+  };
+
   const exportBackup = () => {
     heartbeat(true);
     state.backup.lastExportAt = isoNow();
@@ -2035,6 +2546,61 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     };
   };
 
+  const exportTutorSummary = (attemptId = state.ui.activeAttemptId) => {
+    const attempt = getAttempt(attemptId);
+    if (!attempt) throw new Error("Open a saved attempt before exporting a tutor summary.");
+    const skill = skillsById[attempt.skillId];
+    const record = activeProgress()[attempt.skillId] ?? {};
+    const reviews = state.reviews.filter((review) => review.profileId === state.activeProfileId && review.attemptId === attempt.attemptId);
+    const missedTags = [...new Set(attempt.results.filter((result) => !result.correct).flatMap((result) => result.mistakeTags ?? []))];
+    const lines = [
+      "# QuickMaths Tutor Summary", "", "## Student Context",
+      "Use this saved result as evidence of the learner's current understanding. Mastery is an accumulated 0–100 progress score, not the latest test percentage.", "",
+      "## Current Skill", `Skill: ${skill.name}`, `Skill ID: ${skill.id}`, `Domain: ${skill.domain}`, `Subdomain: ${skill.subdomain}`,
+      `Status: ${record.status ?? "ready"}`, `Mastery Score: ${record.masteryScore ?? 0}/100`, "",
+      "## Test Result", `Attempt ID: ${attempt.attemptId}`, `Completed: ${attempt.completedAt}`, `Score: ${attempt.rawScore}/${attempt.scoreTotal}`,
+      `Percent: ${Math.round(attempt.percentScore * 100)}%`, `Confidence: ${attempt.reflection.confidenceRating}/5`, `Difficulty Felt: ${attempt.reflection.difficultyFelt}`,
+      `Hints Used: ${attempt.reflection.hintsUsed}`, `Guessed: ${attempt.reflection.guessed}`, `Review Status: ${attempt.reviewStatus}`, `Has Pending Review: ${attempt.hasPendingReview}`, "",
+      "## Missed / Risk Areas", ...(missedTags.length ? missedTags.map((tag) => `- ${tag}`) : ["- None flagged"]), "", "## Relevant Prerequisites",
+      ...(skill.prerequisites.length ? skill.prerequisites.map((id) => `- ${id}: ${statusForSkill(id)}`) : ["- None"]), "", "## Learner Notes", attempt.reflection.notes || "No notes provided.", "",
+      "## Per-Question Details", "Review the learner's work for reasoning quality. The local grader judged the final answer and conservative procedural transitions only.", "",
+    ];
+    attempt.results.forEach((result, index) => {
+      lines.push(`### Question ${index + 1}`, `Question ID: ${result.questionId}`, `Prompt: ${result.prompt}`, `Expected final answer: ${result.expectedAnswer}`, `User final answer: ${result.finalAnswer || "No answer"}`, "User work:", result.work || "No work submitted.", `Correct: ${result.correct}`, `Work mode: ${result.workMode}`, `Review required: ${result.reviewRequired}`, `Potential mistake tags: ${(result.mistakeTags ?? []).join(", ") || "none"}`, "Solution steps:", ...(result.solutionSteps?.length ? result.solutionSteps.map((step) => `- ${step}`) : ["- None provided."]), "");
+    });
+    if (reviews.length) {
+      lines.push("## Saved Review Details", "");
+      reviews.forEach((review) => {
+        lines.push(`### Review ${review.reviewId}`, `Question ID: ${review.questionId}`, `Reviewer: ${review.reviewerType}`, `Verdict: ${review.verdict}`, `Score: ${Math.round(review.score * 100)}%`);
+        review.obligationResults?.forEach((item) => lines.push(`- Obligation ${item.id}: ${item.status}${item.note ? ` — ${item.note}` : ""}`));
+        review.rubricResults?.forEach((item) => lines.push(`- Rubric ${item.id}: ${item.awardedPoints}/${item.maxPoints}${item.note ? ` — ${item.note}` : ""}`));
+        lines.push(`Feedback: ${review.feedback}`, `Next step: ${review.nextStep}`, "");
+      });
+    }
+    lines.push("## Recommended Tutoring Instructions", "Start with a brief diagnosis, then tutor the weakest concept Socratically. Ask one practice question at a time, do not reveal answers prematurely, and recommend a QuickMaths retest only after independent success.", "", "AI tutors can make mistakes; verify important explanations and calculations.");
+    return lines.join("\n");
+  };
+
+  const exportTutorReviewPacket = (attemptId = state.ui.activeAttemptId) => {
+    const attempt = getAttempt(attemptId);
+    if (!attempt) throw new Error("Open a saved attempt before exporting a review packet.");
+    const skill = skillsById[attempt.skillId];
+    const targets = attempt.results.filter((result) => result.reviewRequired || result.work);
+    const lines = [
+      "# QuickMaths Tutor Review Packet", "", "Review the saved proof or shown work against every listed obligation or rubric criterion. The app graded the separate final answer; do not infer that a correct final answer proves sound reasoning.", "",
+      "## Skill", `Skill: ${skill.name}`, `Skill ID: ${skill.id}`, `Domain: ${skill.domain}`, `Subdomain: ${skill.subdomain}`, "",
+      "## Attempt Context", `Attempt ID: ${attempt.attemptId}`, `Completed: ${attempt.completedAt}`, `Score: ${attempt.rawScore}/${attempt.scoreTotal} (${Math.round(attempt.percentScore * 100)}%)`, `Review Status: ${attempt.reviewStatus}`, `Confidence: ${attempt.reflection.confidenceRating}/5`, `Difficulty Felt: ${attempt.reflection.difficultyFelt}`, `Hints Used: ${attempt.reflection.hintsUsed}`, `Guessed: ${attempt.reflection.guessed}`, `Learner Notes: ${attempt.reflection.notes || "None"}`, "",
+      "## Requested Return Format", "For a proof: return each obligation ID with satisfied | flawed | missing | not_applicable, plus evidence. For a rubric: return awarded points for every criterion, plus evidence. Then give concise feedback and one Socratic next step.", "",
+    ];
+    targets.forEach((result, index) => {
+      lines.push(`## Question ${index + 1}`, `Question ID: ${result.questionId}`, `Prompt: ${result.prompt}`, `Expected final answer: ${result.expectedAnswer}`, `User final answer: ${result.finalAnswer || "No answer"}`, "User work/proof:", result.work || "No work submitted.", `Final answer autograde: ${result.correct ? "correct" : "incorrect"}`, `Final answer grading method: ${result.gradingMethod}`, `Work mode: ${result.workMode}`, `Review policy: ${result.reviewPolicy}`, "");
+      if (result.proofObligations?.length) lines.push("### Proof Obligations", ...result.proofObligations.map((item) => `- ${item.id}: ${item.description}${item.required === false ? " (optional)" : ""}`), "");
+      if (result.rubricCriteria?.length) lines.push("### Rubric", ...result.rubricCriteria.map((item) => `- ${item.id} (${item.weight} pts): ${item.description}`), "");
+      lines.push("Solution outline for post-attempt review:", ...(result.solutionSteps?.length ? result.solutionSteps.map((step) => `- ${step}`) : ["- None provided."]), "");
+    });
+    return lines.join("\n");
+  };
+
   const exportCsv = (kind) => {
     const quote = (value) => {
       let safe = String(value ?? "");
@@ -2042,17 +2608,29 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       return `"${safe.replace(/"/g, '""')}"`;
     };
     if (kind === "progress") {
-      const header = ["skill_id", "skill", "status", "mastery_score", "latest_score", "best_score", "confidence", "attempt_count", "next_review_at"];
-      const rows = progressRows().map((row) => [row.id, row.name, row.status, row.masteryScore, row.latestScore, row.bestScore, row.confidence, row.attemptCount, row.nextReviewAt]);
+      const header = ["profile_id", "skill_id", "skill_name", "domain", "subdomain", "prerequisites", "status", "mastery_score", "last_test_score", "best_test_score", "confidence_rating", "difficulty_felt_latest", "hints_used_latest", "guessed_latest", "attempt_count", "last_attempt_at", "next_review_at", "mistake_tags", "notes", "next_recommended_action", "pending_review_count", "latest_review_status", "latest_review_verdict"];
+      const rows = progressRows().map((row) => {
+        const record = activeProgress()[row.id] ?? {};
+        const latestAttempt = profileAttempts().filter((attempt) => attempt.skillId === row.id).at(-1);
+        const latestReview = latestAttempt ? state.reviews.filter((review) => review.attemptId === latestAttempt.attemptId).at(-1) : null;
+        const recommended = { rusty: "Review and retest.", learning: "Practice weak areas, then retest.", ready: "Start mastery test.", locked: "Prove prerequisites first.", proven: "Maintain with scheduled review.", mastered: "Maintain with scheduled review." }[row.status] ?? "Open lesson.";
+        return [state.activeProfileId, row.id, row.name, skillsById[row.id].domain, row.subdomain, row.prerequisites.join(";"), row.status, row.masteryScore, row.latestScore, row.bestScore, row.confidence, latestAttempt?.reflection?.difficultyFelt, latestAttempt?.reflection?.hintsUsed, latestAttempt?.reflection?.guessed, row.attemptCount, record.lastAttemptAt, row.nextReviewAt, row.mistakeTags.join(";"), record.notes, recommended, profileAttempts().filter((attempt) => attempt.skillId === row.id && attempt.hasPendingReview).length, latestAttempt?.reviewStatus, latestReview?.verdict];
+      });
       return [header, ...rows].map((row) => row.map(quote).join(",")).join("\n");
     }
     if (kind === "reviews") {
-      const header = ["review_id", "attempt_id", "question_id", "verdict", "score", "confidence", "feedback", "next_step", "created_at"];
-      const rows = state.reviews.filter((review) => review.profileId === state.activeProfileId).map((review) => [review.reviewId, review.attemptId, review.questionId, review.verdict, review.score, review.reviewerConfidence, review.feedback, review.nextStep, review.createdAt]);
+      const header = ["review_id", "attempt_id", "question_id", "reviewer_type", "verdict", "score", "reviewer_confidence", "created_at", "obligation_results_json", "obligation_statuses", "obligation_notes", "rubric_points", "rubric_notes", "feedback", "next_step"];
+      const rows = state.reviews.filter((review) => review.profileId === state.activeProfileId).map((review) => {
+        const obligationStatuses = review.obligationResults?.map((item) => `${item.id}=${item.status}`).join("; ") ?? "";
+        const obligationNotes = review.obligationResults?.filter((item) => item.note).map((item) => `${item.id}: ${item.note}`).join("; ") ?? "";
+        const rubricPoints = review.rubricResults?.map((item) => `${item.id}=${item.awardedPoints}/${item.maxPoints}`).join("; ") ?? "";
+        const rubricNotes = review.rubricResults?.filter((item) => item.note).map((item) => `${item.id}: ${item.note}`).join("; ") ?? "";
+        return [review.reviewId, review.attemptId, review.questionId, review.reviewerType, review.verdict, review.score, review.reviewerConfidence, review.createdAt, JSON.stringify({ obligations: review.obligationResults ?? [], rubric: review.rubricResults ?? [] }), obligationStatuses, obligationNotes, rubricPoints, rubricNotes, review.feedback, review.nextStep];
+      });
       return [header, ...rows].map((row) => row.map(quote).join(",")).join("\n");
     }
-    const header = ["attempt_id", "skill_id", "skill", "score", "total", "percent", "status", "completed_at"];
-    const rows = profileAttempts().map((attempt) => [attempt.attemptId, attempt.skillId, attempt.skillName, attempt.rawScore, attempt.scoreTotal, attempt.percentScore, attempt.masteryUpdate?.status, attempt.completedAt]);
+    const header = ["attempt_id", "profile_id", "skill_id", "skill_name", "completed_at", "score_raw", "score_total", "score_percent", "confidence_rating", "difficulty_felt", "hints_used", "guessed", "wants_more_practice", "confusing_parts", "notes", "review_status", "has_pending_review", "mastery_status", "mastery_score"];
+    const rows = profileAttempts().map((attempt) => [attempt.attemptId, attempt.profileId, attempt.skillId, attempt.skillName, attempt.completedAt, attempt.rawScore, attempt.scoreTotal, attempt.percentScore, attempt.reflection?.confidenceRating, attempt.reflection?.difficultyFelt, attempt.reflection?.hintsUsed, attempt.reflection?.guessed, attempt.reflection?.wantsMorePractice, attempt.reflection?.confusingParts, attempt.reflection?.notes, attempt.reviewStatus, attempt.hasPendingReview, attempt.masteryUpdate?.status, attempt.masteryUpdate?.masteryScore]);
     return [header, ...rows].map((row) => row.map(quote).join(",")).join("\n");
   };
 
@@ -2094,8 +2672,11 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     restoreNativeLessons,
     importLessonPack,
     exportLessonPack,
+    previewNativeAssessment,
     exportBackup,
     exportSyncState,
+    exportTutorSummary,
+    exportTutorReviewPacket,
     previewBackup,
     importBackup,
     importSyncState,

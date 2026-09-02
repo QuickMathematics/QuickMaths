@@ -111,7 +111,7 @@ test:
         type: text
         value: "x < {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -153,7 +153,7 @@ test:
         type: text
         value: "x > {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -195,7 +195,7 @@ test:
         type: text
         value: "x <= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -237,7 +237,7 @@ test:
         type: text
         value: "x >= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -279,7 +279,7 @@ test:
         type: text
         value: "x < {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -321,7 +321,7 @@ test:
         type: text
         value: "x < {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -363,7 +363,7 @@ test:
         type: text
         value: "x >= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -405,7 +405,7 @@ test:
         type: text
         value: "x <= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -447,7 +447,7 @@ test:
         type: text
         value: "x > {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -494,7 +494,7 @@ test:
         type: text
         value: "x < {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -542,7 +542,7 @@ test:
         type: text
         value: "x >= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -590,7 +590,7 @@ test:
         type: text
         value: "x <= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -638,7 +638,7 @@ test:
         type: text
         value: "x > {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -686,7 +686,7 @@ test:
         type: text
         value: "x <= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -734,7 +734,7 @@ test:
         type: text
         value: "x > {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -781,7 +781,7 @@ test:
         type: text
         value: "x <= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -828,7 +828,7 @@ test:
         type: text
         value: "x >= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -870,7 +870,7 @@ test:
         type: text
         value: "x > {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show equivalent inequality steps, ending with x isolated on the left."
@@ -912,7 +912,7 @@ test:
         type: text
         value: "x >= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show equivalent inequality steps, ending with x isolated on the left."
@@ -959,7 +959,7 @@ test:
         type: text
         value: "x < {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show equivalent inequality steps, ending with x isolated on the left."
@@ -1007,7 +1007,7 @@ test:
         type: text
         value: "x >= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -1047,7 +1047,7 @@ test:
         type: text
         value: "x <= 0"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "Show each equivalent inequality step, ending with x isolated."
@@ -1083,7 +1083,7 @@ test:
         type: text
         value: "x < {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "The variable is already isolated. Rewrite the solution."
@@ -1116,7 +1116,7 @@ test:
         type: text
         value: "x >= {s}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: procedural_steps
         prompt: "The variable is already isolated. Rewrite the solution."

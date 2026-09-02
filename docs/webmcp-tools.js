@@ -368,7 +368,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "inspect_student_work",
       title: "Inspect student work",
-      description: "Inspect one response in the active test without exposing its answer key.",
+      description: "Inspect one response in the active test or visible saved attempt without exposing its answer key.",
       inputSchema: {
         type: "object",
         properties: { question_id: stringSchema("Optional question ID; defaults to the first answered question.", 120) },
@@ -393,12 +393,22 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           next_step: stringSchema("One concrete next action for the learner.", 300),
           confidence: { type: "string", enum: ["low", "medium", "high"] },
           verdict: { type: "string", enum: ["pass", "partial", "needs_revision", "fail"] },
+          obligation_results: {
+            type: "array", maxItems: 12, description: "For a proof, one status per obligation from inspect_student_work. Structured statuses determine the verdict.",
+            items: { type: "object", properties: { id: stringSchema("Exact obligation ID.", 80), status: { type: "string", enum: ["satisfied", "flawed", "missing", "not_applicable"] }, note: stringSchema("Evidence or revision note.", 500) }, required: ["id", "status"], additionalProperties: false },
+          },
+          rubric_results: {
+            type: "array", maxItems: 12, description: "For a rubric, one awarded score per criterion from inspect_student_work. Structured scores determine the verdict.",
+            items: { type: "object", properties: { id: stringSchema("Exact criterion ID.", 80), awarded_points: { type: "number", minimum: 0, maximum: 100 }, note: stringSchema("Evidence or revision note.", 500) }, required: ["id", "awarded_points"], additionalProperties: false },
+          },
         },
         required: ["question_id", "feedback", "next_step"],
         additionalProperties: false,
       },
       async execute(input) {
-        requireObject(input); rejectUnknown(input, ["question_id", "feedback", "mistake_tag", "next_step", "confidence", "verdict"]);
+        requireObject(input); rejectUnknown(input, ["question_id", "feedback", "mistake_tag", "next_step", "confidence", "verdict", "obligation_results", "rubric_results"]);
+        if (input.obligation_results !== undefined && !Array.isArray(input.obligation_results)) throw new Error("obligation_results must be an array.");
+        if (input.rubric_results !== undefined && !Array.isArray(input.rubric_results)) throw new Error("rubric_results must be an array.");
         return store.recordTutorFeedback({
           questionId: requiredString(input, "question_id", 120),
           feedback: requiredString(input, "feedback", 1500),
@@ -406,6 +416,8 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           nextStep: requiredString(input, "next_step", 300),
           confidence: input.confidence ?? "medium",
           verdict: input.verdict ?? "partial",
+          obligationResults: input.obligation_results ?? [],
+          rubricResults: input.rubric_results ?? [],
           reviewerType: "ai_tutor",
           activityActor: "agent",
         });

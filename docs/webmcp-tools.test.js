@@ -57,6 +57,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /What your proof must cover/);
   assert.match(js, /workResponsePlaceholder/);
   assert.match(js, /review-question-select/);
+  assert.match(js, /attempt\.results\.findIndex\(\(item\) => item\.questionId === result\.questionId\) \+ 1/);
   assert.match(js, /resultReviewGuide/);
   assert.match(js, /MAP_ZOOM_MIN = 0\.1/);
   assert.doesNotMatch(js, /Math\.min\(5/);
@@ -198,7 +199,8 @@ test("agent lesson authoring guide distinguishes checked steps from reviewed pro
   const guide = readFileSync(new URL("./CUSTOM_LESSON_SETS.md", import.meta.url), "utf8");
   assert.match(guide, /Checked maths steps are not formal proofs/);
   assert.match(guide, /two deliberately separate judgments/);
-  assert.match(guide, /mastery remains unchanged until that review passes/);
+  assert.match(guide, /Pending review initially freezes mastery/);
+  assert.match(guide, /satisfied.*flawed.*missing.*not_applicable/);
   assert.match(guide, /Improving a native QuickMaths lesson/);
   assert.match(guide, /same lesson ID/);
   assert.match(guide, /open_lesson_creator/);
@@ -446,6 +448,11 @@ test("draft-time agent feedback follows the saved attempt", async () => {
     wantsMorePractice: "yes",
   });
   assert.equal(store.snapshot().reviews[0].attemptId, attempt.attemptId);
+  const savedInspection = await tools.inspect_student_work.execute({ question_id: first.template_id });
+  assert.equal(savedInspection.source, "saved_attempt");
+  assert.equal(savedInspection.attempt_id, attempt.attemptId);
+  assert.equal(savedInspection.latest_review.reviewId, store.snapshot().reviews[0].reviewId);
+  assert.equal(JSON.stringify(savedInspection).includes("expectedAnswer"), false);
 });
 
 test("registration reports partial failure without duplicating names", async () => {

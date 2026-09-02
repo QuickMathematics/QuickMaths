@@ -9,9 +9,11 @@ import {
   LESSON_SET_FORMAT,
   STORAGE_KEY,
   createQuickMathsStore,
+  gradeProblem,
   loadState,
   normalizeLessonPack,
   normalizeLessonPackCollection,
+  validateProceduralWork,
 } from "./challenge-core.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
@@ -139,6 +141,7 @@ test("every Mathematics test covers every authored scenario and keeps retake var
     const skill = curriculum.skills.find((candidate) => candidate.id === skillId);
     assert.ok(skill, `${skillId} must ship`);
     assert.equal(skill.question_count, expectedLength, `${skillId} assessment length`);
+    assert.equal(skill.native_templates.length, expectedLength, `${skillId} runtime template coverage`);
     assert.equal(new Set(skill.problems.map((problem) => problem.source_template_id)).size, expectedLength, `${skillId} authored scenario coverage`);
     assert.ok(skill.problems.length >= expectedLength, `${skillId} needs a complete question bank`);
   }
@@ -153,6 +156,8 @@ test("every built-in assessment starts with exactly one problem from every autho
     const scenarioIds = draft.problems.map((problem) => problem.source_template_id ?? problem.template_id);
     assert.equal(draft.problems.length, skill.question_count, `${skill.id} configured length`);
     assert.equal(new Set(scenarioIds).size, skill.question_count, `${skill.id} unique scenario coverage`);
+    assert.ok(draft.problems.every((problem) => gradeProblem(problem, String(problem.expected_answer)).correct), `${skill.id} generated answers must pass their declared graders`);
+    if (skill.native_templates?.length) assert.ok(draft.problems.every((problem) => problem.template_id.includes("__RUNTIME_")), `${skill.id} should generate every native scenario in-browser without bank fallback`);
   }
 });
 
@@ -324,11 +329,12 @@ test("a complete mastery-test reflection records an attempt and unlocks dependen
   assert.equal(store.snapshot().activeTest, null);
 });
 
-test("retakes rotate through fresh comprehensive sets from the seeded variant bank", () => {
+test("native retakes generate fresh comprehensive sets in the browser", () => {
   const { store } = harness();
   store.createProfile("Retake Learner");
   store.startTest("MATH_ARITH_001");
-  const firstIds = store.snapshot().activeTest.problems.map((problem) => problem.template_id);
+  const firstDraft = store.snapshot().activeTest;
+  const firstIds = firstDraft.problems.map((problem) => problem.template_id);
   answerActiveTestCorrectly(store);
   store.submitTest();
   store.saveReflection({ confidenceRating: 4, difficultyFelt: "medium", hintsUsed: "none", guessed: "no" });
@@ -338,10 +344,14 @@ test("retakes rotate through fresh comprehensive sets from the seeded variant ba
   assert.equal(firstIds.length, 10);
   assert.equal(secondIds.length, 10);
   assert.deepEqual(
-    [...new Set(store.skillsById.MATH_ARITH_001.problems.filter((problem) => firstIds.includes(problem.template_id)).map((problem) => problem.source_template_id))].sort(),
+    [...new Set(firstDraft.problems.map((problem) => problem.source_template_id))].sort(),
     [...new Set(secondDraft.problems.map((problem) => problem.source_template_id))].sort(),
   );
   assert.ok(secondIds.some((id) => !firstIds.includes(id)));
+  assert.ok(secondDraft.problems.some((problem) => {
+    const previous = firstDraft.problems.find((item) => item.source_template_id === problem.source_template_id);
+    return previous && (previous.prompt !== problem.prompt || previous.expected_answer !== problem.expected_answer);
+  }), "at least one generated scenario should draw fresh values");
 });
 
 test("saved five-question drafts expand in place without losing existing answers", () => {
@@ -354,6 +364,7 @@ test("saved five-question drafts expand in place without losing existing answers
   const legacyDraft = saved.drafts[profileId].MATH_ALG_002;
   legacyDraft.problems = legacyDraft.problems.slice(0, 5);
   const firstQuestionId = legacyDraft.problems[0].template_id;
+  legacyDraft.problems[0].expected_answer = "tampered answer key";
   legacyDraft.responses[firstQuestionId].finalAnswer = "preserved answer";
   storage.setItem(STORAGE_KEY, JSON.stringify(saved));
   const reloaded = createQuickMathsStore({
@@ -363,6 +374,7 @@ test("saved five-question drafts expand in place without losing existing answers
   });
   assert.equal(reloaded.snapshot().activeTest.problems.length, 23);
   assert.equal(reloaded.snapshot().activeTest.responses[firstQuestionId].finalAnswer, "preserved answer");
+  assert.notEqual(reloaded.snapshot().activeTest.problems.find((problem) => problem.template_id === firstQuestionId).expected_answer, "tampered answer key");
 });
 
 test("a valid custom lesson set joins the real curriculum without replacing built-in skills", () => {
@@ -523,19 +535,71 @@ test("proof and rubric authoring modes retain structured review policies", () =>
   }
   const inspection = store.inspectStudentWork({ questionId: draft.problems[0].template_id });
   assert.equal(inspection.review_guide.mode, "proof_obligations");
-  assert.deepEqual(inspection.review_guide.proof_obligations, ["State the claim", "Connect evidence"]);
+  assert.deepEqual(inspection.review_guide.proof_obligations.map((item) => item.description), ["State the claim", "Connect evidence"]);
   assert.equal(store.submitTest().ok, true);
   const attempt = store.saveReflection({ confidenceRating: 4, difficultyFelt: "medium", hintsUsed: "none", guessed: "no" });
   assert.equal(attempt.hasPendingReview, true);
   assert.equal(attempt.results[0].workMode, "proof_obligations");
-  assert.deepEqual(attempt.results[0].proofObligations, ["State the claim", "Connect evidence"]);
+  assert.deepEqual(attempt.results[0].proofObligations.map((item) => item.description), ["State the claim", "Connect evidence"]);
   assert.equal(store.snapshot().progressRows[0].status, "learning");
+  const savedInspection = store.inspectStudentWork({ questionId: draft.problems[0].template_id });
+  assert.equal(savedInspection.source, "saved_attempt");
+  assert.equal(savedInspection.attempt_id, attempt.attemptId);
+  assert.equal(JSON.stringify(savedInspection).includes("expectedAnswer"), false);
   store.recordTutorFeedback({
-    questionId: draft.problems[0].template_id, feedback: "The proof addresses both obligations.", nextStep: "Continue to the next cell process.",
-    confidence: "high", verdict: "pass", reviewerType: "human_tutor",
+    questionId: draft.problems[0].template_id, feedback: "The claim is clear, but the evidence link needs one more reason.", nextStep: "Add the missing causal link.",
+    confidence: "high", reviewerType: "human_tutor", obligationResults: [
+      { id: "obligation_1", status: "satisfied", note: "Claim is explicit." },
+      { id: "obligation_2", status: "flawed", note: "Evidence is named but not connected." },
+    ],
+  });
+  assert.equal(store.getAttempt(attempt.attemptId).reviewStatus, "partial");
+  assert.equal(store.getAttempt(attempt.attemptId).hasPendingReview, true);
+  assert.equal(store.snapshot().progressRows[0].masteryScore, 3);
+  store.recordTutorFeedback({
+    questionId: draft.problems[0].template_id, feedback: "The revision now addresses both obligations.", nextStep: "Continue to the next cell process.",
+    confidence: "high", reviewerType: "human_tutor", obligationResults: [
+      { id: "obligation_1", status: "satisfied", note: "Claim is explicit." },
+      { id: "obligation_2", status: "satisfied", note: "The evidence is causally connected." },
+    ],
   });
   assert.equal(store.getAttempt(attempt.attemptId).reviewStatus, "review_passed");
+  assert.equal(store.getAttempt(attempt.attemptId).reviewMasteryDeltaApplied, 12);
   assert.equal(store.snapshot().progressRows[0].status, "proven");
+});
+
+test("rubric reviews derive weighted verdicts and replace rather than stack mastery deltas", () => {
+  const { store } = harness();
+  store.createProfile("Rubric Reviewer");
+  const pack = biologyLessonSet();
+  const problem = pack.skills[0].problems[0];
+  problem.answer_mode = "final_plus_required_work";
+  problem.work = { mode: "rubric_check", prompt: "Explain the model.", rubric: { criteria: [
+    { id: "model", description: "Chooses a defensible model", weight: 2 },
+    { id: "evidence", description: "Connects evidence to the conclusion", weight: 1 },
+  ] } };
+  problem.review_policy = { work_review: "tutor_required", mastery_requires_review_pass: true, allow_self_review: false };
+  store.importLessonPack(pack);
+  store.setLearningPreferences({ progressionMode: "soft" });
+  store.startTest("CUSTOM_BIO_CELL_001", { force: true });
+  const draft = store.snapshot().activeTest;
+  for (const item of draft.problems) store.updateResponse(item.template_id, { finalAnswer: String(item.expected_answer), work: item.work.mode === "rubric_check" ? "The model is defensible because the evidence supports its conclusion." : workFor(item) });
+  assert.equal(store.submitTest().ok, true);
+  const attempt = store.saveReflection({ confidenceRating: 4, difficultyFelt: "medium", hintsUsed: "none", guessed: "no" });
+  const questionId = draft.problems[0].template_id;
+  const partial = store.recordTutorFeedback({
+    questionId, feedback: "The evidence is present, but the model needs revision.", nextStep: "Justify the model choice.", reviewerType: "human_tutor",
+    rubricResults: [{ id: "model", awardedPoints: 1, note: "Partly defensible." }, { id: "evidence", awardedPoints: 1, note: "Connection is explicit." }],
+  });
+  assert.equal(partial.verdict, "partial");
+  assert.equal(store.snapshot().progressRows[0].masteryScore, 3);
+  const passed = store.recordTutorFeedback({
+    questionId, feedback: "Both weighted criteria are now complete.", nextStep: "Continue.", reviewerType: "human_tutor",
+    rubricResults: [{ id: "model", awardedPoints: 2, note: "Fully justified." }, { id: "evidence", awardedPoints: 1, note: "Connection is explicit." }],
+  });
+  assert.equal(passed.verdict, "pass");
+  assert.equal(store.getAttempt(attempt.attemptId).reviewMasteryDeltaApplied, 12);
+  assert.equal(store.snapshot().progressRows[0].masteryScore, 12);
 });
 
 test("custom lesson-set validation rejects collisions, missing references, cycles, and unsupported grading", () => {
@@ -657,17 +721,7 @@ test("symbolic grading accepts equivalent forms and rejects correlated-sample tr
   const equivalentResult = equivalent.store.submitTest().results;
   assert.equal(equivalentResult.rawScore, equivalentResult.scoreTotal);
 
-  const adversarial = harness();
-  adversarial.store.createProfile("Independent Samples");
-  adversarial.store.startTest("MATH_PREALG_002", { force: true });
-  for (const problem of adversarial.store.snapshot().activeTest.problems) {
-    adversarial.store.updateResponse(problem.template_id, {
-      finalAnswer: problem.expected_answer === "-2y" ? "-2*y+(x+y)^2-1" : String(problem.expected_answer),
-      work: workFor(problem),
-    });
-  }
-  const adversarialResult = adversarial.store.submitTest().results;
-  assert.equal(adversarialResult.rawScore, adversarialResult.scoreTotal - 1);
+  assert.equal(gradeProblem({ grading_method: "symbolic_expression", expected_answer: "-2y" }, "-2*y+(x+y)^2-1").correct, false);
 });
 
 test("procedural work rejects a broken middle equation even when the final answer is right", () => {
@@ -689,6 +743,42 @@ test("procedural work rejects a broken middle equation even when the final answe
   const result = store.submitTest();
   assert.equal(result.ok, false);
   assert.match(result.workIssues.find((issue) => issue.questionId === target.template_id).message, /changes the solution/i);
+});
+
+test("the browser grader understands mathematical notation and reversed equation answers", () => {
+  assert.equal(gradeProblem({ grading_method: "exact_numeric", expected_answer: String(Math.sqrt(2)), tolerance: 1e-9 }, "√2").correct, true);
+  assert.equal(gradeProblem({ grading_method: "exact_numeric", expected_answer: String(Math.PI), tolerance: 1e-9 }, "π").correct, true);
+  assert.equal(gradeProblem({ grading_method: "equation_solution", expected_answer: "x = 4", variable: "x" }, "4 = x").correct, true);
+  assert.equal(gradeProblem({ grading_method: "symbolic_expression", expected_answer: "(x + 1)^2" }, "x² + 2x + 1").correct, true);
+  assert.equal(gradeProblem({ grading_method: "exact_text", expected_answer: "no solution", accepted_forms: ["none"] }, "none").correct, true);
+  assert.equal(gradeProblem({ grading_method: "symbolic_expression", expected_answer: "x + x", accepted_forms: ["2y"] }, "2y").correct, true);
+});
+
+test("inequality grading checks the complete solution set and sign reversals", () => {
+  const problem = { grading_method: "inequality_solution", expected_answer: "x < 5", variable: "x" };
+  assert.equal(gradeProblem(problem, "2x < 10").correct, true);
+  assert.equal(gradeProblem(problem, "x <= 5").correct, false);
+  assert.equal(gradeProblem(problem, "x > 5").correct, false);
+
+  const workProblem = {
+    ...problem,
+    work_required: true,
+    work: { mode: "procedural_steps", minimum_steps: 2, line_type: "inequality", target_variable: "x", require_final_answer_match: true },
+  };
+  assert.equal(validateProceduralWork(workProblem, "2x < 10\nx < 5"), null);
+  assert.match(validateProceduralWork(workProblem, "-2x < -10\nx < 5"), /changes the inequality solution set/i);
+});
+
+test("literal-equation work preserves solutions with multiple symbols", () => {
+  const problem = {
+    grading_method: "equation_solution",
+    expected_answer: "F/a",
+    variable: "m",
+    work_required: true,
+    work: { mode: "procedural_steps", minimum_steps: 2, line_type: "equation", target_variable: "m", require_final_answer_match: true },
+  };
+  assert.equal(validateProceduralWork(problem, "F = ma\nF/a = m"), null);
+  assert.match(validateProceduralWork(problem, "F = ma\nF + a = m"), /changes the solution/i);
 });
 
 test("learning context exposes prompts and student state but never answer keys", () => {
@@ -773,7 +863,25 @@ test("the original one-skill challenge state migrates into a demo profile", () =
 test("progress, attempt, and review CSV exports have stable headers", () => {
   const { store } = harness();
   store.createProfile("Export Learner", { demo: true });
-  assert.match(store.exportCsv("progress"), /^"skill_id","skill","status"/);
-  assert.match(store.exportCsv("attempts"), /^"attempt_id","skill_id","skill"/);
-  assert.match(store.exportCsv("reviews"), /^"review_id","attempt_id","question_id"/);
+  assert.match(store.exportCsv("progress"), /^"profile_id","skill_id","skill_name","domain"/);
+  assert.match(store.exportCsv("attempts"), /^"attempt_id","profile_id","skill_id","skill_name"/);
+  assert.match(store.exportCsv("reviews"), /^"review_id","attempt_id","question_id","reviewer_type"/);
+  assert.match(store.exportCsv("reviews"), /"obligation_results_json","obligation_statuses","obligation_notes","rubric_points","rubric_notes"/);
+});
+
+test("rich tutor exports preserve post-attempt answers, work, reflection, and review instructions", () => {
+  const { store } = harness();
+  store.createProfile("Tutor Export");
+  store.startTest("MATH_ARITH_001");
+  const draft = answerActiveTestCorrectly(store);
+  assert.equal(store.submitTest().ok, true);
+  const attempt = store.saveReflection({ confidenceRating: 4, difficultyFelt: "hard", hintsUsed: "little", guessed: "no", notes: "Check sign rules." });
+  const summary = store.exportTutorSummary(attempt.attemptId);
+  const packet = store.exportTutorReviewPacket(attempt.attemptId);
+  assert.match(summary, /QuickMaths Tutor Summary/);
+  assert.match(summary, /Expected final answer:/);
+  assert.match(summary, new RegExp(`Question ID: ${draft.problems[0].template_id}`));
+  assert.match(summary, /Check sign rules\./);
+  assert.match(packet, /QuickMaths Tutor Review Packet/);
+  assert.match(packet, /Requested Return Format/);
 });

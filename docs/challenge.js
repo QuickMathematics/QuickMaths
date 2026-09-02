@@ -788,10 +788,10 @@ function renderTest(snapshot) {
 
 function resultReviewGuide(result) {
   if (result.workMode === "proof_obligations" && result.proofObligations?.length) {
-    return `<section class="result-review-guide"><strong>Review this proof against</strong><ol>${result.proofObligations.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol></section>`;
+    return `<section class="result-review-guide"><strong>Review this proof against</strong><ol>${result.proofObligations.map((item) => `<li>${escapeHtml(typeof item === "string" ? item : item.description ?? item.label ?? item.id)}</li>`).join("")}</ol></section>`;
   }
   if (result.workMode === "rubric_check" && result.rubricCriteria?.length) {
-    return `<section class="result-review-guide"><strong>Review this response against</strong><ul>${result.rubricCriteria.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`;
+    return `<section class="result-review-guide"><strong>Review this response against</strong><ul>${result.rubricCriteria.map((item) => `<li>${escapeHtml(typeof item === "string" ? item : item.description ?? item.label ?? item.id)}${typeof item === "object" && item.weight ? ` · ${escapeHtml(item.weight)} point${Number(item.weight) === 1 ? "" : "s"}` : ""}</li>`).join("")}</ul></section>`;
   }
   return "";
 }
@@ -807,7 +807,22 @@ function renderAttemptReviewForm(attempt) {
   const targets = attempt?.results?.filter((item) => item.work) ?? [];
   if (!targets.length) return "";
   const first = targets[0];
-  return `<section class="self-review content-card"><div class="card-heading"><div><p class="eyebrow">${attempt.hasPendingReview ? "Required sign-off" : "Optional review"}</p><h2>${attempt.hasPendingReview ? "Review the saved reasoning" : "Add tutor / self review"}</h2><p>Select the exact response, compare it with its proof checklist or rubric above, then save one overall verdict.</p></div></div><form id="self-review-form"><div class="review-form-grid"><label>Response<select id="review-question-select" name="question">${targets.map((result, index) => `<option value="${escapeHtml(result.questionId)}" data-allow-self="${result.allowSelfReview ? "true" : "false"}">Question ${index + 1} · ${escapeHtml(result.workMode?.replaceAll("_", " ") ?? "shown work")}</option>`).join("")}</select></label><label>Reviewer<select id="review-reviewer-select" name="reviewer"><option value="self" ${first.allowSelfReview ? "" : "disabled"}>Self</option><option value="human_tutor" ${first.allowSelfReview ? "" : "selected"}>Human tutor</option><option value="ai_tutor">AI tutor / agent</option></select></label><label>Verdict<select name="verdict"><option value="pass">Pass</option><option value="partial" selected>Partial</option><option value="needs_revision">Needs revision</option><option value="fail">Fail</option></select></label><label>Confidence<select name="confidence"><option>low</option><option selected>medium</option><option>high</option></select></label></div><p id="review-permission-note" class="review-permission-note">${first.allowSelfReview ? "This response allows self review." : "This response requires a tutor or connected agent."}</p><label>Feedback<textarea name="feedback" rows="3" required placeholder="Which requirements were met, and what needs revision?"></textarea></label><label>Next step<input name="next" required placeholder="One concrete action for the learner"></label><button class="button button-secondary" type="submit">Save review</button></form></section>`;
+  const structured = targets.map((result, index) => {
+    const obligations = result.proofObligations ?? [];
+    const criteria = result.rubricCriteria ?? [];
+    if (!obligations.length && !criteria.length) return `<div class="structured-review" data-review-structure="${escapeHtml(result.questionId)}" ${index ? "hidden" : ""}><p>This response has no checklist. Use the overall verdict below.</p></div>`;
+    if (obligations.length) return `<fieldset class="structured-review" data-review-structure="${escapeHtml(result.questionId)}" ${index ? "hidden" : ""}><legend>Proof obligations · score each one</legend>${obligations.map((item, obligationIndex) => { const value = typeof item === "string" ? { id: `obligation_${obligationIndex + 1}`, description: item } : item; return `<div class="structured-review-row" data-obligation-id="${escapeHtml(value.id)}"><strong>${escapeHtml(value.description ?? value.label ?? value.id)}</strong><select class="review-obligation-status" aria-label="Status for ${escapeHtml(value.description ?? value.id)}"><option value="satisfied">Satisfied</option><option value="flawed">Flawed / incomplete</option><option value="missing">Missing</option>${value.required === false ? '<option value="not_applicable">Not applicable</option>' : ""}</select><input class="review-item-note" placeholder="Evidence or revision note (optional)"></div>`; }).join("")}</fieldset>`;
+    return `<fieldset class="structured-review" data-review-structure="${escapeHtml(result.questionId)}" ${index ? "hidden" : ""}><legend>Rubric · award points per criterion</legend>${criteria.map((item, criterionIndex) => { const value = typeof item === "string" ? { id: `criterion_${criterionIndex + 1}`, description: item, weight: 1 } : item; return `<div class="structured-review-row" data-rubric-id="${escapeHtml(value.id)}"><strong>${escapeHtml(value.description ?? value.label ?? value.id)}</strong><label>Points <input class="review-rubric-score" type="number" min="0" max="${escapeHtml(value.weight ?? 1)}" step="0.1" value="${escapeHtml(value.weight ?? 1)}"> / ${escapeHtml(value.weight ?? 1)}</label><input class="review-item-note" placeholder="Evidence or revision note (optional)"></div>`; }).join("")}</fieldset>`;
+  }).join("");
+  return `<section class="self-review content-card"><div class="card-heading"><div><p class="eyebrow">${attempt.hasPendingReview ? "Required sign-off" : "Optional review"}</p><h2>${attempt.hasPendingReview ? "Review the saved reasoning" : "Add tutor / self review"}</h2><p>Select the response, score every proof obligation or rubric criterion, then leave concise feedback. QuickMaths calculates the structured verdict.</p></div></div><form id="self-review-form"><div class="review-form-grid"><label>Response<select id="review-question-select" name="question">${targets.map((result) => `<option value="${escapeHtml(result.questionId)}" data-allow-self="${result.allowSelfReview ? "true" : "false"}">Question ${attempt.results.findIndex((item) => item.questionId === result.questionId) + 1} · ${escapeHtml(result.workMode?.replaceAll("_", " ") ?? "shown work")}</option>`).join("")}</select></label><label>Reviewer<select id="review-reviewer-select" name="reviewer"><option value="self" ${first.allowSelfReview ? "" : "disabled"}>Self</option><option value="human_tutor" ${first.allowSelfReview ? "" : "selected"}>Human tutor</option><option value="ai_tutor">AI tutor / agent</option></select></label><label>Overall verdict for unstructured work<select name="verdict"><option value="pass">Pass</option><option value="partial" selected>Partial</option><option value="needs_revision">Needs revision</option><option value="fail">Fail</option></select></label><label>Confidence<select name="confidence"><option>low</option><option selected>medium</option><option>high</option></select></label></div><p id="review-permission-note" class="review-permission-note">${first.allowSelfReview ? "This response allows self review." : "This response requires a tutor or connected agent."}</p>${structured}<label>Feedback<textarea name="feedback" rows="3" required placeholder="Which requirements were met, and what needs revision?"></textarea></label><label>Next step<input name="next" required placeholder="One concrete action for the learner"></label><button class="button button-secondary" type="submit">Save review</button></form></section>`;
+}
+
+function savedReviewDetails(review) {
+  const details = [
+    ...(review.obligationResults ?? []).map((item) => `<li><b>${escapeHtml(item.id)}</b> · ${escapeHtml(item.status)}${item.note ? `<small>${escapeHtml(item.note)}</small>` : ""}</li>`),
+    ...(review.rubricResults ?? []).map((item) => `<li><b>${escapeHtml(item.id)}</b> · ${escapeHtml(item.awardedPoints)} / ${escapeHtml(item.maxPoints)}${item.note ? `<small>${escapeHtml(item.note)}</small>` : ""}</li>`),
+  ];
+  return `<article><strong>${escapeHtml(review.verdict)} · ${Math.round(review.score * 100)}%</strong>${details.length ? `<ul>${details.join("")}</ul>` : ""}<p>${escapeHtml(review.feedback)}</p><small>${escapeHtml(review.nextStep)}</small></article>`;
 }
 
 function renderResults(snapshot) {
@@ -822,7 +837,7 @@ function renderResults(snapshot) {
   const score = Math.round((result.percentScore ?? 0) * 100);
   const reviews = snapshot.reviews.filter((review) => !attempt || review.attemptId === attempt.attemptId);
   elements.view.innerHTML = `
-    <header class="page-head"><div><p class="eyebrow">${pending ? "Unsaved reflection" : "Saved attempt"}</p><h1>${escapeHtml(skill?.name ?? result.skillName)}</h1><p>${pending ? "Review the outcome, then save your reflection to update the mastery map." : `Completed ${formatDate(attempt.completedAt)} · ${escapeHtml(attempt.masteryUpdate?.status ?? "saved")}`}</p></div><div class="result-score"><strong>${score}%</strong><span>${result.rawScore} / ${result.scoreTotal} correct</span></div></header>
+    <header class="page-head"><div><p class="eyebrow">${pending ? "Unsaved reflection" : "Saved attempt"}</p><h1>${escapeHtml(skill?.name ?? result.skillName)}</h1><p>${pending ? "Review the outcome, then save your reflection to update the mastery map." : `Completed ${formatDate(attempt.completedAt)} · ${escapeHtml(attempt.masteryUpdate?.status ?? "saved")}`}</p>${pending ? "" : `<div class="page-actions"><button class="button button-outline" data-action="download-tutor-summary">Tutor summary ↓</button><button class="button button-outline" data-action="download-review-packet">Review packet ↓</button></div>`}</div><div class="result-score"><strong>${score}%</strong><span>${result.rawScore} / ${result.scoreTotal} correct</span></div></header>
     <section class="results-layout">
       <div class="result-questions">${resultDetails(result.results ?? [])}</div>
       <aside class="reflection-card">
@@ -835,7 +850,7 @@ function renderResults(snapshot) {
             <label>Notes<textarea name="notes" rows="3"></textarea></label>
             <button class="button button-primary" type="submit">Save result & update map</button>
           </form>` : `<p class="eyebrow">Mastery update</p><h2>${escapeHtml(attempt.masteryUpdate?.status ?? "Saved")}</h2><div class="saved-mastery"><strong>${Math.round(attempt.masteryUpdate?.masteryScore ?? 0)}</strong><span>/ 100 mastery</span></div><dl class="reflection-summary"><div><dt>Confidence</dt><dd>${attempt.reflection?.confidenceRating ?? "—"}/5</dd></div><div><dt>Difficulty</dt><dd>${escapeHtml(attempt.reflection?.difficultyFelt ?? "—")}</dd></div><div><dt>Hints</dt><dd>${escapeHtml(attempt.reflection?.hintsUsed ?? "—")}</dd></div></dl><button class="button button-primary" data-action="retake" data-skill-id="${escapeHtml(attempt.skillId)}">Practice again</button>`}
-        ${reviews.length ? `<div class="saved-reviews"><p class="eyebrow">Saved review</p>${reviews.map((review) => `<article><strong>${escapeHtml(review.verdict)} · ${Math.round(review.score * 100)}%</strong><p>${escapeHtml(review.feedback)}</p><small>${escapeHtml(review.nextStep)}</small></article>`).join("")}</div>` : ""}
+        ${reviews.length ? `<div class="saved-reviews"><p class="eyebrow">Saved review</p>${reviews.map(savedReviewDetails).join("")}</div>` : ""}
       </aside>
     </section>
     ${!pending ? renderAttemptReviewForm(attempt) : ""}
@@ -1527,6 +1542,16 @@ document.addEventListener("click", async (event) => {
     download(`quickmaths-${kind}.csv`, store.exportCsv(kind), "text/csv");
     showToast(`${kind[0].toUpperCase()}${kind.slice(1)} CSV downloaded.`);
   }
+  if (action.dataset.action === "download-tutor-summary") {
+    const attempt = store.getAttempt();
+    download(`quickmaths-${attempt.skillId.toLowerCase()}-tutor-summary.md`, store.exportTutorSummary(attempt.attemptId), "text/markdown");
+    showToast("Rich tutor summary downloaded.");
+  }
+  if (action.dataset.action === "download-review-packet") {
+    const attempt = store.getAttempt();
+    download(`quickmaths-${attempt.skillId.toLowerCase()}-review-packet.md`, store.exportTutorReviewPacket(attempt.attemptId), "text/markdown");
+    showToast("Tutor review packet downloaded.");
+  }
   if (action.dataset.action === "copy-tutor-setup") {
     navigator.clipboard.writeText(TUTOR_SETUP_PROMPT).then(() => showToast("Tutor prompt copied.")).catch(() => showToast("Select the prompt to copy it."));
   }
@@ -1542,6 +1567,7 @@ document.addEventListener("change", (event) => {
     if (!allowSelf && reviewer?.value === "self") reviewer.value = "human_tutor";
     const note = document.querySelector("#review-permission-note");
     if (note) note.textContent = allowSelf ? "This response allows self review." : "This response requires a tutor or connected agent.";
+    document.querySelectorAll("[data-review-structure]").forEach((section) => { section.hidden = section.dataset.reviewStructure !== event.target.value; });
     return;
   }
   if (event.target.id === "depot-subject" || event.target.id === "depot-sort") {
@@ -1665,10 +1691,22 @@ document.addEventListener("submit", (event) => {
     const data = new FormData(event.target);
     const attempt = store.getAttempt();
     const reviewed = attempt?.results?.find((result) => result.questionId === data.get("question")) ?? attempt?.results?.find((result) => result.work) ?? attempt?.results?.[0];
+    const structure = [...event.target.querySelectorAll("[data-review-structure]")].find((section) => section.dataset.reviewStructure === reviewed?.questionId);
+    const obligationResults = [...(structure?.querySelectorAll("[data-obligation-id]") ?? [])].map((row) => ({
+      id: row.dataset.obligationId,
+      status: row.querySelector(".review-obligation-status")?.value ?? "missing",
+      note: row.querySelector(".review-item-note")?.value ?? "",
+    }));
+    const rubricResults = [...(structure?.querySelectorAll("[data-rubric-id]") ?? [])].map((row) => ({
+      id: row.dataset.rubricId,
+      awardedPoints: Number(row.querySelector(".review-rubric-score")?.value ?? 0),
+      note: row.querySelector(".review-item-note")?.value ?? "",
+    }));
     store.recordTutorFeedback({
       questionId: reviewed?.questionId ?? "attempt", feedback: data.get("feedback"), nextStep: data.get("next"),
       confidence: data.get("confidence"), verdict: data.get("verdict"), reviewerType: data.get("reviewer"),
       mistakeTag: reviewed?.mistakeTags?.[0] ?? "none",
+      obligationResults, rubricResults,
     });
     showToast("Review saved to this profile.");
   }

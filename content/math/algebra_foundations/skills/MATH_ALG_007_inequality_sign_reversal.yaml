@@ -80,7 +80,7 @@ test:
         type: text
         value: "x > {x}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: none
       review_policy:
@@ -118,7 +118,7 @@ test:
         type: text
         value: "x < {x}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: none
       review_policy:
@@ -156,7 +156,7 @@ test:
         type: text
         value: "x >= {x}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: none
       review_policy:
@@ -194,7 +194,7 @@ test:
         type: text
         value: "x <= {x}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: none
       review_policy:
@@ -237,7 +237,7 @@ test:
         type: text
         value: "x > {x}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: none
       review_policy:
@@ -280,7 +280,7 @@ test:
         type: text
         value: "x <= {x}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: none
       review_policy:
@@ -318,7 +318,7 @@ test:
         type: text
         value: "x >= {x}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: none
       review_policy:
@@ -356,7 +356,7 @@ test:
         type: text
         value: "x < {x}"
       grading:
-        method: exact_text
+        method: inequality_solution
       work:
         mode: none
       review_policy:

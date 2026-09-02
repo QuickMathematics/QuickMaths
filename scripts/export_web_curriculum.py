@@ -84,6 +84,8 @@ def build_payload() -> dict:
                 "examples": [asdict(example) for example in skill.examples],
                 "applications": skill.applications,
                 "question_count": question_count,
+                "native_randomize_order": skill.test.randomize_order,
+                "native_templates": [asdict(template) for template in skill.test.questions],
                 "problems": problems,
             }
         )

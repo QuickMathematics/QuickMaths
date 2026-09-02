@@ -54,7 +54,7 @@
     "tutoring": [
       "Work Socratically: diagnose briefly, ask one useful question or give one next step, then let the learner attempt it.",
       "Never reveal expected answers or solution steps before submission.",
-      "Inspect only visible student work and save concise feedback with record_tutor_feedback.",
+      "Inspect only visible student work from the active draft or saved attempt. For proofs, return one status for every proof obligation; for rubric responses, return points for every criterion. Save concise evidence, a Socratic next step, and the structured results with record_tutor_feedback.",
       "Do not mark a skill mastered or claim progress was saved unless the app result confirms it."
     ],
     "navigation": [
@@ -145,7 +145,7 @@
       "mode": "override",
       "schema_version": "2.0",
       "scope": "built-in native lessons only; the subject and lesson ID cannot change",
-      "behavior": "Replaces lesson content while installed, without adding a map node or changing the total lesson count. Completed attempts, mastery, and reviews remain attached to the same ID; affected unfinished tests restart so answers cannot cross between question-bank versions.",
+      "behavior": "Replaces lesson content while installed, without adding a map node or changing the total lesson count. Completed attempts, mastery, and reviews remain attached to the same ID; affected unfinished tests restart so answers cannot cross between question-bank versions. Built-in Mathematics uses trusted runtime templates for fresh retake values; custom and community overrides remain fixed validated question banks and never execute uploaded generator code.",
       "agent_pipeline": "Use open_lesson_creator with skill_id for a visible editable copy, or validate_lesson_set then stage_custom_lesson_set for authored JSON. A human must install it.",
       "restore": "Settings offers Restore original; removing the improvement does not remove learner progress.",
       "answer_key_boundary": "Do not return private answer keys or solution steps in tool results or learner-facing conversation."
@@ -156,6 +156,7 @@
       "multiple_choice",
       "symbolic_expression",
       "equation_solution",
+      "inequality_solution",
       "exact_text",
       "theorem_conclusion"
     ],

@@ -40,6 +40,9 @@ function studioHarness({ questionCount = 1 } = {}) {
     store: {
       skillsById: Object.fromEntries(state.curriculum.allSkills.map((skill) => [skill.id, skill])),
       previewLessonPack() { return { name: "Pack", mode: "add", skillCount: 1, problemCount: 1, subjectName: "Mathematics" }; },
+      previewNativeAssessment(skillId, variation) {
+        return { ok: true, skillId, skillName: source.name, variation, templateCount: 1, problems: [{ ...structuredClone(source.problems[0]), template_id: `INTEGER_NATIVE_SCENARIO__RUNTIME_${variation + 1}`, values: { a: String(variation + 2), b: "5" } }] };
+      },
     },
     download() {}, showToast() {}, getSnapshot: () => state, openFilePicker() {},
   });
@@ -124,8 +127,12 @@ test("Lesson Studio opens native lessons as reversible overrides without changin
   assert.match(html, /Edit a native lesson/);
   assert.match(html, /Native improvement/);
   assert.match(html, /completed progress remain preserved/);
+  assert.match(html, /Original native runtime generator/);
+  assert.match(html, /Variation 1/);
   assert.match(html, /Install improvement/);
   assert.match(html, /readonly/);
+  studio.handleAction({ dataset: { creatorAction: "reroll-native-preview" } });
+  assert.match(studio.render(state), /Variation 2/);
 });
 
 test("large native question banks render one editable question at a time", () => {
