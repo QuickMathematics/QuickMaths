@@ -3,7 +3,7 @@
 [![Full test suite](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml/badge.svg)](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml)
 [![Live app](https://img.shields.io/badge/live-QuickMaths-123f35)](https://quickmathematics.github.io/QuickMaths/)
 
-QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, substantial Mathematics and Geography curricula, structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
+QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, a substantial native Mathematics curriculum, an installable 15-lesson Geography curriculum, structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
 
 [![QuickMaths combined Mathematics and Geography mastery map](docs/assets/quickmaths-mastery-map.png)](https://quickmathematics.github.io/QuickMaths/#/map)
 
@@ -18,7 +18,7 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 ## What is in the app
 
 - Multiple learner profiles with separate progress, attempts, reviews, timers, and preferences
-- Mathematics and Geography mastery maps, including cross-subject prerequisite bridges
+- Native Mathematics plus an installable Geography mastery map from the Lesson Depot, joined by a cross-subject prerequisite bridge
 - Persistent Plan mode with draggable layouts, desktop marquee/Ctrl selection, touch hold-selection, colored custom paths, and draggable free or connected comment nodes
 - Enforced Hard path and guideline-only Open path
 - Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, and review gates
@@ -52,7 +52,7 @@ Open the printed `127.0.0.1` URL in a WebMCP-compatible agent browser. The loopb
 
 ## Curriculum development
 
-The native Mathematics curriculum is authored in YAML under `content/math/algebra_foundations/`. Geography and its Mathematics bridge live in `content/geography/foundations/web-curriculum.json`.
+The native Mathematics curriculum is authored in YAML under `content/math/algebra_foundations/`. The deterministic Geography source in `scripts/build_geography_web_curriculum.mjs` emits both the native Mathematics coordinate/geodesy bridge and the installable `PACK_GEOGRAPHY` Lesson Depot package.
 
 Validate native YAML:
 

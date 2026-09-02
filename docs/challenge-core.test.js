@@ -18,6 +18,7 @@ import {
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const lessonSetExample = readFileSync(new URL("./lesson-set-example.json", import.meta.url), "utf8");
+const geographyLessonSet = readFileSync(new URL("./lesson-depot/lessons/geography/1.0.0/lesson-set.json", import.meta.url), "utf8");
 const AUTHORED_MATH_SCENARIO_COUNTS = Object.freeze({
   MATH_ALG_001: 21, MATH_ALG_002: 23, MATH_ALG_003: 22, MATH_ALG_004: 24,
   MATH_ALG_005: 21, MATH_ALG_006: 24, MATH_ALG_007: 8, MATH_ALG_008: 8,
@@ -117,18 +118,15 @@ function workFor(problem, final = String(problem.expected_answer)) {
   return Array.from({ length: Math.max(1, Number(problem.work?.minimum_steps ?? 1)) }, () => final).join("\n");
 }
 
-test("ships the complete first-party Mathematics and Geography curriculum and opens at the profile picker", () => {
+test("ships the complete native Mathematics curriculum and opens at the profile picker", () => {
   const { store } = harness();
   const state = store.snapshot();
-  assert.equal(curriculum.skills.length, 43);
-  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 583);
-  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 583);
-  assert.equal(curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY").length, 15);
+  assert.equal(curriculum.skills.length, 28);
+  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 433);
+  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 433);
+  assert.equal(curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY").length, 0);
   assert.equal(curriculum.skills.filter((skill) => skill.id.startsWith("MATH_GEOM_")).length, 3);
-  assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [
-    ["SUBJECT_MATH", 28],
-    ["SUBJECT_GEOGRAPHY", 15],
-  ]);
+  assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [["SUBJECT_MATH", 28]]);
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "MATH_ARITH_002").questionCount, 16);
   assert.equal(state.profiles.length, 0);
   assert.equal(state.activeProfile, null);
@@ -161,8 +159,9 @@ test("every built-in assessment starts with exactly one problem from every autho
   }
 });
 
-test("first-party Geography is substantial and bridges through Mathematics coordinate geometry", () => {
-  const geography = curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY");
+test("Depot Geography is substantial, installable, and bridges through native Mathematics", () => {
+  const rawPack = JSON.parse(geographyLessonSet);
+  const geography = rawPack.skills;
   assert.equal(geography.length, 15);
   assert.ok(geography.every((skill) => skill.theory.length > 2_200));
   assert.ok(geography.every((skill) => skill.examples.length >= 4));
@@ -170,12 +169,17 @@ test("first-party Geography is substantial and bridges through Mathematics coord
   assert.ok(geography.every((skill) => skill.problems.length === 10));
   assert.ok(geography.every((skill) => skill.problems.some((problem) => problem.work?.mode === "rubric_check")));
 
-  const bridge = curriculum.skills.find((skill) => skill.id === "GEO_CART_002");
-  assert.ok(bridge.prerequisites.includes("MATH_GEOM_003"));
-  assert.deepEqual(bridge.prerequisiteRefs, [{ subjectId: "SUBJECT_MATH", skillId: "MATH_GEOM_003" }]);
-
   const { store } = harness();
   store.createProfile("Geography Learner");
+  assert.deepEqual(store.snapshot().subjects.map((subject) => subject.id), ["SUBJECT_MATH"]);
+  const installed = store.importLessonPack(geographyLessonSet);
+  assert.equal(installed.totalSkillCount, 43);
+  const bridge = store.skillsById.GEO_CART_002;
+  assert.ok(bridge.prerequisites.includes("MATH_GEOM_003"));
+  assert.deepEqual(bridge.prerequisiteRefs, [
+    { subjectId: null, skillId: "GEO_CART_001" },
+    { subjectId: "SUBJECT_MATH", skillId: "MATH_GEOM_003" },
+  ]);
   store.setLearningPreferences({ subjectId: "SUBJECT_GEOGRAPHY" });
   let state = store.snapshot();
   assert.equal(state.activeSubject.name, "Geography");
@@ -185,6 +189,27 @@ test("first-party Geography is substantial and bridges through Mathematics coord
   assert.throws(() => store.startTest("GEO_CART_002"), /locked/i);
   store.setLearningPreferences({ progressionMode: "soft" });
   assert.doesNotThrow(() => store.startTest("GEO_CART_002"));
+});
+
+test("profiles from the native-Geography release migrate to the Depot package without losing progress", () => {
+  const legacyState = {
+    version: 13,
+    activeProfileId: "legacy-geographer",
+    profiles: [{
+      id: "legacy-geographer", displayName: "Legacy Geographer", createdAt: "2026-09-01T09:00:00.000Z",
+      activeSubjectId: "SUBJECT_GEOGRAPHY", progressionMode: "hard", mapScope: "subject", tutorialCompletedAt: "2026-09-01T09:10:00.000Z",
+    }],
+    progress: { "legacy-geographer": { GEO_FOUND_001: { status: "proven", masteryScore: 82, attemptCount: 2 } } },
+    lessonPacks: [],
+    ui: { route: "map", selectedSkillId: "GEO_FOUND_001", selectedMapSkillId: "GEO_FOUND_001" },
+  };
+  const storage = memoryStorage({ [STORAGE_KEY]: JSON.stringify(legacyState) });
+  const store = createQuickMathsStore({ storage, curriculum, bundledLessonPacks: [geographyLessonSet] });
+  const state = store.snapshot();
+  assert.equal(state.lessonPacks[0].id, "PACK_GEOGRAPHY");
+  assert.equal(state.activeSubject.id, "SUBJECT_GEOGRAPHY");
+  assert.equal(state.progressRows.find((row) => row.id === "GEO_FOUND_001").masteryScore, 82);
+  assert.equal(state.ui.selectedMapSkillId, "GEO_FOUND_001");
 });
 
 test("malformed storage falls back safely", () => {
@@ -447,7 +472,7 @@ test("a valid custom lesson set joins the real curriculum without replacing buil
 
   const installed = store.importLessonPack(lessonSetExample);
   const state = store.snapshot();
-  assert.equal(installed.totalSkillCount, 44);
+  assert.equal(installed.totalSkillCount, 29);
   assert.equal(state.lessonPacks.length, 1);
   assert.equal(state.progressRows.length, 29);
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "CUSTOM_FINANCE_DISCOUNTS").custom, true);
@@ -468,7 +493,7 @@ test("native lesson improvements replace content reversibly without moving IDs o
   const preview = store.previewLessonPack(nativeImprovement());
   assert.equal(preview.mode, "override");
   assert.deepEqual(preview.overridesNativeSkills, ["MATH_ARITH_001"]);
-  assert.equal(store.snapshot().curriculum.allSkills.length, 43, "preview must not mutate the curriculum");
+  assert.equal(store.snapshot().curriculum.allSkills.length, 28, "preview must not mutate the curriculum");
 
   const installed = store.importLessonPack(nativeImprovement());
   let state = store.snapshot();
@@ -476,8 +501,8 @@ test("native lesson improvements replace content reversibly without moving IDs o
   assert.equal(installed.mode, "override");
   assert.equal(installed.completedProgressPreserved, true);
   assert.equal(installed.restartedDraftCount, 1);
-  assert.equal(installed.totalSkillCount, 43);
-  assert.equal(state.curriculum.allSkills.length, 43);
+  assert.equal(installed.totalSkillCount, 28);
+  assert.equal(state.curriculum.allSkills.length, 28);
   assert.equal(improved.name, "Integer operations · revised");
   assert.equal(improved.native, true);
   assert.equal(improved.overridden, true);
@@ -515,8 +540,7 @@ test("native improvements enforce the built-in identity and round-trip through f
 
   const moved = nativeImprovement();
   moved.id = "PACK_IMPROVE_MOVED_NATIVE";
-  const geography = curriculum.subjects.find((subject) => subject.id === "SUBJECT_GEOGRAPHY");
-  moved.subject = structuredClone(geography);
+  moved.subject = structuredClone(biologyLessonSet().subject);
   assert.throws(() => source.store.previewLessonPack(moved), /belongs to SUBJECT_MATH/i);
 
   const target = harness();
@@ -524,7 +548,7 @@ test("native improvements enforce the built-in identity and round-trip through f
   target.store.selectProfile(target.store.snapshot().profiles[0].id);
   const restored = target.store.snapshot();
   assert.equal(restored.lessonPacks[0].mode, "override");
-  assert.equal(restored.curriculum.allSkills.length, 43);
+  assert.equal(restored.curriculum.allSkills.length, 28);
   assert.equal(restored.allProgressRows.find((row) => row.id === "MATH_ARITH_001").name, "Integer operations · revised");
 });
 
@@ -537,9 +561,9 @@ test("subjects filter the visible map, apply bridge locks, and support per-profi
   store.importLessonPack(biologyLessonSet());
   let state = store.snapshot();
   assert.equal(state.activeSubject.id, "SUBJECT_BIOLOGY");
-  assert.equal(state.subjects.length, 3);
+  assert.equal(state.subjects.length, 2);
   assert.equal(state.progressRows.length, 1);
-  assert.equal(state.allProgressRows.length, 44);
+  assert.equal(state.allProgressRows.length, 29);
   assert.equal(state.progressRows[0].status, "locked");
   assert.deepEqual(state.progressRows[0].unmetPrerequisites, ["MATH_ARITH_005"]);
   store.setLearningPreferences({ progressionMode: "soft" });

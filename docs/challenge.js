@@ -1,5 +1,5 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-agent-planning-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-agent-planning-v1";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-geography-depot-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-geography-depot-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
 import {
   buildDepotSubmissionPrompt,
@@ -196,7 +196,7 @@ const TUTORIAL_STEPS = [
   {
     eyebrow: "The mastery map",
     title: "Read the map before picking your next lesson.",
-    lede: "Every node is a lesson. Connections show prerequisite knowledge—including bridges between Mathematics, Geography, and any subjects you install.",
+    lede: "Every node is a lesson. Connections show prerequisite knowledge—including bridges from Mathematics into Geography and any other subjects you install.",
     points: ["Switch between the current subject and an All subjects map.", "Drag in either direction; use the mouse wheel on desktop or pinch on mobile to zoom.", "Turn on Plan mode to rearrange a private copy, draw colored study paths, and place draggable free or lesson-connected comment nodes without changing the canonical map."],
     tip: "In Plan mode, use Ctrl or a selection rectangle on desktop; touch and hold lessons on mobile, or hold empty map space to clear the selection. Your plan autosaves with this profile and travels in full backups.",
     visual: "map",
@@ -1441,7 +1441,7 @@ function renderSettings(snapshot) {
       ${snapshot.stagedLessonPack ? `<aside class="staged-pack"><span>${snapshot.stagedLessonPack.mode === "override" ? "Native improvement" : "Agent-staged"}</span><div><strong>${escapeHtml(snapshot.stagedLessonPack.name)}</strong><p>${escapeHtml(snapshot.stagedLessonPack.subjectName)} · ${snapshot.stagedLessonPack.skillCount} lesson${snapshot.stagedLessonPack.skillCount === 1 ? "" : "s"} · ${snapshot.stagedLessonPack.problemCount} questions · ${escapeHtml(snapshot.stagedLessonPack.author)}</p><small>${snapshot.stagedLessonPack.mode === "override" ? "Validated and staged by an agent. Installing keeps completed progress, restarts affected unfinished tests, and can be undone from Settings." : "An agent validated this file, but only you can install it."}</small></div><button class="button button-primary" data-action="install-staged-pack">${snapshot.stagedLessonPack.mode === "override" ? "Install improvement" : "Install"}</button><button class="button button-outline" data-action="discard-staged-pack">Discard</button></aside>` : ""}
       <div class="lesson-pack-guide"><div><strong>Two ways to build</strong><p>Use Lesson Studio to create a curriculum or open a native lesson as an editable copy—or give the machine-readable guide to an agent.</p></div><button class="button button-primary" data-route="creator">Open Lesson Studio</button><a class="button button-outline" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Agent Lesson Authoring Guide</a></div>
       <div class="installed-packs">
-        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.mode === "override" ? `Native improvement · ${pack.overridesNativeSkills.map((id) => escapeHtml(id)).join(", ")} · completed progress preserved` : `${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"}`} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button>${pack.mode === "override" ? `<button class="quiet-button danger-link" data-action="restore-native-lessons" data-pack-id="${escapeHtml(pack.id)}">Restore original</button>` : ""}</div></article>`).join("") : `<div class="empty-state">No lesson sets or improvements installed. The built-in Mathematics and Geography curricula remain unchanged.</div>`}
+        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.mode === "override" ? `Native improvement · ${pack.overridesNativeSkills.map((id) => escapeHtml(id)).join(", ")} · completed progress preserved` : `${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"}`} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button>${pack.mode === "override" ? `<button class="quiet-button danger-link" data-action="restore-native-lessons" data-pack-id="${escapeHtml(pack.id)}">Restore original</button>` : ""}</div></article>`).join("") : `<div class="empty-state">No lesson sets or improvements installed. Mathematics remains the native curriculum; install Geography and other subjects from the Lesson Depot.</div>`}
       </div>
       <p class="pack-security-note"><strong>Teacher-file warning:</strong> lesson-set JSON contains answer keys and solutions. Don’t paste the raw file into a learner tutoring conversation.</p>
     </section>
@@ -2292,13 +2292,17 @@ function initClock() {
 }
 
 async function boot() {
-  const response = await fetch("./curriculum-data.json?v=20260902-scenario-coverage");
-  if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
+  const [response, geographyResponse] = await Promise.all([
+    fetch("./curriculum-data.json?v=20260902-geography-depot"),
+    fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
+  ]);
+  if (!response.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
+  const bundledLessonPacks = [await geographyResponse.text()];
   let agentManifest = {};
   let communityConfig = { enabled: false };
   try {
-    const manifestResponse = await fetch("./agent-manifest.json?v=20260902-agent-planning-v1");
+    const manifestResponse = await fetch("./agent-manifest.json?v=20260902-geography-depot-v1");
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
   } catch {
     // The tools still work if the optional human/machine-readable guide is unavailable.
@@ -2309,7 +2313,7 @@ async function boot() {
   } catch {
     // External GitHub links remain available if optional in-app community authorization is unavailable.
   }
-  store = createQuickMathsStore({ storage: window.localStorage, curriculum });
+  store = createQuickMathsStore({ storage: window.localStorage, curriculum, bundledLessonPacks });
   lessonDepot = createLessonDepot({
     store,
     showToast,

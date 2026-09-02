@@ -94,12 +94,18 @@ def build_payload() -> dict:
     generated_from = ["content/math/algebra_foundations"]
     if FIRST_PARTY_EXPANSION_PATH.exists():
         expansion = json.loads(FIRST_PARTY_EXPANSION_PATH.read_text(encoding="utf-8"))
-        subjects.extend(expansion.get("subjects", []))
+        # This expansion now contributes only the native Mathematics bridge.
+        # Geography is generated as a separately installable Lesson Depot pack.
+        native_skills = [
+            skill for skill in expansion.get("skills", [])
+            if skill.get("subjectId", "SUBJECT_MATH") == "SUBJECT_MATH"
+        ]
+        native_skill_ids = {skill["id"] for skill in native_skills}
         extension_track = expansion["track"]
-        track_row["skills"].extend(extension_track.get("skills", []))
-        track_row["entry_skills"].extend(extension_track.get("entry_skills", []))
-        track_row["exit_skills"].extend(extension_track.get("exit_skills", []))
-        skill_rows.extend(expansion.get("skills", []))
+        track_row["skills"].extend(skill_id for skill_id in extension_track.get("skills", []) if skill_id in native_skill_ids)
+        track_row["entry_skills"].extend(skill_id for skill_id in extension_track.get("entry_skills", []) if skill_id in native_skill_ids)
+        track_row["exit_skills"].extend(skill_id for skill_id in extension_track.get("exit_skills", []) if skill_id in native_skill_ids)
+        skill_rows.extend(native_skills)
         generated_from.append(str(FIRST_PARTY_EXPANSION_PATH.relative_to(PROJECT_ROOT)).replace("\\", "/"))
     return {
         "schema_version": "2.0",

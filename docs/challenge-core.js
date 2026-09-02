@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 13;
+export const APP_VERSION = 14;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -42,6 +42,7 @@ const MAX_MAP_PLAN_PATHS = 40;
 const MAX_MAP_PLAN_ANNOTATIONS = 200;
 const LESSON_SET_ID = /^PACK_[A-Z0-9_]{3,54}$/;
 const CUSTOM_SKILL_ID = /^CUSTOM_[A-Z0-9_]{3,52}$/;
+const LEGACY_FIRST_PARTY_DEPOT_SKILL_ID = /^GEO_[A-Z0-9_]{3,52}$/;
 const SUBJECT_ID = /^SUBJECT_[A-Z0-9_]{2,51}$/;
 const SAFE_ID = /^[A-Z][A-Z0-9_]{2,119}$/;
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
@@ -507,7 +508,9 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
   if (new Set(packSkillIds).size !== packSkillIds.length) throw new Error("Lesson set contains duplicate skill IDs.");
   for (const skillId of packSkillIds) {
     if (mode === "add") {
-      if (!CUSTOM_SKILL_ID.test(skillId)) throw new Error(`${skillId} must start with CUSTOM_ and use uppercase letters, numbers, and underscores.`);
+      if (!CUSTOM_SKILL_ID.test(skillId) && !LEGACY_FIRST_PARTY_DEPOT_SKILL_ID.test(skillId)) {
+        throw new Error(`${skillId} must start with CUSTOM_ and use uppercase letters, numbers, and underscores.`);
+      }
       if (usedSkillIds.has(skillId)) throw new Error(`Skill ID ${skillId} is already installed.`);
     } else {
       const nativeSkill = nativeById.get(skillId);
@@ -1206,6 +1209,25 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   };
 }
 
+function migrateBundledLessonPacks(candidate, bundledLessonPacks = []) {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return candidate;
+  if (Number(candidate.version) >= APP_VERSION || !Array.isArray(candidate.profiles) || !candidate.profiles.length) return candidate;
+  if (!Array.isArray(bundledLessonPacks) || !bundledLessonPacks.length) return candidate;
+  const migrated = clone(candidate);
+  migrated.lessonPacks = Array.isArray(migrated.lessonPacks) ? [...migrated.lessonPacks] : [];
+  const installedIds = new Set(migrated.lessonPacks.map((pack) => pack?.id).filter(Boolean));
+  for (const rawPack of bundledLessonPacks) {
+    let pack = rawPack;
+    if (typeof rawPack === "string") {
+      try { pack = JSON.parse(rawPack); } catch { continue; }
+    }
+    if (!pack?.id || installedIds.has(pack.id)) continue;
+    migrated.lessonPacks.push(pack);
+    installedIds.add(pack.id);
+  }
+  return migrated;
+}
+
 function migrateLegacy(storage, curriculum) {
   try {
     const legacy = JSON.parse(storage?.getItem(LEGACY_STORAGE_KEY) ?? "null");
@@ -1238,10 +1260,10 @@ function migrateLegacy(storage, curriculum) {
   }
 }
 
-export function loadState(storage, curriculum) {
+export function loadState(storage, curriculum, { bundledLessonPacks = [] } = {}) {
   try {
     const raw = storage?.getItem(STORAGE_KEY);
-    if (raw) return sanitizeState(JSON.parse(raw), curriculum);
+    if (raw) return sanitizeState(migrateBundledLessonPacks(JSON.parse(raw), bundledLessonPacks), curriculum);
   } catch {
     // Fall through to migration or a clean state.
   }
@@ -1650,12 +1672,12 @@ function reviewDate(status, score, confidence, date) {
   return next.toISOString();
 }
 
-export function createQuickMathsStore({ storage, curriculum, now = () => new Date() }) {
+export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks = [], now = () => new Date() }) {
   const skillsById = {};
   const skillOrder = [];
   const unlocks = {};
   let catalog = curriculum;
-  let state = loadState(storage, curriculum);
+  let state = loadState(storage, curriculum, { bundledLessonPacks });
   let stagedLessonPack = null;
   const listeners = new Set();
   let storageError = null;
@@ -2805,7 +2827,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     try { candidate = JSON.parse(raw); } catch { throw new Error("Backup file is not valid JSON."); }
     if (!candidate || typeof candidate !== "object") throw new Error("Backup file is invalid.");
     if (Number(candidate.version) > APP_VERSION) throw new Error("This backup was created by a newer QuickMaths version.");
-    const imported = sanitizeState(candidate, curriculum, { strictPacks: true });
+    const imported = sanitizeState(migrateBundledLessonPacks(candidate, bundledLessonPacks), curriculum, { strictPacks: true });
     if (!imported.profiles.length) throw new Error("Backup does not contain any learner profiles.");
     return { candidate, imported };
   };

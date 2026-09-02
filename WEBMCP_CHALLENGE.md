@@ -1,6 +1,6 @@
 # QuickMaths WebMCP Challenge
 
-QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, switch between Mathematics and Geography, inspect one curriculum or every installed subject in a combined bridge map, take varied mastery tests, reflect, review past work, and move progress between devices.
+QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, install Geography or another Depot subject when wanted, inspect one curriculum or every installed subject in a combined bridge map, take varied mastery tests, reflect, review past work, and move progress between devices.
 
 The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page. A separate optional Community GitHub App enables in-app public Discussion votes via 👍 reactions and comments. Its stateless OAuth callback worker stores no data and is isolated from learner state and Bridge credentials.
 
@@ -11,7 +11,7 @@ QuickMaths existed before the WebMCP Challenge. The official submission period b
 | Before August 25, 2026 | Added during the challenge submission period |
 | --- | --- |
 | Python/Streamlit desktop-style application | Complete static browser application deployed on GitHub Pages |
-| 25-lesson Mathematics YAML curriculum | Browser-ready Mathematics runtime plus Geography, coordinate-geometry bridges, and combined subject maps |
+| 25-lesson Mathematics YAML curriculum | Browser-ready native Mathematics runtime, an installable 15-lesson Geography Depot package, coordinate-geometry bridges, and combined subject maps |
 | Existing mastery, grading, profile, review, and export foundations | Twenty-one page-level WebMCP learning tools operating on the same visible human state |
 | Human-only navigation and learner workflows | Shared human-agent navigation, tutoring, saved-work inspection, structured reviews, and activity attribution |
 | Local/Drive-oriented persistence in the original application | Browser autosave, portable backups, GitHub learner storage, and a revision-safe remote Agent Bridge |
@@ -34,7 +34,7 @@ Challenge-period milestone evidence:
 - Original logo landing page with multiple learner profiles and sample progress
 - Six-chapter onboarding tour for every new profile, with skip and persistent replay controls
 - Dashboard metrics, suggested next work, recent attempts, and continue flow
-- 43 first-party lessons: 28 Mathematics lessons and a 15-lesson Geography curriculum joined through coordinate geometry and geodesy
+- 28 native Mathematics lessons plus a first-party 15-lesson Geography package in the Lesson Depot, joined through coordinate geometry and geodesy
 - Theory, applications, prerequisites, unlocks, and worked examples for every skill
 - Scenario-complete mastery tests: every authored assessment case appears once per attempt (8–25 questions in the original Mathematics curriculum), while retakes rotate generated variants
 - Multiple-choice, free-response, required shown work, local grading, and step checks
@@ -107,7 +107,8 @@ Important files:
 
 - `docs/index.html` — landing page and persistent application shell
 - `docs/challenge.css` — responsive visual system and original-style clock
-- `docs/curriculum-data.json` — browser-ready 43-lesson curriculum with comprehensive assessments and rotating retake variants
+- `docs/curriculum-data.json` — browser-ready 28-lesson native Mathematics curriculum with comprehensive assessments and rotating retake variants
+- `docs/lesson-depot/lessons/geography/1.0.0/lesson-set.json` — installable first-party 15-lesson Geography curriculum
 - `docs/challenge-core.js` — profiles, mastery graph, grading, attempts, reviews, timers, and persistence
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports
 - `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio
@@ -124,9 +125,9 @@ Important files:
 - `docs/CUSTOM_LESSON_SETS.md` — Agent Lesson Authoring Guide
 - `docs/lesson-set-example.json` — installable worked example
 - `quickmaths/local_bridge.py` — loopback HTTP boundary and transactional Git adapter
-- `content/geography/foundations/web-curriculum.json` — generated first-party Geography and Mathematics-bridge content
-- `scripts/build_geography_web_curriculum.mjs` — deterministic authoring source for the Geography expansion
-- `scripts/export_web_curriculum.py` — deterministic combined export from the original Mathematics YAML and first-party expansion
+- `content/geography/foundations/web-curriculum.json` — generated native Mathematics coordinate/geodesy bridge
+- `scripts/build_geography_web_curriculum.mjs` — deterministic source for both that native bridge and the Geography Depot package
+- `scripts/export_web_curriculum.py` — deterministic native browser export from the original Mathematics YAML and bridge expansion
 
 ## Run and test
 

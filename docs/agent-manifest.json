@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 17,
+  "app_version": 18,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -186,8 +186,8 @@
     "supported_work_modes": ["none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check"],
     "subject_system": {
       "default_subject_id": "SUBJECT_MATH",
-      "built_in_subjects": ["SUBJECT_MATH", "SUBJECT_GEOGRAPHY"],
-      "geography_bridge": "The built-in Latitude, longitude, and geodetic reference lesson depends on the Mathematics spherical-coordinates bridge, which grows from angles, arcs, and coordinate geometry.",
+      "built_in_subjects": ["SUBJECT_MATH"],
+      "geography_bridge": "The installable Geography package in the Lesson Depot depends on the native Mathematics spherical-coordinates bridge, which grows from angles, arcs, and coordinate geometry. Offer to stage PACK_GEOGRAPHY when a learner wants the Geography curriculum; installation remains a human confirmation.",
       "new_subjects": "Schema 2.0 lesson sets can create themed subjects or extend an installed subject.",
       "bridges": "Prerequisites may reference lessons in any installed subject by globally unique skill ID or explicit subject_id/skill_id object.",
       "combined_map": "The map toggle can place every installed subject in a labeled lane, color nodes from each subject theme, preserve mastery state as a status dot, and draw cross-subject prerequisite bridges between curricula.",

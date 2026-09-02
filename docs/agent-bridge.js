@@ -1,5 +1,5 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260902-agent-planning-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-agent-planning-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260902-geography-depot-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-geography-depot-v1";
 import { createLessonDepot } from "./lesson-depot.js";
 import {
   createGitHubContentsClient,
@@ -117,14 +117,16 @@ async function connectFromForm(event) {
 }
 
 async function boot() {
-  const [curriculumResponse, manifestResponse] = await Promise.all([
-    fetch("./curriculum-data.json?v=20260901-geography"),
-    fetch("./agent-manifest.json?v=20260902-agent-planning-v1").catch(() => null),
+  const [curriculumResponse, geographyResponse, manifestResponse] = await Promise.all([
+    fetch("./curriculum-data.json?v=20260902-geography-depot"),
+    fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
+    fetch("./agent-manifest.json?v=20260902-geography-depot-v1").catch(() => null),
   ]);
-  if (!curriculumResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
+  if (!curriculumResponse.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await curriculumResponse.json();
+  const bundledLessonPacks = [await geographyResponse.text()];
   const manifest = manifestResponse?.ok ? await manifestResponse.json() : {};
-  store = createQuickMathsStore({ storage: createAgentStateStorage(window.localStorage), curriculum });
+  store = createQuickMathsStore({ storage: createAgentStateStorage(window.localStorage), curriculum, bundledLessonPacks });
   lessonDepot = createLessonDepot({ store, showToast: toast });
   lessonDepot.load();
   const localCapability = resolveLocalBridgeCapability();

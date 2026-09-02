@@ -3,7 +3,7 @@
 ## Shipped foundation
 
 - Browser-first local profiles, mastery tests, reviews, timers, backups, and CSV exports
-- Mathematics and Geography curricula with cross-subject prerequisite bridges
+- Native Mathematics and an installable Geography Depot curriculum with cross-subject prerequisite bridges
 - Focused and combined-subject mastery maps with desktop/touch navigation and a persistent visual Plan mode
 - Hard/Open progression modes and subject-specific themes
 - Human Lesson Studio, native lesson improvements, and schema-validated lesson sets

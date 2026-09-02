@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = resolve(projectRoot, "content", "geography", "foundations", "web-curriculum.json");
+const depotOutputPath = resolve(projectRoot, "docs", "lesson-depot", "lessons", "geography", "1.0.0", "lesson-set.json");
 
 const mastery = Object.freeze({
   passing_score: 0.8,
@@ -986,18 +987,51 @@ for (const lesson of lessons) {
   }
 }
 
+// The three coordinate/geodesy lessons remain native Mathematics content. The
+// Geography subject itself is distributed through the Lesson Depot so a fresh
+// QuickMaths profile starts with one focused, built-in curriculum.
 const payload = {
   format: "quickmaths.built-in-curriculum",
   schema_version: "1.0",
-  subjects: [geographySubject],
+  subjects: [],
   track: {
-    skills: [...mathSkillIds, ...geographySkillIds],
-    entry_skills: ["GEO_FOUND_001"],
-    exit_skills: ["MATH_GEOM_003", "GEO_SYNTH_001"],
+    skills: mathSkillIds,
+    entry_skills: [],
+    exit_skills: ["MATH_GEOM_003"],
   },
-  skills: lessons.map(({ questions, ...lesson }) => lesson),
+  skills: lessons.filter((lesson) => lesson.subjectId === "SUBJECT_MATH").map(({ questions, ...lesson }) => lesson),
+};
+
+const depotPayload = {
+  format: "quickmaths.lesson-set",
+  schema_version: "2.0",
+  mode: "add",
+  id: "PACK_GEOGRAPHY",
+  name: "Geography",
+  description: "A rigorous 15-lesson curriculum in spatial inquiry, cartography, Earth systems, population, cities, economies, territory, risk, and regional synthesis.",
+  author: "QuickMaths",
+  version: "1.0.0",
+  subject: geographySubject,
+  track: {
+    id: "TRACK_GEOGRAPHY",
+    name: "Geography",
+    domain: "Geography",
+    description: "Progress from spatial foundations and map evidence to coupled human-environment systems and defensible regional synthesis.",
+    skills: geographySkillIds,
+    entry_skills: ["GEO_FOUND_001"],
+    exit_skills: ["GEO_SYNTH_001"],
+  },
+  skills: lessons.filter((lesson) => lesson.subjectId === "SUBJECT_GEOGRAPHY").map(({ questions, subjectId, ...lesson }) => ({
+    ...lesson,
+    prerequisites: lesson.prerequisites.map((skillId) => skillId.startsWith("MATH_")
+      ? { subject_id: "SUBJECT_MATH", skill_id: skillId }
+      : skillId),
+  })),
 };
 
 mkdirSync(dirname(outputPath), { recursive: true });
 writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
-console.log(`Wrote ${outputPath} with ${geographySkillIds.length} Geography lessons, ${mathSkillIds.length} Mathematics bridge lessons, and ${lessons.reduce((count, lesson) => count + lesson.problems.length, 0)} questions.`);
+mkdirSync(dirname(depotOutputPath), { recursive: true });
+writeFileSync(depotOutputPath, `${JSON.stringify(depotPayload, null, 2)}\n`, "utf8");
+console.log(`Wrote ${outputPath} with ${mathSkillIds.length} native Mathematics bridge lessons.`);
+console.log(`Wrote ${depotOutputPath} with ${geographySkillIds.length} Geography lessons and ${depotPayload.skills.reduce((count, lesson) => count + lesson.problems.length, 0)} questions.`);

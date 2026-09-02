@@ -1,0 +1,12 @@
+{
+  "id": "PACK_GEOGRAPHY",
+  "slug": "geography",
+  "version": "1.0.0",
+  "name": "Geography",
+  "description": "A rigorous 15-lesson curriculum in spatial inquiry, cartography, Earth systems, population, cities, economies, territory, risk, and regional synthesis.",
+  "author": "QuickMaths",
+  "license": "CC BY 4.0",
+  "tags": ["geography", "cartography", "spatial reasoning", "human geography", "physical geography"],
+  "published_at": "2026-09-02",
+  "updated_at": "2026-09-02"
+}

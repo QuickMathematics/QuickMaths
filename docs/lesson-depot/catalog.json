@@ -446,6 +446,44 @@
       "version": "0.0.0-preview.1"
     },
     {
+      "author": "QuickMaths",
+      "community": {
+        "comments": 0,
+        "discussion_url": "",
+        "votes": 0
+      },
+      "description": "A rigorous 15-lesson curriculum in spatial inquiry, cartography, Earth systems, population, cities, economies, territory, risk, and regional synthesis.",
+      "id": "PACK_GEOGRAPHY",
+      "lesson_path": "lessons/geography/1.0.0/lesson-set.json",
+      "license": "CC BY 4.0",
+      "name": "Geography",
+      "problems": 150,
+      "published_at": "2026-09-02",
+      "schema_version": "2.0",
+      "sha256": "651d9e1fb0fbe3f6502f0947e1d7e159e0f8fd875cde3a0831d0f9cf9d895a8d",
+      "skills": 15,
+      "slug": "geography",
+      "subject_id": "SUBJECT_GEOGRAPHY",
+      "subject_name": "Geography",
+      "subject_theme": {
+        "accent": "#d66b47",
+        "highlight": "#f0d98a",
+        "paperLight": "#fbfdfc",
+        "primary": "#164d58",
+        "primaryAlt": "#237080",
+        "tint": "#afd8d4"
+      },
+      "tags": [
+        "cartography",
+        "geography",
+        "human geography",
+        "physical geography",
+        "spatial reasoning"
+      ],
+      "updated_at": "2026-09-02",
+      "version": "1.0.0"
+    },
+    {
       "author": "QuickMaths Preview",
       "availability": "preview",
       "community": {

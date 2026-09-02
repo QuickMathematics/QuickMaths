@@ -7,6 +7,7 @@ import { buildToolDefinitions, registerWebMcpTools, TOOL_NAMES } from "./webmcp-
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const agentManifest = JSON.parse(readFileSync(new URL("./agent-manifest.json", import.meta.url), "utf8"));
+const geographyLessonSet = readFileSync(new URL("./lesson-depot/lessons/geography/1.0.0/lesson-set.json", import.meta.url), "utf8");
 
 function createStore({ profile = true } = {}) {
   const values = new Map();
@@ -218,7 +219,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 17);
+  assert.equal(summary.guide.app_version, 18);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
   assert.equal(summary.guide.tools.length, 21);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
@@ -325,12 +326,15 @@ test("Agent activity includes tool actions but excludes learner UI actions", asy
 
 test("subject tools switch visible curricula and open the no-code creator", async () => {
   const store = createStore();
-  const tools = toolsFor(store);
-  const subjects = await tools.list_subjects.execute({});
-  assert.equal(subjects.active_subject_id, "SUBJECT_MATH");
-  assert.deepEqual(subjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [
-    ["SUBJECT_MATH", 28],
-    ["SUBJECT_GEOGRAPHY", 15],
+  let tools = toolsFor(store);
+  const nativeSubjects = await tools.list_subjects.execute({});
+  assert.equal(nativeSubjects.active_subject_id, "SUBJECT_MATH");
+  assert.deepEqual(nativeSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [["SUBJECT_MATH", 28]]);
+  store.importLessonPack(geographyLessonSet);
+  tools = toolsFor(store);
+  const installedSubjects = await tools.list_subjects.execute({});
+  assert.deepEqual(installedSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [
+    ["SUBJECT_MATH", 28], ["SUBJECT_GEOGRAPHY", 15],
   ]);
   const changed = await tools.set_learning_preferences.execute({ progression_mode: "soft" });
   assert.equal(changed.progression_mode, "soft");
@@ -409,6 +413,7 @@ test("agent planning schemas reject unknown nodes, invalid coordinates, and ambi
 
 test("cross-subject agent paths automatically use the combined mastery map", async () => {
   const store = createStore();
+  store.importLessonPack(geographyLessonSet);
   const created = await toolsFor(store).create_map_plan_path.execute({
     skill_ids: ["MATH_GEOM_003", "GEO_FOUND_001"],
     name: "Coordinates into geography",
