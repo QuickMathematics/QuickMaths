@@ -11,14 +11,14 @@ The public app runs entirely from GitHub Pages:
 
 **https://quickmathematics.github.io/QuickMaths/**
 
-No QuickMaths account, model API key, or paid application server is required. Learner state autosaves in the browser and can be moved with full JSON backups or the optional GitHub Bridge.
+No QuickMaths account, model API key, or paid application server is required. The complete local workspace autosaves in the browser and can be moved with full JSON backups or optional private-repository Workspace Storage.
 
 QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLENGE.md#challenge-period-delta) separates the original application from the challenge-period extension and links the dated commit evidence.
 
 ## What is in the app
 
-- Separate learner and educator profile paths, both covered by browser autosave, full backups, and optional GitHub storage
-- Portable curriculum profiles with per-curriculum Depot packs, canonical personalized maps, learner rules, private agent instructions, and file/GitHub loading
+- Separate learner and educator profile paths with ownership-filtered educator views, browser autosave, full backups, and optional complete-workspace GitHub storage
+- Public curriculum blueprints and privacy-warned private assignments with exact embedded-pack integrity, canonical maps, learner rules, visible supplemental agent guidance, and assignment-progress isolation
 - Native Mathematics plus an installable Geography mastery map from the Lesson Depot, joined by a cross-subject prerequisite bridge
 - Persistent Plan mode with draggable layouts, desktop marquee/Ctrl selection, touch hold-selection, colored custom paths, and draggable free or connected comment nodes
 - Enforced Hard path and guideline-only Open path
@@ -26,7 +26,7 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
 - Public Lesson Depot with optional GitHub Discussion upvotes and comments
 - Twenty-nine WebMCP tools for visible navigation, tutoring, on-demand lesson-authoring guidance, dedicated educator guidance, curriculum design, mastery-map planning, curriculum inspection, and single or batch human-controlled lesson staging
-- Optional GitHub Bridge for revision-safe mobile/remote-agent checkpoints
+- Optional GitHub Bridge for revision-safe mobile/remote-agent checkpoints in a required private writable repository
 
 ## Run the web app locally
 
@@ -89,6 +89,8 @@ node --test community-worker/src/*.test.js
 
 ## Storage and authorization boundaries
 
-Browser autosave, GitHub learner storage, and Lesson Depot community authorization are three separate systems. Storage tokens are entered only in the app, are never committed, and should be restricted to a dedicated data repository. Community authorization cannot read learner state; its public actions are limited to GitHub Discussion reactions and comments.
+Browser autosave, GitHub Workspace Storage, and Lesson Depot community authorization are three separate systems. Workspace Storage uploads every local learner and educator profile, curriculum, attempt, review, installed pack, plan, and educator guidance to a dedicated private repository. Tokens are entered only in the app, are never committed, require Contents read/write, and should be restricted to that repository. Community authorization cannot read learner state; its public actions are limited to GitHub Discussion reactions and comments.
+
+Imported curricula start in a fresh assignment profile unless the curriculum's student name matches the selected learner profile name after whitespace and letter-case normalization. Only that explicit match reuses mastery for matching lesson IDs; the import confirmation and in-app tooltip explain the rule before records are attached.
 
 QuickMaths is MIT licensed.

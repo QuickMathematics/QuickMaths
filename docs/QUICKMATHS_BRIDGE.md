@@ -2,7 +2,9 @@
 
 QuickMaths Bridge turns a free GitHub repository into a small, auditable handoff channel between a learner's browser and an agent workspace. It does not run a model, host a backend, or expose the learner's browser to the internet.
 
-The learner page remains local-first. Normal actions save instantly in browser storage, then a short debounce writes a complete checkpoint to `learner-state.json`. The agent workspace pulls that exact revision, works through QuickMaths WebMCP tools, and publishes `agent-state.json`. The learner accepts it only when it was based on the current learner revision and no local changes are waiting to sync.
+The learner page remains local-first. Normal actions save instantly in browser storage, then a short debounce writes a complete workspace checkpoint to `learner-state.json`. That checkpoint includes every learner and educator profile, curriculum, attempt, review, installed pack, map plan, and supplemental educator guidance stored for QuickMaths on this browser origin. It is not scoped to the currently visible profile.
+
+The agent workspace pulls that exact revision, works through QuickMaths WebMCP tools, and publishes `agent-state.json`. The learner accepts it only when it was based on the current learner revision and no local changes are waiting to sync.
 
 Agent-side changes are transactional: tool calls mark the workspace dirty but never trigger the learner's automatic debounce. Nothing reaches `agent-state.json` until the agent or human explicitly calls `publish_agent_checkpoint` / **Publish agent checkpoint**.
 
@@ -21,7 +23,7 @@ Agent-side changes are transactional: tool calls mark the workspace dirty but ne
 2. Open GitHub **Settings → Developer settings → Personal access tokens → Fine-grained tokens**.
 3. Create a token with a sensible expiry. Under repository access, choose **Only select repositories** and select `quickmaths-sync`.
 4. Under repository permissions, set **Contents** to **Read and write**. Leave everything else at its minimum.
-5. In the learner app, open **Settings → QuickMaths Bridge**. Enter the owner, repository, `main`, and token. On a personal phone, **Remember token on this device** enables background reconnects. Leave it off on shared devices.
+5. In the learner app, open **Settings → Workspace Storage**. Enter the owner, private repository, `main`, and token. QuickMaths verifies privacy and write access before saving the connection. On a personal phone, **Remember token on this device** enables background reconnects. Leave it off on shared devices.
 6. The first connection asks which copy wins only when both the browser and GitHub already contain learner data. Read the labels carefully. Git history keeps the replaced remote version, but a downloaded JSON backup is still the easiest recovery file.
 7. On the agent computer, run the following from the QuickMaths source checkout, replacing the repository URL:
 

@@ -129,7 +129,7 @@ The override envelope differs only in `mode` and its IDs:
 }
 ```
 
-Guardrails are strict: override mode accepts only IDs from the built-in curriculum, rejects a changed subject, rejects two installed improvements targeting the same native lesson, and never changes the total lesson count. New/custom lessons still use `mode: "add"` (or omit `mode`) and must use `CUSTOM_` IDs. To revise an already installed improvement, download its source, restore the original in Settings, then validate and install the replacement.
+Guardrails are strict: override mode accepts only IDs from the built-in curriculum, rejects a changed subject, rejects two installed improvements targeting the same native lesson, and never changes the total lesson count. New/custom lessons still use `mode: "add"` (or omit `mode`) and must use `CUSTOM_` IDs. To revise an already installed improvement, download its source, restore the original in Settings, then validate and install the replacement. Native improvements apply browser-wide and are not silently embedded into portable curricula; Curriculum Designer blocks export until installed improvements are restored.
 
 Lesson files contain private answer-key fields. Even while helping an author, an agent must not return `expected_answer` or `solution_steps` through learner-facing tool results or tutoring conversation.
 
@@ -496,11 +496,11 @@ Agents inside a compatible browser should use this sequence:
 
 `get_lesson_authoring_guide` returns this bundled guide by topic, so an agent does not need a separate network fetch or the entire operating manifest for a small authoring task. Agents cannot call the final install action. They should recommend a full JSON progress backup before curriculum changes and never quote expected answers or solution steps into learner tutoring.
 
-For community lessons, agents can call `search_lesson_depot` to inspect catalog metadata and `stage_depot_lesson` to download, hash-check, validate, and visibly stage a chosen package. The second tool still cannot install anything; the human reviews it in Settings and clicks **Install**.
+For community lessons, agents can call `search_lesson_depot` to inspect catalog metadata and `stage_depot_lesson` to download, hash-check, validate, and visibly stage a chosen package. `stage_depot_lessons` preflights an ordered group so a later pack may depend on an earlier pack in the same batch, and it rejects aggregate capacity problems before opening the review queue. Neither tool can install anything; the human reviews every item in Settings and clicks **Install** or **Skip** separately.
 
 ## Publishing to the Lesson Depot
 
-The public Depot uses this repository as its free backend. Lesson files and catalog hashes live in Git, automated checks run in GitHub Actions, pull requests provide moderation history, and GitHub Discussions provide votes and comments. Browsing and installation require no sign-in. To vote or comment inside QuickMaths, a user can authorize the separate least-privilege QuickMaths Community GitHub App; no personal access token is requested, and its user token never enters learner storage or backups.
+The public Depot uses this repository as its free backend. Lesson files and catalog hashes live in Git, automated checks run in GitHub Actions, pull requests provide moderation history, and GitHub Discussions provide votes and comments. Browsing and installation require no sign-in. To vote or comment inside QuickMaths, a user can authorize the separate least-privilege QuickMaths Community GitHub App; no personal access token is requested, and its user token never enters Workspace Storage checkpoints or backups.
 
 From Lesson Studio, choose **Publish to Lesson Depot** after validation. QuickMaths downloads the author file, copies a detailed Codex publishing prompt when clipboard access is available, and opens the submission form. A direct source contribution uses:
 
@@ -512,7 +512,9 @@ docs/lesson-depot/lessons/<slug>/<version>/
 
 Declare an open content license such as CC BY 4.0, preserve published IDs, run `python -m scripts.lesson_depot docs/lesson-depot --output docs/lesson-depot`, run `node scripts/validate_lesson_depot.mjs docs/lesson-depot` plus both test suites, and submit the generated catalog changes with the lesson. See [`lesson-depot/README.md`](lesson-depot/README.md) for the complete review flow.
 
-Catalog metadata and community reactions are untrusted signals. Every installation independently verifies the catalog hash when supported and always runs the local lesson validator before showing the human confirmation. Public author files contain answer keys and solutions by design; do not paste them into learner tutoring conversations.
+Catalog metadata and community reactions are untrusted signals. Every installation independently verifies the catalog hash and always runs the local lesson validator before showing the human confirmation. If WebCrypto is unavailable, hash verification fails closed and the installation stops. Bounded readers reject or cancel lesson files above 2 MB before parsing. Public author files contain answer keys and solutions by design; do not paste them into learner tutoring conversations.
+
+Portable curriculum imports compare the complete normalized package content, including prerequisites, theory, questions, expected answers, work rules, and review policy. Reusing only a matching package ID or version is not sufficient. Every enabled external package must be embedded in the curriculum so the same file cannot silently resolve to different locally installed content on another device.
 
 ## Installation, progress, and backups
 

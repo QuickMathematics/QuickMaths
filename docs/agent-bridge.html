@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#123f35">
     <meta name="robots" content="noindex">
     <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com; object-src 'none'; base-uri 'none'; form-action 'self'">
     <title>QuickMaths Bridge · Agent workspace</title>
     <link rel="icon" href="./quickmaths-logo.png">
     <link rel="stylesheet" href="./agent-bridge.css">
@@ -22,14 +23,15 @@
         <div>
           <p class="eyebrow">Remote agent workspace</p>
           <h1>The learner’s workspace,<br>without the learning UI.</h1>
-          <p>This top-level page mirrors learner checkpoints from GitHub, exposes the full QuickMaths WebMCP toolset, and publishes agent changes back only when they are based on the current learner revision.</p>
+          <p>This top-level page mirrors complete QuickMaths workspace checkpoints from GitHub, exposes the WebMCP toolset for the active profile, and publishes agent changes back only when they are based on the current learner revision.</p>
         </div>
         <div class="hero-mark" aria-hidden="true"><span>Q</span><span>M</span><i>↔</i></div>
       </section>
 
       <section class="bridge-grid">
         <article class="panel connection-panel">
-          <div class="panel-heading"><div><p class="eyebrow">Connection</p><h2>GitHub data repository</h2></div><button id="disconnect-button" class="quiet-button" type="button" hidden>Disconnect</button></div>
+          <div class="panel-heading"><div><p class="eyebrow">Connection</p><h2>Private workspace repository</h2></div><button id="disconnect-button" class="quiet-button" type="button" hidden>Disconnect</button></div>
+          <p>This connection carries the complete browser workspace: every learner and educator profile, curriculum, attempt, review, installed pack, plan, and educator guidance. Use a dedicated private repository and a token restricted to it.</p>
           <form id="connection-form" autocomplete="off">
             <div class="two-fields">
               <label>Owner<input name="owner" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="github-user" required></label>
@@ -44,7 +46,7 @@
         </article>
 
         <article class="panel state-panel">
-          <div class="panel-heading"><div><p class="eyebrow">Mirrored learner</p><h2 id="learner-name">Waiting for a checkpoint</h2></div><span class="profile-mark" id="profile-mark">?</span></div>
+          <div class="panel-heading"><div><p class="eyebrow">Active mirrored profile</p><h2 id="learner-name">Waiting for a checkpoint</h2></div><span class="profile-mark" id="profile-mark">?</span></div>
           <div class="state-list">
             <div><span>Subject</span><strong id="learner-subject">—</strong></div>
             <div><span>Visible route</span><strong id="learner-route">—</strong></div>
@@ -73,6 +75,6 @@
       </section>
     </main>
     <div id="toast" class="toast" hidden></div>
-    <script type="module" src="./agent-bridge.js?v=20260902-student-docs-v1"></script>
+    <script type="module" src="./agent-bridge.js?v=20260902-security-v1"></script>
   </body>
 </html>

@@ -1,3 +1,5 @@
+import { fetchTextLimited } from "./safe-fetch.js?v=20260902-security-v1";
+
 const CATALOG_FORMAT = "quickmaths.lesson-depot.catalog";
 const CATALOG_SCHEMA = "1.0";
 const MAX_PACKAGES = 1000;
@@ -116,13 +118,13 @@ export function buildDepotSubmissionPrompt(pack = null) {
   return `${packContext}Help me submit it to the public QuickMaths Lesson Depot at ${DEPOT_REPOSITORY_URL}. Create a fork or branch, place it under docs/lesson-depot/lessons/<slug>/<version>/lesson-set.json, add metadata.json with author, content license, tags, and dates, run the Lesson Depot builder and the full test suite, then open a pull request. Do not alter the lesson answer keys, IDs, prerequisites, or grading rules without asking me. Show me the final validation result and ask before publishing the pull request.`;
 }
 
-async function sha256(raw) {
-  if (!globalThis.crypto?.subtle || typeof TextEncoder === "undefined") return "";
-  const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(raw));
+async function sha256(raw, cryptoImpl) {
+  if (!cryptoImpl?.subtle || typeof TextEncoder === "undefined") throw new Error("This browser cannot verify the Lesson Depot file hash. Installation was stopped.");
+  const digest = await cryptoImpl.subtle.digest("SHA-256", new TextEncoder().encode(raw));
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-export function createLessonDepot({ store, fetchImpl = globalThis.fetch?.bind(globalThis), showToast = () => {}, onChange = () => {}, catalogUrl = DEFAULT_DEPOT_CATALOG, confirmInstall = (message) => globalThis.confirm?.(message) ?? false } = {}) {
+export function createLessonDepot({ store, fetchImpl = globalThis.fetch?.bind(globalThis), cryptoImpl = globalThis.crypto, showToast = () => {}, onChange = () => {}, catalogUrl = DEFAULT_DEPOT_CATALOG, confirmInstall = (message) => globalThis.confirm?.(message) ?? false } = {}) {
   if (!store || typeof fetchImpl !== "function") throw new Error("Lesson Depot needs a store and fetch implementation.");
   const state = { phase: "idle", error: "", catalog: null, query: "", sort: "popular", subject: "all", preview: null, installingId: "" };
   const emit = () => onChange(snapshot());
@@ -144,12 +146,10 @@ export function createLessonDepot({ store, fetchImpl = globalThis.fetch?.bind(gl
 
   const fetchPack = async (pack) => {
     if (pack.availability === "preview") throw new Error(`${pack.name} is a concept preview. Installable lesson content has not been published yet.`);
-    const response = await fetchImpl(pack.lessonUrl, { cache: "no-cache" });
-    if (!response.ok) throw new Error(`Lesson download failed (${response.status}).`);
-    const raw = await response.text();
+    const { text: raw } = await fetchTextLimited(fetchImpl, pack.lessonUrl, { maximumBytes: 2_000_000, label: "Lesson file", request: { cache: "no-cache" } });
     if (pack.sha256) {
-      const actual = await sha256(raw);
-      if (actual && actual !== pack.sha256) throw new Error("Lesson file hash does not match the reviewed Depot catalog.");
+      const actual = await sha256(raw, cryptoImpl);
+      if (actual !== pack.sha256) throw new Error("Lesson file hash does not match the reviewed Depot catalog.");
     }
     const preview = store.previewLessonPack(raw);
     if (preview.id !== pack.id || preview.version !== pack.version) throw new Error("Lesson file identity does not match its Depot listing.");

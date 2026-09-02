@@ -1,6 +1,6 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-student-docs-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-student-docs-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
+import { APP_VERSION, createQuickMathsStore, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260902-security-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-security-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260902-security-v1";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
@@ -8,16 +8,20 @@ import {
   DEPOT_REPOSITORY_URL,
   DEPOT_SUBMISSION_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260902-geography-depot-v2";
+} from "./lesson-depot.js?v=20260902-security-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260901-bridge-fix";
+} from "./github-sync.js?v=20260902-security-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
 } from "./github-community.js?v=20260902-community-vote";
+import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-security-v1";
+
+const MAX_CURRICULUM_FILE_BYTES = 10_000_000;
+const MAX_LESSON_FILE_BYTES = 2_000_000;
 
 function assessmentCount(skill) {
   const bankLength = skill?.problems?.length ?? 0;
@@ -77,6 +81,7 @@ let bridgeFormDraft = null;
 let welcomeStorageOpen = false;
 let welcomePath = "learner";
 let pendingLandingCurriculumId = null;
+let legacyGeographyMigrationPromise = null;
 const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
 
 const AGENT_STARTER_PROMPT = "Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.";
@@ -237,7 +242,7 @@ const TUTORIAL_STEPS = [
     title: "Find lessons—and join the conversation.",
     lede: "Browse published lesson packs and clearly labelled roadmap concepts. Every card follows its subject’s color scheme, and published packages can carry live GitHub-backed upvotes and discussion.",
     points: ["Preview, hash-check, and validate a published pack before installing it.", "Connect GitHub Community to upvote and comment without leaving the app.", "Open Lesson Studio from the Depot to build new lessons or improve a native one."],
-    tip: "Community authorization is separate from learner storage. Installing content and posting publicly always remain human-controlled actions.",
+    tip: "Community authorization is separate from Workspace Storage. Installing content and posting publicly always remain human-controlled actions.",
     visual: "depot",
   },
   {
@@ -1011,9 +1016,9 @@ function renderEducatorDashboard(snapshot) {
   const workspace = snapshot.activeCurriculum;
   const enabled = snapshot.lessonPacks.filter((pack) => pack.enabledForCurriculum && pack.mode !== "override");
   elements.view.innerHTML = `
-    <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace</p><h1>${escapeHtml(workspace?.name ?? "Curriculum workspace")}</h1><p>Shape the content, map, learning rules, and agent boundaries that travel with this curriculum.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Educator guide ↗</a><button class="button button-outline" data-action="export-curriculum">Export curriculum</button><button class="button button-primary" data-route="curriculum">Open designer</button></div></header>
-    <section class="metric-grid educator-metrics"><article class="metric-card"><span>Curricula</span><strong>${snapshot.curricula.length}</strong><small>Owned by this educator</small></article><article class="metric-card"><span>Visible lessons</span><strong>${snapshot.curriculum.allSkills.length}</strong><small>Native + enabled packs</small></article><article class="metric-card"><span>Enabled packs</span><strong>${enabled.length}</strong><small>Chosen from the Depot library</small></article><article class="metric-card"><span>Agent</span><strong>${workspace?.settings.agentEnabled ? "On" : "Off"}</strong><small>${workspace?.settings.progressionMode === "soft" ? "Open path" : "Hard path"}</small></article></section>
-    <section class="dashboard-grid"><article class="suggested-card educator-next"><p class="eyebrow">Curriculum design loop</p><h2>Compose, arrange, constrain, share.</h2><p>Enable lesson packs, drag the canonical map into shape, create highlighted learning paths, annotate decisions, then export one portable curriculum file for the learner.</p><div class="suggested-actions"><button class="button button-primary" data-route="curriculum">Continue designing</button><button class="button button-outline" data-route="depot">Browse lesson Depot</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current learner policy</h2><p>These rules are enforced by the app and exposed privately to a compatible agent.</p></div></div><dl class="educator-policy-summary"><div><dt>Student</dt><dd>${escapeHtml(workspace?.settings.studentName || "Not named yet")}</dd></div><div><dt>Learning path</dt><dd>${workspace?.settings.progressionMode === "soft" ? "Open" : "Hard"}</dd></div><div><dt>Agent</dt><dd>${workspace?.settings.agentEnabled ? "In the loop" : "Off"}</dd></div><div><dt>Proof contact</dt><dd>${escapeHtml(workspace?.settings.contactEmail || "Not set")}</dd></div></dl><aside class="assessment-disclaimer"><strong>Learning, not exam supervision</strong><p>QuickMaths is a learning and practice tool. It is not a substitute for supervised, identity-verified, or high-stakes tests.</p></aside></article></section>`;
+    <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace</p><h1>${escapeHtml(workspace?.name ?? "Curriculum workspace")}</h1><p>Shape the content, map, learning rules, and agent boundaries that travel with this curriculum.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Educator guide ↗</a><button class="button button-outline" data-action="export-curriculum">Export public blueprint</button><button class="button button-primary" data-route="curriculum">Open designer</button></div></header>
+    <section class="metric-grid educator-metrics"><article class="metric-card"><span>Curricula</span><strong>${snapshot.curricula.length}</strong><small>Owned by this educator</small></article><article class="metric-card"><span>Visible lessons</span><strong>${snapshot.curriculum.allSkills.length}</strong><small>Native + enabled packs</small></article><article class="metric-card"><span>Enabled packs</span><strong>${enabled.length}</strong><small>Chosen from the Depot library</small></article><article class="metric-card"><span>Agent tutoring</span><strong>${workspace?.settings.agentEnabled ? "On" : "Off"}</strong><small>${workspace?.settings.progressionMode === "soft" ? "Open path" : "Hard path"}</small></article></section>
+    <section class="dashboard-grid"><article class="suggested-card educator-next"><p class="eyebrow">Curriculum design loop</p><h2>Compose, arrange, constrain, share.</h2><p>Enable lesson packs, drag the canonical map into shape, create highlighted learning paths, annotate decisions, then export a public blueprint or private learner assignment.</p><div class="suggested-actions"><button class="button button-primary" data-route="curriculum">Continue designing</button><button class="button button-outline" data-route="depot">Browse lesson Depot</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current learner policy</h2><p>These rules are enforced by the app. Supplemental guidance remains visible to both educator and learner and is labeled untrusted for agents.</p></div></div><dl class="educator-policy-summary"><div><dt>Student</dt><dd>${escapeHtml(workspace?.settings.studentName || "Not named yet")}</dd></div><div><dt>Learning path</dt><dd>${workspace?.settings.progressionMode === "soft" ? "Open" : "Hard"}</dd></div><div><dt>Agent tutoring</dt><dd>${workspace?.settings.agentEnabled ? "On" : "Off"}</dd></div><div><dt>Proof contact</dt><dd>${escapeHtml(workspace?.settings.contactEmail || "Not set")}</dd></div></dl><aside class="assessment-disclaimer"><strong>Learning, not exam supervision</strong><p>QuickMaths is a learning and practice tool. It is not a substitute for supervised, identity-verified, or high-stakes tests.</p></aside></article></section>`;
 }
 
 function renderCurriculumWorkspace(snapshot) {
@@ -1021,10 +1026,10 @@ function renderCurriculumWorkspace(snapshot) {
   if (!workspace) return `<section class="content-card educator-empty"><p class="eyebrow">Curriculum designer</p><h1>Create your first curriculum.</h1><p>A curriculum keeps its own enabled Depot packs, canonical map, annotations, paths, and learner policy.</p><form id="create-curriculum-form" class="educator-inline-form"><input name="name" maxlength="100" placeholder="Curriculum name" required><button class="button button-primary" type="submit">Create curriculum</button></form></section>`;
   const settings = workspace.settings;
   return `<section class="curriculum-workspace" aria-labelledby="curriculum-workspace-title">
-    <header class="curriculum-workspace-head"><div><p class="eyebrow">Open curriculum</p><h1 id="curriculum-workspace-title">${escapeHtml(workspace.name)}</h1><p>${escapeHtml(workspace.description || "A portable, educator-authored learning plan.")}</p></div><div class="curriculum-workspace-actions"><label>Switch curriculum<select id="curriculum-select">${snapshot.curricula.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === workspace.id ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></label><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Guide ↗</a><button class="button button-outline" data-action="import-curriculum">Import</button><button class="button button-outline" data-action="export-curriculum">Export</button></div></header>
+    <header class="curriculum-workspace-head"><div><p class="eyebrow">Open curriculum</p><h1 id="curriculum-workspace-title">${escapeHtml(workspace.name)}</h1><p>${escapeHtml(workspace.description || "A portable, educator-authored learning plan.")}</p></div><div class="curriculum-workspace-actions"><label>Switch curriculum<select id="curriculum-select">${snapshot.curricula.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === workspace.id ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></label><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Guide ↗</a><button class="button button-outline" data-action="import-curriculum">Import</button><button class="button button-outline" data-action="export-curriculum">Public blueprint</button><button class="button button-outline" data-action="export-private-assignment">Private assignment</button></div></header>
     <div class="curriculum-editor-grid">
       <form id="curriculum-identity-form" class="curriculum-editor-card"><div class="card-heading"><div><h2>Curriculum profile</h2><p>Name and describe this particular course of study.</p></div></div><label>Name<input name="name" maxlength="100" value="${escapeHtml(workspace.name)}" required></label><label>Description<textarea name="description" maxlength="1000" rows="3" placeholder="Purpose, audience, and intended outcome…">${escapeHtml(workspace.description)}</textarea></label><div class="form-actions"><button class="button button-secondary" type="submit">Save profile</button><button class="quiet-button" type="button" data-action="create-curriculum">New curriculum</button></div></form>
-      <form id="curriculum-settings-form" class="curriculum-editor-card curriculum-policy-card"><div class="card-heading"><div><h2>Learner & agent policy</h2><p>These rules travel inside the curriculum and are exposed to WebMCP without cluttering the learner interface.</p></div></div><div class="curriculum-field-grid"><label>Student name<input name="studentName" maxlength="60" value="${escapeHtml(settings.studentName)}" placeholder="Optional learner name"></label><label>Proof / completion email<input name="contactEmail" type="email" maxlength="160" value="${escapeHtml(settings.contactEmail)}" placeholder="educator@example.com"></label><label>Learning path<select name="progressionMode"><option value="hard" ${settings.progressionMode === "hard" ? "selected" : ""}>Hard · enforce prerequisites</option><option value="soft" ${settings.progressionMode === "soft" ? "selected" : ""}>Open · connections are guidance</option></select></label></div><label class="curriculum-agent-toggle"><input name="agentEnabled" type="checkbox" ${settings.agentEnabled ? "checked" : ""}><span><strong>Agent in the loop</strong><small>Permit the curriculum’s tutoring policy to guide a connected browser agent.</small></span></label><label>Private agent instructions<textarea name="agentInstructions" maxlength="4000" rows="5" placeholder="For example: never solve assessed tasks; ask one targeted question at a time…">${escapeHtml(settings.agentInstructions)}</textarea></label><div class="agent-policy-preview"><strong>Agent-visible policy</strong><p>This text is injected into WebMCP context throughout the app. Learners do not see it as page content.</p></div><aside class="assessment-disclaimer"><strong>QuickMaths is for learning and practice</strong><p>It does not replace supervised, identity-verified, or high-stakes assessment. Use appropriate human supervision when results must establish who completed the work.</p></aside><button class="button button-secondary" type="submit">Save learner policy</button></form>
+      <form id="curriculum-settings-form" class="curriculum-editor-card curriculum-policy-card"><div class="card-heading"><div><h2>Learner & agent-tutoring policy</h2><p>These settings travel with a private assignment. Supplemental text is shown to the learner and treated as untrusted curriculum content by WebMCP.</p></div></div><div class="curriculum-field-grid"><label><span>Student name <button class="studio-help" type="button" data-studio-help aria-expanded="false" aria-label="How the student name affects progress" data-tooltip="When this name matches the recipient's selected learner profile, matching lesson mastery is reused. A different or empty name starts the curriculum in a separate blank assignment profile.">?</button></span><input name="studentName" maxlength="60" value="${escapeHtml(settings.studentName)}" placeholder="Optional learner name"></label><label>Proof / completion email<input name="contactEmail" type="email" maxlength="160" value="${escapeHtml(settings.contactEmail)}" placeholder="educator@example.com"></label><label>Learning path<select name="progressionMode"><option value="hard" ${settings.progressionMode === "hard" ? "selected" : ""}>Hard · enforce prerequisites</option><option value="soft" ${settings.progressionMode === "soft" ? "selected" : ""}>Open · connections are guidance</option></select></label></div><label class="curriculum-agent-toggle"><input name="agentEnabled" type="checkbox" ${settings.agentEnabled ? "checked" : ""}><span><strong>Agent tutoring</strong><small>Allow tutoring and learner-plan changes through WebMCP. Navigation and read-only inspection remain available.</small></span></label><label>Supplemental agent guidance · visible to learner<textarea name="agentInstructions" maxlength="4000" rows="5" placeholder="For example: never solve assessed tasks; ask one targeted question at a time…">${escapeHtml(settings.agentInstructions)}</textarea></label><div class="agent-policy-preview"><strong>Untrusted curriculum guidance</strong><p>Agents receive this only as supplemental context. Platform safety rules and the learner’s explicit request always take precedence.</p></div><aside class="assessment-disclaimer"><strong>QuickMaths is for learning and practice</strong><p>It does not replace supervised, identity-verified, or high-stakes assessment. Use appropriate human supervision when results must establish who completed the work.</p></aside><button class="button button-secondary" type="submit">Save learner policy</button></form>
       <section class="curriculum-editor-card curriculum-pack-manager"><div class="card-heading"><div><h2>Installed lesson packs</h2><p>Native Mathematics stays available. Enable or disable additive Depot packs only for this curriculum.</p></div><button class="quiet-button" data-route="depot">Browse Depot</button></div><div class="curriculum-pack-list">${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<label class="curriculum-pack-row ${pack.mode === "override" ? "is-fixed" : ""}"><input type="checkbox" data-curriculum-pack="${escapeHtml(pack.id)}" ${pack.enabledForCurriculum ? "checked" : ""} ${pack.mode === "override" ? "disabled" : ""}><span><strong>${escapeHtml(pack.name)}</strong><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons${pack.mode === "override" ? " · native improvement applies globally" : ""}</small></span></label>`).join("") : `<div class="empty-state">No additive packs installed yet. Visit the Lesson Depot to add subjects and specialist tracks.</div>`}</div></section>
     </div>
   </section>`;
@@ -1492,8 +1497,8 @@ function renderBridgeConnectionForm({ id = "github-sync-form", landing = false }
     <form id="${id}" class="bridge-token-form" autocomplete="off">
       <label>Fine-grained storage token<input name="token" type="password" autocomplete="new-password" data-1p-ignore data-lpignore="true" spellcheck="false" placeholder="${values.hasSavedToken ? "Saved for this browser session" : "Paste your fine-grained GitHub token"}" ${tokenRequired ? "required" : ""}></label>
       <label class="bridge-remember"><input name="remember" type="checkbox" ${values.remember ? "checked" : ""}><span><strong>Remember token on this device</strong><small>Useful on your own phone. This stores it in browser storage—not cookies or the repository. Leave off on a shared device.</small></span></label>
-      <div class="bridge-connect-actions"><button class="button button-primary" type="submit">${landing ? "Connect and load my profile" : "Connect GitHub storage"}</button>${landing ? `<a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Storage setup guide ↗</a>` : `<a class="button button-outline" href="https://github.com/new" target="_blank" rel="noopener">Create private data repo ↗</a><a class="button button-outline" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create fine-grained token ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a>`}</div>
-      <p class="bridge-form-note">Paste a fine-grained token limited to your separate QuickMaths data repository. It needs <strong>Repository permissions → Contents → Read and write</strong>, with no account, workflow, or administration permissions.</p>
+      <div class="bridge-connect-actions"><button class="button button-primary" type="submit">${landing ? "Connect and load my workspace" : "Connect Workspace Storage"}</button>${landing ? `<a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Storage setup guide ↗</a>` : `<a class="button button-outline" href="https://github.com/new" target="_blank" rel="noopener">Create private data repo ↗</a><a class="button button-outline" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create fine-grained token ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a>`}</div>
+      <p class="bridge-form-note"><strong>Workspace-wide storage:</strong> this uploads the complete QuickMaths workspace in this browser—including every learner and educator profile, curriculum, attempt, review, installed pack, map plan, and educator guidance. The repository must be private, and the fine-grained token must be limited to that repository with <strong>Contents → Read and write</strong>.</p>
       <p class="form-message" role="status">${escapeHtml(githubSyncSnapshot.error ?? "")}</p>
     </form>
   </div>`;
@@ -1508,7 +1513,7 @@ function renderWelcomeStorageRestore(snapshot) {
   const open = welcomeStorageOpen || Boolean(bridgeFormDraft);
   elements.welcomeStorageRestore.innerHTML = `<details id="welcome-storage-details" class="welcome-storage-restore" ${open ? "open" : ""}>
     <summary><span><strong>Already have a profile on another device?</strong><small>Restore it from GitHub storage instead of starting over.</small></span><b>Connect storage</b></summary>
-    <div class="welcome-storage-body"><p>Use the same private data repository and fine-grained token as your other device. QuickMaths will load its complete learner checkpoint before opening the app.</p>${renderBridgeConnectionForm({ id: "welcome-github-sync-form", landing: true })}</div>
+    <div class="welcome-storage-body"><p>Use the same private data repository and fine-grained token as your other device. QuickMaths will load the complete browser workspace, not only one learner profile.</p>${renderBridgeConnectionForm({ id: "welcome-github-sync-form", landing: true })}</div>
   </details>`;
   restoreBridgeFormDraft(document.querySelector("#welcome-github-sync-form")?.closest("[data-bridge-form]"));
 }
@@ -1517,25 +1522,25 @@ function renderGitHubBridge(snapshot) {
   const status = githubSyncSnapshot;
   const saved = githubCredentials?.load({ role: "learner" });
   const educator = snapshot.activeProfile?.role === "educator";
-  const checkpointLabel = educator ? "educator workspace" : "learner checkpoint";
+  const checkpointLabel = "complete QuickMaths workspace";
   const repository = status.config ? `${status.config.owner}/${status.config.repo}` : null;
   const phaseClass = status.phase === "conflict" ? "conflict" : status.error ? "error" : status.connected ? "connected" : "idle";
   if (!status.connected) {
     return `
       <section class="content-card github-bridge-card" id="github-bridge">
-        <div class="bridge-card-heading"><div><p class="eyebrow">QuickMaths Bridge · experimental</p><h2>${educator ? "Sync curriculum work across devices" : "Connect mobile learning to a remote agent"}</h2><p>Your browser remains the instant local save. A dedicated GitHub data repository carries debounced checkpoints for this ${escapeHtml(checkpointLabel)}.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
+        <div class="bridge-card-heading"><div><p class="eyebrow">Workspace Storage · experimental</p><h2>${educator ? "Sync curriculum work across devices" : "Connect mobile learning to a remote agent"}</h2><p>Your browser remains the instant local save. A dedicated private GitHub repository carries debounced checkpoints for this ${escapeHtml(checkpointLabel)}.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
         ${renderBridgeConnectionForm()}
       </section>`;
   }
 
   return `
     <section class="content-card github-bridge-card" id="github-bridge">
-      <div class="bridge-card-heading"><div><p class="eyebrow">QuickMaths Bridge · experimental</p><h2>${escapeHtml(repository)}</h2><p>Local work is checkpointed after a short pause. Remote updates are accepted only when they were created from the current app revision.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
+      <div class="bridge-card-heading"><div><p class="eyebrow">Workspace Storage · experimental</p><h2>${escapeHtml(repository)}</h2><p>The complete browser workspace is checkpointed after a short pause. Remote updates are accepted only when they were created from the current app revision.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
       ${status.error ? `<aside class="bridge-warning"><strong>${status.phase === "conflict" ? "Sync conflict" : "Bridge paused"}</strong><p>${escapeHtml(status.error)}</p></aside>` : ""}
-      ${bridgeNeedsChoice ? `<aside class="bridge-choice"><div><strong>A learner checkpoint already exists on GitHub.</strong><p>Choose which complete copy should become current. Nothing is overwritten until you choose.</p></div><button class="button button-primary" data-action="bridge-load-remote">Load GitHub copy</button><button class="button button-outline" data-action="bridge-replace-remote">Use this device</button></aside>` : ""}
+      ${bridgeNeedsChoice ? `<aside class="bridge-choice"><div><strong>A complete QuickMaths workspace already exists on GitHub.</strong><p>Choose which complete copy should become current. Nothing is overwritten until you choose.</p></div><button class="button button-primary" data-action="bridge-load-remote">Load GitHub copy</button><button class="button button-outline" data-action="bridge-replace-remote">Use this device</button></aside>` : ""}
       <div class="bridge-status-grid">
         <article><span>Local state</span><strong>${status.dirty ? "Pending checkpoint" : "Checkpointed"}</strong><small>Browser autosave stays instant</small></article>
-        <article><span>${educator ? "Last workspace push" : "Last learner push"}</span><strong>${status.lastPushedAt ? escapeHtml(formatDate(status.lastPushedAt)) : "This session: not yet"}</strong><small>${escapeHtml(status.config.branch)}</small></article>
+        <article><span>Last workspace push</span><strong>${status.lastPushedAt ? escapeHtml(formatDate(status.lastPushedAt)) : "This session: not yet"}</strong><small>${escapeHtml(status.config.branch)}</small></article>
         <article><span>Last agent pull</span><strong>${status.lastPulledAt ? escapeHtml(formatDate(status.lastPulledAt)) : "Waiting"}</strong><small>${status.remoteAvailable ? "Remote files detected" : "No agent checkpoint yet"}</small></article>
         <article><span>Token storage</span><strong>${saved?.rememberToken ? "Remembered here" : "This tab session"}</strong><small>Never committed</small></article>
       </div>
@@ -1551,7 +1556,7 @@ function renderEducatorSettings(snapshot) {
     <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace & data</p><h1>Settings</h1><p>Manage portable backups, GitHub storage, curriculum files, and installed lesson sources.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Educator guide ↗</a><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
     ${renderGitHubBridge(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
-    <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum file</h2><p>A focused file for a learner: enabled packs, canonical map, and learning policy.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download curriculum</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
+    <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum exports</h2><p>Public blueprints omit names, email, and supplemental guidance. Private assignments include them with a privacy warning.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download public blueprint</button><button class="button button-outline" data-action="export-private-assignment" ${workspace ? "" : "disabled"}>Download private assignment</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
     <section class="content-card lesson-packs-card"><div class="card-heading"><div><p class="eyebrow">Shared lesson library</p><h2>Installed lesson packs</h2><p>Installed packs are available to Curriculum designer, where each curriculum enables only what it needs.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson file</button></div><div class="installed-packs">${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : "＋"}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons · ${pack.problemCount} questions</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></div></article>`).join("") : `<div class="empty-state">No additional lesson packs installed. Browse the Depot to assemble a library.</div>`}</div></section>`;
   restoreBridgeFormDraft(document.querySelector("#github-sync-form")?.closest("[data-bridge-form]"));
 }
@@ -1575,7 +1580,8 @@ function renderSettings(snapshot) {
       <article class="settings-control-card"><h2>Learning path</h2><p>${snapshot.activeCurriculum ? `Controlled by ${escapeHtml(snapshot.activeCurriculum.name)}. Ask the educator for a revised curriculum file to change it.` : `This setting belongs to ${escapeHtml(snapshot.activeProfile.displayName)} and travels inside full backups.`}</p><div class="settings-mode-grid" role="group" aria-label="Progression mode"><button type="button" data-progression-mode="hard" aria-pressed="${snapshot.progressionMode === "hard"}" ${snapshot.activeCurriculum ? "disabled" : ""}><strong>Hard path</strong><small>Prerequisites must be proven before connected mastery tests unlock.</small></button><button type="button" data-progression-mode="soft" aria-pressed="${snapshot.progressionMode === "soft"}" ${snapshot.activeCurriculum ? "disabled" : ""}><strong>Open path</strong><small>Connections remain guidance, while every lesson and test stays available.</small></button></div></article>
       <article class="settings-control-card settings-tour-action"><div><h2>App tutorial</h2><p>Replay all seven chapters without resetting progress, subjects, lessons, or preferences.</p></div><button class="button button-secondary" type="button" data-action="replay-tutorial">Replay app tour</button></article>
     </section>
-    <section class="content-card learner-curriculum-card"><div class="card-heading"><div><p class="eyebrow">Educator curriculum</p><h2>${snapshot.activeCurriculum ? escapeHtml(snapshot.activeCurriculum.name) : "Load a curriculum"}</h2><p>${snapshot.activeCurriculum ? "This profile follows the curriculum’s enabled packs, canonical map, learning path, and private agent policy." : "Load a portable curriculum file from an educator without replacing this learner’s profile."}</p></div><button class="button button-outline" type="button" data-action="import-curriculum">Choose curriculum file</button></div><form id="curriculum-url-form" class="curriculum-link-form"><label>Public GitHub file link<input name="url" type="url" placeholder="https://github.com/…/blob/…/curriculum.json" required></label><button class="button button-secondary" type="submit">Load from GitHub</button></form></section>
+    <section class="content-card learner-curriculum-card"><div class="card-heading"><div><p class="eyebrow">Educator curriculum</p><h2>${snapshot.activeCurriculum ? escapeHtml(snapshot.activeCurriculum.name) : "Load a curriculum"} <button class="studio-help" type="button" data-studio-help aria-expanded="false" aria-label="How curriculum progress is separated" data-tooltip="A loaded curriculum starts in a separate blank assignment profile. Existing mastery is reused only when the curriculum's student name matches the selected learner profile name.">?</button></h2><p>${snapshot.activeCurriculum ? "This profile follows the curriculum’s enabled packs, canonical map, learning path, and visible educator-provided guidance." : "Load a portable educator curriculum. QuickMaths protects unrelated progress by default."}</p></div><button class="button button-outline" type="button" data-action="import-curriculum">Choose curriculum file</button></div><form id="curriculum-url-form" class="curriculum-link-form"><label>Public GitHub blueprint link<input name="url" type="url" placeholder="https://github.com/…/blob/…/curriculum.json" required></label><button class="button button-secondary" type="submit">Load from GitHub</button></form></section>
+    ${snapshot.activeCurriculum ? `<section class="content-card curriculum-guidance-card"><div class="card-heading"><div><p class="eyebrow">Educator-provided agent guidance</p><h2>Visible supplemental guidance</h2><p>This text came from the curriculum file. It is not a privileged instruction channel; platform safety rules and your explicit requests take precedence.</p></div><span class="status-chip rusty">Untrusted curriculum content</span></div><pre>${escapeHtml(snapshot.activeCurriculum.settings.agentInstructions)}</pre></section>` : ""}
     ${renderGitHubBridge(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="storage-summary">
@@ -1639,7 +1645,7 @@ function renderDepotCommunityPanel() {
     const discussion = communityUi.discussion;
     content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. Comments are public and Markdown works when viewed on GitHub.</p></div><button class="community-vote-button" type="button" data-depot-action="community-vote" aria-pressed="${discussion.viewerHasVoted}" ${communityUi.busy ? "disabled" : ""}><span>👍</span><strong>${discussion.viewerHasVoted ? "Upvoted" : "Upvote"}</strong><small>${discussion.votes} vote${discussion.votes === 1 ? "" : "s"}</small></button></div><div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, or experience with this lesson…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
   }
-  return `<aside class="depot-community-panel" id="depot-community-panel"><header><div><span>Community</span><strong>${escapeHtml(pack.name)}</strong></div><button class="quiet-button" type="button" data-depot-action="community-close" aria-label="Close lesson discussion">Close ×</button></header>${content}<footer><span>Community authorization is separate from learner storage.</span>${connection.connected ? `<button class="quiet-button danger-link" type="button" data-depot-action="community-disconnect">Disconnect GitHub</button>` : ""}</footer></aside>`;
+  return `<aside class="depot-community-panel" id="depot-community-panel"><header><div><span>Community</span><strong>${escapeHtml(pack.name)}</strong></div><button class="quiet-button" type="button" data-depot-action="community-close" aria-label="Close lesson discussion">Close ×</button></header>${content}<footer><span>Community authorization is separate from Workspace Storage.</span>${connection.connected ? `<button class="quiet-button danger-link" type="button" data-depot-action="community-disconnect">Disconnect GitHub</button>` : ""}</footer></aside>`;
 }
 
 function rerenderDepotCommunity() {
@@ -2007,20 +2013,50 @@ document.querySelector("#welcome-load").addEventListener("click", () => elements
 document.querySelector("#welcome-curriculum-file-button").addEventListener("click", () => elements.curriculumFile.click());
 
 function githubCurriculumRawUrl(value) {
-  let url;
-  try { url = new URL(String(value ?? "").trim()); } catch { throw new Error("Paste a complete GitHub curriculum URL."); }
-  if (url.protocol !== "https:") throw new Error("Curriculum links must use HTTPS.");
-  if (url.hostname === "raw.githubusercontent.com") return url.href;
-  if (url.hostname !== "github.com") throw new Error("For safety, curriculum links must point to github.com or raw.githubusercontent.com.");
-  const parts = url.pathname.split("/").filter(Boolean);
-  if (parts.length < 5 || parts[2] !== "blob") throw new Error("Use a GitHub file link containing /blob/branch/path.");
-  return `https://raw.githubusercontent.com/${parts[0]}/${parts[1]}/${parts.slice(3).join("/")}`;
+  try { return githubFileRawUrl(value); }
+  catch (error) { throw new Error((error instanceof Error ? error.message : String(error)).replace(/file/g, "curriculum")); }
 }
 
 async function importCurriculumRaw(raw, { sourceUrl = null } = {}) {
   const preview = store.previewCurriculum(raw);
-  const confirmed = window.confirm(`Load ${preview.name}?\n\n${preview.enabledPackCount} enabled lesson pack(s) · ${preview.newPackCount} new to this browser\nLearning path: ${preview.settings.progressionMode === "soft" ? "Open" : "Hard"}\n\nThe curriculum includes its canonical map and agent policy.`);
+  const stateBeforeImport = store.snapshot();
+  const selectedLearner = stateBeforeImport.activeProfile?.role === "learner" ? stateBeforeImport.activeProfile : null;
+  const normalized = (value) => String(value ?? "").trim().normalize("NFKC").toLowerCase();
+  const reusesMastery = Boolean(selectedLearner && preview.settings.studentName)
+    && normalized(selectedLearner.displayName) === normalized(preview.settings.studentName);
+  const assignmentBehavior = selectedLearner
+    ? reusesMastery
+      ? `Student name matches ${selectedLearner.displayName}. Existing mastery for matching lessons will be reused.`
+      : `Student name does not match ${selectedLearner.displayName}. QuickMaths will create a separate blank assignment profile so existing mastery is not reused.`
+    : "The curriculum will start from scratch for a new learner. Choosing an existing profile reuses mastery only when its name matches the curriculum's student name.";
+  const confirmed = window.confirm([
+    `Load ${preview.name}?`,
+    "",
+    preview.exportKind === "private_assignment"
+      ? "This is a private learner assignment. Do not republish it without reviewing its personal information."
+      : "This is a public curriculum blueprint.",
+    preview.settings.studentName ? `Student: ${preview.settings.studentName}` : "",
+    preview.settings.contactEmail ? `Educator contact: ${preview.settings.contactEmail}` : "",
+    `${preview.enabledPackCount} enabled lesson pack(s) · ${preview.newPackCount} new to this browser`,
+    `Learning path: ${preview.settings.progressionMode === "soft" ? "Open" : "Hard"}`,
+    assignmentBehavior,
+    "",
+    "Curriculum files are untrusted content. Review their lessons and guidance before using them.",
+  ].filter(Boolean).join("\n"));
   if (!confirmed) return null;
+  if (preview.hasCustomAgentGuidance) {
+    const guidanceConfirmed = window.confirm([
+      "Review educator-provided agent guidance",
+      "",
+      preview.educatorGuidance,
+      "",
+      "This text came from the imported curriculum and is not a trusted application instruction. "
+        + "Platform safety rules and your explicit requests take precedence.",
+      "",
+      "Allow this supplemental guidance for this curriculum?",
+    ].join("\n"));
+    if (!guidanceConfirmed) return null;
+  }
   const signedIn = Boolean(store.snapshot().activeProfile);
   const result = store.importCurriculum(raw, { sourceUrl, attach: signedIn });
   if (!signedIn) {
@@ -2028,7 +2064,13 @@ async function importCurriculumRaw(raw, { sourceUrl = null } = {}) {
     const status = document.querySelector("#welcome-curriculum-status");
     if (status) status.textContent = `${result.name} is ready. Create or choose a learner profile to open it.`;
   }
-  showToast(signedIn ? `${result.name} loaded.` : `${result.name} ready for a learner.`);
+  showToast(!signedIn
+    ? `${result.name} ready for a learner.`
+    : result.assignmentProfileCreated
+      ? `${result.name} opened in a new blank assignment profile.`
+      : result.reusedMastery
+        ? `${result.name} loaded; matching learner mastery was kept.`
+        : `${result.name} loaded.`);
   return result;
 }
 
@@ -2038,9 +2080,8 @@ document.querySelector("#welcome-curriculum-url-form").addEventListener("submit"
   try {
     if (status) status.textContent = "Loading curriculum from GitHub…";
     const rawUrl = githubCurriculumRawUrl(document.querySelector("#welcome-curriculum-url").value);
-    const response = await fetch(rawUrl, { headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error(`GitHub returned ${response.status}. Check that the file is public.`);
-    await importCurriculumRaw(await response.text(), { sourceUrl: rawUrl });
+    const result = await fetchTextLimited(fetch, rawUrl, { maximumBytes: MAX_CURRICULUM_FILE_BYTES, label: "Curriculum", request: { headers: { Accept: "application/json" } } });
+    await importCurriculumRaw(result.text, { sourceUrl: rawUrl });
   } catch (error) {
     if (status) status.textContent = error instanceof Error ? error.message : String(error);
   }
@@ -2049,7 +2090,7 @@ document.querySelector("#welcome-curriculum-url-form").addEventListener("submit"
 elements.curriculumFile.addEventListener("change", async () => {
   const file = elements.curriculumFile.files?.[0];
   if (!file) return;
-  try { await importCurriculumRaw(await file.text()); }
+  try { await importCurriculumRaw(await readFileTextLimited(file, MAX_CURRICULUM_FILE_BYTES, { label: "Curriculum file" })); }
   catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
   finally { elements.curriculumFile.value = ""; }
 });
@@ -2058,7 +2099,8 @@ elements.backupFile.addEventListener("change", async () => {
   const file = elements.backupFile.files?.[0];
   if (!file) return;
   try {
-    const raw = await file.text();
+    const raw = await readFileTextLimited(file, MAX_CURRICULUM_FILE_BYTES, { label: "Backup file" });
+    await ensureLegacyGeographyMigration(raw);
     const preview = store.previewBackup(raw);
     const names = preview.profileNames.slice(0, 5).join(", ") + (preview.profileNames.length > 5 ? ", …" : "");
     const lessonSets = preview.lessonPackNames.length ? `\nLesson sets: ${preview.lessonPackNames.join(", ")}` : "\nLesson sets: none";
@@ -2079,7 +2121,7 @@ elements.lessonSetFile.addEventListener("change", async () => {
   const file = elements.lessonSetFile.files?.[0];
   if (!file) return;
   try {
-    const raw = await file.text();
+    const raw = await readFileTextLimited(file, MAX_LESSON_FILE_BYTES, { label: "Lesson-set file" });
     const preview = store.previewLessonPack(raw);
     const installDetail = preview.mode === "override"
       ? `Native lessons improved: ${preview.overridesNativeSkills.join(", ")}\n\nTheir IDs, map positions, and completed learner progress stay intact. Any unfinished tests for those lessons restart so answers cannot cross between question-bank versions. The original content can be restored later from Settings.`
@@ -2101,7 +2143,7 @@ elements.creatorFile.addEventListener("change", async () => {
   const file = elements.creatorFile.files?.[0];
   if (!file) return;
   try {
-    if (lessonStudio.loadRaw(await file.text())) render(store.snapshot());
+    if (lessonStudio.loadRaw(await readFileTextLimited(file, MAX_LESSON_FILE_BYTES, { label: "Lesson Studio file" }))) render(store.snapshot());
   } finally { elements.creatorFile.value = ""; }
 });
 
@@ -2135,7 +2177,7 @@ document.addEventListener("click", async (event) => {
   openStudioHelp.forEach((button) => {
     if (button !== studioHelp) button.setAttribute("aria-expanded", "false");
   });
-  if (studioHelp && currentSnapshot?.ui.route === "creator") {
+  if (studioHelp) {
     event.preventDefault();
     studioHelp.setAttribute("aria-expanded", studioHelp.getAttribute("aria-expanded") === "true" ? "false" : "true");
     return;
@@ -2277,10 +2319,27 @@ document.addEventListener("click", async (event) => {
   }
   if (action.dataset.action === "import-curriculum") elements.curriculumFile.click();
   if (action.dataset.action === "export-curriculum") {
+    try {
+      const workspace = store.snapshot().activeCurriculum;
+      if (!workspace) return;
+      const stem = workspace.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "quickmaths-curriculum";
+      download(`${stem}.quickmaths-blueprint.json`, store.exportCurriculum(workspace.id, { kind: "blueprint" }), "application/json");
+      showToast("Public curriculum blueprint downloaded.");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : String(error));
+    }
+  }
+  if (action.dataset.action === "export-private-assignment") {
     const workspace = store.snapshot().activeCurriculum;
-    if (workspace) {
-      download(`${workspace.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "quickmaths-curriculum"}.json`, store.exportCurriculum(workspace.id), "application/json");
-      showToast("Portable curriculum downloaded.");
+    if (!workspace) return;
+    const confirmed = window.confirm("Export a private learner assignment?\n\nThis file may contain a student name, educator contact email, and full educator-provided agent guidance. Deliver it directly or through a private channel. Do not publish it in a public GitHub repository.");
+    if (!confirmed) return;
+    try {
+      const stem = workspace.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "quickmaths-curriculum";
+      download(`${stem}.quickmaths-private-assignment.json`, store.exportCurriculum(workspace.id, { kind: "private_assignment" }), "application/json");
+      showToast("Private learner assignment downloaded.");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : String(error));
     }
   }
   if (["start-suggested", "start-test", "retake"].includes(action.dataset.action)) store.startTest(action.dataset.skillId);
@@ -2367,8 +2426,27 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (event.target.matches?.("[data-curriculum-pack]")) {
-    try { store.setCurriculumPackEnabled(event.target.dataset.curriculumPack, event.target.checked); }
-    catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    const packId = event.target.dataset.curriculumPack;
+    const enabled = event.target.checked;
+    try {
+      store.setCurriculumPackEnabled(packId, enabled);
+    } catch (error) {
+      if (!enabled && error?.code === "curriculum_plan_references") {
+        const confirmed = window.confirm(`${error.message}\n\nDisable the lesson set and remove those affected plan references? This cannot be undone except by restoring a backup.`);
+        if (confirmed) {
+          try {
+            const result = store.setCurriculumPackEnabled(packId, false, { removePlanReferences: true });
+            showToast(`Lesson set disabled; ${result.removedPlanReferences} affected plan reference${result.removedPlanReferences === 1 ? "" : "s"} removed.`);
+          } catch (retryError) {
+            event.target.checked = true;
+            showToast(retryError instanceof Error ? retryError.message : String(retryError));
+          }
+        } else event.target.checked = true;
+      } else {
+        event.target.checked = !enabled;
+        showToast(error instanceof Error ? error.message : String(error));
+      }
+    }
     return;
   }
   if (currentSnapshot?.ui.route === "creator" && (event.target.matches?.("[data-creator-field]") || event.target.matches?.("[data-creator-prerequisites]"))) {
@@ -2435,10 +2513,10 @@ document.addEventListener("submit", (event) => {
     if (submit) submit.disabled = true;
     try {
       const rawUrl = githubCurriculumRawUrl(new FormData(event.target).get("url"));
-      fetch(rawUrl, { headers: { Accept: "application/json" } }).then((response) => {
-        if (!response.ok) throw new Error(`GitHub returned ${response.status}. Check that the file is public.`);
-        return response.text();
-      }).then((raw) => importCurriculumRaw(raw, { sourceUrl: rawUrl })).catch((error) => showToast(error instanceof Error ? error.message : String(error))).finally(() => { if (submit?.isConnected) submit.disabled = false; });
+      fetchTextLimited(fetch, rawUrl, { maximumBytes: MAX_CURRICULUM_FILE_BYTES, label: "Curriculum", request: { headers: { Accept: "application/json" } } })
+        .then((result) => importCurriculumRaw(result.text, { sourceUrl: rawUrl }))
+        .catch((error) => showToast(error instanceof Error ? error.message : String(error)))
+        .finally(() => { if (submit?.isConnected) submit.disabled = false; });
     } catch (error) {
       if (submit) submit.disabled = false;
       showToast(error instanceof Error ? error.message : String(error));
@@ -2641,22 +2719,30 @@ function initClock() {
 }
 
 async function boot() {
-  const [response, geographyResponse] = await Promise.all([
-    fetch("./curriculum-data.json?v=20260902-native-math-expansion"),
-    fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
-  ]);
-  if (!response.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
+  const response = await fetch("./curriculum-data.json?v=20260902-native-math-expansion");
+  if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
-  const bundledLessonPacks = [await geographyResponse.text()];
+  let bundledLessonPacks = [];
+  let needsLegacyGeography = false;
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "null");
+    needsLegacyGeography = Boolean(saved && Number(saved.version) < APP_VERSION);
+  } catch {
+    // The store's normal malformed-state recovery remains authoritative.
+  }
+  if (needsLegacyGeography) {
+    const geography = await fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+    bundledLessonPacks = [geography.text];
+  }
   let agentManifest = {};
   let educatorManifest = {};
   let authoringGuideMarkdown = "";
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, educatorManifestResponse, authoringGuideResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260902-student-docs-v1"),
-      fetch("./educator-agent-manifest.json?v=20260902-student-docs-v1"),
-      fetch("./CUSTOM_LESSON_SETS.md?v=20260902-rational-signchart-authoring"),
+      fetch("./agent-manifest.json?v=20260902-security-v1"),
+      fetch("./educator-agent-manifest.json?v=20260902-security-v1"),
+      fetch("./CUSTOM_LESSON_SETS.md?v=20260902-security-v1"),
     ]);
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
     if (educatorManifestResponse.ok) educatorManifest = await educatorManifestResponse.json();
@@ -2763,6 +2849,15 @@ async function boot() {
       showToast(error instanceof Error ? error.message : String(error));
     }
   }
+}
+
+async function ensureLegacyGeographyMigration(raw) {
+  let version = APP_VERSION;
+  try { version = Number(JSON.parse(raw)?.version ?? APP_VERSION); } catch { return; }
+  if (version >= APP_VERSION) return;
+  legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+  const result = await legacyGeographyMigrationPromise;
+  store.registerBundledLessonPacks([result.text]);
 }
 
 boot().catch((error) => {

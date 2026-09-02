@@ -103,6 +103,23 @@ test("controller refuses to fetch or stage metadata-only concept previews", asyn
   assert.equal(lessonFetches, 0);
 });
 
+test("Depot installation fails closed when a declared hash cannot be verified", async () => {
+  const hashedCatalog = {
+    ...catalog,
+    packages: [{ ...catalog.packages[0], sha256: "0".repeat(64) }],
+  };
+  const store = {
+    snapshot: () => ({ lessonPacks: [] }),
+    previewLessonPack: () => ({ id: "PACK_BIO", version: "1.1.0" }),
+  };
+  const fetchImpl = async (url) => url.endsWith("catalog.json")
+    ? { ok: true, json: async () => hashedCatalog }
+    : { ok: true, headers: { get: () => null }, text: async () => "{}" };
+  const depot = createLessonDepot({ store, fetchImpl, cryptoImpl: null, catalogUrl: "https://example.com/catalog.json" });
+  await depot.load();
+  await assert.rejects(depot.previewPack("PACK_BIO", "1.1.0"), /cannot verify .* hash/i);
+});
+
 test("controller validates a Depot batch before opening one sequential human review queue", async () => {
   const raws = {
     PACK_BIO: JSON.stringify({ id: "PACK_BIO", version: "1.1.0", name: "Cell Biology", subjectName: "Biology", skillCount: 2, problemCount: 8 }),

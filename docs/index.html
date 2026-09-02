@@ -6,6 +6,7 @@
     <meta name="description" content="QuickMaths is a local-first mastery map and agent-guided learning workspace.">
     <meta name="theme-color" content="#f3eee3">
     <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://quickmaths-community-auth.quickmaths-community-auth.workers.dev; object-src 'none'; base-uri 'none'; form-action 'self'">
     <title>QuickMaths — Map your mastery</title>
     <link rel="icon" href="./quickmaths-logo.png">
     <link rel="alternate" type="application/json" href="./agent-manifest.json" title="QuickMaths agent guide">
@@ -13,8 +14,8 @@
     <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
     <link rel="help" href="./QuickMaths-Student-Guide.pdf" title="QuickMaths Student Guide">
     <link rel="help" href="./QuickMaths-Educator-Guide.pdf" title="QuickMaths Educator Guide">
-    <link rel="stylesheet" href="./challenge.css?v=20260902-student-docs-v1">
-    <script type="module" src="./challenge.js?v=20260902-student-docs-v1"></script>
+    <link rel="stylesheet" href="./challenge.css?v=20260902-security-v1">
+    <script type="module" src="./challenge.js?v=20260902-security-v1"></script>
   </head>
   <body>
     <a class="skip-link" href="#view-root">Skip to learning workspace</a>
@@ -77,8 +78,8 @@
 
             <section class="welcome-curriculum-loader" aria-labelledby="welcome-curriculum-title">
               <p class="eyebrow">Learning from an educator?</p>
-              <h3 id="welcome-curriculum-title">Load a curriculum</h3>
-              <p>Import a curriculum file or a public GitHub link. Its lesson packs, map, and learning policy travel together.</p>
+              <h3 id="welcome-curriculum-title">Load a curriculum <button class="studio-help" type="button" data-studio-help aria-expanded="false" aria-label="How curriculum progress is separated" data-tooltip="Curricula start in a blank assignment profile. Existing mastery is reused only when the curriculum student name matches the profile you select.">?</button></h3>
+              <p>Import a curriculum file or a public GitHub link. Its lesson packs, map, and learning policy travel together without mixing unrelated learner progress.</p>
               <div class="welcome-loader-actions">
                 <button id="welcome-curriculum-file-button" class="quiet-button" type="button">Choose file</button>
                 <form id="welcome-curriculum-url-form" class="welcome-curriculum-url-form">

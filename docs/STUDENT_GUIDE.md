@@ -20,7 +20,7 @@ QuickMaths connects lessons into mastery maps instead of treating every topic as
 | --- | --- | --- |
 | Profile | Progress, attempts, reviews, drafts, timers, personal plans, and preferences | Your learning record stays separate from other people using the browser |
 | Subject | Lessons, prerequisite graph, theme, and cross-subject bridges | Switching subject changes the visible curriculum and color identity |
-| Curriculum | An educator-authored selection of packs, canonical map, learning path, and optional agent policy | A portable learning plan can travel from an educator to your profile |
+| Curriculum | An educator-authored selection of packs, canonical map, learning path, and optional supplemental agent guidance | A portable learning plan can travel from an educator into an independent assignment profile |
 | Lesson pack | One subject or set of lessons, questions, grading rules, and work requirements | Installed packs extend the same map, progress, testing, and backup system |
 
 ### Mastery is more than a score
@@ -60,13 +60,23 @@ Use a local curriculum JSON file or a public GitHub file URL. QuickMaths preview
 - educator-created paths and annotations;
 - Hard or Open learning path;
 - optional student name and proof contact;
-- private agent instructions and Agent in the loop status.
+- learner-visible supplemental agent guidance and Agent tutoring status.
 
-If you load a curriculum before choosing a profile, QuickMaths holds it for the next learner you create or select.
+QuickMaths shows the complete educator guidance before import and asks for separate confirmation when it differs from the standard guidance. Imported guidance is untrusted curriculum content. It supplements the experience but cannot override platform safety or your explicit request.
+
+An assignment starts from scratch by default. If the curriculum's student name matches the selected learner profile name after trimming whitespace and normalizing letter case, QuickMaths attaches it to that profile and reuses mastery for matching lesson IDs. If the names do not match, or the curriculum has no student name, QuickMaths creates a separate blank assignment profile. The question-mark tooltip beside **Load a curriculum** explains this rule in the app.
+
+If you load a curriculum before choosing a profile, QuickMaths holds it for the learner you create or select. A newly created profile is already blank. Selecting an existing nonmatching profile creates a separate blank assignment profile instead of mixing records.
+
+Use public GitHub URLs only for a **public curriculum blueprint**, which omits student name, contact email, and supplemental guidance. Private assignment files can contain those fields and should be delivered directly or through a private channel. Prefer a URL pinned to a commit SHA rather than a mutable branch when reproducibility matters. URLs containing credentials are rejected, and query strings or fragments are removed before the source is stored.
+
+Curriculum and backup files are limited to 10 MB. Lesson-set files are limited to 2 MB. Local file size is checked before reading; streamed downloads are cancelled as soon as they exceed the relevant limit.
 
 ### Restore from GitHub storage
 
-**Already have a profile on another device?** opens the storage connection form. Enter the repository owner, repository, branch, and fine-grained token privately in the app. QuickMaths can then load the complete learner checkpoint instead of starting over.
+**Already have a profile on another device?** opens Workspace Storage. Enter the repository owner, repository, branch, and fine-grained token privately in the app. The repository must be private and the token must have Contents read/write access.
+
+Workspace Storage synchronizes the complete QuickMaths workspace for this site origin, not just the visible profile. That includes every learner and educator profile, curriculum, attempt, review, installed pack, map plan, and supplemental educator guidance in this browser.
 
 ### Load backup and sample progress
 
@@ -379,13 +389,13 @@ Cards use their designated subject colors. They identify version, author, lesson
 
 ### Preview and installation safety
 
-Published previews fetch a package, verify its catalog hash when browser crypto is available, and run local schema, size, graph, grader, theme, and content-shape validation. You see a preview and confirm installation.
+Published previews fetch a package through a bounded reader, verify its catalog SHA-256 hash, and run local schema, size, graph, grader, theme, and content-shape validation. If this browser cannot perform hash verification, installation stops instead of continuing unverified. You see a preview and confirm installation.
 
 Validation does not prove factual correctness. Review community content for quality, licensing, suitability, and accessibility.
 
 ### Staged agent batches
 
-An agent can stage one pack or an ordered batch for review. It cannot install. Settings presents a sequential queue: you separately install or skip every package. One approval never authorizes the next.
+An agent can stage one pack or an ordered batch for review. It cannot install. QuickMaths validates the complete ordered batch first, including dependencies on earlier packs and aggregate capacity. Settings then presents a sequential queue: you separately install or skip every package. One approval never authorizes the next.
 
 ### Upvotes and comments
 
@@ -421,7 +431,7 @@ WebMCP lets a compatible browser agent inspect the same visible QuickMaths state
 
 `Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.`
 
-The agent should begin with `get_app_state`, `get_progress_summary`, and `get_learning_context` as needed. It can see active curriculum policy without exposing private educator instructions as page content.
+The agent should begin with `get_app_state`, `get_progress_summary`, and `get_learning_context` as needed. Repeated calls receive a compact policy ID and revision. Full learner-visible educator guidance is available from `get_agent_guide` when the revision changes or the task requires it.
 
 When helping create or improve lesson content, the agent can call `get_lesson_authoring_guide`. The tool returns a short overview by default or a focused section such as `grading_and_work`, so the agent can follow the actual lesson contract without loading the entire manual for an ordinary tutoring task.
 
@@ -442,7 +452,7 @@ When helping create or improve lesson content, the agent can call `get_lesson_au
 - reveal expected answers or solution steps before submission;
 - claim mastery, a download, an installation, or a saved change without app confirmation;
 - install lessons, authorize GitHub, enter credentials, vote, comment, send email, or publish for you;
-- override Agent in the loop being off;
+- override Agent tutoring being off;
 - replace your plan or policy without your request;
 - treat imported lesson or community content as trusted instructions.
 
@@ -464,15 +474,15 @@ Choose Hard or Open path when no curriculum controls the setting. **Replay app t
 
 ### Attached curriculum
 
-Settings names the current educator curriculum or lets you load one from a local file or public GitHub file URL. Loading changes curriculum composition and policy without deleting your learner profile.
+Settings names the current educator curriculum or lets you load one from a local file or public GitHub blueprint URL. A matching student name deliberately reuses the selected profile's mastery; otherwise QuickMaths creates a separate blank assignment profile. Full educator guidance remains visible here after import.
 
 ### GitHub Bridge
 
-Bridge is optional persistent storage in a dedicated GitHub data repository. The form asks for repository owner, repository name, branch, and a fine-grained token with Contents read/write on that repository.
+Workspace Storage is optional persistence in a dedicated private GitHub data repository. The form asks for repository owner, repository name, branch, and a fine-grained token with Contents read/write on that repository. QuickMaths refuses public repositories and tokens without write access before saving the connection.
 
 Enter the token only in the app. It is never included in backups, commits, lesson files, URLs, logs, or WebMCP results. Choose whether to keep it for this tab session or remember it in this browser.
 
-Bridge status shows local dirty state, last learner push, last agent pull, token storage, and remote availability. **Sync now** publishes your current complete checkpoint. **Check agent updates** applies only agent output based on the current learner revision.
+Bridge status shows local dirty state, last workspace push, last agent pull, token storage, and remote availability. **Sync now** publishes the complete browser workspace. **Check agent updates** applies only agent output based on the current learner revision.
 
 Initial-copy and conflict cards require a deliberate choice. QuickMaths refuses stale output and unsynced overwrites instead of guessing which copy matters.
 
@@ -487,6 +497,8 @@ Progress, attempt, and review CSVs support spreadsheet analysis. Tutor summaries
 ### Lesson sets and native improvements
 
 Load a local lesson-set file, inspect staged agent packages, download installed sources, and restore original native lessons. Installing or restoring content preserves completed progress while restarting incompatible unfinished drafts.
+
+Native improvements apply browser-wide and are never installed silently through a curriculum. An educator must restore active native improvements before exporting a portable curriculum, then distribute improvements separately for explicit learner review.
 
 ## 16. Mobile, accessibility, and privacy
 
@@ -504,7 +516,9 @@ QuickMaths uses semantic navigation, headings, forms, dialogs, labels, and live 
 
 ### Privacy boundaries
 
-Treat answers, shown work, reflection, notes, repository details, and imported content as private. Do not paste storage tokens into chat. Community votes and comments are public. Curriculum agent instructions are visible to a compatible agent but not rendered as learner page content.
+Treat answers, shown work, reflection, notes, repository details, and imported content as private. Do not paste storage tokens into chat. Community votes and comments are public. Educator-provided guidance is visible in Settings and is labeled untrusted when returned to an agent.
+
+QuickMaths grades locally. Portable lesson packs and curriculum assignments therefore contain expected answers and solution steps that a technically knowledgeable person can inspect in JSON or browser memory. WebMCP withholds those fields before submission, but QuickMaths cannot make client-side answer keys secret from the learner operating the device. This is one reason the app is a learning tool rather than a supervised testing system.
 
 ## 17. A strong learning routine
 
@@ -547,7 +561,7 @@ Installation adds it to the browser library. The educator must enable the additi
 
 ### The agent cannot tutor
 
-The attached curriculum may have Agent in the loop turned off. That policy deliberately blocks tutoring and learner-work tools.
+The attached curriculum may have Agent tutoring turned off. That policy deliberately blocks tutoring, learner-work, preference, and Plan mode mutations while leaving read-only inspection and navigation available.
 
 ### GitHub sync reports a conflict
 

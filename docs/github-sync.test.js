@@ -38,7 +38,7 @@ function fakeGitHub() {
   let revision = 0;
   return {
     files,
-    async verify(config) { return { owner: config.owner, repo: config.repo, private: true, defaultBranch: config.branch }; },
+    async verify(config) { return { owner: config.owner, repo: config.repo, private: true, defaultBranch: config.branch, permissions: { push: true } }; },
     async readFile(_config, path) {
       const file = files.get(path);
       return file ? { exists: true, sha: file.sha, content: file.content } : { exists: false, sha: null, content: null };
@@ -112,6 +112,29 @@ test("credential storage keeps repository config separate from the token", () =>
   assert.equal(store.load({ role: "agent" }).token, "agent-token");
 });
 
+test("workspace storage rejects public repositories and read-only tokens before saving credentials", async () => {
+  for (const repository of [
+    { private: false, permissions: { push: true } },
+    { private: true, permissions: { push: false } },
+  ]) {
+    const credentialStore = credentials();
+    const harness = stateHarness("Learner");
+    const sync = createGitHubSyncController({
+      role: "learner",
+      client: { async verify(config) { return { owner: config.owner, repo: config.repo, defaultBranch: config.branch, ...repository }; } },
+      credentialStore,
+      serializeState: harness.serialize,
+      applyState: harness.apply,
+      subscribeToState: harness.subscribe,
+      setTimer: () => 1,
+      clearTimer() {},
+    });
+    await assert.rejects(() => sync.connect(connection(), { startPolling: false }), repository.private ? /write access/i : /private repository/i);
+    assert.equal(credentialStore.load({ role: "learner" }), null);
+    assert.equal(sync.snapshot().connected, false);
+  }
+});
+
 test("bridge envelopes preserve unicode state and channel metadata", () => {
   const raw = createBridgeEnvelope({
     channel: "agent",
@@ -131,7 +154,7 @@ test("bridge envelopes preserve unicode state and channel metadata", () => {
 test("contents client reads and writes Base64 GitHub files", async () => {
   const calls = [];
   const responses = [
-    new Response(JSON.stringify({ owner: { login: "octo-user" }, name: "quickmaths-sync", private: true, default_branch: "main" }), { status: 200 }),
+    new Response(JSON.stringify({ owner: { login: "octo-user" }, name: "quickmaths-sync", private: true, default_branch: "main", permissions: { push: true } }), { status: 200 }),
     new Response(JSON.stringify({ type: "file", sha: "old-sha", content: btoa(unescape(encodeURIComponent("hello Σ"))) }), { status: 200 }),
     new Response(JSON.stringify({ content: { sha: "new-sha" }, commit: { sha: "commit-sha" } }), { status: 200 }),
   ];

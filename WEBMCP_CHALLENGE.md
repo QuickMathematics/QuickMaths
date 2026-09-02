@@ -14,7 +14,7 @@ QuickMaths existed before the WebMCP Challenge. The official submission period b
 | 25-lesson Mathematics YAML curriculum | Browser-ready native Mathematics runtime, an installable 15-lesson Geography Depot package, coordinate-geometry bridges, and combined subject maps |
 | Existing mastery, grading, profile, review, and export foundations | Twenty-nine page-level WebMCP learning and curriculum tools operating on the same visible human state |
 | Human-only navigation and learner workflows | Shared human-agent navigation, tutoring, saved-work inspection, structured reviews, and activity attribution |
-| Local/Drive-oriented persistence in the original application | Browser autosave, portable backups, GitHub learner storage, and a revision-safe remote Agent Bridge |
+| Local/Drive-oriented persistence in the original application | Browser autosave, portable backups, private-repository full-workspace storage, and a revision-safe remote Agent Bridge |
 | YAML authoring and developer preview utilities | Human Lesson Studio, agent lesson validation/staging, reversible native improvements, and answer-key-safe tutoring boundaries |
 | No WebMCP transport or public curriculum exchange | Three explicit Bridge tools plus the Lesson Depot, safe package staging, and optional in-app community participation |
 

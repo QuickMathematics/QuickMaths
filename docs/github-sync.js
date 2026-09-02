@@ -394,6 +394,16 @@ export function createGitHubSyncController({
     return normalizeGitHubSyncConfig({ ...config, role });
   };
 
+  const requireWritablePrivateRepository = (repository) => {
+    if (!repository?.private) {
+      throw new GitHubSyncError("QuickMaths workspace storage must use a private repository.", { code: "public_repository_forbidden" });
+    }
+    if (repository.transport !== "local-git" && repository.permissions?.push !== true) {
+      throw new GitHubSyncError("The token does not have write access to this repository.", { code: "missing_write_permission" });
+    }
+    return repository;
+  };
+
   const withPhase = async (phase, task) => {
     update({ phase, error: null });
     try { return await task(); }
@@ -445,14 +455,15 @@ export function createGitHubSyncController({
 
   const connect = (candidate, { startPolling = true } = {}) => runSerial(() => withPhase("connecting", async () => {
     const previousRepository = repositoryKey(config);
-    config = credentialStore.save({ ...candidate, role });
+    const nextConfig = normalizeGitHubSyncConfig({ ...candidate, role });
+    const repository = requireWritablePrivateRepository(await client.verify(nextConfig));
+    config = credentialStore.save(nextConfig);
     if (previousRepository !== repositoryKey(config)) {
       learnerSha = null;
       agentSha = null;
       status.dirty = false;
     }
     status.config = config;
-    const repository = await client.verify(config);
     stopped = false;
     update({ connected: true, phase: "idle", error: null, conflict: null, repository });
     persistMetadata();
@@ -464,7 +475,7 @@ export function createGitHubSyncController({
     config = credentialStore.load({ role });
     status.config = config;
     const current = requireConfig();
-    const repository = await client.verify(current);
+    const repository = requireWritablePrivateRepository(await client.verify(current));
     stopped = false;
     update({ connected: true, phase: "idle", error: null, conflict: null, repository });
     persistMetadata();

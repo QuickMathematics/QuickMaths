@@ -36,8 +36,10 @@ const TUTORIAL_STEPS = 7;
 const MAX_ACTIVITY = 60;
 const MAX_ATTEMPTS = 500;
 const MAX_REVIEWS = 1000;
+const MAX_PROFILES = 30;
 const MAX_LESSON_SETS = 10;
 const MAX_CURRICULA = 30;
+const MAX_CURRICULUM_BYTES = 10_000_000;
 const MAX_LESSON_SET_BYTES = 2_000_000;
 const MAX_LESSON_SET_SKILLS = 50;
 const MAX_PROBLEMS_PER_SKILL = 100;
@@ -49,6 +51,7 @@ const LEGACY_FIRST_PARTY_DEPOT_SKILL_ID = /^GEO_[A-Z0-9_]{3,52}$/;
 const SUBJECT_ID = /^SUBJECT_[A-Z0-9_]{2,51}$/;
 const CURRICULUM_ID = /^CURRICULUM_[A-Z0-9_]{3,100}$/;
 const SAFE_ID = /^[A-Z][A-Z0-9_]{2,119}$/;
+const RESERVED_OBJECT_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 const GRADING_METHODS = new Set([
   "exact_numeric", "numeric_with_tolerance", "multiple_choice", "symbolic_expression",
@@ -70,6 +73,11 @@ function cleanText(value, maxLength = 1000) {
 
 function cleanNumber(value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) {
   return Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
+}
+
+function utf8ByteLength(value) {
+  const text = String(value ?? "");
+  return typeof TextEncoder === "function" ? new TextEncoder().encode(text).length : text.length;
 }
 
 function assessmentLength(skill) {
@@ -562,7 +570,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
 export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = [] } = {}) {
   let candidate = input;
   if (typeof input === "string") {
-    if (input.length > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
+    if (utf8ByteLength(input) > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
     try { candidate = JSON.parse(input); } catch { throw new Error("Lesson set is not valid JSON."); }
   }
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error("Lesson set must be a JSON object.");
@@ -572,9 +580,10 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
   const mode = candidate.mode == null || candidate.mode === "add" ? "add" : candidate.mode === "override" ? "override" : null;
   if (!mode) throw new Error("Lesson set mode must be add or override.");
   if (mode === "override" && schemaVersion !== LESSON_SET_SCHEMA_VERSION) throw new Error("Native lesson improvements require schema_version 2.0.");
-  const subject = normalizeSubject(candidate.subject, schemaVersion);
   const id = requiredText(candidate.id, "Lesson set ID", 60);
   if (!LESSON_SET_ID.test(id)) throw new Error("Lesson set ID must start with PACK_ and use uppercase letters, numbers, and underscores.");
+  const subject = normalizeSubject(candidate.subject, schemaVersion);
+  const firstPartyGeography = id === "PACK_GEOGRAPHY" && subject.id === "SUBJECT_GEOGRAPHY";
   if (!Array.isArray(candidate.skills) || !candidate.skills.length || candidate.skills.length > MAX_LESSON_SET_SKILLS) {
     throw new Error(`Lesson set must contain 1 to ${MAX_LESSON_SET_SKILLS} skills.`);
   }
@@ -584,7 +593,7 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
   if (new Set(packSkillIds).size !== packSkillIds.length) throw new Error("Lesson set contains duplicate skill IDs.");
   for (const skillId of packSkillIds) {
     if (mode === "add") {
-      if (!CUSTOM_SKILL_ID.test(skillId) && !LEGACY_FIRST_PARTY_DEPOT_SKILL_ID.test(skillId)) {
+      if (!CUSTOM_SKILL_ID.test(skillId) && !(firstPartyGeography && LEGACY_FIRST_PARTY_DEPOT_SKILL_ID.test(skillId))) {
         throw new Error(`${skillId} must start with CUSTOM_ and use uppercase letters, numbers, and underscores.`);
       }
       if (usedSkillIds.has(skillId)) throw new Error(`Skill ID ${skillId} is already installed.`);
@@ -600,7 +609,15 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
   const questionIds = new Set();
   const skills = candidate.skills.map((skillCandidate) => {
     const skillId = skillCandidate.id;
-    const prerequisiteRefs = prerequisiteList(skillCandidate.prerequisites, `${skillId} prerequisites`);
+    const serializedRefs = Array.isArray(skillCandidate.prerequisiteRefs)
+      ? skillCandidate.prerequisiteRefs.map((ref) => ({ subject_id: ref.subjectId ?? ref.subject_id, skill_id: ref.skillId ?? ref.skill_id }))
+      : [];
+    const basePrerequisiteRefs = prerequisiteList(
+      Array.isArray(skillCandidate.prerequisites) && skillCandidate.prerequisites.length ? skillCandidate.prerequisites : serializedRefs,
+      `${skillId} prerequisites`,
+    );
+    const serializedBySkill = new Map(prerequisiteList(serializedRefs, `${skillId} prerequisiteRefs`).map((ref) => [ref.skillId, ref]));
+    const prerequisiteRefs = basePrerequisiteRefs.map((ref) => serializedBySkill.get(ref.skillId) ?? ref);
     const prerequisites = prerequisiteRefs.map((ref) => ref.skillId);
     const unlocks = idList(skillCandidate.unlocks, `${skillId} unlocks`);
     for (const prerequisite of prerequisites) if (!allKnown.has(prerequisite)) throw new Error(`${skillId} references missing prerequisite ${prerequisite}.`);
@@ -703,7 +720,7 @@ export function normalizeLessonPackCollection(inputs, curriculum) {
   if (!curriculum || !Array.isArray(curriculum.skills)) throw new Error("A base curriculum is required.");
   const candidates = inputs.map((input) => {
     if (typeof input !== "string") return input;
-    if (input.length > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
+    if (utf8ByteLength(input) > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
     try { return JSON.parse(input); } catch { throw new Error("Lesson set is not valid JSON."); }
   });
   const skillIdsByPack = candidates.map((candidate, index) => {
@@ -895,6 +912,50 @@ function sanitizeCurriculumSettings(candidate = {}) {
   };
 }
 
+function validateExternalCurriculumSettings(candidate = {}) {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error("Curriculum settings must be an object.");
+  const allowed = new Set([
+    "studentName", "student_name", "agentEnabled", "agent_enabled", "agentInstructions", "agent_instructions",
+    "progressionMode", "progression_mode", "contactEmail", "contact_email",
+  ]);
+  const unknown = Object.keys(candidate).find((key) => !allowed.has(key));
+  if (unknown) throw new Error(`Curriculum settings contain unsupported field ${unknown}.`);
+  const read = (camel, snake) => {
+    if (candidate[camel] !== undefined && candidate[snake] !== undefined) throw new Error(`Curriculum settings must not provide both ${camel} and ${snake}.`);
+    return candidate[camel] !== undefined ? candidate[camel] : candidate[snake];
+  };
+  const studentName = read("studentName", "student_name");
+  const agentEnabled = read("agentEnabled", "agent_enabled");
+  const agentInstructions = read("agentInstructions", "agent_instructions");
+  const progressionMode = read("progressionMode", "progression_mode");
+  const contactEmail = read("contactEmail", "contact_email");
+  if (studentName !== undefined && typeof studentName !== "string") throw new Error("Curriculum studentName must be text.");
+  if (agentEnabled !== undefined && typeof agentEnabled !== "boolean") throw new Error("Curriculum agentEnabled must be true or false.");
+  if (agentInstructions !== undefined && typeof agentInstructions !== "string") throw new Error("Curriculum agentInstructions must be text.");
+  if (progressionMode !== undefined && !["hard", "soft"].includes(progressionMode)) throw new Error("Curriculum progressionMode must be hard or soft.");
+  if (contactEmail !== undefined && typeof contactEmail !== "string") throw new Error("Curriculum contactEmail must be text.");
+  if (studentName?.trim().length > 60) throw new Error("Curriculum studentName is too long.");
+  if (agentInstructions?.trim().length > 4000) throw new Error("Curriculum agentInstructions are too long.");
+  if (contactEmail?.trim().length > 160) throw new Error("Curriculum contactEmail is too long.");
+  if (contactEmail?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) throw new Error("Curriculum contactEmail is invalid.");
+  const settings = sanitizeCurriculumSettings(candidate);
+  if (agentInstructions === undefined) settings.agentInstructions = "";
+  return settings;
+}
+
+function canonicalLessonPack(pack) {
+  const normalize = (value, key = "") => {
+    if (key === "importedAt") return undefined;
+    if (Array.isArray(value)) return value.map((item) => normalize(item));
+    if (!value || typeof value !== "object") return value;
+    return Object.fromEntries(Object.keys(value).sort().flatMap((childKey) => {
+      const child = normalize(value[childKey], childKey);
+      return child === undefined ? [] : [[childKey, child]];
+    }));
+  };
+  return JSON.stringify(normalize(pack));
+}
+
 function sanitizeMapPlans(candidate, profileIds, skillIds, subjectIds) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return {};
   const output = {};
@@ -1004,7 +1065,7 @@ function sanitizeProfile(candidate) {
   if (!candidate || typeof candidate !== "object") return null;
   const id = cleanText(candidate.id, 100);
   const displayName = cleanText(candidate.displayName ?? candidate.display_name, 60);
-  if (!id || !displayName) return null;
+  if (!id || RESERVED_OBJECT_KEYS.has(id) || !displayName) return null;
   const createdAt = cleanText(candidate.createdAt, 40) || new Date().toISOString();
   const role = candidate.role === "educator" ? "educator" : "learner";
   return {
@@ -1286,12 +1347,27 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   const subjects = new Set(catalog.subjects.map((subject) => subject.id));
   const curricula = sanitizeCurricula(candidate.curricula, lessonPacks, skills, subjects);
   const curriculumIds = new Set(curricula.map((item) => item.id));
+  const seenProfileIds = new Set();
   const profiles = Array.isArray(candidate.profiles)
-    ? candidate.profiles.map(sanitizeProfile).filter(Boolean).slice(0, 30)
+    ? candidate.profiles.map(sanitizeProfile).filter((profile) => {
+      if (!profile || seenProfileIds.has(profile.id)) return false;
+      seenProfileIds.add(profile.id);
+      return true;
+    }).slice(0, MAX_PROFILES)
     : [];
+  for (const item of curricula) {
+    if (profiles.some((profile) => profile.id === item.ownerProfileId && profile.role === "educator")) continue;
+    const legacyOwners = profiles.filter((profile) => profile.role === "educator" && profile.activeCurriculumId === item.id);
+    item.ownerProfileId = legacyOwners.length === 1 ? legacyOwners[0].id : null;
+  }
   for (const profile of profiles) {
     if (!curriculumIds.has(profile.curriculumId)) profile.curriculumId = null;
-    if (!curriculumIds.has(profile.activeCurriculumId)) profile.activeCurriculumId = profile.role === "educator" ? curricula.find((item) => item.ownerProfileId === profile.id)?.id ?? null : null;
+    if (profile.role === "educator") {
+      const owned = curricula.find((item) => item.id === profile.activeCurriculumId && item.ownerProfileId === profile.id)
+        ?? curricula.find((item) => item.ownerProfileId === profile.id)
+        ?? null;
+      profile.activeCurriculumId = owned?.id ?? null;
+    }
   }
   const profileIds = new Set(profiles.map((profile) => profile.id));
   const activeProfileId = profileIds.has(candidate.activeProfileId) ? candidate.activeProfileId : null;
@@ -1302,10 +1378,6 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   for (const profile of profiles) {
     if (!catalog.subjects.some((subject) => subject.id === profile.activeSubjectId)) profile.activeSubjectId = DEFAULT_SUBJECT_ID;
   }
-  for (const item of curricula) {
-    if (!profiles.some((profile) => profile.id === item.ownerProfileId && profile.role === "educator")) item.ownerProfileId = null;
-  }
-
   const attempts = Array.isArray(candidate.attempts)
     ? candidate.attempts.map((item) => sanitizeAttempt(item, profileIds, skills)).filter(Boolean).slice(-MAX_ATTEMPTS)
     : [];
@@ -2093,13 +2165,18 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   const skillOrder = [];
   const unlocks = {};
   let catalog = curriculum;
-  let state = loadState(storage, curriculum, { bundledLessonPacks });
+  let migrationLessonPacks = [...bundledLessonPacks];
+  let state = loadState(storage, curriculum, { bundledLessonPacks: migrationLessonPacks });
   let stagedLessonPacks = [];
+  let lessonPacksById = new Map();
+  let visibleSkillCache = null;
   const listeners = new Set();
   let storageError = null;
 
   const rebuildCatalog = () => {
     catalog = mergeCurriculum(curriculum, state.lessonPacks ?? []);
+    lessonPacksById = new Map(state.lessonPacks.map((pack) => [pack.id, pack]));
+    visibleSkillCache = null;
     for (const key of Object.keys(skillsById)) delete skillsById[key];
     for (const key of Object.keys(unlocks)) delete unlocks[key];
     skillOrder.splice(0, skillOrder.length);
@@ -2147,23 +2224,105 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   };
 
   const activeProfile = () => state.profiles.find((profile) => profile.id === state.activeProfileId) ?? null;
+  const curriculaForProfile = (profile = activeProfile()) => {
+    if (!profile) return [];
+    if (profile.role === "educator") return state.curricula.filter((item) => item.ownerProfileId === profile.id);
+    const assigned = state.curricula.find((item) => item.id === profile.curriculumId);
+    return assigned ? [assigned] : [];
+  };
   const activeCurriculum = () => {
     const profile = activeProfile();
     const curriculumId = profile?.role === "educator" ? profile.activeCurriculumId : profile?.curriculumId;
-    return state.curricula.find((item) => item.id === curriculumId) ?? null;
+    return curriculaForProfile(profile).find((item) => item.id === curriculumId) ?? null;
   };
   const activeCurriculumSettings = () => activeCurriculum()?.settings ?? null;
   const effectiveProgressionMode = () => activeCurriculumSettings()?.progressionMode ?? activeProfile()?.progressionMode ?? "hard";
   const visibleSkillIds = () => {
     const active = activeCurriculum();
     if (!active) return new Set(skillOrder);
+    const cacheKey = `${active.id}\u0000${active.enabledPackIds.join("\u0000")}`;
+    if (visibleSkillCache?.key === cacheKey) return new Set(visibleSkillCache.ids);
     const enabled = new Set(active.enabledPackIds);
-    return new Set(skillOrder.filter((skillId) => {
+    const ids = skillOrder.filter((skillId) => {
       const skill = skillsById[skillId];
       if (!skill?.packId) return true;
-      const pack = state.lessonPacks.find((item) => item.id === skill.packId);
+      const pack = lessonPacksById.get(skill.packId);
       return pack?.mode === "override" || enabled.has(skill.packId);
-    }));
+    });
+    visibleSkillCache = { key: cacheKey, ids };
+    return new Set(ids);
+  };
+  const validateEnabledCurriculum = (workspace, enabledPackIds, {
+    checkPlan = true,
+    packs = state.lessonPacks,
+    catalogView = catalog,
+  } = {}) => {
+    const enabled = new Set(enabledPackIds);
+    const visible = new Set(curriculum.skills.map((skill) => skill.id));
+    for (const pack of packs) {
+      if (pack.mode === "override" || enabled.has(pack.id)) pack.skills.forEach((skill) => visible.add(skill.id));
+    }
+    const catalogSkillsById = new Map(catalogView.skills.map((skill) => [skill.id, skill]));
+    for (const skillId of visible) {
+      const skill = catalogSkillsById.get(skillId);
+      const missing = skill?.prerequisites?.find((prerequisiteId) => !visible.has(prerequisiteId));
+      if (missing) throw new Error(`${skill?.name ?? skillId} depends on ${catalogSkillsById.get(missing)?.name ?? missing} in a disabled lesson set.`);
+    }
+    if (checkPlan) {
+      const plan = workspace.mapPlan ?? emptyMapPlan();
+      const referenced = new Set([
+        ...Object.values(plan.layouts ?? {}).flatMap((positions) => Object.keys(positions ?? {})),
+        ...(plan.paths ?? []).flatMap((path) => path.skillIds ?? []),
+        ...(plan.annotations ?? []).flatMap((annotation) => annotation.skillIds ?? []),
+      ]);
+      const hiddenReferences = [...referenced].filter((skillId) => !visible.has(skillId));
+      if (hiddenReferences.length) {
+        const error = new Error(`The curriculum plan still references ${catalogSkillsById.get(hiddenReferences[0])?.name ?? hiddenReferences[0]}. Remove affected layouts, paths, and annotations before disabling its lesson set.`);
+        error.code = "curriculum_plan_references";
+        error.hiddenSkillIds = hiddenReferences;
+        throw error;
+      }
+    }
+    return visible;
+  };
+  const removeHiddenPlanReferences = (workspace, visible) => {
+    const plan = workspace.mapPlan ?? emptyMapPlan();
+    let removed = 0;
+    for (const [layoutKey, positions] of Object.entries(plan.layouts ?? {})) {
+      for (const skillId of Object.keys(positions ?? {})) {
+        if (!visible.has(skillId)) {
+          delete positions[skillId];
+          removed += 1;
+        }
+      }
+      if (!Object.keys(positions ?? {}).length) delete plan.layouts[layoutKey];
+    }
+    const retainedPaths = [];
+    const removedPathIds = new Set();
+    for (const path of plan.paths ?? []) {
+      const nextIds = (path.skillIds ?? []).filter((skillId) => visible.has(skillId));
+      removed += Math.max(0, (path.skillIds?.length ?? 0) - nextIds.length);
+      if (nextIds.length < 2) {
+        removedPathIds.add(path.id);
+        removed += 1;
+      } else retainedPaths.push({ ...path, skillIds: nextIds, updatedAt: isoNow() });
+    }
+    plan.paths = retainedPaths;
+    plan.annotations = (plan.annotations ?? []).flatMap((annotation) => {
+      if (annotation.pathId && removedPathIds.has(annotation.pathId)) {
+        removed += 1;
+        return [];
+      }
+      const nextIds = (annotation.skillIds ?? []).filter((skillId) => visible.has(skillId));
+      removed += Math.max(0, (annotation.skillIds?.length ?? 0) - nextIds.length);
+      if (!annotation.pathId && !nextIds.length && !Object.keys(annotation.positions ?? {}).length) {
+        removed += 1;
+        return [];
+      }
+      return [{ ...annotation, skillIds: nextIds, targetType: annotation.pathId ? "path" : nextIds.length === 1 ? "node" : nextIds.length > 1 ? "nodes" : "free", updatedAt: isoNow() }];
+    });
+    workspace.mapPlan = plan;
+    return removed;
   };
   const isSkillVisible = (skillId) => visibleSkillIds().has(skillId);
   const activeProgress = () => state.progress[state.activeProfileId] ?? {};
@@ -2296,7 +2455,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       version: state.version,
       activeProfile: clone(activeProfile()),
       activeCurriculum: clone(curriculumWorkspace),
-      curricula: clone(state.curricula.map((item) => ({
+      curricula: clone(curriculaForProfile().map((item) => ({
         id: item.id, name: item.name, description: item.description, ownerProfileId: item.ownerProfileId,
         enabledPackIds: [...item.enabledPackIds], settings: item.settings, createdAt: item.createdAt, updatedAt: item.updatedAt,
       }))),
@@ -2404,7 +2563,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     state.drafts[profileId] ??= {};
     state.mapPlans[profileId] ??= emptyMapPlan();
     const profile = activeProfile();
-    if (profile?.role === "educator" && !state.curricula.some((item) => item.id === profile.activeCurriculumId)) {
+    if (profile?.role === "educator" && !state.curricula.some((item) => item.id === profile.activeCurriculumId && item.ownerProfileId === profile.id)) {
       profile.activeCurriculumId = state.curricula.find((item) => item.ownerProfileId === profile.id)?.id ?? null;
     }
     const subjectId = activeProfile()?.activeSubjectId ?? DEFAULT_SUBJECT_ID;
@@ -2429,6 +2588,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const name = cleanText(displayName, 60);
     if (name.length < 2) throw new Error("Profile name must contain at least 2 characters.");
     const safeRole = role === "educator" ? "educator" : "learner";
+    if (state.profiles.length >= MAX_PROFILES) throw new Error(`QuickMaths supports at most ${MAX_PROFILES} profiles.`);
+    if (safeRole === "educator" && state.curricula.length >= MAX_CURRICULA) throw new Error(`QuickMaths supports at most ${MAX_CURRICULA} curricula.`);
     const profile = {
       id: makeId("profile"), displayName: name, createdAt: isoNow(), totalLoggedSeconds: 0, demo,
       role: safeRole, curriculumId: safeRole === "learner" && state.curricula.some((item) => item.id === curriculumId) ? curriculumId : null,
@@ -2805,7 +2966,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   const parseCurriculumFile = (raw) => {
     let candidate = raw;
     if (typeof raw === "string") {
-      if (raw.length > 10_000_000) throw new Error("Curriculum file is larger than 10 MB.");
+      if (utf8ByteLength(raw) > MAX_CURRICULUM_BYTES) throw new Error("Curriculum file is larger than 10 MB.");
       try { candidate = JSON.parse(raw); } catch { throw new Error("Curriculum file is not valid JSON."); }
     }
     if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error("Curriculum file is invalid.");
@@ -2813,44 +2974,58 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (String(candidate.schema_version ?? candidate.schemaVersion) !== CURRICULUM_SCHEMA_VERSION) throw new Error(`Unsupported curriculum schema; expected ${CURRICULUM_SCHEMA_VERSION}.`);
     const embeddedCandidates = candidate.lesson_packs ?? candidate.lessonPacks ?? [];
     if (!Array.isArray(embeddedCandidates)) throw new Error("Curriculum lesson_packs must be a list.");
-    if (state.lessonPacks.length + embeddedCandidates.length > MAX_LESSON_SETS) throw new Error(`QuickMaths supports at most ${MAX_LESSON_SETS} installed lesson sets and improvements.`);
     const normalizedEmbedded = embeddedCandidates.length ? normalizeLessonPackCollection(embeddedCandidates, curriculum) : [];
+    if (normalizedEmbedded.some((pack) => pack.mode === "override")) {
+      throw new Error("Curriculum files cannot install browser-wide native lesson improvements. Review and install improvements separately in Lesson Studio.");
+    }
     const newPacks = [];
     for (const pack of normalizedEmbedded) {
       const installed = state.lessonPacks.find((item) => item.id === pack.id);
       if (!installed) newPacks.push(pack);
-      else if (installed.mode !== pack.mode || installed.version !== pack.version || installed.name !== pack.name
-        || installed.skills.map((skill) => skill.id).join("|") !== pack.skills.map((skill) => skill.id).join("|")) {
+      else if (canonicalLessonPack(installed) !== canonicalLessonPack(pack)) {
         throw new Error(`Installed lesson set ${pack.id} does not match the curriculum copy.`);
       }
     }
+    if (state.lessonPacks.length + newPacks.length > MAX_LESSON_SETS) throw new Error(`QuickMaths supports at most ${MAX_LESSON_SETS} installed lesson sets and improvements.`);
     const combinedPacks = [...state.lessonPacks, ...newPacks];
     validateCatalogGraph(curriculum, combinedPacks);
     const combinedCatalog = mergeCurriculum(curriculum, combinedPacks);
     const combinedPackIds = new Set(combinedPacks.filter((pack) => pack.mode !== "override").map((pack) => pack.id));
-    const enabledPackIds = Array.isArray(candidate.enabled_pack_ids ?? candidate.enabledPackIds)
-      ? [...new Set((candidate.enabled_pack_ids ?? candidate.enabledPackIds).filter((id) => combinedPackIds.has(id)))].slice(0, MAX_LESSON_SETS)
-      : normalizedEmbedded.filter((pack) => pack.mode !== "override").map((pack) => pack.id);
+    const embeddedPackIds = new Set(normalizedEmbedded.filter((pack) => pack.mode !== "override").map((pack) => pack.id));
+    const rawEnabledPackIds = candidate.enabled_pack_ids ?? candidate.enabledPackIds;
+    if (rawEnabledPackIds !== undefined && !Array.isArray(rawEnabledPackIds)) throw new Error("Curriculum enabled_pack_ids must be a list.");
+    const requestedEnabledPackIds = rawEnabledPackIds ?? [...embeddedPackIds];
+    if (requestedEnabledPackIds.some((id) => typeof id !== "string")) throw new Error("Curriculum enabled_pack_ids must contain lesson-set IDs.");
+    const enabledPackIds = [...new Set(requestedEnabledPackIds)];
+    const unknownEnabled = enabledPackIds.find((id) => !combinedPackIds.has(id));
+    if (unknownEnabled) throw new Error(`Curriculum references unavailable lesson set ${unknownEnabled}.`);
+    const unembeddedEnabled = enabledPackIds.find((id) => !embeddedPackIds.has(id));
+    if (unembeddedEnabled) throw new Error(`Enabled lesson set ${unembeddedEnabled} must be embedded so the curriculum is reproducible on another device.`);
     const rawId = cleanText(candidate.id, 120).toUpperCase().replace(/[^A-Z0-9_]/g, "_");
     const desiredId = CURRICULUM_ID.test(rawId) ? rawId : makeId("curriculum").toUpperCase().replace(/[^A-Z0-9_]/g, "_");
     const skillIds = new Set(combinedCatalog.skills.map((skill) => skill.id));
     const subjectIds = new Set(combinedCatalog.subjects.map((subject) => subject.id));
     const plan = sanitizeMapPlans({ curriculum: candidate.map_plan ?? candidate.mapPlan ?? emptyMapPlan() }, new Set(["curriculum"]), skillIds, subjectIds).curriculum ?? emptyMapPlan();
+    const parsedCurriculum = {
+      id: desiredId,
+      name: cleanText(candidate.name, 100) || "Imported curriculum",
+      description: cleanText(candidate.description, 1000),
+      ownerProfileId: null,
+      enabledPackIds,
+      settings: validateExternalCurriculumSettings(candidate.settings ?? {}),
+      mapPlan: plan,
+      createdAt: cleanText(candidate.created_at ?? candidate.createdAt, 40) || isoNow(),
+      updatedAt: isoNow(),
+      sourceUrl: cleanText(candidate.source_url ?? candidate.sourceUrl, 1000) || null,
+    };
+    validateEnabledCurriculum(parsedCurriculum, enabledPackIds, {
+      packs: combinedPacks,
+      catalogView: combinedCatalog,
+    });
     return {
       candidate,
       newPacks,
-      curriculum: {
-        id: desiredId,
-        name: cleanText(candidate.name, 100) || "Imported curriculum",
-        description: cleanText(candidate.description, 1000),
-        ownerProfileId: null,
-        enabledPackIds,
-        settings: sanitizeCurriculumSettings(candidate.settings),
-        mapPlan: plan,
-        createdAt: cleanText(candidate.created_at ?? candidate.createdAt, 40) || isoNow(),
-        updatedAt: isoNow(),
-        sourceUrl: cleanText(candidate.source_url ?? candidate.sourceUrl, 1000) || null,
-      },
+      curriculum: parsedCurriculum,
     };
   };
 
@@ -2861,10 +3036,15 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       id: parsed.curriculum.id,
       name: parsed.curriculum.name,
       description: parsed.curriculum.description,
+      exportKind: parsed.candidate.export_kind === "private_assignment"
+        ? "private_assignment"
+        : "blueprint",
       enabledPackCount: parsed.curriculum.enabledPackIds.length,
       embeddedPackCount: (parsed.candidate.lesson_packs ?? parsed.candidate.lessonPacks ?? []).length,
       newPackCount: parsed.newPacks.length,
       settings: clone(parsed.curriculum.settings),
+      educatorGuidance: parsed.curriculum.settings.agentInstructions,
+      hasCustomAgentGuidance: Boolean(parsed.curriculum.settings.agentInstructions.trim()),
     };
   };
 
@@ -2930,7 +3110,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return clone(workspace.settings);
   };
 
-  const setCurriculumPackEnabled = (packId, enabled) => {
+  const setCurriculumPackEnabled = (packId, enabled, { removePlanReferences = false } = {}) => {
     const profile = activeProfile();
     const workspace = activeCurriculum();
     if (profile?.role !== "educator" || !workspace) throw new Error("Open a curriculum in an educator profile first.");
@@ -2939,6 +3119,15 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (pack.mode === "override") throw new Error("Native lesson improvements apply to every curriculum while installed.");
     const ids = new Set(workspace.enabledPackIds);
     if (enabled) ids.add(packId); else ids.delete(packId);
+    const visible = validateEnabledCurriculum(workspace, ids, { checkPlan: false });
+    let removedPlanReferences = 0;
+    try {
+      validateEnabledCurriculum(workspace, ids);
+    } catch (error) {
+      if (error?.code !== "curriculum_plan_references" || !removePlanReferences) throw error;
+      removedPlanReferences = removeHiddenPlanReferences(workspace, visible);
+      validateEnabledCurriculum(workspace, ids);
+    }
     workspace.enabledPackIds = [...ids].slice(0, MAX_LESSON_SETS);
     workspace.updatedAt = isoNow();
     const nextVisible = visibleSkillIds();
@@ -2952,15 +3141,29 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     }
     addActivity("set_curriculum_pack", `${enabled ? "Enabled" : "Disabled"} ${pack.name} in ${workspace.name}.`);
     notify();
-    return { ok: true, packId, enabled: Boolean(enabled), enabledPackIds: [...workspace.enabledPackIds] };
+    return { ok: true, packId, enabled: Boolean(enabled), enabledPackIds: [...workspace.enabledPackIds], removedPlanReferences };
   };
 
+  const normalizedLearnerName = (value) => cleanText(value, 60).normalize("NFKC").toLowerCase();
   const attachCurriculum = (curriculumId) => {
     const profile = activeProfile();
     if (!profile) throw new Error("Select a profile first.");
     if (profile.role === "educator") return selectCurriculum(curriculumId);
     const workspace = state.curricula.find((item) => item.id === curriculumId);
     if (!workspace) throw new Error("Curriculum not found.");
+    const assignedName = workspace.settings.studentName;
+    const reuseCurrentProfile = Boolean(assignedName)
+      && normalizedLearnerName(assignedName) === normalizedLearnerName(profile.displayName);
+    if (!reuseCurrentProfile) {
+      if (state.profiles.length >= MAX_PROFILES) throw new Error(`QuickMaths needs a blank assignment profile, but this browser already has ${MAX_PROFILES} profiles.`);
+      const assignmentName = assignedName.length >= 2
+        ? assignedName
+        : cleanText(`${profile.displayName} - ${workspace.name}`, 60);
+      const created = createProfile(assignmentName, { curriculumId: workspace.id });
+      addActivity("attach_curriculum", `Started ${workspace.name} from scratch in an independent assignment profile.`, created.id);
+      notify();
+      return { curriculum: clone(workspace), profile: clone(created), assignmentProfileCreated: true, reusedMastery: false };
+    }
     profile.curriculumId = workspace.id;
     const firstSkill = skillOrder.find((id) => isSkillVisible(id));
     if (firstSkill) {
@@ -2970,51 +3173,69 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     }
     addActivity("load_curriculum", `Loaded curriculum ${workspace.name} for ${profile.displayName}.`);
     notify();
-    return clone(workspace);
+    return { curriculum: clone(workspace), profile: clone(profile), assignmentProfileCreated: false, reusedMastery: true };
   };
 
   const importCurriculum = (raw, { sourceUrl = null, attach = true } = {}) => {
     if (state.curricula.length >= MAX_CURRICULA) throw new Error(`QuickMaths supports at most ${MAX_CURRICULA} curricula.`);
     const parsed = parseCurriculumFile(raw);
+    const importingForLearner = Boolean(attach && activeProfile()?.role === "learner");
+    const learnerNameMatches = importingForLearner
+      && Boolean(parsed.curriculum.settings.studentName)
+      && normalizedLearnerName(parsed.curriculum.settings.studentName) === normalizedLearnerName(activeProfile().displayName);
+    if (importingForLearner && !learnerNameMatches && state.profiles.length >= MAX_PROFILES) {
+      throw new Error(`QuickMaths needs a blank assignment profile, but this browser already has ${MAX_PROFILES} profiles.`);
+    }
     if (state.curricula.some((item) => item.id === parsed.curriculum.id)) parsed.curriculum.id = makeId("curriculum").toUpperCase().replace(/[^A-Z0-9_]/g, "_");
     parsed.curriculum.sourceUrl = cleanText(sourceUrl, 1000) || parsed.curriculum.sourceUrl;
     if (activeProfile()?.role === "educator") parsed.curriculum.ownerProfileId = state.activeProfileId;
     state.lessonPacks.push(...parsed.newPacks);
     state.curricula.push(parsed.curriculum);
     rebuildCatalog();
-    if (attach && activeProfile()) {
-      if (activeProfile().role === "educator") activeProfile().activeCurriculumId = parsed.curriculum.id;
-      else activeProfile().curriculumId = parsed.curriculum.id;
-      const firstSkill = skillOrder.find((id) => isSkillVisible(id));
-      if (firstSkill) {
-        activeProfile().activeSubjectId = skillsById[firstSkill].subjectId;
-        state.ui.selectedSkillId = firstSkill;
-        state.ui.selectedMapSkillId = firstSkill;
-      }
-    }
+    let attachment = null;
+    if (attach && activeProfile()) attachment = attachCurriculum(parsed.curriculum.id);
     addActivity("import_curriculum", `Imported curriculum ${parsed.curriculum.name}${parsed.newPacks.length ? ` with ${parsed.newPacks.length} lesson set${parsed.newPacks.length === 1 ? "" : "s"}` : ""}.`);
     notify();
-    return { ok: true, id: parsed.curriculum.id, name: parsed.curriculum.name, newPackCount: parsed.newPacks.length, attached: Boolean(attach && activeProfile()) };
+    return {
+      ok: true,
+      id: parsed.curriculum.id,
+      name: parsed.curriculum.name,
+      newPackCount: parsed.newPacks.length,
+      attached: Boolean(attachment),
+      assignmentProfileCreated: Boolean(attachment?.assignmentProfileCreated),
+      reusedMastery: Boolean(attachment?.reusedMastery),
+      profile: attachment?.profile ?? null,
+    };
   };
 
-  const exportCurriculum = (curriculumId = activeCurriculum()?.id) => {
-    const workspace = state.curricula.find((item) => item.id === curriculumId);
+  const exportCurriculum = (curriculumId = activeCurriculum()?.id, { kind = "blueprint" } = {}) => {
+    if (!["blueprint", "private_assignment"].includes(kind)) throw new Error("Curriculum export kind must be blueprint or private_assignment.");
+    const workspace = curriculaForProfile().find((item) => item.id === curriculumId);
     if (!workspace) throw new Error("Curriculum not found.");
+    const improvements = state.lessonPacks.filter((pack) => pack.mode === "override");
+    if (improvements.length) throw new Error(`Restore installed native improvement${improvements.length === 1 ? "" : "s"} before exporting. Curriculum files cannot silently install browser-wide native changes.`);
+    validateEnabledCurriculum(workspace, workspace.enabledPackIds);
     const packs = state.lessonPacks.filter((pack) => pack.mode !== "override" && workspace.enabledPackIds.includes(pack.id));
-    return JSON.stringify({
+    const settings = kind === "private_assignment"
+      ? clone(workspace.settings)
+      : { agentEnabled: workspace.settings.agentEnabled, progressionMode: workspace.settings.progressionMode };
+    const output = JSON.stringify({
       format: CURRICULUM_FORMAT,
       schema_version: CURRICULUM_SCHEMA_VERSION,
+      export_kind: kind,
       id: workspace.id,
       name: workspace.name,
       description: workspace.description,
       created_at: workspace.createdAt,
       updated_at: workspace.updatedAt,
-      source_url: workspace.sourceUrl,
       enabled_pack_ids: [...workspace.enabledPackIds],
-      settings: clone(workspace.settings),
+      settings,
       map_plan: clone(workspace.mapPlan),
       lesson_packs: clone(packs),
     }, null, 2);
+    const bytes = typeof TextEncoder === "function" ? new TextEncoder().encode(output).length : output.length;
+    if (bytes > MAX_CURRICULUM_BYTES) throw new Error("This curriculum is larger than 10 MB. Remove lesson packs or map annotations before exporting it.");
+    return output;
   };
 
   const startTest = (skillId, { force = false, activityActor = "learner" } = {}) => {
@@ -3415,22 +3636,23 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return { ok: true, saved: true, problem: { question_id: matching.template_id, skill_id: skillId, prompt: matching.prompt, difficulty: matching.difficulty } };
   };
 
-  const parseLessonPack = (raw) => {
-    if (state.lessonPacks.length >= MAX_LESSON_SETS) throw new Error(`QuickMaths supports at most ${MAX_LESSON_SETS} installed lesson sets and improvements.`);
+  const parseLessonPackAgainst = (raw, workingPacks = state.lessonPacks) => {
+    if (workingPacks.length >= MAX_LESSON_SETS) throw new Error(`QuickMaths supports at most ${MAX_LESSON_SETS} installed lesson sets and improvements.`);
     let candidate = raw;
     if (typeof raw === "string") {
-      if (raw.length > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
+      if (utf8ByteLength(raw) > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
       try { candidate = JSON.parse(raw); } catch { throw new Error("Lesson set is not valid JSON."); }
     }
-    if (state.lessonPacks.some((pack) => pack.id === candidate?.id)) throw new Error(`Lesson set ${candidate.id} is already installed.`);
-    const pack = normalizeLessonPack(candidate, { knownSkillIds: Object.keys(skillsById), nativeSkills: curriculum.skills });
-    validateCatalogGraph(curriculum, [...state.lessonPacks, pack]);
+    if (workingPacks.some((pack) => pack.id === candidate?.id)) throw new Error(`Lesson set ${candidate.id} is already installed or repeated in this batch.`);
+    const workingCatalog = mergeCurriculum(curriculum, workingPacks);
+    const pack = normalizeLessonPack(candidate, { knownSkillIds: workingCatalog.skills.map((skill) => skill.id), nativeSkills: curriculum.skills });
+    validateCatalogGraph(curriculum, [...workingPacks, pack]);
     return pack;
   };
 
-  const previewLessonPack = (raw) => {
-    const pack = parseLessonPack(raw);
-    return {
+  const parseLessonPack = (raw) => parseLessonPackAgainst(raw, state.lessonPacks);
+
+  const lessonPackPreview = (pack) => ({
       ok: true,
       id: pack.id,
       name: pack.name,
@@ -3445,8 +3667,9 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       problemCount: pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
       overridesNativeSkills: pack.mode === "override" ? pack.skills.map((skill) => skill.id) : [],
       prerequisiteLinksToBuiltIn: pack.skills.reduce((count, skill) => count + skill.prerequisites.filter((id) => !id.startsWith("CUSTOM_")).length, 0),
-    };
-  };
+    });
+
+  const previewLessonPack = (raw) => lessonPackPreview(parseLessonPack(raw));
 
   const importLessonPack = (raw) => {
     const pack = parseLessonPack(raw);
@@ -3485,11 +3708,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!Array.isArray(rawItems) || !rawItems.length) throw new Error("At least one lesson set is required for staging.");
     if (rawItems.length > 20) throw new Error("At most 20 lesson sets can be staged together.");
     if (stagedLessonPacks.length) throw new Error("A lesson set is already awaiting human review. Finish or skip the current queue before staging another batch.");
-    const parsed = rawItems.map((raw) => ({ raw: typeof raw === "string" ? raw : JSON.stringify(raw), pack: parseLessonPack(raw) }));
-    const seen = new Set();
-    for (const item of parsed) {
-      if (seen.has(item.pack.id)) throw new Error(`The staging batch contains duplicate lesson set ${item.pack.id}.`);
-      seen.add(item.pack.id);
+    const parsed = [];
+    const workingPacks = [...state.lessonPacks];
+    for (const raw of rawItems) {
+      const serialized = typeof raw === "string" ? raw : JSON.stringify(raw);
+      const pack = parseLessonPackAgainst(serialized, workingPacks);
+      workingPacks.push(pack);
+      parsed.push({ raw: serialized, pack });
     }
     stagedLessonPacks = parsed.map((item, index) => ({ ...item, batchIndex: index + 1, batchTotal: parsed.length }));
     state.ui.route = "settings";
@@ -3503,8 +3728,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       staged_count: parsed.length,
       sequential_review: true,
       requires_human_confirmation: true,
-      previews: parsed.map((item) => previewLessonPack(item.raw)),
-      preview: previewLessonPack(parsed[0].raw),
+      previews: parsed.map((item) => lessonPackPreview(item.pack)),
+      preview: lessonPackPreview(parsed[0].pack),
     };
   };
 
@@ -3589,12 +3814,18 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   };
 
   const parseBackup = (raw) => {
-    if (typeof raw !== "string" || raw.length > 10_000_000) throw new Error("Backup file is invalid or too large.");
+    if (typeof raw !== "string" || utf8ByteLength(raw) > MAX_CURRICULUM_BYTES) throw new Error("Backup file is invalid or too large.");
     let candidate;
     try { candidate = JSON.parse(raw); } catch { throw new Error("Backup file is not valid JSON."); }
     if (!candidate || typeof candidate !== "object") throw new Error("Backup file is invalid.");
+    if (Array.isArray(candidate.profiles)) {
+      if (candidate.profiles.length > MAX_PROFILES) throw new Error(`Backup contains more than ${MAX_PROFILES} profiles.`);
+      const ids = candidate.profiles.map((profile) => cleanText(profile?.id, 100));
+      if (ids.some((id) => !id || RESERVED_OBJECT_KEYS.has(id))) throw new Error("Backup contains an invalid or reserved profile ID.");
+      if (new Set(ids).size !== ids.length) throw new Error("Backup contains duplicate profile IDs.");
+    }
     if (Number(candidate.version) > APP_VERSION) throw new Error("This backup was created by a newer QuickMaths version.");
-    const imported = sanitizeState(migrateBundledLessonPacks(candidate, bundledLessonPacks), curriculum, { strictPacks: true });
+    const imported = sanitizeState(migrateBundledLessonPacks(candidate, migrationLessonPacks), curriculum, { strictPacks: true });
     if (!imported.profiles.length) throw new Error("Backup does not contain any learner profiles.");
     return { candidate, imported };
   };
@@ -3815,6 +4046,11 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     exportTutorReviewPacket,
     previewBackup,
     importBackup,
+    registerBundledLessonPacks(rawPacks = []) {
+      if (!Array.isArray(rawPacks)) throw new Error("Bundled lesson migrations must be a list.");
+      migrationLessonPacks = [...new Set([...migrationLessonPacks, ...rawPacks.filter((raw) => typeof raw === "string")])];
+      return { ok: true, count: migrationLessonPacks.length };
+    },
     importSyncState,
     exportCsv,
     heartbeat,

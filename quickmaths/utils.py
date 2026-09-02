@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import math
 import re
 from fractions import Fraction
 from typing import Any
@@ -17,15 +18,50 @@ _ALLOWED_FUNCTIONS = {
     "round": round,
 }
 
+_MAX_EXPRESSION_LENGTH = 1_000
+_MAX_AST_NODES = 200
+_MAX_AST_DEPTH = 30
+_MAX_INTEGER_BITS = 4_096
+_MAX_TEXT_LENGTH = 10_000
+_MAX_EXPONENT_MAGNITUDE = 100
+
 
 def safe_eval(expression: str, names: dict[str, Any]) -> Any:
-    tree = ast.parse(expression, mode="eval")
-    return _eval_node(tree.body, names)
+    if not isinstance(expression, str) or len(expression) > _MAX_EXPRESSION_LENGTH:
+        raise SafeExpressionError("Expression is too long")
+    try:
+        tree = ast.parse(expression, mode="eval")
+    except (SyntaxError, ValueError) as error:
+        raise SafeExpressionError("Expression syntax is invalid") from error
+    nodes = list(ast.walk(tree))
+    if len(nodes) > _MAX_AST_NODES or _ast_depth(tree) > _MAX_AST_DEPTH:
+        raise SafeExpressionError("Expression is too complex")
+    for node in nodes:
+        if isinstance(node, ast.Constant) and not isinstance(node.value, (str, int, float, bool)):
+            raise SafeExpressionError("Only numeric, text, and boolean constants are allowed")
+    return _bounded(_eval_node(tree.body, names))
+
+
+def _ast_depth(node: ast.AST) -> int:
+    children = list(ast.iter_child_nodes(node))
+    return 1 if not children else 1 + max(_ast_depth(child) for child in children)
+
+
+def _bounded(value: Any) -> Any:
+    if isinstance(value, int) and not isinstance(value, bool) and value.bit_length() > _MAX_INTEGER_BITS:
+        raise SafeExpressionError("Integer result is too large")
+    if isinstance(value, Fraction) and max(value.numerator.bit_length(), value.denominator.bit_length()) > _MAX_INTEGER_BITS:
+        raise SafeExpressionError("Fraction result is too large")
+    if isinstance(value, float) and not math.isfinite(value):
+        raise SafeExpressionError("Numeric result must be finite")
+    if isinstance(value, str) and len(value) > _MAX_TEXT_LENGTH:
+        raise SafeExpressionError("Text result is too large")
+    return value
 
 
 def _eval_node(node: ast.AST, names: dict[str, Any]) -> Any:
     if isinstance(node, ast.Constant):
-        return node.value
+        return _bounded(node.value)
     if isinstance(node, ast.Name):
         if node.id == "true":
             return True
@@ -33,32 +69,42 @@ def _eval_node(node: ast.AST, names: dict[str, Any]) -> Any:
             return False
         if node.id not in names:
             raise SafeExpressionError(f"Unknown name '{node.id}'")
-        return names[node.id]
+        return _bounded(names[node.id])
     if isinstance(node, ast.UnaryOp):
         operand = _eval_node(node.operand, names)
         if isinstance(node.op, ast.USub):
-            return -operand
+            return _bounded(-operand)
         if isinstance(node.op, ast.UAdd):
-            return +operand
+            return _bounded(+operand)
         if isinstance(node.op, ast.Not):
             return not operand
     if isinstance(node, ast.BinOp):
         left = _eval_node(node.left, names)
         right = _eval_node(node.right, names)
         if isinstance(node.op, ast.Add):
-            return left + right
+            return _bounded(left + right)
         if isinstance(node.op, ast.Sub):
-            return left - right
+            return _bounded(left - right)
         if isinstance(node.op, ast.Mult):
-            return left * right
+            if isinstance(left, str) and isinstance(right, int) and len(left) * max(0, right) > _MAX_TEXT_LENGTH:
+                raise SafeExpressionError("Text result is too large")
+            if isinstance(right, str) and isinstance(left, int) and len(right) * max(0, left) > _MAX_TEXT_LENGTH:
+                raise SafeExpressionError("Text result is too large")
+            return _bounded(left * right)
         if isinstance(node.op, ast.Div):
-            return left / right
+            return _bounded(left / right)
         if isinstance(node.op, ast.FloorDiv):
-            return left // right
+            return _bounded(left // right)
         if isinstance(node.op, ast.Mod):
-            return left % right
+            return _bounded(left % right)
         if isinstance(node.op, ast.Pow):
-            return left**right
+            if not isinstance(right, (int, float)) or abs(right) > _MAX_EXPONENT_MAGNITUDE:
+                raise SafeExpressionError("Exponent is too large")
+            if isinstance(left, int) and isinstance(right, int) and right > 0 and left not in (-1, 0, 1):
+                estimated_bits = left.bit_length() * right
+                if estimated_bits > _MAX_INTEGER_BITS:
+                    raise SafeExpressionError("Integer result is too large")
+            return _bounded(left**right)
     if isinstance(node, ast.Compare):
         left = _eval_node(node.left, names)
         for operator, comparator in zip(node.ops, node.comparators):
@@ -90,8 +136,10 @@ def _eval_node(node: ast.AST, names: dict[str, Any]) -> Any:
     if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
         if node.func.id not in _ALLOWED_FUNCTIONS:
             raise SafeExpressionError(f"Function '{node.func.id}' is not allowed")
+        if node.keywords:
+            raise SafeExpressionError("Keyword arguments are not allowed")
         args = [_eval_node(arg, names) for arg in node.args]
-        return _ALLOWED_FUNCTIONS[node.func.id](*args)
+        return _bounded(_ALLOWED_FUNCTIONS[node.func.id](*args))
     raise SafeExpressionError(f"Unsupported expression: {ast.dump(node)}")
 
 

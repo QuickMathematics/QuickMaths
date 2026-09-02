@@ -833,6 +833,8 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .studio-choice small { margin-top: 4px; color: var(--muted); font-size: 8px; }
 .studio-override-note { display: grid; grid-template-columns: 42px minmax(0,1fr); gap: 13px; align-items: center; padding: 16px; color: var(--pine); background: color-mix(in srgb,var(--mint) 42%,white); border: 1px solid color-mix(in srgb,var(--pine-2) 34%,var(--line)); border-radius: 12px; }
 .studio-override-note > span { width: 42px; height: 42px; display: grid; place-items: center; color: var(--lime); background: var(--pine); border-radius: 12px; font-size: 19px; font-weight: 900; }
+.studio-portability-note { margin: 0 0 12px; padding: 10px 12px; color: var(--muted); background: var(--paper-deep); border: 1px solid var(--line); border-radius: 10px; font-size: 8px; line-height: 1.55; }
+.studio-portability-note strong { color: var(--ink); }
 .studio-override-note strong { font: 600 15px/1.1 var(--serif); }
 .studio-override-note p { margin: 5px 0 0; color: var(--muted); font-size: 8px; line-height: 1.55; }
 .theme-palette { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 7px; margin-top: 8px; }
@@ -1397,6 +1399,7 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .curriculum-link-form { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 10px; margin-top: 16px; }
 .curriculum-link-form label { display: grid; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 800; }
 .curriculum-link-form input { min-height: 44px; padding: 0 12px; color: var(--ink); background: var(--paper-light); border: 1px solid var(--line); border-radius: 11px; }
+.curriculum-guidance-card pre { max-height: 320px; margin: 0; padding: 16px; overflow: auto; color: var(--ink); background: var(--paper-deep); border: 1px solid var(--line); border-radius: 12px; font: 500 10px/1.65 var(--sans); white-space: pre-wrap; overflow-wrap: anywhere; }
 
 @media (max-width: 1050px) {
   .curriculum-editor-grid { grid-template-columns: 1fr; }

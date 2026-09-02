@@ -17,7 +17,7 @@
       </header>
 
       <section class="hero guide-hero">
-        <div><p class="eyebrow">Zero-backend mobile handoff</p><h1>Your phone learns.<br>Your computer agents.</h1><p>The learner browser and agent workspace exchange revision-checked checkpoints through one private GitHub data repository. QuickMaths still has no server and no model API bill.</p></div>
+        <div><p class="eyebrow">Zero-backend mobile handoff</p><h1>Your phone learns.<br>Your computer agents.</h1><p>The browser and agent workspace exchange revision-checked, complete-workspace checkpoints through one required private GitHub data repository. QuickMaths still has no server and no model API bill.</p></div>
         <div class="hero-mark" aria-hidden="true"><span>Q</span><span>M</span><i>↔</i></div>
       </section>
 
@@ -40,7 +40,7 @@
 
       <section class="bridge-grid lower-grid guide-grid">
         <article class="panel protocol-panel"><p class="eyebrow">Every agent session</p><ol><li><span>1</span><p><strong>Pull first</strong>Call <code>sync_from_learner</code> before reading or changing learning state.</p></li><li><span>2</span><p><strong>Work through tools</strong>Use QuickMaths site tools so the checkpoint and activity record stay coherent. Changes remain local and marked dirty.</p></li><li><span>3</span><p><strong>Publish changes</strong>Call <code>publish_agent_checkpoint</code> once after the state-changing work is complete.</p></li></ol></article>
-        <article class="panel safety-panel"><p class="eyebrow">Credential boundary</p><h2>Keys never enter the agent page or learning files.</h2><p>The learner token lives in its browser session unless you explicitly remember it on that device. The Codex CLI uses the computer's existing Git credentials and sends none of them to JavaScript.</p><p>Keep the repository private, limit the phone token to that repository, and revoke it immediately if the phone is lost.</p></article>
+        <article class="panel safety-panel"><p class="eyebrow">Credential and data boundary</p><h2>Keys never enter the agent page or learning files.</h2><p>The browser token lives in its session unless you explicitly remember it on that device. The Codex CLI uses the computer's existing Git credentials and sends none of them to JavaScript.</p><p><strong>Storage is workspace-wide:</strong> each checkpoint includes every QuickMaths learner and educator profile, curriculum, attempt, review, installed pack, map plan, and supplemental educator guidance on this browser origin. QuickMaths refuses a public repository or a token without write access. Limit the token to this one private repository and revoke it immediately if the device is lost.</p></article>
       </section>
 
       <section class="panel prompt-panel">

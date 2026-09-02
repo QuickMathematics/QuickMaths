@@ -162,12 +162,17 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /createGitHubSyncController/);
   assert.match(js, /id = "github-sync-form"/);
   assert.match(js, /id: "welcome-github-sync-form", landing: true/);
-  assert.match(js, /Connect and load my profile/);
+  assert.match(js, /Connect and load my workspace/);
+  assert.match(js, /uploads the complete QuickMaths workspace in this browser/);
+  assert.match(js, /repository must be private/);
   assert.match(js, /Paste your fine-grained GitHub token/);
   assert.match(js, /autocomplete="new-password"/);
   assert.match(js, /captureBridgeFormDraft/);
   assert.match(js, /restoreBridgeFormDraft/);
   assert.match(js, /restoreOnly: true/);
+  assert.match(js, /Existing mastery is reused only when the curriculum's student name matches/);
+  assert.match(js, /if \(studioHelp\) \{/);
+  assert.doesNotMatch(js, /studioHelp && currentSnapshot\?\.ui\.route === "creator"/);
   assert.match(js, /closeAgentStudio\(\{ focusToggle: false \}\);/);
   assert.doesNotMatch(js, /Repository Contents: read and write/);
   assert.match(js, /\.\/agent-bridge\.html/);
@@ -254,9 +259,9 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
   assert.equal(summary.guide.tools.length, 29);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
-  assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent GitHub storage/);
+  assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent Workspace Storage/);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
-  assert.match(custom.guide.github_community.setup_recommendation, /separate from learner storage/);
+  assert.match(custom.guide.github_community.setup_recommendation, /separate from Workspace Storage/);
   assert.equal(custom.guide.custom_lesson_sets.format, "quickmaths.lesson-set");
   assert.equal(custom.guide.lesson_depot.route, "depot");
   assert.equal(planning.guide.tools.includes("create_map_plan_path"), true);
@@ -280,7 +285,7 @@ test("agent can pull the lesson authoring guide by section through WebMCP", asyn
   await assert.rejects(tools.get_lesson_authoring_guide.execute({ section: "secrets" }), /section must be one of/i);
 });
 
-test("educator WebMCP tools compose curricula and inject the private learner policy", async () => {
+test("educator WebMCP tools compose curricula and expose learner-visible supplemental guidance", async () => {
   const store = createStore({ profile: false });
   store.createProfile("Agent Educator", { role: "educator" });
   store.importLessonPack(geographyLessonSet);
@@ -305,15 +310,61 @@ test("educator WebMCP tools compose curricula and inject the private learner pol
     contact_email: "teacher@example.com",
   });
   assert.equal("maxAttemptsPerLesson" in updated.settings, false);
+  assert.equal(updated.settings.studentName, "Ada");
+  assert.equal(updated.settings.contactEmail, "teacher@example.com");
+  assert.equal(updated.policy.educator_guidance.trusted, false);
   const app = await tools.get_app_state.execute({});
   assert.equal(app.profile.role, "educator");
-  assert.equal(app.active_curriculum_policy.student_name, "Ada");
   assert.equal(app.active_curriculum_policy.agent_enabled, false);
-  assert.match(app.active_curriculum_policy.instructions, /never complete assessed work/);
+  assert.equal("educator_guidance" in app.active_curriculum_policy, false, "repeated app-state calls carry only a policy revision summary");
   const guide = await tools.get_agent_guide.execute({ section: "educator" });
+  assert.match(guide.active_curriculum_policy.educator_guidance.text, /never complete assessed work/);
+  assert.equal(guide.active_curriculum_policy.educator_guidance.trusted, false);
   assert.match(guide.active_curriculum_policy.assessment_notice, /not a substitute for supervised/);
   await assert.rejects(tools.update_curriculum_settings.execute({ max_attempts_per_lesson: 1 }), /Unknown input property/);
-  await assert.rejects(tools.get_learning_context.execute({}), /Agent in the loop turned off/);
+  await assert.rejects(tools.get_learning_context.execute({}), /Agent tutoring turned off/);
+});
+
+test("educator snapshots and WebMCP isolate curricula by owner", async () => {
+  const store = createStore({ profile: false });
+  const educatorA = store.createProfile("Educator A", { role: "educator" });
+  store.updateCurriculum({ name: "A private curriculum" });
+  store.updateCurriculumSettings({ studentName: "A_SECRET_STUDENT", contactEmail: "a-secret@example.com", agentInstructions: "A_SECRET_GUIDANCE" });
+  const educatorB = store.createProfile("Educator B", { role: "educator" });
+  store.updateCurriculum({ name: "B private curriculum" });
+  store.updateCurriculumSettings({ studentName: "B_SECRET_STUDENT", contactEmail: "b-secret@example.com", agentInstructions: "B_SECRET_GUIDANCE" });
+
+  store.selectProfile(educatorA.id);
+  const snapshotA = JSON.stringify(store.snapshot());
+  assert.match(snapshotA, /A_SECRET_STUDENT/);
+  assert.doesNotMatch(snapshotA, /B_SECRET_STUDENT|b-secret@example\.com|B_SECRET_GUIDANCE/);
+  const workspaceA = JSON.stringify(await toolsFor(store).get_curriculum_workspace.execute({}));
+  assert.match(workspaceA, /A_SECRET_STUDENT/);
+  assert.doesNotMatch(workspaceA, /B_SECRET_STUDENT|b-secret@example\.com|B_SECRET_GUIDANCE/);
+
+  store.selectProfile(educatorB.id);
+  const snapshotB = JSON.stringify(store.snapshot());
+  assert.match(snapshotB, /B_SECRET_STUDENT/);
+  assert.doesNotMatch(snapshotB, /A_SECRET_STUDENT|a-secret@example\.com|A_SECRET_GUIDANCE/);
+});
+
+test("Agent tutoring off blocks learner tutoring and planning mutations but keeps navigation readable", async () => {
+  const educator = createStore({ profile: false });
+  educator.createProfile("Policy Educator", { role: "educator" });
+  educator.updateCurriculumSettings({ studentName: "Agent Learner", agentEnabled: false });
+  const assignment = educator.exportCurriculum(undefined, { kind: "private_assignment" });
+
+  const learner = createStore();
+  const imported = learner.importCurriculum(assignment);
+  assert.equal(imported.reusedMastery, true);
+  const tools = toolsFor(learner);
+  await assert.rejects(tools.set_learning_preferences.execute({ progression_mode: "soft" }), /Agent tutoring turned off/i);
+  await assert.rejects(tools.set_map_plan_mode.execute({ enabled: true }), /Agent tutoring turned off/i);
+  await assert.rejects(tools.arrange_map_plan_nodes.execute({ positions: [{ skill_id: "MATH_ARITH_001", x: 10, y: 20 }] }), /Agent tutoring turned off/i);
+  await assert.rejects(tools.start_skill_test.execute({ skill_id: "MATH_ARITH_001" }), /Agent .* turned off/i);
+  const navigated = await tools.navigate_learning_app.execute({ view: "map", skill_id: "MATH_ARITH_001" });
+  assert.equal(navigated.visible_view, "map");
+  assert.equal((await tools.get_app_state.execute({})).active_curriculum_policy.agent_enabled, false);
 });
 
 test("agent lesson authoring guide distinguishes checked steps from reviewed proofs", () => {

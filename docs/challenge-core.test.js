@@ -87,6 +87,52 @@ function biologyLessonSet() {
   return pack;
 }
 
+function chainLessonSet(index, prerequisite = { subject_id: "SUBJECT_MATH", skill_id: "MATH_ARITH_001" }) {
+  const pack = JSON.parse(lessonSetExample);
+  const suffix = String(index).padStart(2, "0");
+  const skillId = `CUSTOM_CHAIN_${suffix}`;
+  pack.id = `PACK_CHAIN_${suffix}`;
+  pack.name = `Chain Pack ${suffix}`;
+  pack.description = `A test lesson set for dependency position ${suffix}.`;
+  pack.version = "1.0.0";
+  pack.subject = {
+    id: "SUBJECT_CHAIN", name: "Dependency Chain", short_name: "Chain", icon: "C", description: "Regression-test lessons.",
+    theme: {
+      paper: "#eef6f1", paperDeep: "#dcebe2", paperLight: "#ffffff", ink: "#18231d", muted: "#607067",
+      line: "#c7d8ce", primary: "#225c48", primaryAlt: "#33765e", tint: "#bfe2ce", highlight: "#e4ef9b", accent: "#e06b54",
+    },
+  };
+  pack.track = { id: `TRACK_CHAIN_${suffix}`, name: `Chain ${suffix}`, skills: [skillId], entry_skills: [skillId], exit_skills: [skillId] };
+  const skill = pack.skills[0];
+  skill.id = skillId;
+  skill.name = `Chain lesson ${suffix}`;
+  skill.domain = "Dependency Chain";
+  skill.prerequisites = [prerequisite];
+  skill.problems = skill.problems.map((problem, problemIndex) => ({ ...problem, template_id: `${skillId}_Q${problemIndex + 1}`, skill_id: skillId }));
+  return pack;
+}
+
+function curriculumFile({
+  name = "Imported curriculum",
+  settings = { agentEnabled: true, progressionMode: "hard" },
+  packs = [],
+  enabledPackIds = packs.map((pack) => pack.id),
+  mapPlan = { layouts: {}, paths: [], annotations: [] },
+} = {}) {
+  return JSON.stringify({
+    format: "quickmaths.curriculum",
+    schema_version: "1.0",
+    export_kind: "private_assignment",
+    id: "CURRICULUM_REGRESSION_IMPORT",
+    name,
+    description: "A regression-test curriculum.",
+    enabled_pack_ids: enabledPackIds,
+    settings,
+    map_plan: mapPlan,
+    lesson_packs: packs,
+  });
+}
+
 function nativeImprovement(skillId = "MATH_ARITH_001", name = "Integer operations · revised") {
   const source = structuredClone(curriculum.skills.find((skill) => skill.id === skillId));
   const sourceSubjectId = source.subjectId ?? DEFAULT_SUBJECT.id;
@@ -371,9 +417,17 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   });
   store.updateMapPlanLayout({ layoutKey: "subject:SUBJECT_MATH", positions: { MATH_ARITH_001: { x: 120, y: 80 } } });
   store.createMapPlanPath({ name: "Arithmetic start", color: "#556677", skillIds: ["MATH_ARITH_001", "MATH_ARITH_002"] });
-  const raw = store.exportCurriculum();
-  assert.match(raw, /quickmaths\.curriculum/);
+  const publicRaw = store.exportCurriculum();
+  assert.match(publicRaw, /quickmaths\.curriculum/);
+  assert.doesNotMatch(publicRaw, /Ask targeted questions/);
+  assert.doesNotMatch(publicRaw, /teacher@example\.com/);
+  assert.doesNotMatch(publicRaw, /"studentName": "Ada"/);
+  const publicPreview = harness().store.previewCurriculum(publicRaw);
+  assert.equal(publicPreview.educatorGuidance, "");
+  assert.equal(publicPreview.hasCustomAgentGuidance, false);
+  const raw = store.exportCurriculum(undefined, { kind: "private_assignment" });
   assert.match(raw, /Ask targeted questions/);
+  assert.match(raw, /teacher@example\.com/);
 
   const learnerHarness = harness();
   const preview = learnerHarness.store.previewCurriculum(raw);
@@ -397,6 +451,109 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   state = learnerHarness.store.snapshot();
   assert.equal(state.progressRows.find((row) => row.id === "MATH_ARITH_001").attemptCount, 1);
   assert.match(learnerHarness.store.exportBackup(), /Ada's rigorous route/);
+});
+
+test("curriculum assignments reuse mastery only for a matching student name", () => {
+  const educator = harness();
+  educator.store.createProfile("Teacher", { role: "educator" });
+  educator.store.updateCurriculum({ name: "Ada assignment" });
+  educator.store.updateCurriculumSettings({ studentName: "Ada", agentInstructions: "Ask Ada to explain each choice." });
+  const assignment = educator.store.exportCurriculum(undefined, { kind: "private_assignment" });
+
+  const matching = harness();
+  const ada = matching.store.createProfile("  ADA  ", { demo: true });
+  const matchingResult = matching.store.importCurriculum(assignment);
+  assert.equal(matchingResult.reusedMastery, true);
+  assert.equal(matchingResult.assignmentProfileCreated, false);
+  assert.equal(matching.store.snapshot().activeProfile.id, ada.id);
+  assert.equal(matching.store.snapshot().progressRows.find((row) => row.id === "MATH_ARITH_001").attemptCount, 2);
+
+  const mismatched = harness();
+  const bob = mismatched.store.createProfile("Bob", { demo: true });
+  const mismatchResult = mismatched.store.importCurriculum(assignment);
+  assert.equal(mismatchResult.reusedMastery, false);
+  assert.equal(mismatchResult.assignmentProfileCreated, true);
+  assert.equal(mismatched.store.snapshot().activeProfile.displayName, "Ada");
+  assert.equal(mismatched.store.snapshot().progressRows.find((row) => row.id === "MATH_ARITH_001").attemptCount, 0);
+  mismatched.store.selectProfile(bob.id);
+  assert.equal(mismatched.store.snapshot().progressRows.find((row) => row.id === "MATH_ARITH_001").attemptCount, 2, "the original learner keeps independent mastery");
+});
+
+test("external curriculum settings are strict and package contents are reproducible", () => {
+  const { store } = harness();
+  assert.throws(() => store.previewCurriculum(curriculumFile({ settings: { agent_enabled: "false" } })), /agentEnabled must be true or false/i);
+  assert.throws(() => store.previewCurriculum(curriculumFile({ settings: { agentEnabled: true, progressionMode: "free" } })), /progressionMode must be hard or soft/i);
+
+  const pack = chainLessonSet(1);
+  store.importLessonPack(JSON.stringify(pack));
+  const altered = structuredClone(pack);
+  altered.skills[0].problems[0].expected_answer = "999999";
+  assert.throws(() => store.previewCurriculum(curriculumFile({ packs: [altered] })), /does not match the curriculum copy/i);
+  assert.throws(() => store.previewCurriculum(curriculumFile({ packs: [], enabledPackIds: [pack.id] })), /must be embedded/i);
+  assert.throws(() => store.previewCurriculum(curriculumFile({ packs: [nativeImprovement()] })), /cannot install browser-wide native lesson improvements/i);
+});
+
+test("curriculum package capacity counts only new content", () => {
+  const { store } = harness();
+  const packs = Array.from({ length: 9 }, (_, index) => chainLessonSet(index + 1, index ? `CUSTOM_CHAIN_${String(index).padStart(2, "0")}` : undefined));
+  packs.forEach((pack) => store.importLessonPack(JSON.stringify(pack)));
+  const embedded = [JSON.parse(store.exportLessonPack(packs[0].id)), JSON.parse(store.exportLessonPack(packs[1].id))];
+  assert.doesNotThrow(() => store.previewCurriculum(curriculumFile({ packs: embedded, enabledPackIds: embedded.map((pack) => pack.id) })));
+});
+
+test("ordered staging resolves earlier batch dependencies and preflights aggregate capacity", () => {
+  const ordered = harness().store;
+  const first = chainLessonSet(1);
+  const second = chainLessonSet(2, "CUSTOM_CHAIN_01");
+  const result = ordered.stageLessonPacks([JSON.stringify(first), JSON.stringify(second)]);
+  assert.equal(result.staged_count, 2);
+  assert.equal(ordered.snapshot().stagedLessonPack.id, first.id);
+
+  const full = harness().store;
+  for (let index = 1; index <= 9; index += 1) {
+    full.importLessonPack(JSON.stringify(chainLessonSet(index, index === 1 ? undefined : `CUSTOM_CHAIN_${String(index - 1).padStart(2, "0")}`)));
+  }
+  assert.throws(() => full.stageLessonPacks([
+    JSON.stringify(chainLessonSet(10, "CUSTOM_CHAIN_09")),
+    JSON.stringify(chainLessonSet(11, "CUSTOM_CHAIN_10")),
+  ]), /at most 10 installed lesson sets/i);
+  assert.equal(full.snapshot().stagedLessonPack, null, "the review queue never opens for an impossible batch");
+});
+
+test("curriculum pack disabling validates hidden dependencies and offers explicit plan cleanup", () => {
+  const { store } = harness();
+  const first = chainLessonSet(1);
+  const second = chainLessonSet(2, "CUSTOM_CHAIN_01");
+  store.importLessonPack(JSON.stringify(first));
+  store.importLessonPack(JSON.stringify(second));
+  store.createProfile("Planner", { role: "educator" });
+  store.setCurriculumPackEnabled(first.id, true);
+  store.setCurriculumPackEnabled(second.id, true);
+  assert.throws(() => store.setCurriculumPackEnabled(first.id, false), /depends on .* disabled lesson set/i);
+  store.setCurriculumPackEnabled(second.id, false);
+  store.updateMapPlanLayout({ layoutKey: "subject:SUBJECT_CHAIN", positions: { CUSTOM_CHAIN_01: { x: 10, y: 20 } } });
+  assert.throws(() => store.setCurriculumPackEnabled(first.id, false), (error) => error?.code === "curriculum_plan_references");
+  const cleaned = store.setCurriculumPackEnabled(first.id, false, { removePlanReferences: true });
+  assert.ok(cleaned.removedPlanReferences > 0);
+  assert.equal(store.snapshot().curriculum.allSkills.some((skill) => skill.id === "CUSTOM_CHAIN_01"), false);
+});
+
+test("curriculum import rejects an enabled graph with a disabled prerequisite pack", () => {
+  const { store } = harness();
+  const prerequisite = chainLessonSet(1);
+  const dependent = chainLessonSet(2, "CUSTOM_CHAIN_01");
+  assert.throws(() => store.previewCurriculum(curriculumFile({
+    packs: [prerequisite, dependent],
+    enabledPackIds: [dependent.id],
+  })), /depends on .* disabled lesson set/i);
+  assert.equal(store.snapshot().lessonPacks.length, 0, "a rejected curriculum must not install embedded packs");
+});
+
+test("profile creation limits fail before ephemeral state can be created", () => {
+  const { store } = harness();
+  for (let index = 1; index <= 30; index += 1) store.createProfile(`Learner ${index}`);
+  assert.throws(() => store.createProfile("Learner 31"), /at most 30 profiles/i);
+  assert.equal(store.snapshot().profiles.length, 30);
 });
 
 test("selecting a mastery-map node updates both the detail card and routed skill", () => {
@@ -617,6 +774,11 @@ test("native improvements enforce the built-in identity and round-trip through f
   source.store.createProfile("Portable Improvement");
   source.store.importLessonPack(nativeImprovement());
   assert.throws(() => source.store.importLessonPack({ ...nativeImprovement(), id: "PACK_IMPROVE_MATH_ARITH_001_AGAIN" }), /already has an installed improvement/i);
+
+  const exporter = harness();
+  exporter.store.createProfile("Improvement Educator", { role: "educator" });
+  exporter.store.importLessonPack(nativeImprovement());
+  assert.throws(() => exporter.store.exportCurriculum(), /Restore installed native improvement/i);
 
   const missing = nativeImprovement();
   missing.id = "PACK_IMPROVE_MISSING_NATIVE";
