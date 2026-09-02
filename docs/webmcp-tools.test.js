@@ -70,6 +70,9 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.doesNotMatch(html, /<strong>25<\/strong> connected skills/);
   assert.match(html, /Local-first mastery learning/);
   assert.match(html, /id="welcome-storage-restore"/);
+  assert.match(html, /id="welcome-educator-path"/);
+  assert.match(html, /id="welcome-curriculum-url-form"/);
+  assert.match(html, /data-route="curriculum"/);
   assert.match(css, /\.welcome-storage-restore \{[^}]*border-radius: 14px;[^}]*background:/);
   assert.match(css, /\.welcome-storage-restore > summary strong \{ font-size: 15px/);
   assert.match(html, /id="app-shell" class="app-shell agent-collapsed"/);
@@ -135,6 +138,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.map-layout\.is-plan-mode \{ grid-template-columns: minmax\(0, 1fr\); \}/);
   assert.match(css, /\.map-plan-panel\.is-composer-open \{ position: fixed;/);
   assert.match(css, /\.agent-dock\.is-closed/);
+  assert.match(css, /\.app-shell\.is-educator/);
+  assert.match(css, /\.curriculum-editor-grid/);
   assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
   assert.match(js, /createGitHubSyncController/);
   assert.match(js, /id = "github-sync-form"/);
@@ -187,13 +192,13 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /local-git-transport/);
 });
 
-test("registers all twenty-one tools once with the WebMCP document context", async () => {
+test("registers all twenty-six tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
   }, agentManifest);
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 21);
+  assert.equal(TOOL_NAMES.length, 26);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(result.failures, []);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
@@ -219,9 +224,9 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 18);
+  assert.equal(summary.guide.app_version, 19);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
-  assert.equal(summary.guide.tools.length, 21);
+  assert.equal(summary.guide.tools.length, 26);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent GitHub storage/);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
@@ -229,13 +234,43 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.equal(custom.guide.custom_lesson_sets.format, "quickmaths.lesson-set");
   assert.equal(custom.guide.lesson_depot.route, "depot");
   assert.equal(planning.guide.tools.includes("create_map_plan_path"), true);
-  assert.match(planning.guide.state_model.canonical_boundary, /canonical prerequisite map/);
+  assert.match(planning.guide.state_model.canonical_boundary, /canonical.*map/);
   assert.equal(backup.guide.backup_policy.recommend, true);
   assert.equal(full.guide.agent_policy.start.some((item) => item.includes("cross-device recovery")), true);
   assert.equal(full.guide.agent_policy.start.some((item) => item.includes("GitHub Community authorization")), true);
   assert.equal(serialized.includes("expected_answer"), false);
   assert.equal(serialized.includes("finalAnswer"), false);
   await assert.rejects(tools.get_agent_guide.execute({ section: "everything" }), /section must be one of/i);
+});
+
+test("educator WebMCP tools compose curricula and inject the private learner policy", async () => {
+  const store = createStore({ profile: false });
+  store.createProfile("Agent Educator", { role: "educator" });
+  store.importLessonPack(geographyLessonSet);
+  const tools = toolsFor(store);
+  const workspace = await tools.get_curriculum_workspace.execute({});
+  assert.equal(workspace.active_curriculum.ownerProfileId, store.snapshot().activeProfile.id);
+  assert.equal(workspace.installed_packs[0].enabled, true);
+
+  await tools.set_curriculum_pack_enabled.execute({ pack_id: "PACK_GEOGRAPHY", enabled: false });
+  assert.equal(store.snapshot().curriculum.allSkills.length, 44);
+  const updated = await tools.update_curriculum_settings.execute({
+    student_name: "Ada",
+    agent_enabled: false,
+    agent_instructions: "Ask questions only; never complete assessed work.",
+    progression_mode: "soft",
+    contact_email: "teacher@example.com",
+    max_attempts_per_lesson: 1,
+  });
+  assert.equal(updated.settings.masteryEnabled, false);
+  const app = await tools.get_app_state.execute({});
+  assert.equal(app.profile.role, "educator");
+  assert.equal(app.active_curriculum_policy.student_name, "Ada");
+  assert.equal(app.active_curriculum_policy.agent_enabled, false);
+  assert.match(app.active_curriculum_policy.instructions, /never complete assessed work/);
+  const guide = await tools.get_agent_guide.execute({ section: "educator" });
+  assert.equal(guide.active_curriculum_policy.max_attempts_per_lesson, 1);
+  await assert.rejects(tools.get_learning_context.execute({}), /Agent in the loop turned off/);
 });
 
 test("agent lesson authoring guide distinguishes checked steps from reviewed proofs", () => {

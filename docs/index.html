@@ -10,8 +10,8 @@
     <link rel="icon" href="./quickmaths-logo.png">
     <link rel="alternate" type="application/json" href="./agent-manifest.json" title="QuickMaths agent guide">
     <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
-    <link rel="stylesheet" href="./challenge.css?v=20260902-geography-depot-v1">
-    <script type="module" src="./challenge.js?v=20260902-native-math-expansion"></script>
+    <link rel="stylesheet" href="./challenge.css?v=20260902-educator-curricula-v1">
+    <script type="module" src="./challenge.js?v=20260902-educator-curricula-v1"></script>
   </head>
   <body>
     <a class="skip-link" href="#view-root">Skip to learning workspace</a>
@@ -47,7 +47,11 @@
           </div>
         </section>
 
-        <section class="profile-panel" aria-labelledby="profiles-title">
+        <section class="profile-panel welcome-path-panel" aria-labelledby="profiles-title">
+          <div class="welcome-path-switch" role="tablist" aria-label="Choose QuickMaths workspace">
+            <button id="welcome-student-path" class="is-active" type="button" role="tab" aria-selected="true" aria-controls="student-path-body">I’m learning</button>
+            <button id="welcome-educator-path" type="button" role="tab" aria-selected="false" aria-controls="educator-path-body">I’m designing a curriculum</button>
+          </div>
           <div class="panel-heading">
             <div>
               <p class="eyebrow">This browser</p>
@@ -56,23 +60,57 @@
             <button id="welcome-load" class="quiet-button" type="button">Load backup</button>
           </div>
 
-          <div id="profile-list" class="profile-list"></div>
+          <div id="student-path-body" class="welcome-path-body" role="tabpanel">
+            <div id="profile-list" class="profile-list"></div>
 
-          <form id="create-profile-form" class="create-profile-form">
-            <label for="profile-name">New profile</label>
-            <div class="input-action">
-              <input id="profile-name" name="profile-name" maxlength="60" placeholder="Learner name" autocomplete="off" required>
-              <button class="button button-primary" type="submit">Create profile</button>
+            <form id="create-profile-form" class="create-profile-form">
+              <label for="profile-name">New learner profile</label>
+              <div class="input-action">
+                <input id="profile-name" name="profile-name" maxlength="60" placeholder="Learner name" autocomplete="off" required>
+                <button class="button button-primary" type="submit">Create profile</button>
+              </div>
+              <p id="profile-error" class="form-message" aria-live="polite"></p>
+            </form>
+
+            <section class="welcome-curriculum-loader" aria-labelledby="welcome-curriculum-title">
+              <p class="eyebrow">Learning from an educator?</p>
+              <h3 id="welcome-curriculum-title">Load a curriculum</h3>
+              <p>Import a curriculum file or a public GitHub link. Its lesson packs, map, and learning policy travel together.</p>
+              <div class="welcome-loader-actions">
+                <button id="welcome-curriculum-file-button" class="quiet-button" type="button">Choose file</button>
+                <form id="welcome-curriculum-url-form" class="welcome-curriculum-url-form">
+                  <label class="sr-only" for="welcome-curriculum-url">GitHub curriculum link</label>
+                  <input id="welcome-curriculum-url" type="url" placeholder="github.com/…/curriculum.json" autocomplete="off">
+                  <button class="quiet-button" type="submit">Load link</button>
+                </form>
+              </div>
+              <p id="welcome-curriculum-status" class="form-message" aria-live="polite"></p>
+            </section>
+
+            <div class="profile-panel-footer">
+              <button id="create-demo" class="text-button" type="button">Explore with sample progress →</button>
+              <p>Progress autosaves here. Download a backup anytime to move it elsewhere.</p>
             </div>
-            <p id="profile-error" class="form-message" aria-live="polite"></p>
-          </form>
+          </div>
+
+          <div id="educator-path-body" class="welcome-path-body" role="tabpanel" hidden>
+            <div class="educator-welcome-note">
+              <strong>Build a serious learning plan.</strong>
+              <p>Compose curricula, choose Depot packs, arrange a personalized map, and set the rules an in-app agent must follow.</p>
+            </div>
+            <div id="educator-profile-list" class="profile-list"></div>
+            <form id="create-educator-form" class="create-profile-form">
+              <label for="educator-name">New educator profile</label>
+              <div class="input-action">
+                <input id="educator-name" maxlength="60" placeholder="Educator name" autocomplete="off" required>
+                <button class="button button-primary" type="submit">Open designer</button>
+              </div>
+              <p id="educator-error" class="form-message" aria-live="polite"></p>
+            </form>
+            <p class="welcome-educator-storage">Educator work is local-first and supports the same GitHub storage token in Settings.</p>
+          </div>
 
           <div id="welcome-storage-restore"></div>
-
-          <div class="profile-panel-footer">
-            <button id="create-demo" class="text-button" type="button">Explore with sample progress →</button>
-            <p>Progress autosaves here. Download a backup anytime to move it elsewhere.</p>
-          </div>
         </section>
       </main>
       <footer class="welcome-footer">Open source · MIT licensed · Built from the original QuickMaths curriculum</footer>
@@ -106,11 +144,12 @@
         </div>
 
         <nav class="main-nav">
-          <button type="button" data-route="home"><span aria-hidden="true">⌂</span> Dashboard</button>
-          <button type="button" data-route="map"><span aria-hidden="true">⌘</span> Mastery map</button>
-          <button type="button" data-route="lesson"><span aria-hidden="true">◫</span> Lessons</button>
-          <button type="button" data-route="test"><span aria-hidden="true">✓</span> Mastery test</button>
-          <button type="button" data-route="results"><span aria-hidden="true">↗</span> Results</button>
+          <button type="button" data-route="home"><span aria-hidden="true">⌂</span> <span data-nav-label>Dashboard</span></button>
+          <button type="button" data-route="map" data-nav-role="learner"><span aria-hidden="true">⌘</span> Mastery map</button>
+          <button type="button" data-route="curriculum" data-nav-role="educator"><span aria-hidden="true">⌘</span> Curriculum designer</button>
+          <button type="button" data-route="lesson" data-nav-role="learner"><span aria-hidden="true">◫</span> Lessons</button>
+          <button type="button" data-route="test" data-nav-role="learner"><span aria-hidden="true">✓</span> Mastery test</button>
+          <button type="button" data-route="results" data-nav-role="learner"><span aria-hidden="true">↗</span> Results</button>
           <button type="button" data-route="depot"><span aria-hidden="true">◇</span> Lesson depot</button>
           <button type="button" data-route="creator"><span aria-hidden="true">✎</span> Lesson studio</button>
           <button type="button" data-route="settings"><span aria-hidden="true">⚙</span> Settings</button>
@@ -157,9 +196,10 @@
       <button id="agent-toggle" class="agent-toggle" type="button" aria-label="Open agent studio" aria-controls="agent-dock" aria-expanded="false">✦</button>
       <nav class="mobile-nav" aria-label="Mobile navigation">
         <button type="button" data-route="home">Home</button>
-        <button type="button" data-route="map">Map</button>
-        <button type="button" data-route="lesson">Learn</button>
-        <button type="button" data-route="test">Test</button>
+        <button type="button" data-route="map" data-nav-role="learner">Map</button>
+        <button type="button" data-route="curriculum" data-nav-role="educator">Designer</button>
+        <button type="button" data-route="lesson" data-nav-role="learner">Learn</button>
+        <button type="button" data-route="test" data-nav-role="learner">Test</button>
         <button type="button" data-route="depot">Depot</button>
         <button type="button" data-route="settings">Settings</button>
       </nav>
@@ -168,6 +208,7 @@
     <input id="backup-file" type="file" accept="application/json,.json" hidden>
     <input id="lesson-set-file" type="file" accept="application/json,.json" hidden>
     <input id="creator-file" type="file" accept="application/json,.json" hidden>
+    <input id="curriculum-file" type="file" accept="application/json,.json" hidden>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   </body>
 </html>

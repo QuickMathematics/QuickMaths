@@ -345,6 +345,53 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
   assert.throws(() => reloaded.updateMapPlanPath(path.id, { color: "tomato" }), /valid path color/i);
 });
 
+test("educator curricula isolate packs, export canonical plans, and enforce single-attempt completion", () => {
+  const { store } = harness();
+  store.createProfile("Curriculum Educator", { role: "educator" });
+  assert.equal(store.snapshot().ui.route, "curriculum");
+  assert.equal(store.snapshot().activeProfile.role, "educator");
+  store.importLessonPack(geographyLessonSet);
+  assert.equal(store.snapshot().curriculum.allSkills.length, 59);
+  store.setCurriculumPackEnabled("PACK_GEOGRAPHY", false);
+  assert.equal(store.snapshot().curriculum.allSkills.length, 44);
+  store.updateCurriculum({ name: "Ada's rigorous route", description: "A one-pass mathematics curriculum." });
+  store.updateCurriculumSettings({
+    studentName: "Ada",
+    agentEnabled: true,
+    agentInstructions: "Ask targeted questions and never complete assessed work.",
+    progressionMode: "soft",
+    contactEmail: "teacher@example.com",
+    maxAttemptsPerLesson: 1,
+  });
+  store.updateMapPlanLayout({ layoutKey: "subject:SUBJECT_MATH", positions: { MATH_ARITH_001: { x: 120, y: 80 } } });
+  store.createMapPlanPath({ name: "Arithmetic start", color: "#556677", skillIds: ["MATH_ARITH_001", "MATH_ARITH_002"] });
+  const raw = store.exportCurriculum();
+  assert.match(raw, /quickmaths\.curriculum/);
+  assert.match(raw, /Ask targeted questions/);
+
+  const learnerHarness = harness();
+  const preview = learnerHarness.store.previewCurriculum(raw);
+  assert.equal(preview.name, "Ada's rigorous route");
+  const imported = learnerHarness.store.importCurriculum(raw, { attach: false });
+  learnerHarness.store.createProfile("Ada", { curriculumId: imported.id });
+  let state = learnerHarness.store.snapshot();
+  assert.equal(state.activeCurriculum.settings.masteryEnabled, false);
+  assert.equal(state.progressionMode, "soft");
+  assert.equal(state.curriculum.allSkills.length, 44);
+  assert.equal(state.curriculumPlan.paths[0].name, "Arithmetic start");
+  assert.deepEqual(state.curriculumPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: 120, y: 80 });
+
+  learnerHarness.store.startTest("MATH_ARITH_001");
+  answerActiveTestCorrectly(learnerHarness.store);
+  assert.equal(learnerHarness.store.submitTest().ok, true);
+  const attempt = learnerHarness.store.saveReflection({ confidenceRating: 2, difficultyFelt: "hard", hintsUsed: "some", guessed: "yes", wantsMorePractice: "yes" });
+  assert.equal(attempt.masteryUpdate.status, "proven", "single-attempt curricula record completion without mastery gating");
+  state = learnerHarness.store.snapshot();
+  assert.equal(state.progressRows.find((row) => row.id === "MATH_ARITH_001").attemptLimitReached, true);
+  assert.throws(() => learnerHarness.store.startTest("MATH_ARITH_001"), /allows 1 attempt/);
+  assert.match(learnerHarness.store.exportBackup(), /Ada's rigorous route/);
+});
+
 test("selecting a mastery-map node updates both the detail card and routed skill", () => {
   const { store } = harness();
   store.createProfile("Map Learner");

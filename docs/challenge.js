@@ -1,5 +1,5 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-geography-depot-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-geography-depot-v1";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-educator-curricula-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-educator-curricula-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
 import {
   buildDepotSubmissionPrompt,
@@ -31,7 +31,9 @@ const elements = {
   welcome: document.querySelector("#welcome-screen"),
   shell: document.querySelector("#app-shell"),
   profiles: document.querySelector("#profile-list"),
+  educatorProfiles: document.querySelector("#educator-profile-list"),
   profileError: document.querySelector("#profile-error"),
+  educatorError: document.querySelector("#educator-error"),
   welcomeLessonCount: document.querySelector("#welcome-lesson-count"),
   welcomeQuestionCount: document.querySelector("#welcome-question-count"),
   welcomeToolCount: document.querySelector("#welcome-tool-count"),
@@ -51,6 +53,7 @@ const elements = {
   backupFile: document.querySelector("#backup-file"),
   lessonSetFile: document.querySelector("#lesson-set-file"),
   creatorFile: document.querySelector("#creator-file"),
+  curriculumFile: document.querySelector("#curriculum-file"),
   subjectSelect: document.querySelector("#subject-select"),
   toast: document.querySelector("#toast"),
 };
@@ -71,6 +74,8 @@ let githubSyncSnapshot = { phase: "disconnected", connected: false, dirty: false
 let bridgeNeedsChoice = false;
 let bridgeFormDraft = null;
 let welcomeStorageOpen = false;
+let welcomePath = "learner";
+let pendingLandingCurriculumId = null;
 const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
 
 const AGENT_STARTER_PROMPT = "Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.";
@@ -149,18 +154,33 @@ async function copyAgentPrompt() {
   }
 }
 
-function renderProfiles(snapshot) {
-  if (!snapshot.profiles.length) {
-    elements.profiles.innerHTML = '<div class="empty-profiles">No profiles yet. Create one below or explore the sample learner.</div>';
-    return;
-  }
-  elements.profiles.innerHTML = snapshot.profiles.map((profile) => `
+function profileCards(profiles, emptyMessage) {
+  if (!profiles.length) return `<div class="empty-profiles">${escapeHtml(emptyMessage)}</div>`;
+  return profiles.map((profile) => `
     <button class="profile-card" type="button" data-profile-id="${escapeHtml(profile.id)}">
       <span class="avatar">${escapeHtml(profile.displayName.slice(0, 1).toUpperCase())}</span>
-      <span><strong>${escapeHtml(profile.displayName)}</strong><small>${profile.demo ? "Sample progress · " : ""}${escapeHtml(formatDuration(profile.totalLoggedSeconds))} practiced</small></span>
+      <span><strong>${escapeHtml(profile.displayName)}</strong><small>${profile.role === "educator" ? "Curriculum educator" : `${profile.demo ? "Sample progress · " : ""}${escapeHtml(formatDuration(profile.totalLoggedSeconds))} practiced`}</small></span>
       <b aria-hidden="true">→</b>
     </button>
   `).join("");
+}
+
+function setWelcomePath(role) {
+  welcomePath = role === "educator" ? "educator" : "learner";
+  const educator = welcomePath === "educator";
+  document.querySelector("#student-path-body").hidden = educator;
+  document.querySelector("#educator-path-body").hidden = !educator;
+  document.querySelector("#welcome-student-path").classList.toggle("is-active", !educator);
+  document.querySelector("#welcome-educator-path").classList.toggle("is-active", educator);
+  document.querySelector("#welcome-student-path").setAttribute("aria-selected", String(!educator));
+  document.querySelector("#welcome-educator-path").setAttribute("aria-selected", String(educator));
+  document.querySelector("#profiles-title").textContent = educator ? "Choose an educator" : "Choose a learner";
+}
+
+function renderProfiles(snapshot) {
+  elements.profiles.innerHTML = profileCards(snapshot.profiles.filter((profile) => profile.role !== "educator"), "No learner profiles yet. Create one below or explore the sample learner.");
+  elements.educatorProfiles.innerHTML = profileCards(snapshot.profiles.filter((profile) => profile.role === "educator"), "No educator profiles yet. Create one to open Curriculum designer.");
+  setWelcomePath(welcomePath);
 }
 
 function renderWelcomeSummary(snapshot) {
@@ -268,6 +288,10 @@ function renderDashboard(snapshot) {
   const counts = snapshot.progressCounts;
   const attempts = snapshot.attempts.slice(0, 5);
   const suggested = snapshot.suggested;
+  const curriculumComplete = Boolean(snapshot.activeCurriculum && snapshot.allProgressRows.length && snapshot.allProgressRows.every((row) => ["proven", "mastered"].includes(row.status)));
+  const completionEmail = curriculumComplete && snapshot.activeCurriculum.settings.contactEmail
+    ? `mailto:${encodeURIComponent(snapshot.activeCurriculum.settings.contactEmail)}?subject=${encodeURIComponent(`QuickMaths curriculum complete · ${snapshot.activeCurriculum.name}`)}&body=${encodeURIComponent(`Student: ${snapshot.activeCurriculum.settings.studentName || snapshot.activeProfile.displayName}\nCurriculum: ${snapshot.activeCurriculum.name}\nCompleted lessons: ${snapshot.allProgressRows.length}\n\nAttach a QuickMaths JSON backup or CSV export if the educator needs the complete record.`)}`
+    : null;
   elements.view.innerHTML = `
     <header class="page-head">
       <div>
@@ -282,6 +306,7 @@ function renderDashboard(snapshot) {
     </header>
 
     ${snapshot.storageError ? `<div class="content-card" role="alert"><strong>Browser autosave is unavailable.</strong> Download a backup before leaving this page.</div>` : ""}
+    ${curriculumComplete ? `<aside class="backup-recommendation curriculum-complete"><span aria-hidden="true">✓</span><div><strong>Curriculum complete</strong><p>Every lesson in ${escapeHtml(snapshot.activeCurriculum.name)} is complete.</p></div>${completionEmail ? `<a class="button button-primary" href="${escapeHtml(completionEmail)}">Email educator</a>` : `<button class="button button-primary" data-action="save-backup">Download completion record</button>`}</aside>` : ""}
 
     <section class="metric-grid" aria-label="Mastery status summary">
       <article class="metric-card" style="--metric-color:${STATUS_COLORS.ready}"><span>Ready</span><strong>${counts.ready}</strong><small>Prerequisites complete</small></article>
@@ -972,13 +997,36 @@ function renderMapPlanPanel(snapshot, mapRows, layoutKey) {
   const body = composer === "path" ? `${selectionCard}${pathComposer}` : composer === "annotation" ? `${selectionCard}${annotationComposer}` : management;
   return `<aside class="map-detail map-plan-panel ${composer ? "is-composer-open" : ""}" data-plan-card="${escapeHtml(composer ?? "manage")}">
     <div class="map-plan-heading"><div><p class="eyebrow">Visual learning planner</p><h2>${composer === "path" ? "Custom path" : composer === "annotation" ? "Annotation" : "Plan details"}</h2></div>${composer ? `<button type="button" data-action="plan-close-composer" aria-label="Close Plan mode card">×</button>` : `<span>${snapshot.mapPlan.paths.length} paths · ${snapshot.mapPlan.annotations.length} comments</span>`}</div>
-    <p class="map-plan-intro">The map stays in view while you plan. Everything here autosaves with this profile.</p>
+    <p class="map-plan-intro">The map stays in view while you plan. Everything here autosaves with ${snapshot.activeProfile.role === "educator" ? "this curriculum" : "this profile"}.</p>
     ${body}
-    <div class="map-plan-footer">${composer === "path" || composer === "annotation" ? `<button class="button button-outline" type="button" data-action="plan-close-composer">Cancel</button>` : `<button class="quiet-button" type="button" data-action="plan-reset-layout" ${hasMovedLayout ? "" : "disabled"}>Reset this layout</button><button class="button button-outline" type="button" data-action="toggle-plan-mode">Exit Plan mode</button>`}</div>
+    <div class="map-plan-footer">${composer === "path" || composer === "annotation" ? `<button class="button button-outline" type="button" data-action="plan-close-composer">Cancel</button>` : `<button class="quiet-button" type="button" data-action="plan-reset-layout" ${hasMovedLayout ? "" : "disabled"}>Reset this layout</button>${snapshot.activeProfile.role === "educator" ? "" : `<button class="button button-outline" type="button" data-action="toggle-plan-mode">Exit Plan mode</button>`}`}</div>
   </aside>`;
 }
 
-function renderMap(snapshot) {
+function renderEducatorDashboard(snapshot) {
+  const workspace = snapshot.activeCurriculum;
+  const enabled = snapshot.lessonPacks.filter((pack) => pack.enabledForCurriculum && pack.mode !== "override");
+  elements.view.innerHTML = `
+    <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace</p><h1>${escapeHtml(workspace?.name ?? "Curriculum workspace")}</h1><p>Shape the content, map, learning rules, and agent boundaries that travel with this curriculum.</p></div><div class="page-actions"><button class="button button-outline" data-action="export-curriculum">Export curriculum</button><button class="button button-primary" data-route="curriculum">Open designer</button></div></header>
+    <section class="metric-grid educator-metrics"><article class="metric-card"><span>Curricula</span><strong>${snapshot.curricula.length}</strong><small>Owned by this educator</small></article><article class="metric-card"><span>Visible lessons</span><strong>${snapshot.curriculum.allSkills.length}</strong><small>Native + enabled packs</small></article><article class="metric-card"><span>Enabled packs</span><strong>${enabled.length}</strong><small>Chosen from the Depot library</small></article><article class="metric-card"><span>Agent</span><strong>${workspace?.settings.agentEnabled ? "On" : "Off"}</strong><small>${workspace?.settings.progressionMode === "soft" ? "Open path" : "Hard path"}</small></article></section>
+    <section class="dashboard-grid"><article class="suggested-card educator-next"><p class="eyebrow">Curriculum design loop</p><h2>Compose, arrange, constrain, share.</h2><p>Enable lesson packs, drag the canonical map into shape, create highlighted learning paths, annotate decisions, then export one portable curriculum file for the learner.</p><div class="suggested-actions"><button class="button button-primary" data-route="curriculum">Continue designing</button><button class="button button-outline" data-route="depot">Browse lesson Depot</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current learner policy</h2><p>These rules are enforced by the app and exposed privately to a compatible agent.</p></div></div><dl class="educator-policy-summary"><div><dt>Student</dt><dd>${escapeHtml(workspace?.settings.studentName || "Not named yet")}</dd></div><div><dt>Retakes</dt><dd>${workspace?.settings.maxAttemptsPerLesson ? escapeHtml(String(workspace.settings.maxAttemptsPerLesson)) : "Unlimited"}</dd></div><div><dt>Mastery</dt><dd>${workspace?.settings.masteryEnabled ? "Enabled" : "Single completion"}</dd></div><div><dt>Proof contact</dt><dd>${escapeHtml(workspace?.settings.contactEmail || "Not set")}</dd></div></dl></article></section>`;
+}
+
+function renderCurriculumWorkspace(snapshot) {
+  const workspace = snapshot.activeCurriculum;
+  if (!workspace) return `<section class="content-card educator-empty"><p class="eyebrow">Curriculum designer</p><h1>Create your first curriculum.</h1><p>A curriculum keeps its own enabled Depot packs, canonical map, annotations, paths, and learner policy.</p><form id="create-curriculum-form" class="educator-inline-form"><input name="name" maxlength="100" placeholder="Curriculum name" required><button class="button button-primary" type="submit">Create curriculum</button></form></section>`;
+  const settings = workspace.settings;
+  return `<section class="curriculum-workspace" aria-labelledby="curriculum-workspace-title">
+    <header class="curriculum-workspace-head"><div><p class="eyebrow">Open curriculum</p><h1 id="curriculum-workspace-title">${escapeHtml(workspace.name)}</h1><p>${escapeHtml(workspace.description || "A portable, educator-authored learning plan.")}</p></div><div class="curriculum-workspace-actions"><label>Switch curriculum<select id="curriculum-select">${snapshot.curricula.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === workspace.id ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></label><button class="button button-outline" data-action="import-curriculum">Import</button><button class="button button-outline" data-action="export-curriculum">Export</button></div></header>
+    <div class="curriculum-editor-grid">
+      <form id="curriculum-identity-form" class="curriculum-editor-card"><div class="card-heading"><div><h2>Curriculum profile</h2><p>Name and describe this particular course of study.</p></div></div><label>Name<input name="name" maxlength="100" value="${escapeHtml(workspace.name)}" required></label><label>Description<textarea name="description" maxlength="1000" rows="3" placeholder="Purpose, audience, and intended outcome…">${escapeHtml(workspace.description)}</textarea></label><div class="form-actions"><button class="button button-secondary" type="submit">Save profile</button><button class="quiet-button" type="button" data-action="create-curriculum">New curriculum</button></div></form>
+      <form id="curriculum-settings-form" class="curriculum-editor-card curriculum-policy-card"><div class="card-heading"><div><h2>Learner & agent policy</h2><p>These rules travel inside the curriculum and are exposed to WebMCP without cluttering the learner interface.</p></div></div><div class="curriculum-field-grid"><label>Student name<input name="studentName" maxlength="60" value="${escapeHtml(settings.studentName)}" placeholder="Optional learner name"></label><label>Proof / completion email<input name="contactEmail" type="email" maxlength="160" value="${escapeHtml(settings.contactEmail)}" placeholder="educator@example.com"></label><label>Learning path<select name="progressionMode"><option value="hard" ${settings.progressionMode === "hard" ? "selected" : ""}>Hard · enforce prerequisites</option><option value="soft" ${settings.progressionMode === "soft" ? "selected" : ""}>Open · connections are guidance</option></select></label><label>Attempts per lesson<input name="maxAttemptsPerLesson" type="number" min="0" max="50" value="${settings.maxAttemptsPerLesson}"><small>0 = unlimited. 1 turns mastery off and records one completion.</small></label></div><label class="curriculum-agent-toggle"><input name="agentEnabled" type="checkbox" ${settings.agentEnabled ? "checked" : ""}><span><strong>Agent in the loop</strong><small>Permit the curriculum’s tutoring policy to guide a connected browser agent.</small></span></label><label>Private agent instructions<textarea name="agentInstructions" maxlength="4000" rows="5" placeholder="For example: never solve assessed tasks; ask one targeted question at a time…">${escapeHtml(settings.agentInstructions)}</textarea></label><div class="agent-policy-preview"><strong>Agent-visible policy</strong><p>This text is injected into WebMCP context throughout the app. Learners do not see it as page content.</p></div><button class="button button-secondary" type="submit">Save learner policy</button></form>
+      <section class="curriculum-editor-card curriculum-pack-manager"><div class="card-heading"><div><h2>Installed lesson packs</h2><p>Native Mathematics stays available. Enable or disable additive Depot packs only for this curriculum.</p></div><button class="quiet-button" data-route="depot">Browse Depot</button></div><div class="curriculum-pack-list">${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<label class="curriculum-pack-row ${pack.mode === "override" ? "is-fixed" : ""}"><input type="checkbox" data-curriculum-pack="${escapeHtml(pack.id)}" ${pack.enabledForCurriculum ? "checked" : ""} ${pack.mode === "override" ? "disabled" : ""}><span><strong>${escapeHtml(pack.name)}</strong><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons${pack.mode === "override" ? " · native improvement applies globally" : ""}</small></span></label>`).join("") : `<div class="empty-state">No additive packs installed yet. Visit the Lesson Depot to add subjects and specialist tracks.</div>`}</div></section>
+    </div>
+  </section>`;
+}
+
+function renderMap(snapshot, { designer = false } = {}) {
   const combined = snapshot.mapScope === "all";
   const viewportKey = combined ? "all-subjects" : `subject:${snapshot.activeSubject.id}`;
   const previousScroller = elements.view.querySelector(".map-scroll");
@@ -994,12 +1042,13 @@ function renderMap(snapshot) {
   }
   const selectedSkill = store.skillsById[selected.id];
   const selectedSubject = snapshot.subjects.find((subject) => subject.id === selected.subjectId) ?? snapshot.activeSubject;
-  const planMode = Boolean(snapshot.ui.mapPlanMode);
+  const planMode = designer || Boolean(snapshot.ui.mapPlanMode);
+  const displayedPlan = planMode ? snapshot.mapPlan : snapshot.curriculumPlan;
   const layout = mapLayout(mapSkills, { subjects: snapshot.subjects, combined });
-  const savedPositions = snapshot.mapPlan.layouts?.[viewportKey] ?? {};
+  const savedPositions = displayedPlan.layouts?.[viewportKey] ?? {};
   const positions = Object.fromEntries(Object.entries(layout.positions).map(([id, position]) => [
     id,
-    planMode && savedPositions[id] ? { ...position, ...savedPositions[id] } : { ...position },
+    savedPositions[id] ? { ...position, ...savedPositions[id] } : { ...position },
   ]));
   const { lanes, width, height } = layout;
   const zoom = Number(snapshot.ui.mapZoom ?? 1);
@@ -1010,7 +1059,7 @@ function renderMap(snapshot) {
     const crossSubject = store.skillsById[prerequisite]?.subjectId !== skill.subjectId;
     return `<path class="${crossSubject ? "is-cross-subject" : ""}" data-map-edge-from="${escapeHtml(prerequisite)}" data-map-edge-to="${escapeHtml(skill.id)}" data-map-edge-kind="prerequisite" d="${mapEdgePath(from, to)}" />`;
   })).join("");
-  const planConnections = planMode ? snapshot.mapPlan.paths.flatMap((path) => {
+  const planConnections = (planMode || displayedPlan.paths.length) ? displayedPlan.paths.flatMap((path) => {
     const visibleSkillIds = path.skillIds.filter((id) => positions[id]);
     return visibleSkillIds.slice(1).map((skillId, index) => {
       const fromId = visibleSkillIds[index];
@@ -1018,8 +1067,8 @@ function renderMap(snapshot) {
     });
   }).join("") : "";
   const commentLinks = [];
-  const planComments = planMode ? snapshot.mapPlan.annotations.map((annotation, index) => {
-    const path = annotation.pathId ? snapshot.mapPlan.paths.find((item) => item.id === annotation.pathId) : null;
+  const planComments = (planMode || displayedPlan.annotations.length) ? displayedPlan.annotations.map((annotation, index) => {
+    const path = annotation.pathId ? displayedPlan.paths.find((item) => item.id === annotation.pathId) : null;
     const targetSkillIds = (path?.skillIds ?? annotation.skillIds).filter((id) => positions[id]);
     const savedPosition = annotation.positions?.[viewportKey] ?? null;
     if (!savedPosition && !targetSkillIds.length) return "";
@@ -1056,8 +1105,8 @@ function renderMap(snapshot) {
     const subject = snapshot.subjects.find((item) => item.id === row.subjectId) ?? snapshot.activeSubject;
     const nodeFill = combined ? subject.theme?.primary ?? STATUS_COLORS[row.status] : STATUS_COLORS[row.status] ?? STATUS_COLORS.locked;
     const nodeAccent = subject.theme?.primaryAlt ?? subject.theme?.primary ?? "#ffffff";
-    const memberPaths = planMode ? snapshot.mapPlan.paths.filter((path) => path.skillIds.includes(row.id)).slice(0, 4) : [];
-    const noteCount = planMode ? snapshot.mapPlan.annotations.filter((annotation) => !annotation.pathId && annotation.skillIds.includes(row.id)).length : 0;
+    const memberPaths = (planMode || displayedPlan.paths.length) ? displayedPlan.paths.filter((path) => path.skillIds.includes(row.id)).slice(0, 4) : [];
+    const noteCount = (planMode || displayedPlan.annotations.length) ? displayedPlan.annotations.filter((annotation) => !annotation.pathId && annotation.skillIds.includes(row.id)).length : 0;
     return `<g class="map-node ${row.id === selected.id && !planMode ? "is-selected" : ""} ${planMode && snapshot.ui.mapPlanSelection.includes(row.id) ? "is-plan-selected" : ""}" role="button" tabindex="0" data-map-skill="${escapeHtml(row.id)}" transform="translate(${position.x} ${position.y})">
       <title>${escapeHtml(subject?.name ?? row.subjectId)}: ${escapeHtml(row.name)} · ${escapeHtml(row.status)}</title>
       ${memberPaths.map((path, index) => `<rect class="map-node-plan-outline ${path.id === snapshot.ui.selectedMapPlanPathId ? "is-active" : ""}" x="${-4 - index * 3}" y="${-4 - index * 3}" width="${186 + index * 6}" height="${78 + index * 6}" rx="${17 + index * 2}" fill="none" stroke="${escapeHtml(path.color)}"></rect>`).join("")}
@@ -1071,10 +1120,10 @@ function renderMap(snapshot) {
     </g>`;
   }).join("");
 
-  elements.view.innerHTML = `
+  elements.view.innerHTML = `${designer ? renderCurriculumWorkspace(snapshot) : ""}
     <header class="page-head">
-      <div><p class="eyebrow">${combined ? `All subjects · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula` : `${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} · ${mapRows.length} connected lessons`}</p><h1>Mastery map</h1><p>${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} ${combined ? "Subject lanes and highlighted bridge lines show how knowledge travels across every installed curriculum." : "Cross-subject prerequisites stay listed in the detail panel; choose All subjects to draw them between curricula."}</p></div>
-      <div class="page-actions map-toolbar"><button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><div class="map-scope-control" role="group" aria-label="Subjects shown on mastery map"><button type="button" data-map-scope="subject" aria-pressed="${!combined}">Current subject</button><button type="button" data-map-scope="all" aria-pressed="${combined}">All subjects</button></div><label class="compact-select">Jump to skill<select id="map-skill-select">${mapSkillOptions(snapshot, mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
+      <div><p class="eyebrow">${combined ? `All subjects · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula` : `${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} · ${mapRows.length} connected lessons`}</p><h1>${designer ? "Canonical curriculum map" : "Mastery map"}</h1><p>${designer ? "Drag this curriculum’s canonical map into shape. Learners receive these positions, custom paths, and annotations when they load the file." : `${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} ${combined ? "Subject lanes and highlighted bridge lines show how knowledge travels across every installed curriculum." : "Cross-subject prerequisites stay listed in the detail panel; choose All subjects to draw them between curricula."}`}</p></div>
+      <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button>`}<div class="map-scope-control" role="group" aria-label="Subjects shown on mastery map"><button type="button" data-map-scope="subject" aria-pressed="${!combined}">Current subject</button><button type="button" data-map-scope="all" aria-pressed="${combined}">All subjects</button></div><label class="compact-select">Jump to skill<select id="map-skill-select">${mapSkillOptions(snapshot, mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${planMode ? `<span class="map-plan-key">Plan mode is autosaving</span>` : combined ? `<span class="map-subject-key">Node color = subject · dot = status</span>` : ""}</div>
     <section class="map-layout ${planMode ? "is-plan-mode" : ""}">
@@ -1280,6 +1329,12 @@ function renderResults(snapshot) {
   const skill = store.skillsById[result.skillId];
   const score = Math.round((result.percentScore ?? 0) * 100);
   const reviews = snapshot.reviews.filter((review) => !attempt || review.attemptId === attempt.attemptId);
+  const curriculumSettings = snapshot.activeCurriculum?.settings;
+  const attemptsUsed = snapshot.progressRows.find((row) => row.id === result.skillId)?.attemptCount ?? 0;
+  const attemptLimitReached = Boolean(curriculumSettings?.maxAttemptsPerLesson && attemptsUsed >= curriculumSettings.maxAttemptsPerLesson);
+  const contactHref = curriculumSettings?.contactEmail && attempt
+    ? `mailto:${encodeURIComponent(curriculumSettings.contactEmail)}?subject=${encodeURIComponent(`QuickMaths proof · ${skill?.name ?? result.skillName}`)}&body=${encodeURIComponent(`Student: ${curriculumSettings.studentName || snapshot.activeProfile.displayName}\nLesson: ${skill?.name ?? result.skillName}\nScore: ${score}%\nCompleted: ${attempt.completedAt}\n\nAttach the downloaded QuickMaths review packet to this email.`)}`
+    : null;
   elements.view.innerHTML = `
     <header class="page-head"><div><p class="eyebrow">${pending ? "Unsaved reflection" : "Saved attempt"}</p><h1>${escapeHtml(skill?.name ?? result.skillName)}</h1><p>${pending ? "Review the outcome, then save your reflection to update the mastery map." : `Completed ${formatDate(attempt.completedAt)} · ${escapeHtml(attempt.masteryUpdate?.status ?? "saved")}`}</p>${pending ? "" : `<div class="page-actions"><button class="button button-outline" data-action="download-tutor-summary">Tutor summary ↓</button><button class="button button-outline" data-action="download-review-packet">Review packet ↓</button></div>`}</div><div class="result-score"><strong>${score}%</strong><span>${result.rawScore} / ${result.scoreTotal} correct</span></div></header>
     <section class="results-layout">
@@ -1293,7 +1348,7 @@ function renderResults(snapshot) {
             <label>What was confusing?<textarea name="confusing" rows="3"></textarea></label>
             <label>Notes<textarea name="notes" rows="3"></textarea></label>
             <button class="button button-primary" type="submit">Save result & update map</button>
-          </form>` : `<p class="eyebrow">Mastery update</p><h2>${escapeHtml(attempt.masteryUpdate?.status ?? "Saved")}</h2><div class="saved-mastery"><strong>${Math.round(attempt.masteryUpdate?.masteryScore ?? 0)}</strong><span>/ 100 mastery</span></div><dl class="reflection-summary"><div><dt>Confidence</dt><dd>${attempt.reflection?.confidenceRating ?? "—"}/5</dd></div><div><dt>Difficulty</dt><dd>${escapeHtml(attempt.reflection?.difficultyFelt ?? "—")}</dd></div><div><dt>Hints</dt><dd>${escapeHtml(attempt.reflection?.hintsUsed ?? "—")}</dd></div></dl><button class="button button-primary" data-action="retake" data-skill-id="${escapeHtml(attempt.skillId)}">Practice again</button>`}
+          </form>` : `<p class="eyebrow">${curriculumSettings?.masteryEnabled === false ? "Curriculum completion" : "Mastery update"}</p><h2>${escapeHtml(attempt.masteryUpdate?.status ?? "Saved")}</h2><div class="saved-mastery"><strong>${Math.round(attempt.masteryUpdate?.masteryScore ?? 0)}</strong><span>${curriculumSettings?.masteryEnabled === false ? "% complete" : "/ 100 mastery"}</span></div><dl class="reflection-summary"><div><dt>Confidence</dt><dd>${attempt.reflection?.confidenceRating ?? "—"}/5</dd></div><div><dt>Difficulty</dt><dd>${escapeHtml(attempt.reflection?.difficultyFelt ?? "—")}</dd></div><div><dt>Hints</dt><dd>${escapeHtml(attempt.reflection?.hintsUsed ?? "—")}</dd></div></dl><button class="button button-primary" data-action="retake" data-skill-id="${escapeHtml(attempt.skillId)}" ${attemptLimitReached ? "disabled" : ""}>${attemptLimitReached ? "Curriculum attempt limit reached" : "Practice again"}</button>${contactHref ? `<a class="button button-outline" href="${escapeHtml(contactHref)}">Email proof to educator</a>` : ""}`}
         ${reviews.length ? `<div class="saved-reviews"><p class="eyebrow">Saved review</p>${reviews.map(savedReviewDetails).join("")}</div>` : ""}
       </aside>
     </section>
@@ -1383,24 +1438,26 @@ function renderWelcomeStorageRestore(snapshot) {
 function renderGitHubBridge(snapshot) {
   const status = githubSyncSnapshot;
   const saved = githubCredentials?.load({ role: "learner" });
+  const educator = snapshot.activeProfile?.role === "educator";
+  const checkpointLabel = educator ? "educator workspace" : "learner checkpoint";
   const repository = status.config ? `${status.config.owner}/${status.config.repo}` : null;
   const phaseClass = status.phase === "conflict" ? "conflict" : status.error ? "error" : status.connected ? "connected" : "idle";
   if (!status.connected) {
     return `
       <section class="content-card github-bridge-card" id="github-bridge">
-        <div class="bridge-card-heading"><div><p class="eyebrow">QuickMaths Bridge · experimental</p><h2>Connect mobile learning to a remote agent</h2><p>Your browser remains the instant local save. A dedicated GitHub data repository carries debounced checkpoints between this learner page and the agent workspace.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
+        <div class="bridge-card-heading"><div><p class="eyebrow">QuickMaths Bridge · experimental</p><h2>${educator ? "Sync curriculum work across devices" : "Connect mobile learning to a remote agent"}</h2><p>Your browser remains the instant local save. A dedicated GitHub data repository carries debounced checkpoints for this ${escapeHtml(checkpointLabel)}.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
         ${renderBridgeConnectionForm()}
       </section>`;
   }
 
   return `
     <section class="content-card github-bridge-card" id="github-bridge">
-      <div class="bridge-card-heading"><div><p class="eyebrow">QuickMaths Bridge · experimental</p><h2>${escapeHtml(repository)}</h2><p>Local work is checkpointed after a short pause. Agent updates are accepted only when they were created from the current learner revision.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
+      <div class="bridge-card-heading"><div><p class="eyebrow">QuickMaths Bridge · experimental</p><h2>${escapeHtml(repository)}</h2><p>Local work is checkpointed after a short pause. Remote updates are accepted only when they were created from the current app revision.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
       ${status.error ? `<aside class="bridge-warning"><strong>${status.phase === "conflict" ? "Sync conflict" : "Bridge paused"}</strong><p>${escapeHtml(status.error)}</p></aside>` : ""}
       ${bridgeNeedsChoice ? `<aside class="bridge-choice"><div><strong>A learner checkpoint already exists on GitHub.</strong><p>Choose which complete copy should become current. Nothing is overwritten until you choose.</p></div><button class="button button-primary" data-action="bridge-load-remote">Load GitHub copy</button><button class="button button-outline" data-action="bridge-replace-remote">Use this device</button></aside>` : ""}
       <div class="bridge-status-grid">
         <article><span>Local state</span><strong>${status.dirty ? "Pending checkpoint" : "Checkpointed"}</strong><small>Browser autosave stays instant</small></article>
-        <article><span>Last learner push</span><strong>${status.lastPushedAt ? escapeHtml(formatDate(status.lastPushedAt)) : "This session: not yet"}</strong><small>${escapeHtml(status.config.branch)}</small></article>
+        <article><span>${educator ? "Last workspace push" : "Last learner push"}</span><strong>${status.lastPushedAt ? escapeHtml(formatDate(status.lastPushedAt)) : "This session: not yet"}</strong><small>${escapeHtml(status.config.branch)}</small></article>
         <article><span>Last agent pull</span><strong>${status.lastPulledAt ? escapeHtml(formatDate(status.lastPulledAt)) : "Waiting"}</strong><small>${status.remoteAvailable ? "Remote files detected" : "No agent checkpoint yet"}</small></article>
         <article><span>Token storage</span><strong>${saved?.rememberToken ? "Remembered here" : "This tab session"}</strong><small>Never committed</small></article>
       </div>
@@ -1409,7 +1466,23 @@ function renderGitHubBridge(snapshot) {
     </section>`;
 }
 
+function renderEducatorSettings(snapshot) {
+  const backup = snapshot.backupStatus;
+  const workspace = snapshot.activeCurriculum;
+  elements.view.innerHTML = `
+    <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace & data</p><h1>Settings</h1><p>Manage portable backups, GitHub storage, curriculum files, and installed lesson sources.</p></div><div class="page-actions"><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
+    ${renderGitHubBridge(snapshot)}
+    ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
+    <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum file</h2><p>A focused file for a learner: enabled packs, canonical map, and learning policy.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download curriculum</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
+    <section class="content-card lesson-packs-card"><div class="card-heading"><div><p class="eyebrow">Shared lesson library</p><h2>Installed lesson packs</h2><p>Installed packs are available to Curriculum designer, where each curriculum enables only what it needs.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson file</button></div><div class="installed-packs">${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : "＋"}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons · ${pack.problemCount} questions</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></div></article>`).join("") : `<div class="empty-state">No additional lesson packs installed. Browse the Depot to assemble a library.</div>`}</div></section>`;
+  restoreBridgeFormDraft(document.querySelector("#github-sync-form")?.closest("[data-bridge-form]"));
+}
+
 function renderSettings(snapshot) {
+  if (snapshot.activeProfile.role === "educator") {
+    renderEducatorSettings(snapshot);
+    return;
+  }
   captureBridgeFormDraft(document.querySelector("[data-bridge-form]"));
   const backup = snapshot.backupStatus;
   const improvementPacks = snapshot.lessonPacks.filter((pack) => pack.mode === "override");
@@ -1421,9 +1494,10 @@ function renderSettings(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head"><div><p class="eyebrow">Profile preferences & data</p><h1>Settings</h1><p>Choose how this profile moves through the curriculum, replay the guided tour, and manage every save, export, custom lesson, and restore point.</p></div><div class="page-actions"><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
     <section class="settings-controls">
-      <article class="settings-control-card"><h2>Learning path</h2><p>This setting belongs to ${escapeHtml(snapshot.activeProfile.displayName)} and travels inside full backups.</p><div class="settings-mode-grid" role="group" aria-label="Progression mode"><button type="button" data-progression-mode="hard" aria-pressed="${snapshot.progressionMode === "hard"}"><strong>Hard path</strong><small>Prerequisites must be proven before connected mastery tests unlock.</small></button><button type="button" data-progression-mode="soft" aria-pressed="${snapshot.progressionMode === "soft"}"><strong>Open path</strong><small>Connections remain guidance, while every lesson and test stays available.</small></button></div></article>
+      <article class="settings-control-card"><h2>Learning path</h2><p>${snapshot.activeCurriculum ? `Controlled by ${escapeHtml(snapshot.activeCurriculum.name)}. Ask the educator for a revised curriculum file to change it.` : `This setting belongs to ${escapeHtml(snapshot.activeProfile.displayName)} and travels inside full backups.`}</p><div class="settings-mode-grid" role="group" aria-label="Progression mode"><button type="button" data-progression-mode="hard" aria-pressed="${snapshot.progressionMode === "hard"}" ${snapshot.activeCurriculum ? "disabled" : ""}><strong>Hard path</strong><small>Prerequisites must be proven before connected mastery tests unlock.</small></button><button type="button" data-progression-mode="soft" aria-pressed="${snapshot.progressionMode === "soft"}" ${snapshot.activeCurriculum ? "disabled" : ""}><strong>Open path</strong><small>Connections remain guidance, while every lesson and test stays available.</small></button></div></article>
       <article class="settings-control-card settings-tour-action"><div><h2>App tutorial</h2><p>Replay all seven chapters without resetting progress, subjects, lessons, or preferences.</p></div><button class="button button-secondary" type="button" data-action="replay-tutorial">Replay app tour</button></article>
     </section>
+    <section class="content-card learner-curriculum-card"><div class="card-heading"><div><p class="eyebrow">Educator curriculum</p><h2>${snapshot.activeCurriculum ? escapeHtml(snapshot.activeCurriculum.name) : "Load a curriculum"}</h2><p>${snapshot.activeCurriculum ? "This profile follows the curriculum’s enabled packs, canonical map, path mode, retake rules, and private agent policy." : "Load a portable curriculum file from an educator without replacing this learner’s profile."}</p></div><button class="button button-outline" type="button" data-action="import-curriculum">Choose curriculum file</button></div><form id="curriculum-url-form" class="curriculum-link-form"><label>Public GitHub file link<input name="url" type="url" placeholder="https://github.com/…/blob/…/curriculum.json" required></label><button class="button button-secondary" type="submit">Load from GitHub</button></form></section>
     ${renderGitHubBridge(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="storage-summary">
@@ -1610,18 +1684,26 @@ function render(snapshot) {
 
   elements.profileName.textContent = snapshot.activeProfile.displayName;
   elements.profileAvatar.textContent = snapshot.activeProfile.displayName.slice(0, 1).toUpperCase();
+  const educator = snapshot.activeProfile.role === "educator";
+  elements.shell.classList.toggle("is-educator", educator);
   applySubjectTheme(snapshot.activeSubject);
   elements.subjectSelect.innerHTML = snapshot.subjects.map((subject) => `<option value="${escapeHtml(subject.id)}" ${subject.id === snapshot.activeSubject.id ? "selected" : ""}>${escapeHtml(subject.icon)} ${escapeHtml(subject.name)}</option>`).join("");
   document.querySelectorAll("[data-progression-mode]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.progressionMode === snapshot.progressionMode ? "true" : "false"));
   const sidebarSubtitle = document.querySelector(".sidebar-brand small");
-  if (sidebarSubtitle) sidebarSubtitle.textContent = snapshot.activeSubject.name;
+  if (sidebarSubtitle) sidebarSubtitle.textContent = educator ? "Curriculum workspace" : snapshot.activeSubject.name;
+  document.querySelectorAll("[data-nav-role]").forEach((item) => { item.hidden = item.dataset.navRole !== (educator ? "educator" : "learner"); });
+  const dashboardLabel = document.querySelector('[data-route="home"] [data-nav-label]');
+  if (dashboardLabel) dashboardLabel.textContent = educator ? "Overview" : "Dashboard";
+  document.querySelector(".profile-dashboard-button")?.setAttribute("aria-label", educator ? "Open educator overview" : "Open learner dashboard");
+  document.querySelector("#logout-button")?.setAttribute("title", educator ? "Change educator" : "Change learner");
   elements.sessionTime.textContent = formatDuration(snapshot.timers.sessionSeconds);
   elements.profileTime.textContent = formatDuration(snapshot.timers.profileSeconds);
   renderActivity(snapshot.activity);
   syncNavigation(snapshot.ui.route);
-  if (snapshot.ui.route === "home") renderDashboard(snapshot);
+  if (snapshot.ui.route === "home") (educator ? renderEducatorDashboard(snapshot) : renderDashboard(snapshot));
   else if (snapshot.ui.route === "tutorial") renderTutorial(snapshot);
   else if (snapshot.ui.route === "map") renderMap(snapshot);
+  else if (snapshot.ui.route === "curriculum") renderMap(snapshot, { designer: true });
   else if (snapshot.ui.route === "lesson") renderLesson(snapshot);
   else if (snapshot.ui.route === "test") renderTest(snapshot);
   else if (snapshot.ui.route === "results") renderResults(snapshot);
@@ -1649,7 +1731,7 @@ function applyLocationRoute() {
     try { store.logout(); } finally { applyingHistory = false; }
     return;
   }
-  if (!["tutorial", "home", "map", "lesson", "test", "results", "settings", "data", "creator", "depot"].includes(route)) return;
+  if (!["tutorial", "home", "map", "curriculum", "lesson", "test", "results", "settings", "data", "creator", "depot"].includes(route)) return;
   const selectedSkill = skillId && store.skillsById[skillId] ? skillId : null;
   if (state.ui.route === route && (!selectedSkill || state.ui.selectedSkillId === selectedSkill)) return;
   applyingHistory = true;
@@ -1779,12 +1861,28 @@ document.querySelector("#create-profile-form").addEventListener("submit", (event
   elements.profileError.textContent = "";
   try {
     bridgeFormDraft = null;
-    store.createProfile(document.querySelector("#profile-name").value);
+    store.createProfile(document.querySelector("#profile-name").value, { curriculumId: pendingLandingCurriculumId });
+    pendingLandingCurriculumId = null;
     event.currentTarget.reset();
   } catch (error) {
     elements.profileError.textContent = error instanceof Error ? error.message : String(error);
   }
 });
+
+document.querySelector("#create-educator-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  elements.educatorError.textContent = "";
+  try {
+    bridgeFormDraft = null;
+    store.createProfile(document.querySelector("#educator-name").value, { role: "educator" });
+    event.currentTarget.reset();
+  } catch (error) {
+    elements.educatorError.textContent = error instanceof Error ? error.message : String(error);
+  }
+});
+
+document.querySelector("#welcome-student-path").addEventListener("click", () => setWelcomePath("learner"));
+document.querySelector("#welcome-educator-path").addEventListener("click", () => setWelcomePath("educator"));
 
 document.querySelector("#create-demo").addEventListener("click", () => {
   store.createProfile("Demo Learner", { demo: true });
@@ -1792,11 +1890,70 @@ document.querySelector("#create-demo").addEventListener("click", () => {
 
 elements.profiles.addEventListener("click", (event) => {
   const profile = event.target.closest("[data-profile-id]");
+  if (profile) {
+    store.selectProfile(profile.dataset.profileId);
+    if (pendingLandingCurriculumId) {
+      store.attachCurriculum(pendingLandingCurriculumId);
+      pendingLandingCurriculumId = null;
+    }
+  }
+});
+elements.educatorProfiles.addEventListener("click", (event) => {
+  const profile = event.target.closest("[data-profile-id]");
   if (profile) store.selectProfile(profile.dataset.profileId);
 });
 
 document.querySelector("#logout-button").addEventListener("click", () => store.logout());
 document.querySelector("#welcome-load").addEventListener("click", () => elements.backupFile.click());
+document.querySelector("#welcome-curriculum-file-button").addEventListener("click", () => elements.curriculumFile.click());
+
+function githubCurriculumRawUrl(value) {
+  let url;
+  try { url = new URL(String(value ?? "").trim()); } catch { throw new Error("Paste a complete GitHub curriculum URL."); }
+  if (url.protocol !== "https:") throw new Error("Curriculum links must use HTTPS.");
+  if (url.hostname === "raw.githubusercontent.com") return url.href;
+  if (url.hostname !== "github.com") throw new Error("For safety, curriculum links must point to github.com or raw.githubusercontent.com.");
+  const parts = url.pathname.split("/").filter(Boolean);
+  if (parts.length < 5 || parts[2] !== "blob") throw new Error("Use a GitHub file link containing /blob/branch/path.");
+  return `https://raw.githubusercontent.com/${parts[0]}/${parts[1]}/${parts.slice(3).join("/")}`;
+}
+
+async function importCurriculumRaw(raw, { sourceUrl = null } = {}) {
+  const preview = store.previewCurriculum(raw);
+  const confirmed = window.confirm(`Load ${preview.name}?\n\n${preview.enabledPackCount} enabled lesson pack(s) · ${preview.newPackCount} new to this browser\nLearning path: ${preview.settings.progressionMode === "soft" ? "Open" : "Hard"}\nAttempts per lesson: ${preview.settings.maxAttemptsPerLesson || "Unlimited"}\n\nThe curriculum includes its canonical map and agent policy.`);
+  if (!confirmed) return null;
+  const signedIn = Boolean(store.snapshot().activeProfile);
+  const result = store.importCurriculum(raw, { sourceUrl, attach: signedIn });
+  if (!signedIn) {
+    pendingLandingCurriculumId = result.id;
+    const status = document.querySelector("#welcome-curriculum-status");
+    if (status) status.textContent = `${result.name} is ready. Create or choose a learner profile to open it.`;
+  }
+  showToast(signedIn ? `${result.name} loaded.` : `${result.name} ready for a learner.`);
+  return result;
+}
+
+document.querySelector("#welcome-curriculum-url-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const status = document.querySelector("#welcome-curriculum-status");
+  try {
+    if (status) status.textContent = "Loading curriculum from GitHub…";
+    const rawUrl = githubCurriculumRawUrl(document.querySelector("#welcome-curriculum-url").value);
+    const response = await fetch(rawUrl, { headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error(`GitHub returned ${response.status}. Check that the file is public.`);
+    await importCurriculumRaw(await response.text(), { sourceUrl: rawUrl });
+  } catch (error) {
+    if (status) status.textContent = error instanceof Error ? error.message : String(error);
+  }
+});
+
+elements.curriculumFile.addEventListener("change", async () => {
+  const file = elements.curriculumFile.files?.[0];
+  if (!file) return;
+  try { await importCurriculumRaw(await file.text()); }
+  catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+  finally { elements.curriculumFile.value = ""; }
+});
 
 elements.backupFile.addEventListener("change", async () => {
   const file = elements.backupFile.files?.[0];
@@ -1930,7 +2087,7 @@ document.addEventListener("click", async (event) => {
     return;
   }
   const mapScopeButton = event.target.closest?.("[data-map-scope]");
-  if (mapScopeButton && currentSnapshot?.ui.route === "map") {
+  if (mapScopeButton && ["map", "curriculum"].includes(currentSnapshot?.ui.route)) {
     store.setLearningPreferences({ mapScope: mapScopeButton.dataset.mapScope });
     showToast(mapScopeButton.dataset.mapScope === "all" ? "Showing every installed subject and bridge." : `Showing ${store.snapshot().activeSubject.name} only.`);
     return;
@@ -1945,7 +2102,7 @@ document.addEventListener("click", async (event) => {
   }
   const action = event.target.closest("[data-action]");
   if (!action) return;
-  if (currentSnapshot?.ui.route === "map" && (action.dataset.action.startsWith("plan-") || action.dataset.action === "toggle-plan-mode")) {
+  if (["map", "curriculum"].includes(currentSnapshot?.ui.route) && (action.dataset.action.startsWith("plan-") || action.dataset.action === "toggle-plan-mode")) {
     const layoutKey = currentSnapshot.mapScope === "all" ? "all-subjects" : `subject:${currentSnapshot.activeSubject.id}`;
     try {
       if (action.dataset.action === "toggle-plan-mode") {
@@ -1991,6 +2148,18 @@ document.addEventListener("click", async (event) => {
     return;
   }
   if (action.dataset.action === "save-backup") saveBackup();
+  if (action.dataset.action === "create-curriculum") {
+    const name = window.prompt("Name the new curriculum:", "New curriculum");
+    if (name) store.createCurriculum({ name });
+  }
+  if (action.dataset.action === "import-curriculum") elements.curriculumFile.click();
+  if (action.dataset.action === "export-curriculum") {
+    const workspace = store.snapshot().activeCurriculum;
+    if (workspace) {
+      download(`${workspace.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "quickmaths-curriculum"}.json`, store.exportCurriculum(workspace.id), "application/json");
+      showToast("Portable curriculum downloaded.");
+    }
+  }
   if (["start-suggested", "start-test", "retake"].includes(action.dataset.action)) store.startTest(action.dataset.skillId);
   if (action.dataset.action === "open-attempt") store.openAttempt(action.dataset.attemptId);
   if (action.dataset.action === "load-backup") elements.backupFile.click();
@@ -2043,7 +2212,7 @@ document.addEventListener("click", async (event) => {
 });
 
 document.addEventListener("change", (event) => {
-  if (event.target.matches?.("[data-plan-path-color]") && currentSnapshot?.ui.route === "map") {
+  if (event.target.matches?.("[data-plan-path-color]") && ["map", "curriculum"].includes(currentSnapshot?.ui.route)) {
     try {
       store.updateMapPlanPath(event.target.dataset.planPathColor, { color: event.target.value });
       showToast("Path color updated.");
@@ -2068,6 +2237,15 @@ document.addEventListener("change", (event) => {
   }
   if (event.target.id === "subject-select") {
     store.setLearningPreferences({ subjectId: event.target.value });
+    return;
+  }
+  if (event.target.id === "curriculum-select") {
+    store.selectCurriculum(event.target.value);
+    return;
+  }
+  if (event.target.matches?.("[data-curriculum-pack]")) {
+    try { store.setCurriculumPackEnabled(event.target.dataset.curriculumPack, event.target.checked); }
+    catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
     return;
   }
   if (currentSnapshot?.ui.route === "creator" && (event.target.matches?.("[data-creator-field]") || event.target.matches?.("[data-creator-prerequisites]"))) {
@@ -2127,6 +2305,54 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("submit", (event) => {
+  if (event.target.id === "curriculum-url-form") {
+    event.preventDefault();
+    const submit = event.target.querySelector('[type="submit"]');
+    if (submit) submit.disabled = true;
+    try {
+      const rawUrl = githubCurriculumRawUrl(new FormData(event.target).get("url"));
+      fetch(rawUrl, { headers: { Accept: "application/json" } }).then((response) => {
+        if (!response.ok) throw new Error(`GitHub returned ${response.status}. Check that the file is public.`);
+        return response.text();
+      }).then((raw) => importCurriculumRaw(raw, { sourceUrl: rawUrl })).catch((error) => showToast(error instanceof Error ? error.message : String(error))).finally(() => { if (submit?.isConnected) submit.disabled = false; });
+    } catch (error) {
+      if (submit) submit.disabled = false;
+      showToast(error instanceof Error ? error.message : String(error));
+    }
+    return;
+  }
+  if (event.target.id === "create-curriculum-form") {
+    event.preventDefault();
+    const data = new FormData(event.target);
+    try { store.createCurriculum({ name: data.get("name") }); }
+    catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    return;
+  }
+  if (event.target.id === "curriculum-identity-form") {
+    event.preventDefault();
+    const data = new FormData(event.target);
+    try {
+      store.updateCurriculum({ name: data.get("name"), description: data.get("description") });
+      showToast("Curriculum profile saved.");
+    } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    return;
+  }
+  if (event.target.id === "curriculum-settings-form") {
+    event.preventDefault();
+    const data = new FormData(event.target);
+    try {
+      store.updateCurriculumSettings({
+        studentName: data.get("studentName"),
+        contactEmail: data.get("contactEmail"),
+        progressionMode: data.get("progressionMode"),
+        maxAttemptsPerLesson: Number(data.get("maxAttemptsPerLesson")),
+        agentEnabled: data.get("agentEnabled") === "on",
+        agentInstructions: data.get("agentInstructions"),
+      });
+      showToast("Learner and agent policy saved.");
+    } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    return;
+  }
   if (event.target.id === "map-plan-path-form") {
     event.preventDefault();
     const data = new FormData(event.target);

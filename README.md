@@ -3,7 +3,7 @@
 [![Full test suite](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml/badge.svg)](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml)
 [![Live app](https://img.shields.io/badge/live-QuickMaths-123f35)](https://quickmathematics.github.io/QuickMaths/)
 
-QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, a substantial native Mathematics curriculum, an installable 15-lesson Geography curriculum, structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
+QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, educator-authored portable curricula, a substantial native Mathematics curriculum, an installable 15-lesson Geography curriculum, structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
 
 [![QuickMaths combined Mathematics and Geography mastery map](docs/assets/quickmaths-mastery-map.png)](https://quickmathematics.github.io/QuickMaths/#/map)
 
@@ -17,14 +17,15 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 
 ## What is in the app
 
-- Multiple learner profiles with separate progress, attempts, reviews, timers, and preferences
+- Separate learner and educator profile paths, both covered by browser autosave, full backups, and optional GitHub storage
+- Portable curriculum profiles with per-curriculum Depot packs, canonical personalized maps, learner rules, private agent instructions, and file/GitHub loading
 - Native Mathematics plus an installable Geography mastery map from the Lesson Depot, joined by a cross-subject prerequisite bridge
 - Persistent Plan mode with draggable layouts, desktop marquee/Ctrl selection, touch hold-selection, colored custom paths, and draggable free or connected comment nodes
 - Enforced Hard path and guideline-only Open path
 - Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, and review gates
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
 - Public Lesson Depot with optional GitHub Discussion upvotes and comments
-- Twenty-one WebMCP tools for visible navigation, tutoring, mastery-map planning, curriculum inspection, and human-controlled lesson staging
+- Twenty-six WebMCP tools for visible navigation, tutoring, educator curriculum design, mastery-map planning, curriculum inspection, and human-controlled lesson staging
 - Optional GitHub Bridge for revision-safe mobile/remote-agent checkpoints
 
 ## Run the web app locally

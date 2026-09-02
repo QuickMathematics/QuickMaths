@@ -50,7 +50,7 @@ Challenge-period milestone evidence:
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers twenty-one page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact operating summary by default; an agent can request `tutoring`, `navigation`, `planning`, `bridge`, `custom_content`, `backup`, or `all` only when that policy is relevant. The complete source remains the machine-readable `agent-manifest.json`.
+A compatible ChatGPT or Codex browser discovers twenty-six page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact operating summary by default; an agent can request `tutoring`, `navigation`, `planning`, `educator`, `bridge`, `custom_content`, `backup`, or `all` only when that policy is relevant. The complete source remains the machine-readable `agent-manifest.json`.
 
 | Tool | Purpose |
 | --- | --- |
@@ -58,6 +58,11 @@ A compatible ChatGPT or Codex browser discovers twenty-one page tools through `d
 | `get_app_state` | Read the visible view, learner, timers, mastery counts, and current suggestion. |
 | `get_curriculum_map` | Read one subject map or the combined installed-subject map with statuses, prerequisite bridges, and unlocks. |
 | `get_progress_summary` | Read per-skill mastery, attempts, and misconception tags. |
+| `get_curriculum_workspace` | Read the educator's open curriculum, installed pack choices, canonical map, and learner-agent policy. |
+| `create_curriculum` | Create and visibly open a new educator curriculum profile. |
+| `select_curriculum` | Switch the educator workspace to an existing curriculum. |
+| `update_curriculum_settings` | Set student, agent, progression, contact, and retake rules for the open curriculum. |
+| `set_curriculum_pack_enabled` | Enable or disable an installed additive lesson pack only for the open curriculum. |
 | `list_subjects` | Read installed subjects and lesson totals. |
 | `set_learning_preferences` | Change the visible subject, Hard/Open path mode, and focused/combined map scope. |
 | `navigate_learning_app` | Open the dashboard, map, lesson, test, results, Lesson studio, or Settings. |
@@ -76,7 +81,7 @@ A compatible ChatGPT or Codex browser discovers twenty-one page tools through `d
 | `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
-The top-level `agent-bridge.html` workspace registers the same twenty-one learning tools plus three transport tools:
+The top-level `agent-bridge.html` workspace registers the same twenty-six learning tools plus three transport tools:
 
 | Bridge tool | Purpose |
 | --- | --- |
@@ -92,7 +97,7 @@ Tool inputs use closed JSON Schemas and runtime validation. Read-only tools do n
 Mobile learner browser                          Computer / remote Codex task
 ┌──────────────────────────┐                    ┌────────────────────────────┐
 │ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
-│ localStorage + WebMCP    │                    │ 24 WebMCP tools            │
+│ localStorage + WebMCP    │                    │ 29 WebMCP tools            │
 └────────────┬─────────────┘                    └──────────────┬─────────────┘
              │ debounced, complete state                       │ explicit publish → host Git auth
              ▼                                                 ▼

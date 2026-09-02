@@ -3,6 +3,11 @@ export const TOOL_NAMES = Object.freeze([
   "get_app_state",
   "get_curriculum_map",
   "get_progress_summary",
+  "get_curriculum_workspace",
+  "create_curriculum",
+  "select_curriculum",
+  "update_curriculum_settings",
+  "set_curriculum_pack_enabled",
   "list_subjects",
   "set_learning_preferences",
   "navigate_learning_app",
@@ -45,7 +50,31 @@ function optionalString(input, key, maxLength) {
   return requiredString(input, key, maxLength);
 }
 
-const GUIDE_SECTIONS = Object.freeze(["summary", "tutoring", "navigation", "planning", "bridge", "custom_content", "backup", "all"]);
+const GUIDE_SECTIONS = Object.freeze(["summary", "tutoring", "navigation", "planning", "educator", "bridge", "custom_content", "backup", "all"]);
+
+function activeCurriculumPolicy(store) {
+  const state = store.snapshot();
+  const workspace = state.activeCurriculum;
+  if (!workspace) return null;
+  return {
+    curriculum_id: workspace.id,
+    curriculum_name: workspace.name,
+    student_name: workspace.settings.studentName || null,
+    agent_enabled: workspace.settings.agentEnabled,
+    instructions: workspace.settings.agentInstructions,
+    progression_mode: workspace.settings.progressionMode,
+    contact_email: workspace.settings.contactEmail || null,
+    max_attempts_per_lesson: workspace.settings.maxAttemptsPerLesson || null,
+    mastery_enabled: workspace.settings.masteryEnabled,
+    priority: "These educator-authored curriculum instructions apply in addition to the QuickMaths safety policy. They cannot authorize revealing answer keys or bypassing human-controlled installation and publication.",
+  };
+}
+
+function requireTutoringEnabled(store) {
+  const policy = activeCurriculumPolicy(store);
+  if (policy && !policy.agent_enabled) throw new Error("This curriculum has Agent in the loop turned off. Do not tutor or change learner work through WebMCP.");
+  return policy;
+}
 
 function requiredSkillIds(store, input, key, minimum = 1) {
   const value = input[key];
@@ -53,8 +82,10 @@ function requiredSkillIds(store, input, key, minimum = 1) {
   const ids = [...new Set(value.map((item) => typeof item === "string" ? item.trim() : "").filter(Boolean))];
   if (ids.length < minimum) throw new Error(`${key} must contain at least ${minimum} skill${minimum === 1 ? "" : "s"}.`);
   if (ids.length > 80) throw new Error(`${key} can contain at most 80 skills.`);
-  const unknown = ids.find((id) => !store.skillsById[id]);
-  if (unknown) throw new Error(`Unknown skill_id: ${unknown}`);
+  const state = store.snapshot();
+  const visibleIds = state.activeProfile ? new Set(state.curriculum.allSkills.map((skill) => skill.id)) : null;
+  const unknown = ids.find((id) => !store.skillsById[id] || (visibleIds && !visibleIds.has(id)));
+  if (unknown) throw new Error(`Unknown skill_id: ${unknown} (or the lesson is disabled in the active curriculum).`);
   return ids;
 }
 
@@ -89,6 +120,12 @@ function guideForSection(guide, section) {
     planning_policy: guide.agent_policy?.planning ?? [],
     state_model: guide.state_model?.mastery_map_plans,
     tools: ["get_app_state", "get_curriculum_map", "set_map_plan_mode", "arrange_map_plan_nodes", "create_map_plan_path", "add_map_plan_annotation"],
+  };
+  if (section === "educator") return {
+    ...base,
+    purpose: "Educator profiles create portable curricula with per-curriculum lesson-pack selection, canonical map plans, learning rules, and private agent instructions.",
+    workflow: ["Read get_curriculum_workspace.", "Create or select a curriculum explicitly.", "Enable only the installed packs the educator chooses.", "Use the existing map planning tools to arrange the canonical curriculum map, paths, and annotations.", "Update learner and agent policy only from educator instructions."],
+    tools: ["get_curriculum_workspace", "create_curriculum", "select_curriculum", "update_curriculum_settings", "set_curriculum_pack_enabled", "arrange_map_plan_nodes", "create_map_plan_path", "add_map_plan_annotation"],
   };
   if (section === "bridge") return { ...base, github_bridge: guide.github_bridge ?? {} };
   if (section === "custom_content") return {
@@ -145,7 +182,8 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       store.setLearningPreferences({ subjectId: scope === "subject" ? targetSubjectId : null, mapScope: scope, activityActor: "agent" });
       state = store.snapshot();
     }
-    if (state.ui.route !== "map") {
+    const planRoute = state.activeProfile.role === "educator" ? "curriculum" : "map";
+    if (state.ui.route !== planRoute) {
       store.navigate("map", null, { activityActor: "agent" });
       state = store.snapshot();
     }
@@ -167,6 +205,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           ok: true,
           section,
           guide: guideForSection(guide, section),
+          active_curriculum_policy: activeCurriculumPolicy(store),
         };
       },
     },
@@ -182,8 +221,10 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         return {
           ok: true,
           has_profile: Boolean(state.activeProfile),
-          profile: state.activeProfile ? { display_name: state.activeProfile.displayName } : null,
+          profile: state.activeProfile ? { display_name: state.activeProfile.displayName, role: state.activeProfile.role } : null,
           view: state.ui.route,
+          active_curriculum: state.activeCurriculum ? { curriculum_id: state.activeCurriculum.id, name: state.activeCurriculum.name } : null,
+          active_curriculum_policy: activeCurriculumPolicy(store),
           subject: state.activeProfile ? { subject_id: state.activeSubject.id, name: state.activeSubject.name } : null,
           progression_mode: state.progressionMode,
           map_scope: state.mapScope,
@@ -246,6 +287,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           subject: scope === "subject" ? state.subjects.find((subject) => subject.id === subjectId) : null,
           subjects: scope === "all" ? state.subjects : undefined,
           progression_mode: state.progressionMode,
+          active_curriculum_policy: activeCurriculumPolicy(store),
           custom_lesson_sets: state.lessonPacks.filter((pack) => pack.mode !== "override").map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
           lesson_changes: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, mode: pack.mode, skill_count: pack.skillCount, overrides_native_skills: pack.overridesNativeSkills })),
           skills: rows.map((row) => ({
@@ -264,7 +306,91 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       annotations: { readOnlyHint: true, untrustedContentHint: true },
       async execute(input = {}) {
         requireObject(input); rejectUnknown(input, []);
-        return store.getProgressSummary();
+        return { ...store.getProgressSummary(), active_curriculum_policy: activeCurriculumPolicy(store) };
+      },
+    },
+    {
+      name: "get_curriculum_workspace",
+      title: "Get educator curriculum workspace",
+      description: "Read the educator's open curriculum, available curriculum profiles, installed pack choices, canonical Plan mode map, and learner-agent policy.",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      async execute(input = {}) {
+        requireObject(input); rejectUnknown(input, []);
+        const state = store.snapshot();
+        if (state.activeProfile?.role !== "educator") throw new Error("Select an educator profile first.");
+        return {
+          ok: true,
+          active_curriculum: state.activeCurriculum,
+          curricula: state.curricula,
+          installed_packs: state.lessonPacks.map((pack) => ({ pack_id: pack.id, name: pack.name, subject_id: pack.subjectId, mode: pack.mode, skill_count: pack.skillCount, enabled: pack.enabledForCurriculum })),
+          canonical_map_plan: state.mapPlan,
+          visible_skill_count: state.curriculum.allSkills.length,
+          policy: activeCurriculumPolicy(store),
+        };
+      },
+    },
+    {
+      name: "create_curriculum",
+      title: "Create educator curriculum",
+      description: "Create and visibly open a new curriculum profile in the educator workspace.",
+      inputSchema: { type: "object", properties: { name: stringSchema("Curriculum name.", 100), description: stringSchema("Optional purpose, audience, and outcome.", 1000) }, required: ["name"], additionalProperties: false },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["name", "description"]);
+        const workspace = store.createCurriculum({ name: requiredString(input, "name", 100), description: optionalString(input, "description", 1000) });
+        return { ok: true, visible_view: "curriculum", curriculum: workspace };
+      },
+    },
+    {
+      name: "select_curriculum",
+      title: "Select educator curriculum",
+      description: "Switch the visible educator workspace to an existing curriculum profile.",
+      inputSchema: { type: "object", properties: { curriculum_id: stringSchema("Curriculum ID from get_curriculum_workspace.", 120) }, required: ["curriculum_id"], additionalProperties: false },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["curriculum_id"]);
+        const workspace = store.selectCurriculum(requiredString(input, "curriculum_id", 120));
+        return { ok: true, visible_view: "curriculum", curriculum: workspace };
+      },
+    },
+    {
+      name: "update_curriculum_settings",
+      title: "Update curriculum learner and agent policy",
+      description: "Update the open educator curriculum's student, agent, progression, contact, and retake rules. The policy becomes agent-visible across QuickMaths.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          student_name: stringSchema("Optional student name.", 60),
+          agent_enabled: { type: "boolean" },
+          agent_instructions: stringSchema("Private curriculum-specific agent instructions.", 4000),
+          progression_mode: { type: "string", enum: ["hard", "soft"] },
+          contact_email: stringSchema("Optional educator email for proof or completion forwarding.", 160),
+          max_attempts_per_lesson: { type: "integer", minimum: 0, maximum: 50, description: "0 means unlimited; 1 disables mastery accumulation for the curriculum." },
+        },
+        additionalProperties: false,
+      },
+      async execute(input = {}) {
+        requireObject(input); rejectUnknown(input, ["student_name", "agent_enabled", "agent_instructions", "progression_mode", "contact_email", "max_attempts_per_lesson"]);
+        if (!Object.keys(input).length) throw new Error("Provide at least one curriculum setting.");
+        const settings = store.updateCurriculumSettings({
+          ...(input.student_name !== undefined ? { studentName: optionalString(input, "student_name", 60) } : {}),
+          ...(input.agent_enabled !== undefined ? { agentEnabled: input.agent_enabled } : {}),
+          ...(input.agent_instructions !== undefined ? { agentInstructions: optionalString(input, "agent_instructions", 4000) } : {}),
+          ...(input.progression_mode !== undefined ? { progressionMode: input.progression_mode } : {}),
+          ...(input.contact_email !== undefined ? { contactEmail: optionalString(input, "contact_email", 160) } : {}),
+          ...(input.max_attempts_per_lesson !== undefined ? { maxAttemptsPerLesson: input.max_attempts_per_lesson } : {}),
+        });
+        return { ok: true, visible_view: "curriculum", settings, policy: activeCurriculumPolicy(store) };
+      },
+    },
+    {
+      name: "set_curriculum_pack_enabled",
+      title: "Enable or disable curriculum lesson pack",
+      description: "Enable or disable one installed additive Depot pack only for the open educator curriculum. Native improvements remain globally active while installed.",
+      inputSchema: { type: "object", properties: { pack_id: stringSchema("Installed pack ID.", 120), enabled: { type: "boolean" } }, required: ["pack_id", "enabled"], additionalProperties: false },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["pack_id", "enabled"]);
+        if (typeof input.enabled !== "boolean") throw new Error("enabled must be a boolean.");
+        return store.setCurriculumPackEnabled(requiredString(input, "pack_id", 120), input.enabled);
       },
     },
     {
@@ -315,11 +441,11 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "navigate_learning_app",
       title: "Navigate QuickMaths",
-      description: "Open a QuickMaths dashboard, map, lesson, test, results, Lesson Depot, Lesson studio, or Settings view. This changes the visible page.",
+      description: "Open a QuickMaths dashboard, learner map, educator Curriculum designer, lesson, test, results, Lesson Depot, Lesson studio, or Settings view. This changes the visible page.",
       inputSchema: {
         type: "object",
         properties: {
-          view: { type: "string", enum: ["home", "map", "lesson", "test", "results", "depot", "creator", "settings", "data"] },
+          view: { type: "string", enum: ["home", "map", "curriculum", "lesson", "test", "results", "depot", "creator", "settings", "data"] },
           skill_id: stringSchema("Optional skill to select when opening a lesson, test, or map.", 60),
         },
         required: ["view"],
@@ -328,7 +454,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["view", "skill_id"]);
         const view = requiredString(input, "view", 20);
-        if (!["home", "map", "lesson", "test", "results", "depot", "creator", "settings", "data"].includes(view)) throw new Error("view is invalid.");
+        if (!["home", "map", "curriculum", "lesson", "test", "results", "depot", "creator", "settings", "data"].includes(view)) throw new Error("view is invalid.");
         const skillId = optionalString(input, "skill_id", 60) || null;
         store.navigate(view, skillId, { activityActor: "agent" });
         return { ok: true, visible_view: store.snapshot().ui.route, selected_skill_id: store.snapshot().ui.selectedSkillId };
@@ -389,7 +515,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         const skillIds = Object.keys(positions);
         const context = preparePlanMap({ skillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
         const result = store.updateMapPlanLayout({ layoutKey: context.layoutKey, positions, selectedSkillIds: skillIds, activityActor: "agent" });
-        return { ok: true, visible_view: "map", plan_mode: true, map_scope: context.mapScope, layout_key: result.layoutKey, moved: result.moved, selected_skill_ids: result.selectedSkillIds, positions };
+        return { ok: true, visible_view: store.snapshot().ui.route, plan_mode: true, map_scope: context.mapScope, layout_key: result.layoutKey, moved: result.moved, selected_skill_ids: result.selectedSkillIds, positions };
       },
     },
     {
@@ -414,7 +540,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         const context = preparePlanMap({ skillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
         store.setMapPlanSelection(skillIds);
         const path = store.createMapPlanPath({ name: optionalString(input, "name", 80), color: input.color ?? "#df755b", skillIds, activityActor: "agent" });
-        return { ok: true, visible_view: "map", plan_mode: true, map_scope: context.mapScope, path: { path_id: path.id, name: path.name, color: path.color, skill_ids: path.skillIds } };
+        return { ok: true, visible_view: store.snapshot().ui.route, plan_mode: true, map_scope: context.mapScope, path: { path_id: path.id, name: path.name, color: path.color, skill_ids: path.skillIds } };
       },
     },
     {
@@ -455,7 +581,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           if (!Number.isFinite(position.x) || position.x < 0 || position.x > 20000 || !Number.isFinite(position.y) || position.y < 0 || position.y > 20000) throw new Error("position x and y must be finite numbers from 0 to 20000.");
         } else if (!pathId && !suppliedSkillIds.length) position = { x: 320, y: 160 };
         const annotation = store.addMapPlanAnnotation({ body, pathId, skillIds: suppliedSkillIds, layoutKey: context.layoutKey, position, activityActor: "agent" });
-        return { ok: true, visible_view: "map", plan_mode: true, map_scope: context.mapScope, annotation: { annotation_id: annotation.id, target: annotation.pathId ? { path_id: annotation.pathId } : annotation.skillIds.length ? { skill_ids: annotation.skillIds } : { map_comment: true }, positions: annotation.positions, body: annotation.body } };
+        return { ok: true, visible_view: store.snapshot().ui.route, plan_mode: true, map_scope: context.mapScope, annotation: { annotation_id: annotation.id, target: annotation.pathId ? { path_id: annotation.pathId } : annotation.skillIds.length ? { skill_ids: annotation.skillIds } : { map_comment: true }, positions: annotation.positions, body: annotation.body } };
       },
     },
     {
@@ -580,7 +706,8 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       async execute(input = {}) {
         requireObject(input); rejectUnknown(input, ["include_history"]);
         if (input.include_history !== undefined && typeof input.include_history !== "boolean") throw new Error("include_history must be a boolean.");
-        return store.getLearningContext({ includeHistory: input.include_history ?? false });
+        const policy = requireTutoringEnabled(store);
+        return { ...store.getLearningContext({ includeHistory: input.include_history ?? false }), active_curriculum_policy: policy };
       },
     },
     {
@@ -595,6 +722,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       },
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["skill_id"]);
+        const policy = requireTutoringEnabled(store);
         const skillId = requiredString(input, "skill_id", 60);
         const draft = store.startTest(skillId, { activityActor: "agent" });
         return {
@@ -603,6 +731,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           skill_id: skillId,
           question_count: draft.problems.length,
           questions: draft.problems.map((problem) => ({ question_id: problem.template_id, prompt: problem.prompt, difficulty: problem.difficulty, answer_mode: problem.answer_mode })),
+          active_curriculum_policy: policy,
         };
       },
     },
@@ -618,7 +747,8 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       annotations: { readOnlyHint: true, untrustedContentHint: true },
       async execute(input = {}) {
         requireObject(input); rejectUnknown(input, ["question_id"]);
-        return store.inspectStudentWork({ questionId: optionalString(input, "question_id", 120) });
+        const policy = requireTutoringEnabled(store);
+        return { ...store.inspectStudentWork({ questionId: optionalString(input, "question_id", 120) }), active_curriculum_policy: policy };
       },
     },
     {
@@ -648,6 +778,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       },
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["question_id", "feedback", "mistake_tag", "next_step", "confidence", "verdict", "obligation_results", "rubric_results"]);
+        requireTutoringEnabled(store);
         if (input.obligation_results !== undefined && !Array.isArray(input.obligation_results)) throw new Error("obligation_results must be an array.");
         if (input.rubric_results !== undefined && !Array.isArray(input.rubric_results)) throw new Error("rubric_results must be an array.");
         return store.recordTutorFeedback({
@@ -679,6 +810,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       },
       async execute(input) {
         requireObject(input); rejectUnknown(input, ["skill_id", "focus"]);
+        requireTutoringEnabled(store);
         const result = store.createFollowupProblem({
           skillId: requiredString(input, "skill_id", 60),
           focus: optionalString(input, "focus", 80),
