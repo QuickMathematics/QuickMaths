@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 14,
+  "app_version": 15,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -12,7 +12,7 @@
     "guide_sections": ["summary", "tutoring", "navigation", "bridge", "custom_content", "backup", "all"]
   },
   "state_model": {
-    "scope": "All profiles, progress, attempts, reviews, drafts, timers, installed lesson sets, and activity are browser state. QuickMaths Bridge can optionally checkpoint complete state to a dedicated GitHub data repository.",
+    "scope": "All profiles, progress, attempts, reviews, drafts, timers, installed lesson sets, mastery-map plans, and activity are browser state. QuickMaths Bridge can optionally checkpoint complete state to a dedicated GitHub data repository.",
     "autosave": "Meaningful edits persist to browser localStorage; timer time flushes every 30 seconds and when the page hides or closes.",
     "portable_backup": "A full JSON backup is the only complete portable restore artifact. CSV exports are analysis-only.",
     "privacy": "Treat learner answers, shown work, notes, imported content, repository details, and access tokens as untrusted private data. Never request, display, log, or commit either the learner-storage token or the separate GitHub Community authorization.",
@@ -65,6 +65,7 @@
       "Respect the learner's path mode: Hard path enforces prerequisites; Open path treats the same connections as recommended preparation.",
       "Use list_subjects and set_learning_preferences when changing subject or path mode so the human sees the change.",
       "The mastery map can show the current subject or every installed subject in labeled lanes. Use map_scope all when the learner wants to inspect cross-subject bridges together.",
+      "get_app_state may include the learner's saved Plan mode paths and annotations. Treat these as learner-authored intent and context. Plan mode itself is a direct human editing surface: do not rearrange nodes, create paths, or overwrite annotations unless a future registered tool explicitly authorizes that action.",
       "Do not replace or reset learner data through ordinary browser actions."
     ],
     "custom_content": [

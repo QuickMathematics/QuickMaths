@@ -19,6 +19,7 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 
 - Multiple learner profiles with separate progress, attempts, reviews, timers, and preferences
 - Mathematics and Geography mastery maps, including cross-subject prerequisite bridges
+- Persistent Plan mode with draggable layouts, desktop marquee/Ctrl selection, touch hold-selection, colored custom paths, and node/path annotations
 - Enforced Hard path and guideline-only Open path
 - Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, and review gates
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements

@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 11;
+export const APP_VERSION = 12;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -38,6 +38,8 @@ const MAX_LESSON_SETS = 10;
 const MAX_LESSON_SET_BYTES = 2_000_000;
 const MAX_LESSON_SET_SKILLS = 50;
 const MAX_PROBLEMS_PER_SKILL = 100;
+const MAX_MAP_PLAN_PATHS = 40;
+const MAX_MAP_PLAN_ANNOTATIONS = 200;
 const LESSON_SET_ID = /^PACK_[A-Z0-9_]{3,54}$/;
 const CUSTOM_SKILL_ID = /^CUSTOM_[A-Z0-9_]{3,52}$/;
 const SUBJECT_ID = /^SUBJECT_[A-Z0-9_]{2,51}$/;
@@ -759,6 +761,7 @@ function initialState() {
     attempts: [],
     reviews: [],
     drafts: {},
+    mapPlans: {},
     lessonPacks: [],
     backup: {
       lastExportAt: null,
@@ -771,6 +774,9 @@ function initialState() {
       selectedSkillId: "MATH_ARITH_001",
       selectedMapSkillId: "MATH_ARITH_001",
       mapZoom: 1,
+      mapPlanMode: false,
+      mapPlanSelection: [],
+      selectedMapPlanPathId: null,
       activeAttemptId: null,
       pendingResults: null,
       agentOpen: false,
@@ -780,6 +786,73 @@ function initialState() {
     session: null,
     activity: [],
   };
+}
+
+function emptyMapPlan() {
+  return { layouts: {}, paths: [], annotations: [] };
+}
+
+function sanitizeMapPlans(candidate, profileIds, skillIds, subjectIds) {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return {};
+  const output = {};
+  const validLayoutKeys = new Set(["all-subjects", ...[...subjectIds].map((id) => `subject:${id}`)]);
+  for (const profileId of profileIds) {
+    const rawPlan = candidate[profileId];
+    if (!rawPlan || typeof rawPlan !== "object" || Array.isArray(rawPlan)) continue;
+    const layouts = {};
+    if (rawPlan.layouts && typeof rawPlan.layouts === "object" && !Array.isArray(rawPlan.layouts)) {
+      for (const [layoutKey, rawPositions] of Object.entries(rawPlan.layouts)) {
+        if (!validLayoutKeys.has(layoutKey) || !rawPositions || typeof rawPositions !== "object" || Array.isArray(rawPositions)) continue;
+        const positions = {};
+        for (const [skillId, rawPosition] of Object.entries(rawPositions)) {
+          if (!skillIds.has(skillId) || !rawPosition || typeof rawPosition !== "object" || Array.isArray(rawPosition)) continue;
+          if (!Number.isFinite(Number(rawPosition.x)) || !Number.isFinite(Number(rawPosition.y))) continue;
+          positions[skillId] = {
+            x: Math.round(cleanNumber(Number(rawPosition.x), 0, 0, 20_000) * 100) / 100,
+            y: Math.round(cleanNumber(Number(rawPosition.y), 0, 0, 20_000) * 100) / 100,
+          };
+        }
+        if (Object.keys(positions).length) layouts[layoutKey] = positions;
+      }
+    }
+    const paths = Array.isArray(rawPlan.paths) ? rawPlan.paths.map((path, index) => {
+      if (!path || typeof path !== "object" || Array.isArray(path)) return null;
+      const pathSkillIds = Array.isArray(path.skillIds)
+        ? [...new Set(path.skillIds.filter((id) => skillIds.has(id)))].slice(0, 80)
+        : [];
+      if (pathSkillIds.length < 2) return null;
+      return {
+        id: cleanText(path.id, 120) || `plan-path-imported-${index + 1}`,
+        name: cleanText(path.name, 80) || `Path ${index + 1}`,
+        color: HEX_COLOR.test(path.color) ? path.color.toLowerCase() : "#df755b",
+        skillIds: pathSkillIds,
+        createdAt: cleanText(path.createdAt, 40) || new Date().toISOString(),
+        updatedAt: cleanText(path.updatedAt, 40) || cleanText(path.createdAt, 40) || new Date().toISOString(),
+      };
+    }).filter(Boolean).slice(0, MAX_MAP_PLAN_PATHS) : [];
+    const pathIds = new Set(paths.map((path) => path.id));
+    const annotations = Array.isArray(rawPlan.annotations) ? rawPlan.annotations.map((annotation, index) => {
+      if (!annotation || typeof annotation !== "object" || Array.isArray(annotation)) return null;
+      const body = cleanText(annotation.body, 1200);
+      if (!body) return null;
+      const pathId = cleanText(annotation.pathId, 120) || null;
+      const annotationSkillIds = Array.isArray(annotation.skillIds)
+        ? [...new Set(annotation.skillIds.filter((id) => skillIds.has(id)))].slice(0, 80)
+        : [];
+      if (pathId ? !pathIds.has(pathId) : !annotationSkillIds.length) return null;
+      return {
+        id: cleanText(annotation.id, 120) || `plan-note-imported-${index + 1}`,
+        targetType: pathId ? "path" : annotationSkillIds.length === 1 ? "node" : "nodes",
+        pathId,
+        skillIds: pathId ? [] : annotationSkillIds,
+        body,
+        createdAt: cleanText(annotation.createdAt, 40) || new Date().toISOString(),
+        updatedAt: cleanText(annotation.updatedAt, 40) || cleanText(annotation.createdAt, 40) || new Date().toISOString(),
+      };
+    }).filter(Boolean).slice(0, MAX_MAP_PLAN_ANNOTATIONS) : [];
+    output[profileId] = { layouts, paths, annotations };
+  }
+  return output;
 }
 
 function sanitizeProfile(candidate) {
@@ -1046,6 +1119,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   const lessonPacks = sanitizeLessonPacks(candidate.lessonPacks, curriculum, { strict: strictPacks });
   const catalog = mergeCurriculum(curriculum, lessonPacks);
   const skills = new Set(catalog.skills.map((skill) => skill.id));
+  const subjects = new Set(catalog.subjects.map((subject) => subject.id));
   const profiles = Array.isArray(candidate.profiles)
     ? candidate.profiles.map(sanitizeProfile).filter(Boolean).slice(0, 30)
     : [];
@@ -1073,6 +1147,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
     attempts,
     reviews,
     drafts: sanitizeDrafts(candidate.drafts, profileIds, catalog),
+    mapPlans: sanitizeMapPlans(candidate.mapPlans, profileIds, skills, subjects),
     lessonPacks,
     backup: {
       lastExportAt: cleanText(candidate.backup?.lastExportAt, 40) || null,
@@ -1085,6 +1160,9 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       selectedSkillId,
       selectedMapSkillId: skills.has(ui.selectedMapSkillId) ? ui.selectedMapSkillId : selectedSkillId,
       mapZoom: Math.round(cleanNumber(Number(ui.mapZoom), 1, 0.1, 1.6) * 100) / 100,
+      mapPlanMode: Boolean(ui.mapPlanMode),
+      mapPlanSelection: Array.isArray(ui.mapPlanSelection) ? [...new Set(ui.mapPlanSelection.filter((id) => skills.has(id)))].slice(0, 80) : [],
+      selectedMapPlanPathId: cleanText(ui.selectedMapPlanPathId, 120) || null,
       activeAttemptId: attempts.some((attempt) => attempt.attemptId === ui.activeAttemptId) ? ui.activeAttemptId : null,
       pendingResults: sanitizePendingResults(ui.pendingResults, skills),
       agentOpen: Boolean(ui.agentOpen),
@@ -1582,6 +1660,13 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
         if (!unlocks[prerequisite].includes(skill.id)) unlocks[prerequisite].push(skill.id);
       }
     }
+    const profileIds = new Set(state.profiles.map((profile) => profile.id));
+    const skillIds = new Set(skillOrder);
+    const subjectIds = new Set(catalog.subjects.map((subject) => subject.id));
+    state.mapPlans = sanitizeMapPlans(state.mapPlans, profileIds, skillIds, subjectIds);
+    state.ui.mapPlanSelection = Array.isArray(state.ui.mapPlanSelection)
+      ? state.ui.mapPlanSelection.filter((id) => skillIds.has(id))
+      : [];
   };
   rebuildCatalog();
 
@@ -1611,6 +1696,11 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
 
   const activeProfile = () => state.profiles.find((profile) => profile.id === state.activeProfileId) ?? null;
   const activeProgress = () => state.progress[state.activeProfileId] ?? {};
+  const activeMapPlan = () => {
+    if (!state.activeProfileId) return emptyMapPlan();
+    state.mapPlans[state.activeProfileId] ??= emptyMapPlan();
+    return state.mapPlans[state.activeProfileId];
+  };
   const profileAttempts = () => state.attempts.filter((attempt) => attempt.profileId === state.activeProfileId);
   const activeSubjectId = () => activeProfile()?.activeSubjectId ?? DEFAULT_SUBJECT_ID;
 
@@ -1726,6 +1816,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
       suggested: clone(suggested),
       attempts: clone(profileAttempts().slice().reverse()),
       reviews: clone(state.reviews.filter((review) => review.profileId === state.activeProfileId).slice().reverse()),
+      mapPlan: clone(activeMapPlan()),
       ui: clone(state.ui),
       timers: timers(),
       activity: clone(state.activity.filter((item) => item.profileId === state.activeProfileId && item.actor === "agent")),
@@ -1798,6 +1889,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     state.activeProfileId = profileId;
     state.progress[profileId] ??= {};
     state.drafts[profileId] ??= {};
+    state.mapPlans[profileId] ??= emptyMapPlan();
     const subjectId = activeProfile()?.activeSubjectId ?? DEFAULT_SUBJECT_ID;
     const firstSkill = skillOrder.find((id) => skillsById[id]?.subjectId === subjectId) ?? skillOrder[0];
     if (firstSkill && skillsById[state.ui.selectedSkillId]?.subjectId !== subjectId) {
@@ -1807,6 +1899,8 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     state.ui.route = activeProfile()?.tutorialCompletedAt ? "home" : "tutorial";
     state.ui.tutorialStep = 0;
     state.ui.pendingResults = null;
+    state.ui.mapPlanSelection = [];
+    state.ui.selectedMapPlanPathId = null;
     startSession(profileId);
     addActivity("select_profile", "Opened a learner profile.");
     notify();
@@ -1822,6 +1916,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     state.profiles.push(profile);
     state.progress[profile.id] = {};
     state.drafts[profile.id] = {};
+    state.mapPlans[profile.id] = emptyMapPlan();
     if (demo) {
       state.progress[profile.id].MATH_ARITH_001 = {
         status: "proven", masteryScore: 72, confidenceRating: 4, lastTestScore: 0.9, bestTestScore: 0.9,
@@ -1851,6 +1946,9 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     state.session = null;
     state.ui.route = "welcome";
     state.ui.pendingResults = null;
+    state.ui.mapPlanMode = false;
+    state.ui.mapPlanSelection = [];
+    state.ui.selectedMapPlanPathId = null;
     addActivity("logout_profile", "Returned to the profile picker.");
     notify();
   };
@@ -1917,11 +2015,168 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return state.ui.mapZoom;
   };
 
+  const normalizeMapPlanSelection = (skillIds) => Array.isArray(skillIds)
+    ? [...new Set(skillIds.filter((id) => skillsById[id]))].slice(0, 80)
+    : [];
+
+  const setMapPlanMode = (enabled) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    state.ui.mapPlanMode = Boolean(enabled);
+    if (!state.ui.mapPlanMode) state.ui.selectedMapPlanPathId = null;
+    notify();
+    return { ok: true, enabled: state.ui.mapPlanMode };
+  };
+
+  const setMapPlanSelection = (skillIds, { selectedPathId = null } = {}) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const plan = activeMapPlan();
+    const selection = normalizeMapPlanSelection(skillIds);
+    const pathId = cleanText(selectedPathId, 120) || null;
+    state.ui.mapPlanSelection = selection;
+    state.ui.selectedMapPlanPathId = pathId && plan.paths.some((path) => path.id === pathId) ? pathId : null;
+    notify();
+    return { ok: true, skillIds: [...selection], selectedPathId: state.ui.selectedMapPlanPathId };
+  };
+
+  const updateMapPlanLayout = ({ layoutKey, positions = {}, selectedSkillIds = state.ui.mapPlanSelection } = {}) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const allowed = new Set(["all-subjects", ...catalog.subjects.map((subject) => `subject:${subject.id}`)]);
+    if (!allowed.has(layoutKey)) throw new Error("Unknown mastery-map layout.");
+    if (!positions || typeof positions !== "object" || Array.isArray(positions)) throw new Error("Plan positions must be an object.");
+    const plan = activeMapPlan();
+    plan.layouts[layoutKey] ??= {};
+    for (const [skillId, position] of Object.entries(positions)) {
+      if (!skillsById[skillId] || !position || typeof position !== "object" || Array.isArray(position)) continue;
+      if (!Number.isFinite(Number(position.x)) || !Number.isFinite(Number(position.y))) continue;
+      plan.layouts[layoutKey][skillId] = {
+        x: Math.round(cleanNumber(Number(position.x), 0, 0, 20_000) * 100) / 100,
+        y: Math.round(cleanNumber(Number(position.y), 0, 0, 20_000) * 100) / 100,
+      };
+    }
+    state.ui.mapPlanSelection = normalizeMapPlanSelection(selectedSkillIds);
+    state.ui.selectedMapPlanPathId = null;
+    notify();
+    return { ok: true, layoutKey, moved: Object.keys(positions).length, selectedSkillIds: [...state.ui.mapPlanSelection] };
+  };
+
+  const resetMapPlanLayout = (layoutKey, skillIds = null) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const plan = activeMapPlan();
+    if (!plan.layouts[layoutKey]) return { ok: true, reset: 0 };
+    const targets = skillIds == null ? null : normalizeMapPlanSelection(skillIds);
+    const reset = targets == null ? Object.keys(plan.layouts[layoutKey]).length : targets.filter((id) => plan.layouts[layoutKey][id]).length;
+    if (targets == null) delete plan.layouts[layoutKey];
+    else {
+      for (const skillId of targets) delete plan.layouts[layoutKey][skillId];
+      if (!Object.keys(plan.layouts[layoutKey]).length) delete plan.layouts[layoutKey];
+    }
+    notify();
+    return { ok: true, reset };
+  };
+
+  const createMapPlanPath = ({ name = "", color = "#df755b", skillIds = state.ui.mapPlanSelection } = {}) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const plan = activeMapPlan();
+    if (plan.paths.length >= MAX_MAP_PLAN_PATHS) throw new Error(`A learning plan can contain at most ${MAX_MAP_PLAN_PATHS} paths.`);
+    const pathSkillIds = normalizeMapPlanSelection(skillIds);
+    if (pathSkillIds.length < 2) throw new Error("Select at least two lessons to create a path.");
+    if (!HEX_COLOR.test(color)) throw new Error("Choose a valid path color.");
+    const path = {
+      id: makeId("plan-path"),
+      name: cleanText(name, 80) || `Path ${plan.paths.length + 1}`,
+      color: color.toLowerCase(),
+      skillIds: pathSkillIds,
+      createdAt: isoNow(),
+      updatedAt: isoNow(),
+    };
+    plan.paths.push(path);
+    state.ui.mapPlanSelection = [...pathSkillIds];
+    state.ui.selectedMapPlanPathId = path.id;
+    addActivity("create_map_plan_path", `Created ${path.name} with ${path.skillIds.length} lessons.`);
+    notify();
+    return clone(path);
+  };
+
+  const updateMapPlanPath = (pathId, { name = null, color = null } = {}) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const path = activeMapPlan().paths.find((item) => item.id === pathId);
+    if (!path) throw new Error("Plan path not found.");
+    if (name != null) path.name = cleanText(name, 80) || path.name;
+    if (color != null) {
+      if (!HEX_COLOR.test(color)) throw new Error("Choose a valid path color.");
+      path.color = color.toLowerCase();
+    }
+    path.updatedAt = isoNow();
+    notify();
+    return clone(path);
+  };
+
+  const selectMapPlanPath = (pathId) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const path = activeMapPlan().paths.find((item) => item.id === pathId);
+    if (!path) throw new Error("Plan path not found.");
+    state.ui.selectedMapPlanPathId = path.id;
+    state.ui.mapPlanSelection = [...path.skillIds];
+    notify();
+    return clone(path);
+  };
+
+  const deleteMapPlanPath = (pathId) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const plan = activeMapPlan();
+    const index = plan.paths.findIndex((item) => item.id === pathId);
+    if (index < 0) throw new Error("Plan path not found.");
+    const [removed] = plan.paths.splice(index, 1);
+    plan.annotations = plan.annotations.filter((annotation) => annotation.pathId !== pathId);
+    if (state.ui.selectedMapPlanPathId === pathId) state.ui.selectedMapPlanPathId = null;
+    addActivity("delete_map_plan_path", `Removed ${removed.name}.`);
+    notify();
+    return { ok: true, id: pathId };
+  };
+
+  const addMapPlanAnnotation = ({ body, pathId = null, skillIds = state.ui.mapPlanSelection } = {}) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const plan = activeMapPlan();
+    if (plan.annotations.length >= MAX_MAP_PLAN_ANNOTATIONS) throw new Error(`A learning plan can contain at most ${MAX_MAP_PLAN_ANNOTATIONS} annotations.`);
+    const safeBody = cleanText(body, 1200);
+    if (!safeBody) throw new Error("Write an annotation first.");
+    const safePathId = cleanText(pathId, 120) || null;
+    const targetPath = safePathId ? plan.paths.find((path) => path.id === safePathId) : null;
+    if (safePathId && !targetPath) throw new Error("Plan path not found.");
+    const targetSkillIds = safePathId ? [] : normalizeMapPlanSelection(skillIds);
+    if (!safePathId && !targetSkillIds.length) throw new Error("Select one or more lessons to annotate.");
+    const annotation = {
+      id: makeId("plan-note"),
+      targetType: safePathId ? "path" : targetSkillIds.length === 1 ? "node" : "nodes",
+      pathId: safePathId,
+      skillIds: targetSkillIds,
+      body: safeBody,
+      createdAt: isoNow(),
+      updatedAt: isoNow(),
+    };
+    plan.annotations.push(annotation);
+    addActivity("add_map_plan_annotation", `Added a note to ${targetPath?.name ?? `${targetSkillIds.length} selected lesson${targetSkillIds.length === 1 ? "" : "s"}`}.`);
+    notify();
+    return clone(annotation);
+  };
+
+  const deleteMapPlanAnnotation = (annotationId) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const plan = activeMapPlan();
+    const index = plan.annotations.findIndex((annotation) => annotation.id === annotationId);
+    if (index < 0) throw new Error("Plan annotation not found.");
+    plan.annotations.splice(index, 1);
+    notify();
+    return { ok: true, id: annotationId };
+  };
+
   const setLearningPreferences = ({ subjectId = null, progressionMode = null, mapScope = null, activityActor = "learner" } = {}) => {
     const profile = activeProfile();
     if (!profile) throw new Error("Select a profile first.");
+    let mapContextChanged = false;
     if (subjectId != null) {
       if (!catalog.subjects.some((subject) => subject.id === subjectId)) throw new Error("Unknown subject_id.");
+      mapContextChanged ||= profile.activeSubjectId !== subjectId;
       profile.activeSubjectId = subjectId;
       const firstSkill = skillOrder.find((id) => skillsById[id]?.subjectId === subjectId);
       if (firstSkill && skillsById[state.ui.selectedSkillId]?.subjectId !== subjectId) {
@@ -1935,10 +2190,15 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     }
     if (mapScope != null) {
       if (!["subject", "all"].includes(mapScope)) throw new Error("map_scope must be subject or all.");
+      mapContextChanged ||= profile.mapScope !== mapScope;
       profile.mapScope = mapScope;
       if (mapScope === "subject" && skillsById[state.ui.selectedMapSkillId]?.subjectId !== profile.activeSubjectId) {
         state.ui.selectedMapSkillId = skillOrder.find((id) => skillsById[id]?.subjectId === profile.activeSubjectId) ?? state.ui.selectedMapSkillId;
       }
+    }
+    if (mapContextChanged) {
+      state.ui.mapPlanSelection = [];
+      state.ui.selectedMapPlanPathId = null;
     }
     addActivity("set_learning_preferences", `Using ${profile.progressionMode} progression in ${catalog.subjects.find((subject) => subject.id === profile.activeSubjectId)?.name ?? profile.activeSubjectId}; the map shows ${profile.mapScope === "all" ? "all installed subjects" : "the current subject"}.`, undefined, activityActor);
     notify();
@@ -2652,6 +2912,16 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     completeTutorial,
     selectMapSkill,
     setMapZoom,
+    setMapPlanMode,
+    setMapPlanSelection,
+    updateMapPlanLayout,
+    resetMapPlanLayout,
+    createMapPlanPath,
+    updateMapPlanPath,
+    selectMapPlanPath,
+    deleteMapPlanPath,
+    addMapPlanAnnotation,
+    deleteMapPlanAnnotation,
     setLearningPreferences,
     startTest,
     updateResponse,

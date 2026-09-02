@@ -143,6 +143,16 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           subject: state.activeProfile ? { subject_id: state.activeSubject.id, name: state.activeSubject.name } : null,
           progression_mode: state.progressionMode,
           map_scope: state.mapScope,
+          learning_plan: state.activeProfile ? {
+            plan_mode: state.ui.mapPlanMode,
+            selected_skill_ids: state.ui.mapPlanSelection,
+            paths: state.mapPlan.paths.map((path) => ({ path_id: path.id, name: path.name, color: path.color, skill_ids: path.skillIds })),
+            annotations: state.mapPlan.annotations.map((annotation) => ({
+              annotation_id: annotation.id,
+              target: annotation.pathId ? { path_id: annotation.pathId } : { skill_ids: annotation.skillIds },
+              body: annotation.body,
+            })),
+          } : null,
           timers: state.timers,
           mastery_counts: state.progressCounts,
           selected_skill: state.activeProfile ? { skill_id: state.selectedSkill.id, name: state.selectedSkill.name } : null,

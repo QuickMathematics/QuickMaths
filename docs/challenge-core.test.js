@@ -255,6 +255,51 @@ test("Settings, map zoom, and combined-subject map scope persist safely", () => 
   assert.throws(() => reloaded.setLearningPreferences({ mapScope: "galaxy" }), /map_scope/);
 });
 
+test("mastery-map plans persist per learner with scoped layouts, colored paths, and annotations", () => {
+  const { store, storage } = harness();
+  const firstProfile = store.createProfile("Planning Learner");
+  store.completeTutorial();
+  store.navigate("map");
+  assert.equal(store.setMapPlanMode(true).enabled, true);
+  store.setMapPlanSelection(["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"]);
+  store.updateMapPlanLayout({
+    layoutKey: "subject:SUBJECT_MATH",
+    selectedSkillIds: ["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"],
+    positions: {
+      MATH_ARITH_001: { x: 110.25, y: 90.5 },
+      MATH_ARITH_002: { x: 360, y: 180 },
+    },
+  });
+  const path = store.createMapPlanPath({ name: "Algebra launch", color: "#7b4be2" });
+  assert.deepEqual(path.skillIds, ["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"]);
+  store.addMapPlanAnnotation({ body: "Warm up here before Friday.", skillIds: ["MATH_ARITH_001"] });
+  store.addMapPlanAnnotation({ body: "My route into equations.", pathId: path.id });
+  store.updateMapPlanPath(path.id, { color: "#1255aa" });
+
+  let state = store.snapshot();
+  assert.equal(state.ui.mapPlanMode, true);
+  assert.deepEqual(state.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: 110.25, y: 90.5 });
+  assert.equal(state.mapPlan.paths[0].color, "#1255aa");
+  assert.equal(state.mapPlan.annotations.length, 2);
+  assert.match(store.exportBackup(), /My route into equations/);
+
+  const reloaded = createQuickMathsStore({ storage, curriculum, now: () => new Date("2026-09-01T09:41:00.000Z") });
+  state = reloaded.snapshot();
+  assert.equal(state.mapPlan.paths[0].name, "Algebra launch");
+  assert.equal(state.mapPlan.annotations[0].body, "Warm up here before Friday.");
+  assert.equal(state.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_002.x, 360);
+  reloaded.setMapPlanMode(false);
+  assert.equal(reloaded.snapshot().ui.mapPlanMode, false);
+  assert.equal(reloaded.snapshot().mapPlan.paths.length, 1, "closing Plan mode must not erase the plan");
+
+  reloaded.createProfile("Independent Planner");
+  assert.deepEqual(reloaded.snapshot().mapPlan, { layouts: {}, paths: [], annotations: [] });
+  reloaded.selectProfile(firstProfile.id);
+  assert.equal(reloaded.snapshot().mapPlan.paths.length, 1, "plans belong to their learner profile");
+  assert.throws(() => reloaded.createMapPlanPath({ skillIds: ["MATH_ARITH_001"] }), /at least two/i);
+  assert.throws(() => reloaded.updateMapPlanPath(path.id, { color: "tomato" }), /valid path color/i);
+});
+
 test("selecting a mastery-map node updates both the detail card and routed skill", () => {
   const { store } = harness();
   store.createProfile("Map Learner");
