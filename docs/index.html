@@ -10,8 +10,8 @@
     <link rel="icon" href="./quickmaths-logo.png">
     <link rel="alternate" type="application/json" href="./agent-manifest.json" title="QuickMaths agent guide">
     <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
-    <link rel="stylesheet" href="./challenge.css?v=20260902-native-improvements-v2">
-    <script type="module" src="./challenge.js?v=20260902-native-improvements-v2"></script>
+    <link rel="stylesheet" href="./challenge.css?v=20260902-storage-onboarding">
+    <script type="module" src="./challenge.js?v=20260902-storage-onboarding"></script>
   </head>
   <body>
     <a class="skip-link" href="#view-root">Skip to learning workspace</a>
@@ -67,6 +67,8 @@
             <p id="profile-error" class="form-message" aria-live="polite"></p>
           </form>
 
+          <div id="welcome-storage-restore"></div>
+
           <div class="profile-panel-footer">
             <button id="create-demo" class="text-button" type="button">Explore with sample progress →</button>
             <p>Progress autosaves here. Download a backup anytime to move it elsewhere.</p>
@@ -76,7 +78,7 @@
       <footer class="welcome-footer">Open source · MIT licensed · Built from the original QuickMaths curriculum</footer>
     </section>
 
-    <div id="app-shell" class="app-shell" hidden>
+    <div id="app-shell" class="app-shell agent-collapsed" hidden>
       <aside class="sidebar" aria-label="QuickMaths navigation">
         <div class="sidebar-brand">
           <img src="./quickmaths-logo.png" alt="" width="54" height="51">
@@ -125,7 +127,7 @@
 
       <main id="view-root" class="view-root" tabindex="-1"></main>
 
-      <aside id="agent-dock" class="agent-dock" aria-labelledby="agent-dock-title" tabindex="-1">
+      <aside id="agent-dock" class="agent-dock is-closed" aria-labelledby="agent-dock-title" tabindex="-1">
         <div class="agent-dock-header">
           <div>
             <p class="eyebrow">Agent studio</p>

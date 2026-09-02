@@ -97,6 +97,22 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .input-action { display: flex; gap: 8px; }
 .input-action input { min-width: 0; flex: 1; height: 44px; padding: 0 13px; color: var(--ink); background: #fbf8f1; border: 1px solid var(--line); border-radius: 12px; }
 .form-message { min-height: 18px; margin: 7px 0 0; color: var(--red); font-size: 11px; }
+.welcome-storage-restore { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.welcome-storage-restore > summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; color: var(--ink); cursor: pointer; list-style: none; }
+.welcome-storage-restore > summary::-webkit-details-marker { display: none; }
+.welcome-storage-restore > summary span, .welcome-storage-restore > summary strong, .welcome-storage-restore > summary small { display: block; }
+.welcome-storage-restore > summary strong { font-size: 12px; }
+.welcome-storage-restore > summary small { margin-top: 3px; color: var(--muted); font-size: 9px; font-weight: 500; }
+.welcome-storage-restore > summary b { flex: 0 0 auto; padding: 8px 10px; color: var(--pine); background: var(--mint); border-radius: 9px; font-size: 9px; }
+.welcome-storage-restore[open] > summary b { color: #fff; background: var(--pine); }
+.welcome-storage-body > p { margin: 14px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
+.welcome-github-sync-form { gap: 11px; margin-top: 13px; padding-top: 13px; }
+.welcome-github-sync-form .bridge-token-form { gap: 11px; }
+.welcome-github-sync-form .github-repo-fields { grid-template-columns: 1fr 1fr; gap: 8px; }
+.welcome-github-sync-form .github-repo-fields label:last-child { grid-column: 1 / -1; }
+.welcome-github-sync-form label { gap: 5px; font-size: 10px; }
+.welcome-github-sync-form input { min-height: 40px; }
+.welcome-github-sync-form .bridge-remember small, .welcome-github-sync-form .bridge-form-note { font-size: 9px; }
 .profile-panel-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 12px; }
 .profile-panel-footer p { max-width: 210px; margin: 0; color: var(--muted); text-align: right; font-size: 9px; }
 .welcome-footer { position: absolute; left: 32px; bottom: 20px; color: var(--muted); font-size: 10px; }
@@ -987,6 +1003,10 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
   .welcome-lede { font-size: 15px; }
   .welcome-proof { gap: 10px; }
   .welcome-proof span { min-width: 96px; }
+  .welcome-storage-restore > summary { align-items: flex-start; }
+  .welcome-github-sync-form .github-repo-fields { grid-template-columns: 1fr; }
+  .welcome-github-sync-form .github-repo-fields label:last-child { grid-column: auto; }
+  .welcome-github-sync-form .bridge-connect-actions .button { width: 100%; justify-content: center; }
   .profile-panel { padding: 22px; }
   .input-action { align-items: stretch; flex-direction: column; }
   .profile-panel-footer { align-items: start; flex-direction: column; }
@@ -1078,6 +1098,7 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .sync-phase.connected i { background: #359360; box-shadow: 0 0 0 4px color-mix(in srgb, #359360 15%, transparent); }
 .sync-phase.error i, .sync-phase.conflict i { background: var(--coral); box-shadow: 0 0 0 4px color-mix(in srgb, var(--coral) 15%, transparent); }
 .github-sync-form { display: grid; gap: 15px; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
+.bridge-token-form { display: grid; gap: 15px; }
 .github-sync-form label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 800; }
 .github-sync-form input { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper-light); color: var(--ink); outline: none; }
 .github-sync-form input:focus { border-color: var(--pine); box-shadow: 0 0 0 3px color-mix(in srgb, var(--pine) 12%, transparent); }

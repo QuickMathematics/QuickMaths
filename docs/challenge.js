@@ -28,6 +28,7 @@ const elements = {
   welcomeLessonCount: document.querySelector("#welcome-lesson-count"),
   welcomeQuestionCount: document.querySelector("#welcome-question-count"),
   welcomeToolCount: document.querySelector("#welcome-tool-count"),
+  welcomeStorageRestore: document.querySelector("#welcome-storage-restore"),
   view: document.querySelector("#view-root"),
   profileName: document.querySelector("#sidebar-profile-name"),
   profileAvatar: document.querySelector("#profile-avatar"),
@@ -61,6 +62,8 @@ let githubSync;
 let githubCredentials;
 let githubSyncSnapshot = { phase: "disconnected", connected: false, dirty: false, remoteAvailable: false, config: null, error: null, conflict: null };
 let bridgeNeedsChoice = false;
+let bridgeFormDraft = null;
+let welcomeStorageOpen = false;
 const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
 
 const AGENT_STARTER_PROMPT = "Read the QuickMaths agent manifest through WebMCP, then guide me through the learning experience.";
@@ -827,6 +830,73 @@ function bridgePhaseLabel(status) {
   return "Not connected";
 }
 
+function bridgeFormValues() {
+  const saved = githubCredentials?.load({ role: "learner" });
+  return {
+    owner: bridgeFormDraft?.owner ?? saved?.owner ?? "",
+    repo: bridgeFormDraft?.repo ?? saved?.repo ?? "quickmaths-sync",
+    branch: bridgeFormDraft?.branch ?? saved?.branch ?? "main",
+    token: bridgeFormDraft?.token ?? "",
+    remember: bridgeFormDraft?.remember ?? saved?.rememberToken ?? false,
+    hasSavedToken: Boolean(saved?.token),
+  };
+}
+
+function captureBridgeFormDraft(form = document.querySelector("[data-bridge-form]")) {
+  if (!form) return;
+  bridgeFormDraft = {
+    owner: String(form.querySelector('[name="owner"]')?.value ?? ""),
+    repo: String(form.querySelector('[name="repo"]')?.value ?? ""),
+    branch: String(form.querySelector('[name="branch"]')?.value ?? ""),
+    token: String(form.querySelector('[name="token"]')?.value ?? ""),
+    remember: Boolean(form.querySelector('[name="remember"]')?.checked),
+  };
+}
+
+function restoreBridgeFormDraft(form) {
+  if (!form) return;
+  const values = bridgeFormValues();
+  const owner = form.querySelector('[name="owner"]');
+  const repo = form.querySelector('[name="repo"]');
+  const branch = form.querySelector('[name="branch"]');
+  const token = form.querySelector('[name="token"]');
+  const remember = form.querySelector('[name="remember"]');
+  if (owner) owner.value = values.owner;
+  if (repo) repo.value = values.repo;
+  if (branch) branch.value = values.branch;
+  if (token && values.token) token.value = values.token;
+  if (remember) remember.checked = values.remember;
+}
+
+function renderBridgeConnectionForm({ id = "github-sync-form", landing = false } = {}) {
+  const values = bridgeFormValues();
+  const tokenRequired = !values.hasSavedToken && !values.token;
+  return `<div class="github-sync-form ${landing ? "welcome-github-sync-form" : ""}" data-bridge-form>
+    <div class="github-repo-fields"><label>Repository owner<input name="owner" value="${escapeHtml(values.owner)}" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="your-github-username" required></label><label>Data repository<input name="repo" value="${escapeHtml(values.repo)}" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="quickmaths-sync" required></label><label>Branch<input name="branch" value="${escapeHtml(values.branch)}" autocomplete="off" autocapitalize="none" spellcheck="false" required></label></div>
+    <form id="${id}" class="bridge-token-form" autocomplete="off">
+      <label>Fine-grained storage token<input name="token" type="password" autocomplete="new-password" data-1p-ignore data-lpignore="true" spellcheck="false" placeholder="${values.hasSavedToken ? "Saved for this browser session" : "Paste your fine-grained GitHub token"}" ${tokenRequired ? "required" : ""}></label>
+      <label class="bridge-remember"><input name="remember" type="checkbox" ${values.remember ? "checked" : ""}><span><strong>Remember token on this device</strong><small>Useful on your own phone. This stores it in browser storage—not cookies or the repository. Leave off on a shared device.</small></span></label>
+      <div class="bridge-connect-actions"><button class="button button-primary" type="submit">${landing ? "Connect and load my profile" : "Connect GitHub storage"}</button>${landing ? `<a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Storage setup guide ↗</a>` : `<a class="button button-outline" href="https://github.com/new" target="_blank" rel="noopener">Create private data repo ↗</a><a class="button button-outline" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create fine-grained token ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a>`}</div>
+      <p class="bridge-form-note">Paste a fine-grained token limited to your separate QuickMaths data repository. It needs <strong>Repository permissions → Contents → Read and write</strong>, with no account, workflow, or administration permissions.</p>
+      <p class="form-message" role="status">${escapeHtml(githubSyncSnapshot.error ?? "")}</p>
+    </form>
+  </div>`;
+}
+
+function renderWelcomeStorageRestore(snapshot) {
+  if (!elements.welcomeStorageRestore) return;
+  if (snapshot.profiles.length) {
+    elements.welcomeStorageRestore.innerHTML = "";
+    return;
+  }
+  const open = welcomeStorageOpen || Boolean(bridgeFormDraft);
+  elements.welcomeStorageRestore.innerHTML = `<details id="welcome-storage-details" class="welcome-storage-restore" ${open ? "open" : ""}>
+    <summary><span><strong>Already have a profile on another device?</strong><small>Restore it from GitHub storage instead of starting over.</small></span><b>Connect storage</b></summary>
+    <div class="welcome-storage-body"><p>Use the same private data repository and fine-grained token as your other device. QuickMaths will load its complete learner checkpoint before opening the app.</p>${renderBridgeConnectionForm({ id: "welcome-github-sync-form", landing: true })}</div>
+  </details>`;
+  restoreBridgeFormDraft(document.querySelector("#welcome-github-sync-form")?.closest("[data-bridge-form]"));
+}
+
 function renderGitHubBridge(snapshot) {
   const status = githubSyncSnapshot;
   const saved = githubCredentials?.load({ role: "learner" });
@@ -836,14 +906,7 @@ function renderGitHubBridge(snapshot) {
     return `
       <section class="content-card github-bridge-card" id="github-bridge">
         <div class="bridge-card-heading"><div><p class="eyebrow">QuickMaths Bridge · experimental</p><h2>Connect mobile learning to a remote agent</h2><p>Your browser remains the instant local save. A dedicated GitHub data repository carries debounced checkpoints between this learner page and the agent workspace.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
-        <form id="github-sync-form" class="github-sync-form">
-          <div class="github-repo-fields"><label>Repository owner<input name="owner" value="${escapeHtml(saved?.owner ?? "")}" autocomplete="username" placeholder="github-user" required></label><label>Data repository<input name="repo" value="${escapeHtml(saved?.repo ?? "quickmaths-sync")}" placeholder="quickmaths-sync" required></label><label>Branch<input name="branch" value="${escapeHtml(saved?.branch ?? "main")}" required></label></div>
-          <label>Fine-grained GitHub token<input name="token" type="password" autocomplete="off" placeholder="${saved?.token ? "Saved for this browser session" : "Repository Contents: read and write"}" ${saved?.token ? "" : "required"}></label>
-          <label class="bridge-remember"><input name="remember" type="checkbox" ${saved?.rememberToken ? "checked" : ""}><span><strong>Remember token on this device</strong><small>Useful on your own phone. This stores it in browser storage—not cookies or the repository. Leave off on a shared device.</small></span></label>
-          <div class="bridge-connect-actions"><button class="button button-primary" type="submit">Connect GitHub storage</button><a class="button button-outline" href="https://github.com/new" target="_blank" rel="noopener">Create private data repo ↗</a><a class="button button-outline" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create fine-grained token ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a></div>
-          <p class="bridge-form-note">For safety, grant the token access only to a separate data repository—not the public QuickMaths code fork. It needs <strong>Contents: read and write</strong>; no account, workflow, or administration permissions.</p>
-          <p id="github-sync-message" class="form-message" role="status">${escapeHtml(status.error ?? "")}</p>
-        </form>
+        ${renderBridgeConnectionForm()}
       </section>`;
   }
 
@@ -864,6 +927,7 @@ function renderGitHubBridge(snapshot) {
 }
 
 function renderSettings(snapshot) {
+  captureBridgeFormDraft(document.querySelector("[data-bridge-form]"));
   const backup = snapshot.backupStatus;
   const improvementPacks = snapshot.lessonPacks.filter((pack) => pack.mode === "override");
   const addedLessonCount = snapshot.lessonPacks.filter((pack) => pack.mode !== "override").reduce((count, pack) => count + pack.skillCount, 0);
@@ -900,6 +964,7 @@ function renderSettings(snapshot) {
     </section>
     <section class="content-card tutor-setup"><div class="card-heading"><div><h2>Tutor setup prompt</h2><p>Use this in any AI tutor when WebMCP is unavailable.</p></div><button class="quiet-button" data-action="copy-tutor-setup">Copy prompt</button></div><pre id="tutor-setup-prompt">${escapeHtml(TUTOR_SETUP_PROMPT)}</pre></section>
   `;
+  restoreBridgeFormDraft(document.querySelector("#github-sync-form")?.closest("[data-bridge-form]"));
 }
 
 function renderLessonHubTabs(activeRoute) {
@@ -1042,6 +1107,9 @@ function syncNavigation(route) {
 }
 
 function render(snapshot) {
+  captureBridgeFormDraft();
+  const welcomeStorageDetails = document.querySelector("#welcome-storage-details");
+  if (welcomeStorageDetails) welcomeStorageOpen = welcomeStorageDetails.open;
   const previousRoute = currentSnapshot?.ui.route;
   currentSnapshot = snapshot;
   elements.loading.hidden = true;
@@ -1051,6 +1119,7 @@ function render(snapshot) {
   renderWelcomeSummary(snapshot);
   if (!signedIn) {
     renderProfiles(snapshot);
+    renderWelcomeStorageRestore(snapshot);
     if (location.hash !== "#/welcome") history.replaceState(null, "", "#/welcome");
     routeHistoryReady = true;
     return;
@@ -1145,17 +1214,41 @@ async function prepareLearnerBridge({ resumed = false } = {}) {
   return remote;
 }
 
-async function connectLearnerBridge(form) {
-  const data = new FormData(form);
+async function connectLearnerBridge(form, { restoreOnly = false } = {}) {
+  const container = form.closest("[data-bridge-form]") ?? form;
+  captureBridgeFormDraft(container);
   const saved = githubCredentials.load({ role: "learner" });
+  if (restoreOnly && store.snapshot().profiles.length) {
+    throw new Error("This browser already has local profiles. Open one and connect storage from Settings.");
+  }
   await githubSync.connect({
-    owner: data.get("owner"),
-    repo: data.get("repo"),
-    branch: data.get("branch"),
-    token: String(data.get("token") || saved?.token || ""),
-    rememberToken: data.get("remember") === "on",
+    owner: container.querySelector('[name="owner"]')?.value,
+    repo: container.querySelector('[name="repo"]')?.value,
+    branch: container.querySelector('[name="branch"]')?.value,
+    token: String(container.querySelector('[name="token"]')?.value || saved?.token || ""),
+    rememberToken: Boolean(container.querySelector('[name="remember"]')?.checked),
   }, { startPolling: false });
+  if (restoreOnly) {
+    const remote = await githubSync.inspectRemote();
+    if (!remote.learner.exists) {
+      githubSync.disconnect();
+      throw new Error("No learner checkpoint was found in that repository. Check the owner, repository, branch, and token.");
+    }
+    await githubSync.restoreLearner({ force: true });
+    if (!store.snapshot().profiles.length) {
+      githubSync.disconnect();
+      throw new Error("The GitHub checkpoint does not contain a learner profile.");
+    }
+    bridgeFormDraft = null;
+    if (remote.agent?.exists) {
+      try { await githubSync.pullNow(); } catch { /* A stale agent checkpoint must not block learner restoration. */ }
+    }
+    githubSync.start();
+    showToast("Profile loaded from GitHub storage.");
+    return;
+  }
   await prepareLearnerBridge();
+  bridgeFormDraft = null;
   showToast(bridgeNeedsChoice ? "Choose which learner checkpoint to keep." : "QuickMaths Bridge connected.");
 }
 
@@ -1202,6 +1295,7 @@ document.querySelector("#create-profile-form").addEventListener("submit", (event
   event.preventDefault();
   elements.profileError.textContent = "";
   try {
+    bridgeFormDraft = null;
     store.createProfile(document.querySelector("#profile-name").value);
     event.currentTarget.reset();
   } catch (error) {
@@ -1445,6 +1539,11 @@ document.addEventListener("change", (event) => {
 });
 
 document.addEventListener("input", (event) => {
+  const bridgeForm = event.target.closest?.("[data-bridge-form]");
+  if (bridgeForm) {
+    captureBridgeFormDraft(bridgeForm);
+    return;
+  }
   if (event.target.id === "community-comment-body") {
     communityUi.commentDraft = event.target.value;
     return;
@@ -1506,6 +1605,17 @@ document.addEventListener("submit", (event) => {
     connectLearnerBridge(event.target).catch((error) => {
       showToast(error instanceof Error ? error.message : String(error));
     });
+    return;
+  }
+  if (event.target.id === "welcome-github-sync-form") {
+    event.preventDefault();
+    const submit = event.target.querySelector('[type="submit"]');
+    if (submit) submit.disabled = true;
+    connectLearnerBridge(event.target, { restoreOnly: true }).catch((error) => {
+      showToast(error instanceof Error ? error.message : String(error));
+      const message = document.querySelector("#welcome-github-sync-form .form-message");
+      if (message) message.textContent = error instanceof Error ? error.message : String(error);
+    }).finally(() => { if (submit?.isConnected) submit.disabled = false; });
     return;
   }
   if (event.target.id === "test-form") {
@@ -1591,7 +1701,7 @@ async function boot() {
   let agentManifest = {};
   let communityConfig = { enabled: false };
   try {
-    const manifestResponse = await fetch("./agent-manifest.json?v=20260902-native-improvements-v2");
+    const manifestResponse = await fetch("./agent-manifest.json?v=20260902-storage-onboarding");
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
   } catch {
     // The tools still work if the optional human/machine-readable guide is unavailable.
@@ -1645,8 +1755,7 @@ async function boot() {
   });
   lessonDepot.load();
   document.querySelector("#agent-prompt").textContent = AGENT_STARTER_PROMPT;
-  if (window.matchMedia("(max-width: 1240px)").matches) closeAgentStudio({ focusToggle: false });
-  else openAgentStudio({ announce: false, focus: false });
+  closeAgentStudio({ focusToggle: false });
   applyLocationRoute();
   store.subscribe(render);
   initClock();

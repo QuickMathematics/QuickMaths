@@ -30,13 +30,13 @@
       <section class="bridge-grid">
         <article class="panel connection-panel">
           <div class="panel-heading"><div><p class="eyebrow">Connection</p><h2>GitHub data repository</h2></div><button id="disconnect-button" class="quiet-button" type="button" hidden>Disconnect</button></div>
-          <form id="connection-form">
+          <form id="connection-form" autocomplete="off">
             <div class="two-fields">
-              <label>Owner<input name="owner" autocomplete="username" placeholder="github-user" required></label>
+              <label>Owner<input name="owner" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="github-user" required></label>
               <label>Repository<input name="repo" placeholder="quickmaths-sync" required></label>
             </div>
             <label>Branch<input name="branch" value="main" required></label>
-            <label>Fine-grained GitHub token<input name="token" type="password" autocomplete="off" placeholder="Contents: read and write"></label>
+            <label>Fine-grained storage token<input name="token" type="password" autocomplete="new-password" data-1p-ignore data-lpignore="true" spellcheck="false" placeholder="Paste your fine-grained GitHub token"></label>
             <label class="check-row"><input name="remember" type="checkbox"><span><strong>Remember on this device</strong><small>Required for unattended Remote sessions. Never stored in the repository or a cookie.</small></span></label>
             <button class="primary-button" type="submit">Connect agent workspace</button>
             <p class="form-message" id="connection-message" role="status"></p>
