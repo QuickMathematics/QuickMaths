@@ -106,6 +106,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /scroller\.scrollLeft = gesture\.startScrollLeft - deltaX;\s+scroller\.scrollTop = gesture\.startScrollTop - deltaY;/);
   assert.match(js, /pressedSkillId/);
   assert.match(js, /store\.selectMapSkill\(selectedSkillId\)/);
+  assert.match(js, /data-map-viewport-key/);
+  assert.match(js, /nextScroller\.scrollLeft = previousViewport\.scrollLeft;\s+nextScroller\.scrollTop = previousViewport\.scrollTop;/);
   assert.match(js, /addEventListener\("wheel"/);
   assert.match(js, /passive: false/);
   assert.match(js, /map-hint-desktop/);

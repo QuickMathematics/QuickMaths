@@ -589,6 +589,11 @@ function setupMapInteractions() {
 
 function renderMap(snapshot) {
   const combined = snapshot.mapScope === "all";
+  const viewportKey = combined ? "all-subjects" : `subject:${snapshot.activeSubject.id}`;
+  const previousScroller = elements.view.querySelector(".map-scroll");
+  const previousViewport = previousScroller?.dataset.mapViewportKey === viewportKey
+    ? { scrollLeft: previousScroller.scrollLeft, scrollTop: previousScroller.scrollTop }
+    : null;
   const mapRows = combined ? snapshot.allProgressRows : snapshot.progressRows;
   const mapSkills = combined ? snapshot.curriculum.allSkills : snapshot.curriculum.skills;
   const selected = mapRows.find((row) => row.id === snapshot.ui.selectedMapSkillId) ?? mapRows[0];
@@ -641,7 +646,7 @@ function renderMap(snapshot) {
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${combined ? `<span class="map-subject-key">Node color = subject · dot = status</span>` : ""}</div>
     <section class="map-layout">
-      <div class="map-scroll" aria-label="Interactive prerequisite map. Drag to move. Use the mouse wheel on desktop or pinch on a touchscreen to zoom.">
+      <div class="map-scroll" data-map-viewport-key="${escapeHtml(viewportKey)}" aria-label="Interactive prerequisite map. Drag to move. Use the mouse wheel on desktop or pinch on a touchscreen to zoom.">
         <div class="map-gesture-hint" aria-hidden="true">Drag to move <span class="map-hint-desktop">· Wheel to zoom</span><span class="map-hint-touch">· Pinch to zoom</span></div>
         <svg class="mastery-map" viewBox="0 0 ${width} ${height}" data-base-width="${width}" data-base-height="${height}" data-current-zoom="${zoom}" style="width:${Math.round(width * zoom)}px;height:${Math.round(height * zoom)}px">
           <g class="map-subject-lanes">${subjectLanes}</g>
@@ -672,6 +677,11 @@ function renderMap(snapshot) {
       </aside>
     </section>
   `;
+  if (previousViewport) {
+    const nextScroller = elements.view.querySelector(".map-scroll");
+    nextScroller.scrollLeft = previousViewport.scrollLeft;
+    nextScroller.scrollTop = previousViewport.scrollTop;
+  }
   setupMapInteractions();
 }
 
