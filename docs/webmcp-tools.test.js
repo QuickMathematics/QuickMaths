@@ -46,6 +46,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   const css = readFileSync(new URL("./challenge.css", import.meta.url), "utf8");
   const community = readFileSync(new URL("./github-community.js", import.meta.url), "utf8");
   const communityCallback = readFileSync(new URL("./community-auth.html", import.meta.url), "utf8");
+  const studentGuideSource = readFileSync(new URL("./STUDENT_GUIDE.md", import.meta.url), "utf8");
+  const studentPdfUrl = new URL("./QuickMaths-Student-Guide.pdf", import.meta.url);
   const educatorGuideSource = readFileSync(new URL("./EDUCATOR_GUIDE.md", import.meta.url), "utf8");
   const educatorPdfUrl = new URL("./QuickMaths-Educator-Guide.pdf", import.meta.url);
   assert.match(html, /data-route="settings"/);
@@ -75,6 +77,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(html, /id="welcome-storage-restore"/);
   assert.match(html, /id="welcome-educator-path"/);
   assert.match(html, /id="educator-welcome-root"/);
+  assert.match(html, /QuickMaths-Student-Guide\.pdf/);
   assert.match(html, /QuickMaths-Educator-Guide\.pdf/);
   assert.match(html, /educator-agent-manifest\.json/);
   assert.match(html, /id="welcome-curriculum-url-form"/);
@@ -177,6 +180,10 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(community, /quickmaths\.github-community\.credential\.session/);
   assert.doesNotMatch(community, /client_secret/);
   assert.match(communityCallback, /community-auth\.js/);
+  assert.match(studentGuideSource, /complete learner-facing product/i);
+  assert.match(studentGuideSource, /Learner WebMCP starting command: `get_agent_guide`/);
+  assert.ok(statSync(studentPdfUrl).size > 50_000);
+  assert.equal(readFileSync(studentPdfUrl).subarray(0, 5).toString(), "%PDF-");
   assert.match(educatorGuideSource, /complete visible product: educator setup, every educator control/i);
   assert.match(educatorGuideSource, /get_educator_agent_manifest/);
   assert.ok(statSync(educatorPdfUrl).size > 50_000);

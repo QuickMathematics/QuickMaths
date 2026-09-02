@@ -130,6 +130,7 @@ Important files:
 - `docs/QUICKMATHS_BRIDGE.md` — complete setup, security, and recovery protocol
 - `docs/agent-manifest.json` — machine-readable agent operating and backup policy
 - `docs/educator-agent-manifest.json` — dedicated educator agent contract and curriculum-design workflow
+- `docs/QuickMaths-Student-Guide.pdf` — complete human-facing learner workspace and study workflow manual
 - `docs/QuickMaths-Educator-Guide.pdf` — complete human-facing frontend and educator workflow manual
 - `docs/CUSTOM_LESSON_SETS.md` — Agent Lesson Authoring Guide
 - `docs/lesson-set-example.json` — installable worked example

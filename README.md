@@ -36,7 +36,7 @@ python -m http.server 8765 --directory docs
 
 Open `http://localhost:8765/`.
 
-The learner app is `docs/index.html`; the dedicated WebMCP agent workspace is `docs/agent-bridge.html`; the mobile/storage walkthrough is `docs/bridge-guide.html`; and the complete educator manual is `docs/QuickMaths-Educator-Guide.pdf`.
+The learner app is `docs/index.html`; the dedicated WebMCP agent workspace is `docs/agent-bridge.html`; and the mobile/storage walkthrough is `docs/bridge-guide.html`. The complete human manuals are `docs/QuickMaths-Student-Guide.pdf` and `docs/QuickMaths-Educator-Guide.pdf`.
 
 ## Local Git Bridge for Codex
 

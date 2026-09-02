@@ -1393,7 +1393,7 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
   .curriculum-link-form { grid-template-columns: 1fr; }
 }
 
-.welcome-educator-guide { display: inline-flex; width: fit-content; color: var(--pine); font-weight: 800; text-underline-offset: 4px; }
+.welcome-student-guide, .welcome-educator-guide { display: inline-flex; width: fit-content; color: var(--pine); font-weight: 800; text-underline-offset: 4px; }
 body:has(.educator-welcome-backdrop) { overflow: hidden; }
 .educator-welcome-backdrop { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; box-sizing: border-box; max-width: 100vw; padding: clamp(18px,4vw,52px); overflow: auto; background: color-mix(in srgb,#0b2f2b 72%,transparent); backdrop-filter: blur(14px); }
 .educator-welcome-dialog { box-sizing: border-box; width: min(720px,100%); min-width: 0; padding: clamp(28px,5vw,58px); border: 1px solid color-mix(in srgb,var(--pine) 22%,var(--line)); border-radius: 34px; outline: none; background: radial-gradient(circle at 100% 0,color-mix(in srgb,var(--mint) 75%,transparent),transparent 34%),var(--paper-light); box-shadow: 0 28px 90px rgba(4,37,33,.28); }

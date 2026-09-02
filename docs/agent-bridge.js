@@ -1,5 +1,5 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260902-educator-docs-v3";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-educator-docs-v3";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260902-student-docs-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-student-docs-v1";
 import { createLessonDepot } from "./lesson-depot.js?v=20260902-geography-depot-v2";
 import {
   createGitHubContentsClient,
@@ -120,8 +120,8 @@ async function boot() {
   const [curriculumResponse, geographyResponse, manifestResponse, educatorManifestResponse] = await Promise.all([
     fetch("./curriculum-data.json?v=20260902-native-math-expansion"),
     fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
-    fetch("./agent-manifest.json?v=20260902-educator-docs-v3").catch(() => null),
-    fetch("./educator-agent-manifest.json?v=20260902-educator-docs-v3").catch(() => null),
+    fetch("./agent-manifest.json?v=20260902-student-docs-v1").catch(() => null),
+    fetch("./educator-agent-manifest.json?v=20260902-student-docs-v1").catch(() => null),
   ]);
   if (!curriculumResponse.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await curriculumResponse.json();

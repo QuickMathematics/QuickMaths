@@ -1,5 +1,5 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-educator-docs-v3";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-educator-docs-v3";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-student-docs-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-student-docs-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
 import {
   buildDepotSubmissionPrompt,
@@ -303,6 +303,7 @@ function renderDashboard(snapshot) {
         <p>Your ${escapeHtml(snapshot.activeSubject.shortName)} map updates from saved attempts, confidence, reasoning review, and time—not just one score.</p>
       </div>
       <div class="page-actions">
+        <a class="button button-outline" href="./QuickMaths-Student-Guide.pdf" target="_blank" rel="noopener">Student guide ↗</a>
         <button class="button button-outline" type="button" data-action="save-backup">Save backup</button>
         <button class="button button-primary" type="button" data-route="map">Open mastery map</button>
       </div>
@@ -1493,7 +1494,7 @@ function renderSettings(snapshot) {
     improvementPacks.length ? `${improvementPacks.length} native improvement${improvementPacks.length === 1 ? "" : "s"}` : "",
   ].filter(Boolean).join(" · ") || "Built-ins unchanged";
   elements.view.innerHTML = `
-    <header class="page-head"><div><p class="eyebrow">Profile preferences & data</p><h1>Settings</h1><p>Choose how this profile moves through the curriculum, replay the guided tour, and manage every save, export, custom lesson, and restore point.</p></div><div class="page-actions"><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
+    <header class="page-head"><div><p class="eyebrow">Profile preferences & data</p><h1>Settings</h1><p>Choose how this profile moves through the curriculum, replay the guided tour, and manage every save, export, custom lesson, and restore point.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Student-Guide.pdf" target="_blank" rel="noopener">Student guide ↗</a><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
     <section class="settings-controls">
       <article class="settings-control-card"><h2>Learning path</h2><p>${snapshot.activeCurriculum ? `Controlled by ${escapeHtml(snapshot.activeCurriculum.name)}. Ask the educator for a revised curriculum file to change it.` : `This setting belongs to ${escapeHtml(snapshot.activeProfile.displayName)} and travels inside full backups.`}</p><div class="settings-mode-grid" role="group" aria-label="Progression mode"><button type="button" data-progression-mode="hard" aria-pressed="${snapshot.progressionMode === "hard"}" ${snapshot.activeCurriculum ? "disabled" : ""}><strong>Hard path</strong><small>Prerequisites must be proven before connected mastery tests unlock.</small></button><button type="button" data-progression-mode="soft" aria-pressed="${snapshot.progressionMode === "soft"}" ${snapshot.activeCurriculum ? "disabled" : ""}><strong>Open path</strong><small>Connections remain guidance, while every lesson and test stays available.</small></button></div></article>
       <article class="settings-control-card settings-tour-action"><div><h2>App tutorial</h2><p>Replay all seven chapters without resetting progress, subjects, lessons, or preferences.</p></div><button class="button button-secondary" type="button" data-action="replay-tutorial">Replay app tour</button></article>
@@ -2563,8 +2564,8 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, educatorManifestResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260902-educator-docs-v3"),
-      fetch("./educator-agent-manifest.json?v=20260902-educator-docs-v3"),
+      fetch("./agent-manifest.json?v=20260902-student-docs-v1"),
+      fetch("./educator-agent-manifest.json?v=20260902-student-docs-v1"),
     ]);
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
     if (educatorManifestResponse.ok) educatorManifest = await educatorManifestResponse.json();
