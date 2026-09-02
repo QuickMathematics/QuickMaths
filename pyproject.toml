@@ -18,6 +18,9 @@ dev = [
     "pytest>=8.0",
 ]
 
+[tool.setuptools.packages.find]
+include = ["quickmaths*"]
+
 [tool.poetry]
 package-mode = false
 
