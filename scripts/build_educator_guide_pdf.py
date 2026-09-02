@@ -136,7 +136,7 @@ class EducatorDocTemplate(BaseDocTemplate):
             canvas.drawString(18 * mm, PAGE_H - 9.5 * mm, "QUICKMATHS EDUCATOR GUIDE")
             canvas.setFont("Helvetica", 7.5)
             canvas.setFillColor(MUTED)
-            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 21")
+            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 22")
             canvas.setStrokeColor(LINE)
             canvas.line(18 * mm, 12 * mm, PAGE_W - 18 * mm, 12 * mm)
             canvas.setFont("Helvetica", 7.5)

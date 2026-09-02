@@ -10,6 +10,7 @@ import {
   STORAGE_KEY,
   createQuickMathsStore,
   gradeProblem,
+  gradeTraceTable,
   loadState,
   normalizeLessonPack,
   normalizeLessonPackCollection,
@@ -19,6 +20,7 @@ import {
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const lessonSetExample = readFileSync(new URL("./lesson-set-example.json", import.meta.url), "utf8");
 const geographyLessonSet = readFileSync(new URL("./lesson-depot/lessons/geography/1.0.0/lesson-set.json", import.meta.url), "utf8");
+const programmingLessonSet = readFileSync(new URL("./lesson-depot/lessons/programming-fundamentals-python/1.2.0/lesson-set.json", import.meta.url), "utf8");
 const AUTHORED_MATH_SCENARIO_COUNTS = Object.freeze({
   MATH_ALG_001: 21, MATH_ALG_002: 23, MATH_ALG_003: 22, MATH_ALG_004: 24,
   MATH_ALG_005: 21, MATH_ALG_006: 24, MATH_ALG_007: 8, MATH_ALG_008: 8,
@@ -969,6 +971,77 @@ test("custom lesson-set validation rejects collisions, missing references, cycle
   const unsupported = structuredClone(valid);
   unsupported.skills[0].problems[0].grading_method = "run_javascript";
   assert.throws(() => normalizeLessonPack(unsupported, { knownSkillIds: curriculum.track.skills }), /unsupported grading/i);
+});
+
+test("Programming Depot pack validates formatted prompts, trace tables, and sandbox contracts", () => {
+  const pack = normalizeLessonPack(programmingLessonSet, { knownSkillIds: curriculum.track.skills });
+  assert.equal(pack.skills.length, 25);
+  assert.equal(pack.skills.reduce((total, skill) => total + skill.problems.length, 0), 266);
+  const problems = pack.skills.flatMap((skill) => skill.problems);
+  assert.equal(problems.filter((problem) => problem.work.mode === "code_trace_steps").length, 16);
+  assert.equal(problems.filter((problem) => problem.grading_method === "python_program").length, 16);
+  assert.ok(problems.filter((problem) => problem.prompt_blocks.some((block) => block.type === "code")).length >= 50);
+
+  const trace = problems.find((problem) => problem.template_id === "CUSTOM_PROG_001_Q03");
+  const completeRows = structuredClone(trace.work.trace_spec.expected_rows);
+  assert.equal(gradeTraceTable(trace, { rows: completeRows }).ok, true);
+  const wrongRows = structuredClone(completeRows);
+  wrongRows[1].y = 12;
+  const wrong = gradeTraceTable(trace, { rows: wrongRows });
+  assert.equal(wrong.ok, false);
+  assert.deepEqual(wrong.diagnostics[0], {
+    kind: "wrong_value", step: "2", column: "y", actual: 12, expected: 10,
+    message: "Trace step 2, column y, does not match the program state.",
+  });
+
+  const program = problems.find((problem) => problem.template_id === "CUSTOM_PROG_004_CODE_01");
+  assert.equal(program.program_spec.runtime, "python_subset_v1");
+  assert.equal(program.program_spec.entrypoint.name, "is_even");
+  assert.equal(program.program_spec.tests.filter((item) => item.visibility === "hidden").length, 2);
+  assert.deepEqual(program.program_spec.policy.imports, []);
+  assert.equal(program.program_spec.policy.network, false);
+});
+
+test("Python grades bind to exact editor contents and hidden cases stay out of learning context", () => {
+  const { store } = harness();
+  store.createProfile("Python Learner");
+  store.importLessonPack(programmingLessonSet);
+  store.setLearningPreferences({ progressionMode: "soft", subjectId: "SUBJECT_PROGRAMMING" });
+  const draft = store.startTest("CUSTOM_PROG_002", { force: true });
+  for (const problem of draft.problems) {
+    let structuredWorkJson = null;
+    let work = workFor(problem);
+    let finalAnswer = String(problem.expected_answer);
+    if (problem.work.mode === "code_trace_steps") structuredWorkJson = { rows: structuredClone(problem.work.trace_spec.expected_rows) };
+    if (problem.grading_method === "python_program") {
+      finalAnswer = "def rectangle_area(width, height):\n    return width * height";
+      work = "";
+    }
+    store.updateResponse(problem.template_id, { finalAnswer, work, structuredWorkJson });
+    if (problem.grading_method === "python_program") {
+      store.recordPythonGrade(problem.template_id, finalAnswer, {
+        status: "passed", score: 1, passed: problem.program_spec.tests.length, total: problem.program_spec.tests.length,
+        tests: problem.program_spec.tests.map((item) => ({ id: item.id, visibility: item.visibility, status: "passed", message: "Passed." })),
+        messages: ["All tests passed."], stdout: "",
+      });
+    }
+  }
+  const context = store.getLearningContext();
+  const programming = context.active_test.questions.find((item) => item.programming)?.programming;
+  assert.equal(programming.example_tests.length, 1);
+  assert.equal(JSON.stringify(context).includes("zero_width"), false);
+  assert.equal(JSON.stringify(context).includes("expected_answer"), false);
+  const result = store.submitTest();
+  assert.equal(result.ok, true);
+  assert.equal(result.results.rawScore, draft.problems.length);
+
+  store.saveReflection({ confidenceRating: 4, difficultyFelt: "hard", hintsUsed: "none", guessed: "no" });
+  store.startTest("CUSTOM_PROG_002", { force: true });
+  const nextProgram = store.snapshot().activeTest.problems.find((problem) => problem.grading_method === "python_program");
+  store.updateResponse(nextProgram.template_id, { finalAnswer: "def rectangle_area(width, height):\n    return 0", work: "" });
+  const stale = store.submitTest();
+  assert.equal(stale.ok, false);
+  assert.match(stale.workIssues.find((item) => item.questionId === nextProgram.template_id).message, /Run the current Python code/i);
 });
 
 test("custom progress and content round-trip together through a full backup", () => {

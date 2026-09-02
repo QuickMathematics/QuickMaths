@@ -175,16 +175,6 @@
       "tags": ["waves", "optics", "sound"]
     },
     {
-      "id": "PACK_PREVIEW_PROGRAMMING_FOUNDATIONS",
-      "slug": "programming-foundations",
-      "version": "0.0.0-preview.1",
-      "name": "Programming Foundations",
-      "description": "A language-neutral introduction to state, control flow, functions, debugging, and program design.",
-      "subject_id": "SUBJECT_COMPUTER_SCIENCE",
-      "subject_name": "Computer Science",
-      "tags": ["programming", "debugging", "functions"]
-    },
-    {
       "id": "PACK_PREVIEW_DATA_STRUCTURES",
       "slug": "data-structures",
       "version": "0.0.0-preview.1",

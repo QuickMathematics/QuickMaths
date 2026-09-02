@@ -1,6 +1,6 @@
-import { APP_VERSION, createQuickMathsStore, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260902-security-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-security-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260902-security-v1";
+import { APP_VERSION, createQuickMathsStore, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260902-python-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-python-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260902-python-v1";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
@@ -8,17 +8,18 @@ import {
   DEPOT_REPOSITORY_URL,
   DEPOT_SUBMISSION_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260902-security-v1";
+} from "./lesson-depot.js?v=20260902-python-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260902-security-v1";
+} from "./github-sync.js?v=20260902-python-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
 } from "./github-community.js?v=20260902-community-vote";
-import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-security-v1";
+import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
+import { gradePythonProgram, visiblePythonTests } from "./python-grader.js?v=20260902-python-v1";
 
 const MAX_CURRICULUM_FILE_BYTES = 10_000_000;
 const MAX_LESSON_FILE_BYTES = 2_000_000;
@@ -83,6 +84,7 @@ let welcomePath = "learner";
 let pendingLandingCurriculumId = null;
 let legacyGeographyMigrationPromise = null;
 const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
+const runningPythonQuestionIds = new Set();
 
 const AGENT_STARTER_PROMPT = "Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.";
 const EDUCATOR_GUIDE_URL = "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf";
@@ -1255,6 +1257,37 @@ function rationalCandidateRow(candidate = {}) {
   return `<div class="structured-candidate-row" data-rational-candidate><input data-candidate-field="value" value="${escapeHtml(candidate.value ?? "")}" placeholder="Candidate value"><select data-candidate-field="status"><option value="valid" ${candidate.status === "valid" ? "selected" : ""}>Valid solution</option><option value="excluded" ${candidate.status === "excluded" ? "selected" : ""}>Excluded by domain</option><option value="extraneous" ${candidate.status === "extraneous" ? "selected" : ""}>Extraneous</option><option value="repeated" ${candidate.status === "repeated" ? "selected" : ""}>Repeated candidate</option><option value="non_real" ${candidate.status === "non_real" ? "selected" : ""}>Non-real</option></select><input data-candidate-field="original_check" value="${escapeHtml(candidate.original_check ?? "")}" placeholder="Original-equation check"><button type="button" class="quiet-button" data-action="remove-structured-row" aria-label="Remove candidate">×</button></div>`;
 }
 
+function renderFormattedCode(source, language = "text", caption = "Code") {
+  return `<figure class="formatted-code-block"><figcaption><span>${escapeHtml(caption)}</span><small>${escapeHtml(language)}</small></figcaption><pre><code class="language-${escapeHtml(language)}">${escapeHtml(source)}</code></pre></figure>`;
+}
+
+function renderProblemPrompt(problem) {
+  if (!problem.prompt_blocks?.length) return `<h2>${escapeHtml(problem.prompt)}</h2>`;
+  return `<div class="question-prompt-blocks" aria-label="Question prompt">${problem.prompt_blocks.map((block) => block.type === "code"
+    ? renderFormattedCode(block.text, block.language, "Question code")
+    : `<p>${escapeHtml(block.text)}</p>`).join("")}</div>`;
+}
+
+function pythonGradePanel(problem, response, { submitted = false } = {}) {
+  const grade = response?.structuredWorkJson?.python_grade;
+  const running = runningPythonQuestionIds.has(problem.template_id);
+  const visible = visiblePythonTests(grade, { submitted });
+  const label = running
+    ? "Running in an isolated Python worker…"
+    : !grade
+      ? "Run the code to check the authored examples and mastery tests. Hidden cases reveal only pass/fail status."
+      : grade.status === "passed"
+        ? `All ${grade.total} sandbox tests passed.`
+        : `${grade.passed} of ${grade.total} sandbox tests passed · ${String(grade.status).replaceAll("_", " ")}.`;
+  const testRows = visible.length ? `<ul>${visible.map((test) => `<li class="${test.status === "passed" ? "passed" : "failed"}"><strong>${escapeHtml(test.id)}</strong><span>${escapeHtml(test.message || test.status)}</span></li>`).join("")}</ul>` : "";
+  return `<section class="python-sandbox-status ${grade?.status === "passed" ? "passed" : grade ? "failed" : "idle"}" aria-live="polite"><div><p class="eyebrow">Sandboxed Python grader</p><strong>${escapeHtml(label)}</strong></div>${testRows}${grade?.stdout ? `<details><summary>Captured output</summary><pre>${escapeHtml(grade.stdout)}</pre></details>` : ""}</section>`;
+}
+
+function renderPythonResponse(problem, response) {
+  const running = runningPythonQuestionIds.has(problem.template_id);
+  return `<div class="python-response"><label class="response-field code-response-field"><span>Python solution</span><textarea rows="13" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="def ${escapeHtml(problem.program_spec?.entrypoint?.name ?? "solve")}(...):\n    ...">${escapeHtml(response.finalAnswer)}</textarea></label><div class="python-run-row"><button class="button button-secondary" type="button" data-action="run-python-tests" data-question-id="${escapeHtml(problem.template_id)}" ${running ? "disabled" : ""}>${running ? "Running…" : "Run sandboxed tests"}</button><small>Pure functions only · no files, network, imports, browser APIs, or input</small></div>${pythonGradePanel(problem, response)}</div>`;
+}
+
 function renderStructuredWorkEditor(problem, response) {
   const data = response.structuredWorkJson ?? {};
   const pieces = [];
@@ -1276,6 +1309,11 @@ function renderStructuredWorkEditor(problem, response) {
     const endpoints = Array.isArray(data.endpoints) ? data.endpoints : [];
     const layoutValues = points.map((point) => String(point?.value ?? "").trim()).filter(Boolean).sort((left, right) => structuredNumber(left) - structuredNumber(right));
     pieces.push(`<section class="structured-work-editor sign-chart-editor" data-structured-mode="sign_chart_steps"><header><div><p class="eyebrow">Structured sign chart</p><h3>${escapeHtml(chart.expression ?? "Expression")} ${escapeHtml(chart.relation ?? "") } 0</h3></div><span>${expectedCount} critical point${expectedCount === 1 ? "" : "s"}</span></header>${chart.require_factorization ? `<label>Factorization<input data-structured-field="factorization" value="${escapeHtml(data.factorization ?? "")}" placeholder="Factor completely"></label>` : ""}<fieldset><legend>1. Critical points</legend><div class="structured-grid">${Array.from({ length: expectedCount }, (_, index) => { const point = points[index] ?? {}; return `<div data-sign-critical><input data-critical-field="value" value="${escapeHtml(point.value ?? "")}" placeholder="Value ${index + 1}"><select data-critical-field="kind"><option value="zero" ${point.kind === "zero" ? "selected" : ""}>Zero</option><option value="undefined" ${point.kind === "undefined" ? "selected" : ""}>Undefined / pole</option><option value="hole" ${point.kind === "hole" ? "selected" : ""}>Hole</option></select></div>`; }).join("") || "<p>No real critical points are expected; test the whole real line.</p>"}</div></fieldset><fieldset><legend>2. Interval tests</legend><p class="structured-hint">Interval boundaries follow your critical points automatically. Enter one test value and sign per row.</p><div class="sign-interval-list">${Array.from({ length: expectedCount + 1 }, (_, index) => { const row = intervals[index] ?? {}; const lower = index === 0 ? "" : (layoutValues[index - 1] ?? row.lower ?? ""); const upper = index === expectedCount ? "" : (layoutValues[index] ?? row.upper ?? ""); return `<div data-sign-interval><strong>Interval ${index + 1}</strong><input data-interval-field="lower" value="${escapeHtml(lower)}" placeholder="-inf" readonly><input data-interval-field="upper" value="${escapeHtml(upper)}" placeholder="inf" readonly><input data-interval-field="test_value" value="${escapeHtml(row.test_value ?? "")}" placeholder="Test value"><select data-interval-field="sign"><option value="positive" ${row.sign === "positive" ? "selected" : ""}>Positive</option><option value="negative" ${row.sign === "negative" ? "selected" : ""}>Negative</option><option value="zero" ${row.sign === "zero" ? "selected" : ""}>Zero</option></select><label class="check-field"><input type="checkbox" data-interval-field="selected" ${row.selected ? "checked" : ""}> Belongs in solution</label></div>`; }).join("")}</div></fieldset>${expectedCount ? `<fieldset><legend>3. Endpoint decisions</legend><div class="structured-grid">${Array.from({ length: expectedCount }, (_, index) => { const endpoint = endpoints[index] ?? {}; return `<div data-sign-endpoint><input data-endpoint-field="value" value="${escapeHtml(layoutValues[index] ?? endpoint.value ?? "")}" placeholder="Endpoint ${index + 1}" readonly><label class="check-field"><input type="checkbox" data-endpoint-field="included" ${endpoint.included ? "checked" : ""}> Include endpoint</label></div>`; }).join("")}</div></fieldset>` : ""}</section>`);
+  }
+  if (problem.work?.mode === "code_trace_steps") {
+    const trace = problem.work.trace_spec;
+    const rows = Array.isArray(data.rows) ? data.rows : [];
+    pieces.push(`<section class="structured-work-editor trace-table-editor" data-structured-mode="code_trace_steps"><header><div><p class="eyebrow">Structured trace table</p><h3>Follow the state one step at a time</h3></div><span>${trace.expected_rows.length} row${trace.expected_rows.length === 1 ? "" : "s"}</span></header>${trace.display_code ? renderFormattedCode(trace.display_code, trace.language, "Trace this code") : ""}<p class="structured-hint">Each row is one authored execution checkpoint. Enter the variable values and output after that step; blank output means nothing was printed yet.</p><div class="trace-table-scroll"><table><thead><tr>${trace.columns.map((column) => `<th scope="col">${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${trace.expected_rows.map((expectedRow, rowIndex) => { const row = rows[rowIndex] ?? {}; return `<tr data-trace-row="${rowIndex}">${trace.columns.map((column) => column === "step" ? `<th scope="row">${escapeHtml(expectedRow.step)}<input type="hidden" data-trace-field="step" value="${escapeHtml(expectedRow.step)}"></th>` : `<td><input data-trace-field="${escapeHtml(column)}" value="${escapeHtml(row[column] ?? "")}" aria-label="Step ${escapeHtml(expectedRow.step)}, ${escapeHtml(column)}" autocomplete="off" spellcheck="false"></td>`).join("")}</tr>`; }).join("")}</tbody></table></div></section>`);
   }
   return pieces.join("");
 }
@@ -1323,6 +1361,9 @@ function collectStructuredWork(card) {
     output.intervals = [...card.querySelectorAll("[data-sign-interval]")].map((row) => Object.fromEntries([...row.querySelectorAll("[data-interval-field]")].map((field) => [field.dataset.intervalField, field.type === "checkbox" ? field.checked : field.value.trim()])));
     output.endpoints = [...card.querySelectorAll("[data-sign-endpoint]")].map((row) => Object.fromEntries([...row.querySelectorAll("[data-endpoint-field]")].map((field) => [field.dataset.endpointField, field.type === "checkbox" ? field.checked : field.value.trim()])));
   }
+  if (card.dataset.workMode === "code_trace_steps") {
+    output.rows = [...card.querySelectorAll("[data-trace-row]")].map((row) => Object.fromEntries([...row.querySelectorAll("[data-trace-field]")].map((field) => [field.dataset.traceField, field.value.trim()])));
+  }
   return Object.keys(output).length ? output : null;
 }
 
@@ -1351,11 +1392,11 @@ function renderTest(snapshot) {
         const response = draft.responses[problem.template_id] ?? { finalAnswer: "", work: "" };
         return `<article class="question-card" id="question-${escapeHtml(problem.template_id)}" data-work-mode="${escapeHtml(problem.work?.mode ?? "none")}" data-grading-method="${escapeHtml(problem.grading_method)}">
           <div class="question-number"><span>${String(index + 1).padStart(2, "0")}</span><small>${escapeHtml(problem.difficulty)} · ${escapeHtml(problem.answer_mode.replaceAll("_", " "))}</small></div>
-          <h2>${escapeHtml(problem.prompt)}</h2>
-          ${problem.options?.length ? `<fieldset class="answer-options"><legend>Final answer</legend>${problem.options.map((option) => `<label><input type="radio" name="answer-${escapeHtml(problem.template_id)}" value="${escapeHtml(option.id)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" ${response.finalAnswer === String(option.id) ? "checked" : ""}><span><b>${escapeHtml(option.id)}</b>${escapeHtml(option.label ?? option.id)}</span></label>`).join("")}</fieldset>` : `<label class="response-field"><span>Final answer</span><input type="text" value="${escapeHtml(response.finalAnswer)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" autocomplete="off" spellcheck="false" placeholder="Enter your answer"></label>`}
+          ${renderProblemPrompt(problem)}
+          ${problem.grading_method === "python_program" ? renderPythonResponse(problem, response) : problem.options?.length ? `<fieldset class="answer-options"><legend>Final answer</legend>${problem.options.map((option) => `<label><input type="radio" name="answer-${escapeHtml(problem.template_id)}" value="${escapeHtml(option.id)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" ${response.finalAnswer === String(option.id) ? "checked" : ""}><span><b>${escapeHtml(option.id)}</b>${escapeHtml(option.label ?? option.id)}</span></label>`).join("")}</fieldset>` : `<label class="response-field"><span>Final answer</span><input type="text" value="${escapeHtml(response.finalAnswer)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" autocomplete="off" spellcheck="false" placeholder="Enter your answer"></label>`}
           ${renderWorkGuide(problem)}
           ${renderStructuredWorkEditor(problem, response)}
-          ${problem.work?.mode && problem.work.mode !== "none" && !["rational_equation_steps", "sign_chart_steps"].includes(problem.work.mode) ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="${["proof_obligations", "rubric_check"].includes(problem.work.mode) ? 7 : 4}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="${escapeHtml(workResponsePlaceholder(problem))}">${escapeHtml(response.work)}</textarea></label>` : ""}
+          ${problem.work?.mode && problem.work.mode !== "none" && !["rational_equation_steps", "sign_chart_steps", "code_trace_steps"].includes(problem.work.mode) ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="${["proof_obligations", "rubric_check"].includes(problem.work.mode) ? 7 : 4}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="${escapeHtml(workResponsePlaceholder(problem))}">${escapeHtml(response.work)}</textarea></label>` : ""}
         </article>`;
       }).join("")}
       <p id="test-error" class="form-message" role="alert"></p>
@@ -1374,10 +1415,26 @@ function resultReviewGuide(result) {
   return "";
 }
 
+function resultStructuredDetails(result) {
+  const structured = result.structuredWorkJson;
+  if (!structured) return "";
+  if (result.gradingMethod === "python_program") {
+    const grade = structured.python_grade;
+    const tests = visiblePythonTests(grade, { submitted: true });
+    return `<div class="shown-work python-result"><strong>Sandbox result · ${escapeHtml(grade?.passed ?? 0)} / ${escapeHtml(grade?.total ?? 0)} tests passed</strong>${tests.length ? `<ul>${tests.map((test) => `<li class="${test.status === "passed" ? "passed" : "failed"}"><b>${escapeHtml(test.id)}</b> ${escapeHtml(test.message || test.status)}</li>`).join("")}</ul>` : ""}<small>Hidden tests remain hidden; they report status without their inputs or expected values.</small></div>`;
+  }
+  if (result.workMode === "code_trace_steps") {
+    const rows = Array.isArray(structured.rows) ? structured.rows : [];
+    const columns = [...new Set(rows.flatMap((row) => Object.keys(row)))];
+    return `<div class="shown-work trace-result"><strong>Your trace table</strong>${rows.length ? `<div class="trace-table-scroll"><table><thead><tr>${columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${columns.map((column) => `<td>${escapeHtml(row[column] ?? "")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : '<p>No trace rows were entered.</p>'}${result.traceDiagnostics?.length ? `<ul class="trace-diagnostics">${result.traceDiagnostics.map((item) => `<li>${escapeHtml(item.message)}</li>`).join("")}</ul>` : '<p class="trace-correct">Every traced checkpoint matches.</p>'}</div>`;
+  }
+  return `<div class="shown-work"><strong>Structured work</strong><pre>${escapeHtml(JSON.stringify(structured, null, 2))}</pre></div>`;
+}
+
 function resultDetails(results) {
   return results.map((result, index) => `<details class="result-question" ${!result.correct || result.reviewRequired ? "open" : ""}>
     <summary><span class="result-icon ${result.correct ? "correct" : "incorrect"}">${result.correct ? "✓" : "×"}</span><span><strong>Question ${index + 1}</strong><small>${escapeHtml(result.prompt)}</small></span><b>${result.reviewRequired ? "Review required" : result.correct ? "Correct" : "Needs work"}</b></summary>
-    <div class="result-body"><dl><div><dt>Your answer</dt><dd>${escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${result.structuredWorkJson ? `<div class="shown-work"><strong>Structured work</strong><pre>${escapeHtml(JSON.stringify(result.structuredWorkJson, null, 2))}</pre></div>` : ""}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
+    <div class="result-body"><dl><div><dt>Your answer</dt><dd>${result.gradingMethod === "python_program" ? `<pre class="result-code"><code>${escapeHtml(result.finalAnswer || "No code submitted")}</code></pre>` : escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${resultStructuredDetails(result)}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
   </details>`).join("");
 }
 
@@ -1549,6 +1606,23 @@ function renderGitHubBridge(snapshot) {
     </section>`;
 }
 
+function renderStagedLessonReview(snapshot) {
+  if (!snapshot.stagedLessonPack) return "";
+  const staged = snapshot.stagedLessonPack;
+  const heading = staged.batchTotal > 1
+    ? `Review ${staged.batchIndex} of ${staged.batchTotal}`
+    : staged.mode === "override" ? "Native improvement" : "Agent-staged";
+  const note = staged.mode === "override"
+    ? "Validated and staged by an agent. Installing keeps completed progress, restarts affected unfinished tests, and can be undone from Settings."
+    : staged.batchTotal > 1
+      ? `An agent prepared an ordered batch. Review and approve this pack separately; ${staged.queueRemaining} remain after it.`
+      : "An agent validated this file, but only you can install it.";
+  const installLabel = staged.mode === "override"
+    ? "Install improvement"
+    : staged.batchTotal > 1 ? "Approve & install" : "Install";
+  return `<aside class="staged-pack"><span>${heading}</span><div><strong>${escapeHtml(staged.name)}</strong><p>${escapeHtml(staged.subjectName)} · ${staged.skillCount} lesson${staged.skillCount === 1 ? "" : "s"} · ${staged.problemCount} questions · ${escapeHtml(staged.author)}</p><small>${note}</small></div><button class="button button-primary" data-action="install-staged-pack">${installLabel}</button><button class="button button-outline" data-action="discard-staged-pack">${staged.batchTotal > 1 ? "Skip this pack" : "Discard"}</button></aside>`;
+}
+
 function renderEducatorSettings(snapshot) {
   const backup = snapshot.backupStatus;
   const workspace = snapshot.activeCurriculum;
@@ -1557,7 +1631,7 @@ function renderEducatorSettings(snapshot) {
     ${renderGitHubBridge(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum exports</h2><p>Public blueprints omit names, email, and supplemental guidance. Private assignments include them with a privacy warning.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download public blueprint</button><button class="button button-outline" data-action="export-private-assignment" ${workspace ? "" : "disabled"}>Download private assignment</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
-    <section class="content-card lesson-packs-card"><div class="card-heading"><div><p class="eyebrow">Shared lesson library</p><h2>Installed lesson packs</h2><p>Installed packs are available to Curriculum designer, where each curriculum enables only what it needs.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson file</button></div><div class="installed-packs">${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : "＋"}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons · ${pack.problemCount} questions</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></div></article>`).join("") : `<div class="empty-state">No additional lesson packs installed. Browse the Depot to assemble a library.</div>`}</div></section>`;
+    <section class="content-card lesson-packs-card"><div class="card-heading"><div><p class="eyebrow">Shared lesson library</p><h2>Installed lesson packs</h2><p>Installed packs are available to Curriculum designer, where each curriculum enables only what it needs.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson file</button></div>${renderStagedLessonReview(snapshot)}<div class="installed-packs">${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : "＋"}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons · ${pack.problemCount} questions</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></div></article>`).join("") : `<div class="empty-state">No additional lesson packs installed. Browse the Depot to assemble a library.</div>`}</div></section>`;
   restoreBridgeFormDraft(document.querySelector("#github-sync-form")?.closest("[data-bridge-form]"));
 }
 
@@ -1596,7 +1670,7 @@ function renderSettings(snapshot) {
     </section>
     <section class="content-card lesson-packs-card">
       <div class="card-heading"><div><p class="eyebrow">Extend or improve the curriculum</p><h2>Lesson sets and native improvements</h2><p>Add validated lessons, or install a reversible improvement over a built-in lesson without losing its ID, map position, or completed learner progress.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson file</button></div>
-      ${snapshot.stagedLessonPack ? `<aside class="staged-pack"><span>${snapshot.stagedLessonPack.batchTotal > 1 ? `Review ${snapshot.stagedLessonPack.batchIndex} of ${snapshot.stagedLessonPack.batchTotal}` : snapshot.stagedLessonPack.mode === "override" ? "Native improvement" : "Agent-staged"}</span><div><strong>${escapeHtml(snapshot.stagedLessonPack.name)}</strong><p>${escapeHtml(snapshot.stagedLessonPack.subjectName)} · ${snapshot.stagedLessonPack.skillCount} lesson${snapshot.stagedLessonPack.skillCount === 1 ? "" : "s"} · ${snapshot.stagedLessonPack.problemCount} questions · ${escapeHtml(snapshot.stagedLessonPack.author)}</p><small>${snapshot.stagedLessonPack.mode === "override" ? "Validated and staged by an agent. Installing keeps completed progress, restarts affected unfinished tests, and can be undone from Settings." : snapshot.stagedLessonPack.batchTotal > 1 ? `An agent prepared an ordered batch. Review and approve this pack separately; ${snapshot.stagedLessonPack.queueRemaining} remain after it.` : "An agent validated this file, but only you can install it."}</small></div><button class="button button-primary" data-action="install-staged-pack">${snapshot.stagedLessonPack.mode === "override" ? "Install improvement" : snapshot.stagedLessonPack.batchTotal > 1 ? "Approve & install" : "Install"}</button><button class="button button-outline" data-action="discard-staged-pack">${snapshot.stagedLessonPack.batchTotal > 1 ? "Skip this pack" : "Discard"}</button></aside>` : ""}
+      ${renderStagedLessonReview(snapshot)}
       <div class="lesson-pack-guide"><div><strong>Two ways to build</strong><p>Use Lesson Studio to create a curriculum or open a native lesson as an editable copy—or give the machine-readable guide to an agent.</p></div><button class="button button-primary" data-route="creator">Open Lesson Studio</button><a class="button button-outline" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Agent Lesson Authoring Guide</a></div>
       <div class="installed-packs">
         ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.mode === "override" ? `Native improvement · ${pack.overridesNativeSkills.map((id) => escapeHtml(id)).join(", ")} · completed progress preserved` : `${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"}`} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button>${pack.mode === "override" ? `<button class="quiet-button danger-link" data-action="restore-native-lessons" data-pack-id="${escapeHtml(pack.id)}">Restore original</button>` : ""}</div></article>`).join("") : `<div class="empty-state">No lesson sets or improvements installed. Mathematics remains the native curriculum; install Geography and other subjects from the Lesson Depot.</div>`}
@@ -2267,6 +2341,35 @@ document.addEventListener("click", async (event) => {
   }
   const action = event.target.closest("[data-action]");
   if (!action) return;
+  if (action.dataset.action === "run-python-tests") {
+    event.preventDefault();
+    const questionId = action.dataset.questionId;
+    if (!questionId || runningPythonQuestionIds.has(questionId)) return;
+    const draft = store.snapshot().activeTest;
+    const problem = draft?.problems.find((item) => item.template_id === questionId);
+    const response = draft?.responses?.[questionId];
+    if (!problem?.program_spec || !response) return;
+    if (!response.finalAnswer.trim()) {
+      showToast("Write the Python function before running its tests.");
+      return;
+    }
+    runningPythonQuestionIds.add(questionId);
+    action.disabled = true;
+    action.textContent = "Running…";
+    const status = action.closest(".python-response")?.querySelector(".python-sandbox-status strong");
+    if (status) status.textContent = "Loading the isolated Python runtime and running tests…";
+    try {
+      const result = await gradePythonProgram(response.finalAnswer, problem.program_spec);
+      store.recordPythonGrade(questionId, response.finalAnswer, result);
+      showToast(result.status === "passed" ? `All ${result.total} Python tests passed.` : `${result.passed} of ${result.total} Python tests passed.`);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : String(error));
+    } finally {
+      runningPythonQuestionIds.delete(questionId);
+      if (store.snapshot().ui.route === "test") render(store.snapshot());
+    }
+    return;
+  }
   if (["map", "curriculum"].includes(currentSnapshot?.ui.route) && (action.dataset.action.startsWith("plan-") || action.dataset.action === "toggle-plan-mode")) {
     const layoutKey = currentSnapshot.mapScope === "all" ? "all-subjects" : `subject:${currentSnapshot.activeSubject.id}`;
     try {
@@ -2498,7 +2601,7 @@ document.addEventListener("input", (event) => {
   }
   const responseInput = event.target.closest?.("[data-question-id][data-response-kind]");
   const card = responseInput?.closest(".question-card") ?? event.target.closest?.(".question-card");
-  if (!card || (!responseInput && !event.target.matches?.("[data-structured-field], [data-candidate-field], [data-critical-field], [data-interval-field], [data-endpoint-field]"))) return;
+  if (!card || (!responseInput && !event.target.matches?.("[data-structured-field], [data-candidate-field], [data-critical-field], [data-interval-field], [data-endpoint-field], [data-trace-field]"))) return;
   if (event.target.matches?.('[data-critical-field="value"]')) syncSignChartLayout(card);
   const questionId = responseInput?.dataset.questionId ?? card.id.replace(/^question-/, "");
   const answerField = card.querySelector('[data-response-kind="answer"]:checked') ?? card.querySelector('[data-response-kind="answer"]');
@@ -2740,9 +2843,9 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, educatorManifestResponse, authoringGuideResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260902-security-v1"),
-      fetch("./educator-agent-manifest.json?v=20260902-security-v1"),
-      fetch("./CUSTOM_LESSON_SETS.md?v=20260902-security-v1"),
+      fetch("./agent-manifest.json?v=20260902-python-v1"),
+      fetch("./educator-agent-manifest.json?v=20260902-python-v1"),
+      fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1"),
     ]);
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
     if (educatorManifestResponse.ok) educatorManifest = await educatorManifestResponse.json();

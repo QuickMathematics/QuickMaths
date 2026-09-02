@@ -3,7 +3,7 @@
 [![Full test suite](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml/badge.svg)](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml)
 [![Live app](https://img.shields.io/badge/live-QuickMaths-123f35)](https://quickmathematics.github.io/QuickMaths/)
 
-QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, educator-authored portable curricula, a substantial native Mathematics curriculum, an installable 15-lesson Geography curriculum, structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
+QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, educator-authored portable curricula, a substantial native Mathematics curriculum, installable Geography and 25-lesson Python Programming curricula, structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
 
 [![QuickMaths combined Mathematics and Geography mastery map](docs/assets/quickmaths-mastery-map.png)](https://quickmathematics.github.io/QuickMaths/#/map)
 
@@ -19,10 +19,10 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 
 - Separate learner and educator profile paths with ownership-filtered educator views, browser autosave, full backups, and optional complete-workspace GitHub storage
 - Public curriculum blueprints and privacy-warned private assignments with exact embedded-pack integrity, canonical maps, learner rules, visible supplemental agent guidance, and assignment-progress isolation
-- Native Mathematics plus an installable Geography mastery map from the Lesson Depot, joined by a cross-subject prerequisite bridge
+- Native Mathematics plus installable Geography and Python Programming mastery maps from the Lesson Depot; Python adds formatted code prompts, structured trace tables, and deterministic pure-function assessments in a disposable browser Worker
 - Persistent Plan mode with draggable layouts, desktop marquee/Ctrl selection, touch hold-selection, colored custom paths, and draggable free or connected comment nodes
 - Enforced Hard path and guideline-only Open path
-- Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, and review gates
+- Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, trace tables, sandboxed Python functions, and review gates
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
 - Public Lesson Depot with optional GitHub Discussion upvotes and comments
 - Twenty-nine WebMCP tools for visible navigation, tutoring, on-demand lesson-authoring guidance, dedicated educator guidance, curriculum design, mastery-map planning, curriculum inspection, and single or batch human-controlled lesson staging
@@ -40,7 +40,7 @@ The learner app is `docs/index.html`; the dedicated WebMCP agent workspace is `d
 
 ## Local Git Bridge for Codex
 
-The small Python package is not a second learner app. It remains solely for curriculum validation/export and the loopback Git Bridge.
+The small `quickmaths/` Python tooling package is not a second learner app or the Programming curriculum. It remains solely for curriculum validation/export and the loopback Git Bridge.
 
 ```powershell
 python -m venv .venv

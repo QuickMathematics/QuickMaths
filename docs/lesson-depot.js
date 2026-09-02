@@ -1,4 +1,4 @@
-import { fetchTextLimited } from "./safe-fetch.js?v=20260902-security-v1";
+import { fetchTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 
 const CATALOG_FORMAT = "quickmaths.lesson-depot.catalog";
 const CATALOG_SCHEMA = "1.0";

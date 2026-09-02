@@ -228,6 +228,7 @@ Supported graders:
 - `exact_numeric`
 - `numeric_with_tolerance` plus numeric `tolerance`
 - `multiple_choice` with 2–8 unique `{ "id", "label" }` options
+- `python_program` for a learner-authored pure Python function tested inside a disposable, capability-restricted Worker
 - `symbolic_expression`
 - `equation_solution`
 - `inequality_solution` for equivalent one-variable linear solution sets (including reversed signs and strict versus inclusive boundaries)
@@ -250,6 +251,7 @@ Supported `answer_mode` values are `final_only`, `final_plus_optional_work`, and
 | Check algebraic steps | `procedural_steps` | Checks line count, notation, equivalence/equation consistency, and optional final-line match. |
 | Solve a rational equation | `rational_equation_steps` | Shows structured restrictions, algebra steps, candidate classification, and original-equation checks. |
 | Build a sign chart | `sign_chart_steps` | Shows structured critical-point, interval-test, sign, selection, endpoint, and final-set fields. |
+| Trace program state | `code_trace_steps` | Shows formatted Python plus an authored variable/output table and checks every checkpoint without executing package code. |
 | Structure a proof | `proof_obligations` | Shows obligations and strategies, captures the proof, and waits for review. |
 | Grade open reasoning | `rubric_check` | Shows rubric criteria, captures work, and waits for review. |
 
@@ -359,6 +361,103 @@ review_policy:
 
 Native templates may place placeholders anywhere inside `work.sign_chart`; the exporter renders that nested metadata recursively. Uploaded packs remain fixed data and never execute arbitrary template expressions.
 
+### Formatted prompt code
+
+Keep `prompt` as the complete plain-text accessibility fallback. Add optional `prompt_blocks` when indentation or line breaks matter:
+
+```json
+{
+  "prompt": "Trace the program and state what it prints.",
+  "prompt_blocks": [
+    { "type": "text", "text": "Trace the program and state what it prints." },
+    { "type": "code", "language": "python", "text": "x = 2\ny = x + 3\nprint(y)" }
+  ]
+}
+```
+
+Only `text` and `code` blocks are accepted. QuickMaths escapes every character, labels the language, preserves whitespace, and uses horizontal scrolling; it never interprets lesson HTML. A problem may contain at most 12 blocks and 12,000 characters across the blocks. Lesson Studio exposes this as **Formatted code block** beneath the ordinary prompt.
+
+### Structured code traces
+
+`code_trace_steps` checks an authored state model. It displays code but does not execute code from the package:
+
+```json
+{
+  "answer_mode": "final_plus_required_work",
+  "work_required": true,
+  "work": {
+    "mode": "code_trace_steps",
+    "prompt": "Complete every execution checkpoint.",
+    "trace_spec": {
+      "language": "python",
+      "display_code": "x = 2\ny = x + 3\nx = 9\nprint(y)",
+      "columns": ["step", "x", "y", "output"],
+      "expected_rows": [
+        { "step": 1, "x": 2, "y": null, "output": "" },
+        { "step": 2, "x": 2, "y": 5, "output": "" },
+        { "step": 3, "x": 9, "y": 5, "output": "" },
+        { "step": 4, "x": 9, "y": 5, "output": 5 }
+      ],
+      "comparison": {
+        "trim_strings": true,
+        "numeric_equivalence": true,
+        "blank_equals_null": true
+      }
+    }
+  },
+  "review_policy": { "work_review": "auto" }
+}
+```
+
+`step` is mandatory and stable; other columns are author-chosen simple strings, numbers, booleans, or null. The learner gets ordinary table cells. Submission reports missing rows, duplicate/unexpected step labels, wrong variable values, and wrong output separately. The trace is saved in the same draft, attempt, backup, and tutor-review pipeline as other structured work. In Lesson Studio, enter one column per line and one expected row per line using `|` between cells—authors and learners never have to hand-write the response JSON.
+
+### Sandboxed Python function grading
+
+Use `python_program` only for a deterministic pure-function task:
+
+```json
+{
+  "prompt": "Implement is_even(number).",
+  "expected_answer": "All declared Python tests pass.",
+  "answer_type": "code",
+  "grading_method": "python_program",
+  "program_spec": {
+    "runtime": "python_subset_v1",
+    "entrypoint": {
+      "kind": "function",
+      "name": "is_even",
+      "parameters": [{ "name": "number", "type": "int" }],
+      "return_type": "bool"
+    },
+    "tests": [
+      { "id": "even", "args": [8], "expected_return": true, "visibility": "example" },
+      { "id": "odd", "args": [7], "expected_return": false, "visibility": "after_submission" },
+      { "id": "zero", "args": [0], "expected_return": true, "visibility": "hidden" }
+    ],
+    "limits": {
+      "wall_time_ms": 1500,
+      "step_limit": 20000,
+      "memory_mb": 32,
+      "stdout_chars": 1000
+    },
+    "policy": {
+      "allowed_builtins": [],
+      "imports": [],
+      "network": false,
+      "storage": false,
+      "clock": false,
+      "randomness": false
+    }
+  }
+}
+```
+
+Supported parameter types are `json`, `bool`, `int`, `float`, `str`, `list`, and `dict`; the return type may also be `none`. Tests contain JSON data only—never expressions, callbacks, source code, URLs, or a package-authored test harness. Include at least one `example` test. `after_submission` results appear only after submission; `hidden` cases never reveal their arguments or expected values in learner-facing results or WebMCP.
+
+The first run loads pinned Pyodide in a module Worker. QuickMaths parses learner source with a trusted AST supervisor, permits only top-level function definitions and an explicit syntax subset, creates a fresh restricted namespace for every test, and exposes only the authored subset of safe builtins. It rejects imports, classes, decorators, annotations, exception handlers, dynamic evaluation, private/dunder names, unapproved methods, files, process APIs, network, browser APIs, storage, clocks, and randomness. Source length, AST size/depth, exponent size, integer size, execution steps, captured output, return size, and wall time are bounded; the entire Worker is terminated after grading. `memory_mb` is a validated forward-compatible contract field, while current browser enforcement relies on the disposable Worker plus structural/result bounds rather than claiming a precise per-Worker memory quota.
+
+Allowed builtins are: `abs`, `all`, `any`, `bool`, `dict`, `enumerate`, `float`, `int`, `len`, `list`, `max`, `min`, `range`, `round`, `set`, `sorted`, `str`, `sum`, `tuple`, and `zip`. Grant only what the problem needs. The supported value-method allowlist covers ordinary string, list, and dictionary transformations documented in Lesson Studio. Programs that need imports, files, exceptions, classes, command-line input, real time, or randomness remain capture/rubric tasks; do not pretend the subset runs them.
+
 ### Checked maths steps are not formal proofs
 
 The Advanced Algebra curriculum primarily uses `procedural_steps`. The learner writes one equivalent equation, inequality, or expression per line, and QuickMaths conservatively checks each transition plus the final-line match. Use `line_type: "equation"` for `=` steps and `line_type: "inequality"` for `<`, `<=`, `>`, or `>=` steps; inequality mode checks the complete one-variable solution set, including sign reversals. That workflow can finish automatically.
@@ -454,7 +553,7 @@ The repository’s trusted built-in Mathematics YAML is exported as browser-safe
 | Random order / question count | Native Mathematics shuffles every authored scenario and draws fresh values. For uploaded sets, set `question_count` and optionally supply a larger fixed bank; QuickMaths rotates through a complete configured set. |
 | Explanation templates | Pre-render into literal `solution_steps`. |
 | Final-only, optional, or required work | `answer_mode` |
-| Capture, procedural, rational-equation, sign-chart, proof, and rubric workflows | All seven browser `work.mode` values above |
+| Capture, procedural, rational-equation, sign-chart, code-trace, proof, and rubric workflows | All eight browser `work.mode` values above |
 | Review policy and mastery gate | `review_policy` block |
 | Draft skills | Keep them in Lesson studio or outside an installed pack; installed packs accept live skills only. |
 | Deprecated/replacement skills | Publish a new stable skill ID and keep the old source file for backup compatibility. Browser packs do not silently redirect progress. |
@@ -471,6 +570,7 @@ Open **Lesson studio** in the left sidebar. It can:
 - add theory, examples, applications, tags, mastery thresholds, and review timing;
 - add fixed questions with every supported grader;
 - configure answer modes, capture/procedural/proof/rubric work, and review gates;
+- add escaped formatted code blocks, structured trace tables, and declarative sandboxed Python function tests;
 - preview the exact answer box, proof checklist, rubric, and review path the learner will see;
 - start advanced question types from editable examples with plain-language explanations;
 - open an existing JSON file, autosave an author draft locally, validate, download, install, and prepare a public Lesson Depot submission.

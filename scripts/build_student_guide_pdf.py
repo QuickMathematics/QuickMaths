@@ -54,7 +54,7 @@ class StudentDocTemplate(EducatorDocTemplate):
             canvas.drawString(18 * mm, PAGE_H - 9.5 * mm, "QUICKMATHS STUDENT GUIDE")
             canvas.setFont("Helvetica", 7.5)
             canvas.setFillColor(colors.HexColor("#5C6965"))
-            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 21")
+            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 22")
             canvas.setStrokeColor(colors.HexColor("#D8D0C2"))
             canvas.line(18 * mm, 12 * mm, PAGE_W - 18 * mm, 12 * mm)
             canvas.setFont("Helvetica", 7.5)

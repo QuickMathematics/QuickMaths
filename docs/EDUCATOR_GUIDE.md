@@ -331,7 +331,7 @@ Each question separates three decisions:
 
 ### Final-answer grading
 
-Supported grading includes exact numeric, numeric tolerance, multiple choice, symbolic expression, finite set, rational expression with exact excluded values, equation solution, interval set, exact text, and theorem conclusion. The expected answer and accepted forms are private pre-submission values.
+Supported grading includes exact numeric, numeric tolerance, multiple choice, sandboxed Python pure functions, symbolic expression, finite set, rational expression with exact excluded values, equation solution, interval set, exact text, and theorem conclusion. The expected answer and accepted forms are private pre-submission values.
 
 ### Finite sets
 
@@ -356,6 +356,7 @@ The final-answer grader never decides that a formal proof is logically valid.
 | Checked maths steps | Ordered equations, expressions, or inequalities | Local equivalence checks plus final answer |
 | Rational-equation ledger | Restrictions, algebra steps, and classified candidates | Local restriction, equivalence, original-equation, and final-set checks |
 | Structured sign chart | Critical points, interval signs, selections, endpoints, and final set | Local row diagnostics plus final interval-set check |
+| Structured code trace | Variable and output cells at authored execution checkpoints | Local deterministic table comparison; prompt code is not executed |
 | Formal proof required | Short conclusion plus ordinary-text proof | Conclusion auto-graded; obligations reviewed before mastery |
 | Required long response | Answer plus structured response | Rubric reviewed before mastery |
 
@@ -378,6 +379,30 @@ Choose **Structured sign chart** for polynomial or rational inequalities. Enter 
 For example, one row can read -2 | zero | 1 | x + 2. Another can read 3 | undefined | 1 | x - 3. The kind is `zero`, `undefined`, or `hole`; multiplicity is a positive integer; and factor names the corresponding numerator or denominator factor. Studio turns these lines into structured metadata and the learner sees a guided sign-chart editor. The checker derives endpoint inclusion from the relation and point kind, then validates sorted critical points, interval coverage, test-value signs, selected intervals, endpoint decisions, and the final interval set with row-specific diagnostics.
 
 Native sign-chart metadata supports the same trusted runtime placeholders as prompts and expected answers.
+
+### Formatted code blocks
+
+Open **Formatted code block** beneath a problem prompt. Keep the ordinary prompt as a complete accessibility fallback, choose a language label, and paste the source into the code field. The learner sees escaped text inside a whitespace-preserving, horizontally scrollable code block. Package-authored code is presentation-only and is never interpreted or executed.
+
+### Structured code traces
+
+Choose **Code trace - variable/output table**. Paste the displayed Python, list one column name per line beginning with `step`, and enter one expected row per line with pipe-separated cells in the same order. For columns `step`, `x`, and `output`, a valid author row is:
+
+`2 | 5 |`
+
+An empty cell represents no value/output. QuickMaths creates the learner-facing table and grades stable step labels plus every authored cell. Use a small, pedagogically meaningful set of variables rather than turning tracing into transcription. The trace checker never executes the lesson's displayed code.
+
+### Sandboxed Python function assessments
+
+Choose **Sandboxed Python function** as the final-answer grader. Define the function name, positional parameter contracts (`name | type`), return type, allowed builtins, limits, and one declarative test per line:
+
+`example | even | [8] | true`
+
+The four fields are visibility, stable test ID, JSON argument list, and JSON expected return. Include at least one `example`; use `after_submission` for feedback revealed after the attempt, and `hidden` for boundary cases whose inputs/answers must never appear through learner-facing results or WebMCP. Tests are data only and cannot contain scripts, expressions, callbacks, URLs, or a test harness.
+
+The runtime accepts only learner-authored top-level pure functions inside a disposable Worker. A trusted AST supervisor rejects imports, files, network, browser/storage access, clocks, randomness, dynamic evaluation, private attributes, classes, decorators, exception handlers, and unsupported syntax. Structural, step, output, result, and wall-time limits apply. The `memory_mb` schema field is validated for forward compatibility; the browser currently depends on Worker termination and structural/result limits rather than promising an exact per-Worker memory quota.
+
+Use **Load an editable is_even sandbox example** to see the complete contract. Use this grader for deterministic in-memory pure functions. Continue using captured code or rubric review for imports, files, exceptions, classes, command-line input, or multi-module applications.
 
 ### Formal proof required
 
@@ -646,4 +671,4 @@ Use a compatible ChatGPT or Codex browser. Agent Studio will show whether `docum
 - Bridge guide: https://quickmathematics.github.io/QuickMaths/bridge-guide.html
 - Source and Lesson Depot: https://github.com/QuickMathematics/QuickMaths
 
-QuickMaths educator documentation - app version 21 - September 2026.
+QuickMaths educator documentation - app version 22 - September 2026.

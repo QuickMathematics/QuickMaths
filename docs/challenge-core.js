@@ -56,8 +56,14 @@ const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 const GRADING_METHODS = new Set([
   "exact_numeric", "numeric_with_tolerance", "multiple_choice", "symbolic_expression",
   "equation_solution", "inequality_solution", "exact_text", "theorem_conclusion",
-  "finite_set", "rational_expression", "interval_set",
+  "finite_set", "rational_expression", "interval_set", "python_program",
 ]);
+const WORK_MODES = new Set([
+  "none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check",
+  "rational_equation_steps", "sign_chart_steps", "code_trace_steps",
+]);
+const PYTHON_BUILTINS = new Set(["abs", "all", "any", "bool", "dict", "enumerate", "float", "int", "len", "list", "max", "min", "range", "round", "set", "sorted", "str", "sum", "tuple", "zip"]);
+const PYTHON_VALUE_TYPES = new Set(["json", "int", "float", "str", "bool", "list", "dict"]);
 const EXPRESSION_FUNCTIONS = new Set(["sqrt"]);
 const EXPRESSION_CONSTANTS = Object.freeze({ pi: Math.PI, e: Math.E });
 const SUPERSCRIPT_DIGITS = Object.freeze({ "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-" });
@@ -349,6 +355,42 @@ function optionalText(value, label, maxLength) {
   return requiredText(value, label, maxLength);
 }
 
+function preservedText(value, label, maxLength) {
+  if (typeof value !== "string") throw new Error(`${label} must be text.`);
+  const clean = value.replace(/\r\n?/g, "\n").replace(/\t/g, "    ").replace(/^\n+|\n+$/g, "");
+  if (!clean.trim()) throw new Error(`${label} is required.`);
+  if (clean.length > maxLength) throw new Error(`${label} is too long (maximum ${maxLength} characters).`);
+  if (/<script\b|javascript:/i.test(clean)) throw new Error(`${label} contains unsupported executable content.`);
+  return clean;
+}
+
+function jsonCompatibleValue(value, label, { depth = 0, budget = { nodes: 0 } } = {}) {
+  budget.nodes += 1;
+  if (budget.nodes > 500 || depth > 8) throw new Error(`${label} is too complex.`);
+  if (value == null || typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value) || Math.abs(value) > 1e12) throw new Error(`${label} contains an unsupported number.`);
+    return value;
+  }
+  if (typeof value === "string") {
+    if (value.length > 2000) throw new Error(`${label} contains text longer than 2,000 characters.`);
+    return value;
+  }
+  if (Array.isArray(value)) {
+    if (value.length > 100) throw new Error(`${label} contains too many list items.`);
+    return value.map((item) => jsonCompatibleValue(item, label, { depth: depth + 1, budget }));
+  }
+  if (typeof value !== "object") throw new Error(`${label} must contain JSON-compatible values only.`);
+  const entries = Object.entries(value);
+  if (entries.length > 100) throw new Error(`${label} contains too many object fields.`);
+  const output = {};
+  for (const [key, item] of entries) {
+    if (!/^[A-Za-z][A-Za-z0-9_ -]{0,79}$/.test(key) || RESERVED_OBJECT_KEYS.has(key)) throw new Error(`${label} contains an invalid object key.`);
+    output[key] = jsonCompatibleValue(item, label, { depth: depth + 1, budget });
+  }
+  return output;
+}
+
 function idList(value, label, { max = 50 } = {}) {
   if (value == null) return [];
   if (!Array.isArray(value) || value.length > max) throw new Error(`${label} must be a list with at most ${max} IDs.`);
@@ -439,6 +481,137 @@ function normalizeSignChart(candidate, templateId) {
   };
 }
 
+function normalizePromptBlocks(candidate, templateId) {
+  if (candidate == null) return [];
+  if (!Array.isArray(candidate) || candidate.length > 12) throw new Error(`${templateId} prompt_blocks must contain at most 12 blocks.`);
+  let aggregate = 0;
+  return candidate.map((block, index) => {
+    if (!block || typeof block !== "object" || Array.isArray(block)) throw new Error(`${templateId} prompt block ${index + 1} is invalid.`);
+    const unknown = Object.keys(block).find((key) => !["type", "text", "language"].includes(key));
+    if (unknown) throw new Error(`${templateId} prompt block ${index + 1} contains unsupported field ${unknown}.`);
+    if (!['text', 'code'].includes(block.type)) throw new Error(`${templateId} prompt block ${index + 1} type must be text or code.`);
+    const text = preservedText(block.text, `${templateId} prompt block ${index + 1}`, block.type === "code" ? 8000 : 4000);
+    aggregate += text.length;
+    if (aggregate > 12_000) throw new Error(`${templateId} prompt_blocks are too long.`);
+    const language = block.type === "code" ? (optionalText(block.language, `${templateId} code language`, 30) || "text") : null;
+    if (language && !/^[A-Za-z][A-Za-z0-9_+.-]{0,29}$/.test(language)) throw new Error(`${templateId} code language is invalid.`);
+    return { type: block.type, text, ...(language ? { language: language.toLowerCase() } : {}) };
+  });
+}
+
+function normalizeTraceSpec(candidate, templateId) {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${templateId} code_trace_steps needs trace_spec.`);
+  const unknown = Object.keys(candidate).find((key) => !["language", "display_code", "columns", "expected_rows", "comparison"].includes(key));
+  if (unknown) throw new Error(`${templateId} trace_spec contains unsupported field ${unknown}.`);
+  const language = optionalText(candidate.language, `${templateId} trace language`, 30) || "python";
+  if (language !== "python") throw new Error(`${templateId} trace language must be python.`);
+  const displayCode = preservedText(candidate.display_code, `${templateId} trace display_code`, 8000);
+  if (!Array.isArray(candidate.columns) || !candidate.columns.length || candidate.columns.length > 12) throw new Error(`${templateId} trace columns must contain 1 to 12 labels.`);
+  const columns = candidate.columns.map((column, index) => requiredText(String(column ?? ""), `${templateId} trace column ${index + 1}`, 40));
+  if (!columns.includes("step")) throw new Error(`${templateId} trace columns must include step.`);
+  if (new Set(columns).size !== columns.length) throw new Error(`${templateId} trace columns must be unique.`);
+  if (columns.some((column) => RESERVED_OBJECT_KEYS.has(column))) throw new Error(`${templateId} trace columns contain a reserved name.`);
+  if (!Array.isArray(candidate.expected_rows) || !candidate.expected_rows.length || candidate.expected_rows.length > 100) throw new Error(`${templateId} trace expected_rows must contain 1 to 100 rows.`);
+  const expectedRows = candidate.expected_rows.map((row, rowIndex) => {
+    if (!row || typeof row !== "object" || Array.isArray(row)) throw new Error(`${templateId} trace row ${rowIndex + 1} is invalid.`);
+    const unknownColumn = Object.keys(row).find((key) => !columns.includes(key));
+    if (unknownColumn) throw new Error(`${templateId} trace row ${rowIndex + 1} contains unknown column ${unknownColumn}.`);
+    const output = {};
+    for (const column of columns) {
+      const value = row[column];
+      if (value != null && !["string", "number", "boolean"].includes(typeof value)) throw new Error(`${templateId} trace row ${rowIndex + 1} column ${column} must be a simple value.`);
+      output[column] = value ?? null;
+    }
+    if (output.step == null || String(output.step).trim() === "") throw new Error(`${templateId} trace row ${rowIndex + 1} needs a stable step value.`);
+    return output;
+  });
+  if (new Set(expectedRows.map((row) => String(row.step))).size !== expectedRows.length) throw new Error(`${templateId} trace step values must be unique.`);
+  const comparison = candidate.comparison && typeof candidate.comparison === "object" && !Array.isArray(candidate.comparison) ? candidate.comparison : {};
+  const unknownComparison = Object.keys(comparison).find((key) => !["trim_strings", "numeric_equivalence", "blank_equals_null"].includes(key));
+  if (unknownComparison) throw new Error(`${templateId} trace comparison contains unsupported field ${unknownComparison}.`);
+  return {
+    language,
+    display_code: displayCode,
+    columns,
+    expected_rows: expectedRows,
+    comparison: {
+      trim_strings: comparison.trim_strings !== false,
+      numeric_equivalence: comparison.numeric_equivalence !== false,
+      blank_equals_null: comparison.blank_equals_null !== false,
+    },
+  };
+}
+
+function normalizePythonProgramSpec(candidate, templateId) {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${templateId} python_program needs program_spec.`);
+  const unknown = Object.keys(candidate).find((key) => !["runtime", "entrypoint", "tests", "limits", "policy"].includes(key));
+  if (unknown) throw new Error(`${templateId} program_spec contains unsupported field ${unknown}.`);
+  if (candidate.runtime !== "python_subset_v1") throw new Error(`${templateId} program_spec runtime must be python_subset_v1.`);
+  const entrypoint = candidate.entrypoint;
+  if (!entrypoint || typeof entrypoint !== "object" || Array.isArray(entrypoint)) throw new Error(`${templateId} program_spec needs an entrypoint.`);
+  const entryUnknown = Object.keys(entrypoint).find((key) => !["kind", "name", "parameters", "return_type"].includes(key));
+  if (entryUnknown) throw new Error(`${templateId} entrypoint contains unsupported field ${entryUnknown}.`);
+  if (entrypoint.kind !== "function") throw new Error(`${templateId} entrypoint kind must be function.`);
+  const name = requiredText(entrypoint.name, `${templateId} entrypoint name`, 60);
+  if (!/^[A-Za-z][A-Za-z0-9_]{0,59}$/.test(name) || name.startsWith("_") || RESERVED_OBJECT_KEYS.has(name)) throw new Error(`${templateId} entrypoint name is invalid.`);
+  if (!Array.isArray(entrypoint.parameters) || entrypoint.parameters.length > 8) throw new Error(`${templateId} entrypoint parameters must contain at most 8 items.`);
+  const parameters = entrypoint.parameters.map((parameter, index) => {
+    if (!parameter || typeof parameter !== "object" || Array.isArray(parameter)) throw new Error(`${templateId} parameter ${index + 1} is invalid.`);
+    const parameterUnknown = Object.keys(parameter).find((key) => !["name", "type"].includes(key));
+    if (parameterUnknown) throw new Error(`${templateId} parameter ${index + 1} contains unsupported field ${parameterUnknown}.`);
+    const parameterName = requiredText(parameter.name, `${templateId} parameter ${index + 1} name`, 60);
+    if (!/^[A-Za-z][A-Za-z0-9_]{0,59}$/.test(parameterName) || parameterName.startsWith("_") || RESERVED_OBJECT_KEYS.has(parameterName)) throw new Error(`${templateId} parameter ${index + 1} name is invalid.`);
+    if (!PYTHON_VALUE_TYPES.has(parameter.type)) throw new Error(`${templateId} parameter ${parameterName} has unsupported type ${parameter.type}.`);
+    return { name: parameterName, type: parameter.type };
+  });
+  if (new Set(parameters.map((parameter) => parameter.name)).size !== parameters.length) throw new Error(`${templateId} parameter names must be unique.`);
+  const returnType = entrypoint.return_type ?? "json";
+  if (![...PYTHON_VALUE_TYPES, "none"].includes(returnType)) throw new Error(`${templateId} return_type is unsupported.`);
+  if (!Array.isArray(candidate.tests) || !candidate.tests.length || candidate.tests.length > 30) throw new Error(`${templateId} program_spec tests must contain 1 to 30 cases.`);
+  const tests = candidate.tests.map((test, index) => {
+    if (!test || typeof test !== "object" || Array.isArray(test)) throw new Error(`${templateId} program test ${index + 1} is invalid.`);
+    const testUnknown = Object.keys(test).find((key) => !["id", "args", "expected_return", "visibility"].includes(key));
+    if (testUnknown) throw new Error(`${templateId} program test ${index + 1} contains unsupported field ${testUnknown}.`);
+    const id = requiredText(test.id, `${templateId} program test ${index + 1} ID`, 60);
+    if (!/^[A-Za-z][A-Za-z0-9_-]{0,59}$/.test(id)) throw new Error(`${templateId} program test ${index + 1} ID is invalid.`);
+    if (!Array.isArray(test.args) || test.args.length !== parameters.length) throw new Error(`${templateId} program test ${id} must provide ${parameters.length} argument(s).`);
+    const args = test.args.map((argument) => jsonCompatibleValue(argument, `${templateId} program test ${id} arguments`));
+    const expectedReturn = jsonCompatibleValue(test.expected_return, `${templateId} program test ${id} expected_return`);
+    const visibility = test.visibility ?? "hidden";
+    if (!["example", "after_submission", "hidden"].includes(visibility)) throw new Error(`${templateId} program test ${id} visibility is invalid.`);
+    return { id, args, expected_return: expectedReturn, visibility };
+  });
+  if (new Set(tests.map((test) => test.id)).size !== tests.length) throw new Error(`${templateId} program test IDs must be unique.`);
+  if (!tests.some((test) => test.visibility === "example")) throw new Error(`${templateId} program_spec needs at least one visible example test.`);
+  const limits = candidate.limits && typeof candidate.limits === "object" && !Array.isArray(candidate.limits) ? candidate.limits : {};
+  const limitUnknown = Object.keys(limits).find((key) => !["wall_time_ms", "step_limit", "memory_mb", "stdout_chars"].includes(key));
+  if (limitUnknown) throw new Error(`${templateId} program limits contain unsupported field ${limitUnknown}.`);
+  const normalizedLimits = {
+    wall_time_ms: Math.floor(cleanNumber(Number(limits.wall_time_ms), 1500, 250, 3000)),
+    step_limit: Math.floor(cleanNumber(Number(limits.step_limit), 20_000, 100, 50_000)),
+    memory_mb: Math.floor(cleanNumber(Number(limits.memory_mb), 32, 16, 64)),
+    stdout_chars: Math.floor(cleanNumber(Number(limits.stdout_chars), 2000, 0, 4000)),
+  };
+  for (const [key, value] of Object.entries(limits)) {
+    if (!Number.isFinite(Number(value)) || Number(value) !== normalizedLimits[key]) throw new Error(`${templateId} program limit ${key} is outside the supported range.`);
+  }
+  const policy = candidate.policy && typeof candidate.policy === "object" && !Array.isArray(candidate.policy) ? candidate.policy : {};
+  const policyUnknown = Object.keys(policy).find((key) => !["allowed_builtins", "imports", "network", "storage", "clock", "randomness"].includes(key));
+  if (policyUnknown) throw new Error(`${templateId} program policy contains unsupported field ${policyUnknown}.`);
+  if (!Array.isArray(policy.allowed_builtins) || policy.allowed_builtins.some((item) => !PYTHON_BUILTINS.has(item))) throw new Error(`${templateId} program policy contains an unsupported builtin.`);
+  if (!Array.isArray(policy.imports) || policy.imports.length) throw new Error(`${templateId} program policy cannot allow imports.`);
+  for (const capability of ["network", "storage", "clock", "randomness"]) {
+    if (policy[capability] !== false) throw new Error(`${templateId} program policy must explicitly disable ${capability}.`);
+  }
+  return {
+    runtime: "python_subset_v1",
+    entrypoint: { kind: "function", name, parameters, return_type: returnType },
+    tests,
+    limits: normalizedLimits,
+    policy: { allowed_builtins: [...new Set(policy.allowed_builtins)], imports: [], network: false, storage: false, clock: false, randomness: false },
+  };
+}
+
 function normalizeProblem(candidate, skillId, questionIds) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${skillId} contains an invalid problem.`);
   const templateId = requiredText(candidate.template_id, `${skillId} problem ID`, 120);
@@ -467,9 +640,10 @@ function normalizeProblem(candidate, skillId, questionIds) {
     if (normalizedOptions.length < 2) throw new Error(`${templateId} needs at least two options.`);
     if (!normalizedOptions.some((option) => option.id === expectedAnswer)) throw new Error(`${templateId} expected_answer must match an option ID.`);
   }
+  if (gradingMethod === "python_program" && candidate.answer_type !== "code") throw new Error(`${templateId} python_program must use answer_type code.`);
   const workCandidate = candidate.work && typeof candidate.work === "object" && !Array.isArray(candidate.work) ? candidate.work : {};
   const workMode = workCandidate.mode ?? "none";
-  if (!["none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"].includes(workMode)) throw new Error(`${templateId} uses unsupported work mode ${workMode}.`);
+  if (!WORK_MODES.has(workMode)) throw new Error(`${templateId} uses unsupported work mode ${workMode}.`);
   const answerMode = candidate.answer_mode ?? (workMode === "none" ? "final_only" : "final_plus_required_work");
   if (!["final_only", "final_plus_optional_work", "final_plus_required_work"].includes(answerMode)) throw new Error(`${templateId} uses unsupported answer_mode ${answerMode}.`);
   const minimumSteps = Math.floor(cleanNumber(Number(workCandidate.minimum_steps), workMode === "procedural_steps" ? 2 : 1, 1, 10));
@@ -499,9 +673,11 @@ function normalizeProblem(candidate, skillId, questionIds) {
     : [];
   if (workMode === "proof_obligations" && !obligations.length) throw new Error(`${templateId} proof_obligations needs at least one obligation.`);
   const reviewCandidate = candidate.review_policy && typeof candidate.review_policy === "object" && !Array.isArray(candidate.review_policy) ? candidate.review_policy : {};
-  const workReview = reviewCandidate.work_review ?? (["proof_obligations", "rubric_check"].includes(workMode) ? "tutor_required" : ["rational_equation_steps", "sign_chart_steps"].includes(workMode) ? "auto" : "none");
+  const workReview = reviewCandidate.work_review ?? (["proof_obligations", "rubric_check"].includes(workMode) ? "tutor_required" : ["rational_equation_steps", "sign_chart_steps", "code_trace_steps"].includes(workMode) ? "auto" : "none");
   if (!["none", "optional", "auto", "tutor_required", "self_review"].includes(workReview)) throw new Error(`${templateId} uses unsupported work_review ${workReview}.`);
   const signChart = normalizeSignChart(workCandidate.sign_chart, templateId);
+  const traceSpec = workMode === "code_trace_steps" ? normalizeTraceSpec(workCandidate.trace_spec, templateId) : null;
+  const programSpec = gradingMethod === "python_program" ? normalizePythonProgramSpec(candidate.program_spec, templateId) : null;
   if (workMode === "rational_equation_steps") {
     if (!optionalText(workCandidate.target_variable, `${templateId} target_variable`, 40)) throw new Error(`${templateId} rational-equation work needs a target variable.`);
     if (workCandidate.require_restrictions === true && (!Array.isArray(workCandidate.expected_restrictions) || !workCandidate.expected_restrictions.length)) throw new Error(`${templateId} must list the expected original denominator restrictions.`);
@@ -522,6 +698,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
     difficulty: ["easy", "medium", "hard", "brutal"].includes(candidate.difficulty) ? candidate.difficulty : "medium",
     values: {},
     prompt: requiredText(candidate.prompt, `${templateId} prompt`, 2000),
+    prompt_blocks: normalizePromptBlocks(candidate.prompt_blocks, templateId),
     expected_answer: expectedAnswer,
     answer_type: optionalText(candidate.answer_type, `${templateId} answer_type`, 60) || "text",
     grading_method: gradingMethod,
@@ -533,7 +710,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
     answer_mode: answerMode,
     work: {
       mode: workMode,
-      prompt: optionalText(workCandidate.prompt, `${templateId} work prompt`, 500) || (workMode === "procedural_steps" ? "Show one mathematical step per line." : workMode === "none" ? "" : "Explain your reasoning clearly."),
+      prompt: optionalText(workCandidate.prompt, `${templateId} work prompt`, 2000) || (workMode === "procedural_steps" ? "Show one mathematical step per line." : workMode === "code_trace_steps" ? "Complete the trace table after each labeled step." : workMode === "none" ? "" : "Explain your reasoning clearly."),
       line_type: ["expression", "equation", "inequality", "mixed", "text"].includes(workCandidate.line_type) ? workCandidate.line_type : "expression",
       target_variable: optionalText(workCandidate.target_variable, `${templateId} target_variable`, 40) || null,
       minimum_steps: minimumSteps,
@@ -552,6 +729,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
         ? workCandidate.expected_restrictions.map((value, index) => requiredText(String(value), `${templateId} restriction ${index + 1}`, 120)).slice(0, 24)
         : [],
       sign_chart: signChart,
+      trace_spec: traceSpec,
     },
     review_policy: {
       work_review: workReview,
@@ -563,6 +741,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
     grading_metadata: {
       require_reduced_form: candidate.grading_metadata?.require_reduced_form === true,
     },
+    program_spec: programSpec,
     work_required: candidate.work_required === true || answerMode === "final_plus_required_work",
   };
 }
@@ -1168,6 +1347,28 @@ function sanitizeStructuredWork(candidate) {
   } catch { return null; }
 }
 
+function sanitizePythonGrade(candidate) {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return null;
+  const status = ["passed", "incorrect", "syntax_error", "policy_error", "runtime_error", "timeout", "unavailable"].includes(candidate.status) ? candidate.status : "runtime_error";
+  const tests = Array.isArray(candidate.tests) ? candidate.tests.slice(0, 30).map((test, index) => ({
+    id: cleanText(test?.id, 60) || `test_${index + 1}`,
+    status: ["passed", "failed", "runtime_error", "timeout"].includes(test?.status) ? test.status : "failed",
+    visibility: ["example", "after_submission", "hidden"].includes(test?.visibility) ? test.visibility : "hidden",
+    message: cleanText(test?.message, 500),
+  })) : [];
+  const total = Math.floor(cleanNumber(Number(candidate.total), tests.length, 0, 30));
+  const passed = Math.floor(cleanNumber(Number(candidate.passed), tests.filter((test) => test.status === "passed").length, 0, total));
+  return {
+    status,
+    score: cleanNumber(Number(candidate.score), total ? passed / total : 0, 0, 1),
+    passed,
+    total,
+    tests,
+    messages: Array.isArray(candidate.messages) ? candidate.messages.map((message) => cleanText(message, 500)).filter(Boolean).slice(0, 12) : [],
+    stdout: cleanText(candidate.stdout, 4000),
+  };
+}
+
 function sanitizeResult(candidate) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return null;
   const questionId = cleanText(candidate.questionId ?? candidate.question_id, 120);
@@ -1175,7 +1376,7 @@ function sanitizeResult(candidate) {
   return {
     questionId,
     prompt: cleanText(candidate.prompt, 2000),
-    finalAnswer: cleanText(candidate.finalAnswer, 300),
+    finalAnswer: cleanText(candidate.finalAnswer, (candidate.gradingMethod ?? candidate.grading_method) === "python_program" ? 12_000 : 300),
     work: cleanText(candidate.work, 5000),
     structuredWorkJson: sanitizeStructuredWork(candidate.structuredWorkJson),
     expectedAnswer: cleanText(candidate.expectedAnswer, 300),
@@ -1190,6 +1391,14 @@ function sanitizeResult(candidate) {
     proofObligations: Array.isArray(candidate.proofObligations) ? candidate.proofObligations.map(normalizeReviewObligation).slice(0, 12) : [],
     rubricCriteria: Array.isArray(candidate.rubricCriteria) ? candidate.rubricCriteria.map(normalizeReviewCriterion).slice(0, 12) : [],
     reviewPolicy: cleanText(candidate.reviewPolicy, 60) || "none",
+    traceDiagnostics: Array.isArray(candidate.traceDiagnostics) ? candidate.traceDiagnostics.slice(0, 200).map((item) => ({
+      kind: cleanText(item?.kind, 40),
+      step: cleanText(String(item?.step ?? ""), 40),
+      column: cleanText(item?.column, 40),
+      actual: item?.actual == null ? null : cleanText(String(item.actual), 300),
+      expected: item?.expected == null ? null : cleanText(String(item.expected), 300),
+      message: cleanText(item?.message, 500),
+    })) : [],
   };
 }
 
@@ -1310,7 +1519,7 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
         startedAt: cleanText(rawDraft.startedAt, 40) || new Date().toISOString(),
         problems: problemIds.map((id) => clone(safeProblems.get(id))),
         responses: Object.fromEntries(problemIds.map((id) => [id, {
-          finalAnswer: cleanText(responses[id]?.finalAnswer, 300),
+          finalAnswer: cleanText(responses[id]?.finalAnswer, safeProblems.get(id)?.grading_method === "python_program" ? 12_000 : 300),
           work: cleanText(responses[id]?.work, 5000),
           structuredWorkJson: sanitizeStructuredWork(responses[id]?.structuredWorkJson),
         }])),
@@ -1979,6 +2188,9 @@ export function gradeProblem(problem, answer, structuredWork = null) {
       && !(problem.grading_metadata?.require_reduced_form && expressionHasObviousCancellation(answer));
   } else if (method === "interval_set") {
     correct = intervalSetsEquivalent(expected, answer, problem.variable ?? problem.answer_metadata?.variable ?? "x");
+  } else if (method === "python_program") {
+    const grade = structuredWork?.python_grade;
+    correct = grade?.status === "passed" && Number(grade?.passed) === Number(grade?.total) && Number(grade?.total) === Number(problem.program_spec?.tests?.length);
   } else {
     correct = acceptedForms.map(normalizeAnswer).includes(normalizedAnswer);
   }
@@ -1986,11 +2198,71 @@ export function gradeProblem(problem, answer, structuredWork = null) {
   return { correct, expected, method };
 }
 
+function traceComparable(value, comparison) {
+  if (value == null || (comparison.blank_equals_null && String(value).trim() === "")) return null;
+  if (typeof value === "string" && comparison.trim_strings) return value.trim();
+  return value;
+}
+
+function traceCellsEquivalent(actual, expected, comparison) {
+  const left = traceComparable(actual, comparison);
+  const right = traceComparable(expected, comparison);
+  if (left === right) return true;
+  if (comparison.numeric_equivalence && left !== null && right !== null && String(left).trim() !== "" && String(right).trim() !== "") {
+    const leftNumber = Number(left);
+    const rightNumber = Number(right);
+    if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) return Math.abs(leftNumber - rightNumber) <= 1e-9 * Math.max(1, Math.abs(leftNumber), Math.abs(rightNumber));
+  }
+  return String(left) === String(right);
+}
+
+export function gradeTraceTable(problem, structuredWork = null) {
+  const spec = problem?.work?.trace_spec;
+  if (!spec) return { ok: false, diagnostics: [{ kind: "missing_spec", message: "The authored trace model is unavailable." }] };
+  const rows = Array.isArray(structuredWork?.rows) ? structuredWork.rows : [];
+  const diagnostics = [];
+  const byStep = new Map();
+  for (const [index, row] of rows.entries()) {
+    const step = row && typeof row === "object" ? String(row.step ?? "").trim() : "";
+    if (!step) diagnostics.push({ kind: "missing_step", row: index + 1, message: `Trace row ${index + 1} has no step label.` });
+    else if (byStep.has(step)) diagnostics.push({ kind: "duplicate_step", step, message: `Trace step ${step} appears more than once.` });
+    else byStep.set(step, row);
+  }
+  const expectedSteps = new Set(spec.expected_rows.map((row) => String(row.step)));
+  for (const expectedRow of spec.expected_rows) {
+    const step = String(expectedRow.step);
+    const actualRow = byStep.get(step);
+    if (!actualRow) {
+      diagnostics.push({ kind: "missing_row", step, message: `Trace step ${step} is missing.` });
+      continue;
+    }
+    for (const column of spec.columns) {
+      if (column === "step") continue;
+      if (!traceCellsEquivalent(actualRow[column], expectedRow[column], spec.comparison)) {
+        diagnostics.push({
+          kind: String(actualRow[column] ?? "").trim() === "" ? "missing_value" : column === "output" ? "wrong_output" : "wrong_value",
+          step,
+          column,
+          actual: actualRow[column] ?? null,
+          expected: expectedRow[column] ?? null,
+          message: `Trace step ${step}, column ${column}, does not match the program state.`,
+        });
+      }
+    }
+  }
+  for (const step of byStep.keys()) if (!expectedSteps.has(step)) diagnostics.push({ kind: "unexpected_row", step, message: `Trace step ${step} is not part of this trace.` });
+  return { ok: diagnostics.length === 0, diagnostics };
+}
+
 export function validateProceduralWork(problem, work, structuredWork = null, finalAnswer = "") {
   if (!problem.work_required) return null;
   const lines = String(work ?? "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const minimumSteps = Math.max(1, Number(problem.work?.minimum_steps ?? 1));
   const mode = problem.work?.mode ?? "none";
+  if (mode === "code_trace_steps") {
+    const trace = gradeTraceTable(problem, structuredWork);
+    return trace.ok ? null : trace.diagnostics[0]?.message ?? "Complete the trace table.";
+  }
   if (mode === "rational_equation_steps") {
     const data = structuredWork && typeof structuredWork === "object" ? structuredWork : {};
     const restrictions = Array.isArray(data.restrictions) ? data.restrictions.filter((item) => String(item).trim()) : [];
@@ -3270,8 +3542,34 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   const updateResponse = (questionId, { finalAnswer, work, structuredWorkJson = null }) => {
     const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
     if (!draft || !draft.responses[questionId]) throw new Error("Question is not in the active test.");
-    draft.responses[questionId] = { finalAnswer: cleanText(finalAnswer, 300), work: cleanText(work, 5000), structuredWorkJson: sanitizeStructuredWork(structuredWorkJson) };
+    const problem = draft.problems.find((item) => item.template_id === questionId);
+    const previous = draft.responses[questionId];
+    const answerLimit = problem?.grading_method === "python_program" ? 12_000 : 300;
+    const safeAnswer = cleanText(finalAnswer, answerLimit);
+    const nextStructured = sanitizeStructuredWork(structuredWorkJson) ?? {};
+    if (previous?.structuredWorkJson?.python_source === safeAnswer && previous.structuredWorkJson.python_grade) {
+      nextStructured.python_source = safeAnswer;
+      nextStructured.python_grade = previous.structuredWorkJson.python_grade;
+    }
+    draft.responses[questionId] = { finalAnswer: safeAnswer, work: cleanText(work, 5000), structuredWorkJson: Object.keys(nextStructured).length ? nextStructured : null };
     persist();
+  };
+
+  const recordPythonGrade = (questionId, source, candidate) => {
+    const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
+    const problem = draft?.problems.find((item) => item.template_id === questionId);
+    if (!draft || !draft.responses[questionId] || problem?.grading_method !== "python_program") throw new Error("Python question is not in the active test.");
+    const safeSource = cleanText(source, 12_000);
+    if (!safeSource || safeSource !== draft.responses[questionId].finalAnswer) throw new Error("The Python result does not match the current editor contents.");
+    const grade = sanitizePythonGrade(candidate);
+    if (!grade || grade.total !== problem.program_spec.tests.length) throw new Error("The Python sandbox returned an incomplete grade.");
+    const structured = sanitizeStructuredWork(draft.responses[questionId].structuredWorkJson) ?? {};
+    structured.python_source = safeSource;
+    structured.python_grade = grade;
+    draft.responses[questionId].structuredWorkJson = structured;
+    persist();
+    notify();
+    return clone(grade);
   };
 
   const submitTest = () => {
@@ -3279,7 +3577,12 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!draft) throw new Error("No active test.");
     const workIssues = draft.problems.map((problem) => ({
       questionId: problem.template_id,
-      message: validateProceduralWork(problem, draft.responses[problem.template_id]?.work, draft.responses[problem.template_id]?.structuredWorkJson, draft.responses[problem.template_id]?.finalAnswer),
+      message: problem.grading_method === "python_program" && (
+        draft.responses[problem.template_id]?.structuredWorkJson?.python_source !== draft.responses[problem.template_id]?.finalAnswer
+        || !draft.responses[problem.template_id]?.structuredWorkJson?.python_grade
+      )
+        ? "Run the current Python code in the sandbox before submitting."
+        : validateProceduralWork(problem, draft.responses[problem.template_id]?.work, draft.responses[problem.template_id]?.structuredWorkJson, draft.responses[problem.template_id]?.finalAnswer),
     })).filter((issue) => issue.message);
     if (workIssues.length) return { ok: false, missingWork: workIssues.map((issue) => issue.questionId), workIssues };
     const results = draft.problems.map((problem) => {
@@ -3303,6 +3606,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         proofObligations: clone((problem.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation)),
         rubricCriteria: clone((problem.work?.rubric?.criteria ?? []).map(normalizeReviewCriterion)),
         reviewPolicy: problem.review_policy?.work_review ?? "none",
+        traceDiagnostics: problem.work?.mode === "code_trace_steps" ? gradeTraceTable(problem, response.structuredWorkJson).diagnostics : [],
       };
     });
     const rawScore = results.filter((result) => result.correct).length;
@@ -3585,7 +3889,27 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       active_test: draft ? {
         question_count: draft.problems.length,
         answered_count: Object.values(draft.responses).filter((response) => response.finalAnswer).length,
-        questions: draft.problems.map((problem) => ({ question_id: problem.template_id, prompt: problem.prompt, difficulty: problem.difficulty, answer_mode: problem.answer_mode })),
+        questions: draft.problems.map((problem) => ({
+          question_id: problem.template_id,
+          prompt: problem.prompt,
+          prompt_blocks: clone(problem.prompt_blocks ?? []),
+          difficulty: problem.difficulty,
+          answer_mode: problem.answer_mode,
+          work_mode: problem.work?.mode ?? "none",
+          trace: problem.work?.mode === "code_trace_steps" ? {
+            language: problem.work.trace_spec.language,
+            display_code: problem.work.trace_spec.display_code,
+            columns: clone(problem.work.trace_spec.columns),
+            step_labels: problem.work.trace_spec.expected_rows.map((row) => row.step),
+          } : null,
+          programming: problem.grading_method === "python_program" ? {
+            runtime: problem.program_spec.runtime,
+            entrypoint: problem.program_spec.entrypoint,
+            parameters: clone(problem.program_spec.parameters),
+            return_type: problem.program_spec.return_type,
+            example_tests: problem.program_spec.tests.filter((test) => test.visibility === "example").map((test) => ({ id: test.id, arguments: clone(test.arguments), expected_return: clone(test.expected_return) })),
+          } : null,
+        })),
       } : null,
       active_attempt: attempt ? {
         attempt_id: attempt.attemptId,
@@ -4022,6 +4346,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     startTest,
     updateResponse,
     submitTest,
+    recordPythonGrade,
     saveReflection,
     getAttempt,
     openAttempt,

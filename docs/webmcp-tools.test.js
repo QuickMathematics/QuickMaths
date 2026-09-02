@@ -255,7 +255,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 21);
+  assert.equal(summary.guide.app_version, 22);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
   assert.equal(summary.guide.tools.length, 29);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);

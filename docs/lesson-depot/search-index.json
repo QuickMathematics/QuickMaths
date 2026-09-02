@@ -371,20 +371,25 @@
       "version": "0.0.0-preview.1"
     },
     {
-      "author": "QuickMaths Preview",
-      "description": "A language-neutral introduction to state, control flow, functions, debugging, and program design.",
-      "id": "PACK_PREVIEW_PROGRAMMING_FOUNDATIONS",
-      "license": "Not published",
-      "name": "Programming Foundations",
-      "slug": "programming-foundations",
-      "subject_name": "Computer Science",
+      "author": "QuickMaths",
+      "description": "A rigorous 25-lesson beginner-to-advanced-beginner curriculum in algorithms, Python values and control flow, functions, text and collections, files and exceptions, modules, object-oriented design, algorithmic efficiency, software architecture, and two tested application capstones. This release adds formatted code, structured trace tables, and sandboxed pure-function grading.",
+      "id": "PACK_PROGRAMMING_FUNDAMENTALS",
+      "license": "CC BY 4.0",
+      "name": "Programming Fundamentals with Python",
+      "slug": "programming-fundamentals-python",
+      "subject_name": "Programming",
       "tags": [
-        "debugging",
-        "functions",
-        "programming"
+        "algorithms",
+        "beginner",
+        "code-grading",
+        "computer science",
+        "programming",
+        "python",
+        "sandbox",
+        "trace-tables"
       ],
-      "terms": "programming-foundations programming foundations a language-neutral introduction to state, control flow, functions, debugging, and program design. quickmaths preview computer science debugging functions programming",
-      "version": "0.0.0-preview.1"
+      "terms": "programming-fundamentals-python programming fundamentals with python a rigorous 25-lesson beginner-to-advanced-beginner curriculum in algorithms, python values and control flow, functions, text and collections, files and exceptions, modules, object-oriented design, algorithmic efficiency, software architecture, and two tested application capstones. this release adds formatted code, structured trace tables, and sandboxed pure-function grading. quickmaths programming algorithms beginner code-grading computer science programming python sandbox trace-tables",
+      "version": "1.2.0"
     },
     {
       "author": "QuickMaths Preview",

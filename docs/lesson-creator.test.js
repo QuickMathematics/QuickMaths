@@ -148,6 +148,43 @@ test("Lesson Studio authors rational-equation and sign-chart contracts without r
   assert.match(studio.render(state), /value \| kind \| multiplicity \| factor/);
 });
 
+test("Lesson Studio authors formatted code and structured trace tables without response JSON", () => {
+  const { studio, state } = studioHarness();
+  changeProblemField(studio, "promptCode", "x = 2\nx += 3\nprint(x)");
+  changeWorkMode(studio, "code_trace_steps");
+  changeProblemField(studio, "traceDisplayCode", "x = 2\nx += 3\nprint(x)");
+  changeProblemField(studio, "traceColumns", "step\nx\noutput");
+  changeProblemField(studio, "traceRows", "1 | 2 |\n2 | 5 |\n3 | 5 | 5");
+  const problem = studio.buildPack().skills[0].problems[0];
+  const html = studio.render(state);
+  assert.equal(problem.prompt_blocks[1].type, "code");
+  assert.equal(problem.prompt_blocks[1].text, "x = 2\nx += 3\nprint(x)");
+  assert.equal(problem.work.mode, "code_trace_steps");
+  assert.deepEqual(problem.work.trace_spec.columns, ["step", "x", "output"]);
+  assert.deepEqual(problem.work.trace_spec.expected_rows.at(-1), { step: 3, x: 5, output: 5 });
+  assert.equal(problem.review_policy.work_review, "auto");
+  assert.match(html, /table is authored; lesson code is never executed/i);
+  assert.match(html, /Expected rows — pipe-separated cells/);
+});
+
+test("Lesson Studio builds a declarative sandboxed Python function contract", () => {
+  const { studio, state } = studioHarness();
+  studio.handleAction({ dataset: { creatorAction: "apply-python-example", index: "0" } });
+  const problem = studio.buildPack().skills[0].problems[0];
+  const html = studio.render(state);
+  assert.equal(problem.grading_method, "python_program");
+  assert.equal(problem.answer_type, "code");
+  assert.equal(problem.program_spec.runtime, "python_subset_v1");
+  assert.equal(problem.program_spec.entrypoint.name, "is_even");
+  assert.deepEqual(problem.program_spec.entrypoint.parameters, [{ name: "number", type: "int" }]);
+  assert.equal(problem.program_spec.tests.length, 4);
+  assert.equal(problem.program_spec.tests.filter((item) => item.visibility === "hidden").length, 2);
+  assert.deepEqual(problem.program_spec.policy.imports, []);
+  assert.equal(problem.program_spec.policy.network, false);
+  assert.match(html, /Declarative tests, isolated learner code/);
+  assert.match(html, /visibility \| id \| arguments JSON \| expected JSON/);
+});
+
 test("Lesson Studio opens native lessons as reversible overrides without changing identity", () => {
   const { studio, state } = studioHarness();
   const opened = studio.loadNativeLesson("MATH_ARITH_001", { announce: false });

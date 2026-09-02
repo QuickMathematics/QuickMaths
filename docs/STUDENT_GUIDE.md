@@ -305,7 +305,7 @@ The page shows question number, total authored scenarios, prompt, response type,
 
 ### Final-answer types
 
-Questions may accept numeric answers, tolerance ranges, multiple-choice options, symbolic expressions, finite sets, rational expressions with domain exclusions, equation solutions, interval sets, exact text, or theorem conclusions. Follow the notation instructions in the prompt.
+Questions may accept numeric answers, tolerance ranges, multiple-choice options, sandboxed Python functions, symbolic expressions, finite sets, rational expressions with domain exclusions, equation solutions, interval sets, exact text, or theorem conclusions. Follow the notation instructions in the prompt.
 
 Finite sets are order-independent and ignore repeated entries. You can usually write `{ -2, 5 }` or `x = -2 or x = 5`; use `{}` or `no solution` for the empty set. Interval answers accept standard interval/union notation such as `(-infinity, -1] U (3, infinity)`, and many equivalent inequality forms. Infinity endpoints must always be open.
 
@@ -328,6 +328,20 @@ Some rational equations open a guided work area for original restrictions, algeb
 ### Sign-chart workspace
 
 Polynomial and rational inequalities can open a structured sign chart. Enter critical points, one test value and sign for each interval, selected intervals, endpoint decisions, and the final interval set. The page presents normal fields rather than JSON. QuickMaths reports errors by row, including a misplaced critical point, an incorrect test sign, a wrongly selected interval, or an endpoint that should be included or excluded.
+
+### Formatted code and trace tables
+
+Programming questions show source in a labelled code block that preserves indentation and scrolls horizontally on a narrow screen. The code displayed in a lesson prompt is inert text—it is never executed.
+
+A structured trace question adds a scrollable table beneath the code. Each row represents a labelled execution checkpoint; enter the variable values and any output after that step. Blank output means nothing has been printed yet. QuickMaths compares the authored state table without executing the prompt code, and reports the first missing row or divergent variable/output cell before submission.
+
+### Sandboxed Python functions
+
+A `python_program` question provides a code editor and **Run sandboxed tests** button. Write the exact named function with the requested positional parameters and return a value instead of reading interactive input. The supported beginner subset includes assignments, conditions, loops, comprehensions, helper functions, JSON-compatible values, and an author-selected set of ordinary builtins and value methods.
+
+The first run downloads a pinned Python runtime, so it can take longer than later questions. Every run gets a disposable background Worker. QuickMaths rejects imports, files, network, browser/storage APIs, clocks, randomness, dynamic evaluation, private/dunder access, classes, exception handling, decorators, and unsupported syntax. It also limits source structure, execution steps, output, returned data, and wall time, then terminates the Worker.
+
+Before submission, you see only tests marked as examples. After submission, additional `after_submission` outcomes can appear. Hidden tests report only status and never reveal their arguments or expected values. A current sandbox run is required before submitting; editing the code invalidates the old result. The subset is deliberately not full Python: file, module, exception, object-oriented, and complete application exercises remain captured or rubric-reviewed work rather than being falsely run with broad privileges.
 
 ### Formal proof required
 
@@ -413,7 +427,7 @@ Choose a subject, write one or more lessons, add theory, worked examples, applic
 
 ### Response and review design
 
-Studio separates final-answer grading, shown work, and review. It explains ordinary answers, finite sets, rational formulas and exclusions, interval sets, checked maths steps, rational-equation ledgers, sign charts, formal proof obligations, and rubric responses with learner previews and editable examples.
+Studio separates final-answer grading, shown work, and review. It explains ordinary answers, finite sets, rational formulas and exclusions, interval sets, checked maths steps, rational-equation ledgers, sign charts, formatted code blocks, trace tables, sandboxed Python function tests, formal proof obligations, and rubric responses with learner previews and editable examples.
 
 ### Native improvements
 

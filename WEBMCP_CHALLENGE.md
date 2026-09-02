@@ -34,10 +34,10 @@ Challenge-period milestone evidence:
 - Original logo landing page with multiple learner profiles and sample progress
 - Seven-chapter onboarding tour for every new profile, with skip and persistent replay controls
 - Dashboard metrics, suggested next work, recent attempts, and continue flow
-- 53 native Mathematics lessons plus a first-party 15-lesson Geography package in the Lesson Depot, joined through coordinate geometry and geodesy
+- 53 native Mathematics lessons plus first-party 15-lesson Geography and 25-lesson Python Programming packages in the Lesson Depot; Programming adds formatted code, structured traces, and isolated pure-function grading
 - Theory, applications, prerequisites, unlocks, and worked examples for every skill
 - Scenario-complete mastery tests: every authored assessment case appears once per attempt (8–25 questions in the original Mathematics curriculum), while retakes rotate generated variants
-- Multiple-choice, free-response, required shown work, local grading, and step checks
+- Multiple-choice, free-response, required shown work, local grading, structured code traces, sandboxed Python functions, and step checks
 - Results, reflection-based mastery updates, spaced review dates, and saved tutor/self reviews
 - Live analog clock plus per-session and cumulative profile timers
 - Browser autosave, backup recommendations, confirmed JSON restore, and formula-safe CSV exports
@@ -117,8 +117,10 @@ Important files:
 - `docs/challenge.css` — responsive visual system and original-style clock
 - `docs/curriculum-data.json` — browser-ready 53-lesson native Mathematics curriculum with comprehensive assessments and rotating retake variants
 - `docs/lesson-depot/lessons/geography/1.0.0/lesson-set.json` — installable first-party 15-lesson Geography curriculum
+- `docs/lesson-depot/lessons/programming-fundamentals-python/1.2.0/lesson-set.json` — installable 25-lesson Python curriculum with code, trace, and sandbox contracts
 - `docs/challenge-core.js` — profiles, mastery graph, grading, attempts, reviews, timers, and persistence
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports
+- `docs/python-grader.js` and `docs/python-sandbox-worker.js` — disposable-worker Python grading boundary with a trusted AST supervisor
 - `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio
 - `docs/webmcp-tools.js` — WebMCP schemas, validation, registration, and execution
 - `docs/github-sync.js` — GitHub Contents transport, credential separation, revisions, polling, and conflict checks

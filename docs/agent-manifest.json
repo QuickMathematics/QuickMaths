@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 21,
+  "app_version": 22,
   "description": "Operating guide for an agent tutoring learners or helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -108,7 +108,7 @@
     ],
     "custom_content": [
       "Installed custom lesson sets and subjects are part of the same map, lesson, testing, progress, and backup model as built-in skills.",
-      "Before creating or modifying lesson content, call get_lesson_authoring_guide for the relevant sections. Use grading_and_work for finite sets, rational expressions, rational-equation ledgers, interval sets, sign charts, proof obligations, and rubrics.",
+      "Before creating or modifying lesson content, call get_lesson_authoring_guide for the relevant sections. Use grading_and_work for finite sets, rational expressions, rational-equation ledgers, interval sets, formatted prompt code, structured code traces, sandboxed Python functions, proof obligations, and rubrics.",
       "To improve a built-in lesson, call open_lesson_creator with its skill_id to visibly prefill Lesson Studio, or author schema 2.0 JSON with mode override. An override must keep the exact native skill ID and original subject, preserves completed learner progress and map identity, restarts affected unfinished tests, and is reversible from Settings.",
       "Use validate_lesson_set before stage_custom_lesson_set. Staging is visible but cannot install content.",
       "Use search_lesson_depot for public catalog metadata. Results with availability preview are roadmap concepts, not lesson content, and cannot be staged or installed. For published results, use stage_depot_lesson for one package or stage_depot_lessons for an ordered batch. Batches are preflighted for ordered dependencies and aggregate capacity. Hash verification fails closed; all staging opens visible human review and cannot install silently.",
@@ -193,7 +193,7 @@
     "example": "https://quickmathematics.github.io/QuickMaths/lesson-set-example.json",
     "install_route": "settings",
     "human_creator_route": "creator",
-    "human_creator_guidance": "Lesson Studio can create new sets or open a native lesson as an editable, reversible improvement. It explains final-answer grading, shown work, and review as separate stages; advanced modes include finite sets, rational expressions with preserved exclusions, rational-equation candidate ledgers, interval sets, structured sign charts, proof obligations, rubrics, editable examples, and a learner-view preview. Learners use guided fields rather than raw JSON.",
+    "human_creator_guidance": "Lesson Studio can create new sets or open a native lesson as an editable, reversible improvement. It explains final-answer grading, shown work, and review as separate stages; advanced modes include finite sets, rational expressions with preserved exclusions, rational-equation candidate ledgers, interval sets, structured sign charts, escaped formatted code, structured trace tables, sandboxed pure-function Python tests, proof obligations, rubrics, editable examples, and a learner-view preview. Learners use guided fields rather than raw JSON.",
     "limits": { "file_bytes": 2000000, "sets": 10, "skills_per_set": 50, "problems_per_skill": 100 },
     "id_rules": { "pack_prefix": "PACK_", "add_mode_skill_prefix": "CUSTOM_", "override_mode_skill_id": "the exact existing native skill ID", "characters": "uppercase letters, numbers, and underscores" },
     "native_improvements": {
@@ -210,6 +210,7 @@
       "exact_numeric",
       "numeric_with_tolerance",
       "multiple_choice",
+      "python_program",
       "symbolic_expression",
       "equation_solution",
       "inequality_solution",
@@ -219,7 +220,14 @@
       "exact_text",
       "theorem_conclusion"
     ],
-    "supported_work_modes": ["none", "capture_only", "procedural_steps", "rational_equation_steps", "sign_chart_steps", "proof_obligations", "rubric_check"],
+    "supported_work_modes": ["none", "capture_only", "procedural_steps", "rational_equation_steps", "sign_chart_steps", "code_trace_steps", "proof_obligations", "rubric_check"],
+    "programming_assessments": {
+      "prompt_blocks": "Optional escaped text/code blocks preserve whitespace and indentation; package code is presentation-only and never executed.",
+      "trace_tables": "code_trace_steps compares learner cells with declarative expected rows and stable step labels without executing package code.",
+      "python_subset": "python_program runs only learner-authored top-level pure functions in a disposable Pyodide Worker after AST allowlisting. Imports, files, network, browser/storage APIs, clocks, randomness, dynamic evaluation, private attributes, and unsupported syntax are forbidden; authored tests are JSON data only.",
+      "visibility": "Example cases may be shown before submission, after_submission cases only afterwards, and hidden cases never expose arguments or expected values through learner-facing WebMCP results.",
+      "agent_rule": "Do not solve a live programming assessment or reveal hidden/after-submission cases. You may explain syntax, interpret a reported failure, or ask a leading debugging question based on the learner's visible work."
+    },
     "subject_system": {
       "default_subject_id": "SUBJECT_MATH",
       "built_in_subjects": ["SUBJECT_MATH"],

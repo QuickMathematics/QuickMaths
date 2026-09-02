@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Educator Agent Manifest",
   "app": "QuickMaths Educator Workspace",
-  "app_version": 21,
+  "app_version": 22,
   "role": "educator",
   "description": "Dedicated operating contract for an agent helping an educator compose, review, personalize, and export a QuickMaths curriculum.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
@@ -43,14 +43,14 @@
     "search": "search_lesson_depot returns public metadata only. Popularity is not a correctness guarantee.",
     "single_review": "stage_depot_lesson opens one published pack for human review.",
     "batch_review": "stage_depot_lessons accepts ordered package IDs, preflights dependencies and aggregate capacity, then opens them sequentially. Approving one package never authorizes the next.",
-    "authoring": "Call get_lesson_authoring_guide before authoring. open_lesson_creator can start a new set or load a native lesson as a reversible improvement, including finite sets, rational expressions and equations, interval sets, and structured sign charts. validate_lesson_set checks schema and safety before stage_custom_lesson_set opens visible review.",
+    "authoring": "Call get_lesson_authoring_guide before authoring. open_lesson_creator can start a new set or load a native lesson as a reversible improvement, including finite sets, rational expressions and equations, interval sets, structured sign charts, escaped formatted code, structured trace tables, and sandboxed pure-function Python tests. Uploaded code blocks are presentation-only; python_program executes only learner code against declarative JSON cases in the restricted subset. validate_lesson_set checks schema and safety before stage_custom_lesson_set opens visible review.",
     "publication": "Downloading, installing, Depot publication, GitHub submission, and public community actions remain direct human controls."
   },
   "frontend_surfaces": {
     "overview": "Curriculum metrics, design loop, learner policy summary, assessment notice, and direct workspace actions.",
     "curriculum_designer": "Workspace switcher, public-blueprint and private-assignment import/export, identity, learner and agent-tutoring policy, pack manager, canonical mastery map, Plan mode paths, and annotations.",
     "lesson_depot": "Catalog search, filters, trust signals, previews, sequential staging, package installation review, and optional human-operated community participation.",
-    "lesson_studio": "Friendly lesson-set authoring, native improvements, worked examples, applications, mastery questions, grading, shown work, proof obligations, rubrics, validation, installation, and publication handoff.",
+    "lesson_studio": "Friendly lesson-set authoring, native improvements, worked examples, applications, mastery questions, formatted code, trace-table models, sandboxed Python function contracts, grading, shown work, proof obligations, rubrics, validation, installation, and publication handoff.",
     "settings": "Full backup, curriculum import/export, GitHub Bridge, installed pack management, and documentation.",
     "agent_studio": "WebMCP registration status, suggested prompt, available tools, and attributed agent activity."
   },

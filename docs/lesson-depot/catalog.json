@@ -790,38 +790,45 @@
       "version": "0.0.0-preview.1"
     },
     {
-      "author": "QuickMaths Preview",
-      "availability": "preview",
+      "author": "QuickMaths",
       "community": {
         "comments": 0,
         "discussion_url": "",
         "votes": 0
       },
-      "description": "A language-neutral introduction to state, control flow, functions, debugging, and program design.",
-      "id": "PACK_PREVIEW_PROGRAMMING_FOUNDATIONS",
-      "license": "Not published",
-      "name": "Programming Foundations",
-      "problems": 0,
-      "published_at": "",
-      "skills": 0,
-      "slug": "programming-foundations",
-      "subject_id": "SUBJECT_COMPUTER_SCIENCE",
-      "subject_name": "Computer Science",
+      "description": "A rigorous 25-lesson beginner-to-advanced-beginner curriculum in algorithms, Python values and control flow, functions, text and collections, files and exceptions, modules, object-oriented design, algorithmic efficiency, software architecture, and two tested application capstones. This release adds formatted code, structured trace tables, and sandboxed pure-function grading.",
+      "id": "PACK_PROGRAMMING_FUNDAMENTALS",
+      "lesson_path": "lessons/programming-fundamentals-python/1.2.0/lesson-set.json",
+      "license": "CC BY 4.0",
+      "name": "Programming Fundamentals with Python",
+      "problems": 266,
+      "published_at": "2026-09-02",
+      "schema_version": "2.0",
+      "sha256": "cbd4d783e63d3f9be091afae16fd17a7875add279ceca7eede425dd60f711e98",
+      "skills": 25,
+      "slug": "programming-fundamentals-python",
+      "subject_id": "SUBJECT_PROGRAMMING",
+      "subject_name": "Programming",
       "subject_theme": {
-        "accent": "#da6e55",
-        "highlight": "#b8e5db",
-        "paperLight": "#f8faff",
-        "primary": "#253c68",
-        "primaryAlt": "#365a91",
-        "tint": "#c2d4ee"
+        "accent": "#d95d6f",
+        "highlight": "#f5df93",
+        "paperLight": "#fbfcff",
+        "primary": "#273b8f",
+        "primaryAlt": "#3d57b2",
+        "tint": "#c8d2f5"
       },
       "tags": [
-        "debugging",
-        "functions",
-        "programming"
+        "algorithms",
+        "beginner",
+        "code-grading",
+        "computer science",
+        "programming",
+        "python",
+        "sandbox",
+        "trace-tables"
       ],
-      "updated_at": "",
-      "version": "0.0.0-preview.1"
+      "updated_at": "2026-09-02",
+      "version": "1.2.0"
     },
     {
       "author": "QuickMaths Preview",

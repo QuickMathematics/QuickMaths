@@ -14,6 +14,8 @@ docs/lesson-depot/lessons/<slug>/<version>/
 
 The lesson file must follow `quickmaths.lesson-set` schema 2.0 and pass the same complete validator used by local uploads and WebMCP staging. See the [Agent Lesson Authoring Guide](../CUSTOM_LESSON_SETS.md).
 
+The published Programming Fundamentals pack demonstrates the richer schema without adding an executable package format: `prompt_blocks` preserve code formatting, `code_trace_steps` grade declarative state tables without running package code, and `python_program` supplies only a pure-function signature plus JSON test data. Learner Python runs separately in a disposable browser Worker under QuickMaths' trusted AST supervisor; lesson authors cannot provide a test harness or arbitrary grader code.
+
 `showcase.json` contains metadata-only **Concept preview** cards used to exercise the populated Depot layout and communicate possible future subjects. They are visually distinct, have no lesson file or community thread, cannot be previewed, staged, or installed, and must use `PACK_PREVIEW_*` IDs plus a preview semantic version. Remove a concept card when its complete reviewed package is published.
 
 ## Build and validate
