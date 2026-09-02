@@ -1,93 +1,85 @@
-# Quick Maths
+# QuickMaths
 
-Quick Maths is a local-first mastery testing and prerequisite mapping app for AI-assisted learning. It loads skills from YAML, generates mastery tests, grades answers, stores learner progress, shows a prerequisite map, and exports portable progress records for a preferred AI tutor.
+QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, substantial Mathematics and Geography curricula, structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
 
-Learners enter normal school-style math notation. The app separates final answers from shown work, autogrades final answers only, and exports work for AI tutor review.
+The public app runs entirely from GitHub Pages:
 
-## WebMCP Challenge Demo
+**https://quickmathematics.github.io/QuickMaths/**
 
-The zero-cost static app in [`docs/`](docs/) brings 43 first-party Mathematics and Geography lessons to the browser: the original 25-skill Algebra Foundations track, a three-lesson coordinate-geometry bridge, and a substantial 15-lesson Geography curriculum spanning spatial inquiry, cartography, Earth systems, population, cities, trade, territory, risk, and regional synthesis. It includes a replayable new-profile tutorial, learner landing page, profiles, dashboard, prerequisite mastery maps with focused and all-subject lane views, five-question tests, results and reflection, tutor reviews, the original analog clock, JSON backup/load, and CSV exports. Schema 2.0 lesson sets can extend either built-in subject or create new themed subjects with cross-subject prerequisite bridges; each profile can choose an enforced Hard path or guideline-only Open path. A built-in Human Lesson Creator and public Lesson Depot provide no-code authoring and community distribution, including optional in-app GitHub Discussion votes and comments. Seventeen WebMCP tools let a compatible ChatGPT or Codex browser inspect subjects and progress, search or stage community content, navigate the visible app, tutor, validate lesson JSON, and stage content for human-controlled installation.
+No QuickMaths account, model API key, or paid application server is required. Learner state autosaves in the browser and can be moved with full JSON backups or the optional GitHub Bridge.
 
-QuickMaths Bridge adds an optional mobile-to-agent handoff without adding a hosted application server. The learner app checkpoints complete state to `learner-state.json` in a dedicated private GitHub repository; a separate top-level Agent Bridge page exposes the learning tools plus three sync tools and returns revision-bound agent changes through `agent-state.json`. Stale responses and unsynced local overwrites are rejected. The preferred Codex transport is a loopback CLI that uses the host's existing Git credentials, so the agent browser never receives the GitHub token.
+## What is in the app
 
-Without Bridge, all learning state remains in browser `localStorage`; visible backup and restore controls in Settings make it portable between browsers. The static build needs no model API, QuickMaths account, API key, or paid hosting. Bridge users supply their own narrow GitHub repository token. Separately, Lesson Depot participants may authorize the least-privilege QuickMaths Community GitHub App to vote with a 👍 reaction and comment in the public repository. Its short-lived user token is kept in `sessionStorage` by default (or `localStorage` only when the user chooses **Keep me connected**) and never enters learning backups, bridge files, WebMCP output, or commits. A stateless Cloudflare Worker protects the GitHub App client secret and only exchanges or refreshes OAuth tokens. See the [QuickMaths Bridge guide](docs/QUICKMATHS_BRIDGE.md).
+- Multiple learner profiles with separate progress, attempts, reviews, timers, and preferences
+- Mathematics and Geography mastery maps, including cross-subject prerequisite bridges
+- Enforced Hard path and guideline-only Open path
+- Five-question mastery tests with generated variants, required work, proofs, and review gates
+- Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
+- Public Lesson Depot with optional GitHub Discussion upvotes and comments
+- Seventeen WebMCP tools for visible navigation, tutoring, curriculum inspection, and human-controlled lesson staging
+- Optional GitHub Bridge for revision-safe mobile/remote-agent checkpoints
 
-Run it locally:
+## Run the web app locally
 
 ```powershell
 python -m http.server 8765 --directory docs
 ```
 
-Then open `http://localhost:8765/`. See [WEBMCP_CHALLENGE.md](WEBMCP_CHALLENGE.md) for architecture, testing, deployment, and the under-three-minute demo script.
+Open `http://localhost:8765/`.
 
-The dedicated agent workspace is at `http://localhost:8765/agent-bridge.html`, and the mobile setup guide is at `http://localhost:8765/bridge-guide.html`.
+The learner app is `docs/index.html`; the dedicated WebMCP agent workspace is `docs/agent-bridge.html`; the mobile/storage walkthrough is `docs/bridge-guide.html`.
 
-For a Codex host already authenticated to the private data repository, run the WebMCP workspace over the local Git transport:
+## Local Git Bridge for Codex
 
-```powershell
-python -m quickmaths.cli agent-bridge --repo https://github.com/YOUR-NAME/quickmaths-sync.git
-```
-
-Open the printed `127.0.0.1` URL in the compatible agent browser. The loopback server exposes only the two checkpoint files, uses SHA-checked Git commits, and stops with `Ctrl+C`. The learner phone still connects from **Settings → QuickMaths Bridge** with its repository-scoped fine-grained token.
-
-## Version 0.2 Scope
-
-The first-party browser curriculum contains 43 connected lessons and 555 assessment questions. The Python/Streamlit app remains the original Mathematics authoring and reference implementation; the web export combines its 375 seeded Algebra variants with 180 reviewed Mathematics-bridge and Geography questions, serving rotating five-question tests without a backend.
-
-## Run Locally
+The small Python package is not a second learner app. It remains solely for curriculum validation/export and the loopback Git Bridge.
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
-streamlit run app/Quick_Maths.py
+python -m quickmaths.cli agent-bridge --repo https://github.com/YOUR-NAME/quickmaths-sync.git
 ```
 
-For authoring/dev tools, including Author Preview and Lessons-Dev:
+Open the printed `127.0.0.1` URL in a WebMCP-compatible agent browser. The loopback server uses the computer's existing Git credentials and exposes only `learner-state.json` and `agent-state.json` from the selected data repository.
+
+## Curriculum development
+
+The native Mathematics curriculum is authored in YAML under `content/math/algebra_foundations/`. Geography and its Mathematics bridge live in `content/geography/foundations/web-curriculum.json`.
+
+Validate native YAML:
 
 ```powershell
-streamlit run app/Quick_Maths_Dev.py
+python -m quickmaths.cli validate-content --strict-warnings
 ```
 
-`Lessons-Dev` can launch a mastery test for any lesson, including locked lessons. Use the normal app for real learner progress.
+Regenerate the browser curriculum after native YAML changes:
 
-On launch, Quick Maths opens a full-screen profile picker using `Logosketch.png`. Each profile has separate local progress, attempts, reviews, and exports. Use the sidebar `Log Out` button to return to the profile picker.
-
-## Persistent Storage
-
-The landing page offers two storage modes:
-
-- **Google Drive**: recommended for deployed Streamlit apps. Quick Maths signs in with Google, creates or reuses a folder named `Quick Maths`, downloads the saved SQLite/export files at login, and uploads managed files after saves and exports.
-- **Local storage (Not recommended)**: uses the Streamlit server filesystem. This is fine for local development, but deployed app storage can disappear after restarts or redeploys.
-
-For persistent Google Drive sign-in, create a Google Cloud OAuth client, enable the Google Drive API, and register an authorized redirect URI ending in `/oauth2callback`, such as `https://your-streamlit-app-url.streamlit.app/oauth2callback`. Add these Streamlit secrets:
-
-```toml
-[auth]
-redirect_uri = "https://your-streamlit-app-url.streamlit.app/oauth2callback"
-cookie_secret = "replace-with-a-long-random-secret"
-client_id = "..."
-client_secret = "..."
-server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
-expose_tokens = "access"
-client_kwargs = { scope = "openid profile email https://www.googleapis.com/auth/drive.file", prompt = "select_account" }
+```powershell
+python scripts/export_web_curriculum.py
 ```
 
-Generate `cookie_secret` with a password generator or `python -c "import secrets; print(secrets.token_urlsafe(32))"`. Streamlit keeps the identity in a secure browser cookie, so refreshes and new tabs restore the Google identity. Google Drive access tokens are shorter-lived and Streamlit does not expose refresh tokens; when Drive access expires, Quick Maths preserves the downloaded local database and shows a reconnect action instead of attempting unsafe token storage. The app requests Google profile/email scopes plus `drive.file`, then stores only Quick Maths managed files in the `Quick Maths` Drive folder.
+For portable custom lessons and native improvements, use the in-app Lesson Studio or the [Agent Lesson Authoring Guide](docs/CUSTOM_LESSON_SETS.md).
 
 ## Test
 
 ```powershell
-pytest
-npm --prefix docs test
+python -m pytest -q
+node --test docs/*.test.js
+node --test community-worker/src/*.test.js
 ```
 
-## Validate Content
+## Repository map
 
-```powershell
-python -m quickmaths.cli validate-content
-```
+- `docs/` — the complete GitHub Pages app, WebMCP tools, guides, and browser tests
+- `content/` — first-party curriculum sources
+- `quickmaths/` — focused curriculum tooling and local Git Bridge
+- `scripts/` — curriculum and Lesson Depot build/validation scripts
+- `community-worker/` — stateless GitHub Community OAuth callback worker
+- `tests/` — Python curriculum, grading, Depot, and Bridge tests
+- `WEBMCP_CHALLENGE.md` — challenge architecture and demo walkthrough
 
-## Add A Skill
+## Storage and authorization boundaries
 
-Create a YAML file in `content/math/algebra_foundations/skills/`, add its ID to `track.yaml`, run content validation, and restart Streamlit. No Python change should be required for ordinary skills.
+Browser autosave, GitHub learner storage, and Lesson Depot community authorization are three separate systems. Storage tokens are entered only in the app, are never committed, and should be restricted to a dedicated data repository. Community authorization cannot read learner state; its public actions are limited to GitHub Discussion reactions and comments.
+
+QuickMaths is MIT licensed.

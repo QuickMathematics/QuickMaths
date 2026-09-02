@@ -66,6 +66,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.doesNotMatch(html, /<strong>25<\/strong> connected skills/);
   assert.match(html, /Local-first mastery learning/);
   assert.match(html, /id="welcome-storage-restore"/);
+  assert.match(css, /\.welcome-storage-restore \{[^}]*border-radius: 14px;[^}]*background:/);
+  assert.match(css, /\.welcome-storage-restore > summary strong \{ font-size: 15px/);
   assert.match(html, /id="app-shell" class="app-shell agent-collapsed"/);
   assert.match(html, /id="agent-dock" class="agent-dock is-closed"/);
   assert.doesNotMatch(html, /QuickMaths turns \d+ connected lessons across \d+ installed subjects/);

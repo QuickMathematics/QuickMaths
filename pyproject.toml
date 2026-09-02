@@ -1,19 +1,12 @@
 [project]
 name = "quick-maths"
-version = "0.2.0"
-description = "Local-first mastery testing and prerequisite mapping for AI-assisted STEM learning."
+version = "0.3.0"
+description = "Browser-first mastery learning with WebMCP tutoring and a local Git bridge."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "networkx>=3.2",
     "pyyaml>=6.0",
-    "authlib>=1.3.2",
-    "httpx>=0.27",
-    "google-api-python-client>=2.130",
-    "google-auth>=2.29",
-    "google-auth-oauthlib>=1.2",
-    "streamlit>=1.59",
-    "streamlit-agraph>=0.0.45",
     "sympy>=1.12",
 ]
 

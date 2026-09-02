@@ -7,10 +7,11 @@ dist/
 build/
 node_modules/
 *.egg-info/
-.streamlit/
 .bridge-runtime/
+.codex-remote-attachments/
+/ChatGPT Installer.exe
+/Microsoft.Services.Store.winmd
 data/quick_maths.sqlite
 data/oauth_state.sqlite
 data/exports/*.csv
 data/exports/*.md
-!data/exports/.gitkeep
