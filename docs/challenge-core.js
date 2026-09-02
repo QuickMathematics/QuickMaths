@@ -68,6 +68,29 @@ function assessmentLength(skill) {
   return Math.max(1, Math.min(bankLength, configured));
 }
 
+function assessmentGroupKey(problem) {
+  return problem?.source_template_id ?? problem?.template_id;
+}
+
+function selectAssessmentProblems(skill, attemptCount = 0) {
+  const bank = Array.isArray(skill?.problems) ? skill.problems : [];
+  const questionCount = assessmentLength(skill);
+  const groupMap = new Map();
+  for (const problem of bank) {
+    const key = assessmentGroupKey(problem);
+    if (!groupMap.has(key)) groupMap.set(key, []);
+    groupMap.get(key).push(problem);
+  }
+  const groups = [...groupMap.values()];
+  if (groups.length === questionCount) {
+    const rotation = attemptCount % Math.max(1, groups.length);
+    const orderedGroups = [...groups.slice(rotation), ...groups.slice(0, rotation)];
+    return orderedGroups.map((variants) => variants[attemptCount % variants.length]);
+  }
+  const offset = (attemptCount * questionCount) % Math.max(1, bank.length);
+  return [...bank.slice(offset), ...bank.slice(0, offset)].slice(0, questionCount);
+}
+
 function makeId(prefix = "id") {
   if (globalThis.crypto?.randomUUID) return `${prefix}-${globalThis.crypto.randomUUID()}`;
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -147,6 +170,10 @@ function normalizeProblem(candidate, skillId, questionIds) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${skillId} contains an invalid problem.`);
   const templateId = requiredText(candidate.template_id, `${skillId} problem ID`, 120);
   if (!SAFE_ID.test(templateId)) throw new Error(`${templateId} is not a valid problem ID.`);
+  const sourceTemplateId = candidate.source_template_id == null
+    ? templateId
+    : requiredText(candidate.source_template_id, `${templateId} source template ID`, 120);
+  if (!SAFE_ID.test(sourceTemplateId)) throw new Error(`${sourceTemplateId} is not a valid source template ID.`);
   if (questionIds.has(templateId)) throw new Error(`Duplicate problem ID: ${templateId}.`);
   questionIds.add(templateId);
   if (candidate.skill_id != null && candidate.skill_id !== skillId) throw new Error(`${templateId} must use skill_id ${skillId}.`);
@@ -194,7 +221,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
   if (!["none", "optional", "auto", "tutor_required", "self_review"].includes(workReview)) throw new Error(`${templateId} uses unsupported work_review ${workReview}.`);
   return {
     template_id: templateId,
-    source_template_id: templateId,
+    source_template_id: sourceTemplateId,
     skill_id: skillId,
     seed: Math.floor(cleanNumber(Number(candidate.seed), 1, 0, 2_000_000_000)),
     difficulty: ["easy", "medium", "hard", "brutal"].includes(candidate.difficulty) ? candidate.difficulty : "medium",
@@ -685,17 +712,16 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
       const skill = skillsById[skillId];
       if (!skill || !rawDraft || typeof rawDraft !== "object" || Array.isArray(rawDraft)) continue;
       const canonical = Object.fromEntries(skill.problems.map((problem) => [problem.template_id, problem]));
-      const targetLength = assessmentLength(skill);
       const problemIds = Array.isArray(rawDraft.problems)
-        ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => canonical[id]).slice(0, targetLength)
+        ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => canonical[id]).slice(0, MAX_PROBLEMS_PER_SKILL)
         : [];
       if (!problemIds.length) continue;
-      const included = new Set(problemIds);
-      for (const problem of skill.problems) {
-        if (problemIds.length >= targetLength) break;
-        if (included.has(problem.template_id)) continue;
+      const included = new Set(problemIds.map((id) => assessmentGroupKey(canonical[id])));
+      for (const problem of selectAssessmentProblems(skill)) {
+        const groupKey = assessmentGroupKey(problem);
+        if (included.has(groupKey)) continue;
         problemIds.push(problem.template_id);
-        included.add(problem.template_id);
+        included.add(groupKey);
       }
       const responses = rawDraft.responses && typeof rawDraft.responses === "object" ? rawDraft.responses : {};
       output[profileId][skillId] = {
@@ -1502,10 +1528,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     const existing = state.drafts[profileId][skillId];
     if (!existing) {
       const attemptCount = activeProgress()[skillId]?.attemptCount ?? 0;
-      const bank = skillsById[skillId].problems;
-      const questionCount = assessmentLength(skillsById[skillId]);
-      const offset = (attemptCount * questionCount) % Math.max(1, bank.length);
-      const problems = [...bank.slice(offset), ...bank.slice(0, offset)].slice(0, questionCount);
+      const problems = selectAssessmentProblems(skillsById[skillId], attemptCount);
       state.drafts[profileId][skillId] = {
         draftId: makeId("draft"),
         skillId,

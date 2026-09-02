@@ -16,15 +16,15 @@ import {
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const lessonSetExample = readFileSync(new URL("./lesson-set-example.json", import.meta.url), "utf8");
-const ORIGINAL_MATH_TEST_LENGTHS = Object.freeze({
-  MATH_ALG_001: 20, MATH_ALG_002: 24, MATH_ALG_003: 22, MATH_ALG_004: 24,
-  MATH_ALG_005: 20, MATH_ALG_006: 24, MATH_ALG_007: 8, MATH_ALG_008: 8,
-  MATH_ARITH_001: 10, MATH_ARITH_002: 15, MATH_ARITH_003: 20,
-  MATH_ARITH_004: 22, MATH_ARITH_005: 26,
+const AUTHORED_MATH_SCENARIO_COUNTS = Object.freeze({
+  MATH_ALG_001: 21, MATH_ALG_002: 23, MATH_ALG_003: 22, MATH_ALG_004: 24,
+  MATH_ALG_005: 21, MATH_ALG_006: 24, MATH_ALG_007: 8, MATH_ALG_008: 8,
+  MATH_ARITH_001: 10, MATH_ARITH_002: 16, MATH_ARITH_003: 21,
+  MATH_ARITH_004: 22, MATH_ARITH_005: 25,
   MATH_GRAPH_001: 8, MATH_GRAPH_002: 8, MATH_GRAPH_003: 8,
   MATH_GRAPH_004: 8, MATH_GRAPH_005: 8, MATH_GRAPH_006: 8,
   MATH_PREALG_001: 20, MATH_PREALG_002: 18, MATH_PREALG_003: 20,
-  MATH_PREALG_004: 20, MATH_PREALG_005: 22, MATH_SYS_001: 8,
+  MATH_PREALG_004: 21, MATH_PREALG_005: 23, MATH_SYS_001: 8,
 });
 
 function memoryStorage(seed = {}) {
@@ -119,8 +119,8 @@ test("ships the complete first-party Mathematics and Geography curriculum and op
   const { store } = harness();
   const state = store.snapshot();
   assert.equal(curriculum.skills.length, 43);
-  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 579);
-  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 579);
+  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 583);
+  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 583);
   assert.equal(curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY").length, 15);
   assert.equal(curriculum.skills.filter((skill) => skill.id.startsWith("MATH_GEOM_")).length, 3);
   assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [
@@ -132,13 +132,26 @@ test("ships the complete first-party Mathematics and Geography curriculum and op
   assert.equal(state.ui.route, "welcome");
 });
 
-test("restores the original comprehensive Mathematics test lengths and keeps enough retake variants", () => {
-  assert.equal(Object.values(ORIGINAL_MATH_TEST_LENGTHS).reduce((total, count) => total + count, 0), 399);
-  for (const [skillId, expectedLength] of Object.entries(ORIGINAL_MATH_TEST_LENGTHS)) {
+test("every Mathematics test covers every authored scenario and keeps retake variants", () => {
+  assert.equal(Object.values(AUTHORED_MATH_SCENARIO_COUNTS).reduce((total, count) => total + count, 0), 403);
+  for (const [skillId, expectedLength] of Object.entries(AUTHORED_MATH_SCENARIO_COUNTS)) {
     const skill = curriculum.skills.find((candidate) => candidate.id === skillId);
     assert.ok(skill, `${skillId} must ship`);
     assert.equal(skill.question_count, expectedLength, `${skillId} assessment length`);
+    assert.equal(new Set(skill.problems.map((problem) => problem.source_template_id)).size, expectedLength, `${skillId} authored scenario coverage`);
     assert.ok(skill.problems.length >= expectedLength, `${skillId} needs a complete question bank`);
+  }
+});
+
+test("every built-in assessment starts with exactly one problem from every authored scenario", () => {
+  const { store } = harness();
+  store.createProfile("Coverage Auditor");
+  for (const skill of curriculum.skills) {
+    store.startTest(skill.id, { force: true });
+    const draft = store.snapshot().activeTest;
+    const scenarioIds = draft.problems.map((problem) => problem.source_template_id ?? problem.template_id);
+    assert.equal(draft.problems.length, skill.question_count, `${skill.id} configured length`);
+    assert.equal(new Set(scenarioIds).size, skill.question_count, `${skill.id} unique scenario coverage`);
   }
 });
 
@@ -304,17 +317,22 @@ test("retakes rotate through fresh comprehensive sets from the seeded variant ba
   store.submitTest();
   store.saveReflection({ confidenceRating: 4, difficultyFelt: "medium", hintsUsed: "none", guessed: "no" });
   store.startTest("MATH_ARITH_001");
-  const secondIds = store.snapshot().activeTest.problems.map((problem) => problem.template_id);
+  const secondDraft = store.snapshot().activeTest;
+  const secondIds = secondDraft.problems.map((problem) => problem.template_id);
   assert.equal(firstIds.length, 10);
   assert.equal(secondIds.length, 10);
-  assert.equal(new Set([...firstIds, ...secondIds]).size, 20);
+  assert.deepEqual(
+    [...new Set(store.skillsById.MATH_ARITH_001.problems.filter((problem) => firstIds.includes(problem.template_id)).map((problem) => problem.source_template_id))].sort(),
+    [...new Set(secondDraft.problems.map((problem) => problem.source_template_id))].sort(),
+  );
+  assert.ok(secondIds.some((id) => !firstIds.includes(id)));
 });
 
 test("saved five-question drafts expand in place without losing existing answers", () => {
   const { store, storage } = harness();
   store.createProfile("Persistent Test Learner");
   store.startTest("MATH_ALG_002", { force: true });
-  assert.equal(store.snapshot().activeTest.problems.length, 24);
+  assert.equal(store.snapshot().activeTest.problems.length, 23);
   const saved = JSON.parse(storage.value(STORAGE_KEY));
   const profileId = saved.activeProfileId;
   const legacyDraft = saved.drafts[profileId].MATH_ALG_002;
@@ -327,7 +345,7 @@ test("saved five-question drafts expand in place without losing existing answers
     curriculum,
     now: () => new Date("2026-09-01T09:42:00.000Z"),
   });
-  assert.equal(reloaded.snapshot().activeTest.problems.length, 24);
+  assert.equal(reloaded.snapshot().activeTest.problems.length, 23);
   assert.equal(reloaded.snapshot().activeTest.responses[firstQuestionId].finalAnswer, "preserved answer");
 });
 
@@ -380,6 +398,8 @@ test("native lesson improvements replace content reversibly without moving IDs o
   assert.equal(state.activeTest, null);
 
   store.startTest("MATH_ARITH_001", { force: true });
+  const improvedDraft = store.snapshot().activeTest;
+  assert.equal(new Set(improvedDraft.problems.map((problem) => problem.source_template_id)).size, 10);
   const restored = store.restoreNativeLessons("PACK_IMPROVE_MATH_ARITH_001");
   state = store.snapshot();
   const original = state.progressRows.find((row) => row.id === "MATH_ARITH_001");

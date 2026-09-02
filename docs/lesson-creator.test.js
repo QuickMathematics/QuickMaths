@@ -20,7 +20,7 @@ function snapshot() {
     mastery: { passing_score: .8, minimum_confidence: 3, max_guessing_allowed: "maybe", review_after_days_if_mastered: 7, review_after_days_if_learning: 2 },
     theory: "Integers include positive numbers, negative numbers, and zero.", examples: [], applications: [],
     problems: [{
-      template_id: "INTEGER_NATIVE_Q01", skill_id: "MATH_ARITH_001", difficulty: "easy", prompt: "Compute -2 + 5.",
+      template_id: "INTEGER_NATIVE_Q01", source_template_id: "INTEGER_NATIVE_SCENARIO", skill_id: "MATH_ARITH_001", difficulty: "easy", prompt: "Compute -2 + 5.",
       expected_answer: "3", answer_type: "integer", grading_method: "exact_numeric", solution_steps: ["Add five to negative two."],
       mistake_tags: ["signs"], answer_mode: "final_only", work: { mode: "none" },
       review_policy: { work_review: "none", mastery_requires_review_pass: false, allow_self_review: true },
@@ -120,6 +120,7 @@ test("Lesson Studio opens native lessons as reversible overrides without changin
   assert.deepEqual(pack.track.skills, ["MATH_ARITH_001"]);
   assert.equal(pack.skills[0].id, "MATH_ARITH_001");
   assert.equal(pack.skills[0].problems[0].template_id, "INTEGER_NATIVE_Q01");
+  assert.equal(pack.skills[0].problems[0].source_template_id, "INTEGER_NATIVE_SCENARIO");
   assert.match(html, /Edit a native lesson/);
   assert.match(html, /Native improvement/);
   assert.match(html, /completed progress remain preserved/);

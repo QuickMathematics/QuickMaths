@@ -30,8 +30,9 @@ def build_payload() -> dict:
     skill_rows = []
     for skill_id in track.skills:
         skill = skills[skill_id]
-        question_count = skill.test.question_count
+        question_count = len(skill.test.questions)
         target_bank_size = min(question_count * 2, 100)
+        source_template_ids = {template.id for template in skill.test.questions}
         problems = []
         signatures: set[str] = set()
         for variant_index in range(MAX_VARIANT_SEEDS):
@@ -59,14 +60,14 @@ def build_payload() -> dict:
                     "rubric_check",
                 }
                 problems.append(row)
-                if len(problems) >= target_bank_size:
-                    break
-            if len(problems) >= target_bank_size:
+            covered_template_ids = {problem["source_template_id"] for problem in problems}
+            if len(problems) >= target_bank_size and covered_template_ids == source_template_ids:
                 break
-        if len(problems) < question_count:
+        covered_template_ids = {problem["source_template_id"] for problem in problems}
+        if covered_template_ids != source_template_ids:
+            missing = ", ".join(sorted(source_template_ids - covered_template_ids))
             raise RuntimeError(
-                f"{skill.id} produced only {len(problems)} unique problems for a "
-                f"{question_count}-question mastery test."
+                f"{skill.id} did not export every authored assessment scenario; missing: {missing}."
             )
         skill_rows.append(
             {

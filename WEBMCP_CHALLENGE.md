@@ -11,7 +11,7 @@ The app requires no OpenAI API key and sends no learner data to a hosted applica
 - Dashboard metrics, suggested next work, recent attempts, and continue flow
 - 43 first-party lessons: 28 Mathematics lessons and a 15-lesson Geography curriculum joined through coordinate geometry and geodesy
 - Theory, applications, prerequisites, unlocks, and worked examples for every skill
-- Lesson-defined comprehensive mastery tests: 8–26 questions in the original Mathematics curriculum and full assessment banks in newer subjects
+- Scenario-complete mastery tests: every authored assessment case appears once per attempt (8–25 questions in the original Mathematics curriculum), while retakes rotate generated variants
 - Multiple-choice, free-response, required shown work, local grading, and step checks
 - Results, reflection-based mastery updates, spaced review dates, and saved tutor/self reviews
 - Live analog clock plus per-session and cumulative profile timers

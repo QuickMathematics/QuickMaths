@@ -1,6 +1,6 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-comprehensive-tests-v2";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-scenario-coverage";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-native-improvements-v2";
-import { createLessonStudio } from "./lesson-creator.js?v=20260902-comprehensive-tests";
+import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
@@ -18,6 +18,12 @@ import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
 } from "./github-community.js?v=20260902-community-vote";
+
+function assessmentCount(skill) {
+  const bankLength = skill?.problems?.length ?? 0;
+  const configured = Number(skill?.question_count ?? skill?.questionCount);
+  return Number.isInteger(configured) ? Math.max(1, Math.min(bankLength, configured)) : bankLength;
+}
 
 const elements = {
   loading: document.querySelector("#loading-screen"),
@@ -688,7 +694,7 @@ function renderLesson(snapshot) {
         <div class="lesson-score"><span>Mastery</span><strong>${Math.round(row.masteryScore)}</strong><small>/ 100</small></div>
         <div class="mastery-track"><i style="width:${Math.round(row.masteryScore)}%"></i></div>
         <dl class="skill-relations"><div><dt>${snapshot.progressionMode === "soft" ? "Recommended preparation" : "Prerequisites"}</dt><dd>${row.prerequisites.length ? row.prerequisites.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "None"}</dd></div><div><dt>Unlocks</dt><dd>${row.unlocks.length ? row.unlocks.map((id) => escapeHtml(store.skillsById[id]?.name ?? id)).join(", ") : "Track complete"}</dd></div></dl>
-        ${row.status === "locked" ? `<div class="locked-note"><strong>Lesson available, test locked</strong><p>Prove the prerequisite skills or switch this profile to Open path.</p></div>` : `<button class="button button-primary" type="button" data-action="start-test" data-skill-id="${escapeHtml(skill.id)}">Start ${Math.min(5, skill.problems.length)}-question test</button>`}
+        ${row.status === "locked" ? `<div class="locked-note"><strong>Lesson available, test locked</strong><p>Prove the prerequisite skills or switch this profile to Open path.</p></div>` : `<button class="button button-primary" type="button" data-action="start-test" data-skill-id="${escapeHtml(skill.id)}">Start ${assessmentCount(skill)}-question coverage test</button>`}
       </div>
       <article class="theory-card">
         <p class="eyebrow">Core idea</p>
@@ -732,7 +738,7 @@ function renderTest(snapshot) {
   if (!draft) {
     elements.view.innerHTML = `
       <header class="page-head"><div><p class="eyebrow">Mastery test</p><h1>Choose what to prove.</h1><p>Tests use real questions generated from the original QuickMaths curriculum.</p></div><div class="page-actions"><label class="compact-select">Skill<select id="test-skill-select">${skillOptions(snapshot, skill.id)}</select></label></div></header>
-      <section class="test-empty content-card">${statusChip(row.status)}<h2>${escapeHtml(skill.name)}</h2><p>${escapeHtml(skill.description)}</p>${row.status === "locked" ? `<div class="locked-note"><strong>Test locked</strong><p>Open the mastery map to complete its prerequisites first.</p></div><button class="button button-secondary" data-route="lesson" data-skill-id="${escapeHtml(skill.id)}">Read lesson</button>` : `<button class="button button-primary" data-action="start-test" data-skill-id="${escapeHtml(skill.id)}">Start ${Math.min(5, skill.problems.length)} questions</button>`}</section>
+      <section class="test-empty content-card">${statusChip(row.status)}<h2>${escapeHtml(skill.name)}</h2><p>${escapeHtml(skill.description)}</p><p>${assessmentCount(skill)} questions cover the lesson's authored assessment scenarios; retakes rotate available variants.</p>${row.status === "locked" ? `<div class="locked-note"><strong>Test locked</strong><p>Open the mastery map to complete its prerequisites first.</p></div><button class="button button-secondary" data-route="lesson" data-skill-id="${escapeHtml(skill.id)}">Read lesson</button>` : `<button class="button button-primary" data-action="start-test" data-skill-id="${escapeHtml(skill.id)}">Start ${assessmentCount(skill)} coverage questions</button>`}</section>
     `;
     return;
   }

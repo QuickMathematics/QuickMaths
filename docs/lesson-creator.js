@@ -60,6 +60,7 @@ function lines(value) {
 function blankProblem(skillId, index = 0) {
   return {
     templateId: `${skillId}_Q${String(index + 1).padStart(2, "0")}`,
+    sourceTemplateId: "",
     prompt: "What should the learner solve?", expectedAnswer: "", answerType: "text",
     gradingMethod: "exact_text", difficulty: "medium", tolerance: "0.001", options: "A | First choice\nB | Second choice",
     acceptedForms: "", solutionSteps: "Explain the key idea.\nComplete the calculation or reasoning.", mistakeTags: "concept_error",
@@ -274,8 +275,9 @@ function buildPack(draft) {
         };
         if (problem.workMode === "proof_obligations") work.proof_policy = { obligations: lines(problem.proofObligations), accepted_strategies: lines(problem.proofStrategies) };
         if (problem.workMode === "rubric_check") work.rubric = { criteria: lines(problem.rubricCriteria).map((description, index) => ({ id: `criterion_${index + 1}`, description, weight: 1 })) };
+        const templateId = draft.mode === "override" ? problem.templateId : cleanId(problem.templateId || `${skillId}_Q${problemIndex + 1}`, "QUESTION_");
         const output = {
-          template_id: draft.mode === "override" ? problem.templateId : cleanId(problem.templateId || `${skillId}_Q${problemIndex + 1}`, "QUESTION_"), skill_id: skillId,
+          template_id: templateId, source_template_id: problem.sourceTemplateId || templateId, skill_id: skillId,
           difficulty: problem.difficulty, prompt: problem.prompt, expected_answer: problem.expectedAnswer,
           answer_type: problem.answerType, grading_method: problem.gradingMethod, solution_steps: lines(problem.solutionSteps),
           mistake_tags: lines(problem.mistakeTags), answer_mode: answerMode, work,
@@ -328,7 +330,7 @@ function draftFromPack(pack, snapshot) {
     questionCount: skill.question_count ?? skill.problems?.length ?? 1,
     examples: skill.examples?.length ? skill.examples : [], applications: skill.applications?.length ? skill.applications : [],
     problems: (skill.problems ?? []).map((problem, problemIndex) => ({
-      ...blankProblem(skill.id, problemIndex), templateId: problem.template_id, prompt: problem.prompt, expectedAnswer: String(problem.expected_answer ?? ""),
+      ...blankProblem(skill.id, problemIndex), templateId: problem.template_id, sourceTemplateId: problem.source_template_id ?? problem.template_id, prompt: problem.prompt, expectedAnswer: String(problem.expected_answer ?? ""),
       answerType: problem.answer_type ?? "text", gradingMethod: problem.grading_method, difficulty: problem.difficulty ?? "medium",
       tolerance: String(problem.tolerance ?? .001), options: (problem.options ?? []).map((option) => `${option.id} | ${option.label}`).join("\n"),
       acceptedForms: (problem.accepted_forms ?? []).join("\n"), solutionSteps: (problem.solution_steps ?? []).join("\n"), mistakeTags: (problem.mistake_tags ?? []).join("\n"),
