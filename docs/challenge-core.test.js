@@ -261,6 +261,7 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
   store.completeTutorial();
   store.navigate("map");
   assert.equal(store.setMapPlanMode(true).enabled, true);
+  assert.equal(store.setMapPlanComposer("annotation").composer, "annotation");
   store.setMapPlanSelection(["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"]);
   store.updateMapPlanLayout({
     layoutKey: "subject:SUBJECT_MATH",
@@ -274,22 +275,36 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
   assert.deepEqual(path.skillIds, ["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"]);
   store.addMapPlanAnnotation({ body: "Warm up here before Friday.", skillIds: ["MATH_ARITH_001"] });
   store.addMapPlanAnnotation({ body: "My route into equations.", pathId: path.id });
+  const freeComment = store.addMapPlanAnnotation({
+    body: "Remember to revisit this cluster.",
+    skillIds: [],
+    layoutKey: "subject:SUBJECT_MATH",
+    position: { x: 480, y: 225 },
+  });
+  store.updateMapPlanAnnotationPosition(freeComment.id, {
+    layoutKey: "subject:SUBJECT_MATH",
+    position: { x: 505.5, y: 240.25 },
+  });
   store.updateMapPlanPath(path.id, { color: "#1255aa" });
 
   let state = store.snapshot();
   assert.equal(state.ui.mapPlanMode, true);
   assert.deepEqual(state.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: 110.25, y: 90.5 });
   assert.equal(state.mapPlan.paths[0].color, "#1255aa");
-  assert.equal(state.mapPlan.annotations.length, 2);
+  assert.equal(state.mapPlan.annotations.length, 3);
+  assert.equal(state.mapPlan.annotations[2].targetType, "free");
+  assert.deepEqual(state.mapPlan.annotations[2].positions["subject:SUBJECT_MATH"], { x: 505.5, y: 240.25 });
   assert.match(store.exportBackup(), /My route into equations/);
 
   const reloaded = createQuickMathsStore({ storage, curriculum, now: () => new Date("2026-09-01T09:41:00.000Z") });
   state = reloaded.snapshot();
   assert.equal(state.mapPlan.paths[0].name, "Algebra launch");
   assert.equal(state.mapPlan.annotations[0].body, "Warm up here before Friday.");
+  assert.equal(state.mapPlan.annotations[2].positions["subject:SUBJECT_MATH"].x, 505.5);
   assert.equal(state.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_002.x, 360);
   reloaded.setMapPlanMode(false);
   assert.equal(reloaded.snapshot().ui.mapPlanMode, false);
+  assert.equal(reloaded.snapshot().ui.mapPlanComposer, null);
   assert.equal(reloaded.snapshot().mapPlan.paths.length, 1, "closing Plan mode must not erase the plan");
 
   reloaded.createProfile("Independent Planner");

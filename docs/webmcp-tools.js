@@ -149,7 +149,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
             paths: state.mapPlan.paths.map((path) => ({ path_id: path.id, name: path.name, color: path.color, skill_ids: path.skillIds })),
             annotations: state.mapPlan.annotations.map((annotation) => ({
               annotation_id: annotation.id,
-              target: annotation.pathId ? { path_id: annotation.pathId } : { skill_ids: annotation.skillIds },
+              target: annotation.pathId ? { path_id: annotation.pathId } : annotation.skillIds.length ? { skill_ids: annotation.skillIds } : { map_comment: true },
               body: annotation.body,
             })),
           } : null,

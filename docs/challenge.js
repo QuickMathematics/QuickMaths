@@ -1,4 +1,4 @@
-import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-plan-mode-v1";
+import { createQuickMathsStore, STATUS_COLORS } from "./challenge-core.js?v=20260902-plan-mode-v2";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260902-native-improvements-v2";
 import { createLessonStudio } from "./lesson-creator.js?v=20260902-scenario-coverage";
 import {
@@ -197,7 +197,7 @@ const TUTORIAL_STEPS = [
     eyebrow: "The mastery map",
     title: "Read the map before picking your next lesson.",
     lede: "Every node is a lesson. Connections show prerequisite knowledge—including bridges between Mathematics, Geography, and any subjects you install.",
-    points: ["Switch between the current subject and an All subjects map.", "Drag in either direction; use the mouse wheel on desktop or pinch on mobile to zoom.", "Turn on Plan mode to rearrange a private copy, select lessons, draw colored study paths, and attach notes without changing the canonical map."],
+    points: ["Switch between the current subject and an All subjects map.", "Drag in either direction; use the mouse wheel on desktop or pinch on mobile to zoom.", "Turn on Plan mode to rearrange a private copy, draw colored study paths, and place draggable free or lesson-connected comment nodes without changing the canonical map."],
     tip: "In Plan mode, use Ctrl or a selection rectangle on desktop; touch and hold lessons on mobile. Your plan autosaves with this profile and travels in full backups.",
     visual: "map",
   },
@@ -467,6 +467,28 @@ function mapEdgePath(from, to, kind = "prerequisite") {
   return `M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`;
 }
 
+function mapCommentEdgePath(target, comment) {
+  const x1 = target.x + 89;
+  const y1 = target.y + 35;
+  const x2 = comment.x + 95;
+  const y2 = comment.y + 42;
+  const bend = Math.max(32, Math.abs(x2 - x1) * .35);
+  const direction = x2 >= x1 ? 1 : -1;
+  return `M ${x1} ${y1} C ${x1 + bend * direction} ${y1}, ${x2 - bend * direction} ${y2}, ${x2} ${y2}`;
+}
+
+function updateMapPlanCommentLinks(svg, positions) {
+  const commentPositions = new Map(Array.from(svg.querySelectorAll("[data-plan-comment]")).map((comment) => [
+    comment.dataset.planComment,
+    { x: Number(comment.dataset.planX), y: Number(comment.dataset.planY) },
+  ]));
+  svg.querySelectorAll("[data-plan-comment-link][data-map-edge-to]").forEach((edge) => {
+    const target = positions[edge.dataset.mapEdgeTo];
+    const comment = commentPositions.get(edge.dataset.planCommentLink);
+    if (target && comment) edge.setAttribute("d", mapCommentEdgePath(target, comment));
+  });
+}
+
 function updateMapPlanGeometry(svg, positions) {
   svg.querySelectorAll("[data-map-skill]").forEach((node) => {
     const position = positions[node.dataset.mapSkill];
@@ -477,6 +499,7 @@ function updateMapPlanGeometry(svg, positions) {
     const to = positions[edge.dataset.mapEdgeTo];
     if (from && to) edge.setAttribute("d", mapEdgePath(from, to, edge.dataset.mapEdgeKind));
   });
+  updateMapPlanCommentLinks(svg, positions);
 }
 
 function setupMapInteractions({ planMode = false, layoutKey = "", positions = {}, width = 0, height = 0 } = {}) {
@@ -572,6 +595,15 @@ function setupMapInteractions({ planMode = false, layoutKey = "", positions = {}
       }
       suppressClickUntil = Date.now() + 300;
     }
+    if (planMode && finishedGesture?.mode === "plan-comment") {
+      if (finishedGesture.moved) {
+        store.updateMapPlanAnnotationPosition(finishedGesture.annotationId, {
+          layoutKey,
+          position: finishedGesture.position,
+        });
+      }
+      suppressClickUntil = Date.now() + 300;
+    }
     if (planMode && finishedGesture?.mode === "marquee") {
       const rect = finishedGesture.rect;
       const minX = Math.min(rect.x1, rect.x2);
@@ -614,9 +646,24 @@ function setupMapInteractions({ planMode = false, layoutKey = "", positions = {}
       scroller.classList.add("is-pinching");
       return;
     }
+    const comment = event.target.closest?.("[data-plan-comment]");
     const skillId = event.target.closest?.("[data-map-skill]")?.dataset.mapSkill ?? null;
     if (!planMode) {
       beginPan(pointer, skillId);
+      return;
+    }
+    if (comment) {
+      const startMapPoint = mapPoint(pointer);
+      gesture = {
+        mode: "plan-comment",
+        annotationId: comment.dataset.planComment,
+        startX: pointer.x,
+        startY: pointer.y,
+        startMapPoint,
+        startPosition: { x: Number(comment.dataset.planX), y: Number(comment.dataset.planY) },
+        position: { x: Number(comment.dataset.planX), y: Number(comment.dataset.planY) },
+        moved: false,
+      };
       return;
     }
     if (skillId) {
@@ -699,6 +746,30 @@ function setupMapInteractions({ planMode = false, layoutKey = "", positions = {}
       event.preventDefault();
       return;
     }
+    if (planMode && gesture?.mode === "plan-comment") {
+      const pointer = pointFrom(event);
+      if (!gesture.moved && Math.hypot(pointer.x - gesture.startX, pointer.y - gesture.startY) > 6) {
+        gesture.moved = true;
+        scroller.classList.add("is-moving-nodes");
+      }
+      if (gesture.moved) {
+        const currentMapPoint = mapPoint(pointer);
+        gesture.position = {
+          x: Math.max(0, Math.min(width - 190, gesture.startPosition.x + currentMapPoint.x - gesture.startMapPoint.x)),
+          y: Math.max(0, Math.min(height - 84, gesture.startPosition.y + currentMapPoint.y - gesture.startMapPoint.y)),
+        };
+        const commentNode = svg.querySelector(`[data-plan-comment="${CSS.escape(gesture.annotationId)}"]`);
+        if (commentNode) {
+          commentNode.dataset.planX = String(gesture.position.x);
+          commentNode.dataset.planY = String(gesture.position.y);
+          commentNode.setAttribute("transform", `translate(${gesture.position.x} ${gesture.position.y})`);
+          updateMapPlanCommentLinks(svg, workingPositions);
+        }
+        suppressClickUntil = Date.now() + 300;
+        event.preventDefault();
+      }
+      return;
+    }
     if (planMode && gesture?.mode === "plan-node") {
       const pointer = pointFrom(event);
       const screenDistance = Math.hypot(pointer.x - gesture.startX, pointer.y - gesture.startY);
@@ -778,9 +849,51 @@ function setupMapInteractions({ planMode = false, layoutKey = "", positions = {}
 
 function mapPlanTargetLabel(annotation, snapshot) {
   if (annotation.pathId) return snapshot.mapPlan.paths.find((path) => path.id === annotation.pathId)?.name ?? "Removed path";
+  if (!annotation.skillIds.length) return "Free map comment";
   const names = annotation.skillIds.map((id) => store.skillsById[id]?.name ?? id);
   if (names.length <= 2) return names.join(" + ");
   return `${names.slice(0, 2).join(" + ")} + ${names.length - 2} more`;
+}
+
+function splitPlanComment(value, limit = 27, maxLines = 3) {
+  const words = String(value ?? "").trim().split(/\s+/).filter(Boolean);
+  const lines = [];
+  for (const word of words) {
+    if (!lines.length || `${lines.at(-1)} ${word}`.trim().length > limit) lines.push(word);
+    else lines[lines.length - 1] += ` ${word}`;
+    if (lines.length > maxLines) {
+      lines.length = maxLines;
+      lines[maxLines - 1] = `${lines[maxLines - 1].slice(0, Math.max(1, limit - 1))}…`;
+      break;
+    }
+  }
+  return lines;
+}
+
+function mapAnnotationInsertPosition(skillIds = []) {
+  const scroller = document.querySelector(".map-scroll");
+  const svg = scroller?.querySelector(".mastery-map");
+  if (!scroller || !svg) return { x: 24, y: 72 };
+  const zoom = Number(svg.dataset.currentZoom ?? 1) || 1;
+  const maxX = Math.max(0, Number(svg.dataset.baseWidth) - 190);
+  const maxY = Math.max(0, Number(svg.dataset.baseHeight) - 84);
+  const selectedPositions = skillIds.map((skillId) => {
+    const transform = svg.querySelector(`[data-map-skill="${CSS.escape(skillId)}"]`)?.getAttribute("transform") ?? "";
+    const match = transform.match(/translate\(([-\d.]+)[ ,]([-\d.]+)\)/);
+    return match ? { x: Number(match[1]), y: Number(match[2]) } : null;
+  }).filter(Boolean);
+  if (selectedPositions.length) {
+    const center = {
+      x: selectedPositions.reduce((sum, item) => sum + item.x + 89, 0) / selectedPositions.length,
+      y: selectedPositions.reduce((sum, item) => sum + item.y + 35, 0) / selectedPositions.length,
+    };
+    const x = center.x + 130 <= maxX ? center.x + 130 : center.x - 220;
+    return { x: Math.max(0, Math.min(maxX, x)), y: Math.max(0, Math.min(maxY, center.y - 42)) };
+  }
+  return {
+    x: Math.max(0, Math.min(maxX, (scroller.scrollLeft + scroller.clientWidth / 2) / zoom - 95)),
+    y: Math.max(0, Math.min(maxY, (scroller.scrollTop + scroller.clientHeight / 2) / zoom - 42)),
+  };
 }
 
 function renderMapPlanPanel(snapshot, mapRows, layoutKey) {
@@ -790,28 +903,29 @@ function renderMapPlanPanel(snapshot, mapRows, layoutKey) {
   const selectedNames = selectedIds.map((id) => store.skillsById[id]?.name ?? id);
   const hasMovedSelection = selectedIds.some((id) => snapshot.mapPlan.layouts?.[layoutKey]?.[id]);
   const hasMovedLayout = Boolean(Object.keys(snapshot.mapPlan.layouts?.[layoutKey] ?? {}).length);
-  const annotationTargets = [
-    selectedIds.length ? `<option value="selection">Selected lesson${selectedIds.length === 1 ? "" : "s"} (${selectedIds.length})</option>` : "",
-    ...snapshot.mapPlan.paths.map((path) => `<option value="path:${escapeHtml(path.id)}" ${selectedPath?.id === path.id ? "selected" : ""}>Path · ${escapeHtml(path.name)}</option>`),
-  ].join("");
-  return `<aside class="map-detail map-plan-panel">
-    <div class="map-plan-heading"><div><p class="eyebrow">Visual learning planner</p><h2>Plan mode</h2></div><span>${snapshot.mapPlan.paths.length} path${snapshot.mapPlan.paths.length === 1 ? "" : "s"}</span></div>
-    <p class="map-plan-intro">Arrange a private working copy of the map. Your canonical mastery map stays untouched and returns when Plan mode is off.</p>
-    <div class="map-plan-help">
-      <p class="map-plan-desktop-help"><strong>Desktop</strong> Drag nodes to move them. Drag empty space to box-select. Ctrl-click or Ctrl-drag adds; Shift-drag empty space pans.</p>
-      <p class="map-plan-touch-help"><strong>Phone</strong> Hold a node to select it; hold again to deselect. Drag selected nodes to move them. Drag empty space to pan.</p>
-    </div>
-    <section class="map-plan-selection" aria-live="polite">
+  const composer = snapshot.ui.mapPlanComposer;
+  const selectionCard = `<section class="map-plan-selection" aria-live="polite">
       <header><strong>${selectedIds.length} selected</strong>${selectedPath ? `<span style="--plan-color:${escapeHtml(selectedPath.color)}">${escapeHtml(selectedPath.name)}</span>` : ""}</header>
       <p>${selectedNames.length ? escapeHtml(selectedNames.slice(0, 4).join(" · ")) + (selectedNames.length > 4 ? ` · +${selectedNames.length - 4}` : "") : "Select lessons on the map to move, connect, or annotate them."}</p>
       <div><button class="quiet-button" type="button" data-action="plan-reset-selected" ${hasMovedSelection ? "" : "disabled"}>Reset selected positions</button><button class="quiet-button" type="button" data-action="plan-clear-selection" ${selectedIds.length ? "" : "disabled"}>Clear selection</button></div>
-    </section>
-    <form id="map-plan-path-form" class="map-plan-form">
+    </section>`;
+  const pathComposer = `<form id="map-plan-path-form" class="map-plan-form map-plan-composer-form">
       <div class="map-plan-section-heading"><strong>Create a path</strong><small>Selection order becomes path order</small></div>
       <label><span>Path name</span><input name="name" maxlength="80" placeholder="Exam route, next week…"></label>
       <label class="map-plan-color"><span>Outline color</span><input name="color" type="color" value="${escapeHtml(selectedPath?.color ?? "#df755b")}"><output>${escapeHtml(selectedPath?.color ?? "#df755b")}</output></label>
       <button class="button button-primary" type="submit" ${selectedIds.length < 2 ? "disabled" : ""}>Create path from ${selectedIds.length} lesson${selectedIds.length === 1 ? "" : "s"}</button>
-    </form>
+    </form>`;
+  const annotationComposer = `<form id="map-plan-annotation-form" class="map-plan-form map-plan-composer-form">
+      <div class="map-plan-section-heading"><strong>${selectedIds.length ? "Connected comment" : "Free comment"}</strong><small>${selectedIds.length ? `${selectedIds.length} selected lesson${selectedIds.length === 1 ? "" : "s"}` : "Place it on this map"}</small></div>
+      <p class="map-plan-composer-copy">${selectedIds.length ? "The comment node will be connected to every selected lesson. Drag the comment anywhere after saving it." : "The comment node will appear in the center of the visible map. Drag it wherever it belongs."}</p>
+      <label><span>Comment</span><textarea name="body" maxlength="1200" rows="4" placeholder="Why this matters, a deadline, a resource, or the next action…" required></textarea></label>
+      <button class="button button-secondary" type="submit">Insert ${selectedIds.length ? "connected " : ""}comment node</button>
+    </form>`;
+  const management = `<div class="map-plan-help">
+      <p class="map-plan-desktop-help"><strong>Desktop</strong> Drag nodes to move them. Drag empty space to box-select. Ctrl-click or Ctrl-drag adds; Shift-drag empty space pans.</p>
+      <p class="map-plan-touch-help"><strong>Phone</strong> Hold a node to select it; hold again to deselect. Drag selected nodes to move them. Drag empty space to pan.</p>
+    </div>
+    ${selectionCard}
     <section class="map-plan-paths">
       <div class="map-plan-section-heading"><strong>Saved paths</strong><small>Outlined nodes + bold links</small></div>
       ${snapshot.mapPlan.paths.length ? snapshot.mapPlan.paths.map((path) => `<article class="${path.id === selectedPath?.id ? "is-active" : ""}" style="--plan-color:${escapeHtml(path.color)}">
@@ -820,17 +934,16 @@ function renderMapPlanPanel(snapshot, mapRows, layoutKey) {
         <button class="map-plan-delete" type="button" data-action="plan-delete-path" data-path-id="${escapeHtml(path.id)}" aria-label="Delete ${escapeHtml(path.name)}">×</button>
       </article>`).join("") : `<p class="map-plan-empty">No paths yet. Select at least two lessons to draw one.</p>`}
     </section>
-    <form id="map-plan-annotation-form" class="map-plan-form">
-      <div class="map-plan-section-heading"><strong>Add an annotation</strong><small>One node, a selection, or a path</small></div>
-      <label><span>Attach to</span><select name="target" ${annotationTargets ? "" : "disabled"}>${annotationTargets || '<option value="">Select lessons or create a path</option>'}</select></label>
-      <label><span>Note</span><textarea name="body" maxlength="1200" rows="3" placeholder="Why this matters, a deadline, a resource, or the next action…" required></textarea></label>
-      <button class="button button-secondary" type="submit" ${annotationTargets ? "" : "disabled"}>Save annotation</button>
-    </form>
     <section class="map-plan-notes">
       <div class="map-plan-section-heading"><strong>Annotations</strong><small>${snapshot.mapPlan.annotations.length} saved</small></div>
       ${snapshot.mapPlan.annotations.length ? snapshot.mapPlan.annotations.map((annotation) => `<article><div><strong>${escapeHtml(mapPlanTargetLabel(annotation, snapshot))}</strong><p>${escapeHtml(annotation.body)}</p></div><button type="button" data-action="plan-delete-annotation" data-annotation-id="${escapeHtml(annotation.id)}" aria-label="Delete annotation">×</button></article>`).join("") : `<p class="map-plan-empty">Notes attached to lessons and paths will appear here.</p>`}
-    </section>
-    <div class="map-plan-footer"><button class="quiet-button" type="button" data-action="plan-reset-layout" ${hasMovedLayout ? "" : "disabled"}>Reset this layout</button><button class="button button-outline" type="button" data-action="toggle-plan-mode">Exit Plan mode</button></div>
+    </section>`;
+  const body = composer === "path" ? `${selectionCard}${pathComposer}` : composer === "annotation" ? `${selectionCard}${annotationComposer}` : management;
+  return `<aside class="map-detail map-plan-panel ${composer ? "is-composer-open" : ""}" data-plan-card="${escapeHtml(composer ?? "manage")}">
+    <div class="map-plan-heading"><div><p class="eyebrow">Visual learning planner</p><h2>${composer === "path" ? "Custom path" : composer === "annotation" ? "Annotation" : "Plan details"}</h2></div>${composer ? `<button type="button" data-action="plan-close-composer" aria-label="Close Plan mode card">×</button>` : `<span>${snapshot.mapPlan.paths.length} paths · ${snapshot.mapPlan.annotations.length} comments</span>`}</div>
+    <p class="map-plan-intro">The map stays in view while you plan. Everything here autosaves with this profile.</p>
+    ${body}
+    <div class="map-plan-footer">${composer === "path" || composer === "annotation" ? `<button class="button button-outline" type="button" data-action="plan-close-composer">Cancel</button>` : `<button class="quiet-button" type="button" data-action="plan-reset-layout" ${hasMovedLayout ? "" : "disabled"}>Reset this layout</button><button class="button button-outline" type="button" data-action="toggle-plan-mode">Exit Plan mode</button>`}</div>
   </aside>`;
 }
 
@@ -873,6 +986,34 @@ function renderMap(snapshot) {
       return `<path class="map-plan-connection ${path.id === snapshot.ui.selectedMapPlanPathId ? "is-active" : ""}" style="--plan-color:${escapeHtml(path.color)}" data-map-edge-from="${escapeHtml(fromId)}" data-map-edge-to="${escapeHtml(skillId)}" data-map-edge-kind="plan" d="${mapEdgePath(positions[fromId], positions[skillId], "plan")}" />`;
     });
   }).join("") : "";
+  const commentLinks = [];
+  const planComments = planMode ? snapshot.mapPlan.annotations.map((annotation, index) => {
+    const path = annotation.pathId ? snapshot.mapPlan.paths.find((item) => item.id === annotation.pathId) : null;
+    const targetSkillIds = (path?.skillIds ?? annotation.skillIds).filter((id) => positions[id]);
+    const savedPosition = annotation.positions?.[viewportKey] ?? null;
+    if (!savedPosition && !targetSkillIds.length) return "";
+    const targets = targetSkillIds.map((id) => positions[id]);
+    const anchor = targets.length ? {
+      x: targets.reduce((sum, position) => sum + position.x + 89, 0) / targets.length,
+      y: targets.reduce((sum, position) => sum + position.y + 35, 0) / targets.length,
+    } : { x: width / 2, y: height / 2 };
+    const autoX = anchor.x + 130 <= width - 190 ? anchor.x + 130 : Math.max(0, anchor.x - 220);
+    const position = savedPosition ? { ...savedPosition } : {
+      x: Math.max(0, Math.min(width - 190, autoX)),
+      y: Math.max(0, Math.min(height - 84, anchor.y - 42 + (index % 3) * 18)),
+    };
+    for (const skillId of targetSkillIds) {
+      commentLinks.push(`<path class="map-plan-comment-link" data-plan-comment-link="${escapeHtml(annotation.id)}" data-map-edge-to="${escapeHtml(skillId)}" d="${mapCommentEdgePath(positions[skillId], position)}"></path>`);
+    }
+    const lines = splitPlanComment(annotation.body);
+    return `<g class="map-plan-comment" role="note" tabindex="0" data-plan-comment="${escapeHtml(annotation.id)}" data-plan-x="${position.x}" data-plan-y="${position.y}" transform="translate(${position.x} ${position.y})">
+      <title>${escapeHtml(annotation.body)}</title>
+      <rect width="190" height="84" rx="14"></rect>
+      <circle cx="18" cy="18" r="9"></circle><text class="map-plan-comment-icon" x="18" y="21" text-anchor="middle">✎</text>
+      <text class="map-plan-comment-copy" x="34" y="18">${lines.map((line, lineIndex) => `<tspan x="34" dy="${lineIndex ? 15 : 0}">${escapeHtml(line)}</tspan>`).join("")}</text>
+      <text class="map-plan-comment-meta" x="174" y="72" text-anchor="end">${targetSkillIds.length ? `${targetSkillIds.length} linked` : "free"}</text>
+    </g>`;
+  }).join("") : "";
   const subjectLanes = lanes.map(({ subject, y, height: laneHeight }) => `<g class="map-subject-lane">
     <rect x="12" y="${y}" width="${width - 24}" height="${laneHeight}" rx="22" fill="${escapeHtml(subject.theme?.tint ?? "#dceca9")}"></rect>
     <line x1="28" y1="${y + 42}" x2="${width - 28}" y2="${y + 42}" stroke="${escapeHtml(subject.theme?.primary ?? "#153f36")}"></line>
@@ -906,15 +1047,25 @@ function renderMap(snapshot) {
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${planMode ? `<span class="map-plan-key">Plan mode is autosaving</span>` : combined ? `<span class="map-subject-key">Node color = subject · dot = status</span>` : ""}</div>
     <section class="map-layout ${planMode ? "is-plan-mode" : ""}">
+      <div class="map-canvas-shell">
+      ${planMode ? `<div class="map-plan-actionbar" role="toolbar" aria-label="Plan mode actions">
+        <div><strong>${snapshot.ui.mapPlanSelection.length} selected</strong><small>Hold lessons on mobile · Ctrl or box-select on desktop</small></div>
+        <button type="button" data-action="plan-open-annotation"><span>✎</span><strong>Annotation</strong><small>${snapshot.ui.mapPlanSelection.length ? "Connect to selection" : "Free comment node"}</small></button>
+        <button type="button" data-action="plan-open-path"><span>↝</span><strong>Custom path</strong><small>${snapshot.ui.mapPlanSelection.length > 1 ? `${snapshot.ui.mapPlanSelection.length} lessons selected` : "Select multiple lessons"}</small></button>
+        <button type="button" data-action="plan-open-manage"><span>•••</span><strong>Plan details</strong><small>${snapshot.mapPlan.paths.length} paths · ${snapshot.mapPlan.annotations.length} comments</small></button>
+      </div>` : ""}
       <div class="map-scroll ${planMode ? "is-plan-mode" : ""}" data-map-viewport-key="${escapeHtml(viewportKey)}" aria-label="${planMode ? "Plan mode mastery map. Drag lessons to move them. On desktop, drag empty space to select. On touch, hold lessons to select." : "Interactive prerequisite map. Drag to move. Use the mouse wheel on desktop or pinch on a touchscreen to zoom."}">
         <div class="map-gesture-hint" aria-hidden="true">${planMode ? `<span class="map-hint-desktop">Box-select · Ctrl adds · Drag nodes</span><span class="map-hint-touch">Hold to select · Drag to move · Pinch to zoom</span>` : `Drag to move <span class="map-hint-desktop">· Wheel to zoom</span><span class="map-hint-touch">· Pinch to zoom</span>`}</div>
         <svg class="mastery-map" viewBox="0 0 ${width} ${height}" data-base-width="${width}" data-base-height="${height}" data-current-zoom="${zoom}" style="width:${Math.round(width * zoom)}px;height:${Math.round(height * zoom)}px">
           <g class="map-subject-lanes">${subjectLanes}</g>
           <g class="map-edges">${edges}</g>
           <g class="map-plan-connections">${planConnections}</g>
+          <g class="map-plan-comment-links">${commentLinks.join("")}</g>
           <g>${nodes}</g>
+          <g class="map-plan-comments">${planComments}</g>
           <rect class="map-selection-marquee" visibility="hidden" x="0" y="0" width="0" height="0"></rect>
         </svg>
+      </div>
       </div>
       ${planMode ? renderMapPlanPanel(snapshot, mapRows, viewportKey) : `<aside class="map-detail">
         <div class="map-detail-top">${statusChip(selected.status)}<code>${escapeHtml(selected.id)}</code></div>
@@ -1771,6 +1922,13 @@ document.addEventListener("click", async (event) => {
         store.setMapPlanMode(enabled);
         showToast(enabled ? "Plan mode enabled. Your planner autosaves with this profile." : "Plan mode closed. Showing the canonical mastery map.");
       }
+      if (action.dataset.action === "plan-open-annotation") store.setMapPlanComposer("annotation");
+      if (action.dataset.action === "plan-open-path") {
+        if (currentSnapshot.ui.mapPlanSelection.length < 2) showToast("Select multiple nodes to create a custom path.");
+        else store.setMapPlanComposer("path");
+      }
+      if (action.dataset.action === "plan-open-manage") store.setMapPlanComposer("manage");
+      if (action.dataset.action === "plan-close-composer") store.setMapPlanComposer(null);
       if (action.dataset.action === "plan-clear-selection") store.setMapPlanSelection([]);
       if (action.dataset.action === "plan-reset-selected") {
         const result = store.resetMapPlanLayout(layoutKey, currentSnapshot.ui.mapPlanSelection);
@@ -1947,6 +2105,7 @@ document.addEventListener("submit", (event) => {
         color: data.get("color"),
         skillIds: currentSnapshot.ui.mapPlanSelection,
       });
+      store.setMapPlanComposer(null);
       showToast(`${path.name} created with ${path.skillIds.length} lessons.`);
     } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
     return;
@@ -1954,14 +2113,17 @@ document.addEventListener("submit", (event) => {
   if (event.target.id === "map-plan-annotation-form") {
     event.preventDefault();
     const data = new FormData(event.target);
-    const target = String(data.get("target") ?? "");
+    const selectedSkillIds = [...currentSnapshot.ui.mapPlanSelection];
+    const layoutKey = currentSnapshot.mapScope === "all" ? "all-subjects" : `subject:${currentSnapshot.activeSubject.id}`;
     try {
       store.addMapPlanAnnotation({
         body: data.get("body"),
-        pathId: target.startsWith("path:") ? target.slice(5) : null,
-        skillIds: target === "selection" ? currentSnapshot.ui.mapPlanSelection : [],
+        skillIds: selectedSkillIds,
+        layoutKey,
+        position: mapAnnotationInsertPosition(selectedSkillIds),
       });
-      showToast("Annotation saved to this learning plan.");
+      store.setMapPlanComposer(null);
+      showToast(selectedSkillIds.length ? "Connected comment added to the selected lessons." : "Free comment node added to the map.");
     } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
     return;
   }

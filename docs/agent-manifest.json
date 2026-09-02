@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 15,
+  "app_version": 16,
   "description": "Operating guide for an agent tutoring inside the local-first QuickMaths mastery app, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -65,7 +65,7 @@
       "Respect the learner's path mode: Hard path enforces prerequisites; Open path treats the same connections as recommended preparation.",
       "Use list_subjects and set_learning_preferences when changing subject or path mode so the human sees the change.",
       "The mastery map can show the current subject or every installed subject in labeled lanes. Use map_scope all when the learner wants to inspect cross-subject bridges together.",
-      "get_app_state may include the learner's saved Plan mode paths and annotations. Treat these as learner-authored intent and context. Plan mode itself is a direct human editing surface: do not rearrange nodes, create paths, or overwrite annotations unless a future registered tool explicitly authorizes that action.",
+      "get_app_state may include the learner's saved Plan mode paths and annotation nodes. Treat these as learner-authored intent and context. Plan mode itself is a direct human editing surface: do not rearrange nodes, create paths, move comment nodes, or overwrite annotations unless a future registered tool explicitly authorizes that action.",
       "Do not replace or reset learner data through ordinary browser actions."
     ],
     "custom_content": [

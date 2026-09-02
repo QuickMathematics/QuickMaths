@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 12;
+export const APP_VERSION = 13;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -777,6 +777,7 @@ function initialState() {
       mapPlanMode: false,
       mapPlanSelection: [],
       selectedMapPlanPathId: null,
+      mapPlanComposer: null,
       activeAttemptId: null,
       pendingResults: null,
       agentOpen: false,
@@ -839,12 +840,24 @@ function sanitizeMapPlans(candidate, profileIds, skillIds, subjectIds) {
       const annotationSkillIds = Array.isArray(annotation.skillIds)
         ? [...new Set(annotation.skillIds.filter((id) => skillIds.has(id)))].slice(0, 80)
         : [];
-      if (pathId ? !pathIds.has(pathId) : !annotationSkillIds.length) return null;
+      const positions = {};
+      if (annotation.positions && typeof annotation.positions === "object" && !Array.isArray(annotation.positions)) {
+        for (const [layoutKey, rawPosition] of Object.entries(annotation.positions)) {
+          if (!validLayoutKeys.has(layoutKey) || !rawPosition || typeof rawPosition !== "object" || Array.isArray(rawPosition)) continue;
+          if (!Number.isFinite(Number(rawPosition.x)) || !Number.isFinite(Number(rawPosition.y))) continue;
+          positions[layoutKey] = {
+            x: Math.round(cleanNumber(Number(rawPosition.x), 0, 0, 20_000) * 100) / 100,
+            y: Math.round(cleanNumber(Number(rawPosition.y), 0, 0, 20_000) * 100) / 100,
+          };
+        }
+      }
+      if (pathId ? !pathIds.has(pathId) : (!annotationSkillIds.length && !Object.keys(positions).length)) return null;
       return {
         id: cleanText(annotation.id, 120) || `plan-note-imported-${index + 1}`,
-        targetType: pathId ? "path" : annotationSkillIds.length === 1 ? "node" : "nodes",
+        targetType: pathId ? "path" : annotationSkillIds.length === 1 ? "node" : annotationSkillIds.length > 1 ? "nodes" : "free",
         pathId,
         skillIds: pathId ? [] : annotationSkillIds,
+        positions,
         body,
         createdAt: cleanText(annotation.createdAt, 40) || new Date().toISOString(),
         updatedAt: cleanText(annotation.updatedAt, 40) || cleanText(annotation.createdAt, 40) || new Date().toISOString(),
@@ -1163,6 +1176,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       mapPlanMode: Boolean(ui.mapPlanMode),
       mapPlanSelection: Array.isArray(ui.mapPlanSelection) ? [...new Set(ui.mapPlanSelection.filter((id) => skills.has(id)))].slice(0, 80) : [],
       selectedMapPlanPathId: cleanText(ui.selectedMapPlanPathId, 120) || null,
+      mapPlanComposer: ["annotation", "path", "manage"].includes(ui.mapPlanComposer) ? ui.mapPlanComposer : null,
       activeAttemptId: attempts.some((attempt) => attempt.attemptId === ui.activeAttemptId) ? ui.activeAttemptId : null,
       pendingResults: sanitizePendingResults(ui.pendingResults, skills),
       agentOpen: Boolean(ui.agentOpen),
@@ -1901,6 +1915,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     state.ui.pendingResults = null;
     state.ui.mapPlanSelection = [];
     state.ui.selectedMapPlanPathId = null;
+    state.ui.mapPlanComposer = null;
     startSession(profileId);
     addActivity("select_profile", "Opened a learner profile.");
     notify();
@@ -1949,6 +1964,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     state.ui.mapPlanMode = false;
     state.ui.mapPlanSelection = [];
     state.ui.selectedMapPlanPathId = null;
+    state.ui.mapPlanComposer = null;
     addActivity("logout_profile", "Returned to the profile picker.");
     notify();
   };
@@ -2022,9 +2038,20 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
   const setMapPlanMode = (enabled) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     state.ui.mapPlanMode = Boolean(enabled);
-    if (!state.ui.mapPlanMode) state.ui.selectedMapPlanPathId = null;
+    if (!state.ui.mapPlanMode) {
+      state.ui.selectedMapPlanPathId = null;
+      state.ui.mapPlanComposer = null;
+    }
     notify();
     return { ok: true, enabled: state.ui.mapPlanMode };
+  };
+
+  const setMapPlanComposer = (composer = null) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    if (composer != null && !["annotation", "path", "manage"].includes(composer)) throw new Error("Unknown Plan mode card.");
+    state.ui.mapPlanComposer = composer;
+    notify();
+    return { ok: true, composer };
   };
 
   const setMapPlanSelection = (skillIds, { selectedPathId = null } = {}) => {
@@ -2134,7 +2161,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     return { ok: true, id: pathId };
   };
 
-  const addMapPlanAnnotation = ({ body, pathId = null, skillIds = state.ui.mapPlanSelection } = {}) => {
+  const addMapPlanAnnotation = ({ body, pathId = null, skillIds = state.ui.mapPlanSelection, layoutKey = null, position = null } = {}) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     const plan = activeMapPlan();
     if (plan.annotations.length >= MAX_MAP_PLAN_ANNOTATIONS) throw new Error(`A learning plan can contain at most ${MAX_MAP_PLAN_ANNOTATIONS} annotations.`);
@@ -2144,18 +2171,46 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     const targetPath = safePathId ? plan.paths.find((path) => path.id === safePathId) : null;
     if (safePathId && !targetPath) throw new Error("Plan path not found.");
     const targetSkillIds = safePathId ? [] : normalizeMapPlanSelection(skillIds);
-    if (!safePathId && !targetSkillIds.length) throw new Error("Select one or more lessons to annotate.");
+    const allowedLayoutKeys = new Set(["all-subjects", ...catalog.subjects.map((subject) => `subject:${subject.id}`)]);
+    const safeLayoutKey = allowedLayoutKeys.has(layoutKey) ? layoutKey : null;
+    const safePosition = safeLayoutKey && position && typeof position === "object" && !Array.isArray(position)
+      && Number.isFinite(Number(position.x)) && Number.isFinite(Number(position.y))
+      ? {
+        x: Math.round(cleanNumber(Number(position.x), 0, 0, 20_000) * 100) / 100,
+        y: Math.round(cleanNumber(Number(position.y), 0, 0, 20_000) * 100) / 100,
+      }
+      : null;
+    if (!safePathId && !targetSkillIds.length && !safePosition) throw new Error("Place the free annotation on a mastery-map layout.");
     const annotation = {
       id: makeId("plan-note"),
-      targetType: safePathId ? "path" : targetSkillIds.length === 1 ? "node" : "nodes",
+      targetType: safePathId ? "path" : targetSkillIds.length === 1 ? "node" : targetSkillIds.length > 1 ? "nodes" : "free",
       pathId: safePathId,
       skillIds: targetSkillIds,
+      positions: safePosition ? { [safeLayoutKey]: safePosition } : {},
       body: safeBody,
       createdAt: isoNow(),
       updatedAt: isoNow(),
     };
     plan.annotations.push(annotation);
-    addActivity("add_map_plan_annotation", `Added a note to ${targetPath?.name ?? `${targetSkillIds.length} selected lesson${targetSkillIds.length === 1 ? "" : "s"}`}.`);
+    addActivity("add_map_plan_annotation", `Added a note to ${targetPath?.name ?? (targetSkillIds.length ? `${targetSkillIds.length} selected lesson${targetSkillIds.length === 1 ? "" : "s"}` : "the mastery map")}.`);
+    notify();
+    return clone(annotation);
+  };
+
+  const updateMapPlanAnnotationPosition = (annotationId, { layoutKey, position } = {}) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const allowedLayoutKeys = new Set(["all-subjects", ...catalog.subjects.map((subject) => `subject:${subject.id}`)]);
+    if (!allowedLayoutKeys.has(layoutKey)) throw new Error("Unknown mastery-map layout.");
+    if (!position || typeof position !== "object" || Array.isArray(position)
+      || !Number.isFinite(Number(position.x)) || !Number.isFinite(Number(position.y))) throw new Error("Choose a valid annotation position.");
+    const annotation = activeMapPlan().annotations.find((item) => item.id === annotationId);
+    if (!annotation) throw new Error("Plan annotation not found.");
+    annotation.positions ??= {};
+    annotation.positions[layoutKey] = {
+      x: Math.round(cleanNumber(Number(position.x), 0, 0, 20_000) * 100) / 100,
+      y: Math.round(cleanNumber(Number(position.y), 0, 0, 20_000) * 100) / 100,
+    };
+    annotation.updatedAt = isoNow();
     notify();
     return clone(annotation);
   };
@@ -2199,6 +2254,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     if (mapContextChanged) {
       state.ui.mapPlanSelection = [];
       state.ui.selectedMapPlanPathId = null;
+      state.ui.mapPlanComposer = null;
     }
     addActivity("set_learning_preferences", `Using ${profile.progressionMode} progression in ${catalog.subjects.find((subject) => subject.id === profile.activeSubjectId)?.name ?? profile.activeSubjectId}; the map shows ${profile.mapScope === "all" ? "all installed subjects" : "the current subject"}.`, undefined, activityActor);
     notify();
@@ -2913,6 +2969,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     selectMapSkill,
     setMapZoom,
     setMapPlanMode,
+    setMapPlanComposer,
     setMapPlanSelection,
     updateMapPlanLayout,
     resetMapPlanLayout,
@@ -2921,6 +2978,7 @@ export function createQuickMathsStore({ storage, curriculum, now = () => new Dat
     selectMapPlanPath,
     deleteMapPlanPath,
     addMapPlanAnnotation,
+    updateMapPlanAnnotationPosition,
     deleteMapPlanAnnotation,
     setLearningPreferences,
     startTest,

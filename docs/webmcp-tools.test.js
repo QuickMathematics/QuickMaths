@@ -120,8 +120,17 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /navigator\.vibrate/);
   assert.match(js, /map-plan-path-form/);
   assert.match(js, /map-plan-annotation-form/);
+  assert.match(js, /Select multiple nodes to create a custom path\./);
+  assert.match(js, /data-action="plan-open-annotation"/);
+  assert.match(js, /data-action="plan-open-path"/);
+  assert.match(js, /data-plan-comment=/);
+  assert.match(js, /updateMapPlanAnnotationPosition/);
   assert.match(css, /\.map-node-plan-outline/);
   assert.match(css, /\.map-plan-connection/);
+  assert.match(css, /\.map-plan-actionbar/);
+  assert.match(css, /\.map-plan-comment-link/);
+  assert.match(css, /\.map-layout\.is-plan-mode \{ grid-template-columns: minmax\(0, 1fr\); \}/);
+  assert.match(css, /\.map-plan-panel\.is-composer-open \{ position: fixed;/);
   assert.match(css, /\.agent-dock\.is-closed/);
   assert.match(css, /\.app-shell\.agent-collapsed \.agent-toggle/);
   assert.match(js, /createGitHubSyncController/);
@@ -206,7 +215,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 15);
+  assert.equal(summary.guide.app_version, 16);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
   assert.equal(summary.guide.tools.length, 17);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
