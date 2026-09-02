@@ -2298,7 +2298,7 @@ async function boot() {
   let agentManifest = {};
   let communityConfig = { enabled: false };
   try {
-    const manifestResponse = await fetch("./agent-manifest.json?v=20260902-storage-onboarding");
+    const manifestResponse = await fetch("./agent-manifest.json?v=20260902-agent-planning-v1");
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
   } catch {
     // The tools still work if the optional human/machine-readable guide is unavailable.
