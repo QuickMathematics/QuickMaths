@@ -1701,7 +1701,7 @@ function initClock() {
 }
 
 async function boot() {
-  const response = await fetch("./curriculum-data.json?v=20260901-geography");
+  const response = await fetch("./curriculum-data.json?v=20260902-scenario-coverage");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let agentManifest = {};
