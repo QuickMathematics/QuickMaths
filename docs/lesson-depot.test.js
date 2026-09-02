@@ -103,6 +103,41 @@ test("controller refuses to fetch or stage metadata-only concept previews", asyn
   assert.equal(lessonFetches, 0);
 });
 
+test("controller validates a Depot batch before opening one sequential human review queue", async () => {
+  const raws = {
+    PACK_BIO: JSON.stringify({ id: "PACK_BIO", version: "1.1.0", name: "Cell Biology", subjectName: "Biology", skillCount: 2, problemCount: 8 }),
+    PACK_MONEY: JSON.stringify({ id: "PACK_MONEY", version: "1.0.0", name: "Money Maths", subjectName: "Mathematics", skillCount: 1, problemCount: 5 }),
+  };
+  let stagedRaws = [];
+  const store = {
+    snapshot: () => ({ lessonPacks: [] }),
+    previewLessonPack(raw) { return JSON.parse(raw); },
+    stageLessonPacks(rawItems) {
+      stagedRaws = rawItems;
+      return { ok: true, status: "staged", staged_count: rawItems.length, sequential_review: true, requires_human_confirmation: true };
+    },
+  };
+  const fetchImpl = async (url) => {
+    if (url.endsWith("catalog.json")) return { ok: true, json: async () => catalog };
+    const id = url.includes("bio.json") ? "PACK_BIO" : "PACK_MONEY";
+    return { ok: true, text: async () => raws[id] };
+  };
+  const depot = createLessonDepot({ store, fetchImpl, catalogUrl: "https://example.com/catalog.json" });
+  await depot.load();
+  const result = await depot.stagePacks([
+    { package_id: "PACK_BIO", version: "1.1.0" },
+    { package_id: "PACK_MONEY", version: "1.0.0" },
+  ]);
+  assert.equal(result.staged_count, 2);
+  assert.equal(result.sequential_review, true);
+  assert.deepEqual(result.review_queue.map((item) => item.package_id), ["PACK_BIO", "PACK_MONEY"]);
+  assert.equal(stagedRaws.length, 2);
+  await assert.rejects(depot.stagePacks([
+    { package_id: "PACK_BIO", version: "1.1.0" },
+    { package_id: "PACK_BIO", version: "1.1.0" },
+  ]), /duplicate package/i);
+});
+
 test("publishing prompt keeps validation and human approval in the flow", () => {
   const prompt = buildDepotSubmissionPrompt({ id: "PACK_BIO", name: "Cell Biology", version: "1.1.0" });
   assert.match(prompt, /run the Lesson Depot builder and the full test suite/);

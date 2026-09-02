@@ -50,7 +50,7 @@ Challenge-period milestone evidence:
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers twenty-six page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact operating summary by default; an agent can request `tutoring`, `navigation`, `planning`, `educator`, `bridge`, `custom_content`, `backup`, or `all` only when that policy is relevant. The complete source remains the machine-readable `agent-manifest.json`.
+A compatible ChatGPT or Codex browser discovers twenty-seven page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact operating summary by default; an agent can request `tutoring`, `navigation`, `planning`, `educator`, `bridge`, `custom_content`, `backup`, or `all` only when that policy is relevant. The complete source remains the machine-readable `agent-manifest.json`.
 
 | Tool | Purpose |
 | --- | --- |
@@ -61,7 +61,7 @@ A compatible ChatGPT or Codex browser discovers twenty-six page tools through `d
 | `get_curriculum_workspace` | Read the educator's open curriculum, installed pack choices, canonical map, and learner-agent policy. |
 | `create_curriculum` | Create and visibly open a new educator curriculum profile. |
 | `select_curriculum` | Switch the educator workspace to an existing curriculum. |
-| `update_curriculum_settings` | Set student, agent, progression, contact, and retake rules for the open curriculum. |
+| `update_curriculum_settings` | Set student, agent, progression, and contact rules for the open curriculum. |
 | `set_curriculum_pack_enabled` | Enable or disable an installed additive lesson pack only for the open curriculum. |
 | `list_subjects` | Read installed subjects and lesson totals. |
 | `set_learning_preferences` | Change the visible subject, Hard/Open path mode, and focused/combined map scope. |
@@ -75,13 +75,14 @@ A compatible ChatGPT or Codex browser discovers twenty-six page tools through `d
 | `stage_custom_lesson_set` | Stage validated content in the visible UI; only the human can install it. |
 | `search_lesson_depot` | Search published packages and clearly labeled roadmap previews without exposing answer keys. |
 | `stage_depot_lesson` | Hash-check, validate, and visibly stage one published package for human review. |
+| `stage_depot_lessons` | Prepare an ordered batch of published packages for sequential, per-pack human approval or skipping. |
 | `get_learning_context` | Read the selected lesson or active test without answer keys. |
 | `start_skill_test` | Create or resume a test for an unlocked skill and show it on screen. |
 | `inspect_student_work` | Inspect one visible response without returning its expected answer. |
 | `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
-The top-level `agent-bridge.html` workspace registers the same twenty-six learning tools plus three transport tools:
+The top-level `agent-bridge.html` workspace registers the same twenty-seven learning tools plus three transport tools:
 
 | Bridge tool | Purpose |
 | --- | --- |
@@ -97,7 +98,7 @@ Tool inputs use closed JSON Schemas and runtime validation. Read-only tools do n
 Mobile learner browser                          Computer / remote Codex task
 ┌──────────────────────────┐                    ┌────────────────────────────┐
 │ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
-│ localStorage + WebMCP    │                    │ 29 WebMCP tools            │
+│ localStorage + WebMCP    │                    │ 30 WebMCP tools            │
 └────────────┬─────────────┘                    └──────────────┬─────────────┘
              │ debounced, complete state                       │ explicit publish → host Git auth
              ▼                                                 ▼

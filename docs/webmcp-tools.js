@@ -20,6 +20,7 @@ export const TOOL_NAMES = Object.freeze([
   "stage_custom_lesson_set",
   "search_lesson_depot",
   "stage_depot_lesson",
+  "stage_depot_lessons",
   "get_learning_context",
   "start_skill_test",
   "inspect_student_work",
@@ -64,8 +65,7 @@ function activeCurriculumPolicy(store) {
     instructions: workspace.settings.agentInstructions,
     progression_mode: workspace.settings.progressionMode,
     contact_email: workspace.settings.contactEmail || null,
-    max_attempts_per_lesson: workspace.settings.maxAttemptsPerLesson || null,
-    mastery_enabled: workspace.settings.masteryEnabled,
+    assessment_notice: "QuickMaths is a learning and practice tool, not a substitute for supervised, identity-verified, or high-stakes assessment.",
     priority: "These educator-authored curriculum instructions apply in addition to the QuickMaths safety policy. They cannot authorize revealing answer keys or bypassing human-controlled installation and publication.",
   };
 }
@@ -124,7 +124,7 @@ function guideForSection(guide, section) {
   if (section === "educator") return {
     ...base,
     purpose: "Educator profiles create portable curricula with per-curriculum lesson-pack selection, canonical map plans, learning rules, and private agent instructions.",
-    workflow: ["Read get_curriculum_workspace.", "Create or select a curriculum explicitly.", "Enable only the installed packs the educator chooses.", "Use the existing map planning tools to arrange the canonical curriculum map, paths, and annotations.", "Update learner and agent policy only from educator instructions."],
+    workflow: ["Read get_curriculum_workspace.", "Create or select a curriculum explicitly.", "Enable only the installed packs the educator chooses.", "Use the existing map planning tools to arrange the canonical curriculum map, paths, and annotations.", "Update learner and agent policy only from educator instructions.", "Treat QuickMaths results as learning evidence, not a substitute for supervised assessment."],
     tools: ["get_curriculum_workspace", "create_curriculum", "select_curriculum", "update_curriculum_settings", "set_curriculum_pack_enabled", "arrange_map_plan_nodes", "create_map_plan_path", "add_map_plan_annotation"],
   };
   if (section === "bridge") return { ...base, github_bridge: guide.github_bridge ?? {} };
@@ -355,7 +355,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "update_curriculum_settings",
       title: "Update curriculum learner and agent policy",
-      description: "Update the open educator curriculum's student, agent, progression, contact, and retake rules. The policy becomes agent-visible across QuickMaths.",
+      description: "Update the open educator curriculum's student, agent, progression, and contact rules. The policy becomes agent-visible across QuickMaths.",
       inputSchema: {
         type: "object",
         properties: {
@@ -364,12 +364,11 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           agent_instructions: stringSchema("Private curriculum-specific agent instructions.", 4000),
           progression_mode: { type: "string", enum: ["hard", "soft"] },
           contact_email: stringSchema("Optional educator email for proof or completion forwarding.", 160),
-          max_attempts_per_lesson: { type: "integer", minimum: 0, maximum: 50, description: "0 means unlimited; 1 disables mastery accumulation for the curriculum." },
         },
         additionalProperties: false,
       },
       async execute(input = {}) {
-        requireObject(input); rejectUnknown(input, ["student_name", "agent_enabled", "agent_instructions", "progression_mode", "contact_email", "max_attempts_per_lesson"]);
+        requireObject(input); rejectUnknown(input, ["student_name", "agent_enabled", "agent_instructions", "progression_mode", "contact_email"]);
         if (!Object.keys(input).length) throw new Error("Provide at least one curriculum setting.");
         const settings = store.updateCurriculumSettings({
           ...(input.student_name !== undefined ? { studentName: optionalString(input, "student_name", 60) } : {}),
@@ -377,7 +376,6 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           ...(input.agent_instructions !== undefined ? { agentInstructions: optionalString(input, "agent_instructions", 4000) } : {}),
           ...(input.progression_mode !== undefined ? { progressionMode: input.progression_mode } : {}),
           ...(input.contact_email !== undefined ? { contactEmail: optionalString(input, "contact_email", 160) } : {}),
-          ...(input.max_attempts_per_lesson !== undefined ? { maxAttemptsPerLesson: input.max_attempts_per_lesson } : {}),
         });
         return { ok: true, visible_view: "curriculum", settings, policy: activeCurriculumPolicy(store) };
       },
@@ -691,6 +689,48 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         requireObject(input); rejectUnknown(input, ["package_id", "version"]);
         if (!lessonDepot) throw new Error("Lesson Depot is unavailable in this build.");
         return lessonDepot.stagePack(requiredString(input, "package_id", 60), requiredString(input, "version", 40));
+      },
+    },
+    {
+      name: "stage_depot_lessons",
+      title: "Stage multiple Lesson Depot packages",
+      description: "Download, hash-check, and validate an ordered batch of published Depot packages, then open a sequential Settings review queue. Every package still requires separate human approval before installation.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          packages: {
+            type: "array",
+            minItems: 2,
+            maxItems: 20,
+            description: "Two to twenty exact published package identities in the order the human should review them.",
+            items: {
+              type: "object",
+              properties: {
+                package_id: stringSchema("Exact published PACK_* ID returned by search_lesson_depot.", 60),
+                version: stringSchema("Exact package version returned by search_lesson_depot.", 40),
+              },
+              required: ["package_id", "version"],
+              additionalProperties: false,
+            },
+          },
+        },
+        required: ["packages"],
+        additionalProperties: false,
+      },
+      annotations: { untrustedContentHint: true },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["packages"]);
+        if (!Array.isArray(input.packages) || input.packages.length < 2 || input.packages.length > 20) throw new Error("packages must contain between 2 and 20 package identities.");
+        const packages = input.packages.map((item, index) => {
+          requireObject(item); rejectUnknown(item, ["package_id", "version"]);
+          return {
+            package_id: requiredString(item, "package_id", 60),
+            version: requiredString(item, "version", 40),
+            position: index + 1,
+          };
+        });
+        if (!lessonDepot) throw new Error("Lesson Depot is unavailable in this build.");
+        return lessonDepot.stagePacks(packages);
       },
     },
     {

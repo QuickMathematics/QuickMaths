@@ -345,7 +345,7 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
   assert.throws(() => reloaded.updateMapPlanPath(path.id, { color: "tomato" }), /valid path color/i);
 });
 
-test("educator curricula isolate packs, export canonical plans, and enforce single-attempt completion", () => {
+test("educator curricula isolate packs, export canonical plans, and keep practice repeatable", () => {
   const { store } = harness();
   store.createProfile("Curriculum Educator", { role: "educator" });
   assert.equal(store.snapshot().ui.route, "curriculum");
@@ -354,7 +354,7 @@ test("educator curricula isolate packs, export canonical plans, and enforce sing
   assert.equal(store.snapshot().curriculum.allSkills.length, 59);
   store.setCurriculumPackEnabled("PACK_GEOGRAPHY", false);
   assert.equal(store.snapshot().curriculum.allSkills.length, 44);
-  store.updateCurriculum({ name: "Ada's rigorous route", description: "A one-pass mathematics curriculum." });
+  store.updateCurriculum({ name: "Ada's rigorous route", description: "A focused mathematics curriculum." });
   store.updateCurriculumSettings({
     studentName: "Ada",
     agentEnabled: true,
@@ -375,7 +375,8 @@ test("educator curricula isolate packs, export canonical plans, and enforce sing
   const imported = learnerHarness.store.importCurriculum(raw, { attach: false });
   learnerHarness.store.createProfile("Ada", { curriculumId: imported.id });
   let state = learnerHarness.store.snapshot();
-  assert.equal(state.activeCurriculum.settings.masteryEnabled, false);
+  assert.equal("maxAttemptsPerLesson" in state.activeCurriculum.settings, false, "legacy retake caps are ignored");
+  assert.equal("masteryEnabled" in state.activeCurriculum.settings, false);
   assert.equal(state.progressionMode, "soft");
   assert.equal(state.curriculum.allSkills.length, 44);
   assert.equal(state.curriculumPlan.paths[0].name, "Arithmetic start");
@@ -384,11 +385,11 @@ test("educator curricula isolate packs, export canonical plans, and enforce sing
   learnerHarness.store.startTest("MATH_ARITH_001");
   answerActiveTestCorrectly(learnerHarness.store);
   assert.equal(learnerHarness.store.submitTest().ok, true);
-  const attempt = learnerHarness.store.saveReflection({ confidenceRating: 2, difficultyFelt: "hard", hintsUsed: "some", guessed: "yes", wantsMorePractice: "yes" });
-  assert.equal(attempt.masteryUpdate.status, "proven", "single-attempt curricula record completion without mastery gating");
+  const attempt = learnerHarness.store.saveReflection({ confidenceRating: 5, difficultyFelt: "hard", hintsUsed: "none", guessed: "no", wantsMorePractice: "yes" });
+  assert.equal(attempt.masteryUpdate.status, "proven");
+  assert.doesNotThrow(() => learnerHarness.store.startTest("MATH_ARITH_001"), "curricula never turn practice into a one-shot exam");
   state = learnerHarness.store.snapshot();
-  assert.equal(state.progressRows.find((row) => row.id === "MATH_ARITH_001").attemptLimitReached, true);
-  assert.throws(() => learnerHarness.store.startTest("MATH_ARITH_001"), /allows 1 attempt/);
+  assert.equal(state.progressRows.find((row) => row.id === "MATH_ARITH_001").attemptCount, 1);
   assert.match(learnerHarness.store.exportBackup(), /Ada's rigorous route/);
 });
 
@@ -530,6 +531,33 @@ test("a valid custom lesson set joins the real curriculum without replacing buil
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "CUSTOM_FINANCE_DISCOUNTS").custom, true);
   assert.equal(store.statusForSkill("CUSTOM_FINANCE_DISCOUNTS"), "locked");
   assert.match(store.exportLessonPack("PACK_PERSONAL_FINANCE"), new RegExp(LESSON_SET_FORMAT));
+});
+
+test("agent-staged lesson batches require sequential human decisions", () => {
+  const { store } = harness();
+  store.createProfile("Batch Reviewer");
+  const staged = store.stageLessonPacks([lessonSetExample, geographyLessonSet], { activityActor: "agent" });
+  assert.equal(staged.staged_count, 2);
+  assert.equal(staged.sequential_review, true);
+  let state = store.snapshot();
+  assert.equal(state.ui.route, "settings");
+  assert.equal(state.stagedLessonPack.id, "PACK_PERSONAL_FINANCE");
+  assert.equal(state.stagedLessonPack.batchIndex, 1);
+  assert.equal(state.stagedLessonPack.batchTotal, 2);
+  assert.equal(state.lessonPacks.length, 0, "staging never installs content");
+
+  const installed = store.installStagedLessonPack();
+  assert.equal(installed.id, "PACK_PERSONAL_FINANCE");
+  assert.equal(installed.reviewQueueRemaining, 1);
+  state = store.snapshot();
+  assert.equal(state.stagedLessonPack.id, "PACK_GEOGRAPHY");
+  assert.equal(state.stagedLessonPack.batchIndex, 2);
+  assert.equal(state.lessonPacks.length, 1, "one approval installs only one package");
+
+  const skipped = store.discardStagedLessonPack();
+  assert.equal(skipped.reviewQueueRemaining, 0);
+  assert.equal(store.snapshot().stagedLessonPack, null);
+  assert.equal(store.snapshot().lessonPacks.length, 1, "skipping the second package leaves it uninstalled");
 });
 
 test("native lesson improvements replace content reversibly without moving IDs or completed learner progress", () => {

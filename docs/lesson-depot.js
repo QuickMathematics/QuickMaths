@@ -205,6 +205,48 @@ export function createLessonDepot({ store, fetchImpl = globalThis.fetch?.bind(gl
     return store.stageLessonPack(result.raw, { activityActor: "agent" });
   };
 
+  const stagePacks = async (requests) => {
+    if (!Array.isArray(requests) || requests.length < 2) throw new Error("A batch must contain at least two Lesson Depot packages.");
+    if (requests.length > 20) throw new Error("A batch can contain at most 20 Lesson Depot packages.");
+    if (state.phase !== "ready") await load();
+    if (state.phase !== "ready") throw new Error(state.error || "Lesson Depot catalog is unavailable.");
+    const seen = new Set();
+    const installedIds = new Set(store.snapshot().lessonPacks.map((item) => item.id));
+    const selected = [];
+    const alreadyInstalled = [];
+    for (const request of requests) {
+      const id = String(request?.id ?? request?.package_id ?? "").trim();
+      const version = String(request?.version ?? "").trim();
+      const key = `${id}@${version}`;
+      if (seen.has(key)) throw new Error(`The batch contains duplicate package ${key}.`);
+      seen.add(key);
+      const pack = state.catalog.packages.find((item) => item.id === id && item.version === version);
+      if (!pack) throw new Error(`Lesson package ${key} was not found in the current catalog.`);
+      if (pack.availability === "preview") throw new Error(`${pack.name} is a concept preview. Installable lesson content has not been published yet.`);
+      if (installedIds.has(id)) alreadyInstalled.push({ id, version, name: pack.name });
+      else selected.push(pack);
+    }
+    if (!selected.length) throw new Error("Every requested Lesson Depot package is already installed.");
+    const downloaded = [];
+    for (const pack of selected) downloaded.push({ pack, ...(await fetchPack(pack)) });
+    const staged = store.stageLessonPacks(downloaded.map((item) => item.raw), { activityActor: "agent" });
+    return {
+      ...staged,
+      requested_count: requests.length,
+      staged_count: downloaded.length,
+      already_installed: alreadyInstalled,
+      review_queue: downloaded.map(({ pack, preview }, index) => ({
+        position: index + 1,
+        package_id: pack.id,
+        version: pack.version,
+        name: preview.name,
+        subject_name: preview.subjectName,
+        skill_count: preview.skillCount,
+        problem_count: preview.problemCount,
+      })),
+    };
+  };
+
   const setFilters = ({ query = state.query, sort = state.sort, subject = state.subject } = {}, { notify = true } = {}) => {
     state.query = String(query).slice(0, 120); state.sort = ["popular", "newest", "name"].includes(sort) ? sort : "popular"; state.subject = String(subject).slice(0, 60) || "all";
     if (notify) emit();
@@ -212,5 +254,5 @@ export function createLessonDepot({ store, fetchImpl = globalThis.fetch?.bind(gl
 
   const closePreview = () => { state.preview = null; emit(); };
 
-  return { snapshot, load, previewPack, installPack, search, stagePack, setFilters, closePreview };
+  return { snapshot, load, previewPack, installPack, search, stagePack, stagePacks, setFilters, closePreview };
 }

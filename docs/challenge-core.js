@@ -809,13 +809,10 @@ function defaultCurriculumSettings() {
     agentInstructions: "Guide the student Socratically. Do not solve assessed tasks for them; ask targeted questions and respond to their visible work.",
     progressionMode: "hard",
     contactEmail: "",
-    maxAttemptsPerLesson: 0,
-    masteryEnabled: true,
   };
 }
 
 function sanitizeCurriculumSettings(candidate = {}) {
-  const maxAttemptsPerLesson = Math.floor(cleanNumber(Number(candidate.maxAttemptsPerLesson ?? candidate.max_attempts_per_lesson), 0, 0, 50));
   const email = cleanText(candidate.contactEmail ?? candidate.contact_email, 254);
   return {
     studentName: cleanText(candidate.studentName ?? candidate.student_name, 60),
@@ -823,8 +820,6 @@ function sanitizeCurriculumSettings(candidate = {}) {
     agentInstructions: cleanText(candidate.agentInstructions ?? candidate.agent_instructions, 4000) || defaultCurriculumSettings().agentInstructions,
     progressionMode: ["soft", "open"].includes(candidate.progressionMode ?? candidate.progression_mode) ? "soft" : "hard",
     contactEmail: !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "",
-    maxAttemptsPerLesson,
-    masteryEnabled: maxAttemptsPerLesson !== 1,
   };
 }
 
@@ -1756,7 +1751,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   const unlocks = {};
   let catalog = curriculum;
   let state = loadState(storage, curriculum, { bundledLessonPacks });
-  let stagedLessonPack = null;
+  let stagedLessonPacks = [];
   const listeners = new Set();
   let storageError = null;
 
@@ -1895,8 +1890,6 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       bestScore: record.bestTestScore ?? null,
       confidence: record.confidenceRating ?? null,
       attemptCount: record.attemptCount ?? 0,
-      attemptLimit: activeCurriculumSettings()?.maxAttemptsPerLesson ?? 0,
-      attemptLimitReached: Boolean(activeCurriculumSettings()?.maxAttemptsPerLesson && (record.attemptCount ?? 0) >= activeCurriculumSettings().maxAttemptsPerLesson),
       nextReviewAt: record.nextReviewAt ?? null,
       mistakeTags: [...(record.mistakeTags ?? [])],
       unmetPrerequisites: skill.prerequisites.filter((id) => !PROVEN.has(activeProgress()[id]?.status)),
@@ -1982,16 +1975,19 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       activity: clone(state.activity.filter((item) => item.profileId === state.activeProfileId && item.actor === "agent")),
       storageError,
       backupStatus: backupStatus(),
-      stagedLessonPack: stagedLessonPack ? {
-        id: stagedLessonPack.pack.id,
-        name: stagedLessonPack.pack.name,
-        mode: stagedLessonPack.pack.mode,
-        author: stagedLessonPack.pack.author,
-        version: stagedLessonPack.pack.version,
-        subjectId: stagedLessonPack.pack.subject.id,
-        subjectName: stagedLessonPack.pack.subject.name,
-        skillCount: stagedLessonPack.pack.skills.length,
-        problemCount: stagedLessonPack.pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
+      stagedLessonPack: stagedLessonPacks[0] ? {
+        id: stagedLessonPacks[0].pack.id,
+        name: stagedLessonPacks[0].pack.name,
+        mode: stagedLessonPacks[0].pack.mode,
+        author: stagedLessonPacks[0].pack.author,
+        version: stagedLessonPacks[0].pack.version,
+        subjectId: stagedLessonPacks[0].pack.subject.id,
+        subjectName: stagedLessonPacks[0].pack.subject.name,
+        skillCount: stagedLessonPacks[0].pack.skills.length,
+        problemCount: stagedLessonPacks[0].pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
+        batchIndex: stagedLessonPacks[0].batchIndex,
+        batchTotal: stagedLessonPacks[0].batchTotal,
+        queueRemaining: Math.max(0, stagedLessonPacks.length - 1),
       } : null,
       lessonPacks: state.lessonPacks.map((pack) => ({
         id: pack.id,
@@ -2673,9 +2669,6 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (activeProfile().role === "educator") throw new Error("Educator profiles design curricula but do not take learner tests.");
     if (!skillsById[skillId] || !isSkillVisible(skillId)) throw new Error("Unknown or disabled skill_id.");
     if (state.ui.pendingResults) throw new Error("Save the current reflection before starting another test.");
-    const attemptLimit = activeCurriculumSettings()?.maxAttemptsPerLesson ?? 0;
-    const completedAttempts = activeProgress()[skillId]?.attemptCount ?? 0;
-    if (!force && attemptLimit > 0 && completedAttempts >= attemptLimit) throw new Error(`This curriculum allows ${attemptLimit} attempt${attemptLimit === 1 ? "" : "s"} per lesson.`);
     const status = statusForSkill(skillId);
     if (!force && status === "locked") throw new Error("This skill is locked by its prerequisites.");
     const profileId = state.activeProfileId;
@@ -2772,15 +2765,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       const mode = source?.work?.mode;
       return ["proof_obligations", "rubric_check"].includes(mode) || source?.review_policy?.mastery_requires_review_pass === true;
     });
-    const settings = activeCurriculumSettings();
-    const masteryEnabled = settings?.masteryEnabled !== false;
     const prerequisitesMet = effectiveProgressionMode() === "soft" || skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status));
-    const mastery = masteryEnabled ? (hasPendingReview ? previous.masteryScore : updateMastery(previous.masteryScore, pending.percentScore, reflection)) : Math.round(pending.percentScore * 100);
+    const mastery = hasPendingReview ? previous.masteryScore : updateMastery(previous.masteryScore, pending.percentScore, reflection);
     const passed = prerequisitesMet
       && pending.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
       && reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
       && reflection.guessed !== "yes";
-    const status = hasPendingReview ? "learning" : !masteryEnabled ? "proven" : passed ? (previous.status === "proven" ? "mastered" : "proven") : "learning";
+    const status = hasPendingReview ? "learning" : passed ? (previous.status === "proven" ? "mastered" : "proven") : "learning";
     const completedAt = isoNow();
     const mistakeTags = [...new Set(pending.results.flatMap((result) => result.mistakeTags))].slice(0, 12);
     const record = {
@@ -2791,7 +2782,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       bestTestScore: Math.max(previous.bestTestScore ?? 0, pending.percentScore),
       attemptCount: (previous.attemptCount ?? 0) + 1,
       lastAttemptAt: completedAt,
-      nextReviewAt: masteryEnabled ? reviewDate(status, pending.percentScore, reflection.confidenceRating, now()) : null,
+      nextReviewAt: reviewDate(status, pending.percentScore, reflection.confidenceRating, now()),
       mistakeTags,
       notes: reflection.notes,
       updatedAt: completedAt,
@@ -2900,14 +2891,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!record) return;
     record.masteryScore = Math.max(0, Math.min(100, record.masteryScore - Number(attempt.reviewMasteryDeltaApplied ?? 0) + desiredDelta));
     const skill = skillsById[attempt.skillId];
-    const masteryEnabled = activeCurriculumSettings()?.masteryEnabled !== false;
     const prerequisitesMet = effectiveProgressionMode() === "soft" || skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status));
     const passed = verdict === "pass" && prerequisitesMet
       && attempt.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
       && attempt.reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
       && attempt.reflection.guessed !== "yes";
-    record.status = verdict === "pass" && !masteryEnabled ? "proven" : passed ? (record.status === "proven" ? "mastered" : "proven") : "learning";
-    record.nextReviewAt = masteryEnabled ? reviewDate(record.status, attempt.percentScore, attempt.reflection.confidenceRating, now()) : null;
+    record.status = passed ? (record.status === "proven" ? "mastered" : "proven") : "learning";
+    record.nextReviewAt = reviewDate(record.status, attempt.percentScore, attempt.reflection.confidenceRating, now());
     record.updatedAt = isoNow();
     attempt.masteryUpdate = { status: record.status, masteryScore: record.masteryScore };
     attempt.reviewStatus = verdict === "pass" ? "review_passed" : verdict;
@@ -3136,30 +3126,54 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return { ok: true, id: pack.id, name: pack.name, mode: pack.mode, subjectId: pack.subject.id, subjectName: pack.subject.name, skillCount: pack.skills.length, totalSkillCount: skillOrder.length, completedProgressPreserved: pack.mode === "override", restartedDraftCount };
   };
 
-  const stageLessonPack = (raw, { activityActor = "learner" } = {}) => {
-    const pack = parseLessonPack(raw);
-    stagedLessonPack = { raw: typeof raw === "string" ? raw : JSON.stringify(raw), pack };
+  const stageLessonPacks = (rawItems, { activityActor = "learner" } = {}) => {
+    if (!Array.isArray(rawItems) || !rawItems.length) throw new Error("At least one lesson set is required for staging.");
+    if (rawItems.length > 20) throw new Error("At most 20 lesson sets can be staged together.");
+    if (stagedLessonPacks.length) throw new Error("A lesson set is already awaiting human review. Finish or skip the current queue before staging another batch.");
+    const parsed = rawItems.map((raw) => ({ raw: typeof raw === "string" ? raw : JSON.stringify(raw), pack: parseLessonPack(raw) }));
+    const seen = new Set();
+    for (const item of parsed) {
+      if (seen.has(item.pack.id)) throw new Error(`The staging batch contains duplicate lesson set ${item.pack.id}.`);
+      seen.add(item.pack.id);
+    }
+    stagedLessonPacks = parsed.map((item, index) => ({ ...item, batchIndex: index + 1, batchTotal: parsed.length }));
     state.ui.route = "settings";
-    addActivity("stage_custom_lesson_set", `Staged ${pack.name}; human confirmation is required to install it.`, undefined, activityActor);
+    addActivity("stage_custom_lesson_set", parsed.length === 1
+      ? `Staged ${parsed[0].pack.name}; human confirmation is required to install it.`
+      : `Staged ${parsed.length} lesson sets as an ordered review queue; each installation requires separate human confirmation.`, undefined, activityActor);
     notify();
-    return { ok: true, status: "staged", requires_human_confirmation: true, preview: previewLessonPack(raw) };
+    return {
+      ok: true,
+      status: "staged",
+      staged_count: parsed.length,
+      sequential_review: true,
+      requires_human_confirmation: true,
+      previews: parsed.map((item) => previewLessonPack(item.raw)),
+      preview: previewLessonPack(parsed[0].raw),
+    };
   };
 
+  const stageLessonPack = (raw, options = {}) => stageLessonPacks([raw], options);
+
   const installStagedLessonPack = () => {
-    if (!stagedLessonPack) throw new Error("No lesson set is staged.");
-    const staged = stagedLessonPack;
-    stagedLessonPack = null;
-    try { return importLessonPack(staged.raw); }
-    catch (error) { stagedLessonPack = staged; throw error; }
+    if (!stagedLessonPacks.length) throw new Error("No lesson set is staged.");
+    const staged = stagedLessonPacks.shift();
+    try {
+      const result = importLessonPack(staged.raw);
+      return { ...result, reviewQueueRemaining: stagedLessonPacks.length, reviewQueueTotal: staged.batchTotal };
+    } catch (error) {
+      stagedLessonPacks.unshift(staged);
+      throw error;
+    }
   };
 
   const discardStagedLessonPack = () => {
-    if (!stagedLessonPack) return { ok: true, discarded: false };
-    const name = stagedLessonPack.pack.name;
-    stagedLessonPack = null;
+    if (!stagedLessonPacks.length) return { ok: true, discarded: false, reviewQueueRemaining: 0 };
+    const staged = stagedLessonPacks.shift();
+    const name = staged.pack.name;
     addActivity("discard_staged_lesson_set", `Discarded staged lesson set ${name}.`);
     notify();
-    return { ok: true, discarded: true };
+    return { ok: true, discarded: true, reviewQueueRemaining: stagedLessonPacks.length, reviewQueueTotal: staged.batchTotal };
   };
 
   const restoreNativeLessons = (packId) => {
@@ -3432,6 +3446,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     createFollowupProblem,
     previewLessonPack,
     stageLessonPack,
+    stageLessonPacks,
     installStagedLessonPack,
     discardStagedLessonPack,
     restoreNativeLessons,

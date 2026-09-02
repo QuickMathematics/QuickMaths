@@ -75,6 +75,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(html, /data-route="curriculum"/);
   assert.match(css, /\.welcome-storage-restore \{[^}]*border-radius: 14px;[^}]*background:/);
   assert.match(css, /\.welcome-storage-restore > summary strong \{ font-size: 15px/);
+  assert.match(js, /QuickMaths is for learning and practice/);
+  assert.doesNotMatch(js, /Attempts per lesson/);
   assert.match(html, /id="app-shell" class="app-shell agent-collapsed"/);
   assert.match(html, /id="agent-dock" class="agent-dock is-closed"/);
   assert.doesNotMatch(html, /QuickMaths turns \d+ connected lessons across \d+ installed subjects/);
@@ -192,13 +194,13 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /local-git-transport/);
 });
 
-test("registers all twenty-six tools once with the WebMCP document context", async () => {
+test("registers all twenty-seven tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
   }, agentManifest);
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 26);
+  assert.equal(TOOL_NAMES.length, 27);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(result.failures, []);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
@@ -224,9 +226,9 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 19);
+  assert.equal(summary.guide.app_version, 20);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
-  assert.equal(summary.guide.tools.length, 26);
+  assert.equal(summary.guide.tools.length, 27);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent GitHub storage/);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
@@ -260,16 +262,16 @@ test("educator WebMCP tools compose curricula and inject the private learner pol
     agent_instructions: "Ask questions only; never complete assessed work.",
     progression_mode: "soft",
     contact_email: "teacher@example.com",
-    max_attempts_per_lesson: 1,
   });
-  assert.equal(updated.settings.masteryEnabled, false);
+  assert.equal("maxAttemptsPerLesson" in updated.settings, false);
   const app = await tools.get_app_state.execute({});
   assert.equal(app.profile.role, "educator");
   assert.equal(app.active_curriculum_policy.student_name, "Ada");
   assert.equal(app.active_curriculum_policy.agent_enabled, false);
   assert.match(app.active_curriculum_policy.instructions, /never complete assessed work/);
   const guide = await tools.get_agent_guide.execute({ section: "educator" });
-  assert.equal(guide.active_curriculum_policy.max_attempts_per_lesson, 1);
+  assert.match(guide.active_curriculum_policy.assessment_notice, /not a substitute for supervised/);
+  await assert.rejects(tools.update_curriculum_settings.execute({ max_attempts_per_lesson: 1 }), /Unknown input property/);
   await assert.rejects(tools.get_learning_context.execute({}), /Agent in the loop turned off/);
 });
 
@@ -334,12 +336,20 @@ test("Depot tools return metadata and stage for human confirmation without insta
   const lessonDepot = {
     async search() { return [{ id: "PACK_DEMO", name: "Demo", version: "1.0.0", skill_count: 1 }]; },
     async stagePack(id, version) { return { ok: true, id, version, status: "staged", requires_human_confirmation: true }; },
+    async stagePacks(packages) { return { ok: true, status: "staged", staged_count: packages.length, sequential_review: true, requires_human_confirmation: true, review_queue: packages }; },
   };
   const tools = Object.fromEntries(buildToolDefinitions(store, agentManifest, lessonDepot).map((tool) => [tool.name, tool]));
   const found = await tools.search_lesson_depot.execute({ query: "demo" });
   assert.equal(found.packages[0].id, "PACK_DEMO");
   const staged = await tools.stage_depot_lesson.execute({ package_id: "PACK_DEMO", version: "1.0.0" });
   assert.equal(staged.requires_human_confirmation, true);
+  const batch = await tools.stage_depot_lessons.execute({ packages: [
+    { package_id: "PACK_DEMO", version: "1.0.0" },
+    { package_id: "PACK_SECOND", version: "2.0.0" },
+  ] });
+  assert.equal(batch.staged_count, 2);
+  assert.equal(batch.sequential_review, true);
+  await assert.rejects(tools.stage_depot_lessons.execute({ packages: [{ package_id: "PACK_DEMO", version: "1.0.0" }] }), /between 2 and 20/);
   assert.equal(store.snapshot().lessonPacks.length, 0);
   assert.equal(tools.install_depot_lesson, undefined);
 });
