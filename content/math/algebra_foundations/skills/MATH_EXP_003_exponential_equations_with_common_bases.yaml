@@ -1,0 +1,555 @@
+id: MATH_EXP_003
+schema_version: 0.2
+name: Exponential equations with common bases
+domain: Math
+subdomain: Exponential Functions
+description: Solve exponential equations by isolating powers, rewriting expressions with a common base, and equating
+  exponents.
+prerequisites:
+- MATH_EXP_002
+- MATH_ALG_003
+tags:
+- exponential_equations
+- common_bases
+- equating_exponents
+- exponent_laws
+- growth_models
+- half_life
+- doubling_time
+- equation_solving
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Exponential equations contain a variable in an exponent.
+
+  This lesson focuses on equations that can be rewritten with the same base. Logarithms are not needed for these cases.
+
+  One-to-one property:
+  For a positive base b where b is not 1:
+
+  If b^m = b^n, then m = n.
+
+  Example:
+  2^x = 2^7
+
+  The bases match, so x = 7.
+
+  Shifted exponent:
+  3^(x + 2) = 3^8
+
+  Set the exponents equal:
+
+  x + 2 = 8
+  x = 6
+
+  Linear expressions in both exponents:
+  5^(2x + 1) = 5^(x + 7)
+
+  Set the exponents equal:
+
+  2x + 1 = x + 7
+  x = 6
+
+  Isolate the exponential expression first:
+  4 * 2^x = 128
+
+  Divide by 4:
+
+  2^x = 32
+
+  Rewrite 32 as a power of 2:
+
+  2^x = 2^5
+  x = 5
+
+  Rewriting bases:
+  Sometimes one base is a power of another.
+
+  Example:
+  4^x = 2^10
+
+  Since 4 = 2^2:
+
+  (2^2)^x = 2^10
+  2^(2x) = 2^10
+  2x = 10
+  x = 5
+
+  Reciprocal bases:
+  A reciprocal base can be rewritten with a negative exponent.
+
+  (1/3)^x = 3^4
+
+  Because 1/3 = 3^(-1):
+
+  3^(-x) = 3^4
+  -x = 4
+  x = -4
+
+  No real solution in a basic positive exponential model:
+  A positive base raised to a real power is positive. Therefore an equation such as 2^x = -8 has no real solution.
+
+  Growth applications:
+  If a quantity doubles each period:
+
+  final = initial * 2^t
+
+  Divide by the initial value, rewrite the quotient as a power of 2, and solve for t.
+
+  Half-life applications:
+  If half remains each period:
+
+  final = initial * (1/2)^t
+
+  The number of halvings is the exponent t.
+
+  Method:
+  1. Isolate the exponential expression if a coefficient is present.
+  2. Rewrite both sides using a common positive base.
+  3. Use exponent laws to simplify powers of powers.
+  4. Set the exponents equal.
+  5. Solve the resulting linear equation.
+  6. Check the answer in the original equation.
+
+  Common mistake:
+  Do not equate exponents until the bases match.
+
+  Another common mistake:
+  When (b^p)^x appears, multiply exponents: (b^p)^x = b^(px).
+
+  Another common mistake:
+  Isolate b^x before rewriting the other side. A coefficient outside the power is not part of the exponent.
+
+  Another common mistake:
+  A reciprocal base introduces a negative exponent.
+
+  Another common mistake:
+  Not every exponential equation has a common-base solution. More general equations require logarithms, which are beyond this lesson.
+examples:
+- prompt: 'Solve: 3^x = 3^6'
+  solution: x = 6
+  explanation: Equal bases give equal exponents.
+- prompt: 'Solve: 2^(x + 4) = 2^11'
+  solution: x = 7
+  explanation: Set x + 4 = 11.
+- prompt: 'Solve: 5^(2x) = 5^14'
+  solution: x = 7
+  explanation: Set 2x = 14.
+- prompt: 'Solve: 3^(2x + 1) = 3^(x + 8)'
+  solution: x = 7
+  explanation: Set the exponents equal and solve the linear equation.
+- prompt: 'Solve: 6 * 2^x = 192'
+  solution: x = 5
+  explanation: Divide by 6 to get 2^x = 32 = 2^5.
+- prompt: 'Solve: 9^x = 3^8'
+  solution: x = 4
+  explanation: Rewrite 9 as 3^2, so 3^(2x) = 3^8.
+- prompt: 'Solve: (1/2)^x = 2^5'
+  solution: x = -5
+  explanation: Rewrite (1/2)^x as 2^(-x).
+- prompt: Does 4^x = -16 have a real solution?
+  solution: 'No'
+  explanation: A positive base to a real power is always positive.
+applications:
+- title: Doubling time
+  description: Common-base equations find how many repeated doublings produce a target amount.
+- title: Half-life
+  description: Repeated halving equations find the number of decay intervals.
+- title: Computing
+  description: Powers of 2 model memory sizes, branching, and repeated binary growth.
+- title: Model checking
+  description: Solving for an exponent identifies when an exponential model reaches a threshold.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: EXP_EQ_SAME_BASE_BASIC_001
+    type: generated
+    prompt_template: 'Solve for x: {base}^x = {base}^{power}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      power:
+        type: int
+        min: 2
+        max: 9
+    answer:
+      type: equation_solution
+      variable: x
+      value: '{power}'
+    grading:
+      method: equation_solution
+    work:
+      mode: capture_only
+      prompt: Explain why the matching bases allow the exponents to be equated, then state the solution and check
+        it.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The bases already match.
+      Set x = {power}.
+      The solution is x = {power}.
+    mistake_tags:
+    - exponential_equation_error
+    - common_base_error
+    - exponent_error
+    difficulty: easy
+  - id: EXP_EQ_SHIFTED_EXPONENT_001
+    type: generated
+    prompt_template: 'Solve for x: {base}^(x + {shift}) = {base}^{target_exponent}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      solution:
+        type: int
+        min: -6
+        max: 8
+        exclude:
+        - 0
+      shift:
+        type: int
+        min: 2
+        max: 7
+    derived:
+      target_exponent: solution + shift
+    answer:
+      type: equation_solution
+      variable: x
+      value: '{solution}'
+    grading:
+      method: equation_solution
+    work:
+      mode: capture_only
+      prompt: Equate the exponents, solve the resulting linear equation, and check the exponent in the original
+        equation.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The bases match, so x + {shift} = {target_exponent}.
+      Subtract {shift}.
+      The solution is x = {solution}.
+    mistake_tags:
+    - exponential_equation_error
+    - equating_exponents_error
+    - inverse_operations
+    difficulty: easy
+  - id: EXP_EQ_MULTIPLIED_EXPONENT_001
+    type: generated
+    prompt_template: 'Solve for x: {base}^({coefficient}x) = {base}^{target_exponent}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      coefficient:
+        type: int
+        min: 2
+        max: 5
+      solution:
+        type: int
+        min: 2
+        max: 7
+    derived:
+      target_exponent: coefficient * solution
+    answer:
+      type: equation_solution
+      variable: x
+      value: '{solution}'
+    grading:
+      method: equation_solution
+    work:
+      mode: capture_only
+      prompt: Equate the exponents, solve the resulting linear equation, and check the solution.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The bases match, so {coefficient}x = {target_exponent}.
+      Divide by {coefficient}.
+      The solution is x = {solution}.
+    mistake_tags:
+    - equating_exponents_error
+    - coefficient_error
+    - division_error
+    difficulty: medium
+  - id: EXP_EQ_LINEAR_EXPONENTS_BOTH_SIDES_001
+    type: generated
+    prompt_template: 'Solve for x: {base}^(2x + {left_constant}) = {base}^(x + {right_constant})'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      solution:
+        type: int
+        min: -6
+        max: 8
+        exclude:
+        - 0
+      left_constant:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      right_constant: solution + left_constant
+    answer:
+      type: equation_solution
+      variable: x
+      value: '{solution}'
+    grading:
+      method: equation_solution
+    work:
+      mode: capture_only
+      prompt: Equate the two exponent expressions, solve the linear equation, and check the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The bases match, so 2x + {left_constant} = x + {right_constant}.
+      Move the x-terms and constants.
+      The solution is x = {solution}.
+    mistake_tags:
+    - equating_exponents_error
+    - variables_on_both_sides
+    - sign_error
+    difficulty: medium
+  - id: EXP_EQ_ISOLATE_COEFFICIENT_001
+    type: generated
+    prompt_template: 'Solve for x: {multiplier}*{base}^x = {right_side}'
+    answer_mode: final_plus_required_work
+    variables:
+      multiplier:
+        type: int
+        min: 2
+        max: 9
+      base:
+        type: int
+        min: 2
+        max: 5
+      solution:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      power_value: base ** solution
+      right_side: multiplier * power_value
+    answer:
+      type: equation_solution
+      variable: x
+      value: '{solution}'
+    grading:
+      method: equation_solution
+    work:
+      mode: capture_only
+      prompt: First isolate the exponential expression, then rewrite the resulting value as a power of the base
+        and solve.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide both sides by {multiplier}.
+      {base}^x = {power_value} = {base}^{solution}.
+      Therefore x = {solution}.
+    mistake_tags:
+    - isolation_error
+    - common_base_error
+    - division_error
+    - exponent_error
+    difficulty: medium
+  - id: EXP_EQ_REWRITE_SQUARE_BASE_001
+    type: generated
+    prompt_template: 'Solve for x: {square_base}^x = {base}^{target_exponent}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      solution:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      square_base: base ** 2
+      target_exponent: 2 * solution
+    answer:
+      type: equation_solution
+      variable: x
+      value: '{solution}'
+    grading:
+      method: equation_solution
+    work:
+      mode: capture_only
+      prompt: Rewrite the larger base as a power of the smaller base, apply the power-of-a-power rule, and solve.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Rewrite {square_base} as {base}^2.
+      ({base}^2)^x = {base}^(2x) = {base}^{target_exponent}.
+      So 2x = {target_exponent} and x = {solution}.
+    mistake_tags:
+    - common_base_error
+    - power_of_power_error
+    - coefficient_error
+    difficulty: hard
+  - id: EXP_EQ_RECIPROCAL_BASE_001
+    type: generated
+    prompt_template: 'Solve for x: (1/{base})^x = {base}^{power}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      power:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      solution: 0 - power
+    answer:
+      type: equation_solution
+      variable: x
+      value: '{solution}'
+    grading:
+      method: equation_solution
+    work:
+      mode: capture_only
+      prompt: Rewrite the reciprocal base with a negative exponent, equate exponents, and solve.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      1/{base} = {base}^(-1).
+      Therefore (1/{base})^x = {base}^(-x).
+      Set -x = {power}, so x = {solution}.
+    mistake_tags:
+    - reciprocal_base_error
+    - negative_exponent_error
+    - sign_error
+    difficulty: hard
+  - id: EXP_EQ_NO_REAL_SOLUTION_001
+    type: fixed
+    prompt: Which statement correctly describes the equation 2^x = -8 over the real numbers?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: x = -3
+    - id: B
+      label: x = 3
+    - id: C
+      label: x = 1/8
+    - id: D
+      label: There is no real solution.
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      For every real x, 2^x is positive.
+      It cannot equal -8, so there is no real solution.
+    mistake_tags:
+    - exponential_range_error
+    - no_real_solution
+    - sign_error
+    difficulty: medium
+  - id: EXP_EQ_DOUBLING_PERIODS_001
+    type: generated
+    prompt_template: A quantity starts at {initial} and doubles each period. It reaches {final}. How many periods
+      have passed?
+    answer_mode: final_plus_required_work
+    variables:
+      initial:
+        type: int
+        min: 3
+        max: 30
+      periods:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      factor: 2 ** periods
+      final: initial * factor
+    answer:
+      type: numeric
+      value: '{periods}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Write the exponential model, divide by the initial value, identify the matching power of 2, and state
+        the period count.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use {initial} * 2^t = {final}.
+      Divide by {initial}: 2^t = {factor} = 2^{periods}.
+      Therefore t = {periods}.
+    mistake_tags:
+    - doubling_time_error
+    - exponential_model_error
+    - isolation_error
+    difficulty: hard
+  - id: EXP_EQ_HALF_LIFE_PERIODS_001
+    type: generated
+    prompt_template: A sample decreases from {initial} units to {remaining} units, with half remaining after each
+      half-life. How many half-lives have passed?
+    answer_mode: final_plus_required_work
+    variables:
+      remaining:
+        type: int
+        min: 2
+        max: 25
+      periods:
+        type: int
+        min: 2
+        max: 7
+    derived:
+      factor: 2 ** periods
+      initial: remaining * factor
+    answer:
+      type: numeric
+      value: '{periods}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Write the repeated-halving model, compare the initial and remaining amounts, and identify the number
+        of half-life factors.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The initial amount is {factor} times the remaining amount.
+      Since {factor} = 2^{periods}, the quantity was halved {periods} times.
+      Therefore {periods} half-lives have passed.
+    mistake_tags:
+    - half_life_error
+    - exponential_model_error
+    - term_count_error
+    difficulty: hard

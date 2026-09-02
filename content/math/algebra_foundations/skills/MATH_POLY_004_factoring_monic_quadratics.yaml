@@ -1,0 +1,631 @@
+id: MATH_POLY_004
+schema_version: 0.2
+name: Factoring monic quadratics
+domain: Math
+subdomain: Exponents and Polynomials
+description: Factor quadratic expressions of the form x^2 + bx + c using factor pairs, sign patterns, common factors,
+  and special products.
+prerequisites:
+- MATH_POLY_003
+tags:
+- algebra
+- factoring
+- quadratics
+- trinomials
+- factor_pairs
+- perfect_square_trinomials
+- difference_of_squares
+- reverse_distribution
+unlocks:
+- MATH_QUAD_001
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A quadratic expression has highest power 2.
+
+  A monic quadratic has leading coefficient 1:
+
+  x^2 + bx + c
+
+  Factoring a monic quadratic reverses binomial multiplication.
+
+  If:
+
+  (x + m)(x + n)
+  = x^2 + (m + n)x + mn
+
+  then factoring x^2 + bx + c means finding two numbers m and n such that:
+
+  m + n = b
+  m * n = c
+
+  Example:
+
+  x^2 + 7x + 12
+
+  We need two numbers that add to 7 and multiply to 12. The numbers are 3 and 4.
+
+  x^2 + 7x + 12 = (x + 3)(x + 4)
+
+  Sign patterns:
+
+  1. If c is positive and b is positive, both factor numbers are positive.
+
+     x^2 + 9x + 20 = (x + 4)(x + 5)
+
+  2. If c is positive and b is negative, both factor numbers are negative.
+
+     x^2 - 9x + 20 = (x - 4)(x - 5)
+
+  3. If c is negative, the factor numbers have opposite signs.
+
+     x^2 + 2x - 15 = (x + 5)(x - 3)
+
+     The number with the larger absolute value determines the sign of the middle term.
+
+  Method:
+  1. Write the quadratic in descending powers.
+  2. Factor out any numerical or monomial GCF first.
+  3. List factor pairs of the constant c.
+  4. Choose the pair whose sum is the middle coefficient b.
+  5. Write the two binomial factors.
+  6. Multiply the factors to verify the middle term and constant.
+
+  Perfect-square trinomials:
+
+  x^2 + 2ax + a^2 = (x + a)^2
+  x^2 - 2ax + a^2 = (x - a)^2
+
+  Example:
+
+  x^2 - 12x + 36 = (x - 6)^2
+
+  Difference of squares:
+
+  x^2 - a^2 = (x + a)(x - a)
+
+  Example:
+
+  x^2 - 49 = (x + 7)(x - 7)
+
+  Prime over the integers:
+  Some monic quadratics have no integer factor pair with the required sum.
+
+  For x^2 + 2x + 5, the integer factor pairs of 5 are 1 and 5 or -1 and -5. None adds to 2. The expression is prime over the integers.
+
+  Common mistake:
+  Do not choose numbers that only multiply correctly. They must also add to the middle coefficient.
+
+  Another common mistake:
+  Check signs using both the sum and product. A positive constant does not automatically mean both signs are positive; the middle coefficient decides between both positive and both negative.
+
+  Another common mistake:
+  Factor out the GCF before looking for a trinomial pattern. For 3x^2 + 21x + 30, first factor out 3, then factor x^2 + 7x + 10.
+
+  Another common mistake:
+  Factoring is a structural task. The final answer should be a product of factors, not the original expanded expression.
+examples:
+- prompt: "Factor: x^2 + 8x + 15"
+  solution: "(x + 3)(x + 5)"
+  explanation: "3 and 5 multiply to 15 and add to 8."
+- prompt: "Factor: x^2 - 11x + 24"
+  solution: "(x - 3)(x - 8)"
+  explanation: "-3 and -8 multiply to 24 and add to -11."
+- prompt: "Factor: x^2 + 3x - 18"
+  solution: "(x + 6)(x - 3)"
+  explanation: "6 and -3 multiply to -18 and add to 3."
+- prompt: "Factor: x^2 - 4x - 21"
+  solution: "(x - 7)(x + 3)"
+  explanation: "-7 and 3 multiply to -21 and add to -4."
+- prompt: "Factor: x^2 + 10x + 25"
+  solution: "(x + 5)^2"
+  explanation: "The constant is 5^2 and the middle term is 2(5)x."
+- prompt: "Factor: x^2 - 16"
+  solution: "(x + 4)(x - 4)"
+  explanation: "This is a difference of squares: x^2 - 4^2."
+- prompt: "Factor completely: 4x^2 + 28x + 48"
+  solution: "4(x + 3)(x + 4)"
+  explanation: "Factor out 4 first, then factor x^2 + 7x + 12."
+- prompt: "Can x^2 + 4x + 7 be factored using integer binomials?"
+  solution: "No; it is prime over the integers."
+  explanation: "No integer pair multiplies to 7 and adds to 4."
+applications:
+- title: "Quadratic equations"
+  description: "A factored quadratic can be combined with the zero-product property to find solutions."
+- title: "Area models"
+  description: "Factored binomials can represent the side lengths of a rectangle with quadratic area."
+- title: "Polynomial structure"
+  description: "Factoring reveals repeated factors, conjugate factors, and hidden multiplication patterns."
+- title: "Algebra simplification"
+  description: "Factored forms can make substitution, cancellation, and comparison easier."
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: FACTOR_QUAD_POSITIVE_PAIR_001
+    type: generated
+    prompt_template: "Factor completely: x^2 + {sum_value}x + {product_value}"
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 9
+      q:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      sum_value: "p + q"
+      product_value: "p * q"
+    constraints:
+    - "p != q"
+    options:
+    - id: A
+      label: "(x + {p})(x + {q})"
+    - id: B
+      label: "(x - {p})(x - {q})"
+    - id: C
+      label: "(x + {p})(x - {q})"
+    - id: D
+      label: "(x + {sum_value})(x + {product_value})"
+    answer:
+      type: multiple_choice
+      value: "A"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite from the expanded quadratic to a product of two binomials, then choose the matching
+        factorization."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      We need two numbers that multiply to {product_value} and add to {sum_value}.
+      The numbers are {p} and {q}.
+      Therefore x^2 + {sum_value}x + {product_value} = (x + {p})(x + {q}).
+    mistake_tags:
+    - factor_pair_error
+    - middle_term_error
+    - sign_error
+    difficulty: easy
+
+  - id: FACTOR_QUAD_NEGATIVE_PAIR_001
+    type: generated
+    prompt_template: "Factor completely: x^2 - {sum_value}x + {product_value}"
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 9
+      q:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      sum_value: "p + q"
+      product_value: "p * q"
+    constraints:
+    - "p != q"
+    options:
+    - id: A
+      label: "(x + {p})(x + {q})"
+    - id: B
+      label: "(x - {p})(x - {q})"
+    - id: C
+      label: "(x - {p})(x + {q})"
+    - id: D
+      label: "(x - {sum_value})(x - {product_value})"
+    answer:
+      type: multiple_choice
+      value: "B"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite from the expanded quadratic to a product of two binomials, then choose the matching
+        factorization."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The constant is positive and the middle coefficient is negative.
+      Use two negative numbers: -{p} and -{q}.
+      They multiply to {product_value} and add to -{sum_value}.
+      The factorization is (x - {p})(x - {q}).
+    mistake_tags:
+    - factor_pair_error
+    - sign_error
+    - middle_term_error
+    difficulty: easy
+
+  - id: FACTOR_QUAD_OPPOSITE_POSITIVE_MIDDLE_001
+    type: generated
+    prompt_template: "Factor completely: x^2 + {middle_value}x - {product_value}"
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 4
+        max: 10
+      q:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      middle_value: "p - q"
+      product_value: "p * q"
+    constraints:
+    - "p > q"
+    options:
+    - id: A
+      label: "(x - {p})(x + {q})"
+    - id: B
+      label: "(x + {p})(x + {q})"
+    - id: C
+      label: "(x + {p})(x - {q})"
+    - id: D
+      label: "(x - {p})(x - {q})"
+    answer:
+      type: multiple_choice
+      value: "C"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite from the expanded quadratic to a binomial product, then choose the matching signs."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The constant is negative, so the factor numbers have opposite signs.
+      {p} + (-{q}) = {middle_value} and {p} * (-{q}) = -{product_value}.
+      The factorization is (x + {p})(x - {q}).
+    mistake_tags:
+    - factor_pair_error
+    - opposite_signs
+    - middle_term_error
+    difficulty: medium
+
+  - id: FACTOR_QUAD_OPPOSITE_NEGATIVE_MIDDLE_001
+    type: generated
+    prompt_template: "Factor completely: x^2 - {middle_size}x - {product_value}"
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 4
+        max: 10
+      q:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      middle_size: "p - q"
+      product_value: "p * q"
+    constraints:
+    - "p > q"
+    options:
+    - id: A
+      label: "(x + {p})(x - {q})"
+    - id: B
+      label: "(x - {p})(x - {q})"
+    - id: C
+      label: "(x + {p})(x + {q})"
+    - id: D
+      label: "(x - {p})(x + {q})"
+    answer:
+      type: multiple_choice
+      value: "D"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite from the expanded quadratic to a binomial product, then choose the matching signs."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The constant is negative, so the signs are opposite.
+      -{p} + {q} = -{middle_size} and (-{p}) * {q} = -{product_value}.
+      The factorization is (x - {p})(x + {q}).
+    mistake_tags:
+    - factor_pair_error
+    - opposite_signs
+    - sign_error
+    difficulty: medium
+
+  - id: FACTOR_QUAD_PERFECT_SQUARE_POSITIVE_001
+    type: generated
+    prompt_template: "Factor completely: x^2 + {middle_value}x + {constant_value}"
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      middle_value: "2 * a"
+      constant_value: "a * a"
+    options:
+    - id: A
+      label: "x^2 + {constant_value}"
+    - id: B
+      label: "(x + {a})^2"
+    - id: C
+      label: "(x - {a})^2"
+    - id: D
+      label: "(x + {a})(x - {a})"
+    answer:
+      type: multiple_choice
+      value: "B"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite using the perfect-square trinomial pattern, then choose the matching factorization."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      {constant_value} = {a}^2 and the middle term is 2({a})x = {middle_value}x.
+      This matches x^2 + 2ax + a^2.
+      The factorization is (x + {a})^2.
+    mistake_tags:
+    - perfect_square_trinomial
+    - missing_middle_term
+    - sign_error
+    difficulty: medium
+
+  - id: FACTOR_QUAD_PERFECT_SQUARE_NEGATIVE_001
+    type: generated
+    prompt_template: "Factor completely: x^2 - {middle_value}x + {constant_value}"
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      middle_value: "2 * a"
+      constant_value: "a * a"
+    options:
+    - id: A
+      label: "(x + {a})^2"
+    - id: B
+      label: "x^2 - {constant_value}"
+    - id: C
+      label: "(x - {a})^2"
+    - id: D
+      label: "(x + {a})(x - {a})"
+    answer:
+      type: multiple_choice
+      value: "C"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite using the perfect-square trinomial pattern, then choose the matching sign."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      {constant_value} = {a}^2 and the middle term is -2({a})x = -{middle_value}x.
+      This matches x^2 - 2ax + a^2.
+      The factorization is (x - {a})^2.
+    mistake_tags:
+    - perfect_square_trinomial
+    - sign_error
+    - missing_middle_term
+    difficulty: medium
+
+  - id: FACTOR_QUAD_DIFFERENCE_SQUARES_001
+    type: generated
+    prompt_template: "Factor completely: x^2 - {square_value}"
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      square_value: "a * a"
+    options:
+    - id: A
+      label: "(x - {a})^2"
+    - id: B
+      label: "(x + {a})^2"
+    - id: C
+      label: "x(x - {square_value})"
+    - id: D
+      label: "(x + {a})(x - {a})"
+    answer:
+      type: multiple_choice
+      value: "D"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite using the difference-of-squares pattern, then choose the conjugate factors."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      {square_value} = {a}^2.
+      Use x^2 - a^2 = (x + a)(x - a).
+      The factorization is (x + {a})(x - {a}).
+    mistake_tags:
+    - difference_of_squares
+    - conjugate_factors
+    - sign_error
+    difficulty: medium
+
+  - id: FACTOR_QUAD_GCF_FIRST_001
+    type: generated
+    prompt_template: "Factor completely: {g}x^2 + {middle_coefficient}x + {constant_value}"
+    answer_mode: final_plus_required_work
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 8
+      p:
+        type: int
+        min: 2
+        max: 8
+      q:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      sum_value: "p + q"
+      product_value: "p * q"
+      middle_coefficient: "g * sum_value"
+      constant_value: "g * product_value"
+    constraints:
+    - "p != q"
+    options:
+    - id: A
+      label: "{g}(x + {p})(x + {q})"
+    - id: B
+      label: "{g}(x^2 + {sum_value}x + {product_value})"
+    - id: C
+      label: "({g}x + {p})({g}x + {q})"
+    - id: D
+      label: "{g}(x - {p})(x - {q})"
+    answer:
+      type: multiple_choice
+      value: "A"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Factor out the GCF first, then continue to a complete binomial factorization and choose the matching option."
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Every coefficient contains {g}.
+      Factor it out: {g}(x^2 + {sum_value}x + {product_value}).
+      The numbers {p} and {q} multiply to {product_value} and add to {sum_value}.
+      The complete factorization is {g}(x + {p})(x + {q}).
+    mistake_tags:
+    - greatest_common_factor
+    - incomplete_factoring
+    - factor_pair_error
+    - sign_error
+    difficulty: hard
+
+  - id: FACTOR_QUAD_AREA_DIMENSIONS_001
+    type: generated
+    prompt_template: "A rectangle has area x^2 + {sum_value}x + {product_value}. Which pair of expressions can be its side
+      lengths?"
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 10
+      q:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      sum_value: "p + q"
+      product_value: "p * q"
+    constraints:
+    - "p != q"
+    options:
+    - id: A
+      label: "x - {p} and x - {q}"
+    - id: B
+      label: "x + {sum_value} and x + {product_value}"
+    - id: C
+      label: "x + {p} and x + {q}"
+    - id: D
+      label: "x + {p} and x - {q}"
+    answer:
+      type: multiple_choice
+      value: "C"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Rewrite the area as an equivalent product of two binomials, then choose the matching side lengths."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The side constants must multiply to {product_value} and add to {sum_value}.
+      {p} * {q} = {product_value} and {p} + {q} = {sum_value}.
+      The side lengths are x + {p} and x + {q}.
+    mistake_tags:
+    - area_model
+    - factor_pair_error
+    - middle_term_error
+    difficulty: hard
+
+  - id: FACTOR_QUAD_PRIME_INTEGERS_001
+    type: fixed
+    prompt: "Which statement best describes x^2 + 2x + 5 when factoring over the integers?"
+    answer_mode: final_only
+    options:
+    - id: A
+      label: "It factors as (x + 1)(x + 5)."
+    - id: B
+      label: "It is prime over the integers because no integer pair multiplies to 5 and adds to 2."
+    - id: C
+      label: "It factors as (x - 1)(x - 5)."
+    - id: D
+      label: "It factors as (x + 2)(x + 3)."
+    answer:
+      type: multiple_choice
+      value: "B"
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The integer factor pairs of 5 are 1 and 5 or -1 and -5.
+      Their sums are 6 and -6, not 2.
+      Therefore x^2 + 2x + 5 is prime over the integers.
+    mistake_tags:
+    - factor_pair_error
+    - prime_quadratic
+    - middle_term_error
+    difficulty: hard

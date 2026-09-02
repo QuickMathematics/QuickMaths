@@ -1,0 +1,616 @@
+id: MATH_RAD_001
+schema_version: 0.2
+name: Square roots and simplifying radicals
+domain: Math
+subdomain: Radicals and Quadratics
+description: Interpret principal square roots, simplify numerical radicals using perfect-square factors, combine
+  like radicals, and reason about real square roots.
+prerequisites:
+- MATH_EXP_001
+tags:
+- algebra
+- square_roots
+- radicals
+- perfect_squares
+- simplifying_radicals
+- like_radicals
+- real_numbers
+- estimation
+unlocks:
+- MATH_QUAD_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A square root reverses squaring.
+
+  The symbol sqrt(a) means the principal square root of a: the nonnegative number whose square is a.
+
+  Examples:
+  sqrt(49) = 7
+  sqrt(0) = 0
+
+  The principal square root is not written with both signs. The statement sqrt(49) = 7 has one value.
+
+  The plus-or-minus symbol appears when solving an equation such as x^2 = 49:
+
+  x = 7 or x = -7
+
+  because both numbers square to 49.
+
+  Perfect squares:
+  0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, ...
+
+  Simplifying radicals:
+  Look for the largest perfect-square factor of the radicand.
+
+  Example:
+  sqrt(72)
+  = sqrt(36 * 2)
+  = sqrt(36)sqrt(2)
+  = 6sqrt(2)
+
+  Product property:
+  For nonnegative real numbers a and b:
+
+  sqrt(ab) = sqrt(a)sqrt(b)
+
+  This property lets a perfect-square factor move outside the radical.
+
+  Method:
+  1. Factor the radicand into a perfect square times a remaining factor.
+  2. Take the square root of the perfect-square factor.
+  3. Leave the squarefree part inside the radical.
+  4. Multiply any coefficient already outside the radical.
+  5. Check that no perfect-square factor greater than 1 remains inside.
+
+  Example with a coefficient:
+  3sqrt(50)
+  = 3sqrt(25 * 2)
+  = 3 * 5sqrt(2)
+  = 15sqrt(2)
+
+  Like radicals:
+  Radicals are like terms when their simplified radical parts match.
+
+  4sqrt(3) + 7sqrt(3) = 11sqrt(3)
+
+  The radical part stays unchanged while the coefficients combine.
+
+  Unlike radicals cannot be combined directly:
+
+  2sqrt(3) + 5sqrt(2)
+
+  is already simplified.
+
+  Multiplying a radical by itself:
+
+  sqrt(5) * sqrt(5) = 5
+
+  because sqrt(5) is the nonnegative number whose square is 5.
+
+  Estimating square roots:
+  If 36 < 45 < 49, then:
+
+  6 < sqrt(45) < 7
+
+  Negative radicands:
+  No real number squares to a negative number. Therefore sqrt(-9) is not a real number. Complex numbers extend the number system later, but this lesson stays in the real numbers.
+
+  Common mistake:
+  sqrt(a + b) is not generally equal to sqrt(a) + sqrt(b).
+
+  For example:
+  sqrt(9 + 16) = sqrt(25) = 5
+
+  but:
+  sqrt(9) + sqrt(16) = 3 + 4 = 7
+
+  Another common mistake:
+  Do not stop at a radical that still contains a perfect-square factor. sqrt(48) is not fully simplified because 48 = 16 * 3.
+
+  Another common mistake:
+  Do not attach plus-or-minus to the principal square-root symbol. Use plus-or-minus when solving an equation whose two solutions come from squaring.
+examples:
+- prompt: 'Evaluate: sqrt(81)'
+  solution: '9'
+  explanation: 9 is the nonnegative number whose square is 81.
+- prompt: 'Simplify: sqrt(72)'
+  solution: 6sqrt(2)
+  explanation: 72 = 36 * 2, so sqrt(72) = 6sqrt(2).
+- prompt: 'Simplify: sqrt(45)'
+  solution: 3sqrt(5)
+  explanation: 45 = 9 * 5, and sqrt(9) = 3.
+- prompt: 'Simplify: 4sqrt(75)'
+  solution: 20sqrt(3)
+  explanation: sqrt(75) = 5sqrt(3), then multiply by 4.
+- prompt: 'Simplify: 3sqrt(7) + 8sqrt(7)'
+  solution: 11sqrt(7)
+  explanation: The radical parts match, so add the coefficients.
+- prompt: 'Simplify: 10sqrt(5) - 4sqrt(5)'
+  solution: 6sqrt(5)
+  explanation: Subtract the coefficients and keep sqrt(5).
+- prompt: 'Simplify: sqrt(6) * sqrt(6)'
+  solution: '6'
+  explanation: A principal square root multiplied by itself returns the radicand.
+- prompt: Between which consecutive integers is sqrt(70)?
+  solution: 8 and 9
+  explanation: 64 < 70 < 81, so 8 < sqrt(70) < 9.
+applications:
+- title: Quadratic equations
+  description: Square-root methods and the quadratic formula often produce exact radical solutions.
+- title: Distance formulas
+  description: Distances in coordinate geometry frequently involve square roots.
+- title: Geometry
+  description: Diagonal lengths and side lengths can be irrational square roots.
+- title: Measurement
+  description: Simplified radicals preserve exact values when a decimal approximation would lose information.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: RAD_PERFECT_SQUARE_001
+    type: generated
+    prompt_template: 'Evaluate: sqrt({square})'
+    answer_mode: final_only
+    variables:
+      root:
+        type: int
+        min: 2
+        max: 20
+    derived:
+      square: root * root
+    answer:
+      type: numeric
+      value: '{root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |
+      {root}^2 = {square}.
+      The principal square root is nonnegative.
+      Therefore sqrt({square}) = {root}.
+    mistake_tags:
+    - perfect_square_error
+    - square_root_error
+    - arithmetic_error
+    difficulty: easy
+  - id: RAD_PRINCIPAL_ROOT_SIGN_001
+    type: generated
+    prompt_template: Which is the value of the principal square root sqrt({square})?
+    answer_mode: final_only
+    variables:
+      root:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      square: root * root
+    options:
+    - id: A
+      label: -{root}
+    - id: B
+      label: ±{root}
+    - id: C
+      label: '{root}'
+    - id: D
+      label: '{square}'
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The radical symbol names the principal, nonnegative square root.
+      Since {root}^2 = {square}, sqrt({square}) = {root}.
+      The symbol ± is used when solving equations such as x^2 = {square}, not when evaluating the principal root alone.
+    mistake_tags:
+    - principal_root_error
+    - plus_minus_error
+    - square_root_error
+    difficulty: easy
+  - id: RAD_FRACTION_PERFECT_SQUARE_001
+    type: generated
+    prompt_template: 'Evaluate: sqrt({numerator_square}/{denominator_square})'
+    answer_mode: final_plus_required_work
+    variables:
+      numerator:
+        type: int
+        min: 1
+        max: 9
+      denominator:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      numerator_square: numerator * numerator
+      denominator_square: denominator * denominator
+    constraints:
+    - numerator < denominator
+    answer:
+      type: numeric
+      value: '{numerator}/{denominator}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Take the square root of the numerator and denominator, then simplify the resulting fraction if needed.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      sqrt({numerator_square}/{denominator_square}) = sqrt({numerator_square}) / sqrt({denominator_square}).
+      sqrt({numerator_square}) = {numerator} and sqrt({denominator_square}) = {denominator}.
+      The value is {numerator}/{denominator}.
+    mistake_tags:
+    - fraction_error
+    - square_root_error
+    - principal_root_error
+    difficulty: medium
+  - id: RAD_SIMPLIFY_SQUARE_FACTOR_001
+    type: generated
+    prompt_template: Which is the fully simplified form of sqrt({radicand})?
+    answer_mode: final_plus_required_work
+    variables:
+      outside:
+        type: int
+        min: 2
+        max: 9
+      squarefree:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 10
+        - 11
+        - 13
+    derived:
+      square_factor: outside * outside
+      radicand: square_factor * squarefree
+    options:
+    - id: A
+      label: '{square_factor}sqrt({squarefree})'
+    - id: B
+      label: '{outside}sqrt({squarefree})'
+    - id: C
+      label: sqrt({outside * squarefree})
+    - id: D
+      label: '{outside * squarefree}'
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: Rewrite the radicand as a perfect square times a squarefree factor, then simplify.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      {radicand} = {square_factor} * {squarefree}.
+      sqrt({radicand}) = sqrt({square_factor})sqrt({squarefree}).
+      sqrt({square_factor}) = {outside}.
+      Therefore the simplified form is {outside}sqrt({squarefree}).
+    mistake_tags:
+    - simplifying_radicals
+    - perfect_square_factor
+    - coefficient_error
+    difficulty: medium
+  - id: RAD_SIMPLIFY_WITH_COEFFICIENT_001
+    type: generated
+    prompt_template: Which is the fully simplified form of {coefficient}sqrt({radicand})?
+    answer_mode: final_plus_required_work
+    variables:
+      coefficient:
+        type: int
+        min: 2
+        max: 8
+      outside:
+        type: int
+        min: 2
+        max: 7
+      squarefree:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 10
+        - 11
+        - 13
+    derived:
+      square_factor: outside * outside
+      radicand: square_factor * squarefree
+      final_coefficient: coefficient * outside
+    options:
+    - id: A
+      label: '{coefficient + outside}sqrt({radicand})'
+    - id: B
+      label: '{coefficient}sqrt({squarefree})'
+    - id: C
+      label: '{coefficient * square_factor}sqrt({squarefree})'
+    - id: D
+      label: '{final_coefficient}sqrt({squarefree})'
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: Simplify the radical using a perfect-square factor, then multiply the outside coefficients.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      sqrt({radicand}) = {outside}sqrt({squarefree}).
+      Multiply the outside coefficients: {coefficient} * {outside} = {final_coefficient}.
+      The simplified form is {final_coefficient}sqrt({squarefree}).
+    mistake_tags:
+    - simplifying_radicals
+    - coefficient_error
+    - perfect_square_factor
+    - multiplication_error
+    difficulty: medium
+  - id: RAD_COMBINE_LIKE_ADD_001
+    type: generated
+    prompt_template: 'Simplify: {first}sqrt({squarefree}) + {second}sqrt({squarefree})'
+    answer_mode: final_plus_required_work
+    variables:
+      first:
+        type: int
+        min: 2
+        max: 12
+      second:
+        type: int
+        min: 2
+        max: 12
+      squarefree:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 10
+        - 11
+        - 13
+    derived:
+      total: first + second
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: Combine the coefficients of the like radicals and keep the radical part unchanged.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Both terms have the same radical part, sqrt({squarefree}).
+      Add the coefficients: {first} + {second} = {total}.
+      The result is {total}sqrt({squarefree}).
+    mistake_tags:
+    - like_radicals
+    - coefficient_error
+    - addition_error
+    difficulty: easy
+    options:
+    - id: A
+      label: '{first * second}'
+    - id: B
+      label: '{total}sqrt({squarefree + squarefree})'
+    - id: C
+      label: '{total}sqrt({squarefree})'
+    - id: D
+      label: '{first}sqrt({squarefree})'
+  - id: RAD_COMBINE_LIKE_SUBTRACT_001
+    type: generated
+    prompt_template: 'Simplify: {first}sqrt({squarefree}) - {second}sqrt({squarefree})'
+    answer_mode: final_plus_required_work
+    variables:
+      first:
+        type: int
+        min: 5
+        max: 15
+      second:
+        type: int
+        min: 1
+        max: 9
+      squarefree:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 10
+        - 11
+        - 13
+    derived:
+      difference: first - second
+    constraints:
+    - first > second
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: Subtract the coefficients of the like radicals and keep the radical part unchanged.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Both terms have the same radical part, sqrt({squarefree}).
+      Subtract the coefficients: {first} - {second} = {difference}.
+      The result is {difference}sqrt({squarefree}).
+    mistake_tags:
+    - like_radicals
+    - coefficient_error
+    - subtraction_error
+    difficulty: easy
+    options:
+    - id: A
+      label: '{first + second}sqrt({squarefree})'
+    - id: B
+      label: '{difference}sqrt({squarefree - 1})'
+    - id: C
+      label: '{first}sqrt({squarefree})'
+    - id: D
+      label: '{difference}sqrt({squarefree})'
+  - id: RAD_MULTIPLY_SAME_RADICAL_001
+    type: generated
+    prompt_template: 'Simplify: sqrt({squarefree}) * sqrt({squarefree})'
+    answer_mode: final_plus_required_work
+    variables:
+      squarefree:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 10
+        - 11
+        - 13
+    answer:
+      type: numeric
+      value: '{squarefree}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Use the meaning of a square root or combine the radicals into one product.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      sqrt({squarefree}) is the nonnegative number whose square is {squarefree}.
+      Therefore sqrt({squarefree}) * sqrt({squarefree}) = {squarefree}.
+    mistake_tags:
+    - radical_multiplication
+    - square_root_error
+    - exponent_error
+    difficulty: medium
+  - id: RAD_ESTIMATE_BETWEEN_INTEGERS_001
+    type: generated
+    prompt_template: sqrt({radicand}) lies between two consecutive integers. Enter the smaller integer.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      lower:
+        type: int
+        min: 2
+        max: 15
+      offset:
+        type: int
+        min: 1
+        max: 25
+    derived:
+      lower_square: lower * lower
+      upper: lower + 1
+      upper_square: upper * upper
+      radicand: lower_square + offset
+    constraints:
+    - radicand < upper_square
+    answer:
+      type: numeric
+      value: '{lower}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: State the two neighboring perfect squares and use them to bound the square root.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      {lower_square} < {radicand} < {upper_square}.
+      Taking principal square roots gives {lower} < sqrt({radicand}) < {upper}.
+      The smaller consecutive integer is {lower}.
+    mistake_tags:
+    - square_root_estimation
+    - perfect_square_error
+    - inequality_error
+    difficulty: medium
+  - id: RAD_NEGATIVE_RADICAND_REAL_001
+    type: generated
+    prompt_template: Over the real numbers, which statement about sqrt(-{square}) is correct?
+    answer_mode: final_only
+    variables:
+      root:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      square: root * root
+    options:
+    - id: A
+      label: It equals {root}.
+    - id: B
+      label: It equals -{root}.
+    - id: C
+      label: It equals 0.
+    - id: D
+      label: It is not a real number.
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Every real number squared is nonnegative.
+      No real number has square -{square}.
+      Therefore sqrt(-{square}) is not a real number.
+    mistake_tags:
+    - negative_radicand
+    - real_number_domain
+    - square_root_error
+    difficulty: hard

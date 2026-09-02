@@ -1,0 +1,599 @@
+id: MATH_QUAD_005
+schema_version: 0.2
+name: Quadratic modeling and optimization
+domain: Math
+subdomain: Quadratic Functions
+description: Interpret and solve quadratic models involving maximums, minimums, intercepts, physical domains, fixed-perimeter
+  area, and constant second differences.
+prerequisites:
+- MATH_QUAD_003
+- MATH_QUAD_004
+tags:
+- quadratic_models
+- optimization
+- maximum
+- minimum
+- projectile_motion
+- profit
+- area
+- contextual_roots
+- second_differences
+- domain
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Quadratic functions model situations in which the rate of change itself changes at a constant rate.
+
+  Common quadratic contexts include projectile height, area, revenue, profit, braking distance, and designs with a maximum or minimum.
+
+  Choosing a useful form:
+  Each form highlights different information.
+
+  Standard form:
+
+  f(x) = ax^2 + bx + c
+
+  - c is the initial output f(0).
+  - The axis of symmetry is x = -b/(2a).
+  - Substitute the axis value to find the maximum or minimum output.
+
+  Vertex form:
+
+  f(x) = a(x - h)^2 + k
+
+  - The vertex is (h, k).
+  - h is the input where the maximum or minimum occurs.
+  - k is the maximum or minimum output.
+
+  Factored form:
+
+  f(x) = a(x - r1)(x - r2)
+
+  - r1 and r2 are zeros.
+  - In context, zeros may represent break-even quantities, boundary lengths, or times when height is zero.
+
+  Sign between zeros:
+  If a downward-opening quadratic has two zeros r1 < r2, its graph is above the x-axis between the zeros and below the x-axis outside them. In a profit model, that often means profit is positive for r1 < x < r2.
+
+  Optimization:
+  Optimization means finding the largest or smallest possible output.
+
+  For a downward-opening model, the vertex gives a maximum.
+  For an upward-opening model, the vertex gives a minimum.
+
+  Example:
+  Revenue is modeled by:
+
+  R(x) = -3(x - 40)^2 + 7200
+
+  The maximum occurs when x = 40, and the maximum revenue is 7200.
+
+  Standard-form optimization:
+  For:
+
+  P(x) = -2x^2 + 24x + 100
+
+  the maximizing input is:
+
+  x = -24/(2(-2)) = 6
+
+  Then evaluate P(6) to find the maximum output.
+
+  Contextual roots:
+  An algebraic equation may have two real roots, but the context can restrict which one makes sense.
+
+  If time satisfies:
+
+  (t - 5)(t + 2) = 0
+
+  the algebraic roots are 5 and -2. If t is elapsed time, the negative root is outside the physical domain, so t = 5 is the relevant answer.
+
+  Projectile motion:
+  A height function often opens downward.
+
+  - The vertex gives the maximum height and the time it occurs.
+  - The positive zero gives the landing time when height returns to zero.
+  - The physically meaningful domain usually begins at t = 0 and ends at the landing time.
+
+  Fixed-perimeter area:
+  Suppose two positive side lengths must add to S. If one side is x, the other is S - x, so:
+
+  A(x) = x(S - x)
+
+  This parabola opens downward. The area is largest when the two side lengths are equal:
+
+  x = S/2
+
+  Second differences:
+  Linear tables have constant first differences when inputs increase equally.
+  Quadratic tables have constant second differences.
+
+  Example:
+  For f(x) = 2x^2 + x + 3, equally spaced inputs produce a constant second difference of 4, which equals 2a.
+
+  Modeling method:
+  1. Identify the input, output, and realistic domain.
+  2. Decide whether the needed feature is an initial value, zero, maximum, or minimum.
+  3. Choose the form that exposes that feature most clearly.
+  4. Solve algebraically.
+  5. Interpret the answer with units and context.
+  6. Reject algebraic answers that violate the model’s domain.
+  7. Check whether the result is reasonable.
+
+  Common mistake:
+  Do not report the vertex as only a number without deciding whether the question asks for its input or output.
+
+  Another common mistake:
+  Do not accept a negative time or negative length just because it solves the equation algebraically.
+
+  Another common mistake:
+  A zero is where the output equals zero. It does not automatically represent a maximum or minimum.
+
+  Another common mistake:
+  The model’s domain may be smaller than all real numbers. Context determines which inputs are meaningful.
+examples:
+- prompt: Revenue is R(x) = -4(x - 25)^2 + 3000. Which x maximizes revenue?
+  solution: '25'
+  explanation: The vertex input is 25.
+- prompt: For R(x) = -4(x - 25)^2 + 3000, what is the maximum revenue?
+  solution: '3000'
+  explanation: The vertex output is 3000.
+- prompt: A cost is C(x) = 2(x - 8)^2 + 150. What is the minimum cost?
+  solution: '150'
+  explanation: The parabola opens upward and has vertex output 150.
+- prompt: A ball has height H(t) = -5(t - 3)^2 + 50. When is it highest?
+  solution: 3 seconds
+  explanation: The vertex occurs at t = 3.
+- prompt: A height model is H(t) = -4t(t - 6). When does the object return to the ground?
+  solution: 6 seconds
+  explanation: The zeros are t = 0 and t = 6; the positive later time is 6.
+- prompt: A rectangle has side lengths x and 20 - x. Which x maximizes area?
+  solution: '10'
+  explanation: The product x(20 - x) is largest when the two sides are equal.
+- prompt: A model has roots -3 and 7, but x represents a positive length. Which root is relevant?
+  solution: '7'
+  explanation: Negative lengths are outside the contextual domain.
+- prompt: For f(x) = 3x^2 - 2x + 5, what is the constant second difference for unit input steps?
+  solution: '6'
+  explanation: The constant second difference is 2a = 6.
+applications:
+- title: Business
+  description: Revenue and profit models use vertices for maximums and zeros for break-even points.
+- title: Physics
+  description: Projectile height models use vertices and zeros to describe peak height and landing time.
+- title: Design
+  description: Area and material constraints often lead to quadratic optimization.
+- title: Data analysis
+  description: Constant second differences reveal quadratic patterns in tables.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: QUAD_MODEL_MAXIMIZING_INPUT_VERTEX_001
+    type: generated
+    prompt_template: A revenue model is R(x) = -{a}(x - {h})^2 + {k}. Which input x gives the maximum revenue?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 8
+      h:
+        type: int
+        min: 10
+        max: 80
+      k:
+        type: int
+        min: 500
+        max: 9000
+    answer:
+      type: numeric
+      value: '{h}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The model is in vertex form and opens downward.
+      Its vertex is ({h}, {k}).
+      The maximum occurs at input x = {h}.
+    mistake_tags:
+    - optimization_error
+    - vertex_input_output_mixup
+    - maximum_error
+    difficulty: easy
+  - id: QUAD_MODEL_MINIMUM_OUTPUT_VERTEX_001
+    type: generated
+    prompt_template: A cost model is C(x) = {a}(x - {h})^2 + {k}. What is the minimum cost?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 8
+      h:
+        type: int
+        min: 5
+        max: 50
+      k:
+        type: int
+        min: 50
+        max: 2000
+    answer:
+      type: numeric
+      value: '{k}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The coefficient {a} is positive, so the parabola opens upward.
+      Its vertex is ({h}, {k}), so the minimum output is {k}.
+    mistake_tags:
+    - optimization_error
+    - vertex_input_output_mixup
+    - minimum_error
+    difficulty: easy
+  - id: QUAD_MODEL_STANDARD_MAXIMIZING_INPUT_001
+    type: generated
+    prompt_template: Profit is modeled by P(x) = -{scale}x^2 + {b}x + {c}. Which input x maximizes profit?
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 6
+      h:
+        type: int
+        min: 3
+        max: 20
+      c:
+        type: int
+        min: -100
+        max: 500
+    derived:
+      b: 2 * scale * h
+    answer:
+      type: numeric
+      value: '{h}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Use x = -b/(2a), treating the signed leading coefficient carefully, then simplify one equivalent numerical
+        expression per line.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The leading coefficient is -{scale} and b = {b}.
+      The vertex input is -b/(2a):
+      -{b}/(2(-{scale})) = {h}.
+      Profit is maximized at x = {h}.
+    mistake_tags:
+    - optimization_error
+    - axis_of_symmetry_error
+    - coefficient_sign_error
+    - formula_substitution_error
+    difficulty: medium
+  - id: QUAD_MODEL_PROJECTILE_INITIAL_HEIGHT_001
+    type: generated
+    prompt_template: A projectile has height H(t) = -{a}(t - {peak_time})^2 + {peak_height}. What is its height
+      at t = 0?
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      peak_time:
+        type: int
+        min: 2
+        max: 7
+      initial_height:
+        type: int
+        min: 0
+        max: 40
+    derived:
+      peak_height: initial_height + a * peak_time * peak_time
+    answer:
+      type: numeric
+      value: '{initial_height}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Substitute t = 0 and simplify one equivalent numerical expression per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Substitute t = 0:
+      H(0) = -{a}(0 - {peak_time})^2 + {peak_height}.
+      This simplifies to {initial_height}.
+      The initial height is {initial_height}.
+    mistake_tags:
+    - projectile_model_error
+    - initial_value_error
+    - substitution_error
+    - exponent_error
+    difficulty: medium
+  - id: QUAD_MODEL_PROJECTILE_LANDING_TIME_001
+    type: generated
+    prompt_template: A projectile height is H(t) = -{a}t(t - {flight_time}). Besides t = 0, when does it reach the
+      ground?
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 8
+      flight_time:
+        type: int
+        min: 3
+        max: 15
+    answer:
+      type: numeric
+      value: '{flight_time}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Set H(t) = 0, use the zero-product property, list both zeros, and identify the later time.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The factored model equals zero when either factor is zero.
+      t = 0 or t - {flight_time} = 0.
+      The later ground time is t = {flight_time}.
+    mistake_tags:
+    - projectile_model_error
+    - zero_product_error
+    - contextual_root_error
+    difficulty: medium
+  - id: QUAD_MODEL_CHOOSE_CONTEXTUAL_ROOT_001
+    type: generated
+    prompt_template: A positive length x satisfies (x - {positive_root})(x + {negative_size}) = 0. Which solution
+      is valid in context?
+    answer_mode: final_only
+    variables:
+      positive_root:
+        type: int
+        min: 2
+        max: 20
+      negative_size:
+        type: int
+        min: 2
+        max: 20
+    constraints:
+    - positive_root != negative_size
+    derived:
+      negative_root: -negative_size
+    options:
+    - id: A
+      label: x = {negative_root}
+    - id: B
+      label: Both roots are valid positive lengths.
+    - id: C
+      label: x = {positive_root}
+    - id: D
+      label: Neither root solves the equation.
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The algebraic roots are {positive_root} and {negative_root}.
+      Because x represents a positive length, the negative root is outside the contextual domain.
+      The valid solution is x = {positive_root}.
+    mistake_tags:
+    - contextual_root_error
+    - domain_error
+    - zero_product_error
+    difficulty: easy
+  - id: QUAD_MODEL_FIXED_PERIMETER_AREA_001
+    type: generated
+    prompt_template: A rectangle has side lengths x and {side_sum} - x. Which value of x maximizes the area A(x)
+      = x({side_sum} - x)?
+    answer_mode: final_plus_required_work
+    variables:
+      side_sum:
+        type: choice
+        values:
+        - 10
+        - 12
+        - 14
+        - 16
+        - 18
+        - 20
+        - 22
+        - 24
+        - 26
+        - 28
+        - 30
+    derived:
+      best_x: side_sum / 2
+    answer:
+      type: numeric
+      value: '{best_x}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Explain why the area parabola is maximized when the two side lengths are equal, or find its axis of
+        symmetry.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The side lengths add to {side_sum}.
+      The product x({side_sum} - x) is largest when the two factors are equal.
+      x = {side_sum}/2 = {best_x}.
+    mistake_tags:
+    - area_model_error
+    - optimization_error
+    - axis_of_symmetry_error
+    difficulty: medium
+  - id: QUAD_MODEL_SECOND_DIFFERENCE_001
+    type: generated
+    prompt_template: A quadratic table has points (0, {y0}), (1, {y1}), (2, {y2}), and (3, {y3}). What is the constant
+      second difference?
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -10
+        max: 10
+      c:
+        type: int
+        min: -15
+        max: 15
+    derived:
+      y0: c
+      y1: a + b + c
+      y2: 4 * a + 2 * b + c
+      y3: 9 * a + 3 * b + c
+      first1: y1 - y0
+      first2: y2 - y1
+      first3: y3 - y2
+      second: first2 - first1
+    answer:
+      type: numeric
+      value: '{second}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Compute the three first differences, then subtract consecutive first differences to show the constant
+        second difference.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The first differences are {first1}, {first2}, and {first3}.
+      The second differences are {first2} - {first1} and {first3} - {first2}.
+      Both equal {second}.
+    mistake_tags:
+    - second_difference_error
+    - table_error
+    - subtraction_error
+    - quadratic_pattern_error
+    difficulty: hard
+  - id: QUAD_MODEL_PROFIT_POSITIVE_INTERVAL_001
+    type: generated
+    prompt_template: Profit is P(x) = -{a}(x - {r1})(x - {r2}), where {r1} < {r2}. For which inputs is profit positive?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 8
+      r1:
+        type: int
+        min: 1
+        max: 20
+      gap:
+        type: int
+        min: 2
+        max: 20
+    derived:
+      r2: r1 + gap
+    options:
+    - id: A
+      label: x < {r1} or x > {r2}
+    - id: B
+      label: '{r1} < x < {r2}'
+    - id: C
+      label: x < {r1}
+    - id: D
+      label: x > {r2}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The zeros are x = {r1} and x = {r2}.
+      The negative leading coefficient makes the parabola open downward.
+      A downward-opening parabola is above the x-axis between its two zeros, so profit is positive for {r1} < x < {r2}.
+    mistake_tags:
+    - profit_model_error
+    - sign_interval_error
+    - factored_form_error
+    - opening_direction_error
+    difficulty: hard
+  - id: QUAD_MODEL_PHYSICAL_DOMAIN_001
+    type: generated
+    prompt_template: A projectile has height H(t) = -{a}t(t - {flight_time}) from launch until it lands. Which domain
+      is physically meaningful?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 8
+      flight_time:
+        type: int
+        min: 3
+        max: 15
+    options:
+    - id: A
+      label: t <= 0
+    - id: B
+      label: t >= {flight_time}
+    - id: C
+      label: All real numbers
+    - id: D
+      label: 0 <= t <= {flight_time}
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The model begins at launch time t = 0 and ends when the projectile returns to height zero at t = {flight_time}.
+      Therefore the physical domain is 0 <= t <= {flight_time}.
+    mistake_tags:
+    - domain_error
+    - projectile_model_error
+    - context_error
+    difficulty: medium

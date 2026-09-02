@@ -1,0 +1,643 @@
+id: MATH_QUAD_003
+schema_version: 0.2
+name: Quadratic formula and discriminant
+domain: Math
+subdomain: Quadratic Equations
+description: Use the discriminant to classify quadratic roots and apply the quadratic formula to rational and irrational
+  solutions.
+prerequisites:
+- MATH_QUAD_002
+tags:
+- algebra
+- quadratic_equations
+- quadratic_formula
+- discriminant
+- real_roots
+- irrational_roots
+- standard_form
+- exact_solutions
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  The quadratic formula solves every quadratic equation written in standard form:
+
+  ax^2 + bx + c = 0
+
+  where a is not zero.
+
+  The formula is:
+
+  x = (-b plus or minus sqrt(b^2 - 4ac)) / (2a)
+
+  The letters a, b, and c are the signed coefficients from standard form. Their signs must be copied carefully.
+
+  Example:
+  For 2x^2 - 5x - 3 = 0:
+
+  a = 2
+  b = -5
+  c = -3
+
+  Then -b = 5, not -5.
+
+  The discriminant:
+  The expression inside the square root is called the discriminant.
+
+  D = b^2 - 4ac
+
+  The discriminant predicts the real solutions before the full formula is evaluated.
+
+  1. D > 0: two distinct real solutions.
+  2. D = 0: one repeated real solution.
+  3. D < 0: no real solutions.
+
+  For rational coefficients, the positive discriminant also indicates the type of real roots:
+
+  - If D is a perfect square, the roots are rational.
+  - If D is positive but not a perfect square, the roots are irrational.
+
+  Example with two rational roots:
+  Solve x^2 - 7x + 10 = 0.
+
+  D = (-7)^2 - 4(1)(10)
+  = 49 - 40
+  = 9
+
+  x = (7 plus or minus 3)/2
+
+  So x = 5 or x = 2.
+
+  Example with one repeated root:
+  Solve x^2 - 6x + 9 = 0.
+
+  D = 36 - 36 = 0
+
+  x = 6/2 = 3.
+
+  Example with irrational roots:
+  Solve x^2 - 4x + 1 = 0.
+
+  D = 16 - 4 = 12
+
+  x = (4 plus or minus sqrt(12))/2
+  = (4 plus or minus 2sqrt(3))/2
+  = 2 plus or minus sqrt(3).
+
+  Exact form:
+  Keep irrational answers in exact radical form unless the problem asks for a decimal approximation. Exact form preserves the complete value.
+
+  Standardize first:
+  The formula requires one side to equal zero.
+
+  For 2x^2 + 3x = 5, rewrite first:
+
+  2x^2 + 3x - 5 = 0
+
+  Then a = 2, b = 3, and c = -5.
+
+  Method:
+  1. Rewrite the equation as ax^2 + bx + c = 0.
+  2. Identify a, b, and c with their signs.
+  3. Compute D = b^2 - 4ac.
+  4. Use D to predict the number and type of real roots.
+  5. Substitute into the formula with parentheses around negative values.
+  6. Simplify the numerator and denominator separately.
+  7. Reduce radicals and fractions when possible.
+  8. Give both roots unless the question requests a particular one.
+  9. Check solutions in the original equation when practical.
+
+  Connection to completing the square:
+  The quadratic formula is produced by completing the square on the general equation ax^2 + bx + c = 0. It packages the same reasoning into a reusable formula.
+
+  Choosing a method:
+  - Factoring is often fastest when the factors are obvious.
+  - Completing the square is useful for vertex form and for seeing where the formula comes from.
+  - The quadratic formula is reliable for every quadratic equation.
+
+  Common mistake:
+  Do not forget that b includes its sign. If b = -5, then -b = 5 and b^2 = (-5)^2 = 25.
+
+  Another common mistake:
+  The denominator is 2a. The entire numerator is divided by 2a.
+
+  Another common mistake:
+  Do not replace b^2 - 4ac with b^2 + 4ac. The subtraction is part of the formula, even when c is negative.
+
+  Another common mistake:
+  Do not apply the formula before moving every term to one side.
+
+  Another common mistake:
+  When D is positive, the plus and minus branches usually give two different solutions. Do not report only one unless the question asks for one.
+examples:
+- prompt: For 3x^2 - 8x + 2 = 0, identify a, b, and c.
+  solution: a = 3, b = -8, c = 2
+  explanation: Read the signed coefficients from standard form.
+- prompt: Find the discriminant of x^2 + 5x - 6 = 0.
+  solution: '49'
+  explanation: D = 5^2 - 4(1)(-6) = 25 + 24.
+- prompt: How many real solutions does x^2 + 4x + 8 = 0 have?
+  solution: No real solutions
+  explanation: D = 16 - 32 = -16, which is negative.
+- prompt: Solve x^2 - 9x + 14 = 0.
+  solution: x = 7 or x = 2
+  explanation: D = 25, so x = (9 plus or minus 5)/2.
+- prompt: Solve 2x^2 - 3x - 2 = 0.
+  solution: x = 2 or x = -1/2
+  explanation: D = 25, so x = (3 plus or minus 5)/4.
+- prompt: Solve x^2 - 8x + 16 = 0.
+  solution: x = 4
+  explanation: The discriminant is zero, so there is one repeated root.
+- prompt: Solve x^2 - 6x + 7 = 0.
+  solution: x = 3 plus or minus sqrt(2)
+  explanation: D = 8 and sqrt(8) = 2sqrt(2).
+- prompt: Rewrite 2x^2 + 7x = 4 before using the formula.
+  solution: 2x^2 + 7x - 4 = 0
+  explanation: Subtract 4 from both sides so one side equals zero.
+applications:
+- title: Projectile motion
+  description: Setting a height model equal to a target height produces a quadratic equation whose roots represent
+    times.
+- title: Geometry
+  description: Area, diagonal, and intersection problems often lead to quadratics that are not easily factorable.
+- title: Graph analysis
+  description: The discriminant tells whether a parabola crosses, touches, or misses the x-axis.
+- title: Optimization models
+  description: Quadratic roots mark boundaries and break-even points around a maximum or minimum.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: QUADRATIC_FORMULA_SUBSTITUTION_SIGNS_001
+    type: fixed
+    prompt: For 2x^2 - 5x - 3 = 0, which expression correctly substitutes a = 2, b = -5, and c = -3 into the quadratic
+      formula?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: (5 plus or minus sqrt((-5)^2 - 4(2)(-3))) / 4
+    - id: B
+      label: (-5 plus or minus sqrt((-5)^2 - 4(2)(-3))) / 4
+    - id: C
+      label: (5 plus or minus sqrt((-5)^2 + 4(2)(-3))) / 4
+    - id: D
+      label: (5 plus or minus sqrt((-5)^2 - 4(2)(-3))) / 2
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Because b = -5, -b = 5 and b^2 = (-5)^2.
+      The denominator is 2a = 4.
+      The discriminant is b^2 - 4ac, including the subtraction before 4ac.
+    mistake_tags:
+    - quadratic_formula
+    - coefficient_sign_error
+    - denominator_error
+    difficulty: easy
+  - id: QUADRATIC_FORMULA_DISCRIMINANT_001
+    type: generated
+    prompt_template: For {a}x^2 + {b}x + {c} = 0, compute the discriminant b^2 - 4ac.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      b:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+    derived:
+      discriminant: b * b - 4 * a * c
+    answer:
+      type: numeric
+      value: '{discriminant}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Substitute the signed coefficients into b^2 - 4ac, then simplify one equivalent numerical expression
+        per line.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Here a = {a}, b = {b}, and c = {c}.
+      D = ({b})^2 - 4({a})({c}) = {discriminant}.
+    mistake_tags:
+    - discriminant_error
+    - coefficient_sign_error
+    - order_of_operations
+    difficulty: easy
+  - id: QUADRATIC_DISCRIMINANT_IRRATIONAL_ROOTS_001
+    type: generated
+    prompt_template: Classify the real solutions of x^2 + {middle}x + {constant_term} = 0.
+    answer_mode: final_plus_required_work
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+      m:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 10
+        - 11
+        - 13
+    derived:
+      middle: 0 - 2 * h
+      constant_term: h * h - m
+      discriminant: 4 * m
+    options:
+    - id: A
+      label: Two distinct rational real solutions
+    - id: B
+      label: Two distinct irrational real solutions
+    - id: C
+      label: One repeated real solution
+    - id: D
+      label: No real solutions
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Compute the discriminant and explain what its sign and perfect-square status imply.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The discriminant is {discriminant}, which is positive.
+      Because {discriminant} is not a perfect square, the equation has two distinct irrational real solutions.
+    mistake_tags:
+    - discriminant_classification
+    - irrational_roots
+    - perfect_square_error
+    difficulty: medium
+  - id: QUADRATIC_DISCRIMINANT_NO_REAL_ROOTS_001
+    type: generated
+    prompt_template: Classify the real solutions of x^2 + {middle}x + {constant_term} = 0.
+    answer_mode: final_plus_required_work
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+      m:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 10
+        - 11
+        - 13
+    derived:
+      middle: 0 - 2 * h
+      constant_term: h * h + m
+      discriminant: 0 - 4 * m
+    options:
+    - id: A
+      label: Two distinct rational real solutions
+    - id: B
+      label: Two distinct irrational real solutions
+    - id: C
+      label: One repeated real solution
+    - id: D
+      label: No real solutions
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Compute the discriminant and explain what its sign implies in the real-number system.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The discriminant is {discriminant}.
+      A negative discriminant means there are no real solutions.
+    mistake_tags:
+    - discriminant_classification
+    - negative_discriminant
+    - real_number_system
+    difficulty: medium
+  - id: QUADRATIC_FORMULA_REPEATED_ROOT_001
+    type: generated
+    prompt_template: Use the quadratic formula to solve {a}x^2 + {b}x + {c} = 0. Enter the repeated solution.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      root:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    derived:
+      b: 0 - 2 * a * root
+      c: a * root * root
+    answer:
+      type: numeric
+      value: '{root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Identify a, b, and c, compute the zero discriminant, and simplify the formula.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      D = {b}^2 - 4({a})({c}) = 0.
+      The plus and minus branches coincide.
+      x = -({b}) / (2({a})) = {root}.
+    mistake_tags:
+    - quadratic_formula
+    - repeated_root
+    - coefficient_sign_error
+    difficulty: medium
+  - id: QUADRATIC_FORMULA_INTEGER_LARGER_ROOT_001
+    type: generated
+    prompt_template: Use the quadratic formula to solve {a}x^2 + {b}x + {c} = 0. Enter the larger solution.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      larger_root:
+        type: int
+        min: 2
+        max: 10
+      smaller_root:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    derived:
+      b: 0 - a * (larger_root + smaller_root)
+      c: a * larger_root * smaller_root
+      discriminant: b * b - 4 * a * c
+    constraints:
+    - larger_root > smaller_root
+    answer:
+      type: numeric
+      value: '{larger_root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the signed coefficient substitution, both formula branches, and the comparison of the two roots.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The discriminant is {discriminant}.
+      The quadratic formula gives roots {larger_root} and {smaller_root}.
+      The larger solution is {larger_root}.
+    mistake_tags:
+    - quadratic_formula
+    - missing_solution
+    - larger_smaller_error
+    difficulty: medium
+  - id: QUADRATIC_FORMULA_INTEGER_SMALLER_ROOT_001
+    type: generated
+    prompt_template: Use the quadratic formula to solve {a}x^2 + {b}x + {c} = 0. Enter the smaller solution.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      smaller_root:
+        type: int
+        min: -10
+        max: -2
+      larger_root:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    derived:
+      b: 0 - a * (larger_root + smaller_root)
+      c: a * larger_root * smaller_root
+      discriminant: b * b - 4 * a * c
+    constraints:
+    - larger_root > smaller_root
+    answer:
+      type: numeric
+      value: '{smaller_root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the signed coefficient substitution, both formula branches, and the comparison of the two roots.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The discriminant is {discriminant}.
+      The quadratic formula gives roots {larger_root} and {smaller_root}.
+      The smaller solution is {smaller_root}.
+    mistake_tags:
+    - quadratic_formula
+    - missing_solution
+    - larger_smaller_error
+    difficulty: medium
+  - id: QUADRATIC_FORMULA_IRRATIONAL_MONIC_001
+    type: generated
+    prompt_template: Use the quadratic formula to solve x^2 + {b}x + {c} = 0. Enter the larger solution in exact
+      form.
+    answer_mode: final_plus_required_work
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+      m:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 10
+        - 11
+        - 13
+    derived:
+      b: 0 - 2 * h
+      c: h * h - m
+      discriminant: 4 * m
+    answer:
+      type: numeric
+      value: '{h} + sqrt({m})'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Compute the discriminant, use both formula branches, simplify the radical, and select the larger root.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      D = {discriminant}, so sqrt(D) = 2*sqrt({m}).
+      The roots simplify to {h} plus or minus sqrt({m}).
+      The larger solution is {h} + sqrt({m}).
+    mistake_tags:
+    - quadratic_formula
+    - simplifying_radicals
+    - irrational_roots
+    difficulty: hard
+  - id: QUADRATIC_FORMULA_IRRATIONAL_NONMONIC_001
+    type: generated
+    prompt_template: Use the quadratic formula to solve {a}x^2 + {b}x + {c} = 0. Enter the larger solution in exact
+      form.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      a:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+      h:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      m:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+        - 10
+        - 11
+        - 13
+    derived:
+      b: 0 - 2 * a * h
+      c: a * h * h - m
+      radical: a * m
+      discriminant: 4 * radical
+    constraints:
+    - a != m
+    answer:
+      type: numeric
+      value: '{h} + sqrt({radical})/{a}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Substitute carefully, simplify the discriminant radical, show both branches, and select the larger
+        root.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The discriminant is {discriminant} = 4({radical}).
+      After simplifying sqrt(D) and dividing by 2a, the roots are {h} plus or minus sqrt({radical})/{a}.
+      The larger solution is {h} + sqrt({radical})/{a}.
+    mistake_tags:
+    - quadratic_formula
+    - denominator_error
+    - simplifying_radicals
+    difficulty: hard
+  - id: QUADRATIC_FORMULA_STANDARDIZE_FIRST_001
+    type: generated
+    prompt_template: Use the quadratic formula to solve {a}x^2 + {b}x = {right_side}. Enter the larger solution.
+    answer_mode: final_plus_required_work
+    max_attempts: 250
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 4
+      larger_root:
+        type: int
+        min: 2
+        max: 9
+      smaller_root:
+        type: int
+        min: -7
+        max: 7
+        exclude:
+        - 0
+    derived:
+      b: 0 - a * (larger_root + smaller_root)
+      c: a * larger_root * smaller_root
+      right_side: 0 - c
+      discriminant: b * b - 4 * a * c
+    constraints:
+    - larger_root > smaller_root
+    - c != 0
+    answer:
+      type: numeric
+      value: '{larger_root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Move every term to one side first, identify a, b, and c, then show both formula branches.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Move {right_side} to the left to obtain {a}x^2 + {b}x + {c} = 0.
+      The discriminant is {discriminant}.
+      The roots are {larger_root} and {smaller_root}; the larger is {larger_root}.
+    mistake_tags:
+    - standard_form
+    - quadratic_formula
+    - coefficient_sign_error
+    difficulty: hard

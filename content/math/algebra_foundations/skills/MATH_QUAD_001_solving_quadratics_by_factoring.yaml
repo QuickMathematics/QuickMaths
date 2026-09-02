@@ -1,0 +1,551 @@
+id: MATH_QUAD_001
+schema_version: 0.2
+name: Solving quadratics by factoring
+domain: Math
+subdomain: Quadratic Equations
+description: Solve factorable quadratic equations by writing them in standard form, factoring, and applying the
+  zero-product property.
+prerequisites:
+- MATH_POLY_004
+- MATH_ALG_003
+tags:
+- algebra
+- quadratic_equations
+- factoring
+- zero_product_property
+- roots
+- solutions
+- standard_form
+- word_problems
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A quadratic equation contains a squared variable and can be written in standard form:
+
+  ax^2 + bx + c = 0
+
+  where a is not zero.
+
+  Solving a quadratic equation means finding every value of x that makes the equation true. These values are called solutions or roots. On a graph, they are the x-coordinates where the quadratic crosses or touches the x-axis.
+
+  Why it matters:
+  Quadratic equations model area, projectile motion, revenue, geometry, and many situations where one changing quantity is multiplied by another.
+
+  Zero-product property:
+  If a product equals zero, then at least one factor must equal zero.
+
+  If AB = 0, then A = 0 or B = 0.
+
+  This property is what turns a factored quadratic into linear equations.
+
+  Basic method:
+  1. Move every term to one side so the other side is 0.
+  2. Factor out any greatest common factor.
+  3. Factor the remaining quadratic completely.
+  4. Set each variable-containing factor equal to 0.
+  5. Solve the resulting linear equations.
+  6. List every distinct solution.
+  7. Check the solutions in the original equation when practical.
+
+  Example:
+  Solve x^2 - 7x + 12 = 0.
+
+  Factor:
+  (x - 3)(x - 4) = 0
+
+  Apply the zero-product property:
+  x - 3 = 0 or x - 4 = 0
+
+  Therefore:
+  x = 3 or x = 4
+
+  Equation not initially equal to zero:
+  Solve x^2 - 5x = -6.
+
+  Move all terms to one side:
+  x^2 - 5x + 6 = 0
+
+  Factor and solve:
+  (x - 2)(x - 3) = 0
+  x = 2 or x = 3
+
+  A zero solution:
+  Solve x^2 + 6x = 0.
+
+  Factor out x:
+  x(x + 6) = 0
+
+  Therefore x = 0 or x = -6.
+
+  Repeated solution:
+  Solve x^2 - 10x + 25 = 0.
+
+  (x - 5)^2 = 0
+
+  Both factors give the same value, so the equation has one distinct solution:
+  x = 5
+
+  Numerical common factor:
+  Solve 3x^2 - 21x + 30 = 0.
+
+  3(x^2 - 7x + 10) = 0
+  3(x - 5)(x - 2) = 0
+
+  The factor 3 cannot equal zero, so the solutions come from the variable factors:
+  x = 5 or x = 2
+
+  Choosing a requested solution:
+  Some questions ask for the positive, negative, larger, smaller, or nonzero solution. You should still find the complete solution set before selecting the requested value.
+
+  Not every quadratic can be solved by integer factoring. If no suitable factor pair exists, another method such as completing the square or the quadratic formula is needed.
+
+  Common mistake:
+  Do not use the zero-product property until one side of the equation is zero. From (x - 2)(x - 3) = 12, you cannot conclude x - 2 = 0 or x - 3 = 0.
+
+  Another common mistake:
+  Do not stop after factoring. Each variable factor must be set equal to zero and solved.
+
+  Another common mistake:
+  Do not lose the solution x = 0 when x is a factor.
+
+  Another common mistake:
+  A repeated factor gives one distinct solution, not two different values.
+examples:
+- prompt: "Solve: (x - 4)(x + 7) = 0"
+  solution: "x = 4 or x = -7"
+  explanation: "Set each factor equal to zero."
+- prompt: "Solve: x^2 - 9x + 20 = 0"
+  solution: "x = 4 or x = 5"
+  explanation: "Factor as (x - 4)(x - 5) = 0."
+- prompt: "Solve: x^2 + 2x - 15 = 0"
+  solution: "x = 3 or x = -5"
+  explanation: "Factor as (x - 3)(x + 5) = 0."
+- prompt: "Solve: x^2 - 6x = -8"
+  solution: "x = 2 or x = 4"
+  explanation: "Move -8 to the left, factor x^2 - 6x + 8, then use the zero-product property."
+- prompt: "Solve: x^2 + 8x = 0"
+  solution: "x = 0 or x = -8"
+  explanation: "Factor out x: x(x + 8) = 0."
+- prompt: "Solve: x^2 - 12x + 36 = 0"
+  solution: "x = 6"
+  explanation: "The quadratic is (x - 6)^2, so both factors give the repeated root 6."
+- prompt: "Solve: 2x^2 - 14x + 24 = 0"
+  solution: "x = 3 or x = 4"
+  explanation: "Factor out 2, then factor x^2 - 7x + 12."
+- prompt: "A rectangle has sides x + 2 and x + 5 and area 40. Find the positive value of x."
+  solution: "3"
+  explanation: "Solve (x + 2)(x + 5) = 40. The roots are 3 and -10, and the positive value is 3."
+applications:
+- title: "Geometry"
+  description: "Area equations often become quadratics when both dimensions contain the same unknown."
+- title: "Graph intercepts"
+  description: "The roots of a quadratic are the x-values where its graph meets the x-axis."
+- title: "Physics"
+  description: "A height equation can be set equal to zero to find when an object reaches the ground."
+- title: "Business models"
+  description: "Quadratic revenue or profit equations can have roots representing break-even quantities."
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: QUAD_ZERO_PRODUCT_POSITIVE_ROOT_001
+    type: generated
+    prompt_template: "Solve (x - {p})(x + {q}) = 0. Enter the positive solution."
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 12
+      q:
+        type: int
+        min: 2
+        max: 12
+    answer:
+      type: numeric
+      value: "{p}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Apply the zero-product property and show both linear equations before selecting the requested solution."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Set x - {p} = 0 or x + {q} = 0.
+      The two solutions are x = {p} and x = -{q}.
+      The positive solution is {p}.
+    mistake_tags:
+    - zero_product_property
+    - sign_error
+    - missing_solution
+    difficulty: easy
+
+  - id: QUAD_ZERO_PRODUCT_NEGATIVE_ROOT_001
+    type: generated
+    prompt_template: "Solve (x - {p})(x + {q}) = 0. Enter the negative solution."
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 12
+      q:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      negative_root: "0 - q"
+    answer:
+      type: numeric
+      value: "{negative_root}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Apply the zero-product property and show both linear equations before selecting the requested solution."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Set x - {p} = 0 or x + {q} = 0.
+      The two solutions are x = {p} and x = {negative_root}.
+      The negative solution is {negative_root}.
+    mistake_tags:
+    - zero_product_property
+    - sign_error
+    - missing_solution
+    difficulty: easy
+
+  - id: QUAD_MONIC_TWO_POSITIVE_LARGER_001
+    type: generated
+    prompt_template: "Solve x^2 + {middle_coefficient}x + {constant_term} = 0. Enter the larger solution."
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 4
+        max: 12
+      q:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      middle_coefficient: "0 - p - q"
+      constant_term: "p * q"
+    constraints:
+    - "p > q"
+    answer:
+      type: numeric
+      value: "{p}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Factor the quadratic, write both zero-product equations, and state both roots before choosing the larger one."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The quadratic factors as (x - {p})(x - {q}) = 0.
+      Therefore x = {p} or x = {q}.
+      Since {p} > {q}, the larger solution is {p}.
+    mistake_tags:
+    - quadratic_factoring
+    - zero_product_property
+    - larger_smaller_error
+    - sign_error
+    difficulty: medium
+
+  - id: QUAD_MONIC_TWO_POSITIVE_SMALLER_001
+    type: generated
+    prompt_template: "Solve x^2 + {middle_coefficient}x + {constant_term} = 0. Enter the smaller solution."
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 4
+        max: 12
+      q:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      middle_coefficient: "0 - p - q"
+      constant_term: "p * q"
+    constraints:
+    - "p > q"
+    answer:
+      type: numeric
+      value: "{q}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Factor the quadratic, write both zero-product equations, and state both roots before choosing the smaller one."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The quadratic factors as (x - {p})(x - {q}) = 0.
+      Therefore x = {p} or x = {q}.
+      Since {q} < {p}, the smaller solution is {q}.
+    mistake_tags:
+    - quadratic_factoring
+    - zero_product_property
+    - larger_smaller_error
+    - sign_error
+    difficulty: medium
+
+  - id: QUAD_MIXED_SIGNS_POSITIVE_ROOT_001
+    type: generated
+    prompt_template: "Solve x^2 + {middle_coefficient}x + {constant_term} = 0. Enter the positive solution."
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 12
+      q:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      middle_coefficient: "q - p"
+      constant_term: "0 - p * q"
+    answer:
+      type: numeric
+      value: "{p}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Factor the quadratic and use the zero-product property to find both roots before selecting the positive one."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The quadratic factors as (x - {p})(x + {q}) = 0.
+      The roots are x = {p} and x = -{q}.
+      The positive solution is {p}.
+    mistake_tags:
+    - quadratic_factoring
+    - sign_error
+    - zero_product_property
+    - missing_solution
+    difficulty: medium
+
+    constraints:
+    - p != q
+  - id: QUAD_REPEATED_ROOT_001
+    type: generated
+    prompt_template: "Solve x^2 + {middle_coefficient}x + {constant_term} = 0. Enter the repeated solution."
+    answer_mode: final_plus_required_work
+    variables:
+      r:
+        type: int
+        min: -10
+        max: 10
+        exclude: [0]
+    derived:
+      middle_coefficient: "0 - 2 * r"
+      constant_term: "r * r"
+    answer:
+      type: numeric
+      value: "{r}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Identify the perfect-square factorization and explain why both factors give the same solution."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The quadratic is (x - ({r}))^2 = 0.
+      The repeated factor gives x - ({r}) = 0.
+      The one distinct solution is x = {r}.
+    mistake_tags:
+    - repeated_root
+    - perfect_square_trinomial
+    - sign_error
+    - solution_count_error
+    difficulty: medium
+
+  - id: QUAD_ZERO_AS_ROOT_001
+    type: generated
+    prompt_template: "Solve x^2 + {a}x = 0. Enter the nonzero solution."
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -12
+        max: 12
+        exclude: [0]
+    derived:
+      nonzero_root: "0 - a"
+    answer:
+      type: numeric
+      value: "{nonzero_root}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Factor out x, state both roots, and then select the nonzero root."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Factor x: x(x + {a}) = 0.
+      The roots are x = 0 and x = {nonzero_root}.
+      The nonzero solution is {nonzero_root}.
+    mistake_tags:
+    - greatest_common_factor
+    - zero_product_property
+    - missing_zero_solution
+    - sign_error
+    difficulty: medium
+
+  - id: QUAD_MOVE_TO_STANDARD_FORM_001
+    type: generated
+    prompt_template: "Solve x^2 - {sum_value}x = {right_side}. Enter the larger solution."
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 4
+        max: 12
+      q:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      sum_value: "p + q"
+      product_value: "p * q"
+      right_side: "0 - product_value"
+    constraints:
+    - "p > q"
+    answer:
+      type: numeric
+      value: "{p}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Move every term to one side, factor the resulting quadratic, and show both roots before choosing the larger
+        one."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Add {product_value} to both sides: x^2 - {sum_value}x + {product_value} = 0.
+      Factor: (x - {p})(x - {q}) = 0.
+      The roots are {p} and {q}, so the larger solution is {p}.
+    mistake_tags:
+    - standard_form_error
+    - quadratic_factoring
+    - zero_product_property
+    - sign_error
+    difficulty: hard
+
+  - id: QUAD_GCF_THEN_FACTOR_001
+    type: generated
+    prompt_template: "Solve {leading_coefficient}x^2 + {linear_coefficient}x + {constant_term} = 0. Enter the smaller solution."
+    answer_mode: final_plus_required_work
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 6
+      p:
+        type: int
+        min: 4
+        max: 12
+      q:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      sum_value: "p + q"
+      product_value: "p * q"
+      leading_coefficient: "g"
+      linear_coefficient: "0 - g * sum_value"
+      constant_term: "g * product_value"
+    constraints:
+    - "p > q"
+    answer:
+      type: numeric
+      value: "{q}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Factor out the numerical GCF, factor the remaining quadratic, and state both roots before choosing the smaller
+        one."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Factor out {g}: {g}(x^2 - {sum_value}x + {product_value}) = 0.
+      Then factor: {g}(x - {p})(x - {q}) = 0.
+      The roots are {p} and {q}, so the smaller solution is {q}.
+    mistake_tags:
+    - greatest_common_factor
+    - quadratic_factoring
+    - zero_product_property
+    - larger_smaller_error
+    difficulty: hard
+
+  - id: QUAD_RECTANGLE_POSITIVE_SOLUTION_001
+    type: generated
+    prompt_template: "A rectangle has length x + {a}, width x + {b}, and area {area_value} square units. What positive value
+      of x fits these dimensions?"
+    answer_mode: final_plus_required_work
+    variables:
+      solution:
+        type: int
+        min: 2
+        max: 12
+      a:
+        type: int
+        min: 2
+        max: 8
+      b:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      length_value: "solution + a"
+      width_value: "solution + b"
+      area_value: "length_value * width_value"
+      other_root: "0 - a - b - solution"
+    constraints:
+    - "a != b"
+    answer:
+      type: numeric
+      value: "{solution}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: "Write the area equation, move it to standard form, factor it, and explain why the positive root is the meaningful
+        dimension value."
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The area equation is (x + {a})(x + {b}) = {area_value}.
+      One root is x = {solution}; the other is x = {other_root}.
+      The negative root would make at least one stated dimension invalid.
+      The meaningful positive value is x = {solution}.
+    mistake_tags:
+    - area_model_error
+    - standard_form_error
+    - quadratic_factoring
+    - extraneous_context_value
+    difficulty: hard

@@ -63,7 +63,7 @@ test:
     - id: SIGN_REV_NEG_COEFF_LESS_THAN_001
       type: generated
       prompt_template: "Solve for x. Write your answer like x > 5. {a}x < {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         x:
           type: int
@@ -82,9 +82,14 @@ test:
       grading:
         method: inequality_solution
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, reversing the sign exactly when multiplying or dividing by a negative."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with {a}x < {c}.
@@ -101,7 +106,7 @@ test:
     - id: SIGN_REV_NEG_COEFF_GREATER_THAN_001
       type: generated
       prompt_template: "Solve for x. Write your answer like x < 5. {a}x > {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         x:
           type: int
@@ -120,9 +125,14 @@ test:
       grading:
         method: inequality_solution
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, reversing the sign exactly when multiplying or dividing by a negative."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with {a}x > {c}.
@@ -139,7 +149,7 @@ test:
     - id: SIGN_REV_NEG_COEFF_LESS_EQUAL_001
       type: generated
       prompt_template: "Solve for x. Write your answer like x >= 5. {a}x <= {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         x:
           type: int
@@ -158,9 +168,14 @@ test:
       grading:
         method: inequality_solution
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, reversing the sign exactly when multiplying or dividing by a negative."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with {a}x <= {c}.
@@ -177,7 +192,7 @@ test:
     - id: SIGN_REV_NEG_COEFF_GREATER_EQUAL_001
       type: generated
       prompt_template: "Solve for x. Write your answer like x <= 5. {a}x >= {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         x:
           type: int
@@ -196,9 +211,14 @@ test:
       grading:
         method: inequality_solution
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, reversing the sign exactly when multiplying or dividing by a negative."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with {a}x >= {c}.
@@ -215,7 +235,7 @@ test:
     - id: SIGN_REV_TWO_STEP_LESS_THAN_001
       type: generated
       prompt_template: "Solve for x. Write your answer like x > 5. {a}x + {b} < {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         x:
           type: int
@@ -239,9 +259,14 @@ test:
       grading:
         method: inequality_solution
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, reversing the sign exactly when multiplying or dividing by a negative."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with {a}x + {b} < {c}.
@@ -258,7 +283,7 @@ test:
     - id: SIGN_REV_TWO_STEP_GREATER_EQUAL_001
       type: generated
       prompt_template: "Solve for x. Write your answer like x <= 5. {a}x - {b} >= {c}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         x:
           type: int
@@ -282,9 +307,14 @@ test:
       grading:
         method: inequality_solution
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, reversing the sign exactly when multiplying or dividing by a negative."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with {a}x - {b} >= {c}.
@@ -301,7 +331,7 @@ test:
     - id: SIGN_REV_NEG_DIVISOR_LESS_EQUAL_001
       type: generated
       prompt_template: "Solve for x. Write your answer like x >= 5. x / ({d}) <= {q}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         d:
           type: int
@@ -320,9 +350,14 @@ test:
       grading:
         method: inequality_solution
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, reversing the sign exactly when multiplying or dividing by a negative."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with x / ({d}) <= {q}.
@@ -339,7 +374,7 @@ test:
     - id: SIGN_REV_NEG_DIVISOR_GREATER_THAN_001
       type: generated
       prompt_template: "Solve for x. Write your answer like x < 5. x / ({d}) > {q}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         d:
           type: int
@@ -358,9 +393,14 @@ test:
       grading:
         method: inequality_solution
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Show each equivalent inequality step, reversing the sign exactly when multiplying or dividing by a negative."
+        line_type: inequality
+        target_variable: x
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Start with x / ({d}) > {q}.

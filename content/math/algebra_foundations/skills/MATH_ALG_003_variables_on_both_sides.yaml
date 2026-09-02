@@ -17,6 +17,7 @@ tags:
 unlocks:
   - MATH_ALG_004
   - MATH_SYS_001
+  - MATH_EXP_003
 mastery:
   passing_score: 0.8
   minimum_confidence: 3

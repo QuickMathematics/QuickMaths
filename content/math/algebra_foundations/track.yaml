@@ -2,8 +2,9 @@ id: TRACK_MATH_ALGEBRA_FOUNDATIONS
 schema_version: 0.2
 name: Algebra Foundations
 domain: Math
-description: Core arithmetic, pre-algebra, algebra, coordinate graphing, linear functions,
-  and systems skills for foundational math.
+description: A rigorous path through arithmetic, pre-algebra, functions, exponents,
+  sequences, polynomials, radicals, quadratics, coordinate graphing, linear equations,
+  and systems.
 entry_skills:
 - MATH_ARITH_001
 exit_skills:
@@ -12,14 +13,23 @@ exit_skills:
 - MATH_ALG_007
 - MATH_ALG_008
 - MATH_SYS_001
+- MATH_QUAD_005
+- MATH_EXP_003
 skills:
 - MATH_ARITH_001
 - MATH_ARITH_002
 - MATH_ARITH_003
 - MATH_GRAPH_001
 - MATH_PREALG_001
+- MATH_FUNC_001
 - MATH_PREALG_002
 - MATH_PREALG_003
+- MATH_EXP_001
+- MATH_RAD_001
+- MATH_POLY_001
+- MATH_POLY_002
+- MATH_POLY_003
+- MATH_POLY_004
 - MATH_ALG_001
 - MATH_GRAPH_002
 - MATH_ARITH_004
@@ -29,12 +39,21 @@ skills:
 - MATH_ALG_008
 - MATH_ALG_002
 - MATH_GRAPH_003
+- MATH_SEQ_001
+- MATH_SEQ_002
+- MATH_EXP_002
 - MATH_ALG_003
+- MATH_EXP_003
+- MATH_QUAD_001
+- MATH_QUAD_002
+- MATH_QUAD_003
 - MATH_ALG_006
 - MATH_ALG_005
 - MATH_ALG_004
 - MATH_ALG_007
 - MATH_GRAPH_004
 - MATH_GRAPH_005
+- MATH_QUAD_004
+- MATH_QUAD_005
 - MATH_GRAPH_006
 - MATH_SYS_001

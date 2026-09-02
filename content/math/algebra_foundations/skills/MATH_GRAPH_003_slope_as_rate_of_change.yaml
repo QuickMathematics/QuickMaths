@@ -15,6 +15,7 @@ tags:
   - word_problems
 unlocks:
   - MATH_GRAPH_004
+  - MATH_SEQ_001
 mastery:
   passing_score: 0.8
   minimum_confidence: 3

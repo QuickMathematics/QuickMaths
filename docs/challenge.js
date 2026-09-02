@@ -2293,7 +2293,7 @@ function initClock() {
 
 async function boot() {
   const [response, geographyResponse] = await Promise.all([
-    fetch("./curriculum-data.json?v=20260902-geography-depot"),
+    fetch("./curriculum-data.json?v=20260902-native-math-expansion"),
     fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
   ]);
   if (!response.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");

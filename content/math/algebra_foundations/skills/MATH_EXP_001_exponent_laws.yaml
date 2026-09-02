@@ -1,0 +1,532 @@
+id: MATH_EXP_001
+schema_version: 0.2
+name: Exponent laws
+domain: Math
+subdomain: Exponents and Polynomials
+description: Simplify powers and monomials using product, quotient, power, zero-exponent, and negative-exponent rules.
+prerequisites:
+  - MATH_PREALG_002
+  - MATH_ARITH_003
+tags:
+  - algebra
+  - exponents
+  - powers
+  - exponent_laws
+  - monomials
+  - zero_exponent
+  - negative_exponents
+  - simplifying_expressions
+unlocks:
+  - MATH_POLY_001
+  - MATH_SEQ_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  An exponent tells how many times a base is used as a factor.
+
+  In x^4, x is the base and 4 is the exponent:
+
+  x^4 = x * x * x * x
+
+  Exponent laws are shortcuts for repeated multiplication. They work because the factors can be counted and regrouped.
+
+  Product rule:
+  When multiplying powers with the same base, add the exponents.
+
+  x^a * x^b = x^(a + b)
+
+  Quotient rule:
+  When dividing powers with the same nonzero base, subtract the exponents.
+
+  x^a / x^b = x^(a - b)
+
+  Power of a power:
+  When a power is raised to another power, multiply the exponents.
+
+  (x^a)^b = x^(a * b)
+
+  Power of a product:
+  A power outside parentheses applies to every factor inside.
+
+  (ab)^n = a^n * b^n
+
+  Zero exponent:
+  For any nonzero base x:
+
+  x^0 = 1
+
+  Negative exponent:
+  A negative exponent means reciprocal, not a negative value.
+
+  x^(-n) = 1/x^n
+
+  Method:
+  1. Identify the operation joining the powers.
+  2. Check whether the bases are the same.
+  3. Choose the matching exponent law.
+  4. Simplify numerical coefficients separately.
+  5. Rewrite negative exponents with positive exponents when requested.
+  6. Check that you changed exponents, not bases.
+
+  Example:
+  x^3 * x^5 = x^(3 + 5) = x^8.
+
+  Example:
+  x^9 / x^4 = x^(9 - 4) = x^5.
+
+  Example:
+  (x^3)^4 = x^(3 * 4) = x^12.
+
+  Example:
+  (2x^3)(5x^4) = 10x^7.
+
+  Common mistake:
+  Do not add exponents when adding terms. x^2 + x^3 cannot be simplified to x^5.
+
+  Another common mistake:
+  Do not multiply exponents in a product. x^2 * x^3 = x^5, not x^6.
+
+  Another common mistake:
+  x^(-3) means 1/x^3. It does not mean -x^3.
+examples:
+  - prompt: "Simplify: x^4 * x^3"
+    solution: "x^7"
+    explanation: "The bases match, so add the exponents: 4 + 3 = 7."
+  - prompt: "Simplify: x^9 / x^5"
+    solution: "x^4"
+    explanation: "The bases match, so subtract the exponents: 9 - 5 = 4."
+  - prompt: "Simplify: (x^3)^4"
+    solution: "x^12"
+    explanation: "A power raised to a power multiplies exponents: 3 * 4 = 12."
+  - prompt: "Simplify: (3x)^2"
+    solution: "9x^2"
+    explanation: "Square both factors: 3^2 * x^2 = 9x^2."
+  - prompt: "Simplify: (2x^3)(-4x^2)"
+    solution: "-8x^5"
+    explanation: "Multiply coefficients and add exponents on x."
+  - prompt: "Simplify: 18x^7 / 6x^3"
+    solution: "3x^4"
+    explanation: "Divide coefficients and subtract the exponents on x."
+  - prompt: "Simplify: x^0, assuming x is nonzero"
+    solution: "1"
+    explanation: "Every nonzero base raised to the zero power equals 1."
+  - prompt: "Rewrite using only positive exponents: x^(-4)"
+    solution: "1/x^4"
+    explanation: "A negative exponent moves the power to the denominator."
+applications:
+  - title: "Polynomial algebra"
+    description: "Exponent laws are required when multiplying monomials and polynomials."
+  - title: "Scientific notation"
+    description: "Powers of ten make very large and very small quantities easier to write and compare."
+  - title: "Geometry formulas"
+    description: "Area and volume formulas use squared and cubed units."
+  - title: "Growth models"
+    description: "Repeated multiplication is the foundation of exponential growth and decay."
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+    - id: EXP_PRODUCT_SAME_BASE_001
+      type: generated
+      prompt_template: "Simplify: x^{a} * x^{b}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 8
+        b:
+          type: int
+          min: 2
+          max: 8
+      derived:
+        power: "a + b"
+      answer:
+        type: expression
+        value: "x^{power}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent expression steps, including the exponent calculation."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The bases are both x.
+        Add the exponents: {a} + {b} = {power}.
+        x^{a} * x^{b} = x^{power}.
+      mistake_tags:
+        - exponent_rule_error
+        - product_rule_error
+        - exponent_arithmetic
+      difficulty: easy
+
+    - id: EXP_QUOTIENT_SAME_BASE_001
+      type: generated
+      prompt_template: "Simplify: x^{a} / x^{b}"
+      answer_mode: final_plus_required_work
+      variables:
+        b:
+          type: int
+          min: 1
+          max: 6
+        difference:
+          type: int
+          min: 1
+          max: 6
+      derived:
+        a: "b + difference"
+      answer:
+        type: expression
+        value: "x^{difference}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent expression steps, including the exponent subtraction."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The bases are both x.
+        Subtract the exponents: {a} - {b} = {difference}.
+        x^{a} / x^{b} = x^{difference}.
+      mistake_tags:
+        - exponent_rule_error
+        - quotient_rule_error
+        - exponent_arithmetic
+      difficulty: easy
+
+    - id: EXP_POWER_OF_POWER_001
+      type: generated
+      prompt_template: "Simplify: (x^{a})^{b}"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 6
+        b:
+          type: int
+          min: 2
+          max: 5
+      derived:
+        power: "a * b"
+      answer:
+        type: expression
+        value: "x^{power}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent expression steps, including the exponent multiplication."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A power raised to a power multiplies exponents.
+        {a} * {b} = {power}.
+        (x^{a})^{b} = x^{power}.
+      mistake_tags:
+        - exponent_rule_error
+        - power_of_power_error
+        - exponent_arithmetic
+      difficulty: easy
+
+    - id: EXP_POWER_OF_PRODUCT_001
+      type: generated
+      prompt_template: "Simplify: ({coefficient}x^{a})^{b}"
+      answer_mode: final_plus_required_work
+      variables:
+        coefficient:
+          type: int
+          min: 2
+          max: 5
+        a:
+          type: int
+          min: 1
+          max: 4
+        b:
+          type: int
+          min: 2
+          max: 4
+      derived:
+        new_coefficient: "coefficient ** b"
+        power: "a * b"
+      answer:
+        type: expression
+        value: "{new_coefficient}x^{power}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Apply the outside power to both factors and show equivalent expression steps."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The exponent {b} applies to the coefficient and to x^{a}.
+        {coefficient}^{b} = {new_coefficient}.
+        (x^{a})^{b} = x^{power}.
+        The simplified expression is {new_coefficient}x^{power}.
+      mistake_tags:
+        - power_of_product_error
+        - coefficient_error
+        - exponent_rule_error
+      difficulty: medium
+
+    - id: EXP_MONOMIAL_PRODUCT_001
+      type: generated
+      prompt_template: "Simplify: ({a}x^{m}) * ({b}x^{n})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -7
+          max: 7
+          exclude: [0, 1, -1]
+        b:
+          type: int
+          min: -7
+          max: 7
+          exclude: [0, 1, -1]
+        m:
+          type: int
+          min: 1
+          max: 6
+        n:
+          type: int
+          min: 1
+          max: 6
+      derived:
+        coefficient: "a * b"
+        power: "m + n"
+      answer:
+        type: expression
+        value: "{coefficient}x^{power}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Multiply the coefficients, apply the product rule, and show equivalent expression steps."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply the coefficients: {a} * {b} = {coefficient}.
+        Add the exponents on x: {m} + {n} = {power}.
+        The product is {coefficient}x^{power}.
+      mistake_tags:
+        - coefficient_error
+        - sign_error
+        - product_rule_error
+        - exponent_arithmetic
+      difficulty: medium
+
+    - id: EXP_MONOMIAL_QUOTIENT_001
+      type: generated
+      prompt_template: "Simplify: {a}x^{m} / ({b}x^{n})"
+      answer_mode: final_plus_required_work
+      variables:
+        quotient:
+          type: int
+          min: 2
+          max: 7
+        b:
+          type: int
+          min: 2
+          max: 7
+        n:
+          type: int
+          min: 1
+          max: 5
+        difference:
+          type: int
+          min: 1
+          max: 5
+      derived:
+        a: "quotient * b"
+        m: "n + difference"
+      answer:
+        type: expression
+        value: "{quotient}x^{difference}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Divide the coefficients, apply the quotient rule, and show equivalent expression steps."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Divide the coefficients: {a} / {b} = {quotient}.
+        Subtract the exponents on x: {m} - {n} = {difference}.
+        The quotient is {quotient}x^{difference}.
+      mistake_tags:
+        - coefficient_error
+        - quotient_rule_error
+        - exponent_arithmetic
+        - division_error
+      difficulty: medium
+
+    - id: EXP_ZERO_EXPONENT_001
+      type: generated
+      prompt_template: "Simplify: ({a}x^{m})^0, assuming x != 0"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 9
+        m:
+          type: int
+          min: 1
+          max: 6
+      answer:
+        type: expression
+        value: "1"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Rewrite the expression using the zero-exponent rule, one equivalent expression per line."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The entire nonzero base {a}x^{m} is raised to the zero power.
+        Any nonzero base to the zero power equals 1.
+      mistake_tags:
+        - zero_exponent_error
+        - exponent_rule_error
+        - base_error
+      difficulty: medium
+
+    - id: EXP_NEGATIVE_EXPONENT_001
+      type: generated
+      prompt_template: "Rewrite using only positive exponents: x^(-{n})"
+      answer_mode: final_plus_required_work
+      variables:
+        n:
+          type: int
+          min: 1
+          max: 6
+      answer:
+        type: expression
+        value: "1/x^{n}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Use the reciprocal rule and show equivalent expression steps."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        A negative exponent means reciprocal.
+        x^(-{n}) = 1/x^{n}.
+      mistake_tags:
+        - negative_exponent_error
+        - reciprocal_error
+        - sign_error
+      difficulty: medium
+
+    - id: EXP_GROUPED_NEGATIVE_BASE_001
+      type: generated
+      prompt_template: "Evaluate: ({signed_base})^{exponent}"
+      answer_mode: final_plus_required_work
+      variables:
+        base:
+          type: int
+          min: 2
+          max: 8
+        exponent:
+          type: choice
+          values: [2, 3, 4, 5]
+      derived:
+        signed_base: "0 - base"
+        answer_value: "signed_base ** exponent"
+      answer:
+        type: numeric
+        value: "{answer_value}"
+      grading:
+        method: exact_numeric
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent numerical expression steps, ending with the final value."
+        line_type: expression
+        minimum_steps: 2
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The negative base is inside parentheses.
+        An even exponent gives a positive result; an odd exponent gives a negative result.
+        ({signed_base})^{exponent} = {answer_value}.
+      mistake_tags:
+        - negative_base_error
+        - parity_error
+        - exponent_arithmetic
+      difficulty: hard
+
+    - id: EXP_RULE_SELECTION_001
+      type: fixed
+      prompt: "Which exponent-law statement is always correct for nonzero x?"
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "x^3 * x^4 = x^12"
+        - id: B
+          label: "(x^3)^4 = x^7"
+        - id: C
+          label: "x^7 / x^2 = x^5"
+        - id: D
+          label: "x^2 + x^3 = x^5"
+      answer:
+        type: multiple_choice
+        value: "C"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Quotienting powers with the same base means subtracting exponents.
+        7 - 2 = 5, so x^7 / x^2 = x^5.
+        The other choices confuse product, power, or addition rules.
+      mistake_tags:
+        - exponent_rule_error
+        - rule_selection_error
+        - operation_error
+      difficulty: hard

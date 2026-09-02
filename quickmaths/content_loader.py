@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from yaml.constructor import ConstructorError
+from yaml.nodes import MappingNode
 
 from quickmaths.config import DEFAULT_TRACK_DIR, SUPPORTED_GRADING_METHODS
 from quickmaths.models import Example, MasteryRules, ProblemTemplate, Skill, SkillTest, Track
@@ -12,6 +14,31 @@ from quickmaths.models import Example, MasteryRules, ProblemTemplate, Skill, Ski
 
 class ContentError(ValueError):
     pass
+
+
+class _UniqueKeySafeLoader(yaml.SafeLoader):
+    """Safe YAML loader that rejects mappings with repeated keys."""
+
+    def construct_mapping(self, node: MappingNode, deep: bool = False) -> dict[Any, Any]:
+        if not isinstance(node, MappingNode):
+            raise ConstructorError(None, None, f"expected a mapping node, but found {node.id}", node.start_mark)
+        self.flatten_mapping(node)
+        mapping: dict[Any, Any] = {}
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            if key in mapping:
+                raise ConstructorError(
+                    "while constructing a mapping",
+                    node.start_mark,
+                    f"found duplicate key {key!r}",
+                    key_node.start_mark,
+                )
+            mapping[key] = self.construct_object(value_node, deep=deep)
+        return mapping
+
+
+def _safe_load_unique(text: str) -> Any:
+    return yaml.load(text, Loader=_UniqueKeySafeLoader)
 
 
 def load_track(track_dir: Path = DEFAULT_TRACK_DIR) -> Track:
@@ -52,7 +79,7 @@ def load_skills(track_dir: Path = DEFAULT_TRACK_DIR, include_drafts: bool = Fals
 def load_skill_file(path: Path) -> Skill:
     text = path.read_text(encoding="utf-8")
     try:
-        data = yaml.safe_load(text)
+        data = _safe_load_unique(text)
     except yaml.YAMLError as exc:
         raise ContentError(f"{path}: invalid YAML: {exc}") from exc
     if not isinstance(data, dict):
@@ -97,7 +124,7 @@ def load_curriculum(track_dir: Path = DEFAULT_TRACK_DIR, include_drafts: bool = 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
     try:
-        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        data = _safe_load_unique(path.read_text(encoding="utf-8"))
     except FileNotFoundError as exc:
         raise ContentError(f"{path}: file not found") from exc
     except yaml.YAMLError as exc:

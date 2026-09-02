@@ -1,0 +1,589 @@
+id: MATH_POLY_002
+schema_version: 0.2
+name: Multiplying polynomials
+domain: Math
+subdomain: Exponents and Polynomials
+description: Expand and simplify products of monomials, binomials, and simple polynomials using distribution and exponent laws.
+prerequisites:
+  - MATH_POLY_001
+tags:
+  - algebra
+  - polynomials
+  - multiplying_polynomials
+  - distributive_property
+  - binomials
+  - exponent_laws
+  - special_products
+  - area_models
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Multiplying polynomials means distributing every term in one factor across every term in the other factor.
+
+  The distributive property is the engine:
+
+  a(b + c) = ab + ac
+
+  Exponent laws handle the variable powers:
+
+  x^m * x^n = x^(m + n)
+
+  Monomial times polynomial:
+  Multiply the monomial by every term.
+
+  3x(2x^2 - 5x + 4)
+  = 6x^3 - 15x^2 + 12x
+
+  Binomial times binomial:
+  Every term in the first binomial multiplies every term in the second.
+
+  (x + 3)(x + 5)
+  = x(x + 5) + 3(x + 5)
+  = x^2 + 5x + 3x + 15
+  = x^2 + 8x + 15
+
+  Method:
+  1. Multiply every term in the first factor by every term in the second factor.
+  2. Multiply numerical coefficients.
+  3. Add exponents when multiplying powers with the same base.
+  4. Keep each product's sign.
+  5. Combine like terms after all products are written.
+  6. Write the result in descending powers when practical.
+  7. Check that the number of distributed products is complete.
+
+  A two-term factor times another two-term factor creates four products before like terms are combined.
+
+  Special product: square of a binomial
+
+  (x + a)^2 = (x + a)(x + a)
+  = x^2 + 2ax + a^2
+
+  The middle term is 2ax. Squaring term by term and omitting the middle term is incorrect.
+
+  Special product: conjugates
+
+  (x + a)(x - a)
+  = x^2 - a^2
+
+  The middle terms cancel. This pattern is called a difference of squares.
+
+  Area model:
+  If a rectangle has side lengths x + 3 and x + 5, its area is:
+
+  (x + 3)(x + 5) = x^2 + 8x + 15
+
+  Each product represents one region in the area model.
+
+  Common mistake:
+  Do not multiply only the first terms. In (x + 2)(x + 7), all four products are needed.
+
+  Another common mistake:
+  Do not add exponents when adding like terms. First multiply powers, then combine coefficients of matching powers.
+
+  Another common mistake:
+  (x + 4)^2 is x^2 + 8x + 16, not x^2 + 16.
+
+  Another common mistake:
+  Keep negative signs attached to the terms they belong to, especially when both factors contain subtraction.
+examples:
+  - prompt: "Expand and simplify: 4x(3x + 5)"
+    solution: "12x^2 + 20x"
+    explanation: "Multiply 4x by both terms and add exponents on x."
+  - prompt: "Expand and simplify: -2x(3x^2 - 4x + 7)"
+    solution: "-6x^3 + 8x^2 - 14x"
+    explanation: "Distribute -2x to every term and track the signs."
+  - prompt: "Expand and simplify: (x + 3)(x + 5)"
+    solution: "x^2 + 8x + 15"
+    explanation: "Write all four products, then combine the two x-terms."
+  - prompt: "Expand and simplify: (x + 6)(x - 2)"
+    solution: "x^2 + 4x - 12"
+    explanation: "The middle terms are -2x and 6x, which combine to 4x."
+  - prompt: "Expand and simplify: (2x + 3)(4x - 5)"
+    solution: "8x^2 + 2x - 15"
+    explanation: "The four products are 8x^2, -10x, 12x, and -15."
+  - prompt: "Expand and simplify: (x - 7)^2"
+    solution: "x^2 - 14x + 49"
+    explanation: "A binomial square includes the middle term 2(x)(-7)."
+  - prompt: "Expand and simplify: (x + 9)(x - 9)"
+    solution: "x^2 - 81"
+    explanation: "The middle terms cancel, leaving a difference of squares."
+  - prompt: "A rectangle has length x + 4 and width x + 7. Find its area."
+    solution: "x^2 + 11x + 28"
+    explanation: "Multiply the side-length binomials and combine the middle terms."
+applications:
+  - title: "Area and dimensions"
+    description: "Products of polynomial side lengths produce area expressions."
+  - title: "Factoring"
+    description: "Factoring reverses polynomial multiplication and will use the same product patterns."
+  - title: "Quadratic equations"
+    description: "Multiplying two linear factors produces a quadratic expression."
+  - title: "Algebraic models"
+    description: "Polynomial products describe interactions between changing quantities."
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+    - id: POLY_MULT_MONOMIAL_BINOMIAL_001
+      type: generated
+      prompt_template: "Expand and simplify: {a}x^{m} * ({b}x^{n} + {c})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 7
+        b:
+          type: int
+          min: -7
+          max: 7
+          exclude: [0]
+        c:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+        m:
+          type: int
+          min: 1
+          max: 4
+        n:
+          type: int
+          min: 1
+          max: 4
+      derived:
+        leading_coefficient: "a * b"
+        leading_power: "m + n"
+        second_coefficient: "a * c"
+      answer:
+        type: expression
+        value: "{leading_coefficient}x^{leading_power} + {second_coefficient}x^{m}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent expression steps, distributing the monomial to every term."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply {a}x^{m} by both terms.
+        Coefficients: {a} * {b} = {leading_coefficient}.
+        Powers: x^{m} * x^{n} = x^{leading_power}.
+        The second product is {second_coefficient}x^{m}.
+        The result is {leading_coefficient}x^{leading_power} + {second_coefficient}x^{m}.
+      mistake_tags:
+        - distribution_error
+        - exponent_rule_error
+        - coefficient_error
+        - sign_error
+      difficulty: easy
+
+    - id: POLY_MULT_NEGATIVE_MONOMIAL_001
+      type: generated
+      prompt_template: "Expand and simplify: -{a}x * ({b}x^2 + {c}x + {d})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 7
+        b:
+          type: int
+          min: 2
+          max: 8
+        c:
+          type: int
+          min: -9
+          max: 9
+          exclude: [0]
+        d:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        cubic_coefficient: "0 - a * b"
+        quadratic_coefficient: "0 - a * c"
+        linear_coefficient: "0 - a * d"
+      answer:
+        type: expression
+        value: "{cubic_coefficient}x^3 + {quadratic_coefficient}x^2 + {linear_coefficient}x"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show equivalent expression steps, distributing the negative monomial to every term."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply -{a}x by every term.
+        The products are {cubic_coefficient}x^3, {quadratic_coefficient}x^2, and {linear_coefficient}x.
+        The result is {cubic_coefficient}x^3 + {quadratic_coefficient}x^2 + {linear_coefficient}x.
+      mistake_tags:
+        - distribution_error
+        - negative_factor_error
+        - exponent_rule_error
+        - sign_error
+      difficulty: medium
+
+    - id: POLY_MULT_BINOMIALS_UNIT_001
+      type: generated
+      prompt_template: "Expand and simplify: (x + {a})(x + {b})"
+      answer_mode: final_plus_required_work
+      max_attempts: 200
+      variables:
+        a:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        b:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+      derived:
+        middle_coefficient: "a + b"
+        constant_term: "a * b"
+      constraints:
+        - "middle_coefficient != 0"
+      answer:
+        type: expression
+        value: "x^2 + {middle_coefficient}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show all four products, then combine the middle terms."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply every term in the first binomial by every term in the second.
+        The four products are x^2, {b}x, {a}x, and {constant_term}.
+        Combine the middle terms: {b}x + {a}x = {middle_coefficient}x.
+        The result is x^2 + {middle_coefficient}x + {constant_term}.
+      mistake_tags:
+        - polynomial_multiplication
+        - distribution_error
+        - middle_term_error
+        - sign_error
+      difficulty: easy
+
+    - id: POLY_MULT_BINOMIALS_MIXED_SIGNS_001
+      type: generated
+      prompt_template: "Expand and simplify: (x + {a})(x - {b})"
+      answer_mode: final_plus_required_work
+      max_attempts: 200
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        middle_coefficient: "a - b"
+        constant_term: "0 - a * b"
+      constraints:
+        - "a != b"
+      answer:
+        type: expression
+        value: "x^2 + {middle_coefficient}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show all four products, then combine the middle terms."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The four products are x^2, -{b}x, {a}x, and {constant_term}.
+        Combine the middle terms: {a}x - {b}x = {middle_coefficient}x.
+        The result is x^2 + {middle_coefficient}x + {constant_term}.
+      mistake_tags:
+        - polynomial_multiplication
+        - distribution_error
+        - middle_term_error
+        - sign_error
+      difficulty: medium
+
+    - id: POLY_MULT_GENERAL_BINOMIALS_001
+      type: generated
+      prompt_template: "Expand and simplify: ({a}x + {b})({c}x + {d})"
+      answer_mode: final_plus_required_work
+      max_attempts: 250
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 7
+        b:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+        c:
+          type: int
+          min: 2
+          max: 7
+        d:
+          type: int
+          min: -10
+          max: 10
+          exclude: [0]
+      derived:
+        quadratic_coefficient: "a * c"
+        middle_coefficient: "a * d + b * c"
+        constant_term: "b * d"
+      constraints:
+        - "middle_coefficient != 0"
+      answer:
+        type: expression
+        value: "{quadratic_coefficient}x^2 + {middle_coefficient}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show all four products, then combine like terms."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply first terms: {a}x * {c}x = {quadratic_coefficient}x^2.
+        The two middle products are {a * d}x and {b * c}x.
+        Their sum is {middle_coefficient}x.
+        Multiply constants: {b} * {d} = {constant_term}.
+        The result is {quadratic_coefficient}x^2 + {middle_coefficient}x + {constant_term}.
+      mistake_tags:
+        - polynomial_multiplication
+        - distribution_error
+        - coefficient_error
+        - middle_term_error
+      difficulty: medium
+
+    - id: POLY_MULT_NEGATIVE_LEADING_001
+      type: generated
+      prompt_template: "Expand and simplify: ({a}x - {b})(-{c}x + {d})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 7
+        b:
+          type: int
+          min: 2
+          max: 10
+        c:
+          type: int
+          min: 2
+          max: 7
+        d:
+          type: int
+          min: 2
+          max: 10
+      derived:
+        quadratic_coefficient: "0 - a * c"
+        middle_coefficient: "a * d + b * c"
+        constant_term: "0 - b * d"
+      answer:
+        type: expression
+        value: "{quadratic_coefficient}x^2 + {middle_coefficient}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show all four products and track every negative sign."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Multiply {a}x by -{c}x to get {quadratic_coefficient}x^2.
+        The middle products are {a * d}x and {b * c}x.
+        The constant product is {constant_term}.
+        The result is {quadratic_coefficient}x^2 + {middle_coefficient}x + {constant_term}.
+      mistake_tags:
+        - polynomial_multiplication
+        - negative_factor_error
+        - sign_error
+        - middle_term_error
+      difficulty: hard
+
+    - id: POLY_SQUARE_BINOMIAL_001
+      type: generated
+      prompt_template: "Expand and simplify: (x + {a})^2"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: -12
+          max: 12
+          exclude: [0]
+      derived:
+        middle_coefficient: "2 * a"
+        constant_term: "a * a"
+      answer:
+        type: expression
+        value: "x^2 + {middle_coefficient}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Rewrite the square as a product, distribute, and combine like terms."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Rewrite (x + {a})^2 as (x + {a})(x + {a}).
+        The middle terms add to {middle_coefficient}x.
+        The constant term is {a} * {a} = {constant_term}.
+        The result is x^2 + {middle_coefficient}x + {constant_term}.
+      mistake_tags:
+        - binomial_square_error
+        - missing_middle_term
+        - polynomial_multiplication
+        - sign_error
+      difficulty: medium
+
+    - id: POLY_DIFFERENCE_OF_SQUARES_001
+      type: generated
+      prompt_template: "Expand and simplify: (x + {a})(x - {a})"
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 15
+      derived:
+        constant_term: "a * a"
+      answer:
+        type: expression
+        value: "x^2 - {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Show all four products so the middle-term cancellation is visible."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The four products are x^2, -{a}x, {a}x, and -{constant_term}.
+        The middle terms cancel.
+        The result is x^2 - {constant_term}.
+      mistake_tags:
+        - difference_of_squares
+        - cancellation_error
+        - polynomial_multiplication
+        - sign_error
+      difficulty: medium
+
+    - id: POLY_AREA_APPLICATION_001
+      type: generated
+      prompt_template: "A rectangle has length x + {a} and width x + {b}. Expand and simplify its area."
+      answer_mode: final_plus_required_work
+      variables:
+        a:
+          type: int
+          min: 2
+          max: 12
+        b:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        middle_coefficient: "a + b"
+        constant_term: "a * b"
+      answer:
+        type: expression
+        value: "x^2 + {middle_coefficient}x + {constant_term}"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: procedural_steps
+        prompt: "Write the area product, distribute, and combine like terms."
+        line_type: expression
+        minimum_steps: 3
+        require_final_answer_match: true
+      review_policy:
+        work_review: auto
+        mastery_requires_review_pass: false
+      explanation_template: |
+        Area is length times width.
+        Multiply (x + {a})(x + {b}).
+        The middle coefficient is {a} + {b} = {middle_coefficient}.
+        The constant term is {a} * {b} = {constant_term}.
+        The area is x^2 + {middle_coefficient}x + {constant_term}.
+      mistake_tags:
+        - area_model_error
+        - polynomial_multiplication
+        - middle_term_error
+        - constant_error
+      difficulty: hard
+
+    - id: POLY_ERROR_ANALYSIS_001
+      type: fixed
+      prompt: "A learner expands (x + 3)(x - 5). Which result is correct?"
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "x^2 - 15"
+        - id: B
+          label: "x^2 - 2x - 15"
+        - id: C
+          label: "x^2 + 8x - 15"
+        - id: D
+          label: "x^2 - 8x + 15"
+      answer:
+        type: multiple_choice
+        value: "B"
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      explanation_template: |
+        The four products are x^2, -5x, 3x, and -15.
+        The middle terms combine to -2x.
+        The correct result is x^2 - 2x - 15.
+      mistake_tags:
+        - distribution_error
+        - missing_middle_term
+        - sign_error
+        - polynomial_multiplication
+      difficulty: hard

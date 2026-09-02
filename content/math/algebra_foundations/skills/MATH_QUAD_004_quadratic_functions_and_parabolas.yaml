@@ -1,0 +1,621 @@
+id: MATH_QUAD_004
+schema_version: 0.2
+name: Quadratic functions and parabolas
+domain: Math
+subdomain: Quadratic Functions
+description: Connect quadratic equations to parabolas by identifying vertices, axes of symmetry, intercepts, opening
+  direction, transformations, and ranges.
+prerequisites:
+- MATH_FUNC_001
+- MATH_QUAD_002
+- MATH_GRAPH_005
+tags:
+- quadratic_functions
+- parabolas
+- vertex
+- axis_of_symmetry
+- x_intercepts
+- y_intercept
+- transformations
+- range
+- graph_features
+unlocks:
+- MATH_QUAD_005
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A quadratic function has the form:
+
+  f(x) = ax^2 + bx + c
+
+  where a is not zero.
+
+  Its graph is a U-shaped curve called a parabola.
+
+  Opening direction:
+  - If a > 0, the parabola opens upward and has a minimum.
+  - If a < 0, the parabola opens downward and has a maximum.
+
+  The larger the absolute value of a, the narrower the parabola appears. Values of a closer to zero make it wider.
+
+  The vertex:
+  The vertex is the turning point of the parabola.
+
+  - For an upward-opening parabola, the vertex is the minimum point.
+  - For a downward-opening parabola, the vertex is the maximum point.
+
+  The axis of symmetry:
+  A vertical line through the vertex divides the parabola into mirror-image halves.
+
+  If the vertex is (h, k), the axis of symmetry is:
+
+  x = h
+
+  Vertex form:
+
+  f(x) = a(x - h)^2 + k
+
+  This form shows the vertex immediately:
+
+  vertex = (h, k)
+
+  Watch the sign inside the parentheses. In (x - 4)^2, h = 4. In (x + 4)^2, h = -4.
+
+  Standard form:
+
+  f(x) = ax^2 + bx + c
+
+  This form shows the y-intercept immediately because:
+
+  f(0) = c
+
+  The axis of symmetry can be found from standard form using:
+
+  x = -b/(2a)
+
+  Substitute that x-value into the function to find the vertex output.
+
+  Factored form:
+
+  f(x) = a(x - r1)(x - r2)
+
+  This form shows the zeros or x-intercepts:
+
+  x = r1 and x = r2
+
+  At an x-intercept, f(x) = 0.
+
+  Symmetry:
+  Inputs the same distance from the axis of symmetry have the same output.
+
+  If the axis is x = 3, then x = 1 and x = 5 are mirror inputs because both are 2 units from 3.
+
+  Range:
+  If f(x) = a(x - h)^2 + k:
+
+  - When a > 0, the range is y >= k.
+  - When a < 0, the range is y <= k.
+
+  Transformations of the parent function:
+  The parent quadratic is y = x^2, with vertex (0, 0).
+
+  In y = a(x - h)^2 + k:
+  - h shifts the graph right when positive and left when negative.
+  - k shifts the graph up when positive and down when negative.
+  - a < 0 reflects the graph across the x-axis.
+  - |a| > 1 creates a vertical stretch and a narrower graph.
+  - 0 < |a| < 1 creates a vertical compression and a wider graph.
+
+  A reliable graphing method:
+  1. Identify the opening direction.
+  2. Find the vertex and axis of symmetry.
+  3. Find the y-intercept.
+  4. Find x-intercepts when they exist.
+  5. Plot one or more points and their mirror points.
+  6. Draw a smooth parabola through the points.
+
+  Common mistake:
+  Do not read the horizontal shift with the wrong sign. The vertex of (x - 5)^2 + 2 is (5, 2), not (-5, 2).
+
+  Another common mistake:
+  The axis of symmetry is a vertical line x = h, not the point (h, k).
+
+  Another common mistake:
+  A zero is an input where the output is zero. It is not the same thing as the y-intercept.
+
+  Another common mistake:
+  The range depends on the opening direction. An upward parabola includes outputs above its minimum, while a downward parabola includes outputs below its maximum.
+examples:
+- prompt: For f(x) = 3x^2 - 4x + 7, which direction does the parabola open?
+  solution: Upward
+  explanation: The leading coefficient 3 is positive.
+- prompt: Find the vertex of f(x) = 2(x - 5)^2 - 3.
+  solution: (5, -3)
+  explanation: Vertex form a(x - h)^2 + k has vertex (h, k).
+- prompt: Find the vertex of f(x) = -(x + 4)^2 + 6.
+  solution: (-4, 6)
+  explanation: x + 4 is x - (-4), so h = -4.
+- prompt: Find the y-intercept of f(x) = -2x^2 + 7x - 9.
+  solution: '-9'
+  explanation: In standard form, f(0) = c.
+- prompt: Find the zeros of f(x) = (x - 2)(x + 5).
+  solution: x = 2 and x = -5
+  explanation: Set each factor equal to zero.
+- prompt: Find the axis of symmetry of f(x) = x^2 - 8x + 3.
+  solution: x = 4
+  explanation: Use x = -b/(2a) = 8/2.
+- prompt: State the range of f(x) = -3(x - 2)^2 + 7.
+  solution: y <= 7
+  explanation: The parabola opens downward and has maximum output 7.
+- prompt: If a parabola has axis x = 1 and passes through x = -2 at one height, which other input has the same height?
+  solution: '4'
+  explanation: -2 is 3 units left of 1, so the mirror input is 3 units right of 1.
+applications:
+- title: Projectile motion
+  description: Height over time is often modeled by a downward-opening parabola.
+- title: Optimization
+  description: A vertex identifies a maximum profit, maximum area, or minimum cost.
+- title: Engineering and design
+  description: Parabolic shapes appear in reflectors, arches, and trajectories.
+- title: Equation solving
+  description: The x-intercepts of a quadratic graph are the real solutions of the corresponding equation.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: QUAD_FUNCTION_OPENING_NEGATIVE_001
+    type: generated
+    prompt_template: Which direction does the graph of f(x) = {a}x^2 + {b}x + {c} open?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -6
+        max: -1
+      b:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -15
+        max: 15
+        exclude:
+        - 0
+    options:
+    - id: A
+      label: Upward
+    - id: B
+      label: Downward
+    - id: C
+      label: Left
+    - id: D
+      label: Right
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The leading coefficient is {a}, which is negative.
+      A quadratic with a negative leading coefficient opens downward.
+    mistake_tags:
+    - opening_direction_error
+    - leading_coefficient_error
+    - parabola_error
+    difficulty: easy
+  - id: QUAD_FUNCTION_Y_INTERCEPT_001
+    type: generated
+    prompt_template: What is the y-intercept value of f(x) = {a}x^2 + {b}x + {c}?
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -20
+        max: 20
+        exclude:
+        - 0
+    answer:
+      type: numeric
+      value: '{c}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Evaluate f(0), simplifying one equivalent numerical expression per line.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The y-intercept occurs when x = 0.
+      f(0) = {a}(0)^2 + {b}(0) + {c} = {c}.
+    mistake_tags:
+    - y_intercept_error
+    - substitution_error
+    - constant_term_error
+    difficulty: easy
+  - id: QUAD_FUNCTION_VERTEX_FROM_VERTEX_FORM_001
+    type: generated
+    prompt_template: What is the vertex of f(x) = {a}(x - {h})^2 + {k}?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      h:
+        type: int
+        min: 2
+        max: 10
+      k:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+    constraints:
+    - h != k
+    - h != -k
+    options:
+    - id: A
+      label: ({-h}, {k})
+    - id: B
+      label: ({h}, {-k})
+    - id: C
+      label: ({h}, {k})
+    - id: D
+      label: ({k}, {h})
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Vertex form is a(x - h)^2 + k.
+      Here h = {h} and k = {k}, so the vertex is ({h}, {k}).
+    mistake_tags:
+    - vertex_error
+    - horizontal_shift_sign_error
+    - coordinate_order_error
+    difficulty: easy
+  - id: QUAD_FUNCTION_AXIS_FROM_STANDARD_FORM_001
+    type: generated
+    prompt_template: Find the x-value of the axis of symmetry for f(x) = {a}x^2 + {b}x + {c}.
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      h:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -15
+        max: 15
+        exclude:
+        - 0
+    derived:
+      b: -2 * a * h
+    answer:
+      type: numeric
+      value: '{h}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Use x = -b/(2a), then simplify one equivalent numerical expression per line.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      For standard form, the axis is x = -b/(2a).
+      Here a = {a} and b = {b}.
+      -b/(2a) = {-b}/({2 * a}) = {h}.
+    mistake_tags:
+    - axis_of_symmetry_error
+    - coefficient_sign_error
+    - formula_substitution_error
+    difficulty: medium
+  - id: QUAD_FUNCTION_LARGER_ZERO_FACTORED_001
+    type: generated
+    prompt_template: The graph of f(x) = {a}(x - {r1})(x - {r2}) crosses the x-axis twice. What is the larger x-intercept?
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -4
+        max: 4
+        exclude:
+        - 0
+      r1:
+        type: int
+        min: -10
+        max: 3
+      gap:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      r2: r1 + gap
+    constraints:
+    - r1 != 0
+    - r2 != 0
+    answer:
+      type: numeric
+      value: '{r2}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Set each factor equal to zero, list both x-intercepts, and identify the larger one.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The zeros occur when either factor is zero.
+      x - {r1} = 0 gives x = {r1}.
+      x - {r2} = 0 gives x = {r2}.
+      The larger x-intercept is {r2}.
+    mistake_tags:
+    - x_intercept_error
+    - factored_form_error
+    - root_sign_error
+    difficulty: medium
+  - id: QUAD_FUNCTION_SYMMETRIC_INPUT_001
+    type: generated
+    prompt_template: A parabola has axis of symmetry x = {h}. One point on it has input x = {left_input}. What other
+      input has the same output?
+    answer_mode: final_plus_required_work
+    variables:
+      h:
+        type: int
+        min: -8
+        max: 8
+      distance:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      left_input: h - distance
+      right_input: h + distance
+    answer:
+      type: numeric
+      value: '{right_input}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Use the mirror-input formula 2(axis value) - given input, then simplify one equivalent numerical expression
+        per line.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The input {left_input} is {distance} units left of x = {h}.
+      Move {distance} units right of the axis: {h} + {distance} = {right_input}.
+      The mirror input is {right_input}.
+    mistake_tags:
+    - symmetry_error
+    - axis_of_symmetry_error
+    - distance_error
+    difficulty: medium
+  - id: QUAD_FUNCTION_RANGE_DOWNWARD_001
+    type: generated
+    prompt_template: What is the range of f(x) = -{a}(x - {h})^2 + {k}?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 6
+      h:
+        type: int
+        min: -8
+        max: 8
+      k:
+        type: int
+        min: -15
+        max: 15
+        exclude:
+        - 0
+    options:
+    - id: A
+      label: y >= {k}
+    - id: B
+      label: y <= {k}
+    - id: C
+      label: x <= {h}
+    - id: D
+      label: x >= {h}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The leading coefficient is negative, so the parabola opens downward.
+      Its maximum output is the vertex y-value {k}.
+      Therefore the range is y <= {k}.
+    mistake_tags:
+    - range_error
+    - opening_direction_error
+    - vertex_error
+    difficulty: medium
+  - id: QUAD_FUNCTION_TRANSFORMATIONS_001
+    type: generated
+    prompt_template: Compared with y = x^2, which transformations produce f(x) = -{stretch}(x - {h})^2 + {k}?
+    answer_mode: final_only
+    variables:
+      stretch:
+        type: int
+        min: 2
+        max: 6
+      h:
+        type: int
+        min: 2
+        max: 8
+      k:
+        type: int
+        min: 2
+        max: 10
+    options:
+    - id: A
+      label: Do not reflect; vertically stretch by {stretch}, shift left {h}, and shift down {k}.
+    - id: B
+      label: Reflect across the x-axis, vertically compress instead of stretching, shift right {h}, and shift down
+        {k}.
+    - id: C
+      label: Reflect across the x-axis, shift left {h}, and shift up {k}, with no vertical stretch.
+    - id: D
+      label: Reflect across the x-axis, vertically stretch by {stretch}, shift right {h}, and shift up {k}.
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The negative sign reflects the parabola across the x-axis.
+      The factor {stretch} creates a vertical stretch.
+      The expression x - {h} shifts right {h}, and + {k} shifts up {k}.
+    mistake_tags:
+    - transformation_error
+    - horizontal_shift_sign_error
+    - reflection_error
+    - vertical_stretch_error
+    difficulty: hard
+  - id: QUAD_FUNCTION_MINIMUM_FROM_VERTEX_001
+    type: generated
+    prompt_template: What is the minimum value of f(x) = {a}(x - {h})^2 + {k}?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 6
+      h:
+        type: int
+        min: -9
+        max: 9
+      k:
+        type: int
+        min: -20
+        max: 20
+        exclude:
+        - 0
+    answer:
+      type: numeric
+      value: '{k}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Because {a} is positive, the parabola opens upward.
+      Its vertex is ({h}, {k}), so the minimum output is {k}.
+    mistake_tags:
+    - minimum_error
+    - vertex_error
+    - opening_direction_error
+    difficulty: easy
+  - id: QUAD_FUNCTION_MAXIMUM_FROM_STANDARD_001
+    type: generated
+    prompt_template: For f(x) = -{scale}x^2 + {b}x + {c}, the axis of symmetry is x = {h}. Find the maximum value
+      of f.
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 5
+      h:
+        type: int
+        min: 2
+        max: 8
+      c:
+        type: int
+        min: -10
+        max: 20
+    derived:
+      b: 2 * scale * h
+      maximum: c + scale * h * h
+    answer:
+      type: numeric
+      value: '{maximum}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Evaluate the function at the given axis input using one equivalent numerical expression per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A downward-opening parabola reaches its maximum on the axis of symmetry.
+      Substitute x = {h}:
+      f({h}) = -{scale}({h})^2 + {b}({h}) + {c} = {maximum}.
+      The maximum value is {maximum}.
+    mistake_tags:
+    - maximum_error
+    - substitution_error
+    - axis_of_symmetry_error
+    - arithmetic_error
+    difficulty: hard

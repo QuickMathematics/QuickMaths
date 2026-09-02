@@ -131,9 +131,6 @@ test:
           type: int
           min: 2
           max: 12
-      constraints:
-        - "a < b"
-        - "c < d"
       derived:
         num: "a * c"
         den: "b * d"
@@ -654,9 +651,6 @@ test:
           type: int
           min: 2
           max: 12
-      constraints:
-        - "a < b"
-        - "c < d"
       derived:
         num: "a * d"
         den: "b * c"

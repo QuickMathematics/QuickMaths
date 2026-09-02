@@ -1,0 +1,595 @@
+id: MATH_FUNC_001
+schema_version: 0.2
+name: Function notation and representations
+domain: Math
+subdomain: Functions
+description: Interpret functions as input-output rules, evaluate function notation, and connect formulas, tables,
+  ordered pairs, domains, and ranges.
+prerequisites:
+- MATH_PREALG_001
+- MATH_GRAPH_001
+tags:
+- functions
+- function_notation
+- input_output
+- domain
+- range
+- tables
+- ordered_pairs
+- evaluation
+- representations
+unlocks:
+  - MATH_QUAD_004
+  - MATH_SEQ_001
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A function is a rule that assigns exactly one output to each allowed input.
+
+  The input is often written as x. The output can be written as y or with function notation such as f(x).
+
+  Read f(x) as “f of x.” It does not mean f multiplied by x.
+
+  Example:
+  If f(x) = 3x + 2, then:
+
+  f(4) = 3(4) + 2 = 14
+
+  The notation f(4) asks for the output when the input is 4.
+
+  Input and output:
+  - The input is the value placed into the function.
+  - The output is the value produced by the rule.
+  - The domain is the set of allowed inputs.
+  - The range is the set of outputs that actually occur.
+
+  Representations:
+  A function can be represented by a formula, a table, ordered pairs, a graph, or a verbal rule.
+
+  Formula:
+  f(x) = 2x - 5
+
+  Table:
+  x:    0, 1, 2
+  f(x): -5, -3, -1
+
+  Ordered pairs:
+  (0, -5), (1, -3), (2, -1)
+
+  All three representations describe the same input-output relationship.
+
+  Writing a simple linear rule from a table:
+  When inputs increase by 1, a constant output change gives the coefficient of x. The output at x = 0 gives the constant term.
+
+  Example:
+  If f(0) = 4, f(1) = 7, and f(2) = 10, the output increases by 3 each time. The rule is f(x) = 3x + 4.
+
+  The function rule:
+  For a relation to be a function, one input cannot be paired with two different outputs.
+
+  This is a function:
+  (1, 4), (2, 4), (3, 7)
+
+  Different inputs are allowed to share an output.
+
+  This is not a function:
+  (1, 4), (1, 9), (3, 7)
+
+  The input 1 has two different outputs.
+
+  Evaluating a function:
+  1. Identify the requested input.
+  2. Replace every x in the rule with that input.
+  3. Use parentheses around negative inputs.
+  4. Simplify using order of operations.
+
+  Example with a negative input:
+  If g(x) = x^2 + 3x - 1, then:
+
+  g(-2) = (-2)^2 + 3(-2) - 1
+  = 4 - 6 - 1
+  = -3
+
+  Finding an input:
+  Sometimes the output is known and the input is unknown.
+
+  If f(x) = 4x + 3 and f(x) = 19, solve:
+
+  4x + 3 = 19
+  4x = 16
+  x = 4
+
+  Evaluating at an expression:
+  The input can itself be an expression.
+
+  If f(x) = 2x + 5, then:
+
+  f(x + 3) = 2(x + 3) + 5
+  = 2x + 11
+
+  Replace every occurrence of the function input with the entire expression x + 3.
+
+  Graphs:
+  On a graph, a relation is a function when every vertical line meets the graph at most once. This is called the vertical line test.
+
+  Common mistake:
+  Do not treat f(3) as f times 3. The symbol f names the rule, and 3 is the input.
+
+  Another common mistake:
+  When the input is negative, substitute it with parentheses before applying an exponent.
+
+  Another common mistake:
+  A function may repeat an output. The restriction is that one input cannot produce two different outputs.
+
+  Another common mistake:
+  The domain comes from input values, while the range comes from output values.
+examples:
+- prompt: Let f(x) = 5x - 3. Find f(4).
+  solution: '17'
+  explanation: 'Substitute 4 for x: 5(4) - 3 = 20 - 3.'
+- prompt: Let g(x) = x^2 + 2. Find g(-3).
+  solution: '11'
+  explanation: 'Use parentheses: (-3)^2 + 2 = 9 + 2.'
+- prompt: If h(x) = 4x + 1 and h(x) = 21, find x.
+  solution: x = 5
+  explanation: Solve 4x + 1 = 21.
+- prompt: A table contains (0, 7), (1, 10), and (2, 13). Find f(2).
+  solution: '13'
+  explanation: The pair (2, 13) says input 2 has output 13.
+- prompt: Find the domain of {(-2, 5), (0, 8), (4, 5)}.
+  solution: '{-2, 0, 4}'
+  explanation: The domain is the set of first coordinates.
+- prompt: Find the range of {(-2, 5), (0, 8), (4, 5)}.
+  solution: '{5, 8}'
+  explanation: The range uses second coordinates, and repeated values are listed once.
+- prompt: Is {(1, 2), (1, 6), (3, 4)} a function?
+  solution: 'No'
+  explanation: The input 1 is paired with two different outputs.
+- prompt: If f(x) = 3x - 2, simplify f(x + 4).
+  solution: 3x + 10
+  explanation: 'Substitute x + 4: 3(x + 4) - 2 = 3x + 10.'
+applications:
+- title: Programming
+  description: A function takes inputs, applies a rule, and returns outputs.
+- title: Science formulas
+  description: A formula can be treated as a function connecting an independent variable to a dependent variable.
+- title: Data tables
+  description: Tables and ordered pairs record measured inputs and their corresponding outputs.
+- title: Graphing and modeling
+  description: Function notation supports linear, quadratic, exponential, and other mathematical models.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: FUNCTION_EVALUATE_LINEAR_001
+    type: generated
+    prompt_template: Let f(x) = {a}x + {b}. Find f({input_value}).
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+        - 1
+        - -1
+      b:
+        type: int
+        min: -15
+        max: 15
+        exclude:
+        - 0
+      input_value:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    derived:
+      product: a * input_value
+      output: product + b
+    answer:
+      type: numeric
+      value: '{output}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Substitute the input, then simplify one equivalent numerical expression per line.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Substitute x = {input_value}.
+      f({input_value}) = {a}({input_value}) + {b}.
+      {a}({input_value}) = {product}, so the output is {output}.
+    mistake_tags:
+    - function_notation_error
+    - substitution_error
+    - sign_error
+    - arithmetic_error
+    difficulty: easy
+  - id: FUNCTION_EVALUATE_QUADRATIC_NEGATIVE_001
+    type: generated
+    prompt_template: Let g(x) = x^2 + {b}x + {c}. Find g({input_value}).
+    answer_mode: final_plus_required_work
+    variables:
+      b:
+        type: int
+        min: -7
+        max: 7
+        exclude:
+        - 0
+      c:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      input_value:
+        type: int
+        min: -7
+        max: -2
+    derived:
+      square: input_value * input_value
+      linear_term: b * input_value
+      output: square + linear_term + c
+    answer:
+      type: numeric
+      value: '{output}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Substitute the negative input with parentheses, then simplify one equivalent numerical expression
+        per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Substitute x = {input_value} with parentheses.
+      g({input_value}) = ({input_value})^2 + {b}({input_value}) + {c}.
+      The square is {square} and the linear term is {linear_term}.
+      The output is {output}.
+    mistake_tags:
+    - function_notation_error
+    - negative_input_error
+    - exponent_error
+    - substitution_error
+    difficulty: medium
+  - id: FUNCTION_SOLVE_FOR_INPUT_LINEAR_001
+    type: generated
+    prompt_template: Let f(x) = {a}x + {b}. If f(x) = {output}, solve for x.
+    answer_mode: final_plus_required_work
+    variables:
+      x_value:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      a:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+        - 1
+        - -1
+      b:
+        type: int
+        min: -15
+        max: 15
+        exclude:
+        - 0
+    derived:
+      product: a * x_value
+      output: product + b
+    answer:
+      type: equation_solution
+      variable: x
+      value: '{x_value}'
+    grading:
+      method: equation_solution
+    work:
+      mode: procedural_steps
+      prompt: Rewrite the function statement as an equation, then show equivalent equation steps ending with x isolated.
+      line_type: equation
+      minimum_steps: 3
+      require_final_answer_match: true
+      target_variable: x
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Set the rule equal to the known output:
+      {a}x + {b} = {output}.
+      Undo the constant to get {a}x = {product}.
+      Divide by {a}: x = {x_value}.
+    mistake_tags:
+    - function_input_error
+    - inverse_operations
+    - equation_balance
+    - sign_error
+    difficulty: medium
+  - id: FUNCTION_READ_TABLE_OUTPUT_001
+    type: generated
+    prompt_template: A function table contains ({x0}, {y0}), ({x1}, {y1}), and ({x2}, {y2}). What is f({x2})?
+    answer_mode: final_only
+    variables:
+      x0:
+        type: int
+        min: -5
+        max: 3
+      step:
+        type: int
+        min: 1
+        max: 4
+      rate:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+      intercept:
+        type: int
+        min: -12
+        max: 12
+    derived:
+      x1: x0 + step
+      x2: x0 + 2 * step
+      y0: rate * x0 + intercept
+      y1: rate * x1 + intercept
+      y2: rate * x2 + intercept
+    answer:
+      type: numeric
+      value: '{y2}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The ordered pair ({x2}, {y2}) matches input {x2} with output {y2}.
+      Therefore f({x2}) = {y2}.
+    mistake_tags:
+    - table_error
+    - input_output_mixup
+    - function_notation_error
+    difficulty: easy
+  - id: FUNCTION_DOMAIN_ORDERED_PAIRS_001
+    type: fixed
+    prompt: What is the domain of the relation {(-3, 4), (0, 7), (5, 4)}?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: '{-3, 0, 5}'
+    - id: B
+      label: '{4, 7}'
+    - id: C
+      label: '{-3, 0, 4, 5, 7}'
+    - id: D
+      label: '{(-3, 4), (0, 7), (5, 4)}'
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The domain is the set of inputs.
+      Inputs are the first coordinates: -3, 0, and 5.
+    mistake_tags:
+    - domain_error
+    - coordinate_order_error
+    - input_output_mixup
+    difficulty: easy
+  - id: FUNCTION_RANGE_REPEATED_OUTPUT_001
+    type: fixed
+    prompt: What is the range of the relation {(-2, 5), (1, 8), (4, 5)}?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: '{-2, 1, 4}'
+    - id: B
+      label: '{5, 8}'
+    - id: C
+      label: '{5, 8, 5}'
+    - id: D
+      label: '{-2, 1, 4, 5, 8}'
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The range is the set of outputs.
+      The outputs are 5, 8, and 5, so the set is {5, 8}.
+      A set lists a repeated value only once.
+    mistake_tags:
+    - range_error
+    - coordinate_order_error
+    - duplicate_output_error
+    difficulty: easy
+  - id: FUNCTION_IDENTIFY_VALID_RELATION_001
+    type: fixed
+    prompt: Which relation is a function?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: '{(1, 4), (1, 9), (3, 7)}'
+    - id: B
+      label: '{(-2, 5), (0, 5), (4, 8)}'
+    - id: C
+      label: '{(2, 1), (2, 1), (2, 6)}'
+    - id: D
+      label: '{(0, 3), (0, -3), (5, 9)}'
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A relation is a function when every input has exactly one output.
+      Choice B uses each input once. Repeated outputs are allowed.
+    mistake_tags:
+    - function_definition_error
+    - repeated_input_error
+    - input_output_mixup
+    difficulty: medium
+  - id: FUNCTION_INTERPRET_NOTATION_001
+    type: fixed
+    prompt: What does the statement f(6) = 14 mean?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: The input 14 produces the output 6.
+    - id: B
+      label: The function f is multiplied by 6 to make 14.
+    - id: C
+      label: The input 6 produces the output 14.
+    - id: D
+      label: The domain contains only 6 and 14.
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The number inside the parentheses is the input.
+      The value after the equals sign is the output.
+      So input 6 produces output 14.
+    mistake_tags:
+    - function_notation_error
+    - input_output_mixup
+    - multiplication_notation_error
+    difficulty: easy
+  - id: FUNCTION_WRITE_LINEAR_RULE_FROM_TABLE_001
+    type: generated
+    prompt_template: A linear function has f(0) = {b}, f(1) = {y1}, and f(2) = {y2}. Enter only the right-hand side
+      of f(x) = ?
+    answer_mode: final_plus_required_work
+    variables:
+      m:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+        - 1
+        - -1
+      b:
+        type: int
+        min: -15
+        max: 15
+        exclude:
+        - 0
+    derived:
+      y1: m + b
+      y2: 2 * m + b
+    answer:
+      type: expression
+      value: '{m}x + {b}'
+    grading:
+      method: symbolic_expression
+    work:
+      mode: capture_only
+      prompt: Explain how the constant output change gives the coefficient of x and how f(0) gives the constant
+        term.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      From x = 0 to x = 1, the output changes by {m}.
+      The same change occurs from x = 1 to x = 2, so the coefficient of x is {m}.
+      f(0) = {b}, so the constant term is {b}.
+      The rule is f(x) = {m}x + {b}.
+    mistake_tags:
+    - table_error
+    - rate_of_change_error
+    - initial_value_error
+    - function_rule_error
+    difficulty: hard
+  - id: FUNCTION_EVALUATE_SYMBOLIC_INPUT_001
+    type: generated
+    prompt_template: Let f(x) = {a}x + {b}. Simplify f(x + {shift}).
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: -7
+        max: 7
+        exclude:
+        - 0
+        - 1
+        - -1
+      b:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      shift:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      constant_term: a * shift + b
+    constraints:
+    - constant_term != 0
+    answer:
+      type: expression
+      value: '{a}x + {constant_term}'
+    grading:
+      method: symbolic_expression
+    work:
+      mode: procedural_steps
+      prompt: Substitute the entire parenthesized input, then simplify one equivalent expression per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Replace the input x with x + {shift}:
+      f(x + {shift}) = {a}(x + {shift}) + {b}.
+      Distribute {a} and combine constants.
+      The result is {a}x + {constant_term}.
+    mistake_tags:
+    - function_notation_error
+    - symbolic_substitution_error
+    - distribution_error
+    - constant_error
+    difficulty: hard

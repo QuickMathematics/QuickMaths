@@ -6,6 +6,7 @@ subdomain: Linear Functions
 description: Interpret and write linear equations in slope-intercept form y = mx + b.
 prerequisites:
   - MATH_ALG_005
+  - MATH_GRAPH_003
 tags:
   - linear_functions
   - slope_intercept_form

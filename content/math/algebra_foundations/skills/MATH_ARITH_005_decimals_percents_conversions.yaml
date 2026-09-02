@@ -14,7 +14,8 @@ tags:
   - conversions
   - place_value
   - percent_of
-unlocks: []
+unlocks:
+  - MATH_EXP_002
 mastery:
   passing_score: 0.8
   minimum_confidence: 3

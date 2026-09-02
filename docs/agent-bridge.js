@@ -118,7 +118,7 @@ async function connectFromForm(event) {
 
 async function boot() {
   const [curriculumResponse, geographyResponse, manifestResponse] = await Promise.all([
-    fetch("./curriculum-data.json?v=20260902-geography-depot"),
+    fetch("./curriculum-data.json?v=20260902-native-math-expansion"),
     fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
     fetch("./agent-manifest.json?v=20260902-geography-depot-v1").catch(() => null),
   ]);

@@ -28,6 +28,11 @@ const AUTHORED_MATH_SCENARIO_COUNTS = Object.freeze({
   MATH_GRAPH_004: 8, MATH_GRAPH_005: 8, MATH_GRAPH_006: 8,
   MATH_PREALG_001: 20, MATH_PREALG_002: 18, MATH_PREALG_003: 20,
   MATH_PREALG_004: 21, MATH_PREALG_005: 23, MATH_SYS_001: 8,
+  MATH_FUNC_001: 10, MATH_EXP_001: 10, MATH_RAD_001: 10,
+  MATH_POLY_001: 10, MATH_POLY_002: 10, MATH_POLY_003: 10, MATH_POLY_004: 10,
+  MATH_SEQ_001: 10, MATH_SEQ_002: 10, MATH_EXP_002: 12, MATH_EXP_003: 10,
+  MATH_QUAD_001: 10, MATH_QUAD_002: 11, MATH_QUAD_003: 10,
+  MATH_QUAD_004: 10, MATH_QUAD_005: 10,
 });
 
 function memoryStorage(seed = {}) {
@@ -121,12 +126,12 @@ function workFor(problem, final = String(problem.expected_answer)) {
 test("ships the complete native Mathematics curriculum and opens at the profile picker", () => {
   const { store } = harness();
   const state = store.snapshot();
-  assert.equal(curriculum.skills.length, 28);
-  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 433);
-  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 433);
+  assert.equal(curriculum.skills.length, 44);
+  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 596);
+  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 596);
   assert.equal(curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY").length, 0);
   assert.equal(curriculum.skills.filter((skill) => skill.id.startsWith("MATH_GEOM_")).length, 3);
-  assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [["SUBJECT_MATH", 28]]);
+  assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [["SUBJECT_MATH", 44]]);
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "MATH_ARITH_002").questionCount, 16);
   assert.equal(state.profiles.length, 0);
   assert.equal(state.activeProfile, null);
@@ -134,7 +139,7 @@ test("ships the complete native Mathematics curriculum and opens at the profile 
 });
 
 test("every Mathematics test covers every authored scenario and keeps retake variants", () => {
-  assert.equal(Object.values(AUTHORED_MATH_SCENARIO_COUNTS).reduce((total, count) => total + count, 0), 403);
+  assert.equal(Object.values(AUTHORED_MATH_SCENARIO_COUNTS).reduce((total, count) => total + count, 0), 566);
   for (const [skillId, expectedLength] of Object.entries(AUTHORED_MATH_SCENARIO_COUNTS)) {
     const skill = curriculum.skills.find((candidate) => candidate.id === skillId);
     assert.ok(skill, `${skillId} must ship`);
@@ -173,7 +178,7 @@ test("Depot Geography is substantial, installable, and bridges through native Ma
   store.createProfile("Geography Learner");
   assert.deepEqual(store.snapshot().subjects.map((subject) => subject.id), ["SUBJECT_MATH"]);
   const installed = store.importLessonPack(geographyLessonSet);
-  assert.equal(installed.totalSkillCount, 43);
+  assert.equal(installed.totalSkillCount, 59);
   const bridge = store.skillsById.GEO_CART_002;
   assert.ok(bridge.prerequisites.includes("MATH_GEOM_003"));
   assert.deepEqual(bridge.prerequisiteRefs, [
@@ -468,13 +473,13 @@ test("a valid custom lesson set joins the real curriculum without replacing buil
   const preview = store.previewLessonPack(lessonSetExample);
   assert.equal(preview.id, "PACK_PERSONAL_FINANCE");
   assert.equal(preview.skillCount, 1);
-  assert.equal(store.snapshot().progressRows.length, 28, "preview must not mutate state");
+  assert.equal(store.snapshot().progressRows.length, 44, "preview must not mutate state");
 
   const installed = store.importLessonPack(lessonSetExample);
   const state = store.snapshot();
-  assert.equal(installed.totalSkillCount, 29);
+  assert.equal(installed.totalSkillCount, 45);
   assert.equal(state.lessonPacks.length, 1);
-  assert.equal(state.progressRows.length, 29);
+  assert.equal(state.progressRows.length, 45);
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "CUSTOM_FINANCE_DISCOUNTS").custom, true);
   assert.equal(store.statusForSkill("CUSTOM_FINANCE_DISCOUNTS"), "locked");
   assert.match(store.exportLessonPack("PACK_PERSONAL_FINANCE"), new RegExp(LESSON_SET_FORMAT));
@@ -493,7 +498,7 @@ test("native lesson improvements replace content reversibly without moving IDs o
   const preview = store.previewLessonPack(nativeImprovement());
   assert.equal(preview.mode, "override");
   assert.deepEqual(preview.overridesNativeSkills, ["MATH_ARITH_001"]);
-  assert.equal(store.snapshot().curriculum.allSkills.length, 28, "preview must not mutate the curriculum");
+  assert.equal(store.snapshot().curriculum.allSkills.length, 44, "preview must not mutate the curriculum");
 
   const installed = store.importLessonPack(nativeImprovement());
   let state = store.snapshot();
@@ -501,8 +506,8 @@ test("native lesson improvements replace content reversibly without moving IDs o
   assert.equal(installed.mode, "override");
   assert.equal(installed.completedProgressPreserved, true);
   assert.equal(installed.restartedDraftCount, 1);
-  assert.equal(installed.totalSkillCount, 28);
-  assert.equal(state.curriculum.allSkills.length, 28);
+  assert.equal(installed.totalSkillCount, 44);
+  assert.equal(state.curriculum.allSkills.length, 44);
   assert.equal(improved.name, "Integer operations · revised");
   assert.equal(improved.native, true);
   assert.equal(improved.overridden, true);
@@ -548,7 +553,7 @@ test("native improvements enforce the built-in identity and round-trip through f
   target.store.selectProfile(target.store.snapshot().profiles[0].id);
   const restored = target.store.snapshot();
   assert.equal(restored.lessonPacks[0].mode, "override");
-  assert.equal(restored.curriculum.allSkills.length, 28);
+  assert.equal(restored.curriculum.allSkills.length, 44);
   assert.equal(restored.allProgressRows.find((row) => row.id === "MATH_ARITH_001").name, "Integer operations · revised");
 });
 
@@ -563,7 +568,7 @@ test("subjects filter the visible map, apply bridge locks, and support per-profi
   assert.equal(state.activeSubject.id, "SUBJECT_BIOLOGY");
   assert.equal(state.subjects.length, 2);
   assert.equal(state.progressRows.length, 1);
-  assert.equal(state.allProgressRows.length, 29);
+  assert.equal(state.allProgressRows.length, 45);
   assert.equal(state.progressRows[0].status, "locked");
   assert.deepEqual(state.progressRows[0].unmetPrerequisites, ["MATH_ARITH_005"]);
   store.setLearningPreferences({ progressionMode: "soft" });
@@ -742,7 +747,7 @@ test("custom progress and content round-trip together through a full backup", ()
   target.store.importBackup(raw);
   target.store.selectProfile(target.store.snapshot().profiles[0].id);
   const restored = target.store.snapshot();
-  assert.equal(restored.progressRows.length, 29);
+  assert.equal(restored.progressRows.length, 45);
   assert.equal(restored.attempts[0].skillId, "CUSTOM_FINANCE_DISCOUNTS");
   assert.equal(restored.progressRows.find((row) => row.id === "CUSTOM_FINANCE_DISCOUNTS").attemptCount, 1);
 });

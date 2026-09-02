@@ -37,6 +37,8 @@ theory: |
   2. Find the y-intercept b.
   3. Substitute m and b into y = mx + b.
   4. If you know a point and the slope, substitute the point into y = mx + b to solve for b.
+  5. Parallel lines have the same slope. Keep that slope, then use the new
+     y-intercept or a point on the new line to determine b.
 
   Example:
   A line has slope 4 and y-intercept -7.

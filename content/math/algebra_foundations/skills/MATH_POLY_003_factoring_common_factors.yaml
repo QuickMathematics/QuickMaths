@@ -1,0 +1,684 @@
+id: MATH_POLY_003
+schema_version: 0.2
+name: Factoring common factors
+domain: Math
+subdomain: Exponents and Polynomials
+description: Factor numerical and monomial greatest common factors from polynomial expressions and verify the result by
+  distribution.
+prerequisites:
+- MATH_POLY_002
+tags:
+- algebra
+- factoring
+- greatest_common_factor
+- monomials
+- polynomials
+- distributive_property
+- reverse_distribution
+- exponent_laws
+unlocks:
+- MATH_POLY_004
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Factoring reverses multiplication.
+
+  When you expand, you multiply a factor across a sum:
+
+  3(x + 4) = 3x + 12
+
+  When you factor, you recognize the common factor and move it outside parentheses:
+
+  3x + 12 = 3(x + 4)
+
+  The greatest common factor, or GCF, is the largest factor shared by every term.
+
+  A polynomial GCF can contain:
+  - a numerical factor;
+  - one or more variables;
+  - the smallest exponent of each shared variable.
+
+  Numerical GCF:
+  The numerical GCF of 18 and 24 is 6.
+
+  Variable GCF:
+  The GCF of x^5 and x^3 is x^3 because x^3 is the smaller shared power.
+
+  Combined GCF:
+  The GCF of 12x^4 and 18x^2 is 6x^2.
+
+  Therefore:
+
+  12x^4 + 18x^2
+  = 6x^2(2x^2 + 3)
+
+  Method:
+  1. Find the greatest common factor of the numerical coefficients.
+  2. For each variable shared by every term, choose the smallest exponent.
+  3. Write the complete GCF outside parentheses.
+  4. Divide every original term by the GCF to build the expression inside parentheses.
+  5. Check that no common factor remains inside the parentheses.
+  6. Distribute the outside factor to verify that you recover the original expression.
+
+  Three-term example:
+
+  15x^3 + 20x^2 - 5x
+  = 5x(3x^2 + 4x - 1)
+
+  Every term contains 5x. After dividing each term by 5x, the coefficients 3, 4, and -1 have no common factor greater than 1.
+
+  Negative GCF:
+  When every term is negative, factoring out a negative GCF often leaves a cleaner positive leading term inside parentheses.
+
+  -8x^2 - 12x
+  = -4x(2x + 3)
+
+  Two variables:
+
+  15x^2y + 20xy^2
+  = 5xy(3x + 4y)
+
+  Both terms contain 5, x, and y. The smallest exponent of each shared variable is 1.
+
+  Common mistake:
+  Do not factor a variable that is not present in every term. In 6x^2 + 9, the terms share 3, but they do not share x.
+
+  Another common mistake:
+  Do not stop at a smaller common factor. For 12x + 18, 2 is common, but the greatest common factor is 6.
+
+  Another common mistake:
+  Divide every term by the outside factor. If 6x^2 + 9x = 3x(2x + 3), both terms inside parentheses must come from division by 3x.
+
+  Another common mistake:
+  Factoring changes the form of an expression, not its value. Expanding the result must return the original polynomial.
+examples:
+- prompt: "Factor completely: 12x + 18"
+  solution: "6(2x + 3)"
+  explanation: "The greatest numerical factor shared by 12 and 18 is 6."
+- prompt: "Factor completely: 14x^3 + 21x^2"
+  solution: "7x^2(2x + 3)"
+  explanation: "The coefficient GCF is 7 and the smallest shared power of x is x^2."
+- prompt: "Factor completely: 15x^3 + 20x^2 - 5x"
+  solution: "5x(3x^2 + 4x - 1)"
+  explanation: "Every term contains 5x, and no common factor remains inside."
+- prompt: "Factor out a negative GCF: -18x^2 - 24x"
+  solution: "-6x(3x + 4)"
+  explanation: "Factoring out -6x leaves a positive leading term inside the parentheses."
+- prompt: "Factor completely: 16x^4y^2 - 24x^2y^3"
+  solution: "8x^2y^2(2x^2 - 3y)"
+  explanation: "Use the numerical GCF 8 and the smallest shared powers x^2 and y^2."
+- prompt: "Factor completely: 9x^2 + 6x + 3"
+  solution: "3(3x^2 + 2x + 1)"
+  explanation: "Only the numerical factor 3 is shared by all three terms."
+- prompt: "A rectangle has area 12x^2 + 18x and one side length 6x. Find the other side."
+  solution: "2x + 3"
+  explanation: "Factor the area as 6x(2x + 3), then divide by the known side 6x."
+- prompt: "Check: 4x^2(3x - 5)"
+  solution: "12x^3 - 20x^2"
+  explanation: "Distribute 4x^2 to both terms to verify the factorization."
+applications:
+- title: "Quadratic factoring"
+  description: "Factoring out a GCF is always the first check before factoring a quadratic expression further."
+- title: "Solving equations"
+  description: "A factored equation can expose products that equal zero and reveal possible solutions."
+- title: "Geometry"
+  description: "Factoring area expressions can reveal possible side-length expressions."
+- title: "Simplifying formulas"
+  description: "Common factors make long expressions easier to compare, cancel, or evaluate."
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: FACTOR_GCF_COEFFICIENTS_001
+    type: generated
+    prompt_template: "What is the greatest common factor of {first} and {second}?"
+    answer_mode: final_only
+    max_attempts: 250
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 9
+      a:
+        type: int
+        min: 2
+        max: 9
+      b:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      first: "g * a"
+      second: "g * b"
+    constraints:
+    - "a != b"
+    - "not (a % 2 == 0 and b % 2 == 0)"
+    - "not (a % 3 == 0 and b % 3 == 0)"
+    - "not (a % 5 == 0 and b % 5 == 0)"
+    - "not (a % 7 == 0 and b % 7 == 0)"
+    answer:
+      type: numeric
+      value: "{g}"
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |
+      {first} = {g} * {a} and {second} = {g} * {b}.
+      The remaining factors {a} and {b} share no factor greater than 1.
+      The greatest common factor is {g}.
+    mistake_tags:
+    - greatest_common_factor
+    - factor_pair_error
+    - arithmetic_error
+    difficulty: easy
+
+  - id: FACTOR_NUMERIC_TWO_TERMS_001
+    type: generated
+    prompt_template: "Factor completely: {coefficient}x + {constant}"
+    answer_mode: final_plus_required_work
+    max_attempts: 250
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 9
+      a:
+        type: int
+        min: 2
+        max: 9
+      b:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      coefficient: "g * a"
+      constant: "g * b"
+    constraints:
+    - "a != b"
+    - "not (a % 2 == 0 and b % 2 == 0)"
+    - "not (a % 3 == 0 and b % 3 == 0)"
+    - "not (a % 5 == 0 and b % 5 == 0)"
+    - "not (a % 7 == 0 and b % 7 == 0)"
+    options:
+    - id: A
+      label: "{g}({a}x + {b})"
+    - id: B
+      label: "{g}({a}x + {constant})"
+    - id: C
+      label: "{g}({coefficient}x + {b})"
+    - id: D
+      label: "{coefficient}(x + {b})"
+    answer:
+      type: multiple_choice
+      value: "A"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite from the original expression to a completely factored expression, then choose the
+        matching option."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The numerical GCF of {coefficient} and {constant} is {g}.
+      Divide both terms by {g}: {coefficient}x / {g} = {a}x and {constant} / {g} = {b}.
+      The complete factorization is {g}({a}x + {b}).
+    mistake_tags:
+    - greatest_common_factor
+    - incomplete_factoring
+    - division_error
+    - distribution_error
+    difficulty: easy
+
+  - id: FACTOR_MONOMIAL_TWO_TERMS_001
+    type: generated
+    prompt_template: "Factor completely: {first_coefficient}x^{first_power} + {second_coefficient}x^{common_power}"
+    answer_mode: final_plus_required_work
+    max_attempts: 250
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 7
+      a:
+        type: int
+        min: 2
+        max: 8
+      b:
+        type: int
+        min: 2
+        max: 8
+      common_power:
+        type: int
+        min: 2
+        max: 4
+      extra_power:
+        type: int
+        min: 2
+        max: 3
+    derived:
+      first_coefficient: "g * a"
+      second_coefficient: "g * b"
+      first_power: "common_power + extra_power"
+    constraints:
+    - "not (a % 2 == 0 and b % 2 == 0)"
+    - "not (a % 3 == 0 and b % 3 == 0)"
+    - "not (a % 5 == 0 and b % 5 == 0)"
+    - "not (a % 7 == 0 and b % 7 == 0)"
+    options:
+    - id: A
+      label: "{g}x^{first_power}({a} + {b})"
+    - id: B
+      label: "{g}x^{common_power}({a}x^{extra_power} + {b})"
+    - id: C
+      label: "{g}x^{common_power}({a}x^{first_power} + {b})"
+    - id: D
+      label: "{g}({a}x^{first_power} + {b}x^{common_power})"
+    answer:
+      type: multiple_choice
+      value: "B"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite that removes the greatest common monomial from every term, then choose the completely
+        factored option."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The coefficient GCF is {g}.
+      The smallest shared power is x^{common_power}.
+      Divide each term by {g}x^{common_power}.
+      The complete factorization is {g}x^{common_power}({a}x^{extra_power} + {b}).
+    mistake_tags:
+    - greatest_common_factor
+    - exponent_rule_error
+    - incomplete_factoring
+    - division_error
+    difficulty: medium
+
+  - id: FACTOR_MONOMIAL_THREE_TERMS_001
+    type: generated
+    prompt_template: "Factor completely: {first_coefficient}x^{first_power} + {second_coefficient}x^{second_power} + {g}x^{common_power}"
+    answer_mode: final_plus_required_work
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 8
+      a:
+        type: int
+        min: 2
+        max: 8
+      b:
+        type: int
+        min: 2
+        max: 8
+      common_power:
+        type: int
+        min: 2
+        max: 3
+    derived:
+      first_coefficient: "g * a"
+      second_coefficient: "g * b"
+      first_power: "common_power + 2"
+      second_power: "common_power + 1"
+    options:
+    - id: A
+      label: "{g}({a}x^{first_power} + {b}x^{second_power} + x^{common_power})"
+    - id: B
+      label: "x^{common_power}({first_coefficient}x^2 + {second_coefficient}x + {g})"
+    - id: C
+      label: "{g}x^{common_power}({a}x^2 + {b}x + 1)"
+    - id: D
+      label: "{g}x^{second_power}({a}x + {b} + 1)"
+    answer:
+      type: multiple_choice
+      value: "C"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite that factors the greatest common monomial from all three terms."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Every term contains {g}x^{common_power}.
+      The quotients are {a}x^2, {b}x, and 1.
+      Because the final coefficient inside is 1, no numerical GCF remains.
+      The complete factorization is {g}x^{common_power}({a}x^2 + {b}x + 1).
+    mistake_tags:
+    - greatest_common_factor
+    - missing_term
+    - incomplete_factoring
+    - exponent_rule_error
+    difficulty: medium
+
+  - id: FACTOR_NEGATIVE_GCF_001
+    type: generated
+    prompt_template: "Factor out a negative greatest common factor so the leading term inside parentheses is positive: -{first_coefficient}x^{first_power}
+      - {second_coefficient}x^{common_power}"
+    answer_mode: final_plus_required_work
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 8
+      a:
+        type: int
+        min: 2
+        max: 8
+      b:
+        type: int
+        min: 2
+        max: 8
+      common_power:
+        type: int
+        min: 2
+        max: 3
+    derived:
+      first_coefficient: "g * a"
+      second_coefficient: "g * b"
+      first_power: "common_power + 1"
+    constraints:
+    - not (a % 2 == 0 and b % 2 == 0)
+    - not (a % 3 == 0 and b % 3 == 0)
+    - not (a % 5 == 0 and b % 5 == 0)
+    - not (a % 7 == 0 and b % 7 == 0)
+    options:
+    - id: A
+      label: "{g}x^{common_power}({a}x + {b})"
+    - id: B
+      label: "-{g}x^{common_power}({a}x - {b})"
+    - id: C
+      label: "-{g}x^{first_power}({a} + {b})"
+    - id: D
+      label: "-{g}x^{common_power}({a}x + {b})"
+    answer:
+      type: multiple_choice
+      value: "D"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite with a negative GCF outside and a positive leading term inside."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Every term is negative, so factor out -{g}x^{common_power}.
+      Dividing the first term gives {a}x, and dividing the second gives {b}.
+      The result is -{g}x^{common_power}({a}x + {b}).
+    mistake_tags:
+    - negative_gcf
+    - sign_error
+    - exponent_rule_error
+    - distribution_error
+    difficulty: medium
+
+  - id: FACTOR_TWO_VARIABLES_001
+    type: generated
+    prompt_template: "Factor completely: {first_coefficient}x^{first_x_power} * y^{common_y_power} + {second_coefficient}x^{common_x_power}
+      * y^{second_y_power}"
+    answer_mode: final_plus_required_work
+    max_attempts: 250
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 7
+      a:
+        type: int
+        min: 2
+        max: 8
+      b:
+        type: int
+        min: 2
+        max: 8
+      common_x_power:
+        type: int
+        min: 2
+        max: 4
+      common_y_power:
+        type: int
+        min: 2
+        max: 4
+    derived:
+      first_coefficient: "g * a"
+      second_coefficient: "g * b"
+      first_x_power: "common_x_power + 1"
+      second_y_power: "common_y_power + 1"
+    constraints:
+    - "not (a % 2 == 0 and b % 2 == 0)"
+    - "not (a % 3 == 0 and b % 3 == 0)"
+    - "not (a % 5 == 0 and b % 5 == 0)"
+    - "not (a % 7 == 0 and b % 7 == 0)"
+    options:
+    - id: A
+      label: "{g}x^{first_x_power} * y^{second_y_power}({a} + {b})"
+    - id: B
+      label: "{g}x^{common_x_power} * y^{common_y_power}({a}x + {b}y)"
+    - id: C
+      label: "{g}x^{common_x_power}({a}x * y^{common_y_power} + {b}y^{second_y_power})"
+    - id: D
+      label: "{g}y^{common_y_power}({a}x^{first_x_power} + {b}x^{common_x_power} * y)"
+    answer:
+      type: multiple_choice
+      value: "B"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite using the numerical GCF and the smallest shared powers of x and y."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The numerical GCF is {g}.
+      The smallest shared powers are x^{common_x_power} and y^{common_y_power}.
+      The quotients are {a}x and {b}y.
+      The complete factorization is {g}x^{common_x_power} * y^{common_y_power}({a}x + {b}y).
+    mistake_tags:
+    - greatest_common_factor
+    - multivariable_factoring
+    - exponent_rule_error
+    - incomplete_factoring
+    difficulty: hard
+
+  - id: FACTOR_NUMERIC_THREE_TERMS_001
+    type: generated
+    prompt_template: "Factor completely: {first_coefficient}x^2 + {second_coefficient}x + {g}"
+    answer_mode: final_plus_required_work
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 9
+      a:
+        type: int
+        min: 2
+        max: 8
+      b:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      first_coefficient: "g * a"
+      second_coefficient: "g * b"
+    options:
+    - id: A
+      label: "{g}x({a}x + {b} + 1)"
+    - id: B
+      label: "{g}({a}x^2 + {b}x + {g})"
+    - id: C
+      label: "{g}({a}x^2 + {b}x + 1)"
+    - id: D
+      label: "{first_coefficient}(x^2 + {b}x + 1)"
+    answer:
+      type: multiple_choice
+      value: "C"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite and check which factors are shared by all three terms."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      All coefficients share {g}, but the constant term has no x.
+      Therefore x is not part of the GCF.
+      Divide every coefficient by {g} to get {g}({a}x^2 + {b}x + 1).
+    mistake_tags:
+    - greatest_common_factor
+    - variable_not_common
+    - incomplete_factoring
+    - division_error
+    difficulty: medium
+
+  - id: FACTOR_REVERSE_DISTRIBUTION_001
+    type: fixed
+    prompt: "Factor completely: 18x^3 - 24x^2 + 6x"
+    answer_mode: final_plus_required_work
+    options:
+    - id: A
+      label: "6(3x^3 - 4x^2 + x)"
+    - id: B
+      label: "3x(6x^2 - 8x + 2)"
+    - id: C
+      label: "6x^2(3x - 4 + 1)"
+    - id: D
+      label: "6x(3x^2 - 4x + 1)"
+    answer:
+      type: multiple_choice
+      value: "D"
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: "Show an equivalent rewrite using the greatest common monomial, then choose the completely factored form."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      The coefficient GCF is 6 and every term contains x.
+      The smallest shared x-power is x.
+      Dividing each term by 6x gives 3x^2, -4x, and 1.
+      The complete factorization is 6x(3x^2 - 4x + 1).
+    mistake_tags:
+    - greatest_common_factor
+    - incomplete_factoring
+    - sign_error
+    - exponent_rule_error
+    difficulty: hard
+
+  - id: FACTOR_AREA_MISSING_SIDE_001
+    type: generated
+    prompt_template: "A rectangle has area {first_coefficient}x^2 + {second_coefficient}x and one side length {g}x. Enter
+      only the expression for the other side."
+    answer_mode: final_plus_required_work
+    variables:
+      g:
+        type: int
+        min: 2
+        max: 8
+      a:
+        type: int
+        min: 2
+        max: 9
+      b:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      first_coefficient: "g * a"
+      second_coefficient: "g * b"
+    answer:
+      type: expression
+      value: "{a}x + {b}"
+    grading:
+      method: symbolic_expression
+    work:
+      mode: procedural_steps
+      prompt: "Write the quotient of the area by the known side, then simplify through equivalent expressions to the other
+        side."
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Factor the area:
+      {first_coefficient}x^2 + {second_coefficient}x = {g}x({a}x + {b}).
+      The known side is {g}x, so the other side is {a}x + {b}.
+    mistake_tags:
+    - area_model
+    - greatest_common_factor
+    - division_error
+    - missing_side
+    difficulty: hard
+
+  - id: FACTOR_VERIFY_COMPLETE_001
+    type: fixed
+    prompt: "A learner writes 12x^2 + 18x = 6x(2x + 3). Which statement is correct?"
+    answer_mode: final_only
+    options:
+    - id: A
+      label: "The factorization is wrong because the x should stay inside both terms."
+    - id: B
+      label: "The factorization is complete because distributing gives the original expression and 2x + 3 has no common factor."
+    - id: C
+      label: "The factorization is incomplete because 2x + 3 still has a factor of 2."
+    - id: D
+      label: "The factorization is wrong because 6x(2x + 3) expands to 12x^2 + 3."
+    answer:
+      type: multiple_choice
+      value: "B"
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |
+      Distribute 6x: 6x * 2x = 12x^2 and 6x * 3 = 18x.
+      The inside coefficients 2 and 3 share no factor greater than 1.
+      Therefore the factorization is correct and complete.
+    mistake_tags:
+    - factoring_verification
+    - distribution_error
+    - incomplete_factoring
+    difficulty: hard

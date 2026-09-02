@@ -1,0 +1,650 @@
+id: MATH_QUAD_002
+schema_version: 0.2
+name: Completing the square
+domain: Math
+subdomain: Quadratic Equations
+description: Rewrite quadratic expressions as perfect squares, solve quadratic equations by taking square roots,
+  and interpret vertex form.
+prerequisites:
+- MATH_QUAD_001
+- MATH_RAD_001
+tags:
+- algebra
+- quadratic_equations
+- completing_the_square
+- perfect_square_trinomials
+- vertex_form
+- square_roots
+- quadratic_functions
+- equivalent_forms
+unlocks:
+- MATH_QUAD_003
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Completing the square rewrites part of a quadratic expression as a perfect-square binomial.
+
+  The key patterns are:
+
+  (x + p)^2 = x^2 + 2px + p^2
+  (x - p)^2 = x^2 - 2px + p^2
+
+  The middle coefficient determines the number p. For an expression:
+
+  x^2 + bx
+
+  half the middle coefficient, then square the result:
+
+  p = b/2
+  p^2 = (b/2)^2
+
+  That is the number needed to make a perfect-square trinomial.
+
+  Example:
+  Complete the square for x^2 + 10x.
+
+  Half of 10 is 5.
+  Square 5 to get 25.
+
+  x^2 + 10x + 25 = (x + 5)^2
+
+  Negative middle coefficient:
+  For x^2 - 14x, half of -14 is -7, and (-7)^2 = 49.
+
+  x^2 - 14x + 49 = (x - 7)^2
+
+  Odd middle coefficients:
+  Completing the square can require fractions. For x^2 + 5x, half of 5 is 5/2, so the number to add is 25/4.
+
+  Rewriting an expression:
+  Suppose the expression already has a constant.
+
+  x^2 + 8x + 3
+
+  Add and subtract the same number so the value does not change:
+
+  x^2 + 8x + 16 - 16 + 3
+  = (x + 4)^2 - 13
+
+  This form reveals the horizontal and vertical shift of the quadratic.
+
+  Solving an equation:
+  Complete the square while keeping the equation balanced.
+
+  Solve x^2 + 6x = 7.
+
+  Add 9 to both sides because (6/2)^2 = 9:
+
+  x^2 + 6x + 9 = 16
+  (x + 3)^2 = 16
+
+  Take both square-root branches:
+
+  x + 3 = plus or minus 4
+
+  So:
+  x = 1 or x = -7
+
+  Leading coefficient not equal to 1:
+  Before completing the square, make the coefficient of x^2 equal to 1. Divide the whole equation by the leading coefficient when possible.
+
+  Solve 2x^2 + 8x = 10.
+
+  Divide by 2:
+  x^2 + 4x = 5
+
+  Add 4 to both sides:
+  (x + 2)^2 = 9
+
+  Then x + 2 = plus or minus 3, giving x = 1 or x = -5.
+
+  Vertex form:
+  A quadratic function can be written as:
+
+  y = a(x - h)^2 + k
+
+  Its vertex is (h, k). Be careful with the sign inside the parentheses:
+
+  y = (x - 4)^2 + 1 has vertex (4, 1).
+  y = (x + 4)^2 + 1 has vertex (-4, 1).
+
+  Why it works:
+  Completing the square preserves equality or expression value. In an equation, whatever number is added to one side must also be added to the other. In an expression rewrite, the same quantity is added and subtracted.
+
+  Method for rewriting x^2 + bx + c:
+  1. Compute p = b/2.
+  2. Compute p^2.
+  3. Add and subtract p^2.
+  4. Factor the first three terms as (x + p)^2.
+  5. Combine the remaining constants.
+
+  Method for solving:
+  1. Put the quadratic and linear terms together.
+  2. Move the constant term to the other side.
+  3. Make the leading coefficient 1.
+  4. Add (b/2)^2 to both sides.
+  5. Factor the perfect-square trinomial.
+  6. Take both positive and negative square-root branches.
+  7. Isolate x and check both solutions.
+
+  Common mistake:
+  Do not square the entire middle coefficient. For x^2 + 12x, add (12/2)^2 = 36, not 12^2 = 144.
+
+  Another common mistake:
+  Do not add the completing number to only one side of an equation.
+
+  Another common mistake:
+  Do not forget the plus-or-minus step after taking the square root of both sides.
+
+  Another common mistake:
+  In vertex form, the x-coordinate of the vertex has the opposite sign from the number visibly joined to x inside the parentheses.
+examples:
+- prompt: What number completes x^2 + 8x + __?
+  solution: '16'
+  explanation: Half of 8 is 4, and 4^2 = 16.
+- prompt: What number completes x^2 - 12x + __?
+  solution: '36'
+  explanation: Half of -12 is -6, and (-6)^2 = 36.
+- prompt: What number completes the square in x^2 + 5x + ___?
+  solution: 25/4
+  explanation: Half of 5 is 5/2, and (5/2)^2 = 25/4.
+- prompt: 'Factor: x^2 + 14x + 49'
+  solution: (x + 7)^2
+  explanation: 49 = 7^2 and 14x = 2(7)x.
+- prompt: Rewrite x^2 + 6x + 2 in completed-square form.
+  solution: (x + 3)^2 - 7
+  explanation: 'Add and subtract 9: x^2 + 6x + 9 - 9 + 2.'
+- prompt: Rewrite x^2 - 10x + 1 in completed-square form.
+  solution: (x - 5)^2 - 24
+  explanation: Add and subtract 25.
+- prompt: Solve x^2 + 4x = 12.
+  solution: x = 2 or x = -6
+  explanation: 'Add 4: (x + 2)^2 = 16, then use both square-root branches.'
+- prompt: Solve 3x^2 - 18x = 21.
+  solution: x = 7 or x = -1
+  explanation: Divide by 3, complete the square, then take both roots.
+- prompt: Find the vertex of y = (x + 3)^2 - 5.
+  solution: (-3, -5)
+  explanation: Vertex form is y = (x - h)^2 + k, so h = -3 and k = -5.
+applications:
+- title: Quadratic formula
+  description: The quadratic formula is obtained by completing the square on the general quadratic equation.
+- title: Graphing parabolas
+  description: Completed-square form reveals the vertex and shifts of a quadratic graph.
+- title: Optimization
+  description: The vertex identifies a maximum or minimum value in area, revenue, and motion models.
+- title: Exact solutions
+  description: Completing the square solves quadratics that do not factor over the integers and naturally produces
+    radical answers.
+test:
+  question_count: 11
+  randomize_order: true
+  questions:
+  - id: COMPLETE_SQUARE_ADD_POSITIVE_MIDDLE_001
+    type: generated
+    prompt_template: What number must be added to x^2 + {middle}x to make a perfect-square trinomial?
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      middle: 2 * p
+      added: p * p
+    answer:
+      type: numeric
+      value: '{added}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show that you halve the middle coefficient and then square the result.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Half of {middle} is {p}.
+      Square {p}: {p}^2 = {added}.
+      Adding {added} creates (x + {p})^2.
+    mistake_tags:
+    - completing_square_number
+    - halving_error
+    - squaring_error
+    difficulty: easy
+  - id: COMPLETE_SQUARE_ADD_NEGATIVE_MIDDLE_001
+    type: generated
+    prompt_template: What number must be added to x^2 - {middle}x to make a perfect-square trinomial?
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      middle: 2 * p
+      added: p * p
+    answer:
+      type: numeric
+      value: '{added}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show that you halve the signed middle coefficient and then square the result.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Half of -{middle} is -{p}.
+      Square -{p}: (-{p})^2 = {added}.
+      Adding {added} creates (x - {p})^2.
+    mistake_tags:
+    - completing_square_number
+    - sign_error
+    - squaring_error
+    difficulty: easy
+  - id: COMPLETE_SQUARE_ADD_ODD_MIDDLE_001
+    type: generated
+    prompt_template: What number must be added to x^2 + {middle}x to make a perfect-square trinomial?
+    answer_mode: final_plus_required_work
+    variables:
+      middle:
+        type: choice
+        values:
+        - 3
+        - 5
+        - 7
+        - 9
+        - 11
+        - 13
+    derived:
+      square_numerator: middle * middle
+    answer:
+      type: numeric
+      value: '{square_numerator}/4'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Write half of the odd x-coefficient as a fraction, then square that fraction.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Half of {middle} is {middle}/2.
+      Squaring gives ({middle}/2)^2 = {square_numerator}/4.
+      Fractions are valid completing-square constants.
+    mistake_tags:
+    - completing_the_square
+    - half_coefficient_error
+    - fraction_error
+    difficulty: medium
+  - id: COMPLETE_SQUARE_IDENTIFY_TRINOMIAL_001
+    type: generated
+    prompt_template: 'Factor the perfect-square trinomial: x^2 + {middle}x + {constant}'
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      middle: 2 * p
+      constant: p * p
+    options:
+    - id: A
+      label: (x + {p})^2
+    - id: B
+      label: (x - {p})^2
+    - id: C
+      label: (x + {2 * p})^2
+    - id: D
+      label: (x + {p})(x - {p})
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: Write the expanded trinomial and an equivalent factored expression on separate lines, then choose
+        the match.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      {constant} = {p}^2 and {middle}x = 2({p})x.
+      Therefore x^2 + {middle}x + {constant} = (x + {p})^2.
+    mistake_tags:
+    - perfect_square_trinomial
+    - sign_error
+    - factorization_error
+    difficulty: easy
+  - id: COMPLETE_SQUARE_REWRITE_POSITIVE_MIDDLE_001
+    type: generated
+    prompt_template: 'Rewrite in completed-square form: x^2 + {middle}x + {constant_term}'
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 9
+      shift:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      middle: 2 * p
+      square: p * p
+      constant_term: square + shift
+    options:
+    - id: A
+      label: (x + {p})^2 + {shift}
+    - id: B
+      label: (x - {p})^2 + {shift}
+    - id: C
+      label: (x + {p})^2 + {constant_term}
+    - id: D
+      label: (x + {2 * p})^2 + {shift}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: Add and subtract the completing number, then write an equivalent completed-square expression on the
+        final line.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Half of {middle} is {p}, so the completing number is {square}.
+      x^2 + {middle}x + {constant_term} = (x + {p})^2 + {shift}.
+    mistake_tags:
+    - completing_the_square
+    - constant_adjustment
+    - sign_error
+    difficulty: medium
+  - id: COMPLETE_SQUARE_REWRITE_NEGATIVE_MIDDLE_001
+    type: generated
+    prompt_template: 'Rewrite in completed-square form: x^2 - {middle}x + {constant_term}'
+    answer_mode: final_plus_required_work
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 9
+      drop:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      middle: 2 * p
+      square: p * p
+      constant_term: square - drop
+    options:
+    - id: A
+      label: (x - {p})^2 - {drop}
+    - id: B
+      label: (x + {p})^2 - {drop}
+    - id: C
+      label: (x - {p})^2 + {drop}
+    - id: D
+      label: (x - {middle})^2 - {drop}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: procedural_steps
+      prompt: Add and subtract the completing number, then write an equivalent completed-square expression on the
+        final line.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: false
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Half of -{middle} is -{p}, so the completing number is {square}.
+      x^2 - {middle}x + {constant_term} = (x - {p})^2 - {drop}.
+    mistake_tags:
+    - completing_the_square
+    - constant_adjustment
+    - sign_error
+    difficulty: medium
+  - id: COMPLETE_SQUARE_SOLVE_POSITIVE_MIDDLE_001
+    type: generated
+    prompt_template: 'Solve by completing the square: x^2 + {middle}x = {right_side}. Enter the larger solution.'
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 8
+      q:
+        type: int
+        min: 3
+        max: 12
+    derived:
+      middle: 2 * p
+      right_side: q * q - p * p
+      larger_root: q - p
+      smaller_root: 0 - q - p
+    constraints:
+    - q > p
+    answer:
+      type: numeric
+      value: '{larger_root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Add the same completing number to both sides, factor the square, show both roots, then select the
+        larger one.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Add {p * p} to both sides: (x + {p})^2 = {q * q}.
+      Then x + {p} = plus or minus {q}.
+      The roots are {larger_root} and {smaller_root}; the larger is {larger_root}.
+    mistake_tags:
+    - completing_the_square
+    - equation_balance
+    - missing_negative_solution
+    difficulty: medium
+  - id: COMPLETE_SQUARE_SOLVE_NEGATIVE_MIDDLE_001
+    type: generated
+    prompt_template: 'Solve by completing the square: x^2 - {middle}x = {right_side}. Enter the smaller solution.'
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      p:
+        type: int
+        min: 2
+        max: 8
+      q:
+        type: int
+        min: 3
+        max: 12
+    derived:
+      middle: 2 * p
+      right_side: q * q - p * p
+      larger_root: p + q
+      smaller_root: p - q
+    constraints:
+    - q > p
+    answer:
+      type: numeric
+      value: '{smaller_root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Add the same completing number to both sides, factor the square, show both roots, then select the
+        smaller one.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Add {p * p} to both sides: (x - {p})^2 = {q * q}.
+      Then x - {p} = plus or minus {q}.
+      The roots are {larger_root} and {smaller_root}; the smaller is {smaller_root}.
+    mistake_tags:
+    - completing_the_square
+    - sign_error
+    - missing_negative_solution
+    difficulty: medium
+  - id: COMPLETE_SQUARE_SOLVE_STANDARD_FORM_001
+    type: generated
+    prompt_template: 'Solve by completing the square: x^2 + {middle}x + {constant_term} = 0. Enter the larger solution.'
+    answer_mode: final_plus_required_work
+    max_attempts: 250
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+      q:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      middle: 0 - 2 * h
+      constant_term: h * h - q * q
+      larger_root: h + q
+      smaller_root: h - q
+    constraints:
+    - constant_term != 0
+    answer:
+      type: numeric
+      value: '{larger_root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Move the constant, complete the square, show both square-root branches, and choose the larger solution.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Move the constant and add {h * h} to both sides.
+      The equation becomes (x - {h})^2 = {q * q}.
+      The roots are {larger_root} and {smaller_root}; the larger is {larger_root}.
+    mistake_tags:
+    - completing_the_square
+    - standard_form
+    - missing_negative_solution
+    difficulty: hard
+  - id: COMPLETE_SQUARE_LEADING_COEFFICIENT_001
+    type: generated
+    prompt_template: 'Solve by completing the square: {a}x^2 + {middle}x = {right_side}. Enter the larger solution.'
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 5
+      p:
+        type: int
+        min: 2
+        max: 7
+      q:
+        type: int
+        min: 3
+        max: 10
+    derived:
+      middle: 2 * a * p
+      right_side: a * (q * q - p * p)
+      larger_root: q - p
+      smaller_root: 0 - q - p
+    constraints:
+    - q > p
+    answer:
+      type: numeric
+      value: '{larger_root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: First make the x^2 coefficient 1, then complete the square and show both solutions.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide the whole equation by {a}: x^2 + {2 * p}x = {q * q - p * p}.
+      Add {p * p}: (x + {p})^2 = {q * q}.
+      The roots are {larger_root} and {smaller_root}; the larger is {larger_root}.
+    mistake_tags:
+    - leading_coefficient
+    - equation_balance
+    - completing_the_square
+    difficulty: hard
+  - id: COMPLETE_SQUARE_VERTEX_FROM_FORM_001
+    type: generated
+    prompt_template: A quadratic is written as y = (x - {h})^2 + {k}. Which point is its vertex?
+    answer_mode: final_only
+    max_attempts: 200
+    variables:
+      h:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      k:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+    derived:
+      neg_h: 0 - h
+      neg_k: 0 - k
+    constraints:
+    - h != k
+    - h != neg_k
+    options:
+    - id: A
+      label: ({h}, {k})
+    - id: B
+      label: ({neg_h}, {k})
+    - id: C
+      label: ({h}, {neg_k})
+    - id: D
+      label: ({k}, {h})
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Vertex form is y = (x - h)^2 + k.
+      Here h = {h} and k = {k}, so the vertex is ({h}, {k}).
+    mistake_tags:
+    - vertex_form
+    - opposite_sign_error
+    - coordinate_order_error
+    difficulty: hard

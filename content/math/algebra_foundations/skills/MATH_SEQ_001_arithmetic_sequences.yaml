@@ -1,0 +1,556 @@
+id: MATH_SEQ_001
+schema_version: 0.2
+name: Arithmetic sequences
+domain: Math
+subdomain: Sequences
+description: Recognize arithmetic sequences, use common differences, and write recursive and explicit rules for
+  linear patterns.
+prerequisites:
+- MATH_FUNC_001
+- MATH_GRAPH_003
+tags:
+- sequences
+- arithmetic_sequences
+- common_difference
+- explicit_formula
+- recursive_formula
+- linear_patterns
+- term_number
+- rate_of_change
+unlocks:
+- MATH_SEQ_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A sequence is an ordered list of numbers. Each number in the list is called a term.
+
+  An arithmetic sequence changes by the same amount from one term to the next. That constant change is the common difference, written d.
+
+  Example:
+  5, 9, 13, 17, ...
+
+  Each term increases by 4, so d = 4.
+
+  A decreasing arithmetic sequence has a negative common difference.
+
+  Example:
+  18, 13, 8, 3, ...
+
+  Each term changes by -5, so d = -5.
+
+  Finding the common difference:
+  Subtract a term from the term after it.
+
+  d = second term - first term
+
+  For 7, 11, 15, ...:
+
+  d = 11 - 7 = 4
+
+  Recursive rule:
+  A recursive rule tells how to get each term from the previous term.
+
+  a_1 = first term
+  a_n = a_(n - 1) + d
+
+  For 7, 11, 15, ...:
+
+  a_1 = 7
+  a_n = a_(n - 1) + 4
+
+  Explicit rule:
+  An explicit rule gives any term directly from its position n.
+
+  a_n = a_1 + (n - 1)d
+
+  The expression n - 1 appears because no common difference has been added at the first term. By the fifth term, the common difference has been added four times.
+
+  Example:
+  Find the 8th term when a_1 = 3 and d = 5.
+
+  a_8 = 3 + (8 - 1)(5)
+  = 3 + 35
+  = 38
+
+  Arithmetic sequences and linear functions:
+  An arithmetic sequence is a discrete linear pattern. The common difference acts like slope, but the input values are term numbers 1, 2, 3, and so on.
+
+  If a_n = 4n + 1, then increasing n by 1 increases a_n by 4. The common difference is 4.
+
+  Finding a missing middle term:
+  In three consecutive arithmetic terms, the middle term is halfway between the terms on either side.
+
+  Example:
+  6, ?, 18
+
+  The total change is 12 across two equal steps, so each step is 6. The missing term is 12.
+
+  Finding a term number:
+  Set the explicit rule equal to the known term and solve for n.
+
+  Example:
+  For a_n = 5 + 3(n - 1), which term equals 26?
+
+  5 + 3(n - 1) = 26
+  3(n - 1) = 21
+  n - 1 = 7
+  n = 8
+
+  Common mistake:
+  Do not use n instead of n - 1 in the explicit formula. The first term has had zero common-difference steps added.
+
+  Another common mistake:
+  Check every consecutive difference before calling a sequence arithmetic. One matching difference is not enough.
+
+  Another common mistake:
+  Keep the sign of a negative common difference. A sequence that decreases by 6 has d = -6, not 6.
+examples:
+- prompt: 'Find the next term: 4, 9, 14, 19, ...'
+  solution: '24'
+  explanation: The common difference is 5, so add 5 again.
+- prompt: 'Find the common difference: 20, 13, 6, -1, ...'
+  solution: '-7'
+  explanation: Each term is 7 less than the previous term.
+- prompt: Find the 10th term when a_1 = 6 and d = 3.
+  solution: '33'
+  explanation: 'Use a_n = a_1 + (n - 1)d: 6 + 9(3) = 33.'
+- prompt: Write an explicit rule for 8, 12, 16, 20, ...
+  solution: 8 + 4(n - 1)
+  explanation: The first term is 8 and the common difference is 4.
+- prompt: Write a recursive rule for 15, 11, 7, 3, ...
+  solution: a_1 = 15; a_n = a_(n - 1) - 4
+  explanation: Start at 15 and subtract 4 for each new term.
+- prompt: 'Find the missing term: 9, ?, 25'
+  solution: '17'
+  explanation: The total increase is 16 across two equal steps, so each step is 8.
+- prompt: For a_n = 2 + 5(n - 1), which term equals 37?
+  solution: n = 8
+  explanation: Solve 2 + 5(n - 1) = 37.
+- prompt: Is 3, 7, 11, 15, ... arithmetic?
+  solution: 'Yes'
+  explanation: Every consecutive difference is 4.
+applications:
+- title: Savings plans
+  description: Adding the same deposit each week creates an arithmetic sequence of balances.
+- title: Seating and construction
+  description: Rows that gain a fixed number of seats or blocks form arithmetic patterns.
+- title: Linear models
+  description: Arithmetic sequences are linear functions restricted to whole-number term positions.
+- title: Scheduling
+  description: Events repeating after a fixed time interval can be modeled with arithmetic terms.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: ARITH_SEQ_NEXT_POSITIVE_001
+    type: generated
+    prompt_template: The arithmetic sequence begins {a1}, {a2}, {a3}. What is the next term?
+    answer_mode: final_only
+    variables:
+      a1:
+        type: int
+        min: -20
+        max: 20
+        exclude:
+        - 0
+      d:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      a2: a1 + d
+      a3: a1 + 2 * d
+      a4: a1 + 3 * d
+    answer:
+      type: numeric
+      value: '{a4}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The common difference is {d}.
+      Add {d} to {a3}.
+      The next term is {a4}.
+    mistake_tags:
+    - sequence_error
+    - common_difference_error
+    - arithmetic_error
+    difficulty: easy
+  - id: ARITH_SEQ_NEXT_NEGATIVE_001
+    type: generated
+    prompt_template: The arithmetic sequence begins {a1}, {a2}, {a3}. What is the next term?
+    answer_mode: final_only
+    variables:
+      a1:
+        type: int
+        min: -10
+        max: 35
+        exclude:
+        - 0
+      d:
+        type: int
+        min: -10
+        max: -2
+    derived:
+      a2: a1 + d
+      a3: a1 + 2 * d
+      a4: a1 + 3 * d
+    answer:
+      type: numeric
+      value: '{a4}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The common difference is {d}.
+      The sequence decreases by {abs(d)} each step.
+      The next term is {a4}.
+    mistake_tags:
+    - sequence_error
+    - common_difference_error
+    - sign_error
+    difficulty: easy
+  - id: ARITH_SEQ_COMMON_DIFFERENCE_001
+    type: generated
+    prompt_template: Find the common difference of the arithmetic sequence {a1}, {a2}, {a3}, ...
+    answer_mode: final_plus_required_work
+    variables:
+      a1:
+        type: int
+        min: -20
+        max: 20
+        exclude:
+        - 0
+      d:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+    derived:
+      a2: a1 + d
+      a3: a1 + 2 * d
+    answer:
+      type: numeric
+      value: '{d}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Subtract one term from the term after it, then simplify to the common difference.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Subtract consecutive terms.
+      {a2} - ({a1}) = {d}.
+      The common difference is {d}.
+    mistake_tags:
+    - common_difference_error
+    - subtraction_error
+    - sign_error
+    difficulty: easy
+  - id: ARITH_SEQ_NTH_TERM_001
+    type: generated
+    prompt_template: An arithmetic sequence has first term {a1} and common difference {d}. Find term {n}.
+    answer_mode: final_plus_required_work
+    variables:
+      a1:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      d:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      n:
+        type: int
+        min: 5
+        max: 12
+    derived:
+      steps: n - 1
+      change: steps * d
+      term: a1 + change
+    answer:
+      type: numeric
+      value: '{term}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Begin with the explicit formula after substituting the numbers, then simplify one equivalent expression
+        per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use a_n = a_1 + (n - 1)d.
+      There are {steps} common-difference steps before term {n}.
+      {a1} + ({steps})({d}) = {term}.
+    mistake_tags:
+    - explicit_formula_error
+    - term_index_error
+    - common_difference_error
+    - arithmetic_error
+    difficulty: medium
+  - id: ARITH_SEQ_EXPLICIT_RULE_001
+    type: generated
+    prompt_template: Write an explicit rule for an arithmetic sequence with first term {a1} and common difference
+      {d}. Enter only the expression for a_n using n.
+    answer_mode: final_plus_required_work
+    variables:
+      a1:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+      d:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+        - 1
+        - -1
+    answer:
+      type: expression
+      value: '{a1} + {d}*(n - 1)'
+    grading:
+      method: symbolic_expression
+    work:
+      mode: procedural_steps
+      prompt: Write the substituted explicit formula, then simplify it to an equivalent expression if useful.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use a_n = a_1 + (n - 1)d.
+      Substitute a_1 = {a1} and d = {d}.
+      An explicit expression is {a1} + {d}(n - 1).
+    mistake_tags:
+    - explicit_formula_error
+    - term_index_error
+    - sign_error
+    difficulty: medium
+  - id: ARITH_SEQ_FIND_TERM_NUMBER_001
+    type: generated
+    prompt_template: An arithmetic sequence has first term {a1} and common difference {d}. Which term number has
+      value {term}? Solve for n.
+    answer_mode: final_plus_required_work
+    variables:
+      n:
+        type: int
+        min: 4
+        max: 12
+      a1:
+        type: int
+        min: -10
+        max: 10
+        exclude:
+        - 0
+      d:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      steps: n - 1
+      term: a1 + steps * d
+    answer:
+      type: equation_solution
+      variable: n
+      value: '{n}'
+    grading:
+      method: equation_solution
+    work:
+      mode: procedural_steps
+      prompt: Set the explicit sequence rule equal to the known term and show equivalent equation steps ending with
+        n isolated.
+      line_type: equation
+      minimum_steps: 3
+      require_final_answer_match: true
+      target_variable: n
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Set a_1 + (n - 1)d equal to the known term.
+      {a1} + {d}(n - 1) = {term}.
+      Solving gives n = {n}.
+    mistake_tags:
+    - term_index_error
+    - explicit_formula_error
+    - equation_solving_error
+    difficulty: hard
+  - id: ARITH_SEQ_MISSING_MIDDLE_001
+    type: generated
+    prompt_template: Three consecutive terms of an arithmetic sequence are {a1}, ?, {a3}. Find the missing term.
+    answer_mode: final_plus_required_work
+    variables:
+      a1:
+        type: int
+        min: -20
+        max: 20
+        exclude:
+        - 0
+      d:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+    derived:
+      a2: a1 + d
+      a3: a1 + 2 * d
+    answer:
+      type: numeric
+      value: '{a2}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Use equal differences or average the two outside terms, then simplify.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The same difference must occur on both sides of the missing term.
+      The common difference is {d}.
+      The missing term is {a2}.
+    mistake_tags:
+    - missing_term_error
+    - common_difference_error
+    - arithmetic_error
+    difficulty: medium
+  - id: ARITH_SEQ_IDENTIFY_ARITHMETIC_001
+    type: fixed
+    prompt: Which sequence is arithmetic?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: 3, 6, 12, 24, ...
+    - id: B
+      label: 2, 5, 8, 11, ...
+    - id: C
+      label: 1, 4, 9, 16, ...
+    - id: D
+      label: 10, 7, 3, -2, ...
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The differences in 2, 5, 8, 11 are all 3.
+      A constant consecutive difference makes the sequence arithmetic.
+    mistake_tags:
+    - sequence_classification_error
+    - common_difference_error
+    difficulty: easy
+  - id: ARITH_SEQ_RECURSIVE_RULE_001
+    type: fixed
+    prompt: What does the recursive rule a_1 = 12 and a_n = a_(n - 1) - 4 mean?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Start at 12 and multiply by -4 each term.
+    - id: B
+      label: Start at -4 and add 12 each term.
+    - id: C
+      label: Start at 12 and subtract 4 each term.
+    - id: D
+      label: The nth term is always 12 - 4n.
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      a_1 = 12 gives the starting term.
+      a_n = a_(n - 1) - 4 says to subtract 4 from the previous term.
+    mistake_tags:
+    - recursive_formula_error
+    - sequence_notation_error
+    difficulty: medium
+  - id: ARITH_SEQ_SAVINGS_MODEL_001
+    type: generated
+    prompt_template: At the end of week 1, an account contains ${start}. The same ${deposit} deposit is added at
+      the end of each later week. What is the balance at the end of week {week}?
+    answer_mode: final_plus_required_work
+    variables:
+      start:
+        type: int
+        min: 20
+        max: 200
+      deposit:
+        type: int
+        min: 5
+        max: 50
+      week:
+        type: int
+        min: 4
+        max: 12
+    derived:
+      deposits_after_first: week - 1
+      added: deposits_after_first * deposit
+      balance: start + added
+    answer:
+      type: numeric
+      value: '{balance}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write the arithmetic-sequence calculation with the correct number of deposits, then simplify.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The week-1 balance is the first term.
+      By week {week}, {deposits_after_first} equal deposits have been added.
+      {start} + {deposits_after_first}({deposit}) = {balance}.
+    mistake_tags:
+    - arithmetic_sequence_model
+    - term_index_error
+    - money_error
+    difficulty: hard

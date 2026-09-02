@@ -172,7 +172,7 @@ test:
     difficulty: easy
   - id: COORD_PLANE_QUADRANT_I_001
     type: generated
-    prompt_template: 'Which quadrant contains the point ({x}, {y})?. Enter exactly
+    prompt_template: 'Which quadrant contains the point ({x}, {y})? Enter exactly
       one of: Quadrant I, Quadrant II, Quadrant III, Quadrant IV.'
     answer_mode: final_only
     variables:
@@ -206,7 +206,7 @@ test:
     difficulty: easy
   - id: COORD_PLANE_QUADRANT_II_001
     type: generated
-    prompt_template: 'Which quadrant contains the point ({x}, {y})?. Enter exactly
+    prompt_template: 'Which quadrant contains the point ({x}, {y})? Enter exactly
       one of: Quadrant I, Quadrant II, Quadrant III, Quadrant IV.'
     answer_mode: final_only
     variables:
@@ -240,7 +240,7 @@ test:
     difficulty: medium
   - id: COORD_PLANE_QUADRANT_III_001
     type: generated
-    prompt_template: 'Which quadrant contains the point ({x}, {y})?. Enter exactly
+    prompt_template: 'Which quadrant contains the point ({x}, {y})? Enter exactly
       one of: Quadrant I, Quadrant II, Quadrant III, Quadrant IV.'
     answer_mode: final_only
     variables:
@@ -274,7 +274,7 @@ test:
     difficulty: medium
   - id: COORD_PLANE_QUADRANT_IV_001
     type: generated
-    prompt_template: 'Which quadrant contains the point ({x}, {y})?. Enter exactly
+    prompt_template: 'Which quadrant contains the point ({x}, {y})? Enter exactly
       one of: Quadrant I, Quadrant II, Quadrant III, Quadrant IV.'
     answer_mode: final_only
     variables:

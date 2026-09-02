@@ -10,7 +10,7 @@ def test_loads_valid_default_skills():
     assert track.id == "TRACK_MATH_ALGEBRA_FOUNDATIONS"
     assert track.schema_version == "0.2"
     assert "MATH_ALG_001" in skills
-    assert len(track.skills) == 25
+    assert len(track.skills) == 41
     assert skills["MATH_ALG_001"].test.question_count >= 1
     assert len(skills["MATH_ALG_001"].test.questions) >= skills["MATH_ALG_001"].test.question_count
     assert warnings == []
@@ -29,11 +29,15 @@ def test_default_content_uses_procedural_work_only_where_auto_checking_is_suppor
                 line_type = question.work.get("line_type")
                 assert line_type in {"expression", "equation", "inequality"}
                 if line_type == "expression":
-                    assert method in {"symbolic_expression", "exact_numeric"}
+                    assert method in {"symbolic_expression", "exact_numeric", "multiple_choice"}
                 elif line_type == "equation":
-                    assert method in {"equation_solution", "multiple_choice", "symbolic_expression"}
+                    assert method in {"equation_solution", "multiple_choice", "symbolic_expression", "exact_numeric"}
                 else:
                     assert method in {"exact_text", "inequality_solution"}
+            elif mode == "capture_only":
+                assert question.answer_mode == "final_plus_required_work"
+                assert question.work.get("prompt", "").strip()
+                assert question.review_policy["mastery_requires_review_pass"] is False
             else:
                 assert question.answer_mode == "final_only"
                 assert question.work["mode"] == "none"
@@ -63,12 +67,57 @@ def test_rewritten_content_watch_points_are_represented_in_schema():
     inequalities = skills["MATH_ALG_006"]
     assert all(question.work.get("line_type") == "inequality" for question in inequalities.test.questions)
 
+    sign_reversal = skills["MATH_ALG_007"]
+    assert all(question.answer_mode == "final_plus_required_work" for question in sign_reversal.test.questions)
+    assert all(question.work.get("line_type") == "inequality" for question in sign_reversal.test.questions)
+
+    systems = skills["MATH_SYS_001"]
+    assert all(question.answer_mode == "final_plus_required_work" for question in systems.test.questions)
+    assert all(question.work.get("mode") in {"capture_only", "procedural_steps"} for question in systems.test.questions)
+    assert all(question.work.get("mode") == "capture_only" for question in systems.test.questions if "CLASSIFY" in question.id)
+    assert any(question.work.get("mode") == "procedural_steps" for question in systems.test.questions)
+    systems_theory = systems.theory.casefold()
+    assert all(term in systems_theory for term in ("substitution", "elimination", "check"))
+
+    slope_intercept = skills["MATH_GRAPH_004"]
+    assert "MATH_GRAPH_003" in slope_intercept.prerequisites
+
+    writing_lines = skills["MATH_GRAPH_006"]
+    assert "parallel lines have the same slope" in writing_lines.theory.casefold()
+
+    coordinate_plane = skills["MATH_GRAPH_001"]
+    assert all(")?." not in question.prompt_template for question in coordinate_plane.test.questions)
+
+    expansion_ids = {
+        "MATH_EXP_001", "MATH_EXP_002", "MATH_EXP_003", "MATH_FUNC_001",
+        "MATH_SEQ_001", "MATH_SEQ_002", "MATH_POLY_001", "MATH_POLY_002",
+        "MATH_POLY_003", "MATH_POLY_004", "MATH_QUAD_001", "MATH_QUAD_002",
+        "MATH_QUAD_003", "MATH_QUAD_004", "MATH_QUAD_005", "MATH_RAD_001",
+    }
+    assert expansion_ids.issubset(skills)
+    assert "MATH_QUAD_005" in _track.exit_skills
+    assert "MATH_EXP_003" in _track.exit_skills
+
 
 def test_rejects_invalid_yaml(tmp_path: Path):
     skill_dir = tmp_path / "skills"
     skill_dir.mkdir()
     (skill_dir / "bad.yaml").write_text("id: [", encoding="utf-8")
     with pytest.raises(ContentError, match="invalid YAML"):
+        load_skills(tmp_path)
+
+
+def test_rejects_duplicate_yaml_mapping_keys(tmp_path: Path):
+    skill_dir = tmp_path / "skills"
+    skill_dir.mkdir()
+    duplicate_constraints = _skill_yaml("DUPLICATE_KEY", "Duplicate Key").replace(
+        "      grading:\n        method: exact_numeric",
+        "      constraints: [\"1 == 1\"]\n      constraints: [\"2 == 2\"]\n      grading:\n        method: exact_numeric",
+        1,
+    )
+    (skill_dir / "duplicate-key.yaml").write_text(duplicate_constraints, encoding="utf-8")
+
+    with pytest.raises(ContentError, match="duplicate key 'constraints'"):
         load_skills(tmp_path)
 
 

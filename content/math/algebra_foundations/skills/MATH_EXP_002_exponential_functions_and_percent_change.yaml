@@ -1,0 +1,599 @@
+id: MATH_EXP_002
+schema_version: 0.2
+name: Exponential functions and percent change
+domain: Math
+subdomain: Exponential Functions
+description: Interpret and evaluate exponential functions, including initial values, growth factors, decay factors,
+  repeated percent change, and asymptotes.
+prerequisites:
+- MATH_SEQ_002
+- MATH_ARITH_005
+tags:
+- exponential_functions
+- growth
+- decay
+- percent_change
+- growth_factor
+- decay_factor
+- initial_value
+- doubling
+- half_life
+- asymptote
+unlocks:
+- MATH_EXP_003
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  An exponential function has the variable in an exponent.
+
+  A basic exponential function can be written as:
+
+  f(x) = a * b^x
+
+  The initial value a is the output when x = 0.
+
+  f(0) = a * b^0 = a
+
+  The base b is the multiplicative factor for each increase of 1 in x.
+
+  Growth and decay:
+  - If b > 1, the function shows exponential growth.
+  - If 0 < b < 1, the function shows exponential decay.
+
+  Example of growth:
+  P(t) = 50 * 2^t
+
+  The initial value is 50, and the quantity doubles each period.
+
+  Example of decay:
+  A(t) = 160 * (1/2)^t
+
+  The initial value is 160, and half remains after each period.
+
+  Percent growth factors:
+  For a growth rate of r percent per period:
+
+  growth factor = 1 + r/100
+
+  Examples:
+  - 10% growth uses a factor of 1.10.
+  - 25% growth uses a factor of 1.25.
+  - 100% growth uses a factor of 2.
+
+  Percent decay factors:
+  For a decay rate of r percent per period:
+
+  decay factor = 1 - r/100
+
+  Examples:
+  - 20% decay uses a factor of 0.80.
+  - 25% decay uses a factor of 0.75.
+  - 50% decay uses a factor of 0.50.
+
+  Repeated percent change:
+  A percent change is applied to the current amount each time, not repeatedly to the original amount.
+
+  Example:
+  A value of 200 grows by 25% twice.
+
+  After one period:
+  200(1.25) = 250
+
+  After two periods:
+  250(1.25) = 312.5
+
+  This is not the same as adding 50 twice unless the amount happens to stay unchanged.
+
+  Tables:
+  An exponential table has a constant ratio between consecutive outputs when the inputs increase by equal amounts.
+
+  Example:
+  x:    0, 1, 2, 3
+  y:    5, 15, 45, 135
+
+  The ratio is always 3, so y = 5 * 3^x.
+
+  Graph features for a positive initial value:
+  - The y-intercept is (0, a).
+  - The outputs remain positive.
+  - For f(x) = a * b^x with no vertical shift, the horizontal asymptote is y = 0.
+  - The graph approaches the asymptote but does not cross it in this basic model.
+
+  Doubling:
+  If a quantity doubles each period, use a factor of 2.
+
+  A(t) = initial amount * 2^t
+
+  Half-life:
+  If half remains after each equal time interval, use a factor of 1/2.
+
+  A(t) = initial amount * (1/2)^t
+
+  Common mistake:
+  Do not confuse the percent rate with the factor. A 20% increase uses 1.20, not 0.20.
+
+  Another common mistake:
+  A 20% decrease uses 0.80 because 80% remains.
+
+  Another common mistake:
+  Exponential growth does not add the same amount each period. It multiplies by the same factor.
+
+  Another common mistake:
+  The initial value occurs at x = 0, not x = 1.
+examples:
+- prompt: Evaluate f(x) = 3 * 2^x at x = 4.
+  solution: '48'
+  explanation: 3 * 2^4 = 3 * 16.
+- prompt: What is the initial value of g(t) = 75 * 1.4^t?
+  solution: '75'
+  explanation: At t = 0, the power is 1.
+- prompt: What growth factor represents 25% growth?
+  solution: '1.25'
+  explanation: Add 0.25 to 1.
+- prompt: What decay factor represents 30% decay?
+  solution: '0.70'
+  explanation: Seventy percent remains, so use 0.70.
+- prompt: Does y = 80(0.6)^x show growth or decay?
+  solution: Decay
+  explanation: The base is between 0 and 1.
+- prompt: A quantity starts at 40 and doubles for 5 periods. What is the final amount?
+  solution: '1280'
+  explanation: 40 * 2^5 = 1280.
+- prompt: A sample begins at 640 and has three half-lives. How much remains?
+  solution: '80'
+  explanation: 640 * (1/2)^3 = 80.
+- prompt: What is the horizontal asymptote of y = 6 * 3^x?
+  solution: y = 0
+  explanation: There is no vertical shift, so the graph approaches zero.
+applications:
+- title: Finance
+  description: Compound interest and repeated investment returns use exponential growth.
+- title: Population and disease
+  description: Populations and early spread can follow repeated multiplicative change.
+- title: Radioactive decay
+  description: Half-life models the same fractional decrease over equal time intervals.
+- title: Technology
+  description: Storage, processing power, and network effects are often compared with exponential patterns.
+test:
+  question_count: 12
+  randomize_order: true
+  questions:
+  - id: EXP_FUNCTION_EVALUATE_INTEGER_BASE_001
+    type: generated
+    prompt_template: Let f(x) = {a}*{base}^x. Find f({x}).
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+      base:
+        type: int
+        min: 2
+        max: 5
+      x:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      power: base ** x
+      output: a * power
+    answer:
+      type: numeric
+      value: '{output}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Substitute the input, evaluate the power, and simplify one equivalent numerical expression per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Substitute x = {x}.
+      {base}^{x} = {power}.
+      {a} * {power} = {output}.
+    mistake_tags:
+    - exponential_evaluation_error
+    - exponent_error
+    - order_error
+    - arithmetic_error
+    difficulty: easy
+  - id: EXP_FUNCTION_INITIAL_VALUE_001
+    type: generated
+    prompt_template: What is the initial value of f(x) = {a}*{base}^x?
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 10
+        max: 200
+      base:
+        type: int
+        min: 2
+        max: 5
+    answer:
+      type: numeric
+      value: '{a}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The initial value occurs at x = 0.
+      {base}^0 = 1.
+      Therefore f(0) = {a}.
+    mistake_tags:
+    - initial_value_error
+    - zero_exponent_error
+    - function_notation_error
+    difficulty: easy
+  - id: EXP_FUNCTION_GROWTH_FACTOR_FROM_PERCENT_001
+    type: generated
+    prompt_template: What growth factor represents an increase of {rate}% per period?
+    answer_mode: final_only
+    variables:
+      rate:
+        type: choice
+        values:
+        - 10
+        - 20
+        - 25
+        - 50
+    derived:
+      factor: 1 + rate / 100
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Convert {rate}% to {rate}/100.
+      For growth, add the decimal rate to 1.
+      The factor is {factor}.
+    mistake_tags:
+    - growth_factor_error
+    - percent_conversion
+    - decimal_place_error
+    difficulty: easy
+  - id: EXP_FUNCTION_DECAY_FACTOR_FROM_PERCENT_001
+    type: generated
+    prompt_template: What decay factor represents a decrease of {rate}% per period?
+    answer_mode: final_only
+    variables:
+      rate:
+        type: choice
+        values:
+        - 10
+        - 20
+        - 25
+        - 50
+    derived:
+      factor: 1 - rate / 100
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Convert {rate}% to {rate}/100.
+      For decay, subtract the decimal rate from 1.
+      The factor is {factor}.
+    mistake_tags:
+    - decay_factor_error
+    - percent_conversion
+    - remaining_percent_error
+    difficulty: easy
+  - id: EXP_FUNCTION_PERCENT_FROM_GROWTH_FACTOR_001
+    type: generated
+    prompt_template: An exponential model uses growth factor {factor}. What is the percent increase per period?
+    answer_mode: final_only
+    variables:
+      factor:
+        type: choice
+        values:
+        - 1.25
+        - 1.5
+        - 1.75
+        - 2
+    derived:
+      rate: (factor - 1) * 100
+    answer:
+      type: numeric
+      value: '{rate}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Subtract 1 from the factor to find the decimal growth rate.
+      ({factor} - 1) * 100 = {rate}.
+      The percent increase is {rate}%.
+    mistake_tags:
+    - growth_factor_error
+    - percent_conversion
+    - decimal_place_error
+    difficulty: medium
+  - id: EXP_FUNCTION_INTERPRET_BASE_001
+    type: fixed
+    prompt: Which statement correctly interprets f(x) = 120(0.75)^x?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: The initial value is 0.75 and the output grows by 120% each step.
+    - id: B
+      label: The initial value is 120 and the output decreases by 75% each step.
+    - id: C
+      label: The initial value is 120 and the output decreases by 25% each step.
+    - id: D
+      label: The initial value is 120 and the output decreases by 0.75 each step.
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The coefficient 120 is the initial value.
+      A factor of 0.75 means 75% remains, so the decrease is 25% each step.
+    mistake_tags:
+    - initial_value_error
+    - decay_factor_error
+    - percent_change_error
+    difficulty: medium
+  - id: EXP_FUNCTION_IDENTIFY_TABLE_001
+    type: fixed
+    prompt: Which table of outputs represents an exponential pattern when x increases by 1?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: 4, 7, 10, 13
+    - id: B
+      label: 2, 6, 18, 54
+    - id: C
+      label: 1, 4, 9, 16
+    - id: D
+      label: 20, 17, 13, 8
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The outputs 2, 6, 18, 54 have a constant ratio of 3.
+      A constant output ratio signals an exponential pattern.
+    mistake_tags:
+    - exponential_pattern_error
+    - constant_ratio_error
+    - linear_vs_exponential
+    difficulty: easy
+  - id: EXP_FUNCTION_DOUBLING_CONTEXT_001
+    type: generated
+    prompt_template: A quantity starts at {initial} and doubles once per period. What is the amount after {periods}
+      periods?
+    answer_mode: final_plus_required_work
+    variables:
+      initial:
+        type: int
+        min: 5
+        max: 50
+      periods:
+        type: int
+        min: 3
+        max: 7
+    derived:
+      factor: 2 ** periods
+      amount: initial * factor
+    answer:
+      type: numeric
+      value: '{amount}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write the exponential calculation with one factor of 2 per period, then simplify.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use amount = initial * 2^periods.
+      The total multiplication factor is 2^{periods} = {factor}.
+      {initial} * {factor} = {amount}.
+    mistake_tags:
+    - doubling_error
+    - exponential_model_error
+    - exponent_error
+    difficulty: medium
+  - id: EXP_FUNCTION_HALF_LIFE_CONTEXT_001
+    type: generated
+    prompt_template: A sample begins with {initial} units. Half remains after each half-life. How many units remain
+      after {periods} half-lives?
+    answer_mode: final_plus_required_work
+    variables:
+      remaining:
+        type: int
+        min: 2
+        max: 30
+      periods:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      factor: 2 ** periods
+      initial: remaining * factor
+    answer:
+      type: numeric
+      value: '{remaining}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write the repeated-halving calculation, then simplify one equivalent expression per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use amount = initial * (1/2)^periods.
+      After {periods} halvings, the denominator factor is {factor}.
+      {initial} / {factor} = {remaining}.
+    mistake_tags:
+    - half_life_error
+    - decay_factor_error
+    - exponent_error
+    difficulty: medium
+  - id: EXP_FUNCTION_REPEATED_25_PERCENT_GROWTH_001
+    type: generated
+    prompt_template: A quantity starts at {initial} and grows by 25% per period. What is the amount after {periods}
+      periods?
+    answer_mode: final_plus_required_work
+    variables:
+      unit:
+        type: int
+        min: 2
+        max: 20
+      periods:
+        type: int
+        min: 2
+        max: 4
+    derived:
+      initial_factor: 4 ** periods
+      final_factor: 5 ** periods
+      initial: unit * initial_factor
+      amount: unit * final_factor
+    answer:
+      type: numeric
+      value: '{amount}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Convert 25% growth to a factor, write the repeated-growth expression, and simplify one equivalent
+        expression per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A 25% increase uses growth factor 1.25 = 5/4.
+      Use amount = {initial} * (5/4)^{periods}.
+      The amount after {periods} periods is {amount}.
+    mistake_tags:
+    - repeated_percent_change_error
+    - growth_factor_error
+    - exponent_error
+    - arithmetic_error
+    difficulty: hard
+  - id: EXP_FUNCTION_REPEATED_25_PERCENT_DECAY_001
+    type: generated
+    prompt_template: A quantity starts at {initial} and decreases by 25% per period. What is the amount after
+      {periods} periods?
+    answer_mode: final_plus_required_work
+    variables:
+      unit:
+        type: int
+        min: 2
+        max: 20
+      periods:
+        type: int
+        min: 2
+        max: 4
+    derived:
+      initial_factor: 4 ** periods
+      final_factor: 3 ** periods
+      initial: unit * initial_factor
+      amount: unit * final_factor
+    answer:
+      type: numeric
+      value: '{amount}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Convert 25% decay to the fraction that remains, write the repeated-decay expression, and simplify
+        one equivalent expression per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A 25% decrease leaves 75%, so the decay factor is 0.75 = 3/4.
+      Use amount = {initial} * (3/4)^{periods}.
+      The amount after {periods} periods is {amount}.
+    mistake_tags:
+    - repeated_percent_change_error
+    - decay_factor_error
+    - remaining_percent_error
+    - exponent_error
+    difficulty: hard
+  - id: EXP_FUNCTION_HORIZONTAL_ASYMPTOTE_001
+    type: fixed
+    prompt: What is the horizontal asymptote of y = 6 * 3^x?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: x = 0
+    - id: B
+      label: y = 0
+    - id: C
+      label: x = 6
+    - id: D
+      label: y = 6
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      There is no vertical shift in y = 6 * 3^x.
+      The outputs approach zero as x moves far in the negative direction, so the asymptote is y = 0.
+    mistake_tags:
+    - asymptote_error
+    - initial_value_error
+    - graph_feature_error
+    difficulty: hard

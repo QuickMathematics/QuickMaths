@@ -1,0 +1,530 @@
+id: MATH_SEQ_002
+schema_version: 0.2
+name: Geometric sequences
+domain: Math
+subdomain: Sequences
+description: Recognize geometric sequences, use common ratios, and write recursive and explicit rules for multiplicative
+  patterns.
+prerequisites:
+- MATH_SEQ_001
+- MATH_EXP_001
+tags:
+- sequences
+- geometric_sequences
+- common_ratio
+- explicit_formula
+- recursive_formula
+- exponential_patterns
+- growth
+- decay
+unlocks:
+- MATH_EXP_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A geometric sequence changes by multiplying by the same nonzero number from one term to the next. That multiplier is the common ratio, written r.
+
+  Example:
+  3, 12, 48, 192, ...
+
+  Each term is multiplied by 4, so r = 4.
+
+  Finding the common ratio:
+  Divide a term by the term before it.
+
+  r = second term / first term
+
+  For 5, 15, 45, ...:
+
+  r = 15 / 5 = 3
+
+  Decreasing geometric sequences:
+  A geometric sequence can decay when the common ratio is between 0 and 1.
+
+  Example:
+  80, 40, 20, 10, ...
+
+  Each term is multiplied by 1/2.
+
+  Alternating signs:
+  A negative common ratio changes the sign at every step.
+
+  Example:
+  2, -6, 18, -54, ...
+
+  Each term is multiplied by -3.
+
+  Recursive rule:
+  A recursive rule multiplies the previous term by r.
+
+  a_1 = first term
+  a_n = r * a_(n - 1)
+
+  For 5, 15, 45, ...:
+
+  a_1 = 5
+  a_n = 3a_(n - 1)
+
+  Explicit rule:
+  An explicit rule gives any term directly.
+
+  a_n = a_1 * r^(n - 1)
+
+  The exponent is n - 1 because the first term contains zero ratio multiplications.
+
+  Example:
+  Find the 6th term when a_1 = 2 and r = 3.
+
+  a_6 = 2 * 3^(6 - 1)
+  = 2 * 3^5
+  = 486
+
+  Arithmetic versus geometric:
+  - Arithmetic sequences have a constant difference.
+  - Geometric sequences have a constant ratio.
+
+  A sequence can fail both tests.
+
+  Example:
+  1, 4, 9, 16, ... is neither arithmetic nor geometric. Its differences and ratios both change.
+
+  Term numbers:
+  To find which term has a known value, set the explicit formula equal to that value. In simple cases, recognize the needed power of the common ratio.
+
+  Example:
+  For a_n = 3 * 2^(n - 1), which term equals 96?
+
+  3 * 2^(n - 1) = 96
+  2^(n - 1) = 32 = 2^5
+  n - 1 = 5
+  n = 6
+
+  Common mistake:
+  Do not add the common ratio. A ratio describes multiplication, not addition.
+
+  Another common mistake:
+  Use n - 1 in the exponent. The first term has not yet been multiplied by r.
+
+  Another common mistake:
+  A negative ratio alternates signs. It does not make every term negative.
+
+  Another common mistake:
+  When finding r, divide in a consistent order: later term divided by earlier term.
+examples:
+- prompt: 'Find the next term: 4, 12, 36, 108, ...'
+  solution: '324'
+  explanation: Multiply by the common ratio 3.
+- prompt: 'Find the common ratio: 7, -14, 28, -56, ...'
+  solution: '-2'
+  explanation: Each term is the previous term multiplied by -2.
+- prompt: 'Find the next term: 96, 48, 24, 12, ...'
+  solution: '6'
+  explanation: The common ratio is 1/2.
+- prompt: Find the 5th term when a_1 = 3 and r = 2.
+  solution: '48'
+  explanation: 3 * 2^(5 - 1) = 3 * 16.
+- prompt: Write an explicit rule for 5, 15, 45, 135, ...
+  solution: 5 * 3^(n - 1)
+  explanation: The first term is 5 and the common ratio is 3.
+- prompt: Write a recursive rule for 64, 32, 16, 8, ...
+  solution: a_1 = 64; a_n = (1/2)a_(n - 1)
+  explanation: Start at 64 and multiply by 1/2.
+- prompt: For a_n = 2 * 3^(n - 1), which term equals 162?
+  solution: n = 5
+  explanation: 162 / 2 = 81 = 3^4, so n - 1 = 4.
+- prompt: Is 2, 6, 18, 54, ... geometric?
+  solution: 'Yes'
+  explanation: Every consecutive ratio is 3.
+applications:
+- title: Population growth
+  description: A population multiplied by the same factor each period follows a geometric sequence.
+- title: Half-life and depreciation
+  description: Repeatedly keeping the same fraction of a quantity creates geometric decay.
+- title: Compound growth
+  description: Interest and repeated percent changes use multiplicative rather than additive steps.
+- title: Computer science
+  description: Repeated doubling or halving appears in data size, algorithms, and binary structures.
+test:
+  question_count: 10
+  randomize_order: true
+  questions:
+  - id: GEOM_SEQ_NEXT_POSITIVE_001
+    type: generated
+    prompt_template: The geometric sequence begins {a1}, {a2}, {a3}. What is the next term?
+    answer_mode: final_only
+    variables:
+      a1:
+        type: int
+        min: 1
+        max: 10
+      r:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      a2: a1 * r
+      a3: a1 * r ** 2
+      a4: a1 * r ** 3
+    answer:
+      type: numeric
+      value: '{a4}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The common ratio is {r}.
+      Multiply {a3} by {r}.
+      The next term is {a4}.
+    mistake_tags:
+    - geometric_sequence_error
+    - common_ratio_error
+    - multiplication_error
+    difficulty: easy
+  - id: GEOM_SEQ_NEXT_NEGATIVE_001
+    type: generated
+    prompt_template: The geometric sequence begins {a1}, {a2}, {a3}. What is the next term?
+    answer_mode: final_only
+    variables:
+      a1:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      r:
+        type: int
+        min: -4
+        max: -2
+    derived:
+      a2: a1 * r
+      a3: a1 * r ** 2
+      a4: a1 * r ** 3
+    answer:
+      type: numeric
+      value: '{a4}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The common ratio is {r}.
+      A negative ratio alternates the signs.
+      Multiply {a3} by {r} to get {a4}.
+    mistake_tags:
+    - geometric_sequence_error
+    - negative_ratio_error
+    - sign_error
+    difficulty: medium
+  - id: GEOM_SEQ_HALVING_001
+    type: generated
+    prompt_template: The geometric sequence begins {a1}, {a2}, {a3}. It keeps the same ratio. What is the next term?
+    answer_mode: final_only
+    variables:
+      unit:
+        type: int
+        min: 2
+        max: 20
+    derived:
+      a1: unit * 8
+      a2: unit * 4
+      a3: unit * 2
+      a4: unit
+    answer:
+      type: numeric
+      value: '{a4}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Each term is half the previous term.
+      The common ratio is 1/2.
+      Half of {a3} is {a4}.
+    mistake_tags:
+    - geometric_sequence_error
+    - fraction_ratio_error
+    - division_error
+    difficulty: easy
+  - id: GEOM_SEQ_COMMON_RATIO_001
+    type: generated
+    prompt_template: Find the common ratio of the geometric sequence {a1}, {a2}, {a3}, ...
+    answer_mode: final_plus_required_work
+    variables:
+      a1:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      r:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - -1
+        - 0
+        - 1
+    derived:
+      a2: a1 * r
+      a3: a1 * r ** 2
+    answer:
+      type: numeric
+      value: '{r}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Divide a later term by the term before it, then simplify to the common ratio.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide consecutive terms in a consistent order.
+      {a2} / ({a1}) = {r}.
+      The common ratio is {r}.
+    mistake_tags:
+    - common_ratio_error
+    - division_error
+    - sign_error
+    difficulty: easy
+  - id: GEOM_SEQ_NTH_TERM_001
+    type: generated
+    prompt_template: A geometric sequence has first term {a1} and common ratio {r}. Find term {n}.
+    answer_mode: final_plus_required_work
+    variables:
+      a1:
+        type: int
+        min: 1
+        max: 8
+      r:
+        type: int
+        min: 2
+        max: 4
+      n:
+        type: int
+        min: 4
+        max: 7
+    derived:
+      exponent: n - 1
+      power: r ** exponent
+      term: a1 * power
+    answer:
+      type: numeric
+      value: '{term}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Begin with the explicit formula after substituting the numbers, then simplify one equivalent expression
+        per line.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use a_n = a_1 * r^(n - 1).
+      The exponent is {exponent}.
+      {a1} * {r}^{exponent} = {a1} * {power} = {term}.
+    mistake_tags:
+    - geometric_explicit_formula_error
+    - term_index_error
+    - exponent_error
+    - arithmetic_error
+    difficulty: medium
+  - id: GEOM_SEQ_EXPLICIT_RULE_001
+    type: generated
+    prompt_template: Write an explicit rule for a geometric sequence with first term {a1} and common ratio {r}.
+      Enter only the expression for a_n using n.
+    answer_mode: final_plus_required_work
+    variables:
+      a1:
+        type: int
+        min: 2
+        max: 12
+      r:
+        type: int
+        min: 2
+        max: 5
+    answer:
+      type: expression
+      value: '{a1}*{r}^(n - 1)'
+    grading:
+      method: symbolic_expression
+    work:
+      mode: capture_only
+      prompt: State the first term and common ratio, then explain why the exponent is n - 1.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use a_n = a_1 * r^(n - 1).
+      Substitute a_1 = {a1} and r = {r}.
+      An explicit expression is {a1} * {r}^(n - 1).
+    mistake_tags:
+    - geometric_explicit_formula_error
+    - term_index_error
+    - common_ratio_error
+    difficulty: medium
+  - id: GEOM_SEQ_IDENTIFY_GEOMETRIC_001
+    type: fixed
+    prompt: Which sequence is geometric?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: 4, 8, 12, 16, ...
+    - id: B
+      label: 2, 5, 10, 17, ...
+    - id: C
+      label: 1, 4, 9, 16, ...
+    - id: D
+      label: 3, 12, 48, 192, ...
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      In 3, 12, 48, 192, each term is multiplied by 4.
+      A constant consecutive ratio makes the sequence geometric.
+    mistake_tags:
+    - sequence_classification_error
+    - common_ratio_error
+    - arithmetic_vs_geometric
+    difficulty: easy
+  - id: GEOM_SEQ_FIND_TERM_NUMBER_001
+    type: generated
+    prompt_template: A geometric sequence has first term {a1} and common ratio {r}. Which term number has value
+      {term}?
+    answer_mode: final_plus_required_work
+    variables:
+      a1:
+        type: int
+        min: 1
+        max: 5
+      r:
+        type: int
+        min: 2
+        max: 4
+      n:
+        type: int
+        min: 3
+        max: 7
+    derived:
+      exponent: n - 1
+      term: a1 * r ** exponent
+    answer:
+      type: numeric
+      value: '{n}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use the explicit formula, isolate the power, and explain which power of the common ratio matches the
+        known term.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Set {a1} * {r}^(n - 1) equal to {term}.
+      After dividing by {a1}, the required power is {r}^{exponent}.
+      Therefore n - 1 = {exponent}, so n = {n}.
+    mistake_tags:
+    - term_index_error
+    - geometric_explicit_formula_error
+    - exponent_error
+    difficulty: hard
+  - id: GEOM_SEQ_RECURSIVE_RULE_001
+    type: fixed
+    prompt: Which recursive rule generates 5, 15, 45, 135, ...?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: a_1 = 5 and a_n = 3a_(n - 1)
+    - id: B
+      label: a_1 = 5 and a_n = a_(n - 1) + 3
+    - id: C
+      label: a_1 = 3 and a_n = 5a_(n - 1)
+    - id: D
+      label: a_1 = 5 and a_n = a_(n - 1)^3
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The sequence starts at 5.
+      Each new term is 3 times the previous term, so a_n = 3a_(n - 1).
+    mistake_tags:
+    - recursive_formula_error
+    - common_ratio_error
+    - arithmetic_vs_geometric
+    difficulty: medium
+  - id: GEOM_SEQ_DOUBLING_CONTEXT_001
+    type: generated
+    prompt_template: A culture starts with {initial} cells at period 1 and doubles each period. How many cells are
+      present at period {period}?
+    answer_mode: final_plus_required_work
+    variables:
+      initial:
+        type: int
+        min: 5
+        max: 40
+      period:
+        type: int
+        min: 4
+        max: 8
+    derived:
+      exponent: period - 1
+      factor: 2 ** exponent
+      cells: initial * factor
+    answer:
+      type: numeric
+      value: '{cells}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write the geometric-sequence calculation with the correct exponent, then simplify.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The first term is {initial} and the common ratio is 2.
+      By period {period}, doubling has occurred {exponent} times.
+      {initial} * 2^{exponent} = {cells}.
+    mistake_tags:
+    - geometric_sequence_model
+    - term_index_error
+    - doubling_error
+    difficulty: hard

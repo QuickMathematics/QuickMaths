@@ -34,23 +34,47 @@ theory: |
   2. No solution: the lines are parallel and never cross.
   3. Infinitely many solutions: the two equations describe the same line.
 
-  Method for equations in slope-intercept form:
-  1. Set the two right-hand sides equal.
-  2. Solve for x.
-  3. Substitute x into either equation to find y.
-  4. Check that the point works in both equations.
+  Choosing a method:
+  1. If both equations are solved for the same variable, set the two expressions equal.
+  2. If one equation already isolates a variable, substitution is usually the cleanest method.
+  3. If adding or subtracting the equations will cancel a variable, use elimination.
+  4. If you only need to classify lines in slope-intercept form, compare slopes and y-intercepts first.
 
-  Example:
+  Equal-expression method:
   Solve y = 2x + 3 and y = -x + 12.
-  Set them equal: 2x + 3 = -x + 12.
+  Set the right-hand sides equal: 2x + 3 = -x + 12.
   Add x: 3x + 3 = 12.
   Subtract 3: 3x = 9.
   Divide by 3: x = 3.
   Substitute: y = 2(3) + 3 = 9.
-  The solution is the point (3, 9).
+  The solution is (3, 9).
 
-  Common mistake:
-  Do not stop after finding x. A system solution is a point, so you also need the matching y-value.
+  Substitution:
+  Replace an isolated variable with the equivalent expression from the other equation.
+
+  Example:
+  Solve x = y + 1 and 2x + y = 11.
+  Substitute y + 1 for x: 2(y + 1) + y = 11.
+  Simplify: 3y + 2 = 11, so y = 3.
+  Then x = y + 1 = 4.
+  The solution is (4, 3).
+
+  Elimination:
+  Add or subtract equations so one variable cancels.
+
+  Example:
+  Solve x + y = 10 and x - y = 2.
+  Add the equations: 2x = 12, so x = 6.
+  Substitute into x + y = 10: y = 4.
+  The solution is (6, 4).
+
+  Checking a solution:
+  Substitute the ordered pair into both original equations. A point is a solution only when it makes both equations true.
+
+  Common mistakes:
+  - Do not stop after finding one coordinate. A system solution is an ordered pair.
+  - Do not substitute into only one equation when checking.
+  - Keep equations aligned when eliminating so like variable terms combine correctly.
 examples:
   - prompt: "For y = x + 4 and y = -x + 10, what is the x-coordinate of the solution?"
     solution: "3"
@@ -64,6 +88,18 @@ examples:
   - prompt: "Classify the system: y = -2x + 5 and 2x + y = 5"
     solution: "Infinitely many solutions"
     explanation: "Both equations describe the same line."
+  - prompt: "Solve by substitution: x = y + 1 and 2x + y = 11"
+    solution: "(4, 3)"
+    explanation: "Substitute y + 1 for x, solve 2(y + 1) + y = 11, then use x = y + 1."
+  - prompt: "Solve by elimination: x + y = 10 and x - y = 2"
+    solution: "(6, 4)"
+    explanation: "Add the equations to get 2x = 12, then substitute x = 6 to find y = 4."
+  - prompt: "Does (3, 7) solve y = 2x + 1 and x + y = 10?"
+    solution: "Yes"
+    explanation: "The point makes both equations true: 7 = 2(3) + 1 and 3 + 7 = 10."
+  - prompt: "Which method is most direct for x = 2y - 5 and 3x + y = 8?"
+    solution: "Substitution"
+    explanation: "One variable is already isolated, so substitute 2y - 5 for x."
 applications:
   - title: "Comparing costs"
     description: "Systems can show when two pricing plans cost the same."
@@ -78,7 +114,7 @@ test:
     - id: SYSTEM_X_COORD_SLOPE_INTERCEPT_001
       type: generated
       prompt_template: "For the system y = {m1}x + {b1} and y = {m2}x + {b2}, what is the x-coordinate of the solution?"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       max_attempts: 300
       variables:
         x:
@@ -114,9 +150,14 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Set the two right-hand sides equal and show each equivalent equation step, ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         At the intersection, both equations have the same y-value.
@@ -132,7 +173,7 @@ test:
     - id: SYSTEM_Y_COORD_SLOPE_INTERCEPT_001
       type: generated
       prompt_template: "For the system y = {m1}x + {b1} and y = {m2}x + {b2}, what is the y-coordinate of the solution?"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       max_attempts: 300
       variables:
         x:
@@ -169,7 +210,8 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: capture_only
+        prompt: "Show how you find x, then substitute that value into either equation to find y."
       review_policy:
         work_review: none
         mastery_requires_review_pass: false
@@ -187,7 +229,7 @@ test:
     - id: SYSTEM_SUBSTITUTION_X_GIVEN_001
       type: generated
       prompt_template: "Solve the system. What is y? x = {x} and y = {m}x + {b}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         x:
           type: int
@@ -214,9 +256,14 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Substitute the given x-value and show equivalent equation steps, ending with y = your final answer."
+        line_type: equation
+        target_variable: y
+        minimum_steps: 2
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         The first equation gives x = {x}.
@@ -232,7 +279,7 @@ test:
     - id: SYSTEM_ELIMINATION_SUM_DIFF_X_001
       type: generated
       prompt_template: "For the system x + y = {sum_value} and x - y = {diff_value}, what is x?"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         x:
           type: int
@@ -256,9 +303,14 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Add the equations so y cancels, then show equivalent equation steps ending with x = your final answer."
+        line_type: equation
+        target_variable: x
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Add the equations:
@@ -274,7 +326,7 @@ test:
     - id: SYSTEM_ELIMINATION_SUM_DIFF_Y_001
       type: generated
       prompt_template: "For the system x + y = {sum_value} and x - y = {diff_value}, what is y?"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         x:
           type: int
@@ -298,9 +350,14 @@ test:
       grading:
         method: exact_numeric
       work:
-        mode: none
+        mode: procedural_steps
+        prompt: "Subtract the second equation from the first so x cancels, then show equivalent equation steps ending with y = your final answer."
+        line_type: equation
+        target_variable: y
+        minimum_steps: 3
+        require_final_answer_match: true
       review_policy:
-        work_review: none
+        work_review: auto
         mastery_requires_review_pass: false
       explanation_template: |
         Subtract the second equation from the first:
@@ -317,7 +374,7 @@ test:
     - id: SYSTEM_CLASSIFY_NO_SOLUTION_001
       type: generated
       prompt_template: "Classify the system: y = {m}x + {b1} and y = {m}x + {b2}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         m:
           type: int
@@ -349,7 +406,8 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: capture_only
+        prompt: "Explain how the slopes and y-intercepts determine the number of solutions."
       review_policy:
         work_review: none
         mastery_requires_review_pass: false
@@ -367,7 +425,7 @@ test:
     - id: SYSTEM_CLASSIFY_INFINITE_SOLUTIONS_001
       type: generated
       prompt_template: "Classify the system: y = {m}x + {b} and {a}y = {am}x + {ab}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         m:
           type: int
@@ -399,7 +457,8 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: capture_only
+        prompt: "Rewrite or compare the equations and explain why they describe the same line."
       review_policy:
         work_review: none
         mastery_requires_review_pass: false
@@ -417,7 +476,7 @@ test:
     - id: SYSTEM_CLASSIFY_ONE_SOLUTION_001
       type: generated
       prompt_template: "Classify the system: y = {m1}x + {b1} and y = {m2}x + {b2}"
-      answer_mode: final_only
+      answer_mode: final_plus_required_work
       variables:
         m1:
           type: int
@@ -454,7 +513,8 @@ test:
       grading:
         method: multiple_choice
       work:
-        mode: none
+        mode: capture_only
+        prompt: "Explain how the slopes show that the two lines intersect exactly once."
       review_policy:
         work_review: none
         mastery_requires_review_pass: false

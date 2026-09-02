@@ -32,9 +32,9 @@ Challenge-period milestone evidence:
 ## Product surface
 
 - Original logo landing page with multiple learner profiles and sample progress
-- Six-chapter onboarding tour for every new profile, with skip and persistent replay controls
+- Seven-chapter onboarding tour for every new profile, with skip and persistent replay controls
 - Dashboard metrics, suggested next work, recent attempts, and continue flow
-- 28 native Mathematics lessons plus a first-party 15-lesson Geography package in the Lesson Depot, joined through coordinate geometry and geodesy
+- 44 native Mathematics lessons plus a first-party 15-lesson Geography package in the Lesson Depot, joined through coordinate geometry and geodesy
 - Theory, applications, prerequisites, unlocks, and worked examples for every skill
 - Scenario-complete mastery tests: every authored assessment case appears once per attempt (8–25 questions in the original Mathematics curriculum), while retakes rotate generated variants
 - Multiple-choice, free-response, required shown work, local grading, and step checks
@@ -107,7 +107,7 @@ Important files:
 
 - `docs/index.html` — landing page and persistent application shell
 - `docs/challenge.css` — responsive visual system and original-style clock
-- `docs/curriculum-data.json` — browser-ready 28-lesson native Mathematics curriculum with comprehensive assessments and rotating retake variants
+- `docs/curriculum-data.json` — browser-ready 44-lesson native Mathematics curriculum with comprehensive assessments and rotating retake variants
 - `docs/lesson-depot/lessons/geography/1.0.0/lesson-set.json` — installable first-party 15-lesson Geography curriculum
 - `docs/challenge-core.js` — profiles, mastery graph, grading, attempts, reviews, timers, and persistence
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports

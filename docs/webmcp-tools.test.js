@@ -265,8 +265,8 @@ test("app, curriculum, and progress tools expose the full learner state", async 
   assert.equal(app.view, "tutorial");
   assert.equal(app.map_scope, "subject");
   assert.deepEqual(app.learning_plan, { plan_mode: false, selected_skill_ids: [], layouts: {}, paths: [], annotations: [] });
-  assert.equal(map.skills.length, 28);
-  assert.equal(summary.skills.length, 28);
+  assert.equal(map.skills.length, 44);
+  assert.equal(summary.skills.length, 44);
   assert.equal(summary.suggested_next.skill_id, "MATH_ARITH_001");
 });
 
@@ -329,12 +329,12 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
   let tools = toolsFor(store);
   const nativeSubjects = await tools.list_subjects.execute({});
   assert.equal(nativeSubjects.active_subject_id, "SUBJECT_MATH");
-  assert.deepEqual(nativeSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [["SUBJECT_MATH", 28]]);
+  assert.deepEqual(nativeSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [["SUBJECT_MATH", 44]]);
   store.importLessonPack(geographyLessonSet);
   tools = toolsFor(store);
   const installedSubjects = await tools.list_subjects.execute({});
   assert.deepEqual(installedSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [
-    ["SUBJECT_MATH", 28], ["SUBJECT_GEOGRAPHY", 15],
+    ["SUBJECT_MATH", 44], ["SUBJECT_GEOGRAPHY", 15],
   ]);
   const changed = await tools.set_learning_preferences.execute({ progression_mode: "soft" });
   assert.equal(changed.progression_mode, "soft");
@@ -345,7 +345,7 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
   assert.equal(combinedPreference.map_scope, "all");
   const combinedMap = await tools.get_curriculum_map.execute({});
   assert.equal(combinedMap.scope, "all");
-  assert.equal(combinedMap.skills.length, 43);
+  assert.equal(combinedMap.skills.length, 59);
   assert.deepEqual(new Set(combinedMap.skills.map((skill) => skill.subject_id)), new Set(["SUBJECT_MATH", "SUBJECT_GEOGRAPHY"]));
   await assert.rejects(tools.get_curriculum_map.execute({ subject_id: "SUBJECT_MATH", scope: "all" }), /cannot be combined/);
   const opened = await tools.open_lesson_creator.execute({ subject_id: "SUBJECT_MATH" });
