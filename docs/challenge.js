@@ -147,6 +147,54 @@ function escapeHtml(value) {
   })[character]);
 }
 
+let activeAppConfirmation = null;
+
+function requestAppConfirmation({
+  title = "Confirm action",
+  message = "Are you sure?",
+  confirmLabel = "Continue",
+  cancelLabel = "Cancel",
+  destructive = false,
+} = {}) {
+  activeAppConfirmation?.cancel();
+  return new Promise((resolve) => {
+    const backdrop = document.createElement("section");
+    backdrop.className = "action-confirm-backdrop";
+    backdrop.setAttribute("role", "presentation");
+    backdrop.innerHTML = `
+      <article class="action-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="action-confirm-title" aria-describedby="action-confirm-message">
+        <p class="eyebrow">Workspace Storage</p>
+        <h2 id="action-confirm-title">${escapeHtml(title)}</h2>
+        <p id="action-confirm-message">${escapeHtml(message).replace(/\n/g, "<br>")}</p>
+        <div class="action-confirm-actions">
+          <button class="button button-outline" type="button" data-confirm-cancel>${escapeHtml(cancelLabel)}</button>
+          <button class="button ${destructive ? "button-danger" : "button-primary"}" type="button" data-confirm-accept>${escapeHtml(confirmLabel)}</button>
+        </div>
+      </article>`;
+
+    const finish = (accepted) => {
+      if (!backdrop.isConnected) return;
+      document.removeEventListener("keydown", onKeyDown);
+      backdrop.remove();
+      activeAppConfirmation = null;
+      resolve(accepted);
+    };
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") finish(false);
+    };
+    const cancel = () => finish(false);
+    activeAppConfirmation = { cancel };
+    backdrop.querySelector("[data-confirm-cancel]")?.addEventListener("click", cancel);
+    backdrop.querySelector("[data-confirm-accept]")?.addEventListener("click", () => finish(true));
+    backdrop.addEventListener("click", (event) => {
+      if (event.target === backdrop) finish(false);
+    });
+    document.addEventListener("keydown", onKeyDown);
+    document.body.append(backdrop);
+    requestAnimationFrame(() => backdrop.querySelector("[data-confirm-cancel]")?.focus({ preventScroll: true }));
+  });
+}
+
 function agentHandoffMarkup(snapshot, { compact = false } = {}) {
   const agentReady = webMcpAvailable(document.modelContext);
   const previousActivity = hasPriorAgentActivity(snapshot);
@@ -2157,7 +2205,12 @@ async function bridgeAction(action) {
       showToast(result.updated ? "Agent changes applied." : result.stale ? "Outdated agent changes ignored. Ask the agent to sync again." : "No new agent changes.");
     }
     if (action === "bridge-load-remote") {
-      if (!window.confirm("Replace this browser's complete QuickMaths state with the GitHub learner checkpoint?\n\nDownload a JSON backup first if you need to keep the current browser copy.")) return;
+      if (!await requestAppConfirmation({
+        title: "Load the GitHub workspace?",
+        message: "This replaces the complete QuickMaths workspace in this browser. Download a JSON backup first if you need to keep the current browser copy.",
+        confirmLabel: "Load GitHub copy",
+        destructive: true,
+      })) return;
       await githubSync.restoreLearner({ force: true });
       bridgeNeedsChoice = false;
       try { await githubSync.pullNow(); } catch { /* Keep the resolved learner channel active; polling can retry the agent channel. */ }
@@ -2166,7 +2219,12 @@ async function bridgeAction(action) {
       showToast("GitHub learner checkpoint loaded.");
     }
     if (action === "bridge-replace-remote") {
-      if (!window.confirm("Replace the GitHub learner checkpoint with this browser's complete QuickMaths state?\n\nThe previous GitHub version remains in repository history.")) return;
+      if (!await requestAppConfirmation({
+        title: "Use this browser's workspace?",
+        message: "This replaces the GitHub learner checkpoint with the complete QuickMaths workspace in this browser. The previous GitHub version remains in repository history.",
+        confirmLabel: "Replace GitHub copy",
+        destructive: true,
+      })) return;
       await githubSync.pushNow({ force: true });
       bridgeNeedsChoice = false;
       try { await githubSync.pullNow(); } catch { /* Keep the resolved learner channel active; polling can retry the agent channel. */ }

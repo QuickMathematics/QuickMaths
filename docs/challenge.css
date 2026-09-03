@@ -1504,6 +1504,14 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 
 .welcome-student-guide, .welcome-educator-guide { display: inline-flex; width: fit-content; color: var(--pine); font-weight: 800; text-underline-offset: 4px; }
 body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop) { overflow: hidden; }
+.action-confirm-backdrop { position: fixed; inset: 0; z-index: 1600; display: grid; place-items: center; box-sizing: border-box; padding: 20px; background: color-mix(in srgb,#0b2f2b 70%,transparent); backdrop-filter: blur(10px); }
+.action-confirm-dialog { width: min(520px,100%); box-sizing: border-box; padding: clamp(24px,5vw,40px); color: var(--ink); background: var(--paper-light); border: 1px solid color-mix(in srgb,var(--pine) 24%,var(--line)); border-radius: 26px; box-shadow: 0 28px 90px rgba(4,37,33,.3); }
+.action-confirm-dialog h2 { margin: 8px 0 14px; font: 600 clamp(30px,5vw,44px)/1 var(--serif); letter-spacing: -.035em; }
+.action-confirm-dialog > p:not(.eyebrow) { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
+.action-confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 26px; }
+.action-confirm-actions .button { min-height: 50px; }
+.button-danger { border-color: #a94a3c; background: #a94a3c; color: #fff; }
+.button-danger:hover, .button-danger:focus-visible { border-color: #87382d; background: #87382d; }
 .agent-welcome-backdrop { position: fixed; inset: 0; z-index: 1250; display: grid; place-items: center; box-sizing: border-box; max-width: 100vw; padding: clamp(18px,4vw,52px); overflow: auto; background: color-mix(in srgb,#0b2f2b 72%,transparent); backdrop-filter: blur(14px); }
 .agent-welcome-dialog { box-sizing: border-box; width: min(690px,100%); min-width: 0; padding: clamp(28px,5vw,58px); border: 1px solid color-mix(in srgb,var(--pine) 22%,var(--line)); border-radius: 34px; outline: none; background: radial-gradient(circle at 100% 0,color-mix(in srgb,var(--mint) 75%,transparent),transparent 34%),var(--paper-light); box-shadow: 0 28px 90px rgba(4,37,33,.28); }
 .agent-welcome-mark { display: grid; place-items: center; width: 66px; height: 66px; margin-bottom: 24px; border-radius: 20px; background: var(--pine); color: var(--lime); font-size: 25px; }
@@ -1534,6 +1542,9 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop) { overfl
 .studio-python-authoring { display: grid; gap: 13px; margin: 14px 0; padding: 16px; border: 1px solid color-mix(in srgb,var(--pine) 22%,var(--line)); border-radius: 15px; background: color-mix(in srgb,var(--mint) 30%,var(--paper-light)); }
 
 @media (max-width: 640px) {
+  .action-confirm-backdrop { align-items: end; padding: 12px; }
+  .action-confirm-dialog { margin-bottom: 74px; padding: 24px 20px; border-radius: 22px; }
+  .action-confirm-actions { grid-template-columns: 1fr; }
   .agent-handoff-actions { grid-template-columns: 1fr; }
   .agent-welcome-backdrop { align-items: start; padding: 12px; }
   .agent-welcome-dialog { margin: 8px 0 88px; padding: 26px 20px; border-radius: 24px; }

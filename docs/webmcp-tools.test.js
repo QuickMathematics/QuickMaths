@@ -120,6 +120,10 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /GitHub Bridge/);
   assert.match(js, /Manage GitHub storage/);
   assert.match(js, /confirmPermanentDeletion/);
+  assert.match(js, /function requestAppConfirmation/);
+  assert.match(js, /title: "Use this browser's workspace\?"/);
+  assert.match(js, /confirmLabel: "Replace GitHub copy"/);
+  assert.doesNotMatch(js, /window\.confirm\("Replace the GitHub learner checkpoint/);
   assert.match(js, /Are you absolutely sure/);
   assert.match(js, /clearRemoteWorkspace/);
   assert.match(js, /resumeAfterClear/);
