@@ -290,6 +290,7 @@ test("learner checkpoints are debounced and can be pushed manually", async () =>
   assert.equal(parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content).channel, "learner");
   assert.equal(JSON.parse(parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content).stateJson).score, 2);
   assert.equal(learner.snapshot().dirty, false);
+  assert.equal(learner.snapshot().lastRemoteActor, "QuickMaths device");
 });
 
 test("continuous learner activity cannot postpone the scheduled checkpoint forever", async () => {

@@ -665,6 +665,9 @@ export function createGitHubSyncController({
     if (!force && latest.exists && latest.sha !== knownSha) {
       throw new GitHubSyncConflictError("GitHub has a newer copy. Pull it before pushing.", { channel, knownSha, remoteSha: latest.sha });
     }
+    const publishedActorLabel = role === "agent"
+      ? resolvedDeviceLabel
+      : pendingLearnerActor?.label || resolvedDeviceLabel;
     const envelope = createBridgeEnvelope({
       channel,
       stateJson: serializeState(),
@@ -693,7 +696,17 @@ export function createGitHubSyncController({
     else agentSha = result.sha;
     if (channel === "learner") pendingLearnerActor = null;
     persistMetadata({ revisions: true });
-    update({ phase: "synced", dirty: false, lastPushedAt: now().toISOString(), error: null, conflict: null, remoteAvailable: true });
+    const pushedAt = now().toISOString();
+    update({
+      phase: "synced",
+      dirty: false,
+      lastPushedAt: pushedAt,
+      lastRemoteUpdatedAt: pushedAt,
+      lastRemoteActor: publishedActorLabel,
+      error: null,
+      conflict: null,
+      remoteAvailable: true,
+    });
     return { ...result, channel };
   }));
 
