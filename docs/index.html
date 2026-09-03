@@ -14,8 +14,8 @@
     <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
     <link rel="help" href="./QuickMaths-Student-Guide.pdf" title="QuickMaths Student Guide">
     <link rel="help" href="./QuickMaths-Educator-Guide.pdf" title="QuickMaths Educator Guide">
-    <link rel="stylesheet" href="./challenge.css?v=20260903-storage-manager-v1">
-    <script type="module" src="./challenge.js?v=20260903-storage-manager-v1"></script>
+    <link rel="stylesheet" href="./challenge.css?v=20260903-in-app-browser-v1">
+    <script type="module" src="./challenge.js?v=20260903-in-app-browser-v1"></script>
   </head>
   <body>
     <a class="skip-link" href="#view-root">Skip to learning workspace</a>
@@ -49,6 +49,7 @@
             <span><strong id="welcome-question-count">…</strong> varied mastery questions</span>
             <span><strong id="welcome-tool-count">…</strong> agent actions</span>
           </div>
+          <aside class="welcome-agent-boundary"><strong>Using an agent?</strong><span>WebMCP tools work only when QuickMaths is open inside the ChatGPT or Codex in-app browser. An external browser can run the app, but cannot expose its page tools.</span></aside>
         </section>
 
         <section class="profile-panel welcome-path-panel" aria-labelledby="profiles-title">
@@ -184,8 +185,9 @@
           <div><span id="bridge-status">Checking WebMCP…</span><i></i></div>
           <p id="bridge-detail">Looking for browser agent support.</p>
         </div>
+        <p class="agent-browser-boundary"><strong>In-app browser required.</strong> External Firefox, Chrome, Safari, and Edge tabs cannot expose QuickMaths WebMCP tools.</p>
           <div class="agent-prompt-card">
-          <div class="mini-heading"><span>Suggested prompt</span><button id="copy-prompt" type="button">Copy</button></div>
+          <div class="mini-heading"><span>Suggested prompt · includes manifest command</span><button id="copy-prompt" type="button">Copy</button></div>
           <p id="agent-prompt">Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.</p>
         </div>
         <details class="agent-tools">

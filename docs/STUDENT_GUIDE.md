@@ -10,6 +10,8 @@ Product: https://quickmathematics.github.io/QuickMaths/
 
 Learner WebMCP starting command: `get_agent_guide`
 
+WebMCP tools register only when QuickMaths is open inside the ChatGPT or Codex in-app browser. External Firefox, Chrome, Safari, and Edge tabs still run the complete human app, but an agent cannot attach WebMCP tools to those tabs. In the in-app browser, begin with `get_agent_guide` and `section: "summary"`.
+
 > QuickMaths is a learning and practice tool. It is not a substitute for supervised, identity-verified, or high-stakes assessment.
 
 ## 1. How QuickMaths works
@@ -137,7 +139,7 @@ Each subject has a safe fixed color palette. The selected subject changes interf
 
 The star-shaped nub opens Agent Studio. Its close button remains visible at different zoom levels and leaves the nub behind.
 
-Agent Studio reports WebMCP availability, registered and failed tools, a suggested prompt, the available tool-name list, and agent-attributed activity. Your own button clicks do not appear as agent activity.
+Agent Studio reports WebMCP availability, registered and failed tools, a browser-aware suggested prompt with the exact manifest command, the available tool-name list, and agent-attributed activity. Your own button clicks do not appear as agent activity. If the page is in an external browser, Agent Studio explains that the agent must open QuickMaths inside its ChatGPT or Codex in-app browser.
 
 ## 5. Learner Dashboard
 
@@ -453,15 +455,17 @@ Validation reports issues; it does not silently install or publish. Installing r
 
 ## 14. Learning with an agent
 
-WebMCP lets a compatible browser agent inspect the same visible QuickMaths state and use registered tools. It does not create a hidden parallel learner profile.
+WebMCP lets an agent inspect the same visible QuickMaths state and use registered tools only when the page is open inside the ChatGPT or Codex in-app browser. It cannot attach to an external Firefox, Chrome, Safari, or Edge tab, and it does not create a hidden parallel learner profile.
 
 ### Suggested starting prompt
 
-The app detects the current browser and builds the copied prompt at runtime. It begins with wording such as:
+The app checks whether the current page actually exposes WebMCP and builds the copied prompt at runtime. Inside the agent in-app browser it begins with:
 
-`This QuickMaths session is already open in Firefox. Use WebMCP with this open QuickMaths tab; do not open a new QuickMaths tab unless I ask.`
+`QuickMaths is already open in the ChatGPT/Codex in-app browser with WebMCP available. Use this already-open QuickMaths tab; do not open another QuickMaths tab unless I ask.`
 
-It then asks the agent to get the QuickMaths guide summary, inspect app state and progress, and guide the learning experience. Naming the open browser and tab prevents duplicate QuickMaths sessions with separate local state.
+It then gives the exact first command: call `get_agent_guide` with `section: "summary"`, inspect app state and progress, and guide the learning experience. Reusing the open in-app tab prevents duplicate QuickMaths sessions with separate local state.
+
+When copied from an external browser, the prompt names that browser, explains that its tab cannot expose WebMCP, gives the QuickMaths URL, and tells the agent to open and reuse QuickMaths in its own in-app browser. If the in-app origin does not yet contain the learner's workspace, the prompt tells the agent to guide a private Workspace Storage restore without asking for a token in chat.
 
 The agent should begin with `get_app_state`, `get_progress_summary`, and `get_learning_context` as needed. Repeated calls receive a compact policy ID and revision. Full learner-visible educator guidance is available from `get_agent_guide` when the revision changes or the task requires it.
 
@@ -518,7 +522,9 @@ Bridge status shows local dirty state, last workspace push, last agent pull, tok
 
 Initial-copy and conflict cards require a deliberate choice. QuickMaths refuses stale output and unsynced overwrites instead of guessing which copy matters.
 
-**Manage GitHub storage** opens the deletion manager. A profile deletion removes that profile's progress, attempts, reviews, drafts, map plan, and any educator curriculum it owns. With storage connected, QuickMaths writes the reduced learner workspace and deletes the stale agent checkpoint so it cannot remain as the current remote copy. **Clear all data** resets every local profile, curriculum, lesson pack, attempt, review, plan, Lesson Studio draft, browser connection, and same-browser Agent Bridge working copy; when connected, it also deletes `learner-state.json` and `agent-state.json` from the current repository branch.
+**Manage GitHub storage** opens the deletion manager. A profile deletion removes that profile's progress, attempts, reviews, drafts, map plan, and any educator curriculum it owns. With storage connected, QuickMaths writes the reduced learner workspace and deletes the stale agent checkpoint so it cannot remain as the current remote copy. **Clear all data** resets every local profile, curriculum, lesson pack, attempt, review, plan, Lesson Studio draft, and same-browser Agent Bridge working copy; when connected, it also deletes `learner-state.json` and `agent-state.json` from the current repository branch.
+
+Clearing learning data preserves the configured Workspace Storage connection, remembered fine-grained token, Community authorization, and local Bridge connection. Use the separate **Disconnect** controls when you want QuickMaths to forget credentials or end a connection.
 
 Both actions require two separate confirmations: first the full scope and backup warning, then **Are you absolutely sure?** QuickMaths has no undo. Download a JSON backup first. Deleting or replacing a current GitHub file does not erase older commits from repository history; use GitHub's repository-history controls separately if permanent historical erasure is required. If Workspace Storage is disconnected, the manager clearly limits the operation to this browser and leaves remote files untouched.
 
@@ -605,7 +611,7 @@ Download a backup if needed, read which complete copy is newer, and choose delib
 
 ### WebMCP tools are unavailable
 
-Open QuickMaths in a compatible ChatGPT or Codex browser. Agent Studio names registration status and any individual failures.
+Open QuickMaths inside the ChatGPT or Codex in-app browser, not an external browser tab, and reuse that in-app tab. Then call `get_agent_guide` with `section: "summary"`. Agent Studio names registration status and any individual failures. If the in-app workspace is empty, restore it through private Workspace Storage; enter the token only in the QuickMaths form, never in chat.
 
 ### Essential links
 

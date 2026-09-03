@@ -680,6 +680,16 @@ export function createGitHubSyncController({
     return { deletedPaths };
   }));
 
+  const resumeAfterClear = () => {
+    if (role !== "learner") throw new GitHubSyncError("Only the learner workspace can resume cleared Workspace Storage.", { code: "wrong_role" });
+    requireConfig();
+    if (!status.connected) throw new GitHubSyncError("Connect a GitHub repository first.", { code: "not_connected" });
+    stopped = false;
+    update({ phase: "cleared", dirty: false, remoteAvailable: false, error: null, conflict: null });
+    schedulePoll();
+    return statusClone(status);
+  };
+
   const disconnect = () => {
     pauseRemoteActivity();
     credentialStore.clear({ role });
@@ -721,6 +731,7 @@ export function createGitHubSyncController({
     inspectRemote,
     deleteRemoteAgentCheckpoint,
     clearRemoteWorkspace,
+    resumeAfterClear,
     schedulePush,
     snapshot: () => statusClone(status),
     subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },

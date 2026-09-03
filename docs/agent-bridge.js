@@ -1,5 +1,5 @@
 import { createQuickMathsStore } from "./challenge-core.js?v=20260903-storage-manager-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-storage-manager-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-in-app-browser-v1";
 import { createLessonDepot } from "./lesson-depot.js?v=20260902-python-v1";
 import {
   createGitHubContentsClient,
@@ -120,8 +120,8 @@ async function boot() {
   const [curriculumResponse, geographyResponse, manifestResponse, educatorManifestResponse, authoringGuideResponse] = await Promise.all([
     fetch("./curriculum-data.json?v=20260902-native-math-expansion"),
     fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
-    fetch("./agent-manifest.json?v=20260903-storage-manager-v1").catch(() => null),
-    fetch("./educator-agent-manifest.json?v=20260903-storage-manager-v1").catch(() => null),
+    fetch("./agent-manifest.json?v=20260903-in-app-browser-v1").catch(() => null),
+    fetch("./educator-agent-manifest.json?v=20260903-in-app-browser-v1").catch(() => null),
     fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
   ]);
   if (!curriculumResponse.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
@@ -186,8 +186,8 @@ async function boot() {
   elements.toolStatus.textContent = siteTools.available || bridgeTools.available
     ? failedToolNames.size
       ? `${registeredCount} of ${toolNames.length} site tools registered. Failed: ${[...failedToolNames].join(", ")}.`
-      : `${registeredCount} of ${toolNames.length} site tools registered in this browser.`
-    : "Open this page in the built-in Codex or ChatGPT browser to expose its site tools.";
+      : `${registeredCount} of ${toolNames.length} site tools registered in this in-app browser.`
+    : "WebMCP is unavailable in this external browser. Open this page inside the ChatGPT or Codex in-app browser and reuse that tab.";
 
   if (!localMode) elements.form.addEventListener("submit", connectFromForm);
   elements.pull.addEventListener("click", async () => {

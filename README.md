@@ -13,6 +13,8 @@ The public app runs entirely from GitHub Pages:
 
 No QuickMaths account, model API key, or paid application server is required. The complete local workspace autosaves in the browser and can be moved with full JSON backups or optional private-repository Workspace Storage.
 
+WebMCP tools are available only when QuickMaths is open inside the ChatGPT or Codex in-app browser. External Firefox, Chrome, Safari, and Edge tabs can use the complete human learning app, but an agent cannot attach WebMCP tools to those tabs. In the in-app browser, a learner agent starts with `get_agent_guide` using `section: "summary"`; an educator agent starts with `get_educator_agent_manifest`.
+
 QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLENGE.md#challenge-period-delta) separates the original application from the challenge-period extension and links the dated commit evidence.
 
 ## What is in the app
@@ -49,7 +51,7 @@ python -m pip install -e ".[dev]"
 python -m quickmaths.cli agent-bridge --repo https://github.com/YOUR-NAME/quickmaths-sync.git
 ```
 
-Open the printed `127.0.0.1` URL in a WebMCP-compatible agent browser. The loopback server uses the computer's existing Git credentials and exposes only `learner-state.json` and `agent-state.json` from the selected data repository.
+Open the printed `127.0.0.1` URL in the ChatGPT or Codex in-app browser; an external browser cannot expose its WebMCP tools. The loopback server uses the computer's existing Git credentials and exposes only `learner-state.json` and `agent-state.json` from the selected data repository.
 
 ## Curriculum development
 
@@ -91,7 +93,7 @@ node --test community-worker/src/*.test.js
 
 Browser autosave, GitHub Workspace Storage, and Lesson Depot community authorization are three separate systems. Workspace Storage uploads every local learner and educator profile, curriculum, attempt, review, installed pack, plan, and educator guidance to a dedicated private repository. Tokens are entered only in the app, are never committed, require Contents read/write, and should be restricted to that repository. Community authorization cannot read learner state; its public actions are limited to GitHub Discussion reactions and comments.
 
-Settings includes a human-only storage manager. Deleting a profile or clearing the complete workspace requires two confirmations; connected clearing deletes the current `learner-state.json` and `agent-state.json` files, while the interface accurately warns that older Git commits may retain previous checkpoint contents. These destructive operations are not WebMCP tools.
+Settings includes a human-only storage manager. Deleting a profile or clearing the complete workspace requires two confirmations; connected clearing deletes the current `learner-state.json` and `agent-state.json` files while preserving the configured connection and stored token, and the interface accurately warns that older Git commits may retain previous checkpoint contents. These destructive operations are not WebMCP tools.
 
 Imported curricula start in a fresh assignment profile unless the curriculum's student name matches the selected learner profile name after whitespace and letter-case normalization. Only that explicit match reuses mastery for matching lesson IDs; the import confirmation and in-app tooltip explain the rule before records are attached.
 

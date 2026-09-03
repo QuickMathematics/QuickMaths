@@ -10,6 +10,8 @@ Product: https://quickmathematics.github.io/QuickMaths/
 
 Educator WebMCP command: `get_educator_agent_manifest`
 
+WebMCP tools register only when QuickMaths is open inside the ChatGPT or Codex in-app browser. External Firefox, Chrome, Safari, and Edge tabs still run the complete human app, but an agent cannot attach WebMCP tools to those tabs. In the in-app browser, begin with `get_educator_agent_manifest`.
+
 > QuickMaths is a learning and practice tool. It is not a substitute for supervised, identity-verified, or high-stakes assessment.
 
 ## 1. The operating model
@@ -67,7 +69,7 @@ The educator panel can open an existing educator profile or create a new one. A 
 
 ### First educator popup
 
-The first educator opening shows a focused setup dialog. It contains:
+The first educator opening shows a focused setup dialog. It also states that WebMCP requires the ChatGPT or Codex in-app browser. It contains:
 
 - a direct link to this PDF;
 - a copyable prompt that tells an agent to visit QuickMaths and call `get_educator_agent_manifest`;
@@ -115,7 +117,7 @@ Agent Studio shows:
 
 - whether WebMCP is available;
 - how many tools registered and which tools failed;
-- a suggested starting prompt;
+- a browser-aware suggested starting prompt with the exact educator manifest command;
 - the complete registered tool-name list;
 - activity caused by agent tools only.
 
@@ -503,7 +505,7 @@ Bridge status distinguishes local browser state, last workspace push, last agent
 
 **Manage GitHub storage** opens the shared-workspace deletion manager. Deleting a profile removes its progress, attempts, reviews, drafts, map plan, and every curriculum owned by that educator profile. Any remaining learner profile is detached from a curriculum removed with its owner. When storage is connected, QuickMaths checkpoints the reduced workspace and deletes the stale agent checkpoint.
 
-**Clear all data** removes every browser profile, curriculum, pack, assessment record, review, plan, Lesson Studio draft, local connection, and same-browser Agent Bridge working copy. With Workspace Storage connected, it first deletes `learner-state.json` and `agent-state.json` from the current repository branch. With storage disconnected, remote files are explicitly left untouched. Both profile deletion and complete clearing use two consecutive confirmation dialogs, including the warning that QuickMaths has no undo without a backup. Git commit history may retain older contents even after the current files are deleted.
+**Clear all data** removes every browser profile, curriculum, pack, assessment record, review, plan, Lesson Studio draft, and same-browser Agent Bridge working copy. With Workspace Storage connected, it first deletes `learner-state.json` and `agent-state.json` from the current repository branch. With storage disconnected, remote files are explicitly left untouched. The configured Workspace Storage connection, remembered fine-grained token, Community authorization, and local Bridge connection remain in place; use their separate **Disconnect** controls to forget credentials or end a connection. Both profile deletion and complete clearing use two consecutive confirmation dialogs, including the warning that QuickMaths has no undo without a backup. Git commit history may retain older contents even after the current files are deleted.
 
 ### Full educator backup
 
@@ -525,17 +527,19 @@ The shared library lists package descriptions, subject, lesson count, and questi
 
 ## 11. WebMCP educator integration
 
-WebMCP connects a compatible browser agent to the same store and visible routes used by the human. There is no separate demonstration state.
+WebMCP connects an agent to the same store and visible routes used by the human only when QuickMaths is open inside the ChatGPT or Codex in-app browser. It cannot attach to an external Firefox, Chrome, Safari, or Edge tab. There is no separate demonstration state.
 
 ### Starting an educator agent
 
 Use this prompt:
 
-The in-app prompt detects the current browser and starts with wording such as:
+The app checks whether the current page actually exposes WebMCP. In the in-app browser, the prompt starts with:
 
-`This QuickMaths session is already open in Firefox. Use WebMCP with this open QuickMaths tab; do not open a new QuickMaths tab unless I ask.`
+`QuickMaths is already open in the ChatGPT/Codex in-app browser with WebMCP available. Use this already-open QuickMaths tab; do not open another QuickMaths tab unless I ask.`
 
-It then directs the agent to call `get_educator_agent_manifest`, inspect the open curriculum with `get_curriculum_workspace`, and keep installation, learner-policy, and publication actions visible and human-approved. Referring to the existing tab avoids opening a second origin-local workspace.
+It then gives the exact first command, `get_educator_agent_manifest`, directs the agent to inspect the open curriculum with `get_curriculum_workspace`, and keeps installation, learner-policy, and publication actions visible and human-approved. Referring to the existing tab avoids opening a second origin-local workspace.
+
+When copied from an external browser, the prompt names that browser, explains that its tab cannot expose WebMCP, gives the QuickMaths URL, and tells the agent to open and reuse QuickMaths inside its own in-app browser. If the educator workspace is absent there, the prompt directs the agent to guide a private Workspace Storage restore without ever requesting the token in chat.
 
 The dedicated command returns the educator operating contract and the active policy revision. Full supplemental guidance is labeled as learner-visible, imported, and untrusted. Repeated state calls return only a compact policy ID and revision to avoid re-injecting the same free text.
 
@@ -660,7 +664,7 @@ The conclusion and proof are separate judgments. Open Results and complete the r
 
 ### The page does not expose WebMCP tools
 
-Use a compatible ChatGPT or Codex browser. Agent Studio will show whether `document.modelContext.registerTool` is available and name any individual registration failures.
+Open QuickMaths inside the ChatGPT or Codex in-app browser, not an external browser tab, and reuse that tab. Then call `get_educator_agent_manifest`. Agent Studio will show whether `document.modelContext.registerTool` is available and name any individual registration failures. If the in-app workspace is empty, restore it through private Workspace Storage and enter the token only in the QuickMaths form.
 
 ## 16. Quick reference
 
@@ -691,4 +695,4 @@ Use a compatible ChatGPT or Codex browser. Agent Studio will show whether `docum
 - Bridge guide: https://quickmathematics.github.io/QuickMaths/bridge-guide.html
 - Source and Lesson Depot: https://github.com/QuickMathematics/QuickMaths
 
-QuickMaths educator documentation - app version 24 - September 2026.
+QuickMaths educator documentation - app version 25 - September 2026.

@@ -50,7 +50,7 @@ Challenge-period milestone evidence:
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers thirty-one page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact learner/tutor operating summary by default; `get_educator_agent_manifest` returns the dedicated curriculum-design contract and active curriculum policy; and `get_lesson_authoring_guide` returns the bundled authoring contract by topic. The complete sources remain the machine-readable `agent-manifest.json` and `educator-agent-manifest.json`.
+When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers thirty-one page tools through `document.modelContext.registerTool()`. External Firefox, Chrome, Safari, and Edge tabs retain the complete human app but cannot expose WebMCP tools. The tools operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A learner agent starts with `get_agent_guide` and `section: "summary"`; an educator agent starts with `get_educator_agent_manifest`; and `get_lesson_authoring_guide` returns the bundled authoring contract by topic. The complete sources remain the machine-readable `agent-manifest.json` and `educator-agent-manifest.json`.
 
 | Tool | Purpose |
 | --- | --- |
@@ -156,7 +156,7 @@ npm --prefix docs test
 pytest -q
 ```
 
-Open `http://localhost:8765/`. A compatible agent browser shows **Agent tools connected**; an ordinary browser keeps the complete manual experience. Open `http://localhost:8765/agent-bridge.html` for the separate 32-tool agent workspace.
+Open `http://localhost:8765/` inside the ChatGPT or Codex in-app browser. It shows **Agent tools connected in this tab**; an external browser keeps the complete manual experience but cannot expose WebMCP tools. Open `http://localhost:8765/agent-bridge.html` in the same in-app browser for the separate 32-tool agent workspace.
 
 The browser contract suite covers profiles, subject filtering, Hard/Open progression, cross-subject bridges, themes, proof-review mastery gates, unlocks, timers, mastery updates, varied retakes, symbolic grading, procedural-work validation, answer-key privacy, agent policy, lesson-set staging and progress round-trips, malformed backups, CSV exports, strict tool inputs, navigation, visible follow-ups, feedback-to-attempt linkage, credential isolation, Unicode GitHub transport, optimistic write conflicts, revision-bound agent output, and protection for unsynced learner work.
 

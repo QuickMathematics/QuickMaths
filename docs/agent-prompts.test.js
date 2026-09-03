@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { buildEducatorAgentPrompt, buildLearnerAgentPrompt, detectBrowserName } from "./agent-prompts.js";
+import { buildEducatorAgentPrompt, buildLearnerAgentPrompt, detectBrowserName, webMcpAvailable } from "./agent-prompts.js";
 
 test("detects common browsers without mistaking Edge for Chrome", () => {
   assert.equal(detectBrowserName({ userAgent: "Mozilla/5.0 Firefox/142.0" }), "Firefox");
@@ -10,15 +10,36 @@ test("detects common browsers without mistaking Edge for Chrome", () => {
   assert.equal(detectBrowserName({ userAgent: "unknown" }), "this browser");
 });
 
-test("learner and educator prompts target the already-open browser tab", () => {
+test("in-app learner and educator prompts target the already-open WebMCP tab and name their manifest tools", () => {
   const navigatorObject = { userAgent: "Mozilla/5.0 Firefox/142.0" };
-  const learner = buildLearnerAgentPrompt({ navigatorObject });
-  const educator = buildEducatorAgentPrompt({ navigatorObject });
+  const modelContext = { registerTool() {} };
+  const learner = buildLearnerAgentPrompt({ navigatorObject, modelContext });
+  const educator = buildEducatorAgentPrompt({ navigatorObject, modelContext });
   for (const prompt of [learner, educator]) {
-    assert.match(prompt, /already open in Firefox/i);
-    assert.match(prompt, /this open QuickMaths tab/i);
-    assert.match(prompt, /do not open a new QuickMaths tab/i);
+    assert.match(prompt, /ChatGPT\/Codex in-app browser/i);
+    assert.match(prompt, /already-open QuickMaths tab/i);
+    assert.match(prompt, /do not open another QuickMaths tab/i);
   }
-  assert.match(learner, /agent guide summary/i);
+  assert.match(learner, /get_agent_guide with section "summary"/);
   assert.match(educator, /get_educator_agent_manifest/);
+});
+
+test("external-browser prompts explain the boundary and direct the agent into its in-app browser", () => {
+  const navigatorObject = { userAgent: "Mozilla/5.0 Firefox/142.0" };
+  const learner = buildLearnerAgentPrompt({ navigatorObject, modelContext: undefined });
+  const educator = buildEducatorAgentPrompt({ navigatorObject, modelContext: undefined });
+  for (const prompt of [learner, educator]) {
+    assert.match(prompt, /Firefox, an external browser/i);
+    assert.match(prompt, /cannot expose WebMCP tools/i);
+    assert.match(prompt, /Open https:\/\/quickmathematics\.github\.io\/QuickMaths\/ in your ChatGPT or Codex in-app browser/i);
+    assert.match(prompt, /never ask me to paste a token into chat/i);
+  }
+  assert.match(learner, /get_agent_guide with section "summary"/);
+  assert.match(educator, /get_educator_agent_manifest/);
+});
+
+test("detects WebMCP support from the page capability instead of the browser name", () => {
+  assert.equal(webMcpAvailable({ registerTool() {} }), true);
+  assert.equal(webMcpAvailable({}), false);
+  assert.equal(webMcpAvailable(undefined), false);
 });

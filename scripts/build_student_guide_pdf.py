@@ -54,7 +54,7 @@ class StudentDocTemplate(EducatorDocTemplate):
             canvas.drawString(18 * mm, PAGE_H - 9.5 * mm, "QUICKMATHS STUDENT GUIDE")
             canvas.setFont("Helvetica", 7.5)
             canvas.setFillColor(colors.HexColor("#5C6965"))
-            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 24")
+            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 25")
             canvas.setStrokeColor(colors.HexColor("#D8D0C2"))
             canvas.line(18 * mm, 12 * mm, PAGE_W - 18 * mm, 12 * mm)
             canvas.setFont("Helvetica", 7.5)
@@ -64,7 +64,10 @@ class StudentDocTemplate(EducatorDocTemplate):
 
 
 def cover_story() -> list:
-    prompt = "Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience."
+    prompt = (
+        "Open QuickMaths in the ChatGPT/Codex in-app browser. Call "
+        "get_agent_guide with section summary through WebMCP."
+    )
     info = Table([
         [Paragraph("LEARNER REFERENCE", styles["CoverKicker"]), Paragraph("AGENT START", styles["CoverKicker"])],
         [Paragraph("Every visible learner control, study workflow, review state, safety boundary, and recovery path.", styles["CoverSub"]), Paragraph(inline_markup(prompt), styles["CoverSub"])],
@@ -84,7 +87,7 @@ def cover_story() -> list:
         Spacer(1, 15 * mm),
         info,
         Spacer(1, 18 * mm),
-        Paragraph("Version 24 / September 2026", styles["CoverKicker"]),
+        Paragraph("Version 25 / September 2026", styles["CoverKicker"]),
         PageBreak(),
     ]
 

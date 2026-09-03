@@ -587,7 +587,7 @@ Choose **Rubric-reviewed response** for essays, investigations, interpretations,
 
 ## WebMCP workflow
 
-Agents inside a compatible browser should use this sequence:
+Agents must open QuickMaths inside the ChatGPT or Codex in-app browser; external browser tabs cannot expose WebMCP tools. Reuse the existing in-app tab, then use this sequence:
 
 1. `get_lesson_authoring_guide` with the relevant section (normally `summary`, then `grading_and_work`)
 2. `list_subjects`

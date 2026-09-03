@@ -73,11 +73,11 @@ function stateHarness(name) {
   };
 }
 
-function controller({ role, client, harness, date = "2026-09-01T12:00:00.000Z" }) {
+function controller({ role, client, harness, credentialStore = credentials(), date = "2026-09-01T12:00:00.000Z" }) {
   return createGitHubSyncController({
     role,
     client,
-    credentialStore: credentials(),
+    credentialStore,
     serializeState: harness.serialize,
     applyState: harness.apply,
     subscribeToState: harness.subscribe,
@@ -191,7 +191,8 @@ test("learner can discard stale agent state and clear both current workspace fil
   const github = fakeGitHub();
   const learnerState = stateHarness("Learner");
   const agentState = stateHarness("Agent");
-  const learner = controller({ role: "learner", client: github, harness: learnerState });
+  const credentialStore = credentials();
+  const learner = controller({ role: "learner", client: github, harness: learnerState, credentialStore });
   const agent = controller({ role: "agent", client: github, harness: agentState });
   await learner.connect(connection(), { startPolling: false });
   await learner.pushNow();
@@ -212,6 +213,12 @@ test("learner can discard stale agent state and clear both current workspace fil
   assert.equal(github.files.size, 0);
   assert.equal(learner.snapshot().remoteAvailable, false);
   assert.equal(learner.snapshot().dirty, false);
+  learnerState.mutate({ profiles: [], activeProfileId: null });
+  assert.equal(learner.snapshot().dirty, true);
+  learner.resumeAfterClear();
+  assert.equal(learner.snapshot().connected, true);
+  assert.equal(learner.snapshot().dirty, false);
+  assert.equal(credentialStore.load({ role: "learner" }).token, "github-token");
 });
 
 test("learner checkpoints are debounced and can be pushed manually", async () => {

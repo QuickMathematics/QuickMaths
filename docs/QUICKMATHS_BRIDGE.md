@@ -14,7 +14,7 @@ Agent-side changes are transactional: tool calls mark the workspace dirty but ne
 - Your QuickMaths Pages fork, or the public QuickMaths site for testing.
 - A separate private repository such as `quickmaths-sync`, initialized with a README so its `main` branch exists.
 - A fine-grained GitHub personal access token limited to that one data repository with **Contents: Read and write** for the learner phone. No Actions, administration, account, or source-repository access is needed.
-- For the remote-agent flow: a computer running a Codex task with its built-in browser open to the Agent Bridge. The computer and task must remain available while you continue it remotely from your phone.
+- For the remote-agent flow: a computer running a Codex task with its in-app browser open to the Agent Bridge. External browser tabs cannot expose the WebMCP tools. The computer and task must remain available while you continue it remotely from your phone.
 - The QuickMaths source checkout and Git command-line access to the private data repository on that computer. Git Credential Manager or `gh auth login` can supply the host credential.
 
 ## One-time setup
@@ -39,7 +39,7 @@ The older all-browser route remains available at `/agent-bridge.html`, but it ne
 
 Keep the Agent Bridge as a top-level browser page and use this starting prompt:
 
-> You are my QuickMaths learning agent. Keep the QuickMaths Agent Bridge open as the top-level page. Read `get_agent_guide`, then call `sync_from_learner` before inspecting progress, recommending work, or tutoring. Use only the registered QuickMaths tools to read or change learning state. Tutor Socratically, never reveal pre-submission answer keys, and preserve the learner's subject and Hard/Open path choices. After any saved feedback, follow-up problem, preference change, or staged lesson set, call `publish_agent_checkpoint`. If sync reports a conflict, pull the learner again and repeat the intended change from current state; never force stale output over learner work. Recommend a downloadable JSON backup at natural stopping points.
+> You are my QuickMaths learning agent. Open the QuickMaths Agent Bridge in the ChatGPT or Codex in-app browser and keep that already-open tab as the top-level page; external browser tabs cannot expose WebMCP tools. First call `get_agent_guide` with `section: "summary"`, then call `sync_from_learner` before inspecting progress, recommending work, or tutoring. Use only the registered QuickMaths tools to read or change learning state. Tutor Socratically, never reveal pre-submission answer keys, and preserve the learner's subject and Hard/Open path choices. After any saved feedback, follow-up problem, preference change, or staged lesson set, call `publish_agent_checkpoint`. If sync reports a conflict, pull the learner again and repeat the intended change from current state; never force stale output over learner work. Recommend a downloadable JSON backup at natural stopping points.
 
 The bridge page exposes the 17 learning tools plus:
 

@@ -23,7 +23,7 @@
         <div>
           <p class="eyebrow">Remote agent workspace</p>
           <h1>The learner’s workspace,<br>without the learning UI.</h1>
-          <p>This top-level page mirrors complete QuickMaths workspace checkpoints from GitHub, exposes the WebMCP toolset for the active profile, and publishes agent changes back only when they are based on the current learner revision.</p>
+          <p>This top-level page mirrors complete QuickMaths workspace checkpoints from GitHub, exposes the WebMCP toolset for the active profile, and publishes agent changes back only when they are based on the current learner revision. Open it inside the ChatGPT or Codex in-app browser; external browser tabs cannot expose the tools.</p>
         </div>
         <div class="hero-mark" aria-hidden="true"><span>Q</span><span>M</span><i>↔</i></div>
       </section>
@@ -61,7 +61,7 @@
       <section class="bridge-grid lower-grid">
         <article class="panel tool-panel">
           <div class="panel-heading"><div><p class="eyebrow">WebMCP</p><h2>Agent tools</h2></div><strong id="tool-count">0</strong></div>
-          <p id="tool-status">Waiting for a compatible Codex or ChatGPT browser.</p>
+          <p id="tool-status">Waiting for the ChatGPT or Codex in-app browser.</p>
           <div id="tool-list" class="tool-list"></div>
         </article>
         <article class="panel protocol-panel">
@@ -75,6 +75,6 @@
       </section>
     </main>
     <div id="toast" class="toast" hidden></div>
-    <script type="module" src="./agent-bridge.js?v=20260903-storage-manager-v1"></script>
+    <script type="module" src="./agent-bridge.js?v=20260903-in-app-browser-v1"></script>
   </body>
 </html>

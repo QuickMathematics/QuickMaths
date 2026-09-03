@@ -136,7 +136,7 @@ class EducatorDocTemplate(BaseDocTemplate):
             canvas.drawString(18 * mm, PAGE_H - 9.5 * mm, "QUICKMATHS EDUCATOR GUIDE")
             canvas.setFont("Helvetica", 7.5)
             canvas.setFillColor(MUTED)
-            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 24")
+            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 25")
             canvas.setStrokeColor(LINE)
             canvas.line(18 * mm, 12 * mm, PAGE_W - 18 * mm, 12 * mm)
             canvas.setFont("Helvetica", 7.5)
@@ -250,7 +250,7 @@ def parse_markdown(markdown: str) -> list:
 
 def cover_story() -> list:
     prompt = (
-        "Visit https://quickmathematics.github.io/QuickMaths/ and call "
+        "Open QuickMaths in the ChatGPT/Codex in-app browser. Call "
         "get_educator_agent_manifest through WebMCP."
     )
     info = Table([
@@ -272,7 +272,7 @@ def cover_story() -> list:
         Spacer(1, 15 * mm),
         info,
         Spacer(1, 18 * mm),
-        Paragraph("Version 24 / September 2026", styles["CoverKicker"]),
+        Paragraph("Version 25 / September 2026", styles["CoverKicker"]),
         PageBreak(),
     ]
 
