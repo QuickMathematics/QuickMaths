@@ -1,3 +1,5 @@
+export const QUICKMATHS_APP_URL = "https://quickmathematics.github.io/QuickMaths/";
+
 function browserFromUserAgent(userAgent = "", brands = []) {
   const brandText = Array.isArray(brands) ? brands.map((item) => item?.brand ?? "").join(" ") : "";
   const source = `${brandText} ${userAgent}`;
@@ -17,19 +19,19 @@ export function webMcpAvailable(modelContext = globalThis.document?.modelContext
   return typeof modelContext?.registerTool === "function";
 }
 
-function connectionInstruction({ navigatorObject, modelContext, available }) {
-  if (available ?? webMcpAvailable(modelContext)) {
-    return "QuickMaths is already open in the ChatGPT/Codex in-app browser with WebMCP available. Use this already-open QuickMaths tab; do not open another QuickMaths tab unless I ask.";
-  }
-  const browserName = detectBrowserName(navigatorObject);
-  const location = browserName === "this browser" ? "an external browser" : `${browserName}, an external browser`;
-  return `This QuickMaths page is open in ${location}, whose tabs cannot expose WebMCP tools. Open https://quickmathematics.github.io/QuickMaths/ in your ChatGPT or Codex in-app browser and reuse that in-app QuickMaths tab; do not open duplicates. If my workspace is not there, guide me through restoring it with private Workspace Storage, but never ask me to paste a token into chat.`;
+export function buildLearnerAgentPrompt() {
+  return "QuickMaths is open in your in-app browser. Call get_agent_guide with section \"summary\" through WebMCP, then follow the manifest to inspect my learning workspace and guide me.";
 }
 
-export function buildLearnerAgentPrompt({ navigatorObject = globalThis.navigator, modelContext = globalThis.document?.modelContext, webMcpAvailable: available } = {}) {
-  return `${connectionInstruction({ navigatorObject, modelContext, available })} Then call get_agent_guide with section \"summary\" through WebMCP, check my app state and progress, and guide me through the learning experience.`;
+export function buildEducatorAgentPrompt() {
+  return "QuickMaths is open in your in-app browser. Call get_educator_agent_manifest through WebMCP, then follow the manifest to inspect my curriculum workspace and help me design it.";
 }
 
-export function buildEducatorAgentPrompt({ navigatorObject = globalThis.navigator, modelContext = globalThis.document?.modelContext, webMcpAvailable: available } = {}) {
-  return `${connectionInstruction({ navigatorObject, modelContext, available })} Then call get_educator_agent_manifest through WebMCP, read the educator manifest, inspect my open curriculum with get_curriculum_workspace, and help me design it while keeping every lesson installation, learner-policy change, and publication step visible and human-approved.`;
+export function buildQuickMathsDesktopLink({ role = "learner", includePrompt = true, handoff = "workspace" } = {}) {
+  const prompt = role === "educator" ? buildEducatorAgentPrompt() : buildLearnerAgentPrompt();
+  const browserUrl = new URL(QUICKMATHS_APP_URL);
+  browserUrl.searchParams.set("handoff", handoff === "fresh" ? "fresh" : "workspace");
+  const parameters = new URLSearchParams({ mode: "codex", browserUrl: browserUrl.toString() });
+  if (includePrompt) parameters.set("prompt", prompt);
+  return `codex://threads/new?${parameters.toString()}`;
 }

@@ -13,7 +13,8 @@
     "educator_manifest": "https://quickmathematics.github.io/QuickMaths/educator-agent-manifest.json",
     "student_documentation_pdf": "https://quickmathematics.github.io/QuickMaths/QuickMaths-Student-Guide.pdf",
     "educator_documentation_pdf": "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf",
-    "browser_boundary": "QuickMaths WebMCP tools are page-bound and register only when the site is open inside the ChatGPT or Codex in-app browser. They cannot attach to an external Firefox, Chrome, Safari, or Edge tab. If the human starts externally, open the QuickMaths homepage in the agent in-app browser, reuse that tab, and call get_agent_guide with section summary. If its local workspace is empty, guide the human through private Workspace Storage without asking them to paste a token into chat.",
+    "browser_boundary": "QuickMaths WebMCP tools are page-bound and register only when the site is open inside the ChatGPT or Codex in-app browser. They cannot attach to an external browser tab. The human-facing app handles that boundary: a fresh workspace offers an app handoff, while an existing external workspace requires a full JSON backup or private Workspace Storage before moving. Once this manifest is available, reuse the already-open in-app QuickMaths tab and do not create a duplicate.",
+    "credential_handoff": "A desktop handoff URL may carry only the public QuickMaths URL and a short manifest-first prompt. It must never carry a repository token, GitHub Community credential, learner answer, or workspace payload. Never ask the human to paste a token into chat. If restoration is needed, direct them to enter the fine-grained token privately in QuickMaths Workspace Storage.",
     "note": "WebMCP discovers registered page tools. Start with get_agent_guide using section summary. get_lesson_authoring_guide returns the bundled authoring manual by topic before an agent writes or modifies lesson content.",
     "guide_sections": ["summary", "tutoring", "navigation", "planning", "educator", "bridge", "custom_content", "backup", "all"]
   },
@@ -69,7 +70,7 @@
   },
   "agent_policy": {
     "start": [
-      "Confirm QuickMaths is open in the ChatGPT or Codex in-app browser. External browser tabs cannot expose page tools. Reuse the existing in-app QuickMaths tab, then call get_agent_guide with section summary; do not create duplicate tabs.",
+      "QuickMaths is already open in the ChatGPT or Codex in-app browser if this tool is callable. Reuse this tab, call get_agent_guide with section summary, and do not create a duplicate tab.",
       "Call get_app_state before changing the page.",
       "Early in onboarding, explain that browser autosave stays on one origin and offer to guide the human through either a full JSON backup or persistent GitHub storage for cross-device recovery. Never request or repeat their storage token in conversation.",
       "If the human plans to participate in the Lesson Depot community, recommend the separate optional GitHub Community authorization and let them operate the authorization, vote, and comment controls themselves.",

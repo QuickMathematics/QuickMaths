@@ -1267,6 +1267,7 @@ function sanitizeProfile(candidate) {
     activeSubjectId: SUBJECT_ID.test(candidate.activeSubjectId) ? candidate.activeSubjectId : DEFAULT_SUBJECT_ID,
     progressionMode: candidate.progressionMode === "soft" ? "soft" : "hard",
     mapScope: "all",
+    agentActivityAt: cleanText(candidate.agentActivityAt, 40) || null,
     educatorGuideSeenAt: role === "educator"
       ? candidate.educatorGuideSeenAt === null ? null : cleanText(candidate.educatorGuideSeenAt, 40) || null
       : null,
@@ -1601,6 +1602,23 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   const reviews = Array.isArray(candidate.reviews)
     ? candidate.reviews.map((item) => sanitizeReview(item, profileIds)).filter(Boolean).slice(-MAX_REVIEWS)
     : [];
+  const activity = Array.isArray(candidate.activity)
+    ? candidate.activity
+        .filter((item) => item && typeof item === "object")
+        .map((item) => ({
+          at: cleanText(item.at, 40),
+          tool: cleanText(item.tool, 80),
+          message: cleanText(item.message, 200),
+          profileId: profileIds.has(item.profileId) ? item.profileId : null,
+          actor: item.actor === "agent" ? "agent" : "learner",
+        }))
+        .filter((item) => item.at && item.tool && item.message)
+        .slice(-MAX_ACTIVITY)
+    : [];
+  for (const profile of profiles) {
+    if (profile.agentActivityAt) continue;
+    profile.agentActivityAt = activity.filter((item) => item.profileId === profile.id && item.actor === "agent").at(-1)?.at ?? null;
+  }
   return {
     ...base,
     activeProfileId,
@@ -1643,19 +1661,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
           heartbeatAt: cleanNumber(candidate.session.heartbeatAt, Date.now(), 0),
         }
       : null,
-    activity: Array.isArray(candidate.activity)
-      ? candidate.activity
-          .filter((item) => item && typeof item === "object")
-          .map((item) => ({
-            at: cleanText(item.at, 40),
-            tool: cleanText(item.tool, 80),
-            message: cleanText(item.message, 200),
-            profileId: profileIds.has(item.profileId) ? item.profileId : null,
-            actor: item.actor === "agent" ? "agent" : "learner",
-          }))
-          .filter((item) => item.at && item.tool && item.message)
-          .slice(-MAX_ACTIVITY)
-      : [],
+    activity,
   };
 }
 
@@ -2500,9 +2506,14 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   };
 
   const addActivity = (tool, message, profileId = state.activeProfileId, actor = "learner") => {
+    const at = isoNow();
     state.activity = [...state.activity, {
-      at: isoNow(), tool, message, profileId: profileId ?? null, actor: actor === "agent" ? "agent" : "learner",
+      at, tool, message, profileId: profileId ?? null, actor: actor === "agent" ? "agent" : "learner",
     }].slice(-MAX_ACTIVITY);
+    if (actor === "agent") {
+      const profile = state.profiles.find((item) => item.id === profileId);
+      if (profile) profile.agentActivityAt = at;
+    }
   };
 
   const activeProfile = () => state.profiles.find((profile) => profile.id === state.activeProfileId) ?? null;
@@ -2901,6 +2912,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       role: safeRole, curriculumId: safeRole === "learner" && state.curricula.some((item) => item.id === curriculumId) ? curriculumId : null,
       activeCurriculumId: null,
       activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "all", tutorialCompletedAt: safeRole === "educator" ? isoNow() : null, tutorialSkipped: false,
+      agentActivityAt: null,
       educatorGuideSeenAt: null,
     };
     state.profiles.push(profile);

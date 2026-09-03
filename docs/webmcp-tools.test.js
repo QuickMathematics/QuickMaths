@@ -78,13 +78,15 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /authored scenarios are included/);
   assert.match(js, /addEventListener\("pointermove"/);
   assert.match(js, /startDistance/);
-  assert.match(js, /data-tutorial-action="copy-agent-prompt"/);
+  assert.match(js, /agentHandoffMarkup\(snapshot, \{ compact: true \}\)/);
   assert.match(html, /id="welcome-lesson-count">…<\/strong> connected lessons/);
   assert.doesNotMatch(html, /<strong>25<\/strong> connected skills/);
   assert.match(html, /Local-first mastery learning/);
   assert.match(html, /id="welcome-storage-restore"/);
   assert.match(html, /id="welcome-educator-path"/);
   assert.match(html, /id="educator-welcome-root"/);
+  assert.match(html, /id="agent-welcome-root"/);
+  assert.match(html, /id="agent-handoff-root"/);
   assert.match(html, /QuickMaths-Student-Guide\.pdf/);
   assert.match(html, /QuickMaths-Educator-Guide\.pdf/);
   assert.match(html, /educator-agent-manifest\.json/);
@@ -95,21 +97,24 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /QuickMaths is for learning and practice/);
   assert.match(agentPrompts, /get_educator_agent_manifest/);
   assert.match(js, /activeProfile\?\.role === "educator" \? educatorStarterPrompt\(\) : agentStarterPrompt\(\)/);
-  assert.match(js, /data-action="copy-educator-prompt"/);
+  assert.match(js, /data-action="copy-current-agent-prompt"/);
   assert.match(js, /data-action="dismiss-educator-welcome"/);
   assert.match(js, /completeEducatorWelcome/);
   assert.doesNotMatch(js, /Attempts per lesson/);
   assert.match(html, /id="app-shell" class="app-shell agent-collapsed"/);
   assert.match(html, /id="agent-dock" class="agent-dock is-closed"/);
-  assert.match(html, /WebMCP tools work only when QuickMaths is open inside the ChatGPT or Codex in-app browser/);
-  assert.match(html, /External Firefox, Chrome, Safari, and Edge tabs cannot expose QuickMaths WebMCP tools/);
+  assert.match(js, /Open in ChatGPT \/ Codex/);
+  assert.match(js, /Download backup/);
+  assert.match(js, /Set up GitHub storage/);
   assert.doesNotMatch(html, /QuickMaths turns \d+ connected lessons across \d+ installed subjects/);
   assert.match(js, /snapshot\.curriculum\.allSkills\.length/);
   assert.match(agentPrompts, /get_agent_guide with section/);
   assert.match(agentPrompts, /get_educator_agent_manifest/);
-  assert.match(agentPrompts, /ChatGPT\/Codex in-app browser/);
-  assert.match(agentPrompts, /cannot expose WebMCP tools/);
-  assert.match(agentPrompts, /do not open another QuickMaths tab unless I ask/);
+  assert.match(agentPrompts, /codex:\/\/threads\/new/);
+  assert.match(agentPrompts, /browserUrl/);
+  assert.doesNotMatch(agentPrompts, /never ask me to paste a token/);
+  assert.match(js, /hasPriorAgentActivity/);
+  assert.match(js, /agentActivityAt/);
   assert.match(js, /visual: "depot"/);
   assert.match(js, /GitHub Bridge/);
   assert.match(js, /Manage GitHub storage/);
@@ -285,7 +290,8 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.equal(summary.guide.app, "QuickMaths Web");
   assert.equal(summary.guide.app_version, 26);
   assert.match(summary.guide.browser_boundary, /ChatGPT or Codex in-app browser/);
-  assert.match(summary.guide.browser_boundary, /get_agent_guide with section summary/);
+  assert.match(summary.guide.browser_boundary, /already-open in-app QuickMaths tab/);
+  assert.match(summary.guide.credential_handoff, /Never ask the human to paste a token into chat/);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
   assert.equal(summary.guide.tools.length, 31);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
@@ -323,7 +329,8 @@ test("educator WebMCP tools compose curricula and expose learner-visible supplem
   const educatorGuide = await tools.get_educator_agent_manifest.execute({});
   assert.equal(educatorGuide.manifest.role, "educator");
   assert.equal(educatorGuide.manifest.discovery.command, "get_educator_agent_manifest");
-  assert.match(educatorGuide.manifest.discovery.browser_boundary, /external Firefox, Chrome, Safari, or Edge tab/);
+  assert.match(educatorGuide.manifest.discovery.browser_boundary, /external browser tab/);
+  assert.match(educatorGuide.manifest.discovery.credential_handoff, /Never ask the educator to paste a token into chat/);
   assert.match(educatorGuide.manifest.documentation_pdf, /QuickMaths-Educator-Guide\.pdf/);
   assert.equal(educatorGuide.manifest.lesson_content_workflow.batch_review.includes("sequential"), true);
   assert.equal(JSON.stringify(educatorGuide).includes("expected_answer"), false);
@@ -496,6 +503,7 @@ test("Agent activity includes tool actions but excludes learner UI actions", asy
   assert.equal(activity.length, 1);
   assert.equal(activity[0].actor, "agent");
   assert.equal(activity[0].tool, "set_learning_preferences");
+  assert.equal(store.snapshot().activeProfile.agentActivityAt, "2026-09-01T09:42:00.000Z");
 });
 
 test("subject tools describe the combined curriculum and open the no-code creator", async () => {

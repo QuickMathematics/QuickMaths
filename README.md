@@ -13,7 +13,7 @@ The public app runs entirely from GitHub Pages:
 
 No QuickMaths account, model API key, or paid application server is required. The complete local workspace autosaves in the browser and can be moved with full JSON backups or optional private-repository Workspace Storage.
 
-WebMCP tools are available only when QuickMaths is open inside the ChatGPT or Codex in-app browser. External Firefox, Chrome, Safari, and Edge tabs can use the complete human learning app, but an agent cannot attach WebMCP tools to those tabs. In the in-app browser, a learner agent starts with `get_agent_guide` using `section: "summary"`; an educator agent starts with `get_educator_agent_manifest`.
+WebMCP tools are available only when QuickMaths is open inside the ChatGPT or Codex in-app browser. External browsers retain the complete human app and receive a safe migration handoff: back up or configure private Workspace Storage first, then open QuickMaths in the in-app browser through the desktop link. The link carries only the public app URL and a concise manifest-first prompt—never credentials or workspace data. A learner agent starts with `get_agent_guide` using `section: "summary"`; an educator agent starts with `get_educator_agent_manifest`.
 
 QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLENGE.md#challenge-period-delta) separates the original application from the challenge-period extension and links the dated commit evidence.
 

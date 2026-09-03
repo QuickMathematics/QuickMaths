@@ -148,7 +148,7 @@ function guideForSection(guide, section) {
     available_sections: GUIDE_SECTIONS,
   };
   if (section === "all") return guide;
-  const base = { app: guide.app, app_version: guide.app_version, description: guide.description, homepage: guide.homepage, browser_boundary: guide.discovery?.browser_boundary, section };
+  const base = { app: guide.app, app_version: guide.app_version, description: guide.description, homepage: guide.homepage, browser_boundary: guide.discovery?.browser_boundary, credential_handoff: guide.discovery?.credential_handoff, section };
   if (section === "tutoring") return {
     ...base,
     workflow: guide.agent_policy?.start ?? [],

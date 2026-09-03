@@ -1,5 +1,5 @@
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-combined-map-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-combined-map-v1";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-agent-handoff-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-agent-handoff-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260903-combined-map-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -20,7 +20,13 @@ import {
 } from "./github-community.js?v=20260902-community-vote";
 import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 import { cancelActivePythonGraders, gradePythonProgram, visiblePythonTests } from "./python-grader.js?v=20260903-sandbox-v2";
-import { buildEducatorAgentPrompt, buildLearnerAgentPrompt } from "./agent-prompts.js?v=20260903-in-app-browser-v1";
+import {
+  buildEducatorAgentPrompt,
+  buildLearnerAgentPrompt,
+  buildQuickMathsDesktopLink,
+  detectBrowserName,
+  webMcpAvailable,
+} from "./agent-prompts.js?v=20260903-agent-handoff-v1";
 
 const MAX_CURRICULUM_FILE_BYTES = 10_000_000;
 const MAX_LESSON_FILE_BYTES = 2_000_000;
@@ -46,6 +52,7 @@ const elements = {
   welcomeQuestionCount: document.querySelector("#welcome-question-count"),
   welcomeToolCount: document.querySelector("#welcome-tool-count"),
   welcomeStorageRestore: document.querySelector("#welcome-storage-restore"),
+  welcomeAgentBoundary: document.querySelector("#welcome-agent-boundary"),
   view: document.querySelector("#view-root"),
   profileName: document.querySelector("#sidebar-profile-name"),
   profileAvatar: document.querySelector("#profile-avatar"),
@@ -64,6 +71,8 @@ const elements = {
   curriculumFile: document.querySelector("#curriculum-file"),
   toast: document.querySelector("#toast"),
   educatorWelcome: document.querySelector("#educator-welcome-root"),
+  agentWelcome: document.querySelector("#agent-welcome-root"),
+  agentHandoff: document.querySelector("#agent-handoff-root"),
 };
 
 let store;
@@ -81,7 +90,7 @@ let githubCredentials;
 let githubSyncSnapshot = { phase: "disconnected", connected: false, dirty: false, remoteAvailable: false, config: null, error: null, conflict: null };
 let bridgeNeedsChoice = false;
 let bridgeFormDraft = null;
-let welcomeStorageOpen = false;
+let welcomeStorageOpen = new URLSearchParams(window.location.search).get("handoff") === "workspace";
 let welcomePath = "learner";
 let pendingLandingCurriculumId = null;
 let legacyGeographyMigrationPromise = null;
@@ -89,6 +98,7 @@ const communityUi = { phase: "idle", activePack: null, discussion: null, comment
 const runningPythonQuestionIds = new Set();
 
 const EDUCATOR_GUIDE_URL = "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf";
+const AGENT_HANDOFF_NOTICE_KEY = "quickmaths.agent-handoff-notice.v1";
 const MAP_ZOOM_MIN = 0.1;
 const MAP_ZOOM_MAX = 1.6;
 const MAP_ZOOM_STEP = 0.1;
@@ -99,19 +109,35 @@ const THEME_VARIABLES = {
 };
 
 function agentStarterPrompt() {
-  return buildLearnerAgentPrompt({ navigatorObject: navigator, modelContext: document.modelContext });
+  return buildLearnerAgentPrompt();
 }
 
 function educatorStarterPrompt() {
-  return buildEducatorAgentPrompt({ navigatorObject: navigator, modelContext: document.modelContext });
+  return buildEducatorAgentPrompt();
 }
 
 function currentAgentPrompt() {
   return currentSnapshot?.activeProfile?.role === "educator" ? educatorStarterPrompt() : agentStarterPrompt();
 }
 
-function tutorSetupPrompt() {
-  return `${currentAgentPrompt()} If WebMCP still cannot be used in the in-app browser, ask me to paste only the relevant progress summary or shown work—never a raw lesson-set file with answer keys.`;
+function hasPriorAgentActivity(snapshot = currentSnapshot) {
+  return Boolean(snapshot?.activeProfile?.agentActivityAt || snapshot?.activity?.length);
+}
+
+function hasWorkspaceStorageToken() {
+  return Boolean(githubCredentials?.load({ role: "learner" })?.token);
+}
+
+function activeAgentRole(snapshot = currentSnapshot) {
+  return snapshot?.activeProfile?.role === "educator" ? "educator" : "learner";
+}
+
+function agentDesktopLink(snapshot = currentSnapshot, { fresh = false, role = activeAgentRole(snapshot) } = {}) {
+  return buildQuickMathsDesktopLink({
+    role,
+    includePrompt: fresh || !hasPriorAgentActivity(snapshot),
+    handoff: fresh ? "fresh" : "workspace",
+  });
 }
 
 function applySubjectTheme(subject) {
@@ -124,6 +150,49 @@ function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
   })[character]);
+}
+
+function agentHandoffMarkup(snapshot, { compact = false } = {}) {
+  const agentReady = webMcpAvailable(document.modelContext);
+  const previousActivity = hasPriorAgentActivity(snapshot);
+  const role = activeAgentRole(snapshot);
+  const roleLabel = role === "educator" ? "educator" : "learner";
+  if (agentReady) {
+    if (previousActivity) {
+      return `<section class="agent-handoff-card is-active${compact ? " is-compact" : ""}"><p class="eyebrow">Agent connected before</p><h3>Continue in this tab.</h3><p>This profile already has attributed Agent Activity, so the one-time starter prompt is hidden. Your agent can reuse this open QuickMaths tab and continue from the live workspace.</p></section>`;
+    }
+    return `<section class="agent-prompt-card${compact ? " is-compact" : ""}"><div class="mini-heading"><span>Suggested start · ${role === "educator" ? "get_educator_agent_manifest" : "get_agent_guide · summary"}</span><button type="button" data-action="copy-current-agent-prompt">Copy</button></div><p>${escapeHtml(role === "educator" ? educatorStarterPrompt() : agentStarterPrompt())}</p></section>`;
+  }
+  const browserName = detectBrowserName(navigator);
+  if (hasWorkspaceStorageToken()) {
+    return `<section class="agent-handoff-card is-ready${compact ? " is-compact" : ""}"><p class="eyebrow">Ready to hand off</p><h3>Open QuickMaths with your agent.</h3><p>Your ${browserName === "this browser" ? "current browser" : escapeHtml(browserName)} workspace has private Workspace Storage configured. Open QuickMaths in the ChatGPT or Codex in-app browser, then restore the workspace there from the same private repository.</p><a class="button button-primary agent-desktop-link" href="${escapeHtml(agentDesktopLink(snapshot))}">Open in ChatGPT / Codex</a>${previousActivity ? `<small>The starter prompt is omitted because this ${roleLabel} profile already has Agent Activity.</small>` : ""}</section>`;
+  }
+  return `<section class="agent-handoff-card needs-migration${compact ? " is-compact" : ""}"><p class="eyebrow">Move your workspace first</p><h3>Protect your progress before switching browsers.</h3><p>WebMCP needs the ChatGPT or Codex in-app browser, whose browser storage is separate from this one. Download a local backup or set up private GitHub Workspace Storage, then restore it after moving.</p><div class="agent-handoff-actions"><button class="button button-primary" type="button" data-action="save-backup">Download backup</button><button class="button button-outline" type="button" data-action="open-storage-setup">Set up GitHub storage</button></div></section>`;
+}
+
+function renderAgentEntry(snapshot) {
+  if (elements.agentHandoff) elements.agentHandoff.innerHTML = agentHandoffMarkup(snapshot);
+  if (elements.welcomeAgentBoundary) {
+    elements.welcomeAgentBoundary.innerHTML = webMcpAvailable(document.modelContext)
+      ? `<strong>Agent-ready here.</strong><span>This in-app browser can expose QuickMaths through WebMCP. The agent starts by reading the manifest.</span>`
+      : `<strong>Want an agent in the loop?</strong><span>Use the guided handoff to open QuickMaths in the ChatGPT or Codex in-app browser. Your learning app still works fully here.</span>`;
+  }
+}
+
+function freshAgentNoticeDismissed() {
+  try { return window.localStorage.getItem(AGENT_HANDOFF_NOTICE_KEY) === "dismissed"; }
+  catch { return false; }
+}
+
+function renderFreshAgentWelcome(snapshot) {
+  const fresh = !snapshot.activeProfile && snapshot.profiles.length === 0;
+  if (!fresh || webMcpAvailable(document.modelContext) || freshAgentNoticeDismissed()) {
+    elements.agentWelcome.innerHTML = "";
+    return;
+  }
+  const role = welcomePath === "educator" ? "educator" : "learner";
+  elements.agentWelcome.innerHTML = `<section class="agent-welcome-backdrop" role="presentation"><article class="agent-welcome-dialog" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="agent-welcome-title" aria-describedby="agent-welcome-copy"><div class="agent-welcome-mark" aria-hidden="true">✦</div><p class="eyebrow">Optional agent support</p><h1 id="agent-welcome-title">Start where QuickMaths can work with your agent.</h1><p id="agent-welcome-copy">For an agent in the loop, open QuickMaths in the ChatGPT or Codex in-app browser. The handoff opens the app and preloads one concise instruction to read the ${role} manifest through WebMCP.</p><a class="button button-primary agent-desktop-link" href="${escapeHtml(agentDesktopLink(snapshot, { fresh: true, role }))}">Open in ChatGPT / Codex</a><button class="quiet-button agent-welcome-continue" type="button" data-action="dismiss-agent-welcome">Continue in this browser</button></article></section>`;
+  requestAnimationFrame(() => elements.agentWelcome.querySelector(".agent-welcome-dialog")?.focus({ preventScroll: true }));
 }
 
 function formatDuration(seconds) {
@@ -226,9 +295,9 @@ const TUTORIAL_STEPS = [
   {
     eyebrow: "Your learning workspace",
     title: "Welcome to QuickMaths.",
-    lede: "This is a mastery map, lesson library, testing room, tutor workspace, and portable learning record—all running locally in your browser.",
-    points: ["Your profile keeps progress separate from other learners.", "Work autosaves on this device as you learn.", "A full JSON backup moves everything without an account."],
-    tip: "You can leave the tour at any time. Replay it later from Settings.",
+    lede: "QuickMaths is a mastery map, lesson library, testing room, tutor workspace, and portable learning record. Work starts locally, with two deliberate ways to carry it to another device.",
+    points: ["Your profile keeps progress separate from other learners and autosaves in this browser.", "A full JSON backup can move the complete workspace without an account.", "Optional private GitHub Workspace Storage keeps the complete browser workspace recoverable across devices."],
+    tip: "Browser storage is local to each browser profile. Before changing devices or moving into the agent-capable in-app browser, download a backup or configure private Workspace Storage. Replay this tour anytime from Settings.",
     visual: "welcome",
   },
   {
@@ -266,9 +335,9 @@ const TUTORIAL_STEPS = [
   {
     eyebrow: "Agent-assisted learning",
     title: "Bring a tutor into the same live workspace.",
-    lede: "WebMCP works only while QuickMaths is open inside the ChatGPT or Codex in-app browser. External Firefox, Chrome, Safari, and Edge tabs can run the learning app, but cannot expose its agent tools.",
-    points: ["The agent can inspect progress, navigate, recommend a lesson, and tutor from visible work.", "It can save Socratic feedback, prepare follow-up practice, and open a native lesson as an editable Studio improvement.", "Agent Activity records tool actions only, so your own clicks are never mislabelled as the agent’s."],
-    tip: "The copied prompt tells the agent to reuse the open in-app tab and call get_agent_guide with section \"summary\". Educator prompts call get_educator_agent_manifest instead.",
+    lede: "Agent support begins with a deliberate handoff to the ChatGPT or Codex in-app browser, where QuickMaths can expose WebMCP. The app adapts the handoff to this browser and your storage setup.",
+    points: ["Without private Workspace Storage, download a full backup or set up storage before moving so no local work is stranded.", "With storage ready, one link opens QuickMaths in the in-app browser and preloads the short manifest-first instruction.", "Agent Activity records tool actions only. After the first attributed action, QuickMaths hides the one-time starter prompt for that profile."],
+    tip: "The learner start calls get_agent_guide with section \"summary\"; the educator start calls get_educator_agent_manifest. Credential safety, recovery, and tutoring rules live in those manifests instead of bloating the prompt.",
     visual: "agent",
   },
   {
@@ -282,7 +351,7 @@ const TUTORIAL_STEPS = [
 ];
 
 function tutorialVisual(type, snapshot) {
-  if (type === "welcome") return `<div class="tour-profile-preview"><img src="./quickmaths-logo.png" alt="" width="88" height="82"><div><span>Profile ready</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>Autosaving on this device</small></div><i>✓</i></div><div class="tour-local-row"><span>Free</span><span>Local-first</span><span>No account</span></div>`;
+  if (type === "welcome") return `<div class="tour-profile-preview"><img src="./quickmaths-logo.png" alt="" width="88" height="82"><div><span>Profile ready</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>Autosaving in this browser</small></div><i>✓</i></div><div class="tour-local-row"><span>Browser autosave</span><span>JSON backup</span><span>Private GitHub storage</span></div>`;
   if (type === "subjects") {
     const assigned = Boolean(snapshot.activeCurriculum);
     return `<div class="tour-subject-preview"><p>One connected curriculum</p><div><span>∞</span><strong>All installed subjects</strong><b>${snapshot.subjects.length}</b></div><small>Subject lanes stay visible together. The app theme remembers the subject of the last lesson you opened.</small></div><div class="tour-mode-preview" aria-label="${assigned ? "Educator-set learning path" : "Choose a learning path"}"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}" ${assigned ? "disabled" : ""}><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}" ${assigned ? "disabled" : ""}><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>${assigned ? `<p class="tour-assignment-note">This curriculum’s educator chose ${snapshot.progressionMode === "soft" ? "Open" : "Hard"} path. The controls demonstrate both modes but cannot override the assignment.</p>` : ""}`;
@@ -290,7 +359,7 @@ function tutorialVisual(type, snapshot) {
   if (type === "map") return `<div class="tour-map-preview"><div class="tour-map-controls"><strong>All subjects</strong><span>Connected by default</span><b>✦ Plan mode</b><i>− &nbsp; 100% &nbsp; +</i></div><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
   if (type === "loop") return `<div class="tour-loop-preview"><article><span>01</span><b>Read</b><small>Theory and examples</small></article><i>→</i><article><span>02</span><b>Test</b><small>Answers and shown work</small></article><i>→</i><article><span>03</span><b>Reflect</b><small>Confidence and difficulty</small></article><i>→</i><article><span>04</span><b>Review</b><small>Mastery and next date</small></article></div><div class="tour-work-preview"><code>2x + 5 = 13<br>2x = 8<br>x = 4</code><span>Step check passed</span></div>`;
   if (type === "depot") return `<div class="tour-depot-preview"><header><div><small>Community curriculum</small><strong>Lesson Depot</strong></div><span>Browse · discuss · install</span></header><div><article class="is-geography"><span>Geography</span><strong>Field Cartography</strong><small>3 lessons · Published</small><footer><b>👍 18</b><b>◯ 6</b></footer></article><article class="is-biology"><span>Biology</span><strong>Cell Systems</strong><small>Concept preview</small><footer><b>Roadmap</b></footer></article></div><p><b>✓</b> Packages are hash-checked and validated before installation.</p></div>`;
-  if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent studio</small><strong>Tutor in the loop</strong></div><i>In-app browser</i></div><div class="tour-agent-prompt"><span>Suggested starting prompt</span><p>${escapeHtml(agentStarterPrompt())}</p><button class="button button-secondary" type="button" data-tutorial-action="copy-agent-prompt">Copy to clipboard</button></div><div class="tour-tool-row"><code>get_agent_guide</code><code>get_progress_summary</code><code>record_tutor_feedback</code></div></div>`;
+  if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent handoff</small><strong>Tutor in the loop</strong></div><i>${webMcpAvailable(document.modelContext) ? "Agent-ready" : "Move safely"}</i></div>${agentHandoffMarkup(snapshot, { compact: true })}<div class="tour-tool-row"><code>get_agent_guide</code><code>get_progress_summary</code><code>record_tutor_feedback</code></div></div>`;
   return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, subjects, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>↔</span><div><strong>Optional GitHub Bridge</strong><small>Checkpoint learner state and exchange agent updates across sessions</small></div><b>Sync</b></article><article><span>✎</span><div><strong>Lesson Studio</strong><small>Create lesson packs or install reversible improvements over native lessons</small></div><b>Create / improve</b></article></div>`;
 }
 
@@ -1710,6 +1779,7 @@ function renderEducatorSettings(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace & data</p><h1>Settings</h1><p>Manage portable backups, GitHub storage, curriculum files, and installed lesson sources.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Educator guide ↗</a><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
     ${renderGitHubBridge(snapshot)}
+    <section class="content-card tutor-setup"><div class="card-heading"><div><h2>Agent handoff</h2><p>QuickMaths detects whether this tab can expose WebMCP, keeps migration steps outside the prompt, and starts the agent from the educator manifest.</p></div></div>${agentHandoffMarkup(snapshot, { compact: true })}</section>
     ${renderWorkspaceStorageManager(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum exports</h2><p>Public blueprints omit names, email, and supplemental guidance. Private assignments include them with a privacy warning.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download public blueprint</button><button class="button button-outline" data-action="export-private-assignment" ${workspace ? "" : "disabled"}>Download private assignment</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
@@ -1760,7 +1830,7 @@ function renderSettings(snapshot) {
       </div>
       <p class="pack-security-note"><strong>Teacher-file warning:</strong> lesson-set JSON contains answer keys and solutions. Don’t paste the raw file into a learner tutoring conversation.</p>
     </section>
-    <section class="content-card tutor-setup"><div class="card-heading"><div><h2>Tutor setup prompt</h2><p>Copy this to an agent. It explains whether this tab can expose WebMCP, how to open the in-app browser when needed, and which manifest command to call.</p></div><button class="quiet-button" data-action="copy-tutor-setup">Copy prompt</button></div><pre id="tutor-setup-prompt">${escapeHtml(tutorSetupPrompt())}</pre></section>
+    <section class="content-card tutor-setup"><div class="card-heading"><div><h2>Agent handoff</h2><p>QuickMaths detects whether this tab can expose WebMCP, keeps migration steps outside the prompt, and starts the agent from the correct manifest.</p></div></div>${agentHandoffMarkup(snapshot, { compact: true })}</section>
   `;
   restoreBridgeFormDraft(document.querySelector("#github-sync-form")?.closest("[data-bridge-form]"));
 }
@@ -1915,9 +1985,9 @@ function renderEducatorWelcome(snapshot) {
       <div class="educator-welcome-mark" aria-hidden="true">QM</div>
       <p class="eyebrow">Educator setup</p>
       <h1 id="educator-welcome-title">Bring an agent into Curriculum Designer.</h1>
-      <p id="educator-welcome-copy">The educator guide explains every control, workflow, safety boundary, file format, and recovery path in the workspace. WebMCP tools connect only when QuickMaths is open inside the ChatGPT or Codex in-app browser.</p>
+      <p id="educator-welcome-copy">The educator guide explains every control, workflow, safety boundary, file format, and recovery path. Agent support starts from the educator manifest in the ChatGPT or Codex in-app browser.</p>
       <a class="educator-guide-link" href="${escapeHtml(EDUCATOR_GUIDE_URL)}" target="_blank" rel="noopener"><span><small>Complete product documentation</small><strong>Open the educator guide PDF</strong></span><b aria-hidden="true">↗</b></a>
-      <section class="educator-prompt-card" aria-labelledby="educator-prompt-title"><div><span id="educator-prompt-title">Suggested agent prompt · calls get_educator_agent_manifest</span><button type="button" data-action="copy-educator-prompt">Copy</button></div><p>${escapeHtml(educatorStarterPrompt())}</p></section>
+      ${agentHandoffMarkup(snapshot, { compact: true })}
       <button class="button button-primary educator-welcome-ok" type="button" data-action="dismiss-educator-welcome">OK, open Curriculum Designer</button>
     </article>
   </section>`;
@@ -1934,6 +2004,8 @@ function render(snapshot) {
   const signedIn = Boolean(snapshot.activeProfile);
   elements.welcome.hidden = signedIn;
   elements.shell.hidden = !signedIn;
+  renderAgentEntry(snapshot);
+  renderFreshAgentWelcome(snapshot);
   renderEducatorWelcome(snapshot);
   renderWelcomeSummary(snapshot);
   if (!signedIn) {
@@ -1947,7 +2019,6 @@ function render(snapshot) {
   elements.profileName.textContent = snapshot.activeProfile.displayName;
   elements.profileAvatar.textContent = snapshot.activeProfile.displayName.slice(0, 1).toUpperCase();
   const educator = snapshot.activeProfile.role === "educator";
-  document.querySelector("#agent-prompt").textContent = currentAgentPrompt();
   elements.shell.classList.toggle("is-educator", educator);
   applySubjectTheme(snapshot.activeSubject);
   document.querySelectorAll("[data-progression-mode]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.progressionMode === snapshot.progressionMode ? "true" : "false"));
@@ -2375,16 +2446,11 @@ document.addEventListener("click", async (event) => {
     store.updateResponse(card.id.replace(/^question-/, ""), { finalAnswer: answerField?.value ?? "", work: workField?.value ?? "", structuredWorkJson: collectStructuredWork(card) });
     return;
   }
-  const educatorWelcomeAction = event.target.closest?.("[data-action='copy-educator-prompt'], [data-action='dismiss-educator-welcome']");
+  const educatorWelcomeAction = event.target.closest?.("[data-action='dismiss-educator-welcome']");
   if (educatorWelcomeAction) {
     event.preventDefault();
-    if (educatorWelcomeAction.dataset.action === "copy-educator-prompt") {
-      try { await navigator.clipboard.writeText(educatorStarterPrompt()); showToast("Educator agent prompt copied."); }
-      catch { showToast("Copy was blocked. Select the prompt text manually."); }
-    } else {
-      store.completeEducatorWelcome();
-      showToast("Educator setup complete. The guide remains available in your workspace.");
-    }
+    store.completeEducatorWelcome();
+    showToast("Educator setup complete. The guide remains available in your workspace.");
     return;
   }
   const studioHelp = event.target.closest?.("[data-studio-help]");
@@ -2410,7 +2476,6 @@ document.addEventListener("click", async (event) => {
     if (action === "skip") { store.completeTutorial({ skipped: true }); showToast("Tour skipped. Replay it anytime from Settings."); }
     if (action === "finish") { store.completeTutorial(); showToast("Tour complete. Welcome to QuickMaths."); }
     if (action === "finish-creator") { store.completeTutorial(); store.navigate("creator"); }
-    if (action === "copy-agent-prompt") copyAgentPrompt();
     return;
   }
   const creatorAction = event.target.closest?.("[data-creator-action]");
@@ -2671,8 +2736,14 @@ document.addEventListener("click", async (event) => {
     download(`quickmaths-${attempt.skillId.toLowerCase()}-review-packet.md`, store.exportTutorReviewPacket(attempt.attemptId), "text/markdown");
     showToast("Tutor review packet downloaded.");
   }
-  if (action.dataset.action === "copy-tutor-setup") {
-    navigator.clipboard.writeText(tutorSetupPrompt()).then(() => showToast("Tutor prompt copied.")).catch(() => showToast("Select the prompt to copy it."));
+  if (action.dataset.action === "copy-current-agent-prompt") copyAgentPrompt();
+  if (action.dataset.action === "open-storage-setup") {
+    store.navigate("settings");
+    requestAnimationFrame(() => document.querySelector("#github-bridge")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
+  if (action.dataset.action === "dismiss-agent-welcome") {
+    try { window.localStorage.setItem(AGENT_HANDOFF_NOTICE_KEY, "dismissed"); } catch { /* The notice may return next visit if storage is unavailable. */ }
+    elements.agentWelcome.innerHTML = "";
   }
 });
 
@@ -2986,8 +3057,6 @@ document.addEventListener("keydown", (event) => {
 
 document.querySelector("#agent-toggle").addEventListener("click", () => openAgentStudio());
 document.querySelector("#agent-close").addEventListener("click", () => closeAgentStudio());
-document.querySelector("#copy-prompt").addEventListener("click", copyAgentPrompt);
-
 function initClock() {
   const svgNS = "http://www.w3.org/2000/svg";
   const minutes = document.querySelector("#clock-minute-marks");
@@ -3042,8 +3111,8 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, educatorManifestResponse, authoringGuideResponse] = await Promise.all([
-          fetch("./agent-manifest.json?v=20260903-combined-map-v1"),
-          fetch("./educator-agent-manifest.json?v=20260903-combined-map-v1"),
+          fetch("./agent-manifest.json?v=20260903-agent-handoff-v1"),
+          fetch("./educator-agent-manifest.json?v=20260903-agent-handoff-v1"),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1"),
     ]);
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
@@ -3100,7 +3169,6 @@ async function boot() {
     },
   });
   lessonDepot.load();
-  document.querySelector("#agent-prompt").textContent = currentAgentPrompt();
   closeAgentStudio({ focusToggle: false });
   applyLocationRoute();
   store.subscribe(render);
@@ -3116,7 +3184,7 @@ async function boot() {
     ? `${bridge.registered.length} of ${TOOL_NAMES.length} tools registered. Failed: ${bridge.failures.map((failure) => failure.name).join(", ")}.`
     : bridge.available
       ? `${bridge.registered.length} tools can navigate and tutor across this in-app QuickMaths tab.`
-      : "External browser tabs cannot expose page tools. Open QuickMaths inside the ChatGPT or Codex in-app browser, then reuse that tab.";
+      : "This browser cannot expose page tools. Use the backup/storage handoff below before opening QuickMaths in the ChatGPT or Codex in-app browser.";
   render(store.snapshot());
   const returnedFromCommunityAuthorization = new URLSearchParams(window.location.search).get("community") === "connected";
   if (returnedFromCommunityAuthorization) history.replaceState(null, "", `${window.location.pathname}${window.location.hash}`);

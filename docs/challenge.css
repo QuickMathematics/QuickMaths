@@ -215,6 +215,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .bridge-card p { margin: 7px 0 0; color: #9fb9aa; font-size: 10px; }
 .agent-browser-boundary { margin: 12px 2px 0; color: #aac3b5; font-size: 9px; line-height: 1.5; }
 .agent-browser-boundary strong { color: var(--lime); }
+.agent-handoff-card { margin-top: 16px; padding: 18px; color: var(--ink); background: color-mix(in srgb, var(--mint) 42%, var(--paper-light)); border: 1px solid color-mix(in srgb, var(--pine) 18%, var(--line)); border-radius: 15px; }
+.agent-handoff-card h3 { margin: 5px 0 8px; font: 600 22px/1.08 var(--serif); }
+.agent-handoff-card > p:not(.eyebrow) { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+.agent-handoff-card > small { display: block; margin-top: 10px; color: var(--muted); font-size: 8px; line-height: 1.45; }
+.agent-handoff-card.is-ready { border-left: 4px solid var(--pine-2); }
+.agent-handoff-card.needs-migration { border-left: 4px solid var(--coral); }
+.agent-handoff-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 15px; }
+.agent-desktop-link { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 46px; box-sizing: border-box; margin-top: 15px; text-align: center; text-decoration: none; }
+#agent-dock .agent-handoff-card { color: #edf4ef; background: rgba(255,255,255,.055); border-color: rgba(255,255,255,.11); }
+#agent-dock .agent-handoff-card > p:not(.eyebrow), #agent-dock .agent-handoff-card > small { color: #aac3b5; }
+#agent-dock .agent-handoff-card h3 { color: #fff; }
+#agent-dock .agent-handoff-actions { grid-template-columns: 1fr; }
 .mini-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #d9e4de; font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .mini-heading button { padding: 0; color: #9fb9aa; background: transparent; border: 0; cursor: pointer; font-size: 9px; }
 .mini-heading small { color: #809d8c; font-size: 8px; font-weight: 500; text-transform: none; letter-spacing: 0; }
@@ -1491,7 +1503,13 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 }
 
 .welcome-student-guide, .welcome-educator-guide { display: inline-flex; width: fit-content; color: var(--pine); font-weight: 800; text-underline-offset: 4px; }
-body:has(.educator-welcome-backdrop) { overflow: hidden; }
+body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop) { overflow: hidden; }
+.agent-welcome-backdrop { position: fixed; inset: 0; z-index: 1250; display: grid; place-items: center; box-sizing: border-box; max-width: 100vw; padding: clamp(18px,4vw,52px); overflow: auto; background: color-mix(in srgb,#0b2f2b 72%,transparent); backdrop-filter: blur(14px); }
+.agent-welcome-dialog { box-sizing: border-box; width: min(690px,100%); min-width: 0; padding: clamp(28px,5vw,58px); border: 1px solid color-mix(in srgb,var(--pine) 22%,var(--line)); border-radius: 34px; outline: none; background: radial-gradient(circle at 100% 0,color-mix(in srgb,var(--mint) 75%,transparent),transparent 34%),var(--paper-light); box-shadow: 0 28px 90px rgba(4,37,33,.28); }
+.agent-welcome-mark { display: grid; place-items: center; width: 66px; height: 66px; margin-bottom: 24px; border-radius: 20px; background: var(--pine); color: var(--lime); font-size: 25px; }
+.agent-welcome-dialog h1 { max-width: 610px; margin: 8px 0 16px; font-family: "Times New Roman",Times,serif; font-size: clamp(42px,7vw,66px); font-weight: 500; line-height: .94; letter-spacing: -.045em; }
+.agent-welcome-dialog > p:not(.eyebrow) { max-width: 610px; margin: 0; color: var(--muted); font-size: 17px; line-height: 1.65; }
+.agent-welcome-continue { display: block; margin: 16px auto 0; }
 .educator-welcome-backdrop { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; box-sizing: border-box; max-width: 100vw; padding: clamp(18px,4vw,52px); overflow: auto; background: color-mix(in srgb,#0b2f2b 72%,transparent); backdrop-filter: blur(14px); }
 .educator-welcome-dialog { box-sizing: border-box; width: min(720px,100%); min-width: 0; padding: clamp(28px,5vw,58px); border: 1px solid color-mix(in srgb,var(--pine) 22%,var(--line)); border-radius: 34px; outline: none; background: radial-gradient(circle at 100% 0,color-mix(in srgb,var(--mint) 75%,transparent),transparent 34%),var(--paper-light); box-shadow: 0 28px 90px rgba(4,37,33,.28); }
 .educator-welcome-mark { display: grid; place-items: center; width: 66px; height: 66px; margin-bottom: 24px; border-radius: 20px; background: var(--pine); color: var(--paper-light); font-family: "Times New Roman",Times,serif; font-size: 25px; }
@@ -1516,6 +1534,11 @@ body:has(.educator-welcome-backdrop) { overflow: hidden; }
 .studio-python-authoring { display: grid; gap: 13px; margin: 14px 0; padding: 16px; border: 1px solid color-mix(in srgb,var(--pine) 22%,var(--line)); border-radius: 15px; background: color-mix(in srgb,var(--mint) 30%,var(--paper-light)); }
 
 @media (max-width: 640px) {
+  .agent-handoff-actions { grid-template-columns: 1fr; }
+  .agent-welcome-backdrop { align-items: start; padding: 12px; }
+  .agent-welcome-dialog { margin: 8px 0 88px; padding: 26px 20px; border-radius: 24px; }
+  .agent-welcome-mark { width: 52px; height: 52px; margin-bottom: 18px; border-radius: 16px; font-size: 20px; }
+  .agent-welcome-dialog h1 { font-size: 41px; }
   .educator-welcome-backdrop { align-items: start; padding: 12px; }
   .educator-welcome-dialog { margin: 8px 0 88px; padding: 26px 20px; border-radius: 24px; }
   .educator-welcome-mark { width: 52px; height: 52px; margin-bottom: 18px; border-radius: 16px; font-size: 20px; }
