@@ -124,8 +124,11 @@
       "Make changes only through registered QuickMaths tools.",
       "Agent-side changes remain local and dirty until explicitly published; they are never sent by the learner-style debounce.",
       "Call publish_agent_checkpoint after state-changing work.",
-      "If either sync tool reports a conflict, do not force or retry blindly. Pull the learner again and repeat the intended change from current state.",
-      "The learner page is authoritative. It safely acknowledges and ignores agent output based on an older learner revision, refuses to overwrite unsynced local work, and requires the agent to pull current learner state before publishing again."
+      "If either agent-side sync tool reports a conflict, pull the learner again and repeat the intended change from current state; never force a stale agent checkpoint.",
+      "Workspace Storage polls the canonical learner checkpoint and the revision-bound agent checkpoint across every app page, not only Settings.",
+      "QuickMaths uses a random per-browser identifier plus a friendly browser/platform label; it does not read a hardware device ID. Checkpoints identify their last writer as a device or QuickMaths agent.",
+      "A first-time migration with independent local and GitHub work always requires human A/B approval. Afterward, clean state, same-device updates, agent-authored updates, and dirty different-device updates within ten minutes fast-forward automatically. Dirty different-device histories more than ten minutes apart, or without comparable timestamps, open a global comparison before either complete workspace replaces the other.",
+      "Agent output based on an older learner revision is safely acknowledged and ignored, so the agent must pull current learner state before publishing again."
     ],
     "bridge_tools": ["get_bridge_sync_status", "sync_from_learner", "publish_agent_checkpoint"]
   },

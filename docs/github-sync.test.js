@@ -10,9 +10,24 @@ import {
   createGitHubSyncController,
   GitHubSyncConflictError,
   LEARNER_STATE_PATH,
+  learnerBridgeStartupAction,
   normalizeGitHubSyncConfig,
   parseBridgeEnvelope,
 } from "./github-sync.js";
+
+test("learner startup reserves A/B choice for a first device migration", () => {
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2 }), "choose-migration-source");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true }), "restore-remote");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, remoteMatchesKnown: true }), "resume-known");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, sameDevice: true }), "restore-remote");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, remoteActorKind: "agent" }), "restore-remote");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, localChangedAt: "2026-09-03T12:08:00Z", remoteUpdatedAt: "2026-09-03T12:00:00Z" }), "restore-remote");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, localChangedAt: "2026-09-03T12:11:00Z", remoteUpdatedAt: "2026-09-03T12:00:00Z" }), "compare-sources");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true }), "compare-sources");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 0 }), "restore-remote");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: false, localProfileCount: 1 }), "push-local");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: false, localProfileCount: 0 }), "start");
+});
 
 class MemoryStorage {
   constructor() { this.values = new Map(); }
@@ -73,7 +88,7 @@ function stateHarness(name) {
   };
 }
 
-function controller({ role, client, harness, credentialStore = credentials(), date = "2026-09-01T12:00:00.000Z" }) {
+function controller({ role, client, harness, credentialStore = credentials(), date = "2026-09-01T12:00:00.000Z", deviceId = `${role}-device`, deviceLabel = null }) {
   return createGitHubSyncController({
     role,
     client,
@@ -82,7 +97,8 @@ function controller({ role, client, harness, credentialStore = credentials(), da
     applyState: harness.apply,
     subscribeToState: harness.subscribe,
     now: () => new Date(date),
-    deviceId: `${role}-device`,
+    deviceId,
+    deviceLabel,
     setTimer: () => 1,
     clearTimer: () => {},
   });
@@ -147,6 +163,9 @@ test("bridge envelopes preserve unicode state and channel metadata", () => {
     channel: "agent",
     stateJson: JSON.stringify({ learner: "Jadranko Σ", score: 92 }),
     deviceId: "agent-one",
+    deviceLabel: "Codex bridge on Windows",
+    actorKind: "agent",
+    actorLabel: "Curriculum helper",
     baseLearnerSha: "base-sha",
     now: () => new Date("2026-09-01T10:00:00.000Z"),
   });
@@ -155,6 +174,9 @@ test("bridge envelopes preserve unicode state and channel metadata", () => {
   const parsed = parseBridgeEnvelope(raw, { expectedChannel: "agent" });
   assert.equal(JSON.parse(parsed.stateJson).learner, "Jadranko Σ");
   assert.equal(parsed.baseLearnerSha, "base-sha");
+  assert.equal(parsed.deviceLabel, "Codex bridge on Windows");
+  assert.equal(parsed.actorKind, "agent");
+  assert.equal(parsed.actorLabel, "Curriculum helper");
   assert.throws(() => parseBridgeEnvelope(raw, { expectedChannel: "learner" }), /wrong channel/i);
 });
 
@@ -320,6 +342,76 @@ test("agent pulls learner state, publishes a based response, and learner applies
   const received = await learner.pullNow();
   assert.equal(received.updated, true);
   assert.equal(learnerState.read().tutorNote, "Try the inequality lesson next.");
+  await learner.pushNow();
+  const acknowledged = parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content);
+  assert.equal(acknowledged.actorKind, "agent");
+  assert.equal(acknowledged.actorLabel, "QuickMaths agent");
+});
+
+test("learner polling follows the canonical workspace on every route when local state is clean", async () => {
+  const github = fakeGitHub();
+  const phoneState = stateHarness("Phone");
+  const desktopState = stateHarness("Desktop");
+  const phone = controller({ role: "learner", client: github, harness: phoneState, deviceId: "phone", deviceLabel: "Firefox on Android" });
+  const desktop = controller({ role: "learner", client: github, harness: desktopState, deviceId: "desktop", deviceLabel: "OpenAI in-app browser on Windows" });
+  await phone.connect(connection(), { startPolling: false });
+  await phone.pushNow();
+  await desktop.connect(connection(), { startPolling: false });
+  await desktop.restoreLearner({ force: true });
+  phoneState.mutate({ currentLesson: "MATH_ALG_004" });
+  await phone.pushNow();
+
+  const result = await desktop.syncLearnerNow();
+
+  assert.equal(result.updated, true);
+  assert.equal(desktopState.read().currentLesson, "MATH_ALG_004");
+  assert.equal(desktop.snapshot().lastRemoteActor, "Firefox on Android");
+});
+
+test("learner polling exposes source metadata when another device races unsynced local work", async () => {
+  const github = fakeGitHub();
+  const phoneState = stateHarness("Phone");
+  const desktopState = stateHarness("Desktop");
+  const phone = controller({ role: "learner", client: github, harness: phoneState, deviceId: "phone", deviceLabel: "Firefox on Android" });
+  const desktop = controller({ role: "learner", client: github, harness: desktopState, deviceId: "desktop", deviceLabel: "OpenAI in-app browser on Windows" });
+  await phone.connect(connection(), { startPolling: false });
+  await phone.pushNow();
+  await desktop.connect(connection(), { startPolling: false });
+  await desktop.restoreLearner({ force: true });
+  desktopState.mutate({ localDraft: "not pushed" });
+  phoneState.mutate({ currentLesson: "MATH_ALG_005" });
+  await phone.pushNow();
+
+  await assert.rejects(desktop.syncLearnerNow(), /newer QuickMaths workspace/i);
+
+  assert.equal(desktop.snapshot().conflictDetails.channel, "learner");
+  assert.equal(desktop.snapshot().conflictDetails.remoteDeviceId, "phone");
+  assert.equal(desktop.snapshot().conflictDetails.remoteActorLabel, "Firefox on Android");
+});
+
+test("an applied agent remains the recorded writer when its learner acknowledgement resumes after reload", async () => {
+  const github = fakeGitHub();
+  const learnerState = stateHarness("Learner");
+  const agentState = stateHarness("Agent");
+  const learnerCredentials = credentials();
+  const learner = controller({ role: "learner", client: github, harness: learnerState, credentialStore: learnerCredentials, deviceId: "browser", deviceLabel: "Firefox on Android" });
+  const agent = controller({ role: "agent", client: github, harness: agentState, deviceId: "codex", deviceLabel: "Codex agent bridge" });
+  await learner.connect(connection(), { startPolling: false });
+  await learner.pushNow();
+  await agent.connect(connection("agent"), { startPolling: false });
+  await agent.pullNow();
+  agentState.mutate({ agentPlan: "A fresh path" });
+  await agent.pushNow();
+  await learner.pullNow();
+  learner.stop();
+
+  const resumed = controller({ role: "learner", client: github, harness: learnerState, credentialStore: learnerCredentials, deviceId: "browser", deviceLabel: "Firefox on Android" });
+  await resumed.resume({ startPolling: false });
+  await resumed.pushNow();
+
+  const checkpoint = parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content);
+  assert.equal(checkpoint.actorKind, "agent");
+  assert.equal(checkpoint.actorLabel, "Codex agent bridge");
 });
 
 test("agent changes stay dirty until an explicit checkpoint is published", async () => {

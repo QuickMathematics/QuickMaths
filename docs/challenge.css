@@ -1503,13 +1503,28 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 }
 
 .welcome-student-guide, .welcome-educator-guide { display: inline-flex; width: fit-content; color: var(--pine); font-weight: 800; text-underline-offset: 4px; }
-body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop) { overflow: hidden; }
+body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:has(.bridge-source-backdrop) { overflow: hidden; }
 .action-confirm-backdrop { position: fixed; inset: 0; z-index: 1600; display: grid; place-items: center; box-sizing: border-box; padding: 20px; background: color-mix(in srgb,#0b2f2b 70%,transparent); backdrop-filter: blur(10px); }
 .action-confirm-dialog { width: min(520px,100%); box-sizing: border-box; padding: clamp(24px,5vw,40px); color: var(--ink); background: var(--paper-light); border: 1px solid color-mix(in srgb,var(--pine) 24%,var(--line)); border-radius: 26px; box-shadow: 0 28px 90px rgba(4,37,33,.3); }
 .action-confirm-dialog h2 { margin: 8px 0 14px; font: 600 clamp(30px,5vw,44px)/1 var(--serif); letter-spacing: -.035em; }
 .action-confirm-dialog > p:not(.eyebrow) { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
 .action-confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 26px; }
 .action-confirm-actions .button { min-height: 50px; }
+.bridge-source-dialog { width: min(780px,100%); max-height: min(820px,calc(100vh - 40px)); overflow: auto; }
+.bridge-source-columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 24px 0 14px; }
+.bridge-source-columns article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb,var(--mint) 35%,var(--paper-light)); }
+.bridge-source-columns span, .bridge-source-columns small { display: block; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.bridge-source-columns strong { display: block; margin: 7px 0 5px; overflow-wrap: anywhere; font-size: 16px; }
+.bridge-source-columns p { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.bridge-diff-table { overflow: hidden; border: 1px solid var(--line); border-radius: 15px; }
+.bridge-diff-table > div { display: grid; grid-template-columns: minmax(120px,1.4fr) repeat(2,minmax(70px,.8fr)); align-items: center; gap: 10px; padding: 10px 14px; border-top: 1px solid var(--line); }
+.bridge-diff-table > div:first-child { border-top: 0; }
+.bridge-diff-table span { color: var(--muted); font-size: 11px; }
+.bridge-diff-table strong { text-align: center; font-size: 12px; }
+.bridge-diff-head { background: var(--paper-deep); }
+.bridge-diff-head span, .bridge-diff-head strong { color: var(--ink); font-size: 10px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.bridge-choice-note { margin-top: 14px !important; padding-left: 12px; border-left: 3px solid var(--pine-2); font-size: 11px !important; }
+.bridge-source-actions { grid-template-columns: .8fr 1fr 1fr; }
 .button-danger { border-color: #a94a3c; background: #a94a3c; color: #fff; }
 .button-danger:hover, .button-danger:focus-visible { border-color: #87382d; background: #87382d; }
 .agent-welcome-backdrop { position: fixed; inset: 0; z-index: 1250; display: grid; place-items: center; box-sizing: border-box; max-width: 100vw; padding: clamp(18px,4vw,52px); overflow: auto; background: color-mix(in srgb,#0b2f2b 72%,transparent); backdrop-filter: blur(14px); }
@@ -1545,6 +1560,10 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop) { overfl
   .action-confirm-backdrop { align-items: end; padding: 12px; }
   .action-confirm-dialog { margin-bottom: 74px; padding: 24px 20px; border-radius: 22px; }
   .action-confirm-actions { grid-template-columns: 1fr; }
+  .bridge-source-dialog { max-height: calc(100vh - 98px); }
+  .bridge-source-columns { grid-template-columns: 1fr; }
+  .bridge-diff-table > div { grid-template-columns: minmax(105px,1.3fr) repeat(2,minmax(56px,.65fr)); padding: 9px 10px; }
+  .bridge-source-actions { grid-template-columns: 1fr; }
   .agent-handoff-actions { grid-template-columns: 1fr; }
   .agent-welcome-backdrop { align-items: start; padding: 12px; }
   .agent-welcome-dialog { margin: 8px 0 88px; padding: 26px 20px; border-radius: 24px; }

@@ -10,6 +10,51 @@ export const BRIDGE_SCHEMA_VERSION = "1.0";
 export const LEARNER_STATE_PATH = "learner-state.json";
 export const AGENT_STATE_PATH = "agent-state.json";
 const MAX_BRIDGE_FILE_BYTES = 10_000_000;
+export const BRIDGE_CONFLICT_WINDOW_MS = 10 * 60 * 1000;
+
+export function learnerBridgeStartupAction({
+  remoteExists = false,
+  localProfileCount = 0,
+  establishedConnection = false,
+  remoteMatchesKnown = false,
+  localDirty = false,
+  sameDevice = false,
+  remoteActorKind = "device",
+  localChangedAt = null,
+  remoteUpdatedAt = null,
+  conflictWindowMs = BRIDGE_CONFLICT_WINDOW_MS,
+} = {}) {
+  if (!remoteExists) return localProfileCount > 0 ? "push-local" : "start";
+  if (localProfileCount < 1) return "restore-remote";
+  if (!establishedConnection) return "choose-migration-source";
+  if (remoteMatchesKnown) return "resume-known";
+  if (!localDirty || sameDevice || remoteActorKind === "agent") return "restore-remote";
+  const localTime = Date.parse(String(localChangedAt ?? ""));
+  const remoteTime = Date.parse(String(remoteUpdatedAt ?? ""));
+  const comparable = Number.isFinite(localTime) && Number.isFinite(remoteTime);
+  return comparable && Math.abs(localTime - remoteTime) <= conflictWindowMs
+    ? "restore-remote"
+    : "compare-sources";
+}
+
+export function summarizeBridgeWorkspace(stateJson) {
+  const state = parseStateJson(stateJson);
+  const profiles = Array.isArray(state.profiles) ? state.profiles : [];
+  const progress = state.progress && typeof state.progress === "object" && !Array.isArray(state.progress) ? state.progress : {};
+  const mapPlans = state.mapPlans && typeof state.mapPlans === "object" && !Array.isArray(state.mapPlans) ? state.mapPlans : {};
+  const active = profiles.find((profile) => profile?.id === state.activeProfileId) ?? null;
+  return {
+    profileCount: profiles.length,
+    profileNames: profiles.slice(0, 30).map((profile) => String(profile?.displayName ?? profile?.name ?? "Unnamed").slice(0, 80)),
+    activeProfileName: active ? String(active.displayName ?? active.name ?? "Unnamed").slice(0, 80) : null,
+    progressRecordCount: Object.values(progress).reduce((total, records) => total + (records && typeof records === "object" && !Array.isArray(records) ? Object.keys(records).length : 0), 0),
+    attemptCount: Array.isArray(state.attempts) ? state.attempts.length : 0,
+    reviewCount: Array.isArray(state.reviews) ? state.reviews.length : 0,
+    curriculumCount: Array.isArray(state.curricula) ? state.curricula.length : 0,
+    lessonPackCount: Array.isArray(state.lessonPacks) ? state.lessonPacks.length : 0,
+    plannedProfileCount: Object.values(mapPlans).filter((plan) => plan && typeof plan === "object").length,
+  };
+}
 
 export class GitHubSyncError extends Error {
   constructor(message, { status = null, code = "github_sync_error", details = null } = {}) {
@@ -306,10 +351,23 @@ function parseStateJson(stateJson) {
   }
 }
 
-export function createBridgeEnvelope({ channel, stateJson, deviceId, baseLearnerSha = null, now = () => new Date() }) {
+export function createBridgeEnvelope({
+  channel,
+  stateJson,
+  deviceId,
+  deviceLabel = null,
+  actorKind = null,
+  actorLabel = null,
+  baseLearnerSha = null,
+  now = () => new Date(),
+}) {
   if (!["learner", "agent"].includes(channel)) throw new GitHubSyncError("Bridge channel is invalid.", { code: "invalid_channel" });
   const device = String(deviceId ?? "").trim();
   if (!device || device.length > 120) throw new GitHubSyncError("Bridge device ID is invalid.", { code: "invalid_device" });
+  const resolvedDeviceLabel = String(deviceLabel ?? "QuickMaths device").trim().slice(0, 80) || "QuickMaths device";
+  const resolvedActorKind = channel === "agent" || actorKind === "agent" ? "agent" : "device";
+  const resolvedActorLabel = String(actorLabel ?? (resolvedActorKind === "agent" ? "QuickMaths agent" : resolvedDeviceLabel)).trim().slice(0, 80)
+    || (resolvedActorKind === "agent" ? "QuickMaths agent" : resolvedDeviceLabel);
   if (channel === "agent" && (typeof baseLearnerSha !== "string" || !baseLearnerSha.trim() || baseLearnerSha.length > 200)) {
     throw new GitHubSyncError("Pull a learner checkpoint before publishing agent changes.", { code: "missing_learner_base" });
   }
@@ -319,6 +377,8 @@ export function createBridgeEnvelope({ channel, stateJson, deviceId, baseLearner
     channel,
     updated_at: now().toISOString(),
     device_id: device,
+    device_label: resolvedDeviceLabel,
+    actor: { kind: resolvedActorKind, label: resolvedActorLabel },
     base_learner_sha: channel === "agent" ? baseLearnerSha : null,
     app_state: parseStateJson(stateJson),
   }, null, 2);
@@ -342,6 +402,11 @@ export function parseBridgeEnvelope(raw, { expectedChannel = null } = {}) {
     channel: value.channel,
     updatedAt: typeof value.updated_at === "string" ? value.updated_at : null,
     deviceId: typeof value.device_id === "string" ? value.device_id : null,
+    deviceLabel: typeof value.device_label === "string" && value.device_label.trim() ? value.device_label.slice(0, 80) : "QuickMaths device",
+    actorKind: value.actor?.kind === "agent" || value.channel === "agent" ? "agent" : "device",
+    actorLabel: typeof value.actor?.label === "string" && value.actor.label.trim()
+      ? value.actor.label.slice(0, 80)
+      : value.channel === "agent" ? "QuickMaths agent" : (typeof value.device_label === "string" && value.device_label.trim() ? value.device_label.slice(0, 80) : "QuickMaths device"),
     baseLearnerSha: typeof value.base_learner_sha === "string" ? value.base_learner_sha : null,
     stateJson: JSON.stringify(value.app_state),
   };
@@ -365,6 +430,7 @@ export function createGitHubSyncController({
   subscribeToState = null,
   now = () => new Date(),
   deviceId = null,
+  deviceLabel = null,
   debounceMs = 8_000,
   pollMs = 5_000,
   idlePollMs = 30_000,
@@ -381,6 +447,8 @@ export function createGitHubSyncController({
   const repositoryKey = (value) => value ? `${value.owner}/${value.repo}@${value.branch}`.toLowerCase() : null;
   if (metadata?.repositoryKey !== repositoryKey(config)) metadata = null;
   const resolvedDeviceId = String(deviceId || metadata?.deviceId || makeDeviceId());
+  const resolvedDeviceLabel = String(deviceLabel || metadata?.deviceLabel || (role === "agent" ? "QuickMaths agent" : "QuickMaths device")).trim().slice(0, 80)
+    || (role === "agent" ? "QuickMaths agent" : "QuickMaths device");
   let debounceTimer = null;
   let pollTimer = null;
   let stopped = true;
@@ -390,6 +458,13 @@ export function createGitHubSyncController({
   let agentSha = typeof metadata?.agentSha === "string" ? metadata.agentSha : null;
   let unsubscribe = null;
   let consecutiveIdlePolls = 0;
+  let localChangedAt = typeof metadata?.localChangedAt === "string" ? metadata.localChangedAt : null;
+  let pendingLearnerActor = role === "learner" && ["agent", "device"].includes(metadata?.pendingActor?.kind)
+    ? {
+        kind: metadata.pendingActor.kind,
+        label: String(metadata.pendingActor.label ?? (metadata.pendingActor.kind === "agent" ? "QuickMaths agent" : resolvedDeviceLabel)).slice(0, 80),
+      }
+    : null;
   const status = {
     role,
     phase: config?.token ? "idle" : "disconnected",
@@ -402,6 +477,10 @@ export function createGitHubSyncController({
     error: null,
     conflict: null,
     conflictDetails: null,
+    deviceId: resolvedDeviceId,
+    deviceLabel: resolvedDeviceLabel,
+    localChangedAt,
+    lastRemoteActor: null,
     config,
   };
 
@@ -417,11 +496,13 @@ export function createGitHubSyncController({
     const sameRepository = saved?.repositoryKey === currentRepositoryKey;
     const savedLearnerSha = sameRepository && typeof saved?.learnerSha === "string" ? saved.learnerSha : null;
     const savedAgentSha = sameRepository && typeof saved?.agentSha === "string" ? saved.agentSha : null;
+    const savedPendingActor = sameRepository && ["agent", "device"].includes(saved?.pendingActor?.kind) ? saved.pendingActor : null;
     credentialStore.saveMetadata?.({
       role,
       metadata: {
         repositoryKey: currentRepositoryKey,
         deviceId: resolvedDeviceId,
+        deviceLabel: resolvedDeviceLabel,
         // Several QuickMaths tabs can share one credential store. Routine status
         // updates from an older tab must not erase a revision learned by the tab
         // that just pushed or pulled. Only revision-changing operations replace
@@ -429,6 +510,8 @@ export function createGitHubSyncController({
         learnerSha: clearRevisions ? null : revisions ? learnerSha : (savedLearnerSha ?? learnerSha),
         agentSha: clearRevisions ? null : revisions ? agentSha : (savedAgentSha ?? agentSha),
         dirty: status.dirty,
+        localChangedAt,
+        pendingActor: clearRevisions ? null : revisions ? pendingLearnerActor : (pendingLearnerActor ?? savedPendingActor),
       },
     });
   };
@@ -496,14 +579,28 @@ export function createGitHubSyncController({
     const delay = consecutiveIdlePolls >= 3 ? idlePollMs : pollMs;
     pollTimer = setTimer(async () => {
       pollTimer = null;
-      try { await pullNow({ quiet: true }); } catch { /* Status already records the failure. */ }
+      try {
+        // Learner browsers have two remote channels: the canonical workspace
+        // written by devices, and the revision-bound response written by an
+        // agent. Check both from every route; the page shell decides whether a
+        // dirty cross-device mismatch can be resolved automatically or needs a
+        // global A/B comparison.
+        if (role === "learner") await syncLearnerNow({ quiet: true });
+        await pullNow({ quiet: true });
+      } catch { /* Status already records the failure. */ }
       schedulePoll();
     }, delay);
   };
 
-  const schedulePush = () => {
+  const schedulePush = ({ actorKind = "device", actorLabel = null, changedAt = null } = {}) => {
     if (suppressStateChange || !config?.token) return;
-    update({ dirty: true });
+    localChangedAt = typeof changedAt === "string" && Number.isFinite(Date.parse(changedAt)) ? changedAt : now().toISOString();
+    if (role === "learner") {
+      pendingLearnerActor = actorKind === "agent"
+        ? { kind: "agent", label: String(actorLabel || "QuickMaths agent").slice(0, 80) }
+        : { kind: "device", label: resolvedDeviceLabel };
+    }
+    update({ dirty: true, localChangedAt });
     // Agent work is deliberately transactional: tools may make several related
     // state changes before publish_agent_checkpoint commits one coherent result.
     if (role === "agent") return;
@@ -572,6 +669,9 @@ export function createGitHubSyncController({
       channel,
       stateJson: serializeState(),
       deviceId: resolvedDeviceId,
+      deviceLabel: resolvedDeviceLabel,
+      actorKind: role === "agent" ? "agent" : pendingLearnerActor?.kind,
+      actorLabel: role === "agent" ? resolvedDeviceLabel : pendingLearnerActor?.label,
       baseLearnerSha: channel === "agent" ? learnerSha : null,
       now,
     });
@@ -591,6 +691,7 @@ export function createGitHubSyncController({
     }
     if (channel === "learner") learnerSha = result.sha;
     else agentSha = result.sha;
+    if (channel === "learner") pendingLearnerActor = null;
     persistMetadata({ revisions: true });
     update({ phase: "synced", dirty: false, lastPushedAt: now().toISOString(), error: null, conflict: null, remoteAvailable: true });
     return { ...result, channel };
@@ -607,7 +708,7 @@ export function createGitHubSyncController({
     const knownSha = channel === "learner" ? learnerSha : agentSha;
     if (remote.sha === knownSha) {
       consecutiveIdlePolls += 1;
-      update({ phase: status.dirty ? "idle" : "synced", remoteAvailable: true, error: null });
+      update({ phase: status.dirty ? "idle" : "synced", remoteAvailable: true, error: null, lastRemoteActor: remote.envelope.actorLabel });
       return { updated: false, exists: true, sha: remote.sha, channel };
     }
     if (status.dirty) {
@@ -624,6 +725,7 @@ export function createGitHubSyncController({
         remoteAvailable: true,
         lastPulledAt: now().toISOString(),
         lastRemoteUpdatedAt: remote.envelope.updatedAt,
+        lastRemoteActor: remote.envelope.actorLabel,
         error: null,
         conflict: null,
       });
@@ -633,21 +735,81 @@ export function createGitHubSyncController({
       };
     }
     await applyRemote(remote.envelope.stateJson);
+    localChangedAt = remote.envelope.updatedAt ?? now().toISOString();
     if (channel === "learner") learnerSha = remote.sha;
     else agentSha = remote.sha;
     persistMetadata({ revisions: true });
     consecutiveIdlePolls = 0;
     update({
       phase: "synced",
-      dirty: role === "learner",
+      dirty: false,
       remoteAvailable: true,
       lastPulledAt: now().toISOString(),
       lastRemoteUpdatedAt: remote.envelope.updatedAt,
+      lastRemoteActor: remote.envelope.actorLabel,
+      localChangedAt,
       error: null,
       conflict: null,
     });
-    if (role === "learner") schedulePush();
+    if (role === "learner") schedulePush({ actorKind: "agent", actorLabel: remote.envelope.actorLabel, changedAt: remote.envelope.updatedAt });
     return { updated: true, exists: true, sha: remote.sha, channel, updatedAt: remote.envelope.updatedAt };
+  }));
+
+  const syncLearnerNow = ({ quiet = false } = {}) => runSerial(() => withPhase(quiet ? status.phase : "pulling", async () => {
+    if (role !== "learner") throw new GitHubSyncError("Only a learner browser can follow the canonical learner checkpoint.", { code: "wrong_role" });
+    const remote = await readChannel("learner");
+    if (!remote.exists) {
+      update({ phase: status.dirty ? "idle" : "synced", remoteAvailable: false, error: null });
+      return { updated: false, exists: false, channel: "learner" };
+    }
+    if (remote.sha === learnerSha) {
+      update({
+        phase: status.dirty ? "idle" : "synced",
+        remoteAvailable: true,
+        lastRemoteUpdatedAt: remote.envelope.updatedAt,
+        lastRemoteActor: remote.envelope.actorLabel,
+        error: null,
+      });
+      return { updated: false, exists: true, sha: remote.sha, channel: "learner" };
+    }
+    if (status.dirty) {
+      throw new GitHubSyncConflictError("Another device or agent has a newer QuickMaths workspace while this device has unsynced work.", {
+        channel: "learner",
+        knownSha: learnerSha,
+        remoteSha: remote.sha,
+        remoteUpdatedAt: remote.envelope.updatedAt,
+        remoteDeviceId: remote.envelope.deviceId,
+        remoteDeviceLabel: remote.envelope.deviceLabel,
+        remoteActorKind: remote.envelope.actorKind,
+        remoteActorLabel: remote.envelope.actorLabel,
+      });
+    }
+    await applyRemote(remote.envelope.stateJson);
+    localChangedAt = remote.envelope.updatedAt ?? now().toISOString();
+    pendingLearnerActor = null;
+    learnerSha = remote.sha;
+    persistMetadata({ revisions: true });
+    consecutiveIdlePolls = 0;
+    update({
+      phase: "synced",
+      dirty: false,
+      remoteAvailable: true,
+      lastPulledAt: now().toISOString(),
+      lastRemoteUpdatedAt: remote.envelope.updatedAt,
+      lastRemoteActor: remote.envelope.actorLabel,
+      localChangedAt,
+      error: null,
+      conflict: null,
+    });
+    return {
+      updated: true,
+      exists: true,
+      sha: remote.sha,
+      channel: "learner",
+      updatedAt: remote.envelope.updatedAt,
+      actorKind: remote.envelope.actorKind,
+      actorLabel: remote.envelope.actorLabel,
+    };
   }));
 
   const restoreLearner = ({ force = false } = {}) => runSerial(() => withPhase("pulling", async () => {
@@ -655,11 +817,14 @@ export function createGitHubSyncController({
     if (!remote.exists) return { updated: false, exists: false, channel: "learner" };
     if (!force && status.dirty) throw new GitHubSyncConflictError("This device has unsynced changes. Push them or force the restore.");
     await applyRemote(remote.envelope.stateJson);
+    localChangedAt = remote.envelope.updatedAt ?? now().toISOString();
+    pendingLearnerActor = null;
     learnerSha = remote.sha;
     persistMetadata({ revisions: true });
     update({
       phase: "synced", dirty: false, remoteAvailable: true,
       lastPulledAt: now().toISOString(), lastRemoteUpdatedAt: remote.envelope.updatedAt,
+      lastRemoteActor: remote.envelope.actorLabel, localChangedAt,
       error: null, conflict: null,
     });
     return { updated: true, exists: true, sha: remote.sha, channel: "learner", updatedAt: remote.envelope.updatedAt };
@@ -776,6 +941,7 @@ export function createGitHubSyncController({
     pullNow,
     restoreLearner,
     inspectRemote,
+    syncLearnerNow,
     deleteRemoteAgentCheckpoint,
     clearRemoteWorkspace,
     resumeAfterClear,

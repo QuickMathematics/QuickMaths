@@ -523,9 +523,11 @@ Workspace Storage is optional persistence in a dedicated private GitHub data rep
 
 Enter the token only in the app. It is never included in backups, commits, lesson files, URLs, logs, or WebMCP results. Choose whether to keep it for this tab session or remember it in this browser.
 
-Bridge status shows local dirty state, last workspace push, last agent pull, token storage, and remote availability. **Sync now** publishes the complete browser workspace. **Check agent updates** applies only agent output based on the current learner revision.
+Bridge status shows local dirty state and device label, last workspace push, the last remote writer, token storage, and remote availability. **Sync now** publishes the complete browser workspace. **Check agent updates** applies only agent output based on the current learner revision.
 
-Initial-copy and conflict cards require a deliberate choice. QuickMaths refuses stale output and unsynced overwrites instead of guessing which copy matters.
+Workspace Storage runs across the entire app, not only while Settings is open. QuickMaths gives each browser installation a random privacy-safe device ID and a friendly label such as **Firefox on Android**; it does not read a hardware serial number. Checkpoints also identify their last writer as that device or **QuickMaths agent**.
+
+The A/B copy choice always appears for a first-time migration when a browser with independent local work connects to an existing GitHub workspace. After that, clean local state, same-device changes, and agent-authored changes fast-forward automatically. If a different device and this browser both have unsynced work, QuickMaths accepts the GitHub copy automatically when their change times are within ten minutes. If they are more than ten minutes apart—or either time is unavailable—sync pauses and a global comparison shows device labels, times, profiles, progress, attempts, reviews, curricula, lesson packs, and plans before you choose. The comparison can appear on Map, Learn, Test, Depot, Settings, or any other page. Stale agent output is still ignored rather than overwriting newer learner work.
 
 **Manage GitHub storage** opens the deletion manager. A profile deletion removes that profile's progress, attempts, reviews, drafts, map plan, and any educator curriculum it owns. With storage connected, QuickMaths writes the reduced learner workspace and deletes the stale agent checkpoint so it cannot remain as the current remote copy. **Clear all data** resets every local profile, curriculum, lesson pack, attempt, review, plan, Lesson Studio draft, and same-browser Agent Bridge working copy; when connected, it also deletes `learner-state.json` and `agent-state.json` from the current repository branch.
 
@@ -612,7 +614,7 @@ The attached curriculum may have Agent tutoring turned off. That policy delibera
 
 ### GitHub sync reports a conflict
 
-Download a backup if needed, read which complete copy is newer, and choose deliberately. Do not retry blindly. GitHub repository history remains a recovery aid.
+Most updates fast-forward automatically everywhere in the app. If QuickMaths presents the comparison, either this is a first-time migration with independent work on both sides or two different devices have unsynced histories more than ten minutes apart (or missing timestamps). Read the device/agent labels, dates, and compact workspace counts. Download a backup if both copies matter, then choose which complete workspace continues. GitHub repository history remains a recovery aid.
 
 ### WebMCP tools are unavailable
 

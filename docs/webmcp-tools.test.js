@@ -55,6 +55,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   const css = readFileSync(new URL("./challenge.css", import.meta.url), "utf8");
   const community = readFileSync(new URL("./github-community.js", import.meta.url), "utf8");
   const communityCallback = readFileSync(new URL("./community-auth.html", import.meta.url), "utf8");
+  const githubSyncSource = readFileSync(new URL("./github-sync.js", import.meta.url), "utf8");
   const studentGuideSource = readFileSync(new URL("./STUDENT_GUIDE.md", import.meta.url), "utf8");
   const studentPdfUrl = new URL("./QuickMaths-Student-Guide.pdf", import.meta.url);
   const educatorGuideSource = readFileSync(new URL("./EDUCATOR_GUIDE.md", import.meta.url), "utf8");
@@ -124,8 +125,13 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /title: "Use this browser's workspace\?"/);
   assert.match(js, /confirmLabel: "Replace GitHub copy"/);
   assert.doesNotMatch(js, /window\.confirm\("Replace the GitHub learner checkpoint/);
-  assert.match(js, /remoteMatchesDevice/);
-  assert.match(js, /if \(!remoteMatchesKnown\) await githubSync\.restoreLearner\(\{ force: true \}\)/);
+  assert.match(js, /learnerBridgeStartupAction/);
+  assert.match(js, /different device opens the global comparison dialog/);
+  assert.match(js, /void recoverEstablishedLearnerConflict\(\)/);
+  assert.match(js, /Which workspace should continue\?/);
+  assert.match(js, /data-bridge-choice-remote/);
+  assert.match(css, /\.bridge-source-dialog/);
+  assert.match(githubSyncSource, /await syncLearnerNow\(\{ quiet: true \}\)/);
   assert.match(js, /Are you absolutely sure/);
   assert.match(js, /clearRemoteWorkspace/);
   assert.match(js, /resumeAfterClear/);

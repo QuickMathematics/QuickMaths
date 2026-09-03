@@ -498,7 +498,9 @@ The scope is the complete QuickMaths browser workspace, not only the open educat
 
 The token is entered privately in the app. It is never included in backups, agent tool output, URLs, logs, lesson files, or commits. Remembering it uses this browser's credential storage only when the human chooses that option.
 
-Bridge status distinguishes local browser state, last workspace push, last agent pull, credential storage, conflicts, and initial-copy choices. **Sync now** pushes the complete workspace checkpoint. **Check agent updates** pulls a revision-bound agent checkpoint. Conflicts require a visible choice rather than silent overwrite.
+Bridge status distinguishes local browser state and device label, last workspace push, the last remote writer, credential storage, and source choices. **Sync now** pushes the complete workspace checkpoint. **Check agent updates** pulls a revision-bound agent checkpoint. Sync polling runs throughout the educator app, including Overview, Curriculum Designer, Depot, Lesson Studio, and Settings.
+
+QuickMaths creates a random privacy-safe ID for each browser installation and adds a friendly label such as **OpenAI in-app browser on Windows**; it does not inspect hardware identifiers. Each checkpoint also marks the last writer as a device or **QuickMaths agent**. A first-time migration with independent local and GitHub work always requires A/B approval. Afterward, clean state, same-device changes, agent-authored work, and different-device changes within ten minutes fast-forward automatically. A dirty different-device history more than ten minutes apart—or without comparable timestamps—opens a global diff with source labels, times, and compact counts for profiles, progress, attempts, reviews, curricula, lesson packs, and plans.
 
 **Open Agent Bridge** launches the remote-session companion. **Setup guide** opens human instructions. **Disconnect** removes the active connection on this device.
 
@@ -654,7 +656,7 @@ Use **Jump to skill** to focus any enabled lesson on the combined map. If the le
 
 ### GitHub sync reports a conflict
 
-Do not retry blindly. Read which complete workspace copy is current, download a backup if needed, and choose deliberately. The repository history remains a recovery aid.
+Most updates fast-forward automatically on every page. A comparison appears only for a first-time migration with independent work or for dirty histories from different devices that are more than ten minutes apart (or cannot be dated). Review the device/agent labels, timestamps, and workspace counts; download a backup if both copies matter, then choose the complete workspace that continues. The repository history remains a recovery aid.
 
 ### A proof has the correct conclusion but no mastery
 

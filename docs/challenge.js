@@ -13,7 +13,9 @@ import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260903-resilient-autosave-v1";
+  learnerBridgeStartupAction,
+  summarizeBridgeWorkspace,
+} from "./github-sync.js?v=20260903-device-aware-sync-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -88,6 +90,9 @@ let githubSync;
 let githubCredentials;
 let githubSyncSnapshot = { phase: "disconnected", connected: false, dirty: false, remoteAvailable: false, config: null, error: null, conflict: null };
 let bridgeNeedsChoice = false;
+let learnerConflictRecovery = null;
+let bridgeChoiceDetails = null;
+let activeBridgeDecision = null;
 let bridgeFormDraft = null;
 let welcomeStorageOpen = new URLSearchParams(window.location.search).get("handoff") === "workspace";
 let welcomePath = "learner";
@@ -121,6 +126,21 @@ function hasPriorAgentActivity(snapshot = currentSnapshot) {
 
 function hasWorkspaceStorageToken() {
   return Boolean(githubCredentials?.load({ role: "learner" })?.token);
+}
+
+function bridgeDeviceLabel(navigatorObject = globalThis.navigator) {
+  const userAgent = String(navigatorObject?.userAgent ?? "");
+  const browser = webMcpAvailable(globalThis.document?.modelContext)
+    ? "OpenAI in-app browser"
+    : detectBrowserName(navigatorObject) === "this browser" ? "Browser" : detectBrowserName(navigatorObject);
+  let platform = "";
+  if (/Android/i.test(userAgent)) platform = "Android";
+  else if (/iPhone/i.test(userAgent)) platform = "iPhone";
+  else if (/iPad/i.test(userAgent)) platform = "iPad";
+  else if (/Windows/i.test(userAgent)) platform = "Windows";
+  else if (/Macintosh|Mac OS X/i.test(userAgent)) platform = "macOS";
+  else if (/Linux/i.test(userAgent)) platform = "Linux";
+  return platform ? `${browser} on ${platform}` : browser;
 }
 
 function activeAgentRole(snapshot = currentSnapshot) {
@@ -193,6 +213,128 @@ function requestAppConfirmation({
     document.body.append(backdrop);
     requestAnimationFrame(() => backdrop.querySelector("[data-confirm-cancel]")?.focus({ preventScroll: true }));
   });
+}
+
+const BRIDGE_COMPARISON_ROWS = [
+  ["Profiles", "profileCount"],
+  ["Progress records", "progressRecordCount"],
+  ["Saved attempts", "attemptCount"],
+  ["Reviews", "reviewCount"],
+  ["Curricula", "curriculumCount"],
+  ["Lesson packs", "lessonPackCount"],
+  ["Profiles with plans", "plannedProfileCount"],
+];
+
+function localBridgeStateJson() {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored) return stored;
+  } catch { /* The store's serializer remains available when browser storage is blocked. */ }
+  return store.exportSyncState();
+}
+
+function bridgeWorkspaceSummary(stateJson) {
+  try { return summarizeBridgeWorkspace(stateJson); }
+  catch {
+    return {
+      profileCount: 0, profileNames: [], activeProfileName: null, progressRecordCount: 0,
+      attemptCount: 0, reviewCount: 0, curriculumCount: 0, lessonPackCount: 0, plannedProfileCount: 0,
+    };
+  }
+}
+
+function bridgeActorLabel(envelope) {
+  if (envelope?.actorKind === "agent") return envelope.actorLabel || "QuickMaths agent";
+  return envelope?.actorLabel || envelope?.deviceLabel || "Another QuickMaths device";
+}
+
+function buildBridgeChoiceDetails(remoteLearner, kind = "device-conflict") {
+  const local = bridgeWorkspaceSummary(localBridgeStateJson());
+  const remote = bridgeWorkspaceSummary(remoteLearner?.envelope?.stateJson ?? "{}");
+  const localUpdatedAt = githubSync?.snapshot()?.localChangedAt ?? githubCredentials?.loadMetadata?.({ role: "learner" })?.localChangedAt ?? null;
+  const remoteUpdatedAt = remoteLearner?.envelope?.updatedAt ?? null;
+  return {
+    kind,
+    remoteLearner,
+    local,
+    remote,
+    localLabel: githubSync?.snapshot()?.deviceLabel || bridgeDeviceLabel(),
+    remoteLabel: bridgeActorLabel(remoteLearner?.envelope),
+    localUpdatedAt,
+    remoteUpdatedAt,
+  };
+}
+
+function closeBridgeSourceChoice() {
+  const current = activeBridgeDecision;
+  if (!current) return;
+  document.removeEventListener("keydown", current.onKeyDown);
+  current.backdrop.remove();
+  activeBridgeDecision = null;
+}
+
+function openBridgeSourceChoice({ force = false } = {}) {
+  if (!bridgeNeedsChoice || !bridgeChoiceDetails) return;
+  if (activeBridgeDecision && !force) {
+    activeBridgeDecision.backdrop.querySelector("[data-bridge-choice-cancel]")?.focus({ preventScroll: true });
+    return;
+  }
+  if (activeBridgeDecision) closeBridgeSourceChoice();
+  activeAppConfirmation?.cancel();
+  const details = bridgeChoiceDetails;
+  const migration = details.kind === "migration";
+  const changedRows = BRIDGE_COMPARISON_ROWS.filter(([, key]) => details.local[key] !== details.remote[key]);
+  const rows = (changedRows.length ? changedRows : BRIDGE_COMPARISON_ROWS).map(([label, key]) => `
+    <div><span>${escapeHtml(label)}</span><strong>${escapeHtml(details.local[key])}</strong><strong>${escapeHtml(details.remote[key])}</strong></div>`).join("");
+  const localProfiles = details.local.profileNames.length ? details.local.profileNames.join(", ") : "No profiles";
+  const remoteProfiles = details.remote.profileNames.length ? details.remote.profileNames.join(", ") : "No profiles";
+  const backdrop = document.createElement("section");
+  backdrop.className = "action-confirm-backdrop bridge-source-backdrop";
+  backdrop.setAttribute("role", "presentation");
+  backdrop.innerHTML = `
+    <article class="action-confirm-dialog bridge-source-dialog" role="dialog" aria-modal="true" aria-labelledby="bridge-source-title" aria-describedby="bridge-source-copy">
+      <p class="eyebrow">Workspace Storage · ${migration ? "device migration" : "sync decision"}</p>
+      <h2 id="bridge-source-title">Which workspace should continue?</h2>
+      <p id="bridge-source-copy">${migration
+        ? "This browser and GitHub both contain independent QuickMaths work. Choose the complete copy to keep as the shared workspace."
+        : "This device has unsynced work and a substantially older or undated GitHub history from another device. Compare them before choosing."}</p>
+      <div class="bridge-source-columns">
+        <article><span>This device</span><strong>${escapeHtml(details.localLabel)}</strong><small>${escapeHtml(details.localUpdatedAt ? formatDate(details.localUpdatedAt) : "Time unavailable")}</small><p>${escapeHtml(localProfiles)}</p></article>
+        <article><span>GitHub copy · last writer</span><strong>${escapeHtml(details.remoteLabel)}</strong><small>${escapeHtml(details.remoteUpdatedAt ? formatDate(details.remoteUpdatedAt) : "Time unavailable")}</small><p>${escapeHtml(remoteProfiles)}</p></article>
+      </div>
+      <div class="bridge-diff-table" role="table" aria-label="Workspace comparison">
+        <div class="bridge-diff-head" role="row"><span>Workspace data</span><strong>This device</strong><strong>GitHub</strong></div>
+        ${rows}
+      </div>
+      <p class="bridge-choice-note">Nothing is deleted from Git history. Download a JSON backup first if both copies matter.</p>
+      <div class="action-confirm-actions bridge-source-actions">
+        <button class="button button-outline" type="button" data-bridge-choice-cancel>Not now</button>
+        <button class="button button-secondary" type="button" data-bridge-choice-remote>Use GitHub copy</button>
+        <button class="button button-primary" type="button" data-bridge-choice-local>Use this device</button>
+      </div>
+    </article>`;
+  const cancel = () => closeBridgeSourceChoice();
+  const choose = async (source) => {
+    backdrop.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+    await resolveBridgeSourceChoice(source);
+    if (activeBridgeDecision) backdrop.querySelectorAll("button").forEach((button) => { button.disabled = false; });
+  };
+  const onKeyDown = (event) => { if (event.key === "Escape") cancel(); };
+  activeBridgeDecision = { backdrop, onKeyDown };
+  backdrop.querySelector("[data-bridge-choice-cancel]")?.addEventListener("click", cancel);
+  backdrop.querySelector("[data-bridge-choice-remote]")?.addEventListener("click", () => void choose("remote"));
+  backdrop.querySelector("[data-bridge-choice-local]")?.addEventListener("click", () => void choose("local"));
+  backdrop.addEventListener("click", (event) => { if (event.target === backdrop) cancel(); });
+  document.addEventListener("keydown", onKeyDown);
+  document.body.append(backdrop);
+  requestAnimationFrame(() => backdrop.querySelector("[data-bridge-choice-cancel]")?.focus({ preventScroll: true }));
+}
+
+function setBridgeSourceChoice(remoteLearner, kind) {
+  bridgeNeedsChoice = true;
+  bridgeChoiceDetails = buildBridgeChoiceDetails(remoteLearner, kind);
+  githubSync.stop();
+  openBridgeSourceChoice();
 }
 
 function agentHandoffMarkup(snapshot, { compact = false } = {}) {
@@ -1755,6 +1897,7 @@ function renderGitHubBridge(snapshot) {
   const educator = snapshot.activeProfile?.role === "educator";
   const checkpointLabel = "complete QuickMaths workspace";
   const repository = status.config ? `${status.config.owner}/${status.config.repo}` : null;
+  const choice = bridgeChoiceDetails;
   const phaseClass = status.phase === "conflict" ? "conflict" : status.error ? "error" : status.connected ? "connected" : "idle";
   if (!status.connected) {
     return `
@@ -1768,11 +1911,11 @@ function renderGitHubBridge(snapshot) {
     <section class="content-card github-bridge-card" id="github-bridge">
       <div class="bridge-card-heading"><div><p class="eyebrow">Workspace Storage · experimental</p><h2>${escapeHtml(repository)}</h2><p>The complete browser workspace is checkpointed after a short pause. Remote updates are accepted only when they were created from the current app revision.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
       ${status.error ? `<aside class="bridge-warning"><strong>${status.phase === "conflict" ? "Sync conflict" : "Bridge paused"}</strong><p>${escapeHtml(status.error)}</p></aside>` : ""}
-      ${bridgeNeedsChoice ? `<aside class="bridge-choice"><div><strong>A complete QuickMaths workspace already exists on GitHub.</strong><p>Choose which complete copy should become current. Nothing is overwritten until you choose.</p></div><button class="button button-primary" data-action="bridge-load-remote">Load GitHub copy</button><button class="button button-outline" data-action="bridge-replace-remote">Use this device</button></aside>` : ""}
+      ${bridgeNeedsChoice ? `<aside class="bridge-choice"><div><strong>A workspace decision is waiting.</strong><p>${choice?.kind === "migration" ? "This is a first-time migration between independent browser and GitHub work." : "This device has unsynced work that needs a quick comparison with GitHub."}${choice ? ` Last GitHub writer: ${escapeHtml(choice.remoteLabel)}.` : ""}</p></div><button class="button button-primary" data-action="bridge-review-choice">Compare versions</button></aside>` : ""}
       <div class="bridge-status-grid">
-        <article><span>Local state</span><strong>${status.dirty ? "Pending checkpoint" : "Checkpointed"}</strong><small>Browser autosave stays instant</small></article>
+        <article><span>Local state</span><strong>${status.dirty ? "Pending checkpoint" : "Checkpointed"}</strong><small>${escapeHtml(status.deviceLabel ?? bridgeDeviceLabel())}</small></article>
         <article><span>Last workspace push</span><strong>${status.lastPushedAt ? escapeHtml(formatDate(status.lastPushedAt)) : "This session: not yet"}</strong><small>${escapeHtml(status.config.branch)}</small></article>
-        <article><span>Last agent pull</span><strong>${status.lastPulledAt ? escapeHtml(formatDate(status.lastPulledAt)) : "Waiting"}</strong><small>${status.remoteAvailable ? "Remote files detected" : "No agent checkpoint yet"}</small></article>
+        <article><span>Last remote writer</span><strong>${escapeHtml(status.lastRemoteActor ?? "Waiting for remote work")}</strong><small>${status.lastRemoteUpdatedAt ? escapeHtml(formatDate(status.lastRemoteUpdatedAt)) : "No newer checkpoint seen"}</small></article>
         <article><span>Token storage</span><strong>${saved?.rememberToken ? "Remembered here" : "This tab session"}</strong><small>Never committed</small></article>
       </div>
       <div class="bridge-toolbar"><button class="button button-primary" data-action="bridge-push" ${bridgeNeedsChoice ? "disabled" : ""}>Sync now</button><button class="button button-outline" data-action="bridge-pull-agent" ${bridgeNeedsChoice ? "disabled" : ""}>Check agent updates</button><button class="button button-outline" data-action="manage-workspace-storage">Manage GitHub storage</button><a class="button button-outline" href="./agent-bridge.html" target="_blank" rel="noopener">Open Agent Bridge ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a><button class="quiet-button danger-link" data-action="bridge-disconnect">Disconnect</button></div>
@@ -2133,33 +2276,100 @@ async function prepareLearnerBridge({ resumed = false } = {}) {
   const remote = await githubSync.inspectRemote();
   const local = store.snapshot();
   const metadata = githubCredentials.loadMetadata?.({ role: "learner" });
+  const syncStatus = githubSync.snapshot();
   const remoteMatchesKnown = remote.learner.exists && metadata?.learnerSha === remote.learner.sha;
-  const remoteMatchesDevice = remote.learner.exists
-    && typeof metadata?.deviceId === "string"
-    && remote.learner.envelope?.deviceId === metadata.deviceId;
+  const establishedConnection = resumed || typeof metadata?.learnerSha === "string";
+  const startupAction = learnerBridgeStartupAction({
+    remoteExists: remote.learner.exists,
+    localProfileCount: local.profiles.length,
+    establishedConnection,
+    remoteMatchesKnown,
+    localDirty: syncStatus.dirty,
+    sameDevice: remote.learner.envelope?.deviceId === syncStatus.deviceId,
+    remoteActorKind: remote.learner.envelope?.actorKind,
+    localChangedAt: syncStatus.localChangedAt,
+    remoteUpdatedAt: remote.learner.envelope?.updatedAt,
+  });
   bridgeNeedsChoice = false;
-  if (!remote.learner.exists) {
-    if (local.profiles.length) await githubSync.pushNow();
+  bridgeChoiceDetails = null;
+  closeBridgeSourceChoice();
+  if (startupAction === "push-local") {
+    await githubSync.pushNow();
     githubSync.start();
-  } else if (!local.profiles.length) {
+  } else if (startupAction === "start") {
+    githubSync.start();
+  } else if (startupAction === "restore-remote") {
     await githubSync.restoreLearner({ force: true });
     githubSync.start();
-  } else if (resumed && (remoteMatchesKnown || remoteMatchesDevice)) {
-    // If another tab from this same browser wrote the checkpoint, its blob SHA
-    // may be newer than this tab's metadata. Adopt that same-device revision
-    // instead of presenting a false A/B conflict on every reload.
-    if (!remoteMatchesKnown) await githubSync.restoreLearner({ force: true });
+  } else if (startupAction === "resume-known") {
     githubSync.start();
-    if (remoteMatchesKnown && githubSync.snapshot().dirty) await githubSync.pushNow();
+    if (githubSync.snapshot().dirty) await githubSync.pushNow();
   } else {
-    bridgeNeedsChoice = true;
-    githubSync.stop();
+    setBridgeSourceChoice(remote.learner, startupAction === "choose-migration-source" ? "migration" : "device-conflict");
   }
   if (!bridgeNeedsChoice && remote.agent?.exists) {
     try { await githubSync.pullNow(); } catch { /* The status card explains stale agent output. */ }
   }
   if (store.snapshot().ui.route === "settings") renderSettings(store.snapshot());
   return remote;
+}
+
+function recoverEstablishedLearnerConflict() {
+  if (learnerConflictRecovery || !githubSyncSnapshot.connected) return learnerConflictRecovery;
+  githubSync.stop();
+  learnerConflictRecovery = (async () => {
+    const remote = await githubSync.inspectRemote();
+    if (!remote.learner.exists) {
+      await githubSync.pushNow({ force: true });
+      githubSync.start();
+      return;
+    }
+    const syncStatus = githubSync.snapshot();
+    const action = learnerBridgeStartupAction({
+      remoteExists: true,
+      localProfileCount: store.snapshot().profiles.length,
+      establishedConnection: true,
+      remoteMatchesKnown: false,
+      localDirty: syncStatus.dirty,
+      sameDevice: remote.learner.envelope?.deviceId === syncStatus.deviceId,
+      remoteActorKind: remote.learner.envelope?.actorKind,
+      localChangedAt: syncStatus.localChangedAt,
+      remoteUpdatedAt: remote.learner.envelope?.updatedAt,
+    });
+    if (action === "compare-sources") {
+      setBridgeSourceChoice(remote.learner, "device-conflict");
+      showToast("QuickMaths paused sync so you can compare this device with GitHub.");
+      return;
+    }
+    bridgeNeedsChoice = false;
+    bridgeChoiceDetails = null;
+    await githubSync.restoreLearner({ force: true });
+    try { await githubSync.pullNow(); } catch { /* A stale agent checkpoint remains safely ignored. */ }
+    githubSync.start();
+    showToast(remote.learner.envelope?.actorKind === "agent"
+      ? "Agent changes were applied to this workspace."
+      : "This device fast-forwarded to the current GitHub workspace.");
+  })().catch((error) => {
+    showToast(error instanceof Error ? error.message : String(error));
+  }).finally(() => { learnerConflictRecovery = null; });
+  return learnerConflictRecovery;
+}
+
+async function resolveBridgeSourceChoice(source) {
+  if (!bridgeNeedsChoice || !["remote", "local"].includes(source)) return;
+  try {
+    if (source === "remote") await githubSync.restoreLearner({ force: true });
+    else await githubSync.pushNow({ force: true });
+    bridgeNeedsChoice = false;
+    bridgeChoiceDetails = null;
+    closeBridgeSourceChoice();
+    try { await githubSync.pullNow(); } catch { /* A stale agent checkpoint must not undo the chosen learner workspace. */ }
+    githubSync.start();
+    if (store.snapshot().ui.route === "settings") renderSettings(store.snapshot());
+    showToast(source === "remote" ? "GitHub workspace loaded." : "This device is now the shared GitHub workspace.");
+  } catch (error) {
+    showToast(error instanceof Error ? error.message : String(error));
+  }
 }
 
 async function connectLearnerBridge(form, { restoreOnly = false } = {}) {
@@ -2211,6 +2421,7 @@ async function bridgeAction(action) {
       const result = await githubSync.pullNow();
       showToast(result.updated ? "Agent changes applied." : result.stale ? "Outdated agent changes ignored. Ask the agent to sync again." : "No new agent changes.");
     }
+    if (action === "bridge-review-choice") openBridgeSourceChoice({ force: true });
     if (action === "bridge-load-remote") {
       if (!await requestAppConfirmation({
         title: "Load the GitHub workspace?",
@@ -2218,12 +2429,7 @@ async function bridgeAction(action) {
         confirmLabel: "Load GitHub copy",
         destructive: true,
       })) return;
-      await githubSync.restoreLearner({ force: true });
-      bridgeNeedsChoice = false;
-      try { await githubSync.pullNow(); } catch { /* Keep the resolved learner channel active; polling can retry the agent channel. */ }
-      githubSync.start();
-      renderSettings(store.snapshot());
-      showToast("GitHub learner checkpoint loaded.");
+      await resolveBridgeSourceChoice("remote");
     }
     if (action === "bridge-replace-remote") {
       if (!await requestAppConfirmation({
@@ -2232,16 +2438,13 @@ async function bridgeAction(action) {
         confirmLabel: "Replace GitHub copy",
         destructive: true,
       })) return;
-      await githubSync.pushNow({ force: true });
-      bridgeNeedsChoice = false;
-      try { await githubSync.pullNow(); } catch { /* Keep the resolved learner channel active; polling can retry the agent channel. */ }
-      githubSync.start();
-      renderSettings(store.snapshot());
-      showToast("GitHub learner checkpoint replaced.");
+      await resolveBridgeSourceChoice("local");
     }
     if (action === "bridge-disconnect") {
       githubSync.disconnect();
       bridgeNeedsChoice = false;
+      bridgeChoiceDetails = null;
+      closeBridgeSourceChoice();
       showToast("QuickMaths Bridge disconnected on this device.");
     }
   } catch (error) {
@@ -3171,10 +3374,10 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260903-unified-agent-v1").catch(() => null),
+      fetch("./agent-manifest.json?v=20260903-device-aware-sync-v1").catch(() => null),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
-      fetch("./STUDENT_GUIDE.md?v=20260903-unified-agent-v1").catch(() => null),
-      fetch("./EDUCATOR_GUIDE.md?v=20260903-unified-agent-v1").catch(() => null),
+      fetch("./STUDENT_GUIDE.md?v=20260903-device-aware-sync-v1").catch(() => null),
+      fetch("./EDUCATOR_GUIDE.md?v=20260903-device-aware-sync-v1").catch(() => null),
     ]);
     if (manifestResponse?.ok) agentManifest = await manifestResponse.json();
     if (authoringGuideResponse?.ok) authoringGuideMarkdown = await authoringGuideResponse.text();
@@ -3212,16 +3415,16 @@ async function boot() {
     serializeState: () => store.exportSyncState(),
     applyState: (raw) => store.importSyncState(raw),
     subscribeToState: (listener) => store.subscribe(listener),
+    deviceLabel: bridgeDeviceLabel(),
   });
   githubSyncSnapshot = githubSync.snapshot();
   githubSync.subscribe((status) => {
     githubSyncSnapshot = status;
     if (status.phase === "conflict" && status.conflictDetails?.channel === "learner") {
-      // A newer learner checkpoint appeared after the initial connection.
-      // Pause automatic writes and restore the same explicit A/B choice used
-      // during setup, instead of leaving the workspace in an error-only state.
-      bridgeNeedsChoice = true;
-      githubSync.stop();
+      // Polling runs independently of the current route. Most learner-channel
+      // changes fast-forward automatically; only old/undated dirty work from a
+      // different device opens the global comparison dialog.
+      void recoverEstablishedLearnerConflict();
     }
     if (currentSnapshot?.activeProfile && currentSnapshot.ui.route === "settings") renderSettings(currentSnapshot);
   });
