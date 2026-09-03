@@ -224,13 +224,19 @@ Pinch inside the map to zoom. Drag empty space to pan. The map viewport remains 
 
 The skill selector moves focus to a known lesson and updates the detail card. It is useful on large combined maps.
 
+### Plan view and canonical view
+
+The map opens in **Plan view**. This is the read-only presentation of your saved personal plan: it uses your arranged positions, colored paths, annotations, and hidden-node choices, while clicks still open ordinary lesson detail cards and drag, wheel, and pinch gestures only navigate the map.
+
+Use the **Plan view** toggle to switch it off and inspect the untouched canonical prerequisite map. Turn it back on to return to the saved plan. Use **Plan mode** only when you want to edit that plan.
+
 ## 8. Personal Plan mode
 
-Plan mode is a private working copy layered over the canonical mastery map. Turning it off restores the canonical view without deleting your saved plan.
+Plan mode is the editor for the private working copy layered over the canonical mastery map. Leaving Plan mode returns to the read-only Plan view without deleting anything; the separate Plan view toggle reveals the canonical map whenever you want to compare them.
 
 ### Enter and leave Plan mode
 
-Choose **Plan mode** in the map header. A toolbar and Plan details card appear while the map remains visible. Changes autosave with your learner profile and travel in full backups and Bridge checkpoints.
+Choose **Plan mode** in the map header. A toolbar and Plan details card appear while the map remains visible. The editable canvas extends beyond the colored subject bands: those bands are reference guides, not fences, so selected nodes can be placed anywhere on the surrounding canvas. Changes autosave with your learner profile and travel in full backups and Bridge checkpoints.
 
 ### Desktop selection
 
@@ -249,6 +255,12 @@ Choose **Plan mode** in the map header. A toolbar and Plan details card appear w
 - Drag selected nodes to move them.
 - Drag ordinary empty space to pan.
 
+### Hide and restore nodes
+
+Select one or many lesson nodes and choose **Hide selected** to remove them from both the editable Plan mode and read-only Plan view. This does not delete lessons, change prerequisites, uninstall content, or affect the canonical mastery map.
+
+Choose **Show hidden nodes** to reveal every hidden lesson as a faded, clearly labeled node. Select the ones you want back—multi-selection works normally—then choose **Unhide selected**. Choose **Hide hidden nodes** to conceal the remaining hidden nodes again.
+
 ### Custom paths
 
 Select at least two lessons, choose **Custom path**, name the route, and choose an outline color. Selection order becomes path order. Bold connections and node outlines visualize the plan.
@@ -257,11 +269,11 @@ Custom paths do not change real prerequisites or mastery. They represent your in
 
 ### Annotations
 
-Choose **Annotation** to create a note connected to selected lessons, connected to a saved path, or free on the map when nothing is selected. Comment nodes can be dragged. Use annotations for goals, misconceptions, dates, resources, or questions. Do not store passwords or tokens in them.
+Choose **Annotation** to create a note connected to selected lessons, or free on the map when nothing is selected. Custom paths do not own annotations; select the relevant route lessons if one comment should describe them together. Comment nodes can be dragged. Use annotations for goals, misconceptions, dates, resources, or questions. Do not store passwords or tokens in them.
 
 ### Plan details and reset
 
-The side card lists selection, saved paths, and annotations. Delete individual plan items or reset node positions for the visible scope. Subject layouts and the combined all-subject layout keep separate positions.
+The side card lists selection, saved paths, and annotations. Delete individual plan items, hide or restore selected nodes, or reset node positions for the visible scope. Subject layouts and the combined all-subject layout keep separate positions. Hidden-node choices belong to the plan as a whole and remain hidden across its subject and combined views until restored.
 
 ## 9. Lesson page
 
@@ -339,9 +351,11 @@ A structured trace question adds a scrollable table beneath the code. Each row r
 
 A `python_program` question provides a code editor and **Run sandboxed tests** button. Write the exact named function with the requested positional parameters and return a value instead of reading interactive input. The supported beginner subset includes assignments, conditions, loops, comprehensions, helper functions, JSON-compatible values, and an author-selected set of ordinary builtins and value methods.
 
-The first run downloads a pinned Python runtime, so it can take longer than later questions. Every run gets a disposable background Worker. QuickMaths rejects imports, files, network, browser/storage APIs, clocks, randomness, dynamic evaluation, private/dunder access, classes, exception handling, decorators, and unsupported syntax. It also limits source structure, execution steps, output, returned data, and wall time, then terminates the Worker.
+The first run loads QuickMaths' self-hosted, integrity-pinned Pyodide 0.28.3 files, so it can take longer than later questions. No runtime script or package is fetched from a third-party CDN, and package installation is unavailable. Every run gets a fresh disposable background Worker. QuickMaths strictly validates the complete grading payload, rejects imports, files, network, browser/storage APIs, clocks, randomness, dynamic evaluation, private/dunder access, classes, exception handling, decorators, and unsupported syntax, and independently bounds test count, argument depth/size, source structure, execution steps, output, returned data, and wall time. Timeout or cancellation terminates the Worker; that interpreter is never reused.
 
-Before submission, you see only tests marked as examples. After submission, additional `after_submission` outcomes can appear. Hidden tests report only status and never reveal their arguments or expected values. A current sandbox run is required before submitting; editing the code invalidates the old result. The subset is deliberately not full Python: file, module, exception, object-oriented, and complete application exercises remain captured or rubric-reviewed work rather than being falsely run with broad privileges.
+Before submission, you see only tests marked as examples. After submission, additional `after_submission` outcomes can appear. Hidden tests report only status and never reveal their arguments or expected values. A current sandbox run is required before submitting; editing the code invalidates the old result. If the runtime itself cannot start, submission remains blocked and the infrastructure failure is never counted as a learner mistake. Only the visible **Run sandboxed tests** button can execute learner code; WebMCP can stage lessons but has no Python execution tool.
+
+Python source and the bounded pass/fail summary autosave with the learner profile and can enter a full backup or complete-workspace GitHub sync. Captured stdout is transient and discarded. The subset is deliberately not full Python: file, module, exception, object-oriented, and complete application exercises remain captured or rubric-reviewed work rather than being falsely run with broad privileges. The displayed `memory_mb` authoring value is not presented as a precise browser memory quota; disposable-worker termination plus structural, data, result, and time limits are the enforceable boundary.
 
 ### Formal proof required
 
@@ -488,7 +502,7 @@ Choose Hard or Open path when no curriculum controls the setting. **Replay app t
 
 ### Attached curriculum
 
-Settings names the current educator curriculum or lets you load one from a local file or public GitHub blueprint URL. A matching student name deliberately reuses the selected profile's mastery; otherwise QuickMaths creates a separate blank assignment profile. Full educator guidance remains visible here after import.
+Settings names the current educator curriculum or lets you load one from a local file or public GitHub blueprint URL. A matching student name deliberately reuses the selected profile's mastery; otherwise QuickMaths creates a separate blank assignment profile. The educator's canonical paths, annotations, and positions are copied into that learner's independently editable Plan mode. Full educator guidance remains visible here after import.
 
 ### GitHub Bridge
 

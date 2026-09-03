@@ -13,6 +13,7 @@ import contextlib
 import io
 import json
 import math
+import re
 import sys
 
 
@@ -21,6 +22,18 @@ MAX_AST_NODES = 1_200
 MAX_AST_DEPTH = 45
 MAX_LITERAL_CHARS = 2_000
 MAX_INTEGER_BITS = 128
+MAX_PAYLOAD_BYTES = 180_000
+MAX_TESTS = 30
+MAX_PARAMETERS = 8
+MAX_JSON_VALUE_BYTES = 20_000
+MAX_JSON_DEPTH = 10
+MAX_COLLECTION_ITEMS = 1_000
+MAX_ABS_INPUT_INTEGER = 1_000_000
+MAX_TOTAL_STDOUT_CHARS = 4_000
+MAX_RESULT_MESSAGE_CHARS = 500
+MAX_MULTIPLIER = 100_000
+SUPPORTED_VALUE_TYPES = {"json", "none", "bool", "int", "float", "str", "list", "dict"}
+SAFE_IDENTIFIER = re.compile(r"^[A-Za-z][A-Za-z0-9_]{0,59}$")
 
 SAFE_BUILTINS = {
     "abs": abs,
@@ -88,6 +101,18 @@ class LimitedOutput(io.StringIO):
         if self.tell() + len(value) > self.limit:
             raise OutputLimitError("Program output exceeded the configured limit.")
         return super().write(value)
+
+
+def safe_range(*arguments):
+    if not 1 <= len(arguments) <= 3 or any(type(value) is not int for value in arguments):
+        raise TypeError("range expects one to three integers.")
+    result = range(*arguments)
+    if len(result) > MAX_MULTIPLIER:
+        raise RuntimeError(f"range is limited to {MAX_MULTIPLIER} values.")
+    return result
+
+
+SAFE_BUILTINS["range"] = safe_range
 
 
 def _tree_depth(node: ast.AST) -> int:
@@ -165,7 +190,113 @@ class SubsetValidator(ast.NodeVisitor):
         if isinstance(node.op, ast.Pow) and isinstance(node.right, ast.Constant):
             if not isinstance(node.right.value, (int, float)) or abs(node.right.value) > 12:
                 raise PolicyError("Exponent magnitude is limited to 12.")
+        if isinstance(node.op, ast.Mult):
+            constants = [candidate.value for candidate in (node.left, node.right) if isinstance(candidate, ast.Constant)]
+            if any(type(value) is int and abs(value) > MAX_MULTIPLIER for value in constants):
+                raise PolicyError(f"Literal repetition is limited to {MAX_MULTIPLIER} items.")
         self.generic_visit(node)
+
+
+def _json_size(value) -> int:
+    return len(json.dumps(value, ensure_ascii=False, allow_nan=False).encode("utf-8"))
+
+
+def _validate_json_value(value, label: str, depth: int = 0) -> None:
+    if depth > MAX_JSON_DEPTH:
+        raise PolicyError(f"{label} is nested too deeply.")
+    if value is None or type(value) is bool:
+        return
+    if type(value) is int:
+        if abs(value) > MAX_ABS_INPUT_INTEGER:
+            raise PolicyError(f"{label} contains an integer outside the supported range.")
+        return
+    if type(value) is float:
+        if not math.isfinite(value) or abs(value) > MAX_ABS_INPUT_INTEGER:
+            raise PolicyError(f"{label} contains a number outside the supported range.")
+        return
+    if type(value) is str:
+        if len(value) > MAX_LITERAL_CHARS:
+            raise PolicyError(f"{label} contains text that is too long.")
+        return
+    if type(value) is list:
+        if len(value) > MAX_COLLECTION_ITEMS:
+            raise PolicyError(f"{label} contains too many items.")
+        for item in value:
+            _validate_json_value(item, label, depth + 1)
+        return
+    if type(value) is dict:
+        if len(value) > MAX_COLLECTION_ITEMS:
+            raise PolicyError(f"{label} contains too many items.")
+        for key, item in value.items():
+            if type(key) is not str or len(key) > 120 or key in {"__proto__", "prototype", "constructor"}:
+                raise PolicyError(f"{label} contains an invalid object key.")
+            _validate_json_value(item, label, depth + 1)
+        return
+    raise PolicyError(f"{label} contains an unsupported value.")
+
+
+def _validated_spec(candidate) -> dict:
+    if type(candidate) is not dict or candidate.get("runtime") != "python_subset_v1":
+        raise PolicyError("The Python grader specification is invalid.")
+    if set(candidate) - {"runtime", "entrypoint", "tests", "limits", "policy"}:
+        raise PolicyError("The Python grader specification contains unsupported fields.")
+    entrypoint = candidate.get("entrypoint")
+    if type(entrypoint) is not dict or set(entrypoint) - {"kind", "name", "parameters", "return_type"}:
+        raise PolicyError("The Python entrypoint specification is invalid.")
+    if entrypoint.get("kind") != "function" or not SAFE_IDENTIFIER.fullmatch(entrypoint.get("name", "")):
+        raise PolicyError("The Python entrypoint must be a named function.")
+    parameters = entrypoint.get("parameters")
+    if type(parameters) is not list or len(parameters) > MAX_PARAMETERS:
+        raise PolicyError(f"The Python entrypoint supports at most {MAX_PARAMETERS} parameters.")
+    names = []
+    for parameter in parameters:
+        if type(parameter) is not dict or set(parameter) != {"name", "type"}:
+            raise PolicyError("A Python parameter specification is invalid.")
+        if not SAFE_IDENTIFIER.fullmatch(parameter["name"]) or parameter["name"].startswith("_"):
+            raise PolicyError("A Python parameter name is invalid.")
+        if parameter["type"] not in SUPPORTED_VALUE_TYPES - {"none"}:
+            raise PolicyError("A Python parameter type is invalid.")
+        names.append(parameter["name"])
+    if len(set(names)) != len(names) or entrypoint.get("return_type", "json") not in SUPPORTED_VALUE_TYPES:
+        raise PolicyError("The Python function signature is invalid.")
+    tests = candidate.get("tests")
+    if type(tests) is not list or not 1 <= len(tests) <= MAX_TESTS:
+        raise PolicyError(f"The Python grader needs 1 to {MAX_TESTS} tests.")
+    test_ids = []
+    for test in tests:
+        if type(test) is not dict or set(test) - {"id", "args", "expected_return", "visibility"}:
+            raise PolicyError("A Python test specification is invalid.")
+        test_id = test.get("id", "")
+        visibility = test.get("visibility", "hidden")
+        arguments = test.get("args")
+        if not SAFE_IDENTIFIER.fullmatch(test_id) or visibility not in {"example", "after_submission", "hidden"}:
+            raise PolicyError("A Python test identifier or visibility is invalid.")
+        if type(arguments) is not list or len(arguments) != len(parameters):
+            raise PolicyError("A Python test has the wrong number of arguments.")
+        _validate_json_value(arguments, f"Test {test_id} arguments")
+        _validate_json_value(test.get("expected_return"), f"Test {test_id} expected value")
+        if _json_size(arguments) > MAX_JSON_VALUE_BYTES or _json_size(test.get("expected_return")) > MAX_JSON_VALUE_BYTES:
+            raise PolicyError(f"Test {test_id} data is too large.")
+        test_ids.append(test_id)
+    if len(set(test_ids)) != len(test_ids):
+        raise PolicyError("Python test identifiers must be unique.")
+    limits = candidate.get("limits")
+    if type(limits) is not dict or set(limits) - {"wall_time_ms", "step_limit", "memory_mb", "stdout_chars"}:
+        raise PolicyError("The Python resource policy is invalid.")
+    supported_ranges = {"wall_time_ms": (250, 3000), "step_limit": (100, 50_000), "memory_mb": (16, 64), "stdout_chars": (0, 4000)}
+    for name, (minimum, maximum) in supported_ranges.items():
+        value = limits.get(name)
+        if type(value) is not int or not minimum <= value <= maximum:
+            raise PolicyError(f"Python limit {name} is outside the supported range.")
+    policy = candidate.get("policy")
+    if type(policy) is not dict or set(policy) != {"allowed_builtins", "imports", "network", "storage", "clock", "randomness"}:
+        raise PolicyError("The Python capability policy is invalid.")
+    allowed = policy.get("allowed_builtins")
+    if type(allowed) is not list or len(allowed) > len(SAFE_BUILTINS) or any(type(name) is not str or name not in SAFE_BUILTINS for name in allowed):
+        raise PolicyError("The Python builtin policy is invalid.")
+    if policy.get("imports") != [] or any(policy.get(name) is not False for name in ("network", "storage", "clock", "randomness")):
+        raise PolicyError("Python capabilities must be explicitly disabled.")
+    return candidate
 
 
 def _matches_declared_type(value, declared: str) -> bool:
@@ -194,7 +325,7 @@ def _matches_declared_type(value, declared: str) -> bool:
 
 def _json_value(value):
     encoded = json.dumps(value, ensure_ascii=False, allow_nan=False)
-    if len(encoded) > 20_000:
+    if len(encoded.encode("utf-8")) > MAX_JSON_VALUE_BYTES:
         raise RuntimeError("The returned value is too large.")
     return json.loads(encoded)
 
@@ -208,19 +339,30 @@ def _same_value(actual, expected) -> bool:
 def _error_tests(spec: dict, status: str, message: str) -> list[dict]:
     return [
         {
-            "id": test["id"],
+            "id": str(test.get("id", "test"))[:60],
             "status": status,
             "visibility": test["visibility"],
             "message": message if test["visibility"] != "hidden" else "A hidden test could not run.",
         }
-        for test in spec.get("tests", [])
+        for test in spec.get("tests", [])[:MAX_TESTS] if type(test) is dict
     ]
 
 
 def grade_payload(payload_json: str) -> str:
+    if not isinstance(payload_json, str) or len(payload_json.encode("utf-8")) > MAX_PAYLOAD_BYTES:
+        raise PolicyError("The Python grading payload is too large.")
     payload = json.loads(payload_json)
+    if type(payload) is not dict or set(payload) != {"source", "spec"}:
+        raise PolicyError("The Python grading payload is invalid.")
     source = payload.get("source", "")
-    spec = payload.get("spec") or {}
+    raw_spec = payload.get("spec") or {}
+    try:
+        spec = _validated_spec(raw_spec)
+    except (PolicyError, TypeError, ValueError) as error:
+        message = str(error)[:MAX_RESULT_MESSAGE_CHARS]
+        tests = raw_spec.get("tests", []) if type(raw_spec) is dict else []
+        safe_spec = {"tests": tests[:MAX_TESTS] if type(tests) is list else []}
+        return json.dumps({"status": "policy_error", "score": 0, "passed": 0, "total": len(safe_spec["tests"]), "tests": _error_tests(safe_spec, "failed", message), "messages": [message], "stdout": ""})
     tests = spec.get("tests") or []
     total = len(tests)
     if not isinstance(source, str) or not source.strip():
@@ -251,10 +393,11 @@ def grade_payload(payload_json: str) -> str:
     compiled = compile(tree, "<learner>", "exec", dont_inherit=True, optimize=0)
     results = []
     combined_stdout = []
+    remaining_stdout = min(stdout_limit, MAX_TOTAL_STDOUT_CHARS)
 
     for test in tests:
         namespace = {"__builtins__": {name: SAFE_BUILTINS[name] for name in allowed_names}}
-        output = LimitedOutput(stdout_limit)
+        output = LimitedOutput(remaining_stdout)
         counter = {"steps": 0}
 
         def tracer(frame, event, arg):
@@ -293,12 +436,14 @@ def grade_payload(payload_json: str) -> str:
         except StepLimitError as error:
             results.append({"id": test["id"], "status": "timeout", "visibility": visibility, "message": str(error) if visibility != "hidden" else "A hidden test exceeded the step limit."})
         except Exception as error:  # trusted boundary: return only type and a bounded message
-            message = f"{type(error).__name__}: {str(error)[:180]}"
+            message = f"{type(error).__name__}: {str(error)[:180]}"[:MAX_RESULT_MESSAGE_CHARS]
             results.append({"id": test["id"], "status": "runtime_error", "visibility": visibility, "message": message if visibility != "hidden" else "A hidden test raised an error."})
         finally:
             sys.settrace(None)
-        if output.getvalue():
-            combined_stdout.append(output.getvalue())
+        if output.getvalue() and remaining_stdout:
+            captured = output.getvalue()[:remaining_stdout]
+            combined_stdout.append(captured)
+            remaining_stdout -= len(captured)
 
     passed = sum(result["status"] == "passed" for result in results)
     status = "passed" if total and passed == total else "incorrect"
@@ -313,6 +458,5 @@ def grade_payload(payload_json: str) -> str:
         "total": total,
         "tests": results,
         "messages": [f"{passed} of {total} sandbox tests passed."],
-        "stdout": "".join(combined_stdout)[:stdout_limit],
+        "stdout": "".join(combined_stdout),
     }, ensure_ascii=False)
-

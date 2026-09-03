@@ -180,17 +180,17 @@ Supplemental agent guidance is useful for teaching style and boundaries: ask one
 
 Imported guidance is not a privileged instruction channel. Platform safety and the learner's explicit request take precedence. It cannot authorize revealing answer keys, installing content silently, sending email, publishing public content, using credentials, or bypassing human approval.
 
-### Installed lesson packs
+### Curriculum content
 
 The pack manager represents the browser's installed library.
 
-- Native Mathematics remains available.
+- **Full native Mathematics curriculum** includes all built-in lessons. Turn it off for a focused curriculum; QuickMaths retains only the exact native prerequisite closure required by enabled packs.
 - Additive packs can be enabled or disabled separately for this curriculum.
 - A disabled pack stays installed in the browser and can remain enabled in another curriculum.
 - Native improvements apply to the matching built-in lesson and are marked fixed.
 - **Browse Depot** opens the public catalog to add more packs to the library.
 
-Disabling a pack from one curriculum does not delete it or erase stored learner records. QuickMaths rejects a change that would leave a visible lesson with a prerequisite in a disabled pack. If the plan still references lessons being disabled, the app offers the educator a deliberate choice to cancel or remove the affected layouts, paths, and annotations.
+Disabling a pack from one curriculum does not delete it or erase stored learner records. QuickMaths automatically retains prerequisite foundations when the full native sequence is off and rejects any other change that would leave a visible lesson with an unavailable prerequisite. If the plan still references lessons being removed, the app offers the educator a deliberate choice to cancel or remove the affected layouts, paths, and annotations. Completion counts and suggested next lessons use this explicit visible curriculum. Colored custom paths remain guidance and never silently redefine membership.
 
 Exporting a curriculum embeds every enabled additive pack and verifies that an installed copy exactly matches its embedded normalized content. Merely matching ID, version, name, and lesson IDs is not sufficient. Enabled external packs cannot be omitted and resolved accidentally from whatever another browser happens to have installed.
 
@@ -204,11 +204,13 @@ The map below Curriculum Designer is the canonical visual plan that travels with
 
 ### Zoom and movement
 
-Desktop users can use zoom buttons, the mouse wheel over the map, and click-drag empty space to pan horizontally and vertically. Mobile users use pinch zoom and drag empty space. Zoom changes the map content, not the page viewport.
+Desktop users can use zoom buttons, the mouse wheel over the map, and click-drag empty space to pan horizontally and vertically. Mobile users use pinch zoom and drag empty space. Zoom changes the map content, not the page viewport. In Plan mode the canvas extends beyond the colored subject bands. Those bands are reference guides, not placement boundaries, and selected lessons may be arranged anywhere on the surrounding free canvas.
 
 ### Node meaning
 
 Each node is one lesson. Color identifies subject. Status is learner-specific when viewed by a learner: Locked, Ready, Learning, Proven, Mastered, or Rusty. Selecting a node opens its details without resetting the map's pan position.
+
+Learner maps open in a read-only **Plan view** that shows the saved personalized arrangement while preserving ordinary node selection, detail cards, panning, and zoom. The learner can switch off Plan view to compare it with the untouched canonical prerequisite map, or enter Plan mode to edit their independent copy. Curriculum Designer itself remains the editable canonical-plan surface for the educator.
 
 ### Desktop selection and arrangement
 
@@ -226,6 +228,12 @@ Each node is one lesson. Color identifies subject. Status is learner-specific wh
 - Drag a selected node to move the selected group.
 - Drag empty space to pan.
 
+### Hide and restore Plan mode nodes
+
+Select one lesson or a multi-selection and choose **Hide selected** to simplify the curriculum's visual plan. The lesson disappears from the editable Plan mode and the learner's read-only Plan view. It remains present in the canonical mastery map and curriculum: hiding does not disable its pack, remove it, or alter prerequisites.
+
+Choose **Show hidden nodes** to display faded, labeled hidden nodes for editing. Select any of them and choose **Unhide selected** to restore them. Hidden-node choices autosave in the curriculum's canonical plan and are copied into a learner's independent personal plan when the curriculum is loaded.
+
 ### Custom paths
 
 Select at least two lessons and choose **Custom path**. Selection order becomes path order. Give the path a meaningful name and choose an outline color. The map draws bold connections in that order and outlines its nodes.
@@ -237,8 +245,9 @@ A path is an educator-authored emphasis, not a new prerequisite rule. Hard/Open 
 Choose **Annotation** to create:
 
 - a note connected to the selected lesson or lessons;
-- a note connected to a saved custom path;
 - a free draggable comment node when nothing is selected.
+
+Custom paths do not carry their own annotations. To comment on a route, select the relevant lessons and create one connected note; this keeps the same comment useful even if the path is later recolored or deleted.
 
 Annotation bodies are plain text. Comment nodes can be dragged to improve layout. Do not place credentials, answer keys, or unnecessary private learner information in them.
 
@@ -400,7 +409,9 @@ Choose **Sandboxed Python function** as the final-answer grader. Define the func
 
 The four fields are visibility, stable test ID, JSON argument list, and JSON expected return. Include at least one `example`; use `after_submission` for feedback revealed after the attempt, and `hidden` for boundary cases whose inputs/answers must never appear through learner-facing results or WebMCP. Tests are data only and cannot contain scripts, expressions, callbacks, URLs, or a test harness.
 
-The runtime accepts only learner-authored top-level pure functions inside a disposable Worker. A trusted AST supervisor rejects imports, files, network, browser/storage access, clocks, randomness, dynamic evaluation, private attributes, classes, decorators, exception handlers, and unsupported syntax. Structural, step, output, result, and wall-time limits apply. The `memory_mb` schema field is validated for forward compatibility; the browser currently depends on Worker termination and structural/result limits rather than promising an exact per-Worker memory quota.
+The runtime accepts only learner-authored top-level pure functions inside a fresh disposable Worker using self-hosted, integrity-pinned Pyodide 0.28.3. It does not fetch executable runtime code or packages from a third-party CDN. A trusted supervisor strictly validates the complete payload and rejects imports, package installation, files, network, browser/storage access, clocks, randomness, dynamic evaluation, private attributes, classes, decorators, exception handlers, and unsupported syntax. Test count, JSON depth and size, structural complexity, steps, aggregate output, result size, and wall time are independently bounded. Timeout or cancellation terminates the Worker and it is never reused. The `memory_mb` schema field is validated for forward compatibility; the browser currently depends on Worker termination and structural/data/result limits rather than promising an exact per-Worker memory quota.
+
+Only the learner-facing **Run sandboxed tests** button can execute source. WebMCP has no execution tool: an agent may draft, validate, or stage a package, but every install and every learner run remains a visible human action. Learner source and the bounded grade summary enter autosave, full backup, and complete-workspace GitHub sync; captured stdout is discarded before persistence. A runtime startup failure blocks submission and is never converted into an incorrect learner result.
 
 Use **Load an editable is_even sandbox example** to see the complete contract. Use this grader for deterministic in-memory pure functions. Continue using captured code or rubric review for imports, files, exceptions, classes, command-line input, or multi-module applications.
 
@@ -448,7 +459,7 @@ The dashboard reports mastery status, suggested next work, recent attempts, back
 
 ### Mastery map
 
-Normal mode shows the canonical prerequisite map and educator plan. Learner Plan mode is a separate private overlay. Learners can rearrange nodes, create personal paths, and add annotations without mutating the educator's canonical plan.
+The learner map opens in read-only Plan view, initially copied from the educator's plan. Learners can enter Plan mode to rearrange nodes, create personal paths, hide nodes, and add annotations without mutating the educator's source curriculum. Turning Plan view off reveals the untouched prerequisite layout with no planning overlays.
 
 ### Lesson page
 
@@ -529,16 +540,17 @@ The dedicated command returns the educator operating contract and the active pol
 | get_app_state | Current profile, route, subject, scope, selection, plan, and status |
 | get_curriculum_workspace | Open curriculum identity, settings, enabled packs, and available library |
 | get_curriculum_map | Visible lesson graph and prerequisite relationships |
+| set_curriculum_native_lessons_enabled | Include the full native Mathematics sequence or keep only native prerequisites required by enabled packs |
 | list_subjects | Installed subjects and theme identity |
 | search_lesson_depot | Public catalog metadata without answer keys |
 
 ### Curriculum change tools
 
-`create_curriculum`, `select_curriculum`, `update_curriculum_settings`, and `set_curriculum_pack_enabled` make visible changes only after explicit educator direction.
+`create_curriculum`, `select_curriculum`, `update_curriculum_settings`, `set_curriculum_pack_enabled`, and `set_curriculum_native_lessons_enabled` make visible changes only after explicit educator direction.
 
 ### Planning tools
 
-`set_map_plan_mode`, `arrange_map_plan_nodes`, `create_map_plan_path`, and `add_map_plan_annotation` operate on the open curriculum's canonical map when an educator profile is active.
+`set_map_plan_mode`, `arrange_map_plan_nodes`, `set_map_plan_nodes_hidden`, `create_map_plan_path`, and `add_map_plan_annotation` operate on the open curriculum's canonical map when an educator profile is active. Free-canvas coordinates may be negative; colored subject bands are guides rather than coordinate limits. Hiding through WebMCP changes the saved Plan presentation shown in Plan mode and Plan view, but never removes curriculum content or alters the canonical prerequisite map.
 
 ### Content tools
 
@@ -671,4 +683,4 @@ Use a compatible ChatGPT or Codex browser. Agent Studio will show whether `docum
 - Bridge guide: https://quickmathematics.github.io/QuickMaths/bridge-guide.html
 - Source and Lesson Depot: https://github.com/QuickMathematics/QuickMaths
 
-QuickMaths educator documentation - app version 22 - September 2026.
+QuickMaths educator documentation - app version 23 - September 2026.

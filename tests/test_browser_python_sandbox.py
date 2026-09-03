@@ -79,3 +79,51 @@ def test_hidden_failure_does_not_reveal_hidden_values() -> None:
     assert "0" not in hidden["message"]
     assert "True" not in hidden["message"]
 
+
+def test_supervisor_rejects_excessive_or_malformed_test_payloads() -> None:
+    too_many = program_spec()
+    too_many["tests"] = [
+        {"id": f"case_{index}", "args": [index], "expected_return": True, "visibility": "hidden"}
+        for index in range(31)
+    ]
+    result = grade("def is_even(number):\n    return True", too_many)
+    assert result["status"] == "policy_error"
+    assert "1 to 30" in result["messages"][0]
+
+    wrong_policy = program_spec()
+    wrong_policy["policy"]["network"] = True
+    result = grade("def is_even(number):\n    return True", wrong_policy)
+    assert result["status"] == "policy_error"
+    assert "disabled" in result["messages"][0]
+
+
+def test_supervisor_rejects_deep_values_and_large_numeric_inputs() -> None:
+    deep = program_spec()
+    value: object = 1
+    for _ in range(12):
+        value = [value]
+    deep["tests"][0]["args"] = [value]
+    result = grade("def is_even(number):\n    return True", deep)
+    assert result["status"] == "policy_error"
+    assert "nested too deeply" in result["messages"][0]
+
+    large = program_spec()
+    large["tests"][0]["args"] = [10**9]
+    result = grade("def is_even(number):\n    return True", large)
+    assert result["status"] == "policy_error"
+    assert "outside the supported range" in result["messages"][0]
+
+
+def test_supervisor_limits_range_and_literal_repetition() -> None:
+    result = grade("def is_even(number):\n    return len(range(200000)) == number")
+    assert result["status"] == "runtime_error"
+    assert "range is limited" in result["tests"][0]["message"]
+
+    result = grade("def is_even(number):\n    return len('x' * 200000) == number")
+    assert result["status"] == "policy_error"
+    assert "repetition is limited" in result["messages"][0]
+
+
+def test_supervisor_resets_the_learner_namespace_for_every_test() -> None:
+    result = grade("def is_even(number):\n    values = []\n    values.append(number)\n    return len(values) == 1 and number % 2 == 0")
+    assert result["passed"] == result["total"] == 3

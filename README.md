@@ -18,14 +18,14 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 ## What is in the app
 
 - Separate learner and educator profile paths with ownership-filtered educator views, browser autosave, full backups, and optional complete-workspace GitHub storage
-- Public curriculum blueprints and privacy-warned private assignments with exact embedded-pack integrity, canonical maps, learner rules, visible supplemental agent guidance, and assignment-progress isolation
-- Native Mathematics plus installable Geography and Python Programming mastery maps from the Lesson Depot; Python adds formatted code prompts, structured trace tables, and deterministic pure-function assessments in a disposable browser Worker
+- Public curriculum blueprints and privacy-warned private assignments with exact embedded-pack integrity, canonical maps copied into learner Plan mode, explicit lesson scope with prerequisite closure, learner rules, visible supplemental agent guidance, and assignment-progress isolation
+- Native Mathematics plus installable Geography and Python Programming mastery maps from the Lesson Depot; Python adds formatted code prompts, structured trace tables, and deterministic pure-function assessments in a fresh disposable browser Worker using a self-hosted integrity-pinned runtime
 - Persistent Plan mode with draggable layouts, desktop marquee/Ctrl selection, touch hold-selection, colored custom paths, and draggable free or connected comment nodes
 - Enforced Hard path and guideline-only Open path
 - Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, trace tables, sandboxed Python functions, and review gates
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
 - Public Lesson Depot with optional GitHub Discussion upvotes and comments
-- Twenty-nine WebMCP tools for visible navigation, tutoring, on-demand lesson-authoring guidance, dedicated educator guidance, curriculum design, mastery-map planning, curriculum inspection, and single or batch human-controlled lesson staging
+- Thirty-one WebMCP tools for visible navigation, tutoring, on-demand lesson-authoring guidance, dedicated educator guidance, curriculum design and scoping, mastery-map planning, curriculum inspection, and single or batch human-controlled lesson staging
 - Optional GitHub Bridge for revision-safe mobile/remote-agent checkpoints in a required private writable repository
 
 ## Run the web app locally

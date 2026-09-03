@@ -222,3 +222,19 @@ test("large native question banks render one editable question at a time", () =>
   assert.match(selectedHtml, /Editing question 13 of 30/);
   assert.match(selectedHtml, /Native question 13/);
 });
+
+test("an untouched Studio draft follows the active subject instead of defaulting to Mathematics", () => {
+  const state = snapshot();
+  const programming = {
+    ...structuredClone(state.activeSubject), id: "SUBJECT_PROGRAMMING", name: "Programming", shortName: "Python", icon: "λ",
+  };
+  state.activeSubject = programming;
+  state.subjects.push(programming);
+  const studio = createLessonStudio({
+    store: { skillsById: {}, previewLessonPack() { return {}; } },
+    download() {}, showToast() {}, getSnapshot: () => state, openFilePicker() {},
+  });
+  studio.render(state);
+  assert.equal(studio.buildPack().subject.id, "SUBJECT_PROGRAMMING");
+  assert.equal(studio.buildPack().subject.name, "Programming");
+});

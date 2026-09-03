@@ -1,6 +1,6 @@
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 15;
+export const APP_VERSION = 16;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.0";
 export const CURRICULUM_FORMAT = "quickmaths.curriculum";
@@ -45,6 +45,8 @@ const MAX_LESSON_SET_SKILLS = 50;
 const MAX_PROBLEMS_PER_SKILL = 100;
 const MAX_MAP_PLAN_PATHS = 40;
 const MAX_MAP_PLAN_ANNOTATIONS = 200;
+const MAP_PLAN_COORDINATE_LIMIT = 20_000;
+export const MAX_LONG_WORK_CHARS = 50_000;
 const LESSON_SET_ID = /^PACK_[A-Z0-9_]{3,54}$/;
 const CUSTOM_SKILL_ID = /^CUSTOM_[A-Z0-9_]{3,52}$/;
 const LEGACY_FIRST_PARTY_DEPOT_SKILL_ID = /^GEO_[A-Z0-9_]{3,52}$/;
@@ -1052,6 +1054,8 @@ function initialState() {
       selectedMapSkillId: "MATH_ARITH_001",
       mapZoom: 1,
       mapPlanMode: false,
+      mapPlanView: true,
+      mapPlanShowHidden: false,
       mapPlanSelection: [],
       selectedMapPlanPathId: null,
       mapPlanComposer: null,
@@ -1067,7 +1071,7 @@ function initialState() {
 }
 
 function emptyMapPlan() {
-  return { layouts: {}, paths: [], annotations: [] };
+  return { layouts: {}, paths: [], annotations: [], hiddenSkillIds: [] };
 }
 
 function defaultCurriculumSettings() {
@@ -1151,8 +1155,8 @@ function sanitizeMapPlans(candidate, profileIds, skillIds, subjectIds) {
           if (!skillIds.has(skillId) || !rawPosition || typeof rawPosition !== "object" || Array.isArray(rawPosition)) continue;
           if (!Number.isFinite(Number(rawPosition.x)) || !Number.isFinite(Number(rawPosition.y))) continue;
           positions[skillId] = {
-            x: Math.round(cleanNumber(Number(rawPosition.x), 0, 0, 20_000) * 100) / 100,
-            y: Math.round(cleanNumber(Number(rawPosition.y), 0, 0, 20_000) * 100) / 100,
+            x: Math.round(cleanNumber(Number(rawPosition.x), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
+            y: Math.round(cleanNumber(Number(rawPosition.y), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
           };
         }
         if (Object.keys(positions).length) layouts[layoutKey] = positions;
@@ -1173,39 +1177,42 @@ function sanitizeMapPlans(candidate, profileIds, skillIds, subjectIds) {
         updatedAt: cleanText(path.updatedAt, 40) || cleanText(path.createdAt, 40) || new Date().toISOString(),
       };
     }).filter(Boolean).slice(0, MAX_MAP_PLAN_PATHS) : [];
-    const pathIds = new Set(paths.map((path) => path.id));
     const annotations = Array.isArray(rawPlan.annotations) ? rawPlan.annotations.map((annotation, index) => {
       if (!annotation || typeof annotation !== "object" || Array.isArray(annotation)) return null;
       const body = cleanText(annotation.body, 1200);
       if (!body) return null;
       const pathId = cleanText(annotation.pathId, 120) || null;
-      const annotationSkillIds = Array.isArray(annotation.skillIds)
+      const directSkillIds = Array.isArray(annotation.skillIds)
         ? [...new Set(annotation.skillIds.filter((id) => skillIds.has(id)))].slice(0, 80)
         : [];
+      const legacyPath = pathId ? paths.find((path) => path.id === pathId) : null;
+      const annotationSkillIds = legacyPath ? [...legacyPath.skillIds] : directSkillIds;
       const positions = {};
       if (annotation.positions && typeof annotation.positions === "object" && !Array.isArray(annotation.positions)) {
         for (const [layoutKey, rawPosition] of Object.entries(annotation.positions)) {
           if (!validLayoutKeys.has(layoutKey) || !rawPosition || typeof rawPosition !== "object" || Array.isArray(rawPosition)) continue;
           if (!Number.isFinite(Number(rawPosition.x)) || !Number.isFinite(Number(rawPosition.y))) continue;
           positions[layoutKey] = {
-            x: Math.round(cleanNumber(Number(rawPosition.x), 0, 0, 20_000) * 100) / 100,
-            y: Math.round(cleanNumber(Number(rawPosition.y), 0, 0, 20_000) * 100) / 100,
+            x: Math.round(cleanNumber(Number(rawPosition.x), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
+            y: Math.round(cleanNumber(Number(rawPosition.y), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
           };
         }
       }
-      if (pathId ? !pathIds.has(pathId) : (!annotationSkillIds.length && !Object.keys(positions).length)) return null;
+      if (!annotationSkillIds.length && !Object.keys(positions).length) return null;
       return {
         id: cleanText(annotation.id, 120) || `plan-note-imported-${index + 1}`,
-        targetType: pathId ? "path" : annotationSkillIds.length === 1 ? "node" : annotationSkillIds.length > 1 ? "nodes" : "free",
-        pathId,
-        skillIds: pathId ? [] : annotationSkillIds,
+        targetType: annotationSkillIds.length === 1 ? "node" : annotationSkillIds.length > 1 ? "nodes" : "free",
+        skillIds: annotationSkillIds,
         positions,
         body,
         createdAt: cleanText(annotation.createdAt, 40) || new Date().toISOString(),
         updatedAt: cleanText(annotation.updatedAt, 40) || cleanText(annotation.createdAt, 40) || new Date().toISOString(),
       };
     }).filter(Boolean).slice(0, MAX_MAP_PLAN_ANNOTATIONS) : [];
-    output[profileId] = { layouts, paths, annotations };
+    const hiddenSkillIds = Array.isArray(rawPlan.hiddenSkillIds ?? rawPlan.hidden_skill_ids)
+      ? [...new Set((rawPlan.hiddenSkillIds ?? rawPlan.hidden_skill_ids).filter((id) => skillIds.has(id)))].slice(0, 80)
+      : [];
+    output[profileId] = { layouts, paths, annotations, hiddenSkillIds };
   }
   return output;
 }
@@ -1231,6 +1238,7 @@ function sanitizeCurricula(candidate, lessonPacks, skillIds, subjectIds) {
       enabledPackIds: Array.isArray(item.enabledPackIds ?? item.enabled_pack_ids)
         ? [...new Set((item.enabledPackIds ?? item.enabled_pack_ids).filter((packId) => packIds.has(packId)))].slice(0, MAX_LESSON_SETS)
         : [],
+      includeNativeLessons: (item.includeNativeLessons ?? item.include_native_lessons) !== false,
       settings: sanitizeCurriculumSettings(item.settings),
       mapPlan: plan,
       createdAt: cleanText(item.createdAt ?? item.created_at, 40) || new Date().toISOString(),
@@ -1377,7 +1385,7 @@ function sanitizeResult(candidate) {
     questionId,
     prompt: cleanText(candidate.prompt, 2000),
     finalAnswer: cleanText(candidate.finalAnswer, (candidate.gradingMethod ?? candidate.grading_method) === "python_program" ? 12_000 : 300),
-    work: cleanText(candidate.work, 5000),
+    work: cleanText(candidate.work, MAX_LONG_WORK_CHARS),
     structuredWorkJson: sanitizeStructuredWork(candidate.structuredWorkJson),
     expectedAnswer: cleanText(candidate.expectedAnswer, 300),
     correct: Boolean(candidate.correct),
@@ -1520,7 +1528,7 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
         problems: problemIds.map((id) => clone(safeProblems.get(id))),
         responses: Object.fromEntries(problemIds.map((id) => [id, {
           finalAnswer: cleanText(responses[id]?.finalAnswer, safeProblems.get(id)?.grading_method === "python_program" ? 12_000 : 300),
-          work: cleanText(responses[id]?.work, 5000),
+          work: cleanText(responses[id]?.work, MAX_LONG_WORK_CHARS),
           structuredWorkJson: sanitizeStructuredWork(responses[id]?.structuredWorkJson),
         }])),
       };
@@ -1617,6 +1625,8 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       selectedMapSkillId: skills.has(ui.selectedMapSkillId) ? ui.selectedMapSkillId : selectedSkillId,
       mapZoom: Math.round(cleanNumber(Number(ui.mapZoom), 1, 0.1, 1.6) * 100) / 100,
       mapPlanMode: Boolean(ui.mapPlanMode),
+      mapPlanView: ui.mapPlanView !== false,
+      mapPlanShowHidden: Boolean(ui.mapPlanShowHidden),
       mapPlanSelection: Array.isArray(ui.mapPlanSelection) ? [...new Set(ui.mapPlanSelection.filter((id) => skills.has(id)))].slice(0, 80) : [],
       selectedMapPlanPathId: cleanText(ui.selectedMapPlanPathId, 120) || null,
       mapPlanComposer: ["annotation", "path", "manage"].includes(ui.mapPlanComposer) ? ui.mapPlanComposer : null,
@@ -2509,18 +2519,37 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   };
   const activeCurriculumSettings = () => activeCurriculum()?.settings ?? null;
   const effectiveProgressionMode = () => activeCurriculumSettings()?.progressionMode ?? activeProfile()?.progressionMode ?? "hard";
+  const addPrerequisiteClosure = (ids, catalogView = catalog, shouldInclude = () => true) => {
+    const byId = new Map(catalogView.skills.map((skill) => [skill.id, skill]));
+    const pending = [...ids];
+    while (pending.length) {
+      const skill = byId.get(pending.pop());
+      for (const prerequisiteId of skill?.prerequisites ?? []) {
+        if (ids.has(prerequisiteId)) continue;
+        const prerequisite = byId.get(prerequisiteId);
+        if (!prerequisite || !shouldInclude(prerequisite)) continue;
+        ids.add(prerequisiteId);
+        pending.push(prerequisiteId);
+      }
+    }
+    return ids;
+  };
   const visibleSkillIds = () => {
     const active = activeCurriculum();
     if (!active) return new Set(skillOrder);
-    const cacheKey = `${active.id}\u0000${active.enabledPackIds.join("\u0000")}`;
+    const cacheKey = `${active.id}\u0000${active.includeNativeLessons !== false}\u0000${active.enabledPackIds.join("\u0000")}`;
     if (visibleSkillCache?.key === cacheKey) return new Set(visibleSkillCache.ids);
     const enabled = new Set(active.enabledPackIds);
-    const ids = skillOrder.filter((skillId) => {
+    const included = new Set(skillOrder.filter((skillId) => {
       const skill = skillsById[skillId];
-      if (!skill?.packId) return true;
+      if (skill?.native || !skill?.packId) return active.includeNativeLessons !== false;
       const pack = lessonPacksById.get(skill.packId);
-      return pack?.mode === "override" || enabled.has(skill.packId);
-    });
+      return (pack?.mode === "override" && active.includeNativeLessons !== false) || enabled.has(skill.packId);
+    }));
+    if (active.includeNativeLessons === false) {
+      addPrerequisiteClosure(included, catalog, (skill) => skill.native || !skill.packId);
+    }
+    const ids = skillOrder.filter((skillId) => included.has(skillId));
     visibleSkillCache = { key: cacheKey, ids };
     return new Set(ids);
   };
@@ -2530,9 +2559,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     catalogView = catalog,
   } = {}) => {
     const enabled = new Set(enabledPackIds);
-    const visible = new Set(curriculum.skills.map((skill) => skill.id));
+    const visible = new Set(workspace.includeNativeLessons === false ? [] : curriculum.skills.map((skill) => skill.id));
     for (const pack of packs) {
-      if (pack.mode === "override" || enabled.has(pack.id)) pack.skills.forEach((skill) => visible.add(skill.id));
+      if ((pack.mode === "override" && workspace.includeNativeLessons !== false) || enabled.has(pack.id)) pack.skills.forEach((skill) => visible.add(skill.id));
+    }
+    if (!visible.size) throw new Error("A curriculum must include native Mathematics or at least one enabled lesson pack.");
+    if (workspace.includeNativeLessons === false) {
+      addPrerequisiteClosure(visible, catalogView, (skill) => skill.native || !skill.packId);
     }
     const catalogSkillsById = new Map(catalogView.skills.map((skill) => [skill.id, skill]));
     for (const skillId of visible) {
@@ -2546,6 +2579,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         ...Object.values(plan.layouts ?? {}).flatMap((positions) => Object.keys(positions ?? {})),
         ...(plan.paths ?? []).flatMap((path) => path.skillIds ?? []),
         ...(plan.annotations ?? []).flatMap((annotation) => annotation.skillIds ?? []),
+        ...(plan.hiddenSkillIds ?? []),
       ]);
       const hiddenReferences = [...referenced].filter((skillId) => !visible.has(skillId));
       if (hiddenReferences.length) {
@@ -2570,29 +2604,26 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       if (!Object.keys(positions ?? {}).length) delete plan.layouts[layoutKey];
     }
     const retainedPaths = [];
-    const removedPathIds = new Set();
     for (const path of plan.paths ?? []) {
       const nextIds = (path.skillIds ?? []).filter((skillId) => visible.has(skillId));
       removed += Math.max(0, (path.skillIds?.length ?? 0) - nextIds.length);
       if (nextIds.length < 2) {
-        removedPathIds.add(path.id);
         removed += 1;
       } else retainedPaths.push({ ...path, skillIds: nextIds, updatedAt: isoNow() });
     }
     plan.paths = retainedPaths;
     plan.annotations = (plan.annotations ?? []).flatMap((annotation) => {
-      if (annotation.pathId && removedPathIds.has(annotation.pathId)) {
-        removed += 1;
-        return [];
-      }
       const nextIds = (annotation.skillIds ?? []).filter((skillId) => visible.has(skillId));
       removed += Math.max(0, (annotation.skillIds?.length ?? 0) - nextIds.length);
-      if (!annotation.pathId && !nextIds.length && !Object.keys(annotation.positions ?? {}).length) {
+      if (!nextIds.length && !Object.keys(annotation.positions ?? {}).length) {
         removed += 1;
         return [];
       }
-      return [{ ...annotation, skillIds: nextIds, targetType: annotation.pathId ? "path" : nextIds.length === 1 ? "node" : nextIds.length > 1 ? "nodes" : "free", updatedAt: isoNow() }];
+      return [{ ...annotation, skillIds: nextIds, targetType: nextIds.length === 1 ? "node" : nextIds.length > 1 ? "nodes" : "free", updatedAt: isoNow() }];
     });
+    const nextHidden = (plan.hiddenSkillIds ?? []).filter((skillId) => visible.has(skillId));
+    removed += Math.max(0, (plan.hiddenSkillIds?.length ?? 0) - nextHidden.length);
+    plan.hiddenSkillIds = nextHidden;
     workspace.mapPlan = plan;
     return removed;
   };
@@ -2729,7 +2760,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       activeCurriculum: clone(curriculumWorkspace),
       curricula: clone(curriculaForProfile().map((item) => ({
         id: item.id, name: item.name, description: item.description, ownerProfileId: item.ownerProfileId,
-        enabledPackIds: [...item.enabledPackIds], settings: item.settings, createdAt: item.createdAt, updatedAt: item.updatedAt,
+        enabledPackIds: [...item.enabledPackIds], includeNativeLessons: item.includeNativeLessons !== false, settings: item.settings, createdAt: item.createdAt, updatedAt: item.updatedAt,
       }))),
       curriculumPlan: clone(assignedCurriculumPlan()),
       activeSubject: clone(visibleSubjects.find((subject) => subject.id === activeSubjectId()) ?? visibleSubjects[0] ?? catalog.subjects[0]),
@@ -2814,12 +2845,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     state.session = { profileId, startedAt: milliseconds(), heartbeatAt: milliseconds() };
   };
 
-  const buildCurriculum = ({ name, description = "", ownerProfileId = null, enabledPackIds = [], settings = {}, sourceUrl = null } = {}) => ({
+  const buildCurriculum = ({ name, description = "", ownerProfileId = null, enabledPackIds = [], includeNativeLessons = true, settings = {}, sourceUrl = null } = {}) => ({
     id: makeId("curriculum").toUpperCase().replace(/[^A-Z0-9_]/g, "_"),
     name: cleanText(name, 100) || "Untitled curriculum",
     description: cleanText(description, 1000),
     ownerProfileId,
     enabledPackIds: [...new Set(enabledPackIds.filter((packId) => state.lessonPacks.some((pack) => pack.id === packId && pack.mode !== "override")))].slice(0, MAX_LESSON_SETS),
+    includeNativeLessons: includeNativeLessons !== false,
     settings: sanitizeCurriculumSettings(settings),
     mapPlan: emptyMapPlan(),
     createdAt: isoNow(),
@@ -2846,6 +2878,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     }
     state.ui.route = profile?.role === "educator" ? "curriculum" : profile?.tutorialCompletedAt ? "home" : "tutorial";
     state.ui.mapPlanMode = profile?.role === "educator";
+    state.ui.mapPlanView = true;
+    state.ui.mapPlanShowHidden = false;
     state.ui.tutorialStep = 0;
     state.ui.pendingResults = null;
     state.ui.mapPlanSelection = [];
@@ -2872,7 +2906,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     state.profiles.push(profile);
     state.progress[profile.id] = {};
     state.drafts[profile.id] = {};
-    state.mapPlans[profile.id] = emptyMapPlan();
+    const assignedCurriculum = safeRole === "learner" ? state.curricula.find((item) => item.id === profile.curriculumId) : null;
+    state.mapPlans[profile.id] = assignedCurriculum ? clone(assignedCurriculum.mapPlan) : emptyMapPlan();
     if (safeRole === "educator") {
       const workspace = buildCurriculum({ name: `${name}'s curriculum`, ownerProfileId: profile.id });
       state.curricula.push(workspace);
@@ -2908,6 +2943,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     state.ui.route = "welcome";
     state.ui.pendingResults = null;
     state.ui.mapPlanMode = false;
+    state.ui.mapPlanView = true;
+    state.ui.mapPlanShowHidden = false;
     state.ui.mapPlanSelection = [];
     state.ui.selectedMapPlanPathId = null;
     state.ui.mapPlanComposer = null;
@@ -2931,6 +2968,12 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       state.ui.selectedSkillId = skillId;
       state.ui.selectedMapSkillId = skillId;
       profile.activeSubjectId = skillsById[skillId].subjectId;
+    }
+    if (visibleRoute === "results") {
+      const attempt = skillId
+        ? [...profileAttempts()].reverse().find((item) => item.skillId === skillId) ?? null
+        : getAttempt() ?? profileAttempts().at(-1) ?? null;
+      state.ui.activeAttemptId = attempt?.attemptId ?? null;
     }
     state.ui.route = visibleRoute;
     if (profile.role === "educator" && visibleRoute === "curriculum") state.ui.mapPlanMode = true;
@@ -3002,6 +3045,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!activeProfile()) throw new Error("Select a profile first.");
     state.ui.mapPlanMode = activeProfile().role === "educator" ? true : Boolean(enabled);
     if (!state.ui.mapPlanMode) {
+      state.ui.mapPlanView = true;
+      state.ui.mapPlanShowHidden = false;
       state.ui.selectedMapPlanPathId = null;
       state.ui.mapPlanComposer = null;
     }
@@ -3010,12 +3055,35 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return { ok: true, enabled: state.ui.mapPlanMode };
   };
 
+  const setMapPlanView = (enabled) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    if (activeProfile().role === "educator") throw new Error("Educator Curriculum designer is always in editable Plan mode.");
+    state.ui.mapPlanView = Boolean(enabled);
+    state.ui.mapPlanShowHidden = false;
+    state.ui.mapPlanSelection = [];
+    state.ui.selectedMapPlanPathId = null;
+    state.ui.mapPlanComposer = null;
+    notify();
+    return { ok: true, enabled: state.ui.mapPlanView };
+  };
+
   const setMapPlanComposer = (composer = null) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     if (composer != null && !["annotation", "path", "manage"].includes(composer)) throw new Error("Unknown Plan mode card.");
     state.ui.mapPlanComposer = composer;
     notify();
     return { ok: true, composer };
+  };
+
+  const setMapPlanShowHidden = (visible) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    state.ui.mapPlanShowHidden = Boolean(visible) && activeMapPlan().hiddenSkillIds.length > 0;
+    if (!state.ui.mapPlanShowHidden) {
+      const hiddenIds = new Set(activeMapPlan().hiddenSkillIds);
+      state.ui.mapPlanSelection = state.ui.mapPlanSelection.filter((id) => !hiddenIds.has(id));
+    }
+    notify();
+    return { ok: true, visible: state.ui.mapPlanShowHidden };
   };
 
   const setMapPlanSelection = (skillIds, { selectedPathId = null } = {}) => {
@@ -3040,8 +3108,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       if (!skillsById[skillId] || !position || typeof position !== "object" || Array.isArray(position)) continue;
       if (!Number.isFinite(Number(position.x)) || !Number.isFinite(Number(position.y))) continue;
       plan.layouts[layoutKey][skillId] = {
-        x: Math.round(cleanNumber(Number(position.x), 0, 0, 20_000) * 100) / 100,
-        y: Math.round(cleanNumber(Number(position.y), 0, 0, 20_000) * 100) / 100,
+        x: Math.round(cleanNumber(Number(position.x), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
+        y: Math.round(cleanNumber(Number(position.y), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
       };
     }
     state.ui.mapPlanSelection = normalizeMapPlanSelection(selectedSkillIds);
@@ -3050,6 +3118,25 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     addActivity("arrange_map_plan_nodes", `Moved ${Object.keys(positions).length} lesson${Object.keys(positions).length === 1 ? "" : "s"} in ${layoutKey}.`, undefined, activityActor);
     notify();
     return { ok: true, layoutKey, moved: Object.keys(positions).length, selectedSkillIds: [...state.ui.mapPlanSelection] };
+  };
+
+  const setMapPlanNodesHidden = (skillIds = state.ui.mapPlanSelection, hidden = true, { activityActor = "learner" } = {}) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    const targets = normalizeMapPlanSelection(skillIds);
+    if (!targets.length) throw new Error(`Select at least one lesson to ${hidden ? "hide" : "unhide"}.`);
+    const plan = activeMapPlan();
+    const hiddenIds = new Set(plan.hiddenSkillIds ?? []);
+    for (const skillId of targets) {
+      if (hidden) hiddenIds.add(skillId);
+      else hiddenIds.delete(skillId);
+    }
+    plan.hiddenSkillIds = [...hiddenIds].filter((id) => skillsById[id]).slice(0, 80);
+    if (hidden) state.ui.mapPlanSelection = state.ui.mapPlanSelection.filter((id) => !hiddenIds.has(id));
+    if (!plan.hiddenSkillIds.length) state.ui.mapPlanShowHidden = false;
+    touchActiveCurriculum();
+    addActivity("set_map_plan_nodes_hidden", `${hidden ? "Hid" : "Unhid"} ${targets.length} lesson${targets.length === 1 ? "" : "s"} in the saved plan.`, undefined, activityActor);
+    notify();
+    return { ok: true, hidden: Boolean(hidden), skillIds: targets, hiddenSkillIds: [...plan.hiddenSkillIds] };
   };
 
   const resetMapPlanLayout = (layoutKey, skillIds = null) => {
@@ -3123,7 +3210,6 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const index = plan.paths.findIndex((item) => item.id === pathId);
     if (index < 0) throw new Error("Plan path not found.");
     const [removed] = plan.paths.splice(index, 1);
-    plan.annotations = plan.annotations.filter((annotation) => annotation.pathId !== pathId);
     touchActiveCurriculum();
     if (state.ui.selectedMapPlanPathId === pathId) state.ui.selectedMapPlanPathId = null;
     addActivity("delete_map_plan_path", `Removed ${removed.name}.`);
@@ -3138,23 +3224,21 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const safeBody = cleanText(body, 1200);
     if (!safeBody) throw new Error("Write an annotation first.");
     const safePathId = cleanText(pathId, 120) || null;
-    const targetPath = safePathId ? plan.paths.find((path) => path.id === safePathId) : null;
-    if (safePathId && !targetPath) throw new Error("Plan path not found.");
-    const targetSkillIds = safePathId ? [] : normalizeMapPlanSelection(skillIds);
+    if (safePathId) throw new Error("Path annotations are not supported. Attach the comment to selected lessons instead.");
+    const targetSkillIds = normalizeMapPlanSelection(skillIds);
     const allowedLayoutKeys = new Set(["all-subjects", ...catalog.subjects.map((subject) => `subject:${subject.id}`)]);
     const safeLayoutKey = allowedLayoutKeys.has(layoutKey) ? layoutKey : null;
     const safePosition = safeLayoutKey && position && typeof position === "object" && !Array.isArray(position)
       && Number.isFinite(Number(position.x)) && Number.isFinite(Number(position.y))
       ? {
-        x: Math.round(cleanNumber(Number(position.x), 0, 0, 20_000) * 100) / 100,
-        y: Math.round(cleanNumber(Number(position.y), 0, 0, 20_000) * 100) / 100,
+        x: Math.round(cleanNumber(Number(position.x), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
+        y: Math.round(cleanNumber(Number(position.y), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
       }
       : null;
-    if (!safePathId && !targetSkillIds.length && !safePosition) throw new Error("Place the free annotation on a mastery-map layout.");
+    if (!targetSkillIds.length && !safePosition) throw new Error("Place the free annotation on a mastery-map layout.");
     const annotation = {
       id: makeId("plan-note"),
-      targetType: safePathId ? "path" : targetSkillIds.length === 1 ? "node" : targetSkillIds.length > 1 ? "nodes" : "free",
-      pathId: safePathId,
+      targetType: targetSkillIds.length === 1 ? "node" : targetSkillIds.length > 1 ? "nodes" : "free",
       skillIds: targetSkillIds,
       positions: safePosition ? { [safeLayoutKey]: safePosition } : {},
       body: safeBody,
@@ -3163,7 +3247,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     };
     plan.annotations.push(annotation);
     touchActiveCurriculum();
-    addActivity("add_map_plan_annotation", `Added a note to ${targetPath?.name ?? (targetSkillIds.length ? `${targetSkillIds.length} selected lesson${targetSkillIds.length === 1 ? "" : "s"}` : "the mastery map")}.`, undefined, activityActor);
+    addActivity("add_map_plan_annotation", `Added a note to ${targetSkillIds.length ? `${targetSkillIds.length} selected lesson${targetSkillIds.length === 1 ? "" : "s"}` : "the mastery map"}.`, undefined, activityActor);
     notify();
     return clone(annotation);
   };
@@ -3178,8 +3262,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!annotation) throw new Error("Plan annotation not found.");
     annotation.positions ??= {};
     annotation.positions[layoutKey] = {
-      x: Math.round(cleanNumber(Number(position.x), 0, 0, 20_000) * 100) / 100,
-      y: Math.round(cleanNumber(Number(position.y), 0, 0, 20_000) * 100) / 100,
+      x: Math.round(cleanNumber(Number(position.x), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
+      y: Math.round(cleanNumber(Number(position.y), 0, -MAP_PLAN_COORDINATE_LIMIT, MAP_PLAN_COORDINATE_LIMIT) * 100) / 100,
     };
     annotation.updatedAt = isoNow();
     touchActiveCurriculum();
@@ -3269,6 +3353,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const requestedEnabledPackIds = rawEnabledPackIds ?? [...embeddedPackIds];
     if (requestedEnabledPackIds.some((id) => typeof id !== "string")) throw new Error("Curriculum enabled_pack_ids must contain lesson-set IDs.");
     const enabledPackIds = [...new Set(requestedEnabledPackIds)];
+    const rawIncludeNative = candidate.include_native_lessons ?? candidate.includeNativeLessons;
+    if (rawIncludeNative !== undefined && typeof rawIncludeNative !== "boolean") throw new Error("Curriculum include_native_lessons must be true or false.");
     const unknownEnabled = enabledPackIds.find((id) => !combinedPackIds.has(id));
     if (unknownEnabled) throw new Error(`Curriculum references unavailable lesson set ${unknownEnabled}.`);
     const unembeddedEnabled = enabledPackIds.find((id) => !embeddedPackIds.has(id));
@@ -3284,6 +3370,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       description: cleanText(candidate.description, 1000),
       ownerProfileId: null,
       enabledPackIds,
+      includeNativeLessons: rawIncludeNative !== false,
       settings: validateExternalCurriculumSettings(candidate.settings ?? {}),
       mapPlan: plan,
       createdAt: cleanText(candidate.created_at ?? candidate.createdAt, 40) || isoNow(),
@@ -3342,10 +3429,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!workspace) throw new Error("Curriculum not found for this educator.");
     if (!workspace.ownerProfileId) workspace.ownerProfileId = profile.id;
     profile.activeCurriculumId = workspace.id;
-    const visible = new Set([...
-      curriculum.skills.map((skill) => skill.id),
-      ...state.lessonPacks.filter((pack) => pack.mode === "override" || workspace.enabledPackIds.includes(pack.id)).flatMap((pack) => pack.skills.map((skill) => skill.id)),
-    ]);
+    const visible = validateEnabledCurriculum(workspace, workspace.enabledPackIds, { checkPlan: false });
     const firstSkill = skillOrder.find((id) => visible.has(id));
     if (firstSkill) {
       profile.activeSubjectId = skillsById[firstSkill].subjectId;
@@ -3416,6 +3500,34 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return { ok: true, packId, enabled: Boolean(enabled), enabledPackIds: [...workspace.enabledPackIds], removedPlanReferences };
   };
 
+  const setCurriculumNativeLessonsEnabled = (enabled, { removePlanReferences = false } = {}) => {
+    const profile = activeProfile();
+    const workspace = activeCurriculum();
+    if (profile?.role !== "educator" || !workspace) throw new Error("Open a curriculum in an educator profile first.");
+    const candidate = { ...workspace, includeNativeLessons: Boolean(enabled) };
+    const visible = validateEnabledCurriculum(candidate, workspace.enabledPackIds, { checkPlan: false });
+    let removedPlanReferences = 0;
+    try {
+      validateEnabledCurriculum(candidate, workspace.enabledPackIds);
+    } catch (error) {
+      if (error?.code !== "curriculum_plan_references" || !removePlanReferences) throw error;
+      removedPlanReferences = removeHiddenPlanReferences(workspace, visible);
+      validateEnabledCurriculum(candidate, workspace.enabledPackIds);
+    }
+    workspace.includeNativeLessons = Boolean(enabled);
+    workspace.updatedAt = isoNow();
+    visibleSkillCache = null;
+    const firstSkill = skillOrder.find((id) => visible.has(id));
+    if (firstSkill && !visible.has(state.ui.selectedSkillId)) {
+      state.ui.selectedSkillId = firstSkill;
+      state.ui.selectedMapSkillId = firstSkill;
+      profile.activeSubjectId = skillsById[firstSkill].subjectId;
+    }
+    addActivity("set_curriculum_native_lessons", `${enabled ? "Included" : "Excluded"} native Mathematics in ${workspace.name}.`);
+    notify();
+    return { ok: true, enabled: Boolean(enabled), removedPlanReferences };
+  };
+
   const normalizedLearnerName = (value) => cleanText(value, 60).normalize("NFKC").toLowerCase();
   const attachCurriculum = (curriculumId) => {
     const profile = activeProfile();
@@ -3432,11 +3544,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         ? assignedName
         : cleanText(`${profile.displayName} - ${workspace.name}`, 60);
       const created = createProfile(assignmentName, { curriculumId: workspace.id });
+      state.mapPlans[created.id] = clone(workspace.mapPlan);
       addActivity("attach_curriculum", `Started ${workspace.name} from scratch in an independent assignment profile.`, created.id);
       notify();
       return { curriculum: clone(workspace), profile: clone(created), assignmentProfileCreated: true, reusedMastery: false };
     }
     profile.curriculumId = workspace.id;
+    state.mapPlans[profile.id] = clone(workspace.mapPlan);
     const firstSkill = skillOrder.find((id) => isSkillVisible(id));
     if (firstSkill) {
       profile.activeSubjectId = skillsById[firstSkill].subjectId;
@@ -3501,6 +3615,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       created_at: workspace.createdAt,
       updated_at: workspace.updatedAt,
       enabled_pack_ids: [...workspace.enabledPackIds],
+      include_native_lessons: workspace.includeNativeLessons !== false,
       settings,
       map_plan: clone(workspace.mapPlan),
       lesson_packs: clone(packs),
@@ -3545,13 +3660,14 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const problem = draft.problems.find((item) => item.template_id === questionId);
     const previous = draft.responses[questionId];
     const answerLimit = problem?.grading_method === "python_program" ? 12_000 : 300;
+    if (typeof work === "string" && work.length > MAX_LONG_WORK_CHARS) throw new Error(`Shown work is limited to ${MAX_LONG_WORK_CHARS.toLocaleString()} characters.`);
     const safeAnswer = cleanText(finalAnswer, answerLimit);
     const nextStructured = sanitizeStructuredWork(structuredWorkJson) ?? {};
     if (previous?.structuredWorkJson?.python_source === safeAnswer && previous.structuredWorkJson.python_grade) {
       nextStructured.python_source = safeAnswer;
       nextStructured.python_grade = previous.structuredWorkJson.python_grade;
     }
-    draft.responses[questionId] = { finalAnswer: safeAnswer, work: cleanText(work, 5000), structuredWorkJson: Object.keys(nextStructured).length ? nextStructured : null };
+    draft.responses[questionId] = { finalAnswer: safeAnswer, work: cleanText(work, MAX_LONG_WORK_CHARS), structuredWorkJson: Object.keys(nextStructured).length ? nextStructured : null };
     persist();
   };
 
@@ -3565,11 +3681,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!grade || grade.total !== problem.program_spec.tests.length) throw new Error("The Python sandbox returned an incomplete grade.");
     const structured = sanitizeStructuredWork(draft.responses[questionId].structuredWorkJson) ?? {};
     structured.python_source = safeSource;
-    structured.python_grade = grade;
+    // Source and the bounded grade summary persist with progress. Captured stdout
+    // is deliberately transient and never enters browser backups or GitHub sync.
+    structured.python_grade = { ...grade, stdout: "" };
     draft.responses[questionId].structuredWorkJson = structured;
     persist();
     notify();
-    return clone(grade);
+    return clone(structured.python_grade);
   };
 
   const submitTest = () => {
@@ -3577,11 +3695,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!draft) throw new Error("No active test.");
     const workIssues = draft.problems.map((problem) => ({
       questionId: problem.template_id,
-      message: problem.grading_method === "python_program" && (
-        draft.responses[problem.template_id]?.structuredWorkJson?.python_source !== draft.responses[problem.template_id]?.finalAnswer
-        || !draft.responses[problem.template_id]?.structuredWorkJson?.python_grade
-      )
-        ? "Run the current Python code in the sandbox before submitting."
+      message: problem.grading_method === "python_program" && draft.responses[problem.template_id]?.structuredWorkJson?.python_grade?.status === "unavailable"
+        ? "The local Python runtime is unavailable. Retry the sandbox before submitting; infrastructure failures are never graded as learner mistakes."
+        : problem.grading_method === "python_program" && (
+          draft.responses[problem.template_id]?.structuredWorkJson?.python_source !== draft.responses[problem.template_id]?.finalAnswer
+          || !draft.responses[problem.template_id]?.structuredWorkJson?.python_grade
+        )
+          ? "Run the current Python code in the sandbox before submitting."
         : validateProceduralWork(problem, draft.responses[problem.template_id]?.work, draft.responses[problem.template_id]?.structuredWorkJson, draft.responses[problem.template_id]?.finalAnswer),
     })).filter((issue) => issue.message);
     if (workIssues.length) return { ok: false, missingWork: workIssues.map((issue) => issue.questionId), workIssues };
@@ -4322,10 +4442,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     selectMapSkill,
     setMapZoom,
     setMapPlanMode,
+    setMapPlanView,
+    setMapPlanShowHidden,
     setMapPlanComposer,
     setMapPlanSelection,
     updateMapPlanLayout,
     resetMapPlanLayout,
+    setMapPlanNodesHidden,
     createMapPlanPath,
     updateMapPlanPath,
     selectMapPlanPath,
@@ -4339,6 +4462,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     updateCurriculum,
     updateCurriculumSettings,
     setCurriculumPackEnabled,
+    setCurriculumNativeLessonsEnabled,
     attachCurriculum,
     previewCurriculum,
     importCurriculum,

@@ -12,7 +12,7 @@ QuickMaths existed before the WebMCP Challenge. The official submission period b
 | --- | --- |
 | Python/Streamlit desktop-style application | Complete static browser application deployed on GitHub Pages |
 | 25-lesson Mathematics YAML curriculum | Browser-ready native Mathematics runtime, an installable 15-lesson Geography Depot package, coordinate-geometry bridges, and combined subject maps |
-| Existing mastery, grading, profile, review, and export foundations | Twenty-nine page-level WebMCP learning and curriculum tools operating on the same visible human state |
+| Existing mastery, grading, profile, review, and export foundations | Thirty-one page-level WebMCP learning and curriculum tools operating on the same visible human state |
 | Human-only navigation and learner workflows | Shared human-agent navigation, tutoring, saved-work inspection, structured reviews, and activity attribution |
 | Local/Drive-oriented persistence in the original application | Browser autosave, portable backups, private-repository full-workspace storage, and a revision-safe remote Agent Bridge |
 | YAML authoring and developer preview utilities | Human Lesson Studio, agent lesson validation/staging, reversible native improvements, and answer-key-safe tutoring boundaries |
@@ -41,7 +41,7 @@ Challenge-period milestone evidence:
 - Results, reflection-based mastery updates, spaced review dates, and saved tutor/self reviews
 - Live analog clock plus per-session and cumulative profile timers
 - Browser autosave, backup recommendations, confirmed JSON restore, and formula-safe CSV exports
-- Multi-subject curricula, cross-subject prerequisite bridges, safe per-subject themes, and Hard/Open progression modes
+- Multi-subject curricula, explicit native/additive content scope, automatic prerequisite closure, cross-subject bridges, safe per-subject themes, and Hard/Open progression modes
 - Human Lesson Creator with tutorial, tooltips, multiple lessons, all graders, proof/rubric controls, validation, download, and install
 - Validated schema 2.0 lesson-set JSON with Agent Lesson Authoring Guide and full backup integration
 - Responsive desktop, tablet, and mobile navigation
@@ -50,7 +50,7 @@ Challenge-period milestone evidence:
 
 ## WebMCP integration
 
-A compatible ChatGPT or Codex browser discovers twenty-nine page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact learner/tutor operating summary by default; `get_educator_agent_manifest` returns the dedicated curriculum-design contract and active curriculum policy; and `get_lesson_authoring_guide` returns the bundled authoring contract by topic. The complete sources remain the machine-readable `agent-manifest.json` and `educator-agent-manifest.json`.
+A compatible ChatGPT or Codex browser discovers thirty-one page tools through `document.modelContext.registerTool()`. They operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. The read-only `get_agent_guide` returns a compact learner/tutor operating summary by default; `get_educator_agent_manifest` returns the dedicated curriculum-design contract and active curriculum policy; and `get_lesson_authoring_guide` returns the bundled authoring contract by topic. The complete sources remain the machine-readable `agent-manifest.json` and `educator-agent-manifest.json`.
 
 | Tool | Purpose |
 | --- | --- |
@@ -65,13 +65,15 @@ A compatible ChatGPT or Codex browser discovers twenty-nine page tools through `
 | `select_curriculum` | Switch the educator workspace to an existing curriculum. |
 | `update_curriculum_settings` | Set student, agent, progression, and contact rules for the open curriculum. |
 | `set_curriculum_pack_enabled` | Enable or disable an installed additive lesson pack only for the open curriculum. |
+| `set_curriculum_native_lessons_enabled` | Include or exclude native Mathematics while preserving a valid curriculum dependency graph. |
 | `list_subjects` | Read installed subjects and lesson totals. |
 | `set_learning_preferences` | Change the visible subject, Hard/Open path mode, and focused/combined map scope. |
 | `navigate_learning_app` | Open the dashboard, map, lesson, test, results, Lesson studio, or Settings. |
-| `set_map_plan_mode` | Visibly open the persistent editable mastery-map plan or return to the untouched canonical map. |
+| `set_map_plan_mode` | Visibly open the persistent editable mastery-map plan or return to its default read-only Plan view; the human can compare it with the canonical map. |
 | `arrange_map_plan_nodes` | Move lesson nodes to absolute positions in a subject or combined Plan mode layout. |
+| `set_map_plan_nodes_hidden` | Hide or restore lessons in the saved Plan presentation without removing curriculum content or changing the canonical map. |
 | `create_map_plan_path` | Create an ordered, colored study path through two or more installed lessons. |
-| `add_map_plan_annotation` | Add a free, lesson-connected, or path-connected comment node to the visible plan. |
+| `add_map_plan_annotation` | Add a free or lesson-connected comment node to the visible plan. |
 | `open_lesson_creator` | Open the no-code Human Lesson Creator. |
 | `validate_lesson_set` | Validate schema 2.0 subjects, bridges, questions, proof/rubric policy, and safety limits. |
 | `stage_custom_lesson_set` | Stage validated content in the visible UI; only the human can install it. |
@@ -84,7 +86,7 @@ A compatible ChatGPT or Codex browser discovers twenty-nine page tools through `
 | `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
-The top-level `agent-bridge.html` workspace registers the same twenty-nine learning tools plus three transport tools:
+The top-level `agent-bridge.html` workspace registers the same thirty-one learning tools plus three transport tools:
 
 | Bridge tool | Purpose |
 | --- | --- |
@@ -94,13 +96,15 @@ The top-level `agent-bridge.html` workspace registers the same twenty-nine learn
 
 Tool inputs use closed JSON Schemas and runtime validation. Read-only tools do not mutate learner state. Agent writes appear in the profile-scoped activity panel. Answer keys and solution steps are excluded from pre-submission learning context; arbitrary code, HTML, expressions to evaluate, storage keys, and network destinations are not accepted from tools.
 
+`python_program` is deliberately outside agent execution authority. WebMCP may draft, validate, or stage a package, but it exposes no Python-run tool; a human installs the package and presses the learner-visible run button. The exact Pyodide 0.28.3 runtime is self-hosted under `docs/vendor/` with a checked SHA-256 manifest and a CSP that trusts only same-origin scripts/workers. Each run strictly validates bounded JSON input, evaluates an AST-limited top-level pure function in a new disposable Worker, hard-terminates that Worker on success, error, cancellation, or wall timeout, ignores late/foreign messages, and never reuses the interpreter. Runtime startup failures block submission instead of becoming learner mistakes. Learner source and bounded grade summaries can enter local autosave/backups/workspace sync; captured stdout is discarded.
+
 ## Architecture
 
 ```text
 Mobile learner browser                          Computer / remote Codex task
 ┌──────────────────────────┐                    ┌────────────────────────────┐
 │ Full QuickMaths SPA      │                    │ Top-level Agent Bridge     │
-│ localStorage + WebMCP    │                    │ 32 WebMCP tools            │
+│ localStorage + WebMCP    │                    │ 34 WebMCP tools            │
 └────────────┬─────────────┘                    └──────────────┬─────────────┘
              │ debounced, complete state                       │ explicit publish → host Git auth
              ▼                                                 ▼
@@ -120,7 +124,7 @@ Important files:
 - `docs/lesson-depot/lessons/programming-fundamentals-python/1.2.0/lesson-set.json` — installable 25-lesson Python curriculum with code, trace, and sandbox contracts
 - `docs/challenge-core.js` — profiles, mastery graph, grading, attempts, reviews, timers, and persistence
 - `docs/challenge.js` — routes, views, controls, clock, backup/load, and exports
-- `docs/python-grader.js` and `docs/python-sandbox-worker.js` — disposable-worker Python grading boundary with a trusted AST supervisor
+- `docs/python-grader.js`, `docs/python-sandbox-worker.js`, `docs/python-sandbox-supervisor.py`, and `docs/vendor/pyodide-0.28.3/` — disposable-worker Python grading boundary, strict payload/AST supervisor, and integrity-pinned self-hosted runtime
 - `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio
 - `docs/webmcp-tools.js` — WebMCP schemas, validation, registration, and execution
 - `docs/github-sync.js` — GitHub Contents transport, credential separation, revisions, polling, and conflict checks

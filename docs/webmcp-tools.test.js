@@ -5,6 +5,12 @@ import { readFileSync, statSync } from "node:fs";
 import { DEFAULT_SUBJECT, LESSON_SET_FORMAT, createQuickMathsStore } from "./challenge-core.js";
 import { buildToolDefinitions, registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js";
 
+test("WebMCP can stage Python lessons but exposes no silent code-execution tool", () => {
+  assert.equal(TOOL_NAMES.some((name) => /run.*python|execute.*python|python.*run/i.test(name)), false);
+  assert.equal(TOOL_NAMES.includes("stage_custom_lesson_set"), true);
+  assert.equal(TOOL_NAMES.includes("stage_depot_lessons"), true);
+});
+
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const agentManifest = JSON.parse(readFileSync(new URL("./agent-manifest.json", import.meta.url), "utf8"));
 const educatorManifest = JSON.parse(readFileSync(new URL("./educator-agent-manifest.json", import.meta.url), "utf8"));
@@ -129,12 +135,14 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /pressedSkillId/);
   assert.match(js, /store\.selectMapSkill\(finishedGesture\.pressedSkillId\)/);
   assert.match(js, /data-map-viewport-key/);
-  assert.match(js, /nextScroller\.scrollLeft = previousViewport\.scrollLeft;\s+nextScroller\.scrollTop = previousViewport\.scrollTop;/);
+  assert.match(js, /const worldLeft = previousViewport\.viewMinX \+ previousViewport\.scrollLeft \/ previousViewport\.zoom;/);
   assert.match(js, /addEventListener\("wheel"/);
   assert.match(js, /passive: false/);
   assert.match(js, /map-hint-desktop/);
   assert.match(js, /map-hint-touch/);
   assert.match(js, /data-action=\"toggle-plan-mode\"/);
+  assert.match(js, /data-action=\"toggle-plan-view\"/);
+  assert.match(js, /Plan view · read only/);
   assert.match(js, /class=\"map-selection-marquee\"/);
   assert.match(js, /event\.ctrlKey \|\| event\.metaKey/);
   assert.match(js, /navigator\.vibrate/);
@@ -145,6 +153,10 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /Select multiple nodes to create a custom path\./);
   assert.match(js, /data-action="plan-open-annotation"/);
   assert.match(js, /data-action="plan-open-path"/);
+  assert.match(js, /data-action="plan-toggle-hidden"/);
+  assert.match(js, /data-action="plan-hide-selected"/);
+  assert.match(js, /Subject bands are guides/);
+  assert.match(css, /\.map-node\.is-plan-hidden/);
   assert.match(js, /data-plan-comment=/);
   assert.match(js, /updateMapPlanAnnotationPosition/);
   assert.match(css, /\.map-node-plan-outline/);
@@ -223,13 +235,13 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /local-git-transport/);
 });
 
-test("registers all twenty-nine tools once with the WebMCP document context", async () => {
+test("registers all thirty-one tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
   }, agentManifest, null, null, educatorManifest, authoringGuide);
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 29);
+  assert.equal(TOOL_NAMES.length, 31);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(result.failures, []);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
@@ -255,9 +267,9 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 22);
+  assert.equal(summary.guide.app_version, 23);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
-  assert.equal(summary.guide.tools.length, 29);
+  assert.equal(summary.guide.tools.length, 31);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent Workspace Storage/);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
@@ -300,6 +312,11 @@ test("educator WebMCP tools compose curricula and expose learner-visible supplem
   assert.equal(workspace.active_curriculum.ownerProfileId, store.snapshot().activeProfile.id);
   assert.equal(workspace.installed_packs[0].enabled, true);
 
+  const focused = await tools.set_curriculum_native_lessons_enabled.execute({ enabled: false });
+  assert.equal(focused.enabled, false);
+  assert.equal(store.snapshot().activeCurriculum.includeNativeLessons, false);
+  assert.ok(store.snapshot().curriculum.allSkills.filter((skill) => skill.subjectId === "SUBJECT_MATH").length < 53);
+  await tools.set_curriculum_native_lessons_enabled.execute({ enabled: true });
   await tools.set_curriculum_pack_enabled.execute({ pack_id: "PACK_GEOGRAPHY", enabled: false });
   assert.equal(store.snapshot().curriculum.allSkills.length, 53);
   const updated = await tools.update_curriculum_settings.execute({
@@ -361,6 +378,7 @@ test("Agent tutoring off blocks learner tutoring and planning mutations but keep
   await assert.rejects(tools.set_learning_preferences.execute({ progression_mode: "soft" }), /Agent tutoring turned off/i);
   await assert.rejects(tools.set_map_plan_mode.execute({ enabled: true }), /Agent tutoring turned off/i);
   await assert.rejects(tools.arrange_map_plan_nodes.execute({ positions: [{ skill_id: "MATH_ARITH_001", x: 10, y: 20 }] }), /Agent tutoring turned off/i);
+  await assert.rejects(tools.set_map_plan_nodes_hidden.execute({ skill_ids: ["MATH_ARITH_001"], hidden: true }), /Agent tutoring turned off/i);
   await assert.rejects(tools.start_skill_test.execute({ skill_id: "MATH_ARITH_001" }), /Agent .* turned off/i);
   const navigated = await tools.navigate_learning_app.execute({ view: "map", skill_id: "MATH_ARITH_001" });
   assert.equal(navigated.visible_view, "map");
@@ -393,7 +411,7 @@ test("app, curriculum, and progress tools expose the full learner state", async 
   assert.equal(app.has_profile, true);
   assert.equal(app.view, "tutorial");
   assert.equal(app.map_scope, "subject");
-  assert.deepEqual(app.learning_plan, { plan_mode: false, selected_skill_ids: [], layouts: {}, paths: [], annotations: [] });
+  assert.deepEqual(app.learning_plan, { plan_mode: false, plan_view: true, show_hidden_nodes: false, selected_skill_ids: [], layouts: {}, paths: [], annotations: [], hidden_skill_ids: [] });
   assert.equal(map.skills.length, 53);
   assert.equal(summary.skills.length, 53);
   assert.equal(summary.suggested_next.skill_id, "MATH_ARITH_001");
@@ -499,12 +517,23 @@ test("agent planning tools visibly arrange nodes, create paths, and add connecte
 
   const arranged = await tools.arrange_map_plan_nodes.execute({
     positions: [
-      { skill_id: "MATH_ARITH_001", x: 140, y: 180 },
+      { skill_id: "MATH_ARITH_001", x: -140, y: -180 },
       { skill_id: "MATH_ARITH_002", x: 420, y: 180 },
     ],
   });
   assert.equal(arranged.layout_key, "subject:SUBJECT_MATH");
   assert.equal(arranged.moved, 2);
+
+  const hidden = await tools.set_map_plan_nodes_hidden.execute({
+    skill_ids: ["MATH_ARITH_002"],
+    hidden: true,
+  });
+  assert.deepEqual(hidden.hidden_skill_ids, ["MATH_ARITH_002"]);
+  const restored = await tools.set_map_plan_nodes_hidden.execute({
+    skill_ids: ["MATH_ARITH_002"],
+    hidden: false,
+  });
+  assert.deepEqual(restored.hidden_skill_ids, []);
 
   const created = await tools.create_map_plan_path.execute({
     skill_ids: ["MATH_ARITH_001", "MATH_ARITH_002"],
@@ -516,21 +545,22 @@ test("agent planning tools visibly arrange nodes, create paths, and add connecte
 
   const connected = await tools.add_map_plan_annotation.execute({
     body: "Revisit the sign rules before moving on.",
-    path_id: created.path.path_id,
+    skill_ids: created.path.skill_ids,
   });
-  assert.deepEqual(connected.annotation.target, { path_id: created.path.path_id });
+  assert.deepEqual(connected.annotation.target, { skill_ids: created.path.skill_ids });
   const free = await tools.add_map_plan_annotation.execute({ body: "Exam week starts here." });
   assert.deepEqual(free.annotation.target, { map_comment: true });
   assert.deepEqual(free.annotation.positions["subject:SUBJECT_MATH"], { x: 320, y: 160 });
 
   const app = await tools.get_app_state.execute({});
   assert.deepEqual(app.learning_plan.layouts["subject:SUBJECT_MATH"], {
-    MATH_ARITH_001: { x: 140, y: 180 },
+    MATH_ARITH_001: { x: -140, y: -180 },
     MATH_ARITH_002: { x: 420, y: 180 },
   });
   assert.equal(app.learning_plan.paths.length, 1);
   assert.equal(app.learning_plan.annotations.length, 2);
   assert.ok(store.snapshot().activity.some((item) => item.tool === "arrange_map_plan_nodes"));
+  assert.ok(store.snapshot().activity.some((item) => item.tool === "set_map_plan_nodes_hidden"));
   assert.ok(store.snapshot().activity.some((item) => item.tool === "create_map_plan_path"));
   assert.ok(store.snapshot().activity.some((item) => item.tool === "add_map_plan_annotation"));
 
@@ -539,13 +569,13 @@ test("agent planning tools visibly arrange nodes, create paths, and add connecte
   assert.equal(store.snapshot().mapPlan.paths.length, 1);
 });
 
-test("agent planning schemas reject unknown nodes, invalid coordinates, and ambiguous annotation targets", async () => {
+test("agent planning schemas reject unknown nodes, invalid coordinates, and removed path annotation targets", async () => {
   const tools = toolsFor(createStore());
   await assert.rejects(tools.create_map_plan_path.execute({ skill_ids: ["MATH_ARITH_001"] }), /at least 2 skills/);
   await assert.rejects(tools.create_map_plan_path.execute({ skill_ids: ["MATH_ARITH_001", "NOT_A_SKILL"] }), /Unknown skill_id/);
-  await assert.rejects(tools.arrange_map_plan_nodes.execute({ positions: [{ skill_id: "MATH_ARITH_001", x: -1, y: 20 }] }), /0 to 20000/);
+  await assert.rejects(tools.arrange_map_plan_nodes.execute({ positions: [{ skill_id: "MATH_ARITH_001", x: -20001, y: 20 }] }), /-20000 to 20000/);
   const path = await tools.create_map_plan_path.execute({ skill_ids: ["MATH_ARITH_001", "MATH_ARITH_002"] });
-  await assert.rejects(tools.add_map_plan_annotation.execute({ body: "Ambiguous", path_id: path.path.path_id, skill_ids: ["MATH_ARITH_001"] }), /cannot be combined/);
+  await assert.rejects(tools.add_map_plan_annotation.execute({ body: "Removed target", path_id: path.path.path_id }), /Unknown input property: path_id/);
 });
 
 test("cross-subject agent paths automatically use the combined mastery map", async () => {

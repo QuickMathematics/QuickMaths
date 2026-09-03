@@ -10,7 +10,7 @@
 
 ## Shipped agent and community layer
 
-- Twenty-one learner-facing WebMCP tools, including visible mastery-map planning
+- Twenty-two learner-facing WebMCP tools, including free-canvas mastery-map planning and reversible node hiding
 - Dedicated Agent Bridge with revision-bound GitHub checkpoint exchange
 - Loopback CLI transport that keeps Git credentials out of browser JavaScript
 - Public Lesson Depot with validation, staging, upvotes, and comments

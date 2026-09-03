@@ -10,11 +10,13 @@ export const TOOL_NAMES = Object.freeze([
   "select_curriculum",
   "update_curriculum_settings",
   "set_curriculum_pack_enabled",
+  "set_curriculum_native_lessons_enabled",
   "list_subjects",
   "set_learning_preferences",
   "navigate_learning_app",
   "set_map_plan_mode",
   "arrange_map_plan_nodes",
+  "set_map_plan_nodes_hidden",
   "create_map_plan_path",
   "add_map_plan_annotation",
   "open_lesson_creator",
@@ -165,13 +167,13 @@ function guideForSection(guide, section) {
     ...base,
     planning_policy: guide.agent_policy?.planning ?? [],
     state_model: guide.state_model?.mastery_map_plans,
-    tools: ["get_app_state", "get_curriculum_map", "set_map_plan_mode", "arrange_map_plan_nodes", "create_map_plan_path", "add_map_plan_annotation"],
+    tools: ["get_app_state", "get_curriculum_map", "set_map_plan_mode", "arrange_map_plan_nodes", "set_map_plan_nodes_hidden", "create_map_plan_path", "add_map_plan_annotation"],
   };
   if (section === "educator") return {
     ...base,
     purpose: "Educator profiles create portable curricula with per-curriculum lesson-pack selection, canonical map plans, learning rules, and learner-visible supplemental agent guidance.",
     workflow: ["Read get_curriculum_workspace.", "Create or select a curriculum explicitly.", "Enable only the installed packs the educator chooses.", "Use the existing map planning tools to arrange the canonical curriculum map, paths, and annotations.", "Update learner and agent policy only from educator instructions.", "Treat QuickMaths results as learning evidence, not a substitute for supervised assessment."],
-    tools: ["get_curriculum_workspace", "create_curriculum", "select_curriculum", "update_curriculum_settings", "set_curriculum_pack_enabled", "arrange_map_plan_nodes", "create_map_plan_path", "add_map_plan_annotation"],
+    tools: ["get_curriculum_workspace", "create_curriculum", "select_curriculum", "update_curriculum_settings", "set_curriculum_pack_enabled", "arrange_map_plan_nodes", "set_map_plan_nodes_hidden", "create_map_plan_path", "add_map_plan_annotation"],
   };
   if (section === "bridge") return { ...base, github_bridge: guide.github_bridge ?? {} };
   if (section === "custom_content") return {
@@ -295,7 +297,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "get_app_state",
       title: "Get QuickMaths app state",
-      description: "Read the current QuickMaths view, selected learner, timers, mastery counts, selected skill, and saved Plan mode layouts, paths, and annotations.",
+      description: "Read the current QuickMaths view, selected learner, timers, mastery counts, selected skill, and saved Plan presentation including layouts, paths, hidden lessons, and annotations.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: true, untrustedContentHint: true },
       async execute(input = {}) {
@@ -313,15 +315,18 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           map_scope: state.mapScope,
           learning_plan: state.activeProfile ? {
             plan_mode: state.ui.mapPlanMode,
+            plan_view: !state.ui.mapPlanMode && state.ui.mapPlanView,
+            show_hidden_nodes: state.ui.mapPlanShowHidden,
             selected_skill_ids: state.ui.mapPlanSelection,
             layouts: state.mapPlan.layouts,
             paths: state.mapPlan.paths.map((path) => ({ path_id: path.id, name: path.name, color: path.color, skill_ids: path.skillIds })),
             annotations: state.mapPlan.annotations.map((annotation) => ({
               annotation_id: annotation.id,
-              target: annotation.pathId ? { path_id: annotation.pathId } : annotation.skillIds.length ? { skill_ids: annotation.skillIds } : { map_comment: true },
+              target: annotation.skillIds.length ? { skill_ids: annotation.skillIds } : { map_comment: true },
               positions: annotation.positions,
               body: annotation.body,
             })),
+            hidden_skill_ids: state.mapPlan.hiddenSkillIds,
           } : null,
           timers: state.timers,
           mastery_counts: state.progressCounts,
@@ -476,6 +481,17 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       },
     },
     {
+      name: "set_curriculum_native_lessons_enabled",
+      title: "Include or exclude native Mathematics",
+      description: "Include or exclude the native Mathematics lessons from the open educator curriculum. The app rejects impossible dependency graphs and never treats a custom visual path as hidden content scope.",
+      inputSchema: { type: "object", properties: { enabled: { type: "boolean" } }, required: ["enabled"], additionalProperties: false },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["enabled"]);
+        if (typeof input.enabled !== "boolean") throw new Error("enabled must be a boolean.");
+        return store.setCurriculumNativeLessonsEnabled(input.enabled);
+      },
+    },
+    {
       name: "list_subjects",
       title: "List QuickMaths subjects",
       description: "Read every installed subject, its theme-safe metadata, lesson count, and the learner's current subject.",
@@ -546,11 +562,11 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "set_map_plan_mode",
       title: "Open or close mastery-map Plan mode",
-      description: "Show the visible mastery map in its persistent editable Plan mode, or return to the untouched canonical map. Optional subject and scope inputs choose which map the human sees.",
+      description: "Show the mastery map in its persistent editable Plan mode, or return to the default read-only Plan view. The human can separately toggle between Plan view and the untouched canonical map. Optional subject and scope inputs choose which map is visible.",
       inputSchema: {
         type: "object",
         properties: {
-          enabled: { type: "boolean", description: "True opens the editable plan; false restores the canonical map view." },
+          enabled: { type: "boolean", description: "True opens the editable plan; false returns to the read-only saved Plan view." },
           map_scope: { type: "string", enum: ["subject", "all"], description: "Show one subject or every installed subject." },
           subject_id: stringSchema("Installed subject ID when map_scope is subject.", 60),
         },
@@ -576,8 +592,8 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         properties: {
           positions: {
             type: "array", minItems: 1, maxItems: 80,
-            description: "Lesson positions in map canvas units; x and y must be between 0 and 20000.",
-            items: { type: "object", properties: { skill_id: stringSchema("Installed lesson ID.", 60), x: { type: "number", minimum: 0, maximum: 20000 }, y: { type: "number", minimum: 0, maximum: 20000 } }, required: ["skill_id", "x", "y"], additionalProperties: false },
+            description: "Lesson positions in free-canvas units; x and y must be between -20000 and 20000. Subject bands are visual guides, not placement boundaries.",
+            items: { type: "object", properties: { skill_id: stringSchema("Installed lesson ID.", 60), x: { type: "number", minimum: -20000, maximum: 20000 }, y: { type: "number", minimum: -20000, maximum: 20000 } }, required: ["skill_id", "x", "y"], additionalProperties: false },
           },
           map_scope: { type: "string", enum: ["subject", "all"] },
           subject_id: stringSchema("Installed subject ID when arranging a subject-only map.", 60),
@@ -594,7 +610,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           requireObject(item); rejectUnknown(item, ["skill_id", "x", "y"]);
           const skillId = requiredString(item, "skill_id", 60);
           if (!store.skillsById[skillId]) throw new Error(`Unknown skill_id: ${skillId}`);
-          if (!Number.isFinite(item.x) || item.x < 0 || item.x > 20000 || !Number.isFinite(item.y) || item.y < 0 || item.y > 20000) throw new Error("x and y must be finite numbers from 0 to 20000.");
+          if (!Number.isFinite(item.x) || item.x < -20000 || item.x > 20000 || !Number.isFinite(item.y) || item.y < -20000 || item.y > 20000) throw new Error("x and y must be finite numbers from -20000 to 20000.");
           positions[skillId] = { x: item.x, y: item.y };
         }
         const skillIds = Object.keys(positions);
@@ -602,6 +618,40 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         const context = preparePlanMap({ skillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
         const result = store.updateMapPlanLayout({ layoutKey: context.layoutKey, positions, selectedSkillIds: skillIds, activityActor: "agent" });
         return { ok: true, visible_view: store.snapshot().ui.route, plan_mode: true, map_scope: context.mapScope, layout_key: result.layoutKey, moved: result.moved, selected_skill_ids: result.selectedSkillIds, positions };
+      },
+    },
+    {
+      name: "set_map_plan_nodes_hidden",
+      title: "Hide or restore mastery-map plan nodes",
+      description: "Hide one or more lessons from the saved Plan presentation, or restore previously hidden lessons. Hidden lessons disappear from Plan mode and Plan view but remain in the curriculum and canonical mastery map.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          skill_ids: { type: "array", minItems: 1, maxItems: 80, description: "Lesson IDs to hide or restore in Plan mode.", items: stringSchema("Installed lesson ID.", 60) },
+          hidden: { type: "boolean", description: "True hides the lessons from Plan mode; false restores them." },
+          map_scope: { type: "string", enum: ["subject", "all"] },
+          subject_id: stringSchema("Installed subject ID when editing a subject-only map.", 60),
+        },
+        required: ["skill_ids", "hidden"],
+        additionalProperties: false,
+      },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["skill_ids", "hidden", "map_scope", "subject_id"]);
+        requireLearnerPlanningEnabled(store);
+        const skillIds = requiredSkillIds(store, input, "skill_ids", 1);
+        if (typeof input.hidden !== "boolean") throw new Error("hidden must be a boolean.");
+        const context = preparePlanMap({ skillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
+        store.setMapPlanSelection(skillIds);
+        const result = store.setMapPlanNodesHidden(skillIds, input.hidden, { activityActor: "agent" });
+        return {
+          ok: true,
+          visible_view: store.snapshot().ui.route,
+          plan_mode: true,
+          map_scope: context.mapScope,
+          hidden: result.hidden,
+          skill_ids: result.skillIds,
+          hidden_skill_ids: result.hiddenSkillIds,
+        };
       },
     },
     {
@@ -633,14 +683,13 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "add_map_plan_annotation",
       title: "Add a mastery-map annotation",
-      description: "Add a persistent visible comment node connected to selected lessons, connected to a saved path, or free on the map. A free comment defaults near the upper-left canvas when position is omitted.",
+      description: "Add a persistent visible comment node connected to one or more selected lessons, or free on the map. A free comment defaults near the upper-left canvas when position is omitted.",
       inputSchema: {
         type: "object",
         properties: {
           body: stringSchema("Annotation text shown on the map; plain text only.", 1200),
           skill_ids: { type: "array", maxItems: 80, description: "Optional lesson IDs to connect to the comment.", items: stringSchema("Installed lesson ID.", 60) },
-          path_id: stringSchema("Optional saved Plan mode path ID. Do not combine with skill_ids.", 120),
-          position: { type: "object", description: "Optional absolute comment position in map canvas units.", properties: { x: { type: "number", minimum: 0, maximum: 20000 }, y: { type: "number", minimum: 0, maximum: 20000 } }, required: ["x", "y"], additionalProperties: false },
+          position: { type: "object", description: "Optional absolute comment position in free-canvas units.", properties: { x: { type: "number", minimum: -20000, maximum: 20000 }, y: { type: "number", minimum: -20000, maximum: 20000 } }, required: ["x", "y"], additionalProperties: false },
           map_scope: { type: "string", enum: ["subject", "all"] },
           subject_id: stringSchema("Installed subject ID when annotating a subject-only map.", 60),
         },
@@ -649,27 +698,20 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       },
       annotations: { untrustedContentHint: true },
       async execute(input) {
-        requireObject(input); rejectUnknown(input, ["body", "skill_ids", "path_id", "position", "map_scope", "subject_id"]);
+        requireObject(input); rejectUnknown(input, ["body", "skill_ids", "position", "map_scope", "subject_id"]);
         requireLearnerPlanningEnabled(store);
         const body = requiredString(input, "body", 1200);
-        const pathId = optionalString(input, "path_id", 120) || null;
         if (input.skill_ids != null && !Array.isArray(input.skill_ids)) throw new Error("skill_ids must be an array.");
         const suppliedSkillIds = input.skill_ids?.length ? requiredSkillIds(store, input, "skill_ids", 1) : [];
-        if (pathId && suppliedSkillIds.length) throw new Error("path_id cannot be combined with skill_ids.");
-        const currentPlan = store.snapshot().mapPlan;
-        const targetPath = pathId ? currentPlan.paths.find((path) => path.id === pathId) : null;
-        if (pathId && !targetPath) throw new Error("Plan path not found.");
-        const contextSkillIds = targetPath?.skillIds ?? suppliedSkillIds;
-        const context = preparePlanMap({ skillIds: contextSkillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
-        if (pathId) store.selectMapPlanPath(pathId);
-        else store.setMapPlanSelection(suppliedSkillIds);
+        const context = preparePlanMap({ skillIds: suppliedSkillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
+        store.setMapPlanSelection(suppliedSkillIds);
         let position = input.position ?? null;
         if (position) {
           requireObject(position); rejectUnknown(position, ["x", "y"]);
-          if (!Number.isFinite(position.x) || position.x < 0 || position.x > 20000 || !Number.isFinite(position.y) || position.y < 0 || position.y > 20000) throw new Error("position x and y must be finite numbers from 0 to 20000.");
-        } else if (!pathId && !suppliedSkillIds.length) position = { x: 320, y: 160 };
-        const annotation = store.addMapPlanAnnotation({ body, pathId, skillIds: suppliedSkillIds, layoutKey: context.layoutKey, position, activityActor: "agent" });
-        return { ok: true, visible_view: store.snapshot().ui.route, plan_mode: true, map_scope: context.mapScope, annotation: { annotation_id: annotation.id, target: annotation.pathId ? { path_id: annotation.pathId } : annotation.skillIds.length ? { skill_ids: annotation.skillIds } : { map_comment: true }, positions: annotation.positions, body: annotation.body } };
+          if (!Number.isFinite(position.x) || position.x < -20000 || position.x > 20000 || !Number.isFinite(position.y) || position.y < -20000 || position.y > 20000) throw new Error("position x and y must be finite numbers from -20000 to 20000.");
+        } else if (!suppliedSkillIds.length) position = { x: 320, y: 160 };
+        const annotation = store.addMapPlanAnnotation({ body, skillIds: suppliedSkillIds, layoutKey: context.layoutKey, position, activityActor: "agent" });
+        return { ok: true, visible_view: store.snapshot().ui.route, plan_mode: true, map_scope: context.mapScope, annotation: { annotation_id: annotation.id, target: annotation.skillIds.length ? { skill_ids: annotation.skillIds } : { map_comment: true }, positions: annotation.positions, body: annotation.body } };
       },
     },
     {

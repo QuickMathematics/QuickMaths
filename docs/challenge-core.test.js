@@ -119,6 +119,7 @@ function curriculumFile({
   settings = { agentEnabled: true, progressionMode: "hard" },
   packs = [],
   enabledPackIds = packs.map((pack) => pack.id),
+  includeNativeLessons = true,
   mapPlan = { layouts: {}, paths: [], annotations: [] },
 } = {}) {
   return JSON.stringify({
@@ -129,6 +130,7 @@ function curriculumFile({
     name,
     description: "A regression-test curriculum.",
     enabled_pack_ids: enabledPackIds,
+    include_native_lessons: includeNativeLessons,
     settings,
     map_plan: mapPlan,
     lesson_packs: packs,
@@ -335,11 +337,22 @@ test("Settings, map zoom, and combined-subject map scope persist safely", () => 
   assert.throws(() => reloaded.setLearningPreferences({ mapScope: "galaxy" }), /map_scope/);
 });
 
+test("results navigation selects the requested skill's saved attempt", () => {
+  const { store } = harness();
+  store.createProfile("Results Learner", { demo: true });
+  const attempt = store.snapshot().attempts.find((item) => item.skillId === "MATH_ARITH_002");
+  store.navigate("results", "MATH_ARITH_002");
+  assert.equal(store.snapshot().ui.activeAttemptId, attempt.attemptId);
+  store.navigate("results", "MATH_ARITH_001");
+  assert.equal(store.snapshot().ui.activeAttemptId, null, "a skill with no saved attempt must not show an unrelated latest result");
+});
+
 test("mastery-map plans persist per learner with scoped layouts, colored paths, and annotations", () => {
   const { store, storage } = harness();
   const firstProfile = store.createProfile("Planning Learner");
   store.completeTutorial();
   store.navigate("map");
+  assert.equal(store.snapshot().ui.mapPlanView, true, "the read-only saved plan is the default map view");
   assert.equal(store.setMapPlanMode(true).enabled, true);
   assert.equal(store.setMapPlanComposer("annotation").composer, "annotation");
   store.setMapPlanSelection(["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"]);
@@ -347,14 +360,15 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
     layoutKey: "subject:SUBJECT_MATH",
     selectedSkillIds: ["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"],
     positions: {
-      MATH_ARITH_001: { x: 110.25, y: 90.5 },
+      MATH_ARITH_001: { x: -110.25, y: -90.5 },
       MATH_ARITH_002: { x: 360, y: 180 },
     },
   });
   const path = store.createMapPlanPath({ name: "Algebra launch", color: "#7b4be2" });
   assert.deepEqual(path.skillIds, ["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"]);
   store.addMapPlanAnnotation({ body: "Warm up here before Friday.", skillIds: ["MATH_ARITH_001"] });
-  store.addMapPlanAnnotation({ body: "My route into equations.", pathId: path.id });
+  store.addMapPlanAnnotation({ body: "My route into equations.", skillIds: path.skillIds });
+  assert.throws(() => store.addMapPlanAnnotation({ body: "Redundant path note.", pathId: path.id }), /not supported/i);
   const freeComment = store.addMapPlanAnnotation({
     body: "Remember to revisit this cluster.",
     skillIds: [],
@@ -366,11 +380,17 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
     position: { x: 505.5, y: 240.25 },
   });
   store.updateMapPlanPath(path.id, { color: "#1255aa" });
+  store.setMapPlanNodesHidden(["MATH_ARITH_002", "MATH_PREALG_001"], true);
+  assert.deepEqual(store.snapshot().ui.mapPlanSelection, ["MATH_ARITH_001"]);
+  assert.equal(store.setMapPlanShowHidden(true).visible, true);
+  store.setMapPlanSelection(["MATH_ARITH_002"]);
+  store.setMapPlanNodesHidden(["MATH_ARITH_002"], false);
 
   let state = store.snapshot();
   assert.equal(state.ui.mapPlanMode, true);
-  assert.deepEqual(state.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: 110.25, y: 90.5 });
+  assert.deepEqual(state.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: -110.25, y: -90.5 });
   assert.equal(state.mapPlan.paths[0].color, "#1255aa");
+  assert.deepEqual(state.mapPlan.hiddenSkillIds, ["MATH_PREALG_001"]);
   assert.equal(state.mapPlan.annotations.length, 3);
   assert.equal(state.mapPlan.annotations[2].targetType, "free");
   assert.deepEqual(state.mapPlan.annotations[2].positions["subject:SUBJECT_MATH"], { x: 505.5, y: 240.25 });
@@ -382,17 +402,48 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
   assert.equal(state.mapPlan.annotations[0].body, "Warm up here before Friday.");
   assert.equal(state.mapPlan.annotations[2].positions["subject:SUBJECT_MATH"].x, 505.5);
   assert.equal(state.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_002.x, 360);
+  assert.deepEqual(state.mapPlan.hiddenSkillIds, ["MATH_PREALG_001"]);
   reloaded.setMapPlanMode(false);
   assert.equal(reloaded.snapshot().ui.mapPlanMode, false);
+  assert.equal(reloaded.snapshot().ui.mapPlanView, true, "leaving the editor returns to read-only Plan view");
   assert.equal(reloaded.snapshot().ui.mapPlanComposer, null);
   assert.equal(reloaded.snapshot().mapPlan.paths.length, 1, "closing Plan mode must not erase the plan");
+  assert.equal(reloaded.setMapPlanView(false).enabled, false);
+  assert.equal(reloaded.setMapPlanView(true).enabled, true);
 
   reloaded.createProfile("Independent Planner");
-  assert.deepEqual(reloaded.snapshot().mapPlan, { layouts: {}, paths: [], annotations: [] });
+  assert.deepEqual(reloaded.snapshot().mapPlan, { layouts: {}, paths: [], annotations: [], hiddenSkillIds: [] });
   reloaded.selectProfile(firstProfile.id);
   assert.equal(reloaded.snapshot().mapPlan.paths.length, 1, "plans belong to their learner profile");
   assert.throws(() => reloaded.createMapPlanPath({ skillIds: ["MATH_ARITH_001"] }), /at least two/i);
   assert.throws(() => reloaded.updateMapPlanPath(path.id, { color: "tomato" }), /valid path color/i);
+});
+
+test("legacy path annotations migrate to lesson-connected annotations", () => {
+  const { store, storage } = harness();
+  const profile = store.createProfile("Legacy Path Notes");
+  store.completeTutorial();
+  store.setMapPlanMode(true);
+  const skillIds = ["MATH_ARITH_001", "MATH_ARITH_002"];
+  const path = store.createMapPlanPath({ name: "Old route", skillIds });
+  const persisted = JSON.parse(storage.value(STORAGE_KEY));
+  persisted.mapPlans[profile.id].annotations = [{
+    id: "legacy-path-note",
+    targetType: "path",
+    pathId: path.id,
+    skillIds: [],
+    positions: {},
+    body: "This note used to belong to the path.",
+    createdAt: "2026-09-01T09:41:00.000Z",
+    updatedAt: "2026-09-01T09:41:00.000Z",
+  }];
+  storage.setItem(STORAGE_KEY, JSON.stringify(persisted));
+
+  const reloaded = createQuickMathsStore({ storage, curriculum, now: () => new Date("2026-09-01T09:41:00.000Z") });
+  const [annotation] = reloaded.snapshot().mapPlan.annotations;
+  assert.deepEqual(annotation.skillIds, skillIds);
+  assert.equal(annotation.targetType, "nodes");
+  assert.equal("pathId" in annotation, false);
 });
 
 test("educator curricula isolate packs, export canonical plans, and keep practice repeatable", () => {
@@ -442,6 +493,7 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   assert.equal(state.progressionMode, "soft");
   assert.equal(state.curriculum.allSkills.length, 53);
   assert.equal(state.curriculumPlan.paths[0].name, "Arithmetic start");
+  assert.equal(state.mapPlan.paths[0].name, "Arithmetic start", "the learner receives an editable copy of the canonical plan");
   assert.deepEqual(state.curriculumPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: 120, y: 80 });
 
   learnerHarness.store.startTest("MATH_ARITH_001");
@@ -453,6 +505,26 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   state = learnerHarness.store.snapshot();
   assert.equal(state.progressRows.find((row) => row.id === "MATH_ARITH_001").attemptCount, 1);
   assert.match(learnerHarness.store.exportBackup(), /Ada's rigorous route/);
+});
+
+test("educator curricula can exclude native Mathematics and completion scope follows visible content", () => {
+  const { store } = harness();
+  store.createProfile("Programming Educator", { role: "educator" });
+  assert.throws(() => store.setCurriculumNativeLessonsEnabled(false), /must include native Mathematics or at least one enabled lesson pack/i);
+  store.importLessonPack(programmingLessonSet);
+  const result = store.setCurriculumNativeLessonsEnabled(false);
+  assert.equal(result.enabled, false);
+  const snapshot = store.snapshot();
+  assert.equal(snapshot.activeCurriculum.includeNativeLessons, false);
+  assert.ok(snapshot.curriculum.allSkills.length >= 25);
+  assert.ok(snapshot.curriculum.allSkills.length < 79, "unrelated native Mathematics lessons must be excluded");
+  const retainedMath = snapshot.curriculum.allSkills.filter((skill) => skill.subjectId === "SUBJECT_MATH");
+  assert.ok(retainedMath.length > 0 && retainedMath.length < 53, "only prerequisite Mathematics foundations should remain");
+  assert.equal(retainedMath.some((skill) => skill.id === "MATH_ARITH_001"), true);
+  const exported = JSON.parse(store.exportCurriculum());
+  assert.equal(exported.include_native_lessons, false);
+  const imported = harness().store.previewCurriculum(JSON.stringify(exported));
+  assert.equal(imported.enabledPackCount, 1);
 });
 
 test("curriculum assignments reuse mastery only for a matching student name", () => {
@@ -479,6 +551,24 @@ test("curriculum assignments reuse mastery only for a matching student name", ()
   assert.equal(mismatched.store.snapshot().progressRows.find((row) => row.id === "MATH_ARITH_001").attemptCount, 0);
   mismatched.store.selectProfile(bob.id);
   assert.equal(mismatched.store.snapshot().progressRows.find((row) => row.id === "MATH_ARITH_001").attemptCount, 2, "the original learner keeps independent mastery");
+});
+
+test("curriculum import copies its canonical plan into both fresh and matching learner workspaces", () => {
+  const plan = {
+    layouts: { "subject:SUBJECT_MATH": { MATH_ARITH_001: { x: 220, y: 140 } } },
+    paths: [{ id: "path-one", name: "First route", color: "#4455aa", skillIds: ["MATH_ARITH_001", "MATH_ARITH_002"] }],
+    annotations: [{ id: "note-one", body: "Begin here.", targetType: "skills", skillIds: ["MATH_ARITH_001"], pathId: null, positions: {}, createdAt: "2026-09-01T09:41:00.000Z", updatedAt: "2026-09-01T09:41:00.000Z" }],
+  };
+  for (const profileName of ["Ada", "Bob"]) {
+    const { store } = harness();
+    store.createProfile(profileName);
+    const result = store.importCurriculum(curriculumFile({ settings: { studentName: "Ada", agentEnabled: true, progressionMode: "hard" }, mapPlan: plan }));
+    const snapshot = store.snapshot();
+    assert.equal(snapshot.mapPlan.paths[0].name, "First route");
+    assert.equal(snapshot.mapPlan.annotations[0].body, "Begin here.");
+    assert.deepEqual(snapshot.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: 220, y: 140 });
+    assert.equal(result.assignmentProfileCreated, profileName === "Bob");
+  }
 });
 
 test("external curriculum settings are strict and package contents are reproducible", () => {
@@ -548,6 +638,11 @@ test("curriculum import rejects an enabled graph with a disabled prerequisite pa
     packs: [prerequisite, dependent],
     enabledPackIds: [dependent.id],
   })), /depends on .* disabled lesson set/i);
+  assert.throws(() => store.previewCurriculum(curriculumFile({
+    packs: [prerequisite, dependent],
+    enabledPackIds: [dependent.id],
+    includeNativeLessons: false,
+  })), /depends on .* disabled lesson set/i, "native prerequisite closure must not silently enable a disabled external pack");
   assert.equal(store.snapshot().lessonPacks.length, 0, "a rejected curriculum must not install embedded packs");
 });
 
@@ -1042,6 +1137,32 @@ test("Python grades bind to exact editor contents and hidden cases stay out of l
   const stale = store.submitTest();
   assert.equal(stale.ok, false);
   assert.match(stale.workIssues.find((item) => item.questionId === nextProgram.template_id).message, /Run the current Python code/i);
+
+  store.recordPythonGrade(nextProgram.template_id, "def rectangle_area(width, height):\n    return 0", {
+    status: "unavailable", score: 0, passed: 0, total: nextProgram.program_spec.tests.length,
+    tests: nextProgram.program_spec.tests.map((item) => ({ id: item.id, visibility: item.visibility, status: "runtime_error", message: "Runtime unavailable." })),
+    messages: ["Runtime unavailable."], stdout: "transient output",
+  });
+  const unavailable = store.submitTest();
+  assert.equal(unavailable.ok, false);
+  assert.match(unavailable.workIssues.find((item) => item.questionId === nextProgram.template_id).message, /infrastructure failures are never graded/i);
+  assert.equal(store.snapshot().activeTest.responses[nextProgram.template_id].structuredWorkJson.python_grade.stdout, "", "captured output must not persist");
+});
+
+test("long proof and capstone work is preserved without the former 5000-character truncation", () => {
+  const { store } = harness();
+  store.createProfile("Capstone Learner");
+  store.setLearningPreferences({ progressionMode: "soft" });
+  const skill = curriculum.skills.find((candidate) => candidate.problems.some((problem) => problem.work_required));
+  const draft = store.startTest(skill.id, { force: true });
+  const problem = draft.problems.find((item) => item.work_required);
+  const work = "x".repeat(6_780);
+  store.updateResponse(problem.template_id, { finalAnswer: String(problem.expected_answer), work });
+  assert.equal(store.snapshot().activeTest.responses[problem.template_id].work.length, 6_780);
+  assert.throws(
+    () => store.updateResponse(problem.template_id, { finalAnswer: String(problem.expected_answer), work: "x".repeat(50_001) }),
+    /50,000 characters/i,
+  );
 });
 
 test("custom progress and content round-trip together through a full backup", () => {

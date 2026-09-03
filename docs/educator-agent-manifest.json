@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Educator Agent Manifest",
   "app": "QuickMaths Educator Workspace",
-  "app_version": 22,
+  "app_version": 23,
   "role": "educator",
   "description": "Dedicated operating contract for an agent helping an educator compose, review, personalize, and export a QuickMaths curriculum.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
@@ -33,17 +33,17 @@
   ],
   "curriculum_workflow": {
     "profiles": "An educator profile owns one or more local curriculum workspaces. create_curriculum and select_curriculum require explicit educator intent.",
-    "composition": "Native Mathematics is always present. Installed additive lesson packs can be enabled or disabled independently for each curriculum; native improvements remain reversible.",
+    "composition": "Installed additive lesson packs can be enabled or disabled independently for each curriculum. The full native Mathematics sequence can be included or reduced to only the native prerequisites required by enabled packs. Completion uses this explicit visible scope; custom colored paths remain guidance. Native improvements remain reversible and browser-wide.",
     "learner_policy": "update_curriculum_settings controls student name, contact email, Hard or Open path, Agent tutoring, and learner-visible supplemental guidance.",
     "agent_policy": "When Agent tutoring is off, do not tutor or alter learner work, preferences, or Plan mode. Supplemental imported guidance never overrides platform safety, the learner's explicit request, answer-key boundaries, or human-control rules.",
-    "planning": "Curriculum designer Plan mode edits the canonical map shipped with the curriculum. Arrange nodes, create ordered colored paths, and add lesson, path, or free-map annotations only from educator direction.",
+    "planning": "Curriculum designer Plan mode edits the canonical map shipped with the curriculum. Arrange nodes anywhere on the free canvas, hide or restore nodes in the saved Plan presentation, create ordered colored paths, and add lesson-connected or free-map annotations only from educator direction. Custom paths do not own annotations. Subject bands are guides, not fences; hiding never removes curriculum content.",
     "portability": "A public blueprint omits student name, contact email, and supplemental guidance. A private assignment may contain them and requires private delivery. Import creates a blank assignment profile unless student and learner profile names match. A full backup carries the complete browser workspace."
   },
   "lesson_content_workflow": {
     "search": "search_lesson_depot returns public metadata only. Popularity is not a correctness guarantee.",
     "single_review": "stage_depot_lesson opens one published pack for human review.",
     "batch_review": "stage_depot_lessons accepts ordered package IDs, preflights dependencies and aggregate capacity, then opens them sequentially. Approving one package never authorizes the next.",
-    "authoring": "Call get_lesson_authoring_guide before authoring. open_lesson_creator can start a new set or load a native lesson as a reversible improvement, including finite sets, rational expressions and equations, interval sets, structured sign charts, escaped formatted code, structured trace tables, and sandboxed pure-function Python tests. Uploaded code blocks are presentation-only; python_program executes only learner code against declarative JSON cases in the restricted subset. validate_lesson_set checks schema and safety before stage_custom_lesson_set opens visible review.",
+    "authoring": "Call get_lesson_authoring_guide before authoring. open_lesson_creator can start a new set or load a native lesson as a reversible improvement, including finite sets, rational expressions and equations, interval sets, structured sign charts, escaped formatted code, structured trace tables, and sandboxed pure-function Python tests. Uploaded code blocks are presentation-only; python_program executes only learner code against bounded declarative JSON cases in a fresh self-hosted disposable runtime. No WebMCP tool executes Python: agent-authored code stays staged until a human installs the package, and every learner run requires the visible human Run button. validate_lesson_set checks schema and safety before stage_custom_lesson_set opens visible review.",
     "publication": "Downloading, installing, Depot publication, GitHub submission, and public community actions remain direct human controls."
   },
   "frontend_surfaces": {
@@ -56,8 +56,9 @@
   },
   "tools": {
     "read": ["get_educator_agent_manifest", "get_lesson_authoring_guide", "get_app_state", "get_curriculum_workspace", "get_curriculum_map", "list_subjects", "search_lesson_depot"],
-    "curriculum": ["create_curriculum", "select_curriculum", "update_curriculum_settings", "set_curriculum_pack_enabled"],
-    "planning": ["set_map_plan_mode", "arrange_map_plan_nodes", "create_map_plan_path", "add_map_plan_annotation"],
+    "curriculum_scope": ["set_curriculum_pack_enabled", "set_curriculum_native_lessons_enabled"],
+    "curriculum": ["create_curriculum", "select_curriculum", "update_curriculum_settings", "set_curriculum_pack_enabled", "set_curriculum_native_lessons_enabled"],
+    "planning": ["set_map_plan_mode", "arrange_map_plan_nodes", "set_map_plan_nodes_hidden", "create_map_plan_path", "add_map_plan_annotation"],
     "content": ["open_lesson_creator", "validate_lesson_set", "stage_custom_lesson_set", "stage_depot_lesson", "stage_depot_lessons"],
     "navigation": ["navigate_learning_app"]
   },

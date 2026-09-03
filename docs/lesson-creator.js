@@ -507,6 +507,25 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
   let draft = restoreDraft(getSnapshot());
 
   const save = () => persist(draft);
+  const isUntouchedStarter = () => draft.mode === "add"
+    && draft.id === "PACK_MY_LESSONS"
+    && draft.name === "My lesson set"
+    && !draft.author
+    && draft.skills?.length === 1
+    && draft.skills[0]?.name === "New lesson"
+    && draft.skills[0]?.problems?.length === 1
+    && draft.skills[0].problems[0]?.prompt === "What should the learner solve?";
+  const adoptActiveSubjectForStarter = (snapshot) => {
+    const subject = snapshot?.activeSubject;
+    if (!subject || !isUntouchedStarter() || draft.subjectMode !== "extend" || draft.subjectId === subject.id) return;
+    draft.subjectId = subject.id;
+    draft.subjectName = subject.name;
+    draft.subjectShortName = subject.shortName;
+    draft.subjectIcon = subject.icon;
+    draft.subjectDescription = subject.description;
+    draft.theme = { ...subject.theme };
+    save();
+  };
   const currentSkill = () => draft.skills[Math.max(0, Math.min(draft.activeSkill, draft.skills.length - 1))];
   const loadNativeLesson = (skillId, { announce = true } = {}) => {
     const snapshot = getSnapshot();
@@ -573,6 +592,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
   };
 
   const render = (snapshot) => {
+    adoptActiveSubjectForStarter(snapshot);
     const skill = currentSkill();
     skill.activeProblem = Math.max(0, Math.min(Number(skill.activeProblem) || 0, skill.problems.length - 1));
     const activeProblem = skill.problems[skill.activeProblem];
