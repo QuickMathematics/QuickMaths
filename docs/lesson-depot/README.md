@@ -1,8 +1,55 @@
 # QuickMaths Lesson Depot
 
-The Lesson Depot is a zero-cost, open-source catalog of declarative QuickMaths lesson sets. Anyone can browse and install without signing in. Submissions use pull requests, while an optional least-privilege GitHub App lets a signed-in user vote with a 👍 reaction and comment on the matching GitHub Discussion from inside QuickMaths.
+The Lesson Depot is a zero-cost, federated marketplace of declarative QuickMaths lesson sets. Authors keep immutable packages in their own public GitHub repositories. QuickMaths combines the official catalog, automatically discovered community registries, and registries a learner subscribes to directly. Browsing and installation require no account; the optional least-privilege GitHub App provides public recommendations, flags, and comments inside the app.
 
-## Package layout
+## Federation model
+
+Each publisher hosts a `quickmaths-registry.json` file using the normal catalog envelope plus a registry identity:
+
+```json
+{
+  "format": "quickmaths.lesson-depot.catalog",
+  "schema_version": "1.0",
+  "registry": {
+    "id": "github-owner/repository-name",
+    "name": "Publisher display name",
+    "namespace": "OWNER",
+    "homepage_url": "https://github.com/github-owner/repository-name"
+  },
+  "packages": [
+    {
+      "id": "PACK_OWNER_TOPIC",
+      "slug": "topic",
+      "version": "1.0.0",
+      "name": "Topic",
+      "description": "A complete curriculum.",
+      "author": "Publisher",
+      "license": "CC BY 4.0",
+      "lesson_url": "https://raw.githubusercontent.com/github-owner/repository-name/40_CHARACTER_COMMIT_SHA/topic/1.0.0/lesson-set.json",
+      "sha256": "64_CHARACTER_LOWERCASE_SHA256",
+      "subject_id": "SUBJECT_TOPIC",
+      "subject_name": "Topic",
+      "subject_theme": {
+        "paperLight": "#fffdf8", "primary": "#153f36", "primaryAlt": "#205c4e",
+        "tint": "#b8d9c9", "highlight": "#dceca9", "accent": "#df755b"
+      },
+      "tags": ["topic"],
+      "skills": 1,
+      "problems": 10,
+      "published_at": "2026-09-03",
+      "updated_at": "2026-09-03"
+    }
+  ]
+}
+```
+
+The registry URL and every lesson URL must be pinned to complete commit SHAs in the same repository. Use a two-commit publication flow: first commit the final lesson file, then commit a registry that points to that immutable lesson commit and its SHA-256 digest. Pin the submitted registry URL to the second commit. `registry.id` must match the GitHub owner and repository in those URLs. Community package IDs use `PACK_NAMESPACE_*`; their authored skill IDs use `CUSTOM_NAMESPACE_*`. This prevents mutable content from inheriting another version's reviews and prevents accidental identity collisions.
+
+To join global discovery, create a QuickMaths Discussion titled `[Registry] Publisher name` through the in-app **Submit a lesson** action and provide the pinned registry URL. An Action treats every file as untrusted data, checks its URL boundary, size, digest, namespace, schema, and complete prerequisite graph, and writes a small static federation index. Valid work appears immediately as **New** without a maintainer merge. Every exact package version receives a public discussion.
+
+Users can also paste a public registry URL under **Settings → Manage lesson sources**. Direct subscriptions appear immediately and remain clearly marked **Subscribed**; they do not need the central discovery index.
+
+## Official package layout
 
 ```text
 docs/lesson-depot/lessons/<slug>/<version>/
@@ -10,7 +57,9 @@ docs/lesson-depot/lessons/<slug>/<version>/
   lesson-set.json
 ```
 
-`metadata.json` must contain `id`, `slug`, `version`, `name`, `author`, `license`, `description`, `tags`, `published_at`, and `updated_at`. Lesson content should use an explicit open content license such as CC BY 4.0. Code in this repository remains MIT licensed.
+This in-repository layout is reserved for first-party, migration, and reproducible-test copies. Community publishers use the federated registry format above instead of copying content into QuickMaths `main`. `metadata.json` must contain `id`, `slug`, `version`, `name`, `author`, `license`, `description`, `tags`, `published_at`, and `updated_at`. Set `distribution` to `federated` when a vendored fixture is published through an external registry; the builder still validates it but omits it from the official catalog. Lesson content should use an explicit open content license such as CC BY 4.0. Code in this repository remains MIT licensed.
+
+The live federation fixture is [`QuickMathematics/QM_Dev_Depot`](https://github.com/QuickMathematics/QM_Dev_Depot). Its registry publishes immutable copies of Geography and Programming from a repository separate from QuickMaths `main`. `node scripts/test_live_federated_depot.mjs` performs an opt-in network test that discovers both, downloads and verifies their exact commits, validates their complete cross-subject graph, and stages them together for sequential human review.
 
 The lesson file must follow `quickmaths.lesson-set` schema 2.0 and pass the same complete validator used by local uploads and WebMCP staging. See the [Agent Lesson Authoring Guide](../CUSTOM_LESSON_SETS.md).
 
@@ -30,19 +79,21 @@ cd docs
 npm test
 ```
 
-The catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. A least-privilege Action creates a matching GitHub Discussion titled `[Lesson] PACK_ID` for each accepted catalog entry, then materializes its 👍 vote and comment totals into `community.json` for anonymous browsing. Connected users fetch the selected live thread only when they open its community panel.
+The official catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. One Action maintains the legacy first-party package threads and `community.json`; the federation Action separately creates a digest-bound `[Lesson] registry/PACK@version#digest` Discussion for every accepted external release and materializes its recommendation, flag, and comment totals into `federation.json`. Connected users fetch the selected live thread only when they open its community panel.
 
 ## Community flow
 
 1. Build and validate in Lesson Studio or with the authoring guide.
-2. Submit one package in a pull request.
-3. Automated checks verify the package and deterministic catalog.
-4. Maintainers review and merge.
-5. A matching GitHub Discussion carries votes, comments, questions, and future update notes.
+2. Publish the lesson and registry in the author's own public GitHub repository.
+3. Pin the lesson URL to its content commit and the registry URL to the later registry commit, then register the feed in a `[Registry]` Discussion.
+4. Automated checks add every valid package to the federation index without a maintainer merge.
+5. Each exact version and digest receives recommendations, flags, comments, questions, and update notes.
+
+Three recommendations with at least a four-to-one recommendation/flag ratio mark a package **Community recommended**. Two serious flags that reach at least half the recommendation count mark it **Contested** and hide it from ordinary search. Contested work is not erased: users can reveal it deliberately in **Manage lesson sources**. Explain flags in comments so authors can correct their work. A corrected release uses a new semantic version, immutable URL, digest, and review thread.
 
 ## In-app community authorization
 
-The Community GitHub App is installed only on `QuickMathematics/QuickMaths` and requests only repository Discussions read/write. The user access token is separate from the optional learner-storage bridge token. QuickMaths keeps it in `sessionStorage` by default, or in `localStorage` only when the user explicitly chooses to remain connected. It is never placed in a lesson file, learner backup, WebMCP response, URL, or Git commit.
+The Community GitHub App is installed only on `QuickMathematics/QuickMaths` and requests only repository Discussions read/write. The user access token is separate from the optional learner-storage bridge token. QuickMaths keeps it in `sessionStorage` by default, or in `localStorage` only when the user explicitly chooses to remain connected. It is never placed in a lesson file, learner backup, WebMCP response, URL, or Git commit. A recommendation uses 👍. A serious correctness, licensing, or safety flag uses 👎 and should be accompanied by an explanatory comment.
 
 The static callback uses the OAuth authorization-code flow with state and PKCE. A free, stateless Cloudflare Worker holds the GitHub App client secret and performs only code exchange and token refresh; it has no database and retains no user token. Comments and 👍 votes are public GitHub actions attributed to the authorizing GitHub account. Disconnecting clears the browser copy, and GitHub authorization can also be revoked from GitHub settings.
 

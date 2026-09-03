@@ -1,0 +1,45 @@
+name: Refresh federated Lesson Depot
+
+on:
+  discussion:
+    types: [created, edited, deleted]
+  discussion_comment:
+    types: [created, edited, deleted]
+  schedule:
+    - cron: "13,43 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  discussions: write
+
+concurrency:
+  group: lesson-depot-index-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate submitted registries and refresh federation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node scripts/sync_federated_depot.mjs docs/lesson-depot
+      - name: Commit changed federation snapshot
+        shell: bash
+        run: |
+          if git diff --quiet -- docs/lesson-depot/federation.json; then
+            echo "Federation snapshot is current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/lesson-depot/federation.json
+          git commit -m "Refresh federated Lesson Depot"
+          git push

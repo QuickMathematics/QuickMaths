@@ -813,7 +813,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "search_lesson_depot",
       title: "Search the QuickMaths Lesson Depot",
-      description: "Search published community-reviewed lessons and clearly labeled roadmap concepts by title, author, subject, or tag. Results contain metadata only—never answer keys; availability says whether a result can be staged.",
+      description: "Search the merged official, federated-community, and directly subscribed Lesson Depot by title, author, subject, or tag. Results contain metadata and provenance/trust signals only—never answer keys; availability says whether a result can be staged.",
       inputSchema: {
         type: "object",
         properties: {
@@ -838,7 +838,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "stage_depot_lesson",
       title: "Stage a Lesson Depot package",
-      description: "Download, hash-check, validate, and stage one published Depot package for visible human review. Concept-preview listings cannot be staged. This cannot install content; the learner must confirm installation in Settings.",
+      description: "Download the exact package from its reported source, hash-check, validate, and stage it for visible human review. Concept-preview listings cannot be staged. This cannot install content; the learner must confirm installation in Settings.",
       inputSchema: {
         type: "object",
         properties: {

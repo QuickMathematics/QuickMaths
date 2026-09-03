@@ -1,0 +1,33 @@
+title: "[Registry] "
+labels: ["lesson registry"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Register a public QuickMaths lesson feed. Packages stay in your repository; an automatic check verifies immutable URLs, SHA-256 hashes, schema, namespaces, and the complete prerequisite graph before discovery.
+  - type: input
+    id: registry-url
+    attributes:
+      label: Registry manifest URL
+      description: Use a public GitHub file URL pinned to the complete 40-character publishing commit SHA.
+      placeholder: https://github.com/your-name/your-lessons/blob/0123456789abcdef0123456789abcdef01234567/quickmaths-registry.json
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Audience and teaching goals
+      description: Explain the intended learners, prerequisites, and what makes this curriculum useful.
+    validations:
+      required: true
+  - type: checkboxes
+    id: declarations
+    attributes:
+      label: Publication declaration
+      options:
+        - label: I have the right to publish this material under its declared open license.
+          required: true
+        - label: I understand that lesson files are public and include expected answers and solution material.
+          required: true
+        - label: I understand that each immutable package version receives community recommendations, flags, and comments.
+          required: true

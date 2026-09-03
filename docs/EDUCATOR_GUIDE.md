@@ -95,7 +95,7 @@ The shell keeps navigation, identity, time, and agent status visible around the 
 | Lessons | Learner-only lesson theory, examples, and applications |
 | Mastery test | Learner-only complete authored assessment |
 | Results | Learner-only grading, reflection, review, and mastery update |
-| Lesson Depot | Public pack catalog, preview, staging, installation, votes, and comments |
+| Lesson Depot | Federated pack discovery, provenance, preview, staging, installation, recommendations, flags, and comments |
 | Lesson Studio | Visual authoring and native-lesson improvement workspace |
 | Settings | Backups, curriculum files, storage, and installed content |
 | Profile badge | Opens Overview; the arrow returns to profile selection |
@@ -258,7 +258,7 @@ The side card lists selected lessons, saved paths, and annotations. Paths and an
 
 ## 7. Lesson Depot
 
-Lesson Depot is the public discovery and installation layer. Catalog browsing does not require an account.
+Lesson Depot is the federated public discovery and installation layer. Authors keep immutable packages in their own public GitHub repositories; QuickMaths quietly merges the official catalog, automatically indexed community registries, and registries subscribed to directly. Browsing does not require an account.
 
 ### Depot header and tabs
 
@@ -270,9 +270,15 @@ Search matches package names, subjects, descriptions, authors, and tags. Availab
 
 ### Package cards
 
-Cards inherit their designated subject palette. A card shows package identity, subject, description, version, author, tags, lesson count, compatibility, and catalog/community signals when available.
+Cards inherit their designated subject palette. A card shows package identity, subject, description, version, author, tags, lesson count, source, and a compact **Official**, **Community recommended**, **New**, **Subscribed**, or **Contested** provenance badge.
 
-Published packages can be previewed. A bounded reader fetches the lesson file, verifies its catalog SHA-256 hash, validates the full schema locally, and summarizes content without exposing answer keys. If WebCrypto is unavailable, QuickMaths stops rather than treating the file as verified.
+Published packages can be previewed. A bounded reader fetches the immutable lesson file, verifies its registry SHA-256 hash, validates the full schema locally, and summarizes content without exposing answer keys. If WebCrypto is unavailable, QuickMaths stops rather than treating the file as verified. Registry failures remain isolated.
+
+### Federation and community moderation
+
+Valid publisher registries appear automatically after a `[Registry]` Discussion and automated immutable-URL, digest, namespace, schema, and graph checks; a maintainer merge is not required. Each exact package version receives a separate public review thread. Recommendations can promote it to **Community recommended**. Serious correctness, licensing, or safety flags can mark it **Contested** and hide it from normal search without erasing its public history.
+
+Under **Settings → Manage lesson sources**, an educator can inspect active registries, add a public GitHub registry directly, remove direct subscriptions, see isolated source errors, or deliberately reveal contested packages. A registry subscription is content discovery only and receives no access to educator or learner state.
 
 ### Installation boundary
 
@@ -282,13 +288,13 @@ WebMCP can search and stage one package or an ordered batch. It cannot install. 
 
 Optional **Connect GitHub** authorizes the QuickMaths Community GitHub App for Discussions on the QuickMaths repository. This is separate from the fine-grained storage token.
 
-Connected humans can upvote with GitHub's public thumbs-up reaction and post public comments inside the app. Those actions use the human's GitHub identity and are intentionally not agent tools.
+Connected humans can upvote with GitHub's public thumbs-up reaction, flag serious correctness, licensing, or safety concerns with thumbs-down, and post public comments inside the app. Those actions use the human's GitHub identity and are intentionally not agent tools.
 
 Popularity is not evidence that a lesson is correct, complete, accessible, or appropriate for a particular learner. Review content before installation.
 
 ### Depot publication
 
-Lesson Studio can download a package and open the human-operated GitHub submission path. Public publication remains a maintainer and contributor workflow; the browser does not silently commit or publish lessons.
+Lesson Studio can download a package and open the human-operated GitHub submission path. The author publishes to their own repository and registers its pinned feed; automated validation replaces the old maintainer-merge queue. The browser never silently commits or publishes lessons.
 
 ## 8. Lesson Studio
 
@@ -444,7 +450,7 @@ The preview shows exactly how answer and work fields, proof obligations, strateg
 - **Validate preview** reports schema, ID, graph, content, and safety issues.
 - **Download JSON** creates a portable source file.
 - **Install into QuickMaths** or **Install improvement** asks for human confirmation and adds the pack to local autosave/backup state.
-- **Publish to Lesson Depot** downloads the source and opens the contribution workflow.
+- **Publish to Lesson Depot** downloads the source, copies the federated publishing prompt, and opens the `[Registry]` Discussion workflow. The author commits final lesson files first, commits the registry with immutable lesson URLs and digests second, and approves the public files before registering the pinned catalog.
 
 ## 9. Learner experience created by a curriculum
 
@@ -695,4 +701,4 @@ Use the app's Agent handoff. Download a full backup or configure private Workspa
 - Bridge guide: https://quickmathematics.github.io/QuickMaths/bridge-guide.html
 - Source and Lesson Depot: https://github.com/QuickMathematics/QuickMaths
 
-QuickMaths educator documentation - app version 27 - September 2026.
+QuickMaths educator documentation - app version 28 - September 2026.

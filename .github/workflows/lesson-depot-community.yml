@@ -20,7 +20,7 @@ permissions:
   discussions: write
 
 concurrency:
-  group: lesson-depot-community
+  group: lesson-depot-index-refresh
   cancel-in-progress: false
 
 jobs:

@@ -6,6 +6,7 @@ import {
   createLessonDepot,
   filterDepotPackages,
   normalizeDepotCatalog,
+  normalizeFederationIndex,
 } from "./lesson-depot.js";
 
 const catalog = {
@@ -65,7 +66,7 @@ test("controller previews before explicit install", async () => {
     importLessonPack: () => ({ ok: true, id: "PACK_BIO", name: "Cell Biology", subjectName: "Biology" }),
   };
   const fetchImpl = async (url) => url.endsWith("catalog.json")
-    ? { ok: true, json: async () => catalog }
+    ? { ok: true, text: async () => JSON.stringify(catalog) }
     : { ok: true, text: async () => raw };
   let confirmations = 0;
   const depot = createLessonDepot({ store, fetchImpl, catalogUrl: "https://example.com/catalog.json", confirmInstall: () => { confirmations += 1; return true; } });
@@ -92,7 +93,7 @@ test("controller refuses to fetch or stage metadata-only concept previews", asyn
   let lessonFetches = 0;
   const store = { snapshot: () => ({ lessonPacks: [] }) };
   const fetchImpl = async (url) => {
-    if (url.endsWith("catalog.json")) return { ok: true, json: async () => previewCatalog };
+    if (url.endsWith("catalog.json")) return { ok: true, text: async () => JSON.stringify(previewCatalog) };
     lessonFetches += 1;
     throw new Error("Concept previews must never be fetched.");
   };
@@ -113,7 +114,7 @@ test("Depot installation fails closed when a declared hash cannot be verified", 
     previewLessonPack: () => ({ id: "PACK_BIO", version: "1.1.0" }),
   };
   const fetchImpl = async (url) => url.endsWith("catalog.json")
-    ? { ok: true, json: async () => hashedCatalog }
+    ? { ok: true, text: async () => JSON.stringify(hashedCatalog) }
     : { ok: true, headers: { get: () => null }, text: async () => "{}" };
   const depot = createLessonDepot({ store, fetchImpl, cryptoImpl: null, catalogUrl: "https://example.com/catalog.json" });
   await depot.load();
@@ -135,7 +136,7 @@ test("controller validates a Depot batch before opening one sequential human rev
     },
   };
   const fetchImpl = async (url) => {
-    if (url.endsWith("catalog.json")) return { ok: true, json: async () => catalog };
+    if (url.endsWith("catalog.json")) return { ok: true, text: async () => JSON.stringify(catalog) };
     const id = url.includes("bio.json") ? "PACK_BIO" : "PACK_MONEY";
     return { ok: true, text: async () => raws[id] };
   };
@@ -157,6 +158,138 @@ test("controller validates a Depot batch before opening one sequential human rev
 
 test("publishing prompt keeps validation and human approval in the flow", () => {
   const prompt = buildDepotSubmissionPrompt({ id: "PACK_BIO", name: "Cell Biology", version: "1.1.0" });
-  assert.match(prompt, /run the Lesson Depot builder and the full test suite/);
-  assert.match(prompt, /ask before publishing/);
+  assert.match(prompt, /federated QuickMaths Lesson Depot/);
+  assert.match(prompt, /SHA-256 digest/);
+  assert.match(prompt, /before creating the discussion/);
+});
+
+test("normalizes a federated registry index with immutable moderation overlays", () => {
+  const commit = "a".repeat(40);
+  const result = normalizeFederationIndex({
+    format: "quickmaths.lesson-depot.federation",
+    schema_version: "1.0",
+    registries: [{
+      id: "alice/learning",
+      name: "Alice Learning",
+      catalog_url: `https://raw.githubusercontent.com/alice/learning/${commit}/quickmaths-registry.json`,
+      status: "new",
+      packages: [{ id: "PACK_ALICE_BIO", version: "1.0.0", sha256: "b".repeat(64), status: "recommended", votes: 8, flags: 1 }],
+    }],
+  }, { federationUrl: "https://raw.githubusercontent.com/QuickMathematics/QuickMaths/main/docs/lesson-depot/federation.json" });
+  assert.equal(result.registries[0].id, "alice/learning");
+  assert.equal(result.registries[0].packages[0].status, "recommended");
+  assert.equal(result.registries[0].packages[0].votes, 8);
+  assert.throws(() => normalizeFederationIndex({
+    format: "quickmaths.lesson-depot.federation",
+    schema_version: "1.0",
+    registries: [{ id: "alice/learning", name: "Alice Learning", catalog_url: "https://raw.githubusercontent.com/alice/learning/main/quickmaths-registry.json" }],
+  }), /complete Git commit SHA/);
+});
+
+test("a pinned registry can reference a different immutable commit in the same repository", () => {
+  const catalogCommit = "a".repeat(40);
+  const lessonCommit = "b".repeat(40);
+  const source = { id: "alice/learning", name: "Alice Learning", trust: "new", packages: [] };
+  const candidate = {
+    format: "quickmaths.lesson-depot.catalog",
+    schema_version: "1.0",
+    registry: { id: "alice/learning", name: "Alice Learning", namespace: "ALICE" },
+    packages: [{ ...catalog.packages[0], id: "PACK_ALICE_BIO", version: "1.0.0", lesson_url: `https://raw.githubusercontent.com/alice/learning/${lessonCommit}/lesson.json`, sha256: "c".repeat(64) }],
+  };
+  const result = normalizeDepotCatalog(candidate, { catalogUrl: `https://raw.githubusercontent.com/alice/learning/${catalogCommit}/registry.json`, source, requireHashes: true });
+  assert.equal(result.packages[0].lessonUrl.includes(lessonCommit), true);
+  assert.throws(() => normalizeDepotCatalog({ ...candidate, packages: [{ ...candidate.packages[0], lesson_url: `https://raw.githubusercontent.com/mallory/other/${lessonCommit}/lesson.json` }] }, { catalogUrl: `https://raw.githubusercontent.com/alice/learning/${catalogCommit}/registry.json`, source, requireHashes: true }), /outside its registry repository/);
+});
+
+test("controller merges official and federated catalogs while isolating a failed source", async () => {
+  const commit = "a".repeat(40);
+  const federationUrl = "https://raw.githubusercontent.com/QuickMathematics/QuickMaths/main/docs/lesson-depot/federation.json";
+  const registryUrl = `https://raw.githubusercontent.com/alice/learning/${commit}/quickmaths-registry.json`;
+  const federation = {
+    format: "quickmaths.lesson-depot.federation",
+    schema_version: "1.0",
+    registries: [
+      { id: "alice/learning", name: "Alice Learning", catalog_url: registryUrl, status: "new", packages: [{ id: "PACK_ALICE_BIO", version: "1.0.0", sha256: "b".repeat(64), status: "recommended", votes: 5 }] },
+      { id: "broken/feed", name: "Broken feed", catalog_url: `https://raw.githubusercontent.com/broken/feed/${commit}/registry.json`, status: "new", packages: [] },
+    ],
+  };
+  const external = {
+    format: "quickmaths.lesson-depot.catalog",
+    schema_version: "1.0",
+    registry: { id: "alice/learning", name: "Alice Learning", namespace: "ALICE" },
+    packages: [{ ...catalog.packages[0], id: "PACK_ALICE_BIO", version: "1.0.0", lesson_path: "lesson.json", sha256: "b".repeat(64) }],
+  };
+  const fetchImpl = async (url) => {
+    if (url === federationUrl) return { ok: true, text: async () => JSON.stringify(federation) };
+    if (url === registryUrl) return { ok: true, text: async () => JSON.stringify(external) };
+    if (url.includes("broken/feed")) return { ok: false, status: 404, text: async () => "" };
+    if (url.includes("catalog.json")) return { ok: true, text: async () => JSON.stringify(catalog) };
+    throw new Error(`Unexpected URL ${url}`);
+  };
+  const depot = createLessonDepot({ store: { snapshot: () => ({ lessonPacks: [] }) }, fetchImpl, catalogUrl: "https://example.com/catalog.json", federationUrl });
+  const state = await depot.load();
+  assert.equal(state.phase, "ready");
+  assert.equal(state.catalog.packages.some((pack) => pack.id === "PACK_ALICE_BIO" && pack.trust === "recommended"), true);
+  assert.equal(state.sources.find((source) => source.id === "broken/feed").available, false);
+  assert.match(state.warnings.join(" "), /Broken feed/);
+});
+
+test("contested packages are hidden by default but can be deliberately revealed", () => {
+  const packs = [{ ...normalizeDepotCatalog(catalog, { baseUrl: "https://example.com/" }).packages[0], trust: "contested" }];
+  assert.equal(filterDepotPackages(packs).length, 0);
+  assert.equal(filterDepotPackages(packs, { showContested: true }).length, 1);
+});
+
+test("direct registry subscriptions persist locally and remain removable", async () => {
+  const commit = "c".repeat(40);
+  const registryUrl = `https://raw.githubusercontent.com/bob/science/${commit}/quickmaths-registry.json`;
+  const external = {
+    format: "quickmaths.lesson-depot.catalog",
+    schema_version: "1.0",
+    registry: { id: "bob/science", name: "Bob Science", namespace: "BOB" },
+    packages: [{ ...catalog.packages[0], id: "PACK_BOB_BIO", version: "1.0.0", lesson_path: "lesson.json", sha256: "d".repeat(64) }],
+  };
+  const values = new Map();
+  const sourceStorage = { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+  const fetchImpl = async (url) => {
+    if (url === registryUrl) return { ok: true, text: async () => JSON.stringify(external) };
+    if (url.includes("catalog.json")) return { ok: true, text: async () => JSON.stringify(catalog) };
+    throw new Error(`Unexpected URL ${url}`);
+  };
+  const depot = createLessonDepot({ store: { snapshot: () => ({ lessonPacks: [] }) }, fetchImpl, sourceStorage, catalogUrl: "https://example.com/catalog.json" });
+  await depot.load();
+  const added = await depot.addRegistry(registryUrl);
+  assert.equal(added.id, "bob/science");
+  assert.equal(depot.snapshot().catalog.packages.some((pack) => pack.id === "PACK_BOB_BIO" && pack.trust === "subscribed"), true);
+  assert.match([...values.values()][0], /bob\/science/);
+  await depot.removeRegistry("bob/science");
+  assert.equal(depot.snapshot().catalog.packages.some((pack) => pack.id === "PACK_BOB_BIO"), false);
+});
+
+test("direct registry subscriptions discard URL secrets and reject credentials", async () => {
+  const commit = "c".repeat(40);
+  const registryUrl = `https://raw.githubusercontent.com/bob/science/${commit}/quickmaths-registry.json`;
+  const external = {
+    format: "quickmaths.lesson-depot.catalog",
+    schema_version: "1.0",
+    registry: { id: "bob/science", name: "Bob Science", namespace: "BOB" },
+    packages: [{ ...catalog.packages[0], id: "PACK_BOB_BIO", version: "1.0.0", lesson_path: "lesson.json", sha256: "d".repeat(64) }],
+  };
+  const values = new Map();
+  const sourceStorage = { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+  const fetchImpl = async (url) => {
+    if (url === registryUrl) return { ok: true, text: async () => JSON.stringify(external) };
+    if (url.includes("catalog.json")) return { ok: true, text: async () => JSON.stringify(catalog) };
+    throw new Error(`Unexpected URL ${url}`);
+  };
+  const depot = createLessonDepot({ store: { snapshot: () => ({ lessonPacks: [] }) }, fetchImpl, sourceStorage, catalogUrl: "https://example.com/catalog.json" });
+
+  await depot.addRegistry(`${registryUrl}?token=secret#section`);
+  const saved = JSON.parse([...values.values()][0]);
+  assert.equal(saved[0].catalogUrl, registryUrl);
+  assert.doesNotMatch(JSON.stringify(saved), /secret|token/);
+  await assert.rejects(
+    () => depot.addRegistry(`https://user:pass@raw.githubusercontent.com/bob/science/${commit}/quickmaths-registry.json`),
+    /Use a public GitHub/,
+  );
 });

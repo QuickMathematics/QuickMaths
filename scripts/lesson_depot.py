@@ -201,6 +201,9 @@ def build_catalog(depot_dir: str | Path, output_dir: str | Path | None = None) -
         version = _text(metadata.get("version"), "version")
         author = _text(metadata.get("author"), "author")
         license_name = _text(metadata.get("license"), "license")
+        distribution = str(metadata.get("distribution", "official")).strip().lower()
+        if distribution not in {"official", "federated"}:
+            raise DepotError("metadata.distribution must be official or federated")
         if not _SLUG.fullmatch(metadata_slug) or metadata_slug != slug:
             raise DepotError(f"metadata.slug must match package slug {slug!r}")
         if not _VERSION.fullmatch(version) or version != path_version:
@@ -261,7 +264,11 @@ def build_catalog(depot_dir: str | Path, output_dir: str | Path | None = None) -
                 "discussion_url": discussion_url,
             },
         }
-        packages.append(entry)
+        # Federated packages remain vendored here only for migrations, offline
+        # regression tests, and reproducible builds. Their public discovery
+        # metadata is owned by the external registry instead of this catalog.
+        if distribution == "official":
+            packages.append(entry)
     packages.extend(_showcase_packages(root))
     slugs_by_id: dict[str, str] = {}
     for package in packages:

@@ -602,19 +602,20 @@ For community lessons, agents can call `search_lesson_depot` to inspect catalog 
 
 ## Publishing to the Lesson Depot
 
-The public Depot uses this repository as its free backend. Lesson files and catalog hashes live in Git, automated checks run in GitHub Actions, pull requests provide moderation history, and GitHub Discussions provide votes and comments. Browsing and installation require no sign-in. To vote or comment inside QuickMaths, a user can authorize the separate least-privilege QuickMaths Community GitHub App; no personal access token is requested, and its user token never enters Workspace Storage checkpoints or backups.
+The public Depot is federated. Authors keep lesson files and a small `quickmaths-registry.json` catalog in their own public GitHub repositories. A machine-readable `[Registry]` Discussion lets an automatic GitHub Action validate and add the feed to global discovery without a maintainer merge. GitHub Discussions provide recommendations, serious-concern flags, comments, and immutable per-version review history. Browsing and installation require no sign-in. To participate inside QuickMaths, a user can authorize the separate least-privilege QuickMaths Community GitHub App; no personal access token is requested, and its user token never enters Workspace Storage checkpoints or backups.
 
-From Lesson Studio, choose **Publish to Lesson Depot** after validation. QuickMaths downloads the author file, copies a detailed Codex publishing prompt when clipboard access is available, and opens the submission form. A direct source contribution uses:
+From Lesson Studio, choose **Publish to Lesson Depot** after validation. QuickMaths downloads the author file, copies a detailed Codex publishing prompt, and opens the registry discussion form. The publishing agent should:
 
-```text
-docs/lesson-depot/lessons/<slug>/<version>/
-  metadata.json
-  lesson-set.json
-```
+1. Create or use the author's own public GitHub repository.
+2. Put the lesson under an immutable versioned path, commit it, and record that content commit SHA.
+3. Generate `quickmaths-registry.json` with `format: quickmaths.lesson-depot.catalog`, schema `1.0`, a `registry` identity, complete package metadata, the lesson URL pinned to its content commit, and SHA-256 digest.
+4. Use a `registry.id` matching `github-owner/repository`, an uppercase 2–24 character namespace, `PACK_NAMESPACE_*` package IDs, and `CUSTOM_NAMESPACE_*` authored skill IDs.
+5. Validate the full lesson and prerequisite graph, commit the registry, then pin the submitted registry URL to that second complete 40-character commit SHA. The lesson and registry commits may differ, but both files must belong to the declared repository.
+6. Create the `[Registry]` Discussion only after showing the human the exact public files and receiving approval.
 
-Declare an open content license such as CC BY 4.0, preserve published IDs, run `python -m scripts.lesson_depot docs/lesson-depot --output docs/lesson-depot`, run `node scripts/validate_lesson_depot.mjs docs/lesson-depot` plus both test suites, and submit the generated catalog changes with the lesson. See [`lesson-depot/README.md`](lesson-depot/README.md) for the complete review flow.
+The registry builder never executes publisher code. Every valid submission appears immediately as **New**. Community support can promote it to **Community recommended**; serious flags can mark it **Contested** and hide it from ordinary search without erasing it. Users may also bypass global discovery by adding a public GitHub registry URL directly under **Settings → Manage lesson sources**.
 
-Catalog metadata and community reactions are untrusted signals. Every installation independently verifies the catalog hash and always runs the local lesson validator before showing the human confirmation. If WebCrypto is unavailable, hash verification fails closed and the installation stops. Bounded readers reject or cancel lesson files above 2 MB before parsing. Public author files contain answer keys and solutions by design; do not paste them into learner tutoring conversations.
+Registry metadata and community reactions are untrusted signals. Every installation independently verifies the package hash and always runs the local lesson validator before showing the human confirmation. Federated registry failures are isolated so one publisher cannot take down the official catalog or other feeds. If WebCrypto is unavailable, hash verification fails closed and installation stops. Bounded readers reject or cancel registries above 500 KB and lesson files above 2 MB before parsing. Public author files contain answer keys and solutions by design; do not paste them into learner tutoring conversations.
 
 Portable curriculum imports compare the complete normalized package content, including prerequisites, theory, questions, expected answers, work rules, and review policy. Reusing only a matching package ID or version is not sufficient. Every enabled external package must be embedded in the curriculum so the same file cannot silently resolve to different locally installed content on another device.
 

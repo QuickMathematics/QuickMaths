@@ -92,12 +92,13 @@ test("OAuth callback rejects mismatched state before contacting the broker", asy
   assert.equal(store.load(), null);
 });
 
-test("authenticated community client loads live votes/comments and writes both actions", async () => {
+test("authenticated community client loads live votes, flags, and comments and writes every action", async () => {
   const calls = [];
   const responses = [
     { data: { viewer: { login: "ada", avatarUrl: "https://avatars.example/ada", url: "https://github.com/ada" }, repository: { id: "R_repo", nameWithOwner: "QuickMathematics/QuickMaths", hasDiscussionsEnabled: true } } },
-    { data: { repository: { discussion: { id: "D_1", number: 1, title: "Estimation Lab", url: "https://github.com/QuickMathematics/QuickMaths/discussions/1", viewerCanReact: true, reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: false, users: { totalCount: 3 } }], comments: { totalCount: 1, nodes: [{ id: "C_1", bodyText: "Useful pack", createdAt: "2026-09-01T10:00:00Z", updatedAt: "2026-09-01T10:00:00Z", url: "https://github.com/comment", author: { login: "bo", avatarUrl: "", url: "https://github.com/bo" } }] } } } } },
+    { data: { repository: { discussion: { id: "D_1", number: 1, title: "Estimation Lab", url: "https://github.com/QuickMathematics/QuickMaths/discussions/1", viewerCanReact: true, reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: false, users: { totalCount: 3 } }, { content: "THUMBS_DOWN", viewerHasReacted: false, users: { totalCount: 1 } }], comments: { totalCount: 1, nodes: [{ id: "C_1", bodyText: "Useful pack", createdAt: "2026-09-01T10:00:00Z", updatedAt: "2026-09-01T10:00:00Z", url: "https://github.com/comment", author: { login: "bo", avatarUrl: "", url: "https://github.com/bo" } }] } } } } },
     { data: { addReaction: { subject: { reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: true, users: { totalCount: 4 } }] } } } },
+    { data: { addReaction: { subject: { reactionGroups: [{ content: "THUMBS_DOWN", viewerHasReacted: true, users: { totalCount: 2 } }] } } } },
     { data: { addDiscussionComment: { comment: { id: "C_2", bodyText: "My note", createdAt: "2026-09-01T11:00:00Z", updatedAt: "2026-09-01T11:00:00Z", url: "https://github.com/comment2", author: { login: "ada", avatarUrl: "", url: "https://github.com/ada" } } } } },
   ];
   const client = createGitHubCommunityClient({
@@ -109,13 +110,17 @@ test("authenticated community client loads live votes/comments and writes both a
   });
   const discussion = await client.loadDiscussion("https://github.com/QuickMathematics/QuickMaths/discussions/1");
   assert.equal(discussion.votes, 3);
+  assert.equal(discussion.flags, 1);
   assert.equal(discussion.comments[0].body, "Useful pack");
   const vote = await client.setVote(discussion.id, true);
   assert.deepEqual(vote, { votes: 4, viewerHasVoted: true });
+  const flag = await client.setFlag(discussion.id, true);
+  assert.deepEqual(flag, { flags: 2, viewerHasFlagged: true });
   const comment = await client.addComment(discussion.id, "My note");
   assert.equal(comment.viewerDidAuthor, true);
   assert.match(calls[2].body.query, /addReaction/);
-  assert.equal(calls[3].body.variables.body, "My note");
+  assert.match(calls[3].body.query, /THUMBS_DOWN/);
+  assert.equal(calls[4].body.variables.body, "My note");
   assert.ok(calls.every((call) => call.options.headers.authorization === "Bearer ghu_access"));
 });
 

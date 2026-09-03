@@ -5,6 +5,7 @@
   "name": "Geography",
   "description": "A rigorous 15-lesson curriculum in spatial inquiry, cartography, Earth systems, population, cities, economies, territory, risk, and regional synthesis.",
   "author": "QuickMaths",
+  "distribution": "federated",
   "license": "CC BY 4.0",
   "tags": ["geography", "cartography", "spatial reasoning", "human geography", "physical geography"],
   "published_at": "2026-09-02",

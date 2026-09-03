@@ -446,44 +446,6 @@
       "version": "0.0.0-preview.1"
     },
     {
-      "author": "QuickMaths",
-      "community": {
-        "comments": 0,
-        "discussion_url": "https://github.com/QuickMathematics/QuickMaths/discussions/2",
-        "votes": 0
-      },
-      "description": "A rigorous 15-lesson curriculum in spatial inquiry, cartography, Earth systems, population, cities, economies, territory, risk, and regional synthesis.",
-      "id": "PACK_GEOGRAPHY",
-      "lesson_path": "lessons/geography/1.0.0/lesson-set.json",
-      "license": "CC BY 4.0",
-      "name": "Geography",
-      "problems": 150,
-      "published_at": "2026-09-02",
-      "schema_version": "2.0",
-      "sha256": "651d9e1fb0fbe3f6502f0947e1d7e159e0f8fd875cde3a0831d0f9cf9d895a8d",
-      "skills": 15,
-      "slug": "geography",
-      "subject_id": "SUBJECT_GEOGRAPHY",
-      "subject_name": "Geography",
-      "subject_theme": {
-        "accent": "#d66b47",
-        "highlight": "#f0d98a",
-        "paperLight": "#fbfdfc",
-        "primary": "#164d58",
-        "primaryAlt": "#237080",
-        "tint": "#afd8d4"
-      },
-      "tags": [
-        "cartography",
-        "geography",
-        "human geography",
-        "physical geography",
-        "spatial reasoning"
-      ],
-      "updated_at": "2026-09-02",
-      "version": "1.0.0"
-    },
-    {
       "author": "QuickMaths Preview",
       "availability": "preview",
       "community": {
@@ -788,47 +750,6 @@
       ],
       "updated_at": "",
       "version": "0.0.0-preview.1"
-    },
-    {
-      "author": "QuickMaths",
-      "community": {
-        "comments": 0,
-        "discussion_url": "https://github.com/QuickMathematics/QuickMaths/discussions/3",
-        "votes": 0
-      },
-      "description": "A rigorous 25-lesson beginner-to-advanced-beginner curriculum in algorithms, Python values and control flow, functions, text and collections, files and exceptions, modules, object-oriented design, algorithmic efficiency, software architecture, and two tested application capstones. This release adds formatted code, structured trace tables, and sandboxed pure-function grading.",
-      "id": "PACK_PROGRAMMING_FUNDAMENTALS",
-      "lesson_path": "lessons/programming-fundamentals-python/1.2.0/lesson-set.json",
-      "license": "CC BY 4.0",
-      "name": "Programming Fundamentals with Python",
-      "problems": 266,
-      "published_at": "2026-09-02",
-      "schema_version": "2.0",
-      "sha256": "cbd4d783e63d3f9be091afae16fd17a7875add279ceca7eede425dd60f711e98",
-      "skills": 25,
-      "slug": "programming-fundamentals-python",
-      "subject_id": "SUBJECT_PROGRAMMING",
-      "subject_name": "Programming",
-      "subject_theme": {
-        "accent": "#d95d6f",
-        "highlight": "#f5df93",
-        "paperLight": "#fbfcff",
-        "primary": "#273b8f",
-        "primaryAlt": "#3d57b2",
-        "tint": "#c8d2f5"
-      },
-      "tags": [
-        "algorithms",
-        "beginner",
-        "code-grading",
-        "computer science",
-        "programming",
-        "python",
-        "sandbox",
-        "trace-tables"
-      ],
-      "updated_at": "2026-09-02",
-      "version": "1.2.0"
     },
     {
       "author": "QuickMaths Preview",

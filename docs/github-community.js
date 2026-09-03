@@ -164,6 +164,9 @@ function normalizeDiscussion(node, viewerLogin = "") {
   const voteReaction = Array.isArray(node?.reactionGroups)
     ? node.reactionGroups.find((group) => group?.content === "THUMBS_UP")
     : null;
+  const flagReaction = Array.isArray(node?.reactionGroups)
+    ? node.reactionGroups.find((group) => group?.content === "THUMBS_DOWN")
+    : null;
   const comments = Array.isArray(node?.comments?.nodes) ? node.comments.nodes : [];
   return {
     id: String(node?.id ?? ""),
@@ -172,6 +175,8 @@ function normalizeDiscussion(node, viewerLogin = "") {
     url: String(node?.url ?? ""),
     votes: Math.max(0, Number(voteReaction?.users?.totalCount) || 0),
     viewerHasVoted: voteReaction?.viewerHasReacted === true,
+    flags: Math.max(0, Number(flagReaction?.users?.totalCount) || 0),
+    viewerHasFlagged: flagReaction?.viewerHasReacted === true,
     commentCount: Math.max(0, Number(node?.comments?.totalCount) || 0),
     comments: comments.map((comment) => ({
       id: String(comment?.id ?? ""),
@@ -332,6 +337,18 @@ export function createGitHubCommunityClient({
     return { votes: Math.max(0, Number(voteReaction?.users?.totalCount) || 0), viewerHasVoted: voteReaction?.viewerHasReacted === true };
   };
 
+  const setFlag = async (discussionId, shouldFlag) => {
+    const id = String(discussionId ?? "");
+    if (!id || id.length > 200) throw new GitHubCommunityError("Discussion ID is invalid.", { code: "invalid_discussion" });
+    const mutation = shouldFlag
+      ? `mutation QuickMathsFlag($id:ID!){addReaction(input:{subjectId:$id,content:THUMBS_DOWN}){subject{reactionGroups{content viewerHasReacted users{totalCount}}}}}`
+      : `mutation QuickMathsRemoveFlag($id:ID!){removeReaction(input:{subjectId:$id,content:THUMBS_DOWN}){subject{reactionGroups{content viewerHasReacted users{totalCount}}}}}`;
+    const data = await graphql(mutation, { id });
+    const subject = shouldFlag ? data?.addReaction?.subject : data?.removeReaction?.subject;
+    const reaction = subject?.reactionGroups?.find((group) => group?.content === "THUMBS_DOWN");
+    return { flags: Math.max(0, Number(reaction?.users?.totalCount) || 0), viewerHasFlagged: reaction?.viewerHasReacted === true };
+  };
+
   const addComment = async (discussionId, body) => {
     const id = String(discussionId ?? "");
     const cleanBody = String(body ?? "").trim();
@@ -347,5 +364,5 @@ export function createGitHubCommunityClient({
   const disconnect = () => { credentialStore.clear(); credential = null; viewer = null; };
   const snapshot = () => ({ configured: true, connected: Boolean(credential), remembered: credential?.remembered === true, viewer: viewer ? { ...viewer } : null });
 
-  return { configured: true, config, snapshot, beginAuthorization, completeAuthorization, connect, loadDiscussion, setVote, addComment, disconnect };
+  return { configured: true, config, snapshot, beginAuthorization, completeAuthorization, connect, loadDiscussion, setVote, setFlag, addComment, disconnect };
 }

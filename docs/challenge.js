@@ -1,14 +1,15 @@
 import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-unified-agent-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-final-handoff-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260903-combined-map-v1";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
+  DEFAULT_DEPOT_FEDERATION,
   DEPOT_DISCUSSIONS_URL,
   DEPOT_REPOSITORY_URL,
   DEPOT_SUBMISSION_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260902-python-v1";
+} from "./lesson-depot.js?v=20260903-federation-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
@@ -19,7 +20,7 @@ import {
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
-} from "./github-community.js?v=20260902-community-vote";
+} from "./github-community.js?v=20260903-federation-v1";
 import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 import { cancelActivePythonGraders, gradePythonProgram, visiblePythonTests } from "./python-grader.js?v=20260903-sandbox-v2";
 import {
@@ -1974,6 +1975,7 @@ function renderEducatorSettings(snapshot) {
     ${renderGitHubBridge(snapshot)}
     <section class="content-card tutor-setup"><div class="card-heading"><div><h2>Agent handoff</h2><p>QuickMaths detects whether this tab can expose WebMCP, keeps migration steps outside the prompt, and starts every role from the unified agent guide.</p></div></div>${agentHandoffMarkup(snapshot, { compact: true })}</section>
     ${renderWorkspaceStorageManager(snapshot)}
+    ${renderDepotSourceManager()}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum exports</h2><p>Public blueprints omit names, email, and supplemental guidance. Private assignments include them with a privacy warning.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download public blueprint</button><button class="button button-outline" data-action="export-private-assignment" ${workspace ? "" : "disabled"}>Download private assignment</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
     <section class="content-card lesson-packs-card"><div class="card-heading"><div><p class="eyebrow">Shared lesson library</p><h2>Installed lesson packs</h2><p>Installed packs are available to Curriculum designer, where each curriculum enables only what it needs.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson file</button></div>${renderStagedLessonReview(snapshot)}<div class="installed-packs">${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : "＋"}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons · ${pack.problemCount} questions</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></div></article>`).join("") : `<div class="empty-state">No additional lesson packs installed. Browse the Depot to assemble a library.</div>`}</div></section>`;
@@ -2003,6 +2005,7 @@ function renderSettings(snapshot) {
     ${snapshot.activeCurriculum ? `<section class="content-card curriculum-guidance-card"><div class="card-heading"><div><p class="eyebrow">Educator-provided agent guidance</p><h2>Visible supplemental guidance</h2><p>This text came from the curriculum file. It is not a privileged instruction channel; platform safety rules and your explicit requests take precedence.</p></div><span class="status-chip rusty">Untrusted curriculum content</span></div><pre>${escapeHtml(snapshot.activeCurriculum.settings.agentInstructions)}</pre></section>` : ""}
     ${renderGitHubBridge(snapshot)}
     ${renderWorkspaceStorageManager(snapshot)}
+    ${renderDepotSourceManager()}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="storage-summary">
       <article><span>Storage</span><strong>${snapshot.storageError ? "Needs backup" : "Autosaving"}</strong><small>${snapshot.storageError ? escapeHtml(snapshot.storageError) : "Browser local storage"}</small></article>
@@ -2063,7 +2066,7 @@ function renderDepotCommunityPanel() {
     content = `<div class="community-connect-copy"><p class="eyebrow">Discussion unavailable</p><h2>GitHub did not return this conversation.</h2><p class="community-error" role="alert">${escapeHtml(communityUi.error)}</p><div><button class="button button-primary" type="button" data-depot-action="community-refresh">Try again</button>${external}</div></div>`;
   } else if (communityUi.discussion) {
     const discussion = communityUi.discussion;
-    content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. Comments are public and Markdown works when viewed on GitHub.</p></div><button class="community-vote-button" type="button" data-depot-action="community-vote" aria-pressed="${discussion.viewerHasVoted}" ${communityUi.busy ? "disabled" : ""}><span>👍</span><strong>${discussion.viewerHasVoted ? "Upvoted" : "Upvote"}</strong><small>${discussion.votes} vote${discussion.votes === 1 ? "" : "s"}</small></button></div><div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, or experience with this lesson…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
+    content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. Recommend useful work, flag serious correctness, licensing, or safety concerns, and explain flags in a public comment.</p></div><div class="community-reaction-actions"><button class="community-vote-button" type="button" data-depot-action="community-vote" aria-pressed="${discussion.viewerHasVoted}" ${communityUi.busy ? "disabled" : ""}><span>👍</span><strong>${discussion.viewerHasVoted ? "Upvoted" : "Upvote"}</strong><small>${discussion.votes} vote${discussion.votes === 1 ? "" : "s"}</small></button><button class="community-flag-button" type="button" data-depot-action="community-flag" aria-pressed="${discussion.viewerHasFlagged}" ${communityUi.busy ? "disabled" : ""}><span>⚑</span><strong>${discussion.viewerHasFlagged ? "Flagged" : "Flag concern"}</strong><small>${discussion.flags} flag${discussion.flags === 1 ? "" : "s"}</small></button></div></div><div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, review, or reason for a flag…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
   }
   return `<aside class="depot-community-panel" id="depot-community-panel"><header><div><span>Community</span><strong>${escapeHtml(pack.name)}</strong></div><button class="quiet-button" type="button" data-depot-action="community-close" aria-label="Close lesson discussion">Close ×</button></header>${content}<footer><span>Community authorization is separate from Workspace Storage.</span>${connection.connected ? `<button class="quiet-button danger-link" type="button" data-depot-action="community-disconnect">Disconnect GitHub</button>` : ""}</footer></aside>`;
 }
@@ -2095,6 +2098,38 @@ async function openDepotCommunity(packId, packVersion) {
   else document.querySelector("#depot-community-panel")?.scrollIntoView({ block: "start", behavior: "smooth" });
 }
 
+function depotTrustLabel(pack) {
+  return ({
+    official: "Official",
+    recommended: "Community recommended",
+    new: "New",
+    subscribed: "Subscribed",
+    contested: "Contested",
+    preview: "Concept",
+  }[pack?.trust] ?? "New");
+}
+
+function renderDepotSourceManager() {
+  const depot = lessonDepot?.snapshot() ?? { sources: [], warnings: [], showContested: false };
+  const sources = depot.sources ?? [];
+  const subscribed = sources.filter((source) => source.subscription);
+  const federated = sources.filter((source) => !source.subscription && source.trust !== "official");
+  return `<details class="content-card depot-source-manager" id="depot-source-manager">
+    <summary><span><span class="eyebrow">Advanced lesson discovery</span><strong>Manage lesson sources</strong><small>${sources.filter((source) => source.available).length} active source${sources.filter((source) => source.available).length === 1 ? "" : "s"} · official, community, and direct subscriptions</small></span><b>Open manager</b></summary>
+    <div class="depot-source-manager-body">
+      <div class="storage-manager-notice"><strong>Federated, locally verified</strong><p>Authors can keep lessons in their own public GitHub repositories. QuickMaths verifies the exact SHA-256 file, validates its complete graph, and still asks before installation.</p></div>
+      <form id="depot-registry-form" class="curriculum-link-form"><label>Public registry file<input name="url" type="url" placeholder="https://github.com/author/repo/blob/commit/quickmaths-registry.json" required></label><button class="button button-secondary" type="submit">Add registry</button></form>
+      <div class="depot-source-list">
+        ${sources.map((source) => `<article class="${source.available ? "" : "is-error"}"><div><strong>${escapeHtml(source.name)}</strong><small>${source.trust === "official" ? "Built-in official catalog" : source.subscription ? "Direct subscription on this device" : `${depotTrustLabel(source)} community registry`} · ${source.packageCount ?? 0} package${source.packageCount === 1 ? "" : "s"}</small>${source.error ? `<p>${escapeHtml(source.error)}</p>` : ""}</div>${source.subscription ? `<button class="quiet-button danger-link" type="button" data-depot-source-action="remove" data-source-id="${escapeHtml(source.id)}">Remove</button>` : ""}</article>`).join("") || `<div class="empty-state">The official catalog will appear after the Depot has loaded.</div>`}
+      </div>
+      <label class="community-remember"><input id="depot-show-contested" type="checkbox" ${depot.showContested ? "checked" : ""}><span><strong>Show community-contested packages</strong><small>They remain hidden from normal search but are never silently erased.</small></span></label>
+      ${depot.warnings?.length ? `<div class="depot-source-warnings"><strong>${depot.warnings.length} source warning${depot.warnings.length === 1 ? "" : "s"}</strong>${depot.warnings.map((warning) => `<p>${escapeHtml(warning)}</p>`).join("")}</div>` : ""}
+      ${federated.length ? `<p class="pack-security-note"><strong>Community federation:</strong> ${federated.length} public registr${federated.length === 1 ? "y is" : "ies are"} being merged automatically.</p>` : ""}
+      ${subscribed.length ? `<p class="pack-security-note">Direct subscriptions are browser preferences and do not grant their authors access to your progress or storage.</p>` : ""}
+    </div>
+  </details>`;
+}
+
 function renderLessonDepot(snapshot) {
   const depot = lessonDepot?.snapshot() ?? { phase: "loading", catalog: null, error: "", query: "", sort: "popular", subject: "all", preview: null, installingId: "" };
   const packages = filterDepotPackages(depot.catalog?.packages ?? [], depot);
@@ -2104,10 +2139,10 @@ function renderLessonDepot(snapshot) {
   const connection = communityConnection();
   elements.view.innerHTML = `
     ${renderLessonHubTabs("depot")}
-    <header class="page-head depot-head"><div><p class="eyebrow">Free · open · community reviewed</p><h1>Lesson Depot</h1><p>Install complete community lesson packs and explore clearly marked concepts for future subjects. Every published download is hash-checked and run through the same local validator before you can install it.</p></div><div class="page-actions">${connection.configured ? `<button class="button ${connection.connected ? "button-secondary" : "button-outline"}" type="button" data-depot-action="community-connect">${connection.connected ? `GitHub · ${escapeHtml(connection.viewer?.login ?? "connected")}` : "Connect GitHub"}</button>` : `<a class="button button-outline" href="${DEPOT_DISCUSSIONS_URL}" target="_blank" rel="noopener">Community ↗</a>`}<a class="button button-primary" href="${DEPOT_SUBMISSION_URL}" target="_blank" rel="noopener">Submit a lesson ↗</a></div></header>
+    <header class="page-head depot-head"><div><p class="eyebrow">Free · open · federated</p><h1>Lesson Depot</h1><p>Install lessons published from independent community repositories alongside the official catalog. Every exact download is hash-checked and run through the same local validator before you can install it.</p></div><div class="page-actions">${connection.configured ? `<button class="button ${connection.connected ? "button-secondary" : "button-outline"}" type="button" data-depot-action="community-connect">${connection.connected ? `GitHub · ${escapeHtml(connection.viewer?.login ?? "connected")}` : "Connect GitHub"}</button>` : `<a class="button button-outline" href="${DEPOT_DISCUSSIONS_URL}" target="_blank" rel="noopener">Community ↗</a>`}<a class="button button-primary" href="${DEPOT_SUBMISSION_URL}" target="_blank" rel="noopener">Submit a lesson ↗</a></div></header>
     ${renderDepotCommunityPanel()}
-    <section class="depot-trust-strip" aria-label="Lesson Depot safety model"><span><b>1</b><strong>Authors submit</strong><small>GitHub pull request</small></span><i>→</i><span><b>2</b><strong>Checks run</strong><small>Schema, graph, hashes</small></span><i>→</i><span><b>3</b><strong>You approve</strong><small>Local install confirmation</small></span><i>→</i><span><b>4</b><strong>Progress saves</strong><small>Normal backup pipeline</small></span></section>
-    ${preview ? `<aside class="depot-preview"><div><p class="eyebrow">Validated preview</p><h2>${escapeHtml(preview.pack.name)}</h2><p>${escapeHtml(preview.pack.description)}</p><div class="depot-preview-facts"><span>${preview.preview.skillCount}<small>Lessons</small></span><span>${preview.preview.problemCount}<small>Questions</small></span><span>${escapeHtml(preview.preview.subjectName)}<small>Subject</small></span><span>${escapeHtml(preview.pack.license)}<small>License</small></span></div></div><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(preview.pack.id)}" data-pack-version="${escapeHtml(preview.pack.version)}">Install this pack</button><button class="quiet-button" data-depot-action="close-preview">Close preview</button></aside>` : ""}
+    <section class="depot-trust-strip" aria-label="Lesson Depot safety model"><span><b>1</b><strong>Authors publish</strong><small>Their own GitHub repository</small></span><i>→</i><span><b>2</b><strong>Community reviews</strong><small>Recommend, flag, discuss</small></span><i>→</i><span><b>3</b><strong>QuickMaths verifies</strong><small>Hash, schema, full graph</small></span><i>→</i><span><b>4</b><strong>You approve</strong><small>Local installation only</small></span></section>
+    ${preview ? `<aside class="depot-preview"><div><p class="eyebrow">Validated preview · ${escapeHtml(depotTrustLabel(preview.pack))}</p><h2>${escapeHtml(preview.pack.name)}</h2><p>${escapeHtml(preview.pack.description)}</p><div class="depot-preview-facts"><span>${preview.preview.skillCount}<small>Lessons</small></span><span>${preview.preview.problemCount}<small>Questions</small></span><span>${escapeHtml(preview.preview.subjectName)}<small>Subject</small></span><span>${escapeHtml(preview.pack.sourceName)}<small>Source</small></span></div></div><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(preview.pack.id)}" data-pack-version="${escapeHtml(preview.pack.version)}">Install this pack</button><button class="quiet-button" data-depot-action="close-preview">Close preview</button></aside>` : ""}
     <section class="depot-toolbar" aria-label="Filter lesson packages">
       <label><span>Search</span><input id="depot-search" type="search" value="${escapeHtml(depot.query)}" placeholder="Percentages, biology, author…"></label>
       <label><span>Subject</span><select id="depot-subject"><option value="all">All subjects</option>${subjects.map(([id, name]) => `<option value="${escapeHtml(id)}" ${depot.subject === id ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}</select></label>
@@ -2116,23 +2151,27 @@ function renderLessonDepot(snapshot) {
     </section>
     ${depot.phase === "loading" ? `<section class="depot-state"><span class="depot-spinner" aria-hidden="true"></span><h2>Opening the catalog…</h2><p>The app itself remains fully local-first.</p></section>` : ""}
     ${depot.phase === "error" ? `<section class="depot-state is-error"><span>!</span><h2>The catalog is unavailable</h2><p>${escapeHtml(depot.error)}</p><button class="button button-primary" data-depot-action="reload">Try again</button></section>` : ""}
-    ${depot.phase === "ready" ? `<section class="depot-results-heading"><div><p class="eyebrow">Catalog</p><h2>${packages.length} package${packages.length === 1 ? "" : "s"}</h2></div><small>${connection.connected ? "Open a package’s community panel for live totals, voting, and comments." : "Catalog totals are cached from GitHub Discussions. Connect GitHub for live in-app voting and comments."}</small></section><section id="lesson-depot" class="depot-grid">${packages.map((pack) => {
+    ${depot.phase === "ready" ? `<section class="depot-results-heading"><div><p class="eyebrow">Catalog</p><h2>${packages.length} package${packages.length === 1 ? "" : "s"}</h2></div><small>${connection.connected ? "Open a package’s community panel for live recommendations, flags, and comments." : "Community totals are cached from GitHub Discussions. Connect GitHub to participate inside the app."}</small></section><section id="lesson-depot" class="depot-grid">${packages.map((pack) => {
       const installed = installedById.get(pack.id);
       const busy = depot.installingId === pack.id;
       const isPreview = pack.availability === "preview";
       const live = communityUi.activePack?.id === pack.id && communityUi.activePack?.version === pack.version ? communityUi.discussion : null;
       const votes = live?.votes ?? pack.votes;
+      const flags = live?.flags ?? pack.flags;
       const comments = live?.commentCount ?? pack.comments;
+      const hasDiscussion = /\/discussions\/\d+$/.test(pack.discussionUrl ?? "");
       const communityControl = isPreview
         ? `<button type="button" class="depot-preview-community" disabled><span>◇</span><b>Discussion opens when published</b></button>`
-        : connection.configured
-          ? `<button type="button" data-depot-action="community-open" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" aria-label="Upvote and discuss ${escapeHtml(pack.name)} inside QuickMaths"><span>👍 ${votes}</span><span>◯ ${comments}</span><b>${connection.connected ? "Join discussion" : "Upvote & discuss"}</b></button>`
-          : `<a href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener" aria-label="Upvote or comment on ${escapeHtml(pack.name)} on GitHub"><span>👍 ${votes}</span><span>◯ ${comments}</span><b>Upvote or comment ↗</b></a>`;
+        : connection.configured && hasDiscussion
+          ? `<button type="button" data-depot-action="community-open" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" aria-label="Recommend, flag, or discuss ${escapeHtml(pack.name)} inside QuickMaths"><span>👍 ${votes}</span><span>⚑ ${flags}</span><span>◯ ${comments}</span><b>${connection.connected ? "Join discussion" : "Review & discuss"}</b></button>`
+          : hasDiscussion
+            ? `<a href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener" aria-label="Recommend, flag, or comment on ${escapeHtml(pack.name)} on GitHub"><span>👍 ${votes}</span><span>⚑ ${flags}</span><span>◯ ${comments}</span><b>Review on GitHub ↗</b></a>`
+            : `<button type="button" disabled><span>◇</span><b>Community review pending</b></button>`;
       const actions = isPreview
         ? `<button class="button button-outline" disabled>Concept preview</button><button class="button button-primary" disabled>Coming soon</button>`
         : `<button class="button button-outline" data-depot-action="preview" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed ? "disabled" : ""}>Preview</button><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" ${installed || busy ? "disabled" : ""}>${installed ? `Installed v${escapeHtml(installed.version)}` : busy ? "Checking…" : "Install"}</button>`;
       const cardTheme = `--depot-paper:${pack.theme.paperLight};--depot-primary:${pack.theme.primary};--depot-primary-alt:${pack.theme.primaryAlt};--depot-tint:${pack.theme.tint};--depot-highlight:${pack.theme.highlight};--depot-accent:${pack.theme.accent}`;
-      return `<article class="depot-card${isPreview ? " is-preview" : ""}" data-depot-pack-id="${escapeHtml(pack.id)}" style="${escapeHtml(cardTheme)}"><div class="depot-card-top"><span class="depot-subject">${escapeHtml(pack.subjectName)}</span><span class="depot-version">${isPreview ? "Concept" : `v${escapeHtml(pack.version)}`}</span></div><h2>${escapeHtml(pack.name)}</h2><p>${escapeHtml(pack.description)}</p><div class="depot-tags">${pack.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div><dl><div><dt>Author</dt><dd>${escapeHtml(pack.author)}</dd></div><div><dt>Contents</dt><dd>${isPreview ? "Not authored yet" : `${pack.skills} lessons · ${pack.problems} questions`}</dd></div><div><dt>${isPreview ? "Status" : "License"}</dt><dd>${escapeHtml(isPreview ? "Roadmap concept" : pack.license)}</dd></div></dl><div class="depot-community">${communityControl}</div><div class="depot-card-actions">${actions}</div></article>`;
+      return `<article class="depot-card${isPreview ? " is-preview" : ""}${pack.trust === "contested" ? " is-contested" : ""}" data-depot-pack-id="${escapeHtml(pack.id)}" style="${escapeHtml(cardTheme)}"><div class="depot-card-top"><span class="depot-subject">${escapeHtml(pack.subjectName)}</span><span class="depot-card-badges"><span class="depot-trust-badge is-${escapeHtml(pack.trust)}">${escapeHtml(depotTrustLabel(pack))}</span><span class="depot-version">${isPreview ? "Concept" : `v${escapeHtml(pack.version)}`}</span></span></div><h2>${escapeHtml(pack.name)}</h2><p>${escapeHtml(pack.description)}</p><div class="depot-tags">${pack.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div><dl><div><dt>Author</dt><dd>${escapeHtml(pack.author)}</dd></div><div><dt>Contents</dt><dd>${isPreview ? "Not authored yet" : `${pack.skills} lessons · ${pack.problems} questions`}</dd></div><div><dt>${isPreview ? "Status" : "Source"}</dt><dd>${escapeHtml(isPreview ? "Roadmap concept" : pack.sourceName)}</dd></div></dl><div class="depot-community">${communityControl}</div><div class="depot-card-actions">${actions}</div></article>`;
     }).join("")}</section>${!packages.length ? `<section class="depot-state"><span>⌕</span><h2>No matching lessons yet</h2><p>Try another search—or publish the lesson you wish existed.</p></section>` : ""}` : ""}
     <section class="depot-contribute"><div><p class="eyebrow">Share what works</p><h2>Create a lesson. Help someone else learn it.</h2><p>Build in Lesson Studio, publish it for community review, or install lessons that other learners and teachers have shared. Every published pack is previewed and checked before it can join your curriculum.</p></div><div><button class="button button-primary" data-route="creator">Open Lesson Studio</button><button class="button button-outline" data-depot-action="copy-publish-prompt">Copy Codex publishing prompt</button><a class="button button-outline" href="${DEPOT_REPOSITORY_URL}/tree/main/docs/lesson-depot" target="_blank" rel="noopener">See how the Depot works ↗</a></div></section>`;
 }
@@ -2754,6 +2793,15 @@ document.addEventListener("click", async (event) => {
     if (lessonStudio.handleAction(creatorAction)) render(store.snapshot());
     return;
   }
+  const depotSourceAction = event.target.closest?.("[data-depot-source-action]");
+  if (depotSourceAction) {
+    event.preventDefault();
+    try {
+      if (depotSourceAction.dataset.depotSourceAction === "remove") await lessonDepot.removeRegistry(depotSourceAction.dataset.sourceId);
+      render(store.snapshot());
+    } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    return;
+  }
   const depotAction = event.target.closest?.("[data-depot-action]");
   if (depotAction && currentSnapshot?.ui.route === "depot") {
     event.preventDefault();
@@ -2779,7 +2827,15 @@ document.addEventListener("click", async (event) => {
         try {
           const vote = await githubCommunity.setVote(communityUi.discussion.id, !communityUi.discussion.viewerHasVoted);
           communityUi.discussion = { ...communityUi.discussion, ...vote };
-          showToast(vote.viewerHasVoted ? "Lesson vote saved on GitHub." : "GitHub vote removed.");
+          showToast(vote.viewerHasVoted ? "Lesson upvote saved on GitHub." : "GitHub upvote removed.");
+        } finally { communityUi.busy = false; rerenderDepotCommunity(); }
+      }
+      if (actionName === "community-flag" && communityUi.discussion && !communityUi.busy) {
+        communityUi.busy = true; rerenderDepotCommunity();
+        try {
+          const flag = await githubCommunity.setFlag(communityUi.discussion.id, !communityUi.discussion.viewerHasFlagged);
+          communityUi.discussion = { ...communityUi.discussion, ...flag };
+          showToast(flag.viewerHasFlagged ? "Concern flagged. Add a comment explaining it." : "GitHub flag removed.");
         } finally { communityUi.busy = false; rerenderDepotCommunity(); }
       }
       if (actionName === "community-disconnect") {
@@ -3018,6 +3074,11 @@ document.addEventListener("click", async (event) => {
 });
 
 document.addEventListener("change", (event) => {
+  if (event.target.id === "depot-show-contested") {
+    lessonDepot.setFilters({ showContested: event.target.checked });
+    if (currentSnapshot?.ui.route === "settings") renderSettings(store.snapshot());
+    return;
+  }
   if (event.target.matches?.("[data-plan-path-color]") && ["map", "curriculum"].includes(currentSnapshot?.ui.route)) {
     try {
       store.updateMapPlanPath(event.target.dataset.planPathColor, { color: event.target.value });
@@ -3150,6 +3211,17 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("submit", (event) => {
+  if (event.target.id === "depot-registry-form") {
+    event.preventDefault();
+    const form = event.target;
+    const submit = form.querySelector('[type="submit"]');
+    if (submit) submit.disabled = true;
+    lessonDepot.addRegistry(new FormData(form).get("url"))
+      .then(() => { form.reset(); render(store.snapshot()); })
+      .catch((error) => showToast(error instanceof Error ? error.message : String(error)))
+      .finally(() => { if (submit?.isConnected) submit.disabled = false; });
+    return;
+  }
   if (event.target.id === "curriculum-url-form") {
     event.preventDefault();
     const submit = event.target.querySelector('[type="submit"]');
@@ -3381,7 +3453,7 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260903-final-handoff-v1").catch(() => null),
+      fetch("./agent-manifest.json?v=20260903-federation-v1").catch(() => null),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
       fetch("./STUDENT_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
       fetch("./EDUCATOR_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
@@ -3402,6 +3474,8 @@ async function boot() {
   store = createQuickMathsStore({ storage: window.localStorage, curriculum, bundledLessonPacks });
   lessonDepot = createLessonDepot({
     store,
+    federationUrl: DEFAULT_DEPOT_FEDERATION,
+    sourceStorage: window.localStorage,
     showToast,
     onChange: () => { if (currentSnapshot?.activeProfile && currentSnapshot.ui.route === "depot") renderLessonDepot(store.snapshot()); },
   });

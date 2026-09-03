@@ -68,6 +68,23 @@ def test_catalog_publishes_only_latest_version_for_a_stable_package(tmp_path):
     assert [(item["slug"], item["version"]) for item in catalog["packages"]] == [("fractions", "1.10.0")]
 
 
+def test_federated_packages_are_validated_but_not_duplicated_in_the_official_catalog(tmp_path):
+    path = _package(tmp_path, distribution="federated")
+    catalog, search = build_catalog(tmp_path)
+    assert catalog["packages"] == []
+    assert search["entries"] == []
+
+    path.write_text("{}", encoding="utf-8")
+    with pytest.raises(DepotError, match="format"):
+        build_catalog(tmp_path)
+
+
+def test_rejects_unknown_package_distribution(tmp_path):
+    _package(tmp_path, distribution="side-channel")
+    with pytest.raises(DepotError, match="metadata.distribution"):
+        build_catalog(tmp_path)
+
+
 def test_trusted_community_overlay_is_materialized_and_url_checked(tmp_path):
     _package(tmp_path)
     community_path = tmp_path / "community.json"

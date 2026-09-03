@@ -26,7 +26,7 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 - Enforced Hard path and guideline-only Open path
 - Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, trace tables, sandboxed Python functions, and review gates
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
-- Public Lesson Depot with optional GitHub Discussion upvotes and comments
+- Federated Lesson Depot that discovers immutable packages from independent GitHub repositories, with optional in-app recommendations, flags, and comments
 - Thirty-one WebMCP tools for visible navigation, tutoring, unified learner/educator guidance, machine-readable product manuals, on-demand lesson-authoring guidance, curriculum design and scoping, mastery-map planning, curriculum inspection, and single or batch human-controlled lesson staging
 - Optional GitHub Bridge for revision-safe mobile/remote-agent checkpoints in a required private writable repository
 
@@ -55,7 +55,7 @@ Open the printed `127.0.0.1` URL in the ChatGPT or Codex in-app browser; an exte
 
 ## Curriculum development
 
-The native Mathematics curriculum is authored in YAML under `content/math/algebra_foundations/`. The deterministic Geography source in `scripts/build_geography_web_curriculum.mjs` emits both the native Mathematics coordinate/geodesy bridge and the installable `PACK_GEOGRAPHY` Lesson Depot package.
+The native Mathematics curriculum is authored in YAML under `content/math/algebra_foundations/`. The deterministic Geography source in `scripts/build_geography_web_curriculum.mjs` emits both the native Mathematics coordinate/geodesy bridge and the reproducible `PACK_GEOGRAPHY` fixture. Geography and Programming are published through the independent [`QuickMathematics/QM_Dev_Depot`](https://github.com/QuickMathematics/QM_Dev_Depot) registry so the production app dogfoods the same federated discovery path as community publishers.
 
 Validate native YAML:
 
@@ -91,7 +91,7 @@ node --test community-worker/src/*.test.js
 
 ## Storage and authorization boundaries
 
-Browser autosave, GitHub Workspace Storage, and Lesson Depot community authorization are three separate systems. Workspace Storage uploads every local learner and educator profile, curriculum, attempt, review, installed pack, plan, and educator guidance to a dedicated private repository. Tokens are entered only in the app, are never committed, require Contents read/write, and should be restricted to that repository. Community authorization cannot read learner state; its public actions are limited to GitHub Discussion reactions and comments.
+Browser autosave, GitHub Workspace Storage, federated lesson discovery, and Lesson Depot community authorization are separate systems. Workspace Storage uploads every local learner and educator profile, curriculum, attempt, review, installed pack, plan, and educator guidance to a dedicated private repository. Tokens are entered only in the app, are never committed, require Contents read/write, and should be restricted to that repository. Public registries cannot read learner state. Community authorization cannot read learner state either; its public actions are limited to GitHub Discussion reactions and comments.
 
 Settings includes a human-only storage manager. Deleting a profile or clearing the complete workspace requires two confirmations; connected clearing deletes the current `learner-state.json` and `agent-state.json` files while preserving the configured connection and stored token, and the interface accurately warns that older Git commits may retain previous checkpoint contents. These destructive operations are not WebMCP tools.
 

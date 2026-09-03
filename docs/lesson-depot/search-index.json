@@ -209,24 +209,6 @@
       "version": "0.0.0-preview.1"
     },
     {
-      "author": "QuickMaths",
-      "description": "A rigorous 15-lesson curriculum in spatial inquiry, cartography, Earth systems, population, cities, economies, territory, risk, and regional synthesis.",
-      "id": "PACK_GEOGRAPHY",
-      "license": "CC BY 4.0",
-      "name": "Geography",
-      "slug": "geography",
-      "subject_name": "Geography",
-      "tags": [
-        "cartography",
-        "geography",
-        "human geography",
-        "physical geography",
-        "spatial reasoning"
-      ],
-      "terms": "geography geography a rigorous 15-lesson curriculum in spatial inquiry, cartography, earth systems, population, cities, economies, territory, risk, and regional synthesis. quickmaths geography cartography geography human geography physical geography spatial reasoning",
-      "version": "1.0.0"
-    },
-    {
       "author": "QuickMaths Preview",
       "description": "A future evidence-based path through rocks, plate tectonics, deep time, resources, and landscape change.",
       "id": "PACK_PREVIEW_GEOLOGY",
@@ -369,27 +351,6 @@
       ],
       "terms": "probability probability a future course moving from sample spaces and conditional probability to simulation and bayesian updating. quickmaths preview statistics bayes probability simulation",
       "version": "0.0.0-preview.1"
-    },
-    {
-      "author": "QuickMaths",
-      "description": "A rigorous 25-lesson beginner-to-advanced-beginner curriculum in algorithms, Python values and control flow, functions, text and collections, files and exceptions, modules, object-oriented design, algorithmic efficiency, software architecture, and two tested application capstones. This release adds formatted code, structured trace tables, and sandboxed pure-function grading.",
-      "id": "PACK_PROGRAMMING_FUNDAMENTALS",
-      "license": "CC BY 4.0",
-      "name": "Programming Fundamentals with Python",
-      "slug": "programming-fundamentals-python",
-      "subject_name": "Programming",
-      "tags": [
-        "algorithms",
-        "beginner",
-        "code-grading",
-        "computer science",
-        "programming",
-        "python",
-        "sandbox",
-        "trace-tables"
-      ],
-      "terms": "programming-fundamentals-python programming fundamentals with python a rigorous 25-lesson beginner-to-advanced-beginner curriculum in algorithms, python values and control flow, functions, text and collections, files and exceptions, modules, object-oriented design, algorithmic efficiency, software architecture, and two tested application capstones. this release adds formatted code, structured trace tables, and sandboxed pure-function grading. quickmaths programming algorithms beginner code-grading computer science programming python sandbox trace-tables",
-      "version": "1.2.0"
     },
     {
       "author": "QuickMaths Preview",

@@ -2,7 +2,7 @@
 
 QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, install Geography or another Depot subject when wanted, inspect every installed subject and cross-curriculum bridge on one combined mastery map, take varied mastery tests, reflect, review past work, and move progress between devices.
 
-The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page. A separate optional Community GitHub App enables in-app public Discussion votes via 👍 reactions and comments. Its stateless OAuth callback worker stores no data and is isolated from learner state and Bridge credentials.
+The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page. A separate optional Community GitHub App enables in-app public Discussion recommendations, serious-concern flags, and comments. Its stateless OAuth callback worker stores no data and is isolated from learner state and Bridge credentials. Lesson discovery itself is federated and anonymous: publishers retain immutable packs in their own public GitHub repositories while a small automatically generated index carries only registry URLs, hashes, provenance, and public moderation totals.
 
 ## Challenge-period delta
 
@@ -16,7 +16,7 @@ QuickMaths existed before the WebMCP Challenge. The official submission period b
 | Human-only navigation and learner workflows | Shared human-agent navigation, tutoring, saved-work inspection, structured reviews, and activity attribution |
 | Local/Drive-oriented persistence in the original application | Browser autosave, portable backups, private-repository full-workspace storage, and a revision-safe remote Agent Bridge |
 | YAML authoring and developer preview utilities | Human Lesson Studio, agent lesson validation/staging, reversible native improvements, and answer-key-safe tutoring boundaries |
-| No WebMCP transport or public curriculum exchange | Three explicit Bridge tools plus the Lesson Depot, safe package staging, and optional in-app community participation |
+| No WebMCP transport or public curriculum exchange | Three explicit Bridge tools plus a federated Lesson Depot, safe package staging, optional in-app community participation, and automatic cross-repository validation |
 
 Challenge-period milestone evidence:
 
@@ -46,7 +46,8 @@ Challenge-period milestone evidence:
 - Validated schema 2.0 lesson-set JSON with Agent Lesson Authoring Guide and full backup integration
 - Responsive desktop, tablet, and mobile navigation
 - Optional GitHub Bridge with debounced learner checkpoints, an agent-only workspace, a credential-free local Git transport for Codex, revision-bound agent responses, conflict protection, and a mobile setup guide
-- Optional in-app GitHub Discussion 👍 votes and comments through a least-privilege GitHub App, state + PKCE, short-lived user tokens, and a stateless free callback worker
+- Federated Lesson Depot discovery from independent public GitHub registries, with immutable commit URLs, SHA-256 identity, publisher namespaces, combined-graph validation, per-source failure isolation, and direct user subscriptions
+- Optional in-app GitHub Discussion 👍 recommendations, 👎 serious-concern flags, and comments through a least-privilege GitHub App, state + PKCE, short-lived user tokens, and a stateless free callback worker
 
 ## WebMCP integration
 
@@ -128,7 +129,9 @@ Important files:
 - `docs/lesson-creator.js` — no-code multi-subject lesson authoring studio
 - `docs/webmcp-tools.js` — WebMCP schemas, validation, registration, and execution
 - `docs/github-sync.js` — GitHub Contents transport, credential separation, revisions, polling, and conflict checks
-- `docs/github-community.js` — least-privilege GitHub App OAuth, credential isolation, live 👍 votes, and comments
+- `docs/github-community.js` — least-privilege GitHub App OAuth, credential isolation, live 👍 recommendations, 👎 serious-concern flags, and comments
+- `docs/lesson-depot.js` and `docs/lesson-depot/federation.json` — isolated multi-registry discovery, provenance/trust presentation, direct subscriptions, and the generated community index
+- `scripts/sync_federated_depot.mjs` — untrusted registry validation, immutable package review-thread creation, and deterministic recommendation/contested moderation snapshots
 - `community-worker/` — stateless OAuth code-exchange and refresh boundary for free deployment
 - `docs/local-git-client.js` — same-origin browser adapter for the credential-free loopback transport
 - `docs/agent-bridge.html` — top-level agent-only workspace with no learner-facing UI
