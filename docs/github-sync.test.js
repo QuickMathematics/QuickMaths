@@ -51,6 +51,13 @@ function fakeGitHub() {
       files.set(path, next);
       return { sha: next.sha, commitSha: `commit-${revision}` };
     },
+    async deleteFile(_config, path, { sha } = {}) {
+      const file = files.get(path);
+      if (!file || file.sha !== sha) throw new GitHubSyncConflictError();
+      files.delete(path);
+      revision += 1;
+      return { deleted: true, commitSha: `commit-${revision}` };
+    },
   };
 }
 
@@ -157,6 +164,7 @@ test("contents client reads and writes Base64 GitHub files", async () => {
     new Response(JSON.stringify({ owner: { login: "octo-user" }, name: "quickmaths-sync", private: true, default_branch: "main", permissions: { push: true } }), { status: 200 }),
     new Response(JSON.stringify({ type: "file", sha: "old-sha", content: btoa(unescape(encodeURIComponent("hello Σ"))) }), { status: 200 }),
     new Response(JSON.stringify({ content: { sha: "new-sha" }, commit: { sha: "commit-sha" } }), { status: 200 }),
+    new Response(JSON.stringify({ content: null, commit: { sha: "delete-commit-sha" } }), { status: 200 }),
   ];
   const client = createGitHubContentsClient({
     fetchImpl: async (url, options = {}) => { calls.push({ url, options }); return responses.shift(); },
@@ -171,6 +179,39 @@ test("contents client reads and writes Base64 GitHub files", async () => {
   assert.equal(decodeURIComponent(escape(atob(requestBody.content))), "next Σ");
   assert.equal(requestBody.sha, "old-sha");
   assert.equal(calls[2].options.headers.Authorization, "Bearer github-token");
+  const deleted = await client.deleteFile(connection(), LEARNER_STATE_PATH, { sha: "new-sha" });
+  assert.deepEqual(deleted, { deleted: true, commitSha: "delete-commit-sha" });
+  const deleteBody = JSON.parse(calls[3].options.body);
+  assert.equal(calls[3].options.method, "DELETE");
+  assert.equal(deleteBody.sha, "new-sha");
+  assert.equal(deleteBody.branch, "main");
+});
+
+test("learner can discard stale agent state and clear both current workspace files", async () => {
+  const github = fakeGitHub();
+  const learnerState = stateHarness("Learner");
+  const agentState = stateHarness("Agent");
+  const learner = controller({ role: "learner", client: github, harness: learnerState });
+  const agent = controller({ role: "agent", client: github, harness: agentState });
+  await learner.connect(connection(), { startPolling: false });
+  await learner.pushNow();
+  await agent.connect(connection("agent"), { startPolling: false });
+  await agent.pullNow();
+  await agent.pushNow();
+  assert.equal(github.files.has(LEARNER_STATE_PATH), true);
+  assert.equal(github.files.has(AGENT_STATE_PATH), true);
+
+  const agentDeletion = await learner.deleteRemoteAgentCheckpoint();
+  assert.deepEqual(agentDeletion, { deleted: true, path: AGENT_STATE_PATH });
+  assert.equal(github.files.has(AGENT_STATE_PATH), false);
+  await agent.pullNow();
+  await agent.pushNow();
+
+  const cleared = await learner.clearRemoteWorkspace();
+  assert.deepEqual(new Set(cleared.deletedPaths), new Set([AGENT_STATE_PATH, LEARNER_STATE_PATH]));
+  assert.equal(github.files.size, 0);
+  assert.equal(learner.snapshot().remoteAvailable, false);
+  assert.equal(learner.snapshot().dirty, false);
 });
 
 test("learner checkpoints are debounced and can be pushed manually", async () => {

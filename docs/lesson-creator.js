@@ -790,5 +790,10 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     } catch (error) { showToast(error instanceof Error ? error.message : String(error)); return false; }
   };
 
-  return { render, handleInput, handleAction, loadRaw, loadNativeLesson, buildPack: () => buildPack(draft) };
+  const clearDraft = () => {
+    draft = blankDraft(getSnapshot());
+    try { localStorage.removeItem(DRAFT_KEY); } catch { /* Workspace clearing remains best effort if browser storage is unavailable. */ }
+  };
+
+  return { render, handleInput, handleAction, loadRaw, loadNativeLesson, clearDraft, buildPack: () => buildPack(draft) };
 }

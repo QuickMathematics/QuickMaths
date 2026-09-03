@@ -91,6 +91,8 @@ node --test community-worker/src/*.test.js
 
 Browser autosave, GitHub Workspace Storage, and Lesson Depot community authorization are three separate systems. Workspace Storage uploads every local learner and educator profile, curriculum, attempt, review, installed pack, plan, and educator guidance to a dedicated private repository. Tokens are entered only in the app, are never committed, require Contents read/write, and should be restricted to that repository. Community authorization cannot read learner state; its public actions are limited to GitHub Discussion reactions and comments.
 
+Settings includes a human-only storage manager. Deleting a profile or clearing the complete workspace requires two confirmations; connected clearing deletes the current `learner-state.json` and `agent-state.json` files, while the interface accurately warns that older Git commits may retain previous checkpoint contents. These destructive operations are not WebMCP tools.
+
 Imported curricula start in a fresh assignment profile unless the curriculum's student name matches the selected learner profile name after whitespace and letter-case normalization. Only that explicit match reuses mastery for matching lesson IDs; the import confirmation and in-app tooltip explain the rule before records are attached.
 
 QuickMaths is MIT licensed.

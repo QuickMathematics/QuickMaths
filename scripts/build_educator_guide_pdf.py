@@ -136,7 +136,7 @@ class EducatorDocTemplate(BaseDocTemplate):
             canvas.drawString(18 * mm, PAGE_H - 9.5 * mm, "QUICKMATHS EDUCATOR GUIDE")
             canvas.setFont("Helvetica", 7.5)
             canvas.setFillColor(MUTED)
-            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 23")
+            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 24")
             canvas.setStrokeColor(LINE)
             canvas.line(18 * mm, 12 * mm, PAGE_W - 18 * mm, 12 * mm)
             canvas.setFont("Helvetica", 7.5)
@@ -272,7 +272,7 @@ def cover_story() -> list:
         Spacer(1, 15 * mm),
         info,
         Spacer(1, 18 * mm),
-        Paragraph("Version 23 / September 2026", styles["CoverKicker"]),
+        Paragraph("Version 24 / September 2026", styles["CoverKicker"]),
         PageBreak(),
     ]
 

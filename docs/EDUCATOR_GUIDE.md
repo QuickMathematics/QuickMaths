@@ -501,6 +501,10 @@ Bridge status distinguishes local browser state, last workspace push, last agent
 
 **Open Agent Bridge** launches the remote-session companion. **Setup guide** opens human instructions. **Disconnect** removes the active connection on this device.
 
+**Manage GitHub storage** opens the shared-workspace deletion manager. Deleting a profile removes its progress, attempts, reviews, drafts, map plan, and every curriculum owned by that educator profile. Any remaining learner profile is detached from a curriculum removed with its owner. When storage is connected, QuickMaths checkpoints the reduced workspace and deletes the stale agent checkpoint.
+
+**Clear all data** removes every browser profile, curriculum, pack, assessment record, review, plan, Lesson Studio draft, local connection, and same-browser Agent Bridge working copy. With Workspace Storage connected, it first deletes `learner-state.json` and `agent-state.json` from the current repository branch. With storage disconnected, remote files are explicitly left untouched. Both profile deletion and complete clearing use two consecutive confirmation dialogs, including the warning that QuickMaths has no undo without a backup. Git commit history may retain older contents even after the current files are deleted.
+
 ### Full educator backup
 
 This JSON includes educator and learner profiles in the browser, curricula, installed packs, maps, plans, attempts, reviews, drafts, settings, and timers. Back up before major imports, content replacement, or device changes.
@@ -527,7 +531,11 @@ WebMCP connects a compatible browser agent to the same store and visible routes 
 
 Use this prompt:
 
-`Visit https://quickmathematics.github.io/QuickMaths/ and call get_educator_agent_manifest through WebMCP. Read the educator manifest, inspect my open curriculum with get_curriculum_workspace, and help me design it while keeping every lesson installation, learner-policy change, and publication step visible and human-approved.`
+The in-app prompt detects the current browser and starts with wording such as:
+
+`This QuickMaths session is already open in Firefox. Use WebMCP with this open QuickMaths tab; do not open a new QuickMaths tab unless I ask.`
+
+It then directs the agent to call `get_educator_agent_manifest`, inspect the open curriculum with `get_curriculum_workspace`, and keep installation, learner-policy, and publication actions visible and human-approved. Referring to the existing tab avoids opening a second origin-local workspace.
 
 The dedicated command returns the educator operating contract and the active policy revision. Full supplemental guidance is labeled as learner-visible, imported, and untrusted. Repeated state calls return only a compact policy ID and revision to avoid re-injecting the same free text.
 
@@ -683,4 +691,4 @@ Use a compatible ChatGPT or Codex browser. Agent Studio will show whether `docum
 - Bridge guide: https://quickmathematics.github.io/QuickMaths/bridge-guide.html
 - Source and Lesson Depot: https://github.com/QuickMathematics/QuickMaths
 
-QuickMaths educator documentation - app version 23 - September 2026.
+QuickMaths educator documentation - app version 24 - September 2026.

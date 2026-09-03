@@ -1320,6 +1320,31 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .bridge-status-grid small { color: var(--muted); font-size: 10px; }
 .bridge-toolbar { margin-bottom: 14px; }
 .danger-link { margin-left: auto; color: var(--coral); }
+.workspace-storage-manager { margin: 24px 0; padding: 0; overflow: hidden; }
+.workspace-storage-manager > summary { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 24px; cursor: pointer; list-style: none; }
+.workspace-storage-manager > summary::-webkit-details-marker { display: none; }
+.workspace-storage-manager > summary > span { display: grid; gap: 4px; }
+.workspace-storage-manager > summary strong { font: 600 clamp(22px,2.6vw,30px)/1.1 var(--font-display); }
+.workspace-storage-manager > summary small { color: var(--muted); font-size: 11px; }
+.workspace-storage-manager > summary > b { flex: 0 0 auto; padding: 10px 14px; color: #fff; background: var(--pine); border-radius: 10px; font-size: 11px; }
+.workspace-storage-manager[open] > summary { border-bottom: 1px solid var(--line); }
+.workspace-storage-manager[open] > summary > b::after { content: " ×"; }
+.workspace-storage-manager-body { display: grid; gap: 26px; padding: 24px; }
+.storage-manager-notice { padding: 16px 18px; border-left: 4px solid var(--coral); border-radius: 12px; background: color-mix(in srgb, var(--coral) 10%, var(--paper-light)); }
+.storage-manager-notice p, .storage-manager-heading p:not(.eyebrow), .storage-clear-zone p:not(.eyebrow) { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.storage-manager-heading, .storage-clear-zone { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.storage-manager-heading h2, .storage-clear-zone h2 { margin: 0; font: 600 24px/1.1 var(--font-display); }
+.storage-manager-heading > span { flex: 0 0 auto; padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 10px; font-weight: 800; }
+.storage-profile-list { display: grid; gap: 9px; margin-top: 16px; }
+.storage-profile-list article { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-light); }
+.storage-profile-list article > div { display: grid; gap: 3px; min-width: 0; }
+.storage-profile-list article strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.storage-profile-list article small { color: var(--muted); font-size: 10px; }
+.storage-profile-avatar { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; color: var(--pine); background: var(--lime); font: 700 18px/1 var(--serif); }
+.storage-clear-zone { align-items: center; padding: 20px; border: 1px solid color-mix(in srgb, var(--coral) 48%, var(--line)); border-radius: 14px; background: color-mix(in srgb, var(--coral) 6%, var(--paper-light)); }
+.danger-button { border-color: color-mix(in srgb, var(--coral) 65%, var(--line)) !important; color: var(--coral) !important; }
+.danger-button-solid { color: #fff !important; background: var(--coral) !important; box-shadow: 0 9px 20px color-mix(in srgb, var(--coral) 22%, transparent); }
+.danger-button:disabled { opacity: .45; cursor: not-allowed; }
 @media (max-width: 900px) {
   .github-repo-fields { grid-template-columns: 1fr 1fr; }
   .github-repo-fields label:last-child { grid-column: 1 / -1; }
@@ -1331,6 +1356,12 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
   .github-repo-fields label:last-child { grid-column: auto; }
   .bridge-connect-actions .button, .bridge-toolbar .button { width: 100%; justify-content: center; }
   .danger-link { margin-left: 0; }
+  .workspace-storage-manager > summary, .workspace-storage-manager-body { padding: 18px; }
+  .workspace-storage-manager > summary, .storage-manager-heading, .storage-clear-zone { align-items: stretch; flex-direction: column; }
+  .workspace-storage-manager > summary > b, .storage-clear-zone .button { width: 100%; text-align: center; }
+  .storage-profile-list article { grid-template-columns: 36px minmax(0,1fr); }
+  .storage-profile-avatar { width: 36px; height: 36px; }
+  .storage-profile-list article .button { grid-column: 1 / -1; width: 100%; justify-content: center; }
 }
 
 /* GitHub community authorization */

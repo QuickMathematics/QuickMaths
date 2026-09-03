@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 23,
+  "app_version": 24,
   "description": "Operating guide for an agent tutoring learners or helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -45,6 +45,7 @@
     "transport": "learner-state.json and agent-state.json in a dedicated private data repository. The checkpoint contains the complete QuickMaths browser workspace, including every local learner and educator profile, curriculum, attempt, review, installed pack, map plan, and supplemental educator guidance. The learner browser uses GitHub's Contents API; the preferred Codex host path serves the same WebMCP workspace over loopback and performs Git operations through the host Git credential manager.",
     "credentials": "The learner browser uses a fine-grained token restricted to the data repository with Contents read/write. The local Codex transport never sends a GitHub token to JavaScript: python -m quickmaths.cli agent-bridge uses the host's existing Git credentials, binds only to 127.0.0.1, and gives the browser a per-process capability. No credential is stored in learning files, backups, cookies, URLs sent to GitHub, WebMCP output, or commits.",
     "setup_recommendation": "At onboarding or a natural pause, offer to guide the human through persistent Workspace Storage. Disclose that it uploads the complete browser workspace, require a private repository and Contents read/write token, and point a returning user to Already have a profile on another device? Never ask them to paste the token into chat or expose it through an agent tool; they must enter it privately in the app form.",
+    "deletion_boundary": "Settings lets the human delete one profile or clear the complete workspace after two confirmations. These destructive controls are intentionally not WebMCP tools. Never activate them for the human. Current GitHub files can be replaced or deleted, but repository history may retain older checkpoint contents.",
     "protocol": [
       "Call sync_from_learner before inspecting progress or making a recommendation.",
       "Make changes only through registered QuickMaths tools.",

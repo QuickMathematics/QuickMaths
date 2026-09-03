@@ -2936,6 +2936,70 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return clone(profile);
   };
 
+  const resetProfileUi = () => {
+    state.activeProfileId = null;
+    state.session = null;
+    state.ui.route = "welcome";
+    state.ui.pendingResults = null;
+    state.ui.activeAttemptId = null;
+    state.ui.mapPlanMode = false;
+    state.ui.mapPlanView = true;
+    state.ui.mapPlanShowHidden = false;
+    state.ui.mapPlanSelection = [];
+    state.ui.selectedMapPlanPathId = null;
+    state.ui.mapPlanComposer = null;
+  };
+
+  const deleteProfile = (profileId) => {
+    const profile = state.profiles.find((item) => item.id === profileId);
+    if (!profile) throw new Error("Profile not found.");
+    const deletedCurriculumIds = new Set(state.curricula
+      .filter((item) => item.ownerProfileId === profile.id)
+      .map((item) => item.id));
+    state.profiles = state.profiles.filter((item) => item.id !== profile.id);
+    state.curricula = state.curricula.filter((item) => !deletedCurriculumIds.has(item.id));
+    for (const remaining of state.profiles) {
+      if (deletedCurriculumIds.has(remaining.curriculumId)) remaining.curriculumId = null;
+      if (deletedCurriculumIds.has(remaining.activeCurriculumId)) remaining.activeCurriculumId = null;
+    }
+    delete state.progress[profile.id];
+    delete state.drafts[profile.id];
+    delete state.mapPlans[profile.id];
+    state.attempts = state.attempts.filter((attempt) => attempt.profileId !== profile.id);
+    for (const attempt of state.attempts) {
+      if (deletedCurriculumIds.has(attempt.curriculumId)) attempt.curriculumId = null;
+    }
+    state.reviews = state.reviews.filter((review) => review.profileId !== profile.id);
+    state.activity = state.activity.filter((item) => item.profileId !== profile.id);
+    visibleSkillCache = null;
+    if (state.activeProfileId === profile.id) resetProfileUi();
+    notify();
+    return {
+      ok: true,
+      profileId: profile.id,
+      displayName: profile.displayName,
+      deletedCurriculumCount: deletedCurriculumIds.size,
+      remainingProfiles: state.profiles.length,
+    };
+  };
+
+  const clearAllData = () => {
+    const removed = {
+      profiles: state.profiles.length,
+      curricula: state.curricula.length,
+      lessonPacks: state.lessonPacks.length,
+      attempts: state.attempts.length,
+      reviews: state.reviews.length,
+    };
+    state = initialState();
+    stagedLessonPacks = [];
+    storageError = null;
+    rebuildCatalog();
+    try { storage?.removeItem?.(LEGACY_STORAGE_KEY); } catch { /* The current empty state still prevents legacy migration. */ }
+    notify();
+    return { ok: true, removed };
+  };
+
   const logout = () => {
     heartbeat(true);
     state.activeProfileId = null;
@@ -4433,6 +4497,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
     createProfile,
     selectProfile,
+    deleteProfile,
+    clearAllData,
     logout,
     navigate,
     startTutorial,

@@ -457,7 +457,11 @@ WebMCP lets a compatible browser agent inspect the same visible QuickMaths state
 
 ### Suggested starting prompt
 
-`Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.`
+The app detects the current browser and builds the copied prompt at runtime. It begins with wording such as:
+
+`This QuickMaths session is already open in Firefox. Use WebMCP with this open QuickMaths tab; do not open a new QuickMaths tab unless I ask.`
+
+It then asks the agent to get the QuickMaths guide summary, inspect app state and progress, and guide the learning experience. Naming the open browser and tab prevents duplicate QuickMaths sessions with separate local state.
 
 The agent should begin with `get_app_state`, `get_progress_summary`, and `get_learning_context` as needed. Repeated calls receive a compact policy ID and revision. Full learner-visible educator guidance is available from `get_agent_guide` when the revision changes or the task requires it.
 
@@ -513,6 +517,10 @@ Enter the token only in the app. It is never included in backups, commits, lesso
 Bridge status shows local dirty state, last workspace push, last agent pull, token storage, and remote availability. **Sync now** publishes the complete browser workspace. **Check agent updates** applies only agent output based on the current learner revision.
 
 Initial-copy and conflict cards require a deliberate choice. QuickMaths refuses stale output and unsynced overwrites instead of guessing which copy matters.
+
+**Manage GitHub storage** opens the deletion manager. A profile deletion removes that profile's progress, attempts, reviews, drafts, map plan, and any educator curriculum it owns. With storage connected, QuickMaths writes the reduced learner workspace and deletes the stale agent checkpoint so it cannot remain as the current remote copy. **Clear all data** resets every local profile, curriculum, lesson pack, attempt, review, plan, Lesson Studio draft, browser connection, and same-browser Agent Bridge working copy; when connected, it also deletes `learner-state.json` and `agent-state.json` from the current repository branch.
+
+Both actions require two separate confirmations: first the full scope and backup warning, then **Are you absolutely sure?** QuickMaths has no undo. Download a JSON backup first. Deleting or replacing a current GitHub file does not erase older commits from repository history; use GitHub's repository-history controls separately if permanent historical erasure is required. If Workspace Storage is disconnected, the manager clearly limits the operation to this browser and leaves remote files untouched.
 
 ### Full backup
 

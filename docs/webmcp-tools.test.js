@@ -50,6 +50,7 @@ function nativeImprovement(store) {
 test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and persistent Agent Studio controls", () => {
   const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
   const js = readFileSync(new URL("./challenge.js", import.meta.url), "utf8");
+  const agentPrompts = readFileSync(new URL("./agent-prompts.js", import.meta.url), "utf8");
   const css = readFileSync(new URL("./challenge.css", import.meta.url), "utf8");
   const community = readFileSync(new URL("./github-community.js", import.meta.url), "utf8");
   const communityCallback = readFileSync(new URL("./community-auth.html", import.meta.url), "utf8");
@@ -92,7 +93,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.welcome-storage-restore \{[^}]*border-radius: 14px;[^}]*background:/);
   assert.match(css, /\.welcome-storage-restore > summary strong \{ font-size: 15px/);
   assert.match(js, /QuickMaths is for learning and practice/);
-  assert.match(js, /get_educator_agent_manifest/);
+  assert.match(agentPrompts, /get_educator_agent_manifest/);
   assert.match(js, /data-action="copy-educator-prompt"/);
   assert.match(js, /data-action="dismiss-educator-welcome"/);
   assert.match(js, /completeEducatorWelcome/);
@@ -101,9 +102,16 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(html, /id="agent-dock" class="agent-dock is-closed"/);
   assert.doesNotMatch(html, /QuickMaths turns \d+ connected lessons across \d+ installed subjects/);
   assert.match(js, /snapshot\.curriculum\.allSkills\.length/);
-  assert.match(js, /Get the QuickMaths agent guide summary/);
+  assert.match(agentPrompts, /Get the QuickMaths agent guide summary/);
+  assert.match(agentPrompts, /Use WebMCP with this open QuickMaths tab/);
+  assert.match(agentPrompts, /do not open a new QuickMaths tab unless I ask/);
   assert.match(js, /visual: "depot"/);
   assert.match(js, /GitHub Bridge/);
+  assert.match(js, /Manage GitHub storage/);
+  assert.match(js, /confirmPermanentDeletion/);
+  assert.match(js, /Are you absolutely sure/);
+  assert.match(js, /clearRemoteWorkspace/);
+  assert.match(css, /\.workspace-storage-manager/);
   assert.match(css, /\.tour-depot-preview/);
   assert.match(js, /Subject selector/);
   assert.match(js, /Changes the visible curriculum, mastery map, and color theme/);
@@ -267,7 +275,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 23);
+  assert.equal(summary.guide.app_version, 24);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
   assert.equal(summary.guide.tools.length, 31);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);

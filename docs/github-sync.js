@@ -244,7 +244,25 @@ export function createGitHubContentsClient({ fetchImpl = globalThis.fetch, apiBa
     return { sha: nextSha, commitSha: payload?.commit?.sha ?? null };
   };
 
-  return { verify, readFile, writeFile };
+  const deleteFile = async (candidate, path, { sha, message = null } = {}) => {
+    const config = normalizeGitHubSyncConfig(candidate);
+    if (typeof sha !== "string" || !sha.trim()) {
+      throw new GitHubSyncError(`Cannot delete ${path} without its current revision.`, { code: "missing_file_revision" });
+    }
+    const response = await request(contentsUrl(config, path), {
+      method: "DELETE",
+      headers: { ...apiHeaders(config.token), "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: message || `QuickMaths Bridge: delete ${path}`,
+        sha,
+        branch: config.branch,
+      }),
+    }, "deleting bridge state");
+    const payload = await response.json();
+    return { deleted: true, commitSha: payload?.commit?.sha ?? null };
+  };
+
+  return { verify, readFile, writeFile, deleteFile };
 }
 
 function parseStateJson(stateJson) {
@@ -611,12 +629,59 @@ export function createGitHubSyncController({
     return { learner, agent: null };
   }));
 
-  const disconnect = () => {
+  const pauseRemoteActivity = () => {
     stopped = true;
     if (debounceTimer) clearTimer(debounceTimer);
     if (pollTimer) clearTimer(pollTimer);
     debounceTimer = null;
     pollTimer = null;
+  };
+
+  const deleteRemoteAgentCheckpoint = () => runSerial(() => withPhase("deleting", async () => {
+    if (role !== "learner") throw new GitHubSyncError("Only the learner workspace can discard an agent checkpoint.", { code: "wrong_role" });
+    const current = requireConfig();
+    requireWritablePrivateRepository(await client.verify(current));
+    const remote = await readChannel("agent");
+    if (remote.exists) {
+      if (typeof client.deleteFile !== "function") throw new GitHubSyncError("This storage connection cannot delete files.", { code: "delete_unavailable" });
+      await client.deleteFile(current, AGENT_STATE_PATH, {
+        sha: remote.sha,
+        message: "QuickMaths Workspace Storage: discard stale agent checkpoint",
+      });
+    }
+    agentSha = null;
+    persistMetadata();
+    update({ phase: "synced", error: null, conflict: null, remoteAvailable: learnerSha != null });
+    return { deleted: remote.exists, path: AGENT_STATE_PATH };
+  }));
+
+  const clearRemoteWorkspace = () => runSerial(() => withPhase("deleting", async () => {
+    if (role !== "learner") throw new GitHubSyncError("Only the learner workspace can clear Workspace Storage.", { code: "wrong_role" });
+    pauseRemoteActivity();
+    const current = requireConfig();
+    requireWritablePrivateRepository(await client.verify(current));
+    if (typeof client.deleteFile !== "function") throw new GitHubSyncError("This storage connection cannot delete files.", { code: "delete_unavailable" });
+    const deletedPaths = [];
+    // Delete the agent copy first because it can contain an older complete
+    // workspace. A retry is safe if either file changes between reads.
+    for (const [channel, path] of [["agent", AGENT_STATE_PATH], ["learner", LEARNER_STATE_PATH]]) {
+      const remote = await readChannel(channel);
+      if (!remote.exists) continue;
+      await client.deleteFile(current, path, {
+        sha: remote.sha,
+        message: `QuickMaths Workspace Storage: clear ${path}`,
+      });
+      deletedPaths.push(path);
+    }
+    learnerSha = null;
+    agentSha = null;
+    persistMetadata();
+    update({ phase: "cleared", dirty: false, remoteAvailable: false, error: null, conflict: null });
+    return { deletedPaths };
+  }));
+
+  const disconnect = () => {
+    pauseRemoteActivity();
     credentialStore.clear({ role });
     config = null;
     learnerSha = null;
@@ -654,6 +719,8 @@ export function createGitHubSyncController({
     pullNow,
     restoreLearner,
     inspectRemote,
+    deleteRemoteAgentCheckpoint,
+    clearRemoteWorkspace,
     schedulePush,
     snapshot: () => statusClone(status),
     subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },

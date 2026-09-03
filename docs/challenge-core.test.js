@@ -653,6 +653,48 @@ test("profile creation limits fail before ephemeral state can be created", () =>
   assert.equal(store.snapshot().profiles.length, 30);
 });
 
+test("profile deletion removes every profile-owned record and educator curriculum", () => {
+  const { store } = harness();
+  const learner = store.createProfile("Delete Learner", { demo: true });
+  const educator = store.createProfile("Delete Educator", { role: "educator" });
+  const educatorCurriculumId = store.snapshot().activeCurriculum.id;
+  const kept = store.createProfile("Keep Learner", { curriculumId: educatorCurriculumId });
+
+  const learnerDeletion = store.deleteProfile(learner.id);
+  assert.equal(learnerDeletion.remainingProfiles, 2);
+  let persisted = JSON.parse(store.exportSyncState());
+  assert.equal(persisted.profiles.some((profile) => profile.id === learner.id), false);
+  assert.equal(persisted.progress[learner.id], undefined);
+  assert.equal(persisted.drafts[learner.id], undefined);
+  assert.equal(persisted.mapPlans[learner.id], undefined);
+  assert.equal(persisted.attempts.some((attempt) => attempt.profileId === learner.id), false);
+  assert.equal(persisted.activity.some((item) => item.profileId === learner.id), false);
+
+  const educatorDeletion = store.deleteProfile(educator.id);
+  assert.equal(educatorDeletion.deletedCurriculumCount, 1);
+  persisted = JSON.parse(store.exportSyncState());
+  assert.equal(persisted.curricula.some((item) => item.id === educatorCurriculumId), false);
+  assert.equal(persisted.profiles.find((profile) => profile.id === kept.id).curriculumId, null);
+  assert.equal(store.snapshot().activeProfile.id, kept.id);
+});
+
+test("clearing all data resets the persisted workspace and returns to welcome", () => {
+  const { store, storage } = harness();
+  store.createProfile("Clear Everything", { demo: true });
+  store.importLessonPack(geographyLessonSet);
+  const removed = store.clearAllData();
+  assert.deepEqual(removed.removed, { profiles: 1, curricula: 0, lessonPacks: 1, attempts: 1, reviews: 0 });
+  const snapshot = store.snapshot();
+  assert.equal(snapshot.activeProfile, null);
+  assert.equal(snapshot.profiles.length, 0);
+  assert.equal(snapshot.lessonPacks.length, 0);
+  assert.equal(snapshot.ui.route, "welcome");
+  const persisted = JSON.parse(storage.value(STORAGE_KEY));
+  assert.equal(persisted.version, APP_VERSION);
+  assert.deepEqual(persisted.profiles, []);
+  assert.deepEqual(persisted.lessonPacks, []);
+});
+
 test("selecting a mastery-map node updates both the detail card and routed skill", () => {
   const { store } = harness();
   store.createProfile("Map Learner");

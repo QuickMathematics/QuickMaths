@@ -1,6 +1,6 @@
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-plan-free-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-plan-free-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260903-studio-v2";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-storage-manager-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-storage-manager-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260903-storage-manager-v1";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
@@ -13,13 +13,14 @@ import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260902-python-v1";
+} from "./github-sync.js?v=20260903-storage-manager-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
 } from "./github-community.js?v=20260902-community-vote";
 import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 import { cancelActivePythonGraders, gradePythonProgram, visiblePythonTests } from "./python-grader.js?v=20260903-sandbox-v2";
+import { buildEducatorAgentPrompt, buildLearnerAgentPrompt } from "./agent-prompts.js?v=20260903-storage-manager-v1";
 
 const MAX_CURRICULUM_FILE_BYTES = 10_000_000;
 const MAX_LESSON_FILE_BYTES = 2_000_000;
@@ -88,9 +89,9 @@ let legacyGeographyMigrationPromise = null;
 const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
 const runningPythonQuestionIds = new Set();
 
-const AGENT_STARTER_PROMPT = "Get the QuickMaths agent guide summary, check my app state and progress, then guide me through the learning experience.";
+const AGENT_STARTER_PROMPT = buildLearnerAgentPrompt();
 const EDUCATOR_GUIDE_URL = "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf";
-const EDUCATOR_STARTER_PROMPT = "Visit https://quickmathematics.github.io/QuickMaths/ and call get_educator_agent_manifest through WebMCP. Read the educator manifest, inspect my open curriculum with get_curriculum_workspace, and help me design it while keeping every lesson installation, learner-policy change, and publication step visible and human-approved.";
+const EDUCATOR_STARTER_PROMPT = buildEducatorAgentPrompt();
 const MAP_ZOOM_MIN = 0.1;
 const MAP_ZOOM_MAX = 1.6;
 const MAP_ZOOM_STEP = 0.1;
@@ -1553,7 +1554,7 @@ function bridgePhaseLabel(status) {
   if (bridgeNeedsChoice) return "Needs your choice";
   if (status.phase === "conflict") return "Sync paused";
   if (status.error) return "Connection problem";
-  if (["connecting", "checking", "pulling", "pushing"].includes(status.phase)) return `${status.phase[0].toUpperCase()}${status.phase.slice(1)}…`;
+  if (["connecting", "checking", "pulling", "pushing", "deleting"].includes(status.phase)) return `${status.phase[0].toUpperCase()}${status.phase.slice(1)}…`;
   if (status.connected && status.dirty) return "Waiting to sync";
   if (status.connected) return "Connected";
   return "Not connected";
@@ -1652,9 +1653,28 @@ function renderGitHubBridge(snapshot) {
         <article><span>Last agent pull</span><strong>${status.lastPulledAt ? escapeHtml(formatDate(status.lastPulledAt)) : "Waiting"}</strong><small>${status.remoteAvailable ? "Remote files detected" : "No agent checkpoint yet"}</small></article>
         <article><span>Token storage</span><strong>${saved?.rememberToken ? "Remembered here" : "This tab session"}</strong><small>Never committed</small></article>
       </div>
-      <div class="bridge-toolbar"><button class="button button-primary" data-action="bridge-push" ${bridgeNeedsChoice ? "disabled" : ""}>Sync now</button><button class="button button-outline" data-action="bridge-pull-agent" ${bridgeNeedsChoice ? "disabled" : ""}>Check agent updates</button><a class="button button-outline" href="./agent-bridge.html" target="_blank" rel="noopener">Open Agent Bridge ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a><button class="quiet-button danger-link" data-action="bridge-disconnect">Disconnect</button></div>
+      <div class="bridge-toolbar"><button class="button button-primary" data-action="bridge-push" ${bridgeNeedsChoice ? "disabled" : ""}>Sync now</button><button class="button button-outline" data-action="bridge-pull-agent" ${bridgeNeedsChoice ? "disabled" : ""}>Check agent updates</button><button class="button button-outline" data-action="manage-workspace-storage">Manage GitHub storage</button><a class="button button-outline" href="./agent-bridge.html" target="_blank" rel="noopener">Open Agent Bridge ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a><button class="quiet-button danger-link" data-action="bridge-disconnect">Disconnect</button></div>
       <p class="bridge-form-note"><strong>Remote-session flow:</strong> keep the Agent Bridge open in the paired computer’s Codex browser, then start or guide that task from ChatGPT Remote on your phone.</p>
     </section>`;
+}
+
+function renderWorkspaceStorageManager(snapshot) {
+  const connected = githubSyncSnapshot.connected;
+  const repository = connected && githubSyncSnapshot.config
+    ? `${githubSyncSnapshot.config.owner}/${githubSyncSnapshot.config.repo}`
+    : null;
+  const deletionDisabled = bridgeNeedsChoice ? "disabled" : "";
+  return `<details class="content-card workspace-storage-manager" id="workspace-storage-manager">
+    <summary><span><span class="eyebrow">Privacy & deletion</span><strong>${connected ? "Manage GitHub storage" : "Manage browser data"}</strong><small>${connected ? `Current checkpoint: ${escapeHtml(repository)}` : "Connect Workspace Storage above to remove its current GitHub files too."}</small></span><b>Open manager</b></summary>
+    <div class="workspace-storage-manager-body">
+      <div class="storage-manager-notice"><strong>QuickMaths has no undo for deletion.</strong><p>Download a full JSON backup first if you may need this work again. GitHub repository history can retain older checkpoint contents even after current files are replaced or deleted.</p></div>
+      <section aria-labelledby="stored-profiles-title"><div class="storage-manager-heading"><div><p class="eyebrow">Stored profiles</p><h2 id="stored-profiles-title">Delete one profile</h2><p>Deletes its progress, attempts, reviews, drafts, map plan, and any curriculum it owns. When GitHub is connected, QuickMaths replaces the current learner checkpoint and discards the stale agent checkpoint.</p></div><span>${snapshot.profiles.length} total</span></div>
+        <div class="storage-profile-list">${snapshot.profiles.map((profile) => `<article><span class="storage-profile-avatar" aria-hidden="true">${escapeHtml(profile.displayName.slice(0, 1).toUpperCase())}</span><div><strong>${escapeHtml(profile.displayName)}</strong><small>${profile.role === "educator" ? "Educator" : "Learner"}${profile.id === snapshot.activeProfile.id ? " · current profile" : ""}</small></div><button class="button button-outline danger-button" type="button" data-action="delete-stored-profile" data-profile-id="${escapeHtml(profile.id)}" ${deletionDisabled}>Delete profile</button></article>`).join("")}</div>
+      </section>
+      <section class="storage-clear-zone" aria-labelledby="clear-workspace-title"><div><p class="eyebrow">Danger zone</p><h2 id="clear-workspace-title">Clear all QuickMaths data</h2><p>Resets every profile, curriculum, lesson pack, test, review, plan, local draft, and connection on this browser.${connected ? " It also deletes learner-state.json and agent-state.json from the current GitHub branch." : " No GitHub files can be removed while Workspace Storage is disconnected."}</p></div><button class="button danger-button danger-button-solid" type="button" data-action="clear-all-workspace-data" ${deletionDisabled}>Clear all data</button></section>
+      ${bridgeNeedsChoice ? `<p class="form-message" role="alert">Resolve the GitHub checkpoint choice above before deleting synchronized data.</p>` : ""}
+    </div>
+  </details>`;
 }
 
 function renderStagedLessonReview(snapshot) {
@@ -1680,6 +1700,7 @@ function renderEducatorSettings(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace & data</p><h1>Settings</h1><p>Manage portable backups, GitHub storage, curriculum files, and installed lesson sources.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Educator guide ↗</a><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
     ${renderGitHubBridge(snapshot)}
+    ${renderWorkspaceStorageManager(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum exports</h2><p>Public blueprints omit names, email, and supplemental guidance. Private assignments include them with a privacy warning.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download public blueprint</button><button class="button button-outline" data-action="export-private-assignment" ${workspace ? "" : "disabled"}>Download private assignment</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
     <section class="content-card lesson-packs-card"><div class="card-heading"><div><p class="eyebrow">Shared lesson library</p><h2>Installed lesson packs</h2><p>Installed packs are available to Curriculum designer, where each curriculum enables only what it needs.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson file</button></div>${renderStagedLessonReview(snapshot)}<div class="installed-packs">${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : "＋"}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons · ${pack.problemCount} questions</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></div></article>`).join("") : `<div class="empty-state">No additional lesson packs installed. Browse the Depot to assemble a library.</div>`}</div></section>`;
@@ -1708,6 +1729,7 @@ function renderSettings(snapshot) {
     <section class="content-card learner-curriculum-card"><div class="card-heading"><div><p class="eyebrow">Educator curriculum</p><h2>${snapshot.activeCurriculum ? escapeHtml(snapshot.activeCurriculum.name) : "Load a curriculum"} <button class="studio-help" type="button" data-studio-help aria-expanded="false" aria-label="How curriculum progress is separated" data-tooltip="A loaded curriculum starts in a separate blank assignment profile. Existing mastery is reused only when the curriculum's student name matches the selected learner profile name.">?</button></h2><p>${snapshot.activeCurriculum ? "This profile follows the curriculum’s enabled packs, canonical map, learning path, and visible educator-provided guidance." : "Load a portable educator curriculum. QuickMaths protects unrelated progress by default."}</p></div><button class="button button-outline" type="button" data-action="import-curriculum">Choose curriculum file</button></div><form id="curriculum-url-form" class="curriculum-link-form"><label>Public GitHub blueprint link<input name="url" type="url" placeholder="https://github.com/…/blob/…/curriculum.json" required></label><button class="button button-secondary" type="submit">Load from GitHub</button></form></section>
     ${snapshot.activeCurriculum ? `<section class="content-card curriculum-guidance-card"><div class="card-heading"><div><p class="eyebrow">Educator-provided agent guidance</p><h2>Visible supplemental guidance</h2><p>This text came from the curriculum file. It is not a privileged instruction channel; platform safety rules and your explicit requests take precedence.</p></div><span class="status-chip rusty">Untrusted curriculum content</span></div><pre>${escapeHtml(snapshot.activeCurriculum.settings.agentInstructions)}</pre></section>` : ""}
     ${renderGitHubBridge(snapshot)}
+    ${renderWorkspaceStorageManager(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="storage-summary">
       <article><span>Storage</span><strong>${snapshot.storageError ? "Needs backup" : "Autosaving"}</strong><small>${snapshot.storageError ? escapeHtml(snapshot.storageError) : "Browser local storage"}</small></article>
@@ -2086,6 +2108,75 @@ async function bridgeAction(action) {
   }
 }
 
+function confirmPermanentDeletion(firstMessage, secondMessage) {
+  if (!window.confirm(firstMessage)) return false;
+  return window.confirm(secondMessage);
+}
+
+function clearAuxiliaryBrowserData() {
+  githubCredentials?.clear?.({ role: "agent" });
+  for (const [storage, keys] of [
+    [window.localStorage, [
+      "quickmaths.agent-bridge.quickmaths.web.v2",
+      "quickmaths.agent-bridge.quickmaths.webmcp.challenge.v1",
+      "quickmaths.local-git.meta.agent.v1",
+    ]],
+    [window.sessionStorage, [
+      "quickmaths.local-git.capability.v1",
+      "quickmaths.github-community.oauth.v1",
+    ]],
+  ]) {
+    for (const key of keys) {
+      try { storage.removeItem(key); } catch { /* Exact QuickMaths auxiliary keys only; continue best effort. */ }
+    }
+  }
+}
+
+async function deleteStoredProfile(profileId) {
+  const profile = store.snapshot().profiles.find((item) => item.id === profileId);
+  if (!profile) throw new Error("Profile not found.");
+  const connected = githubSyncSnapshot.connected;
+  const ownedCurriculumWarning = profile.role === "educator" ? ", plus every curriculum it owns" : "";
+  const first = `Delete the ${profile.role} profile “${profile.displayName}” and all of its progress, tests, reviews, drafts, and map plans${ownedCurriculumWarning}?\n\nThis is not reversible in QuickMaths unless you made a backup.${connected ? " The current GitHub learner checkpoint will be replaced and the stale agent checkpoint deleted. Repository history may still retain older copies." : " Workspace Storage is disconnected, so this removes browser data only."}`;
+  if (!confirmPermanentDeletion(first, `Are you absolutely sure you want to permanently delete “${profile.displayName}”?`)) return;
+  const result = store.deleteProfile(profile.id);
+  if (connected) {
+    try {
+      await githubSync.pushNow();
+      await githubSync.deleteRemoteAgentCheckpoint();
+    } catch (error) {
+      showToast(`Profile deleted from this browser, but GitHub cleanup needs attention: ${error instanceof Error ? error.message : String(error)}`);
+      return;
+    }
+  }
+  showToast(`${result.displayName} deleted${connected ? " from this browser and the current GitHub checkpoint" : " from this browser"}.`);
+}
+
+async function clearAllWorkspaceData() {
+  const connected = githubSyncSnapshot.connected;
+  const repository = connected && githubSyncSnapshot.config ? `${githubSyncSnapshot.config.owner}/${githubSyncSnapshot.config.repo}` : null;
+  const first = `Clear every QuickMaths profile, curriculum, lesson pack, attempt, review, plan, and local draft from this browser${connected ? `, and delete learner-state.json and agent-state.json from ${repository}` : ""}?\n\nThis is not reversible in QuickMaths unless you made a backup.${connected ? " GitHub commit history may still retain older copies." : " Workspace Storage is disconnected, so remote files will not be changed."}`;
+  if (!confirmPermanentDeletion(first, "Are you absolutely sure you want to permanently clear all QuickMaths data?")) return;
+  if (connected) await githubSync.clearRemoteWorkspace();
+  cancelActivePythonGraders();
+  lessonStudio?.clearDraft?.();
+  store.clearAllData();
+  githubCommunity?.disconnect?.();
+  clearAuxiliaryBrowserData();
+  githubSync?.disconnect?.();
+  bridgeNeedsChoice = false;
+  bridgeFormDraft = null;
+  pendingLandingCurriculumId = null;
+  welcomeStorageOpen = false;
+  communityUi.phase = "idle";
+  communityUi.activePack = null;
+  communityUi.discussion = null;
+  communityUi.commentDraft = "";
+  communityUi.error = "";
+  communityUi.connectionError = "";
+  showToast(connected ? "Browser workspace and current GitHub storage files cleared." : "Browser workspace cleared. Disconnected GitHub files were left untouched.");
+}
+
 document.querySelector("#create-profile-form").addEventListener("submit", (event) => {
   event.preventDefault();
   elements.profileError.textContent = "";
@@ -2396,6 +2487,27 @@ document.addEventListener("click", async (event) => {
   }
   const action = event.target.closest("[data-action]");
   if (!action) return;
+  if (action.dataset.action === "manage-workspace-storage") {
+    const manager = document.querySelector("#workspace-storage-manager");
+    if (manager) {
+      manager.open = true;
+      manager.scrollIntoView({ behavior: "smooth", block: "start" });
+      manager.querySelector("summary")?.focus?.();
+    }
+    return;
+  }
+  if (action.dataset.action === "delete-stored-profile") {
+    if (bridgeNeedsChoice) { showToast("Resolve the GitHub checkpoint choice before deleting synchronized data."); return; }
+    try { await deleteStoredProfile(action.dataset.profileId); }
+    catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    return;
+  }
+  if (action.dataset.action === "clear-all-workspace-data") {
+    if (bridgeNeedsChoice) { showToast("Resolve the GitHub checkpoint choice before clearing synchronized data."); return; }
+    try { await clearAllWorkspaceData(); }
+    catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    return;
+  }
   if (action.dataset.action === "run-python-tests") {
     event.preventDefault();
     const questionId = action.dataset.questionId;
@@ -2941,8 +3053,8 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, educatorManifestResponse, authoringGuideResponse] = await Promise.all([
-          fetch("./agent-manifest.json?v=20260903-plan-free-v1"),
-          fetch("./educator-agent-manifest.json?v=20260903-plan-free-v1"),
+          fetch("./agent-manifest.json?v=20260903-storage-manager-v1"),
+          fetch("./educator-agent-manifest.json?v=20260903-storage-manager-v1"),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1"),
     ]);
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();
