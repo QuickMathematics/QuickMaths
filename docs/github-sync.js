@@ -401,6 +401,7 @@ export function createGitHubSyncController({
     lastRemoteUpdatedAt: null,
     error: null,
     conflict: null,
+    conflictDetails: null,
     config,
   };
 
@@ -433,6 +434,7 @@ export function createGitHubSyncController({
   };
 
   const update = (patch) => {
+    if (patch.conflict === null) status.conflictDetails = null;
     Object.assign(status, patch);
     persistMetadata();
     emit();
@@ -464,7 +466,12 @@ export function createGitHubSyncController({
     try { return await task(); }
     catch (error) {
       const conflict = error instanceof GitHubSyncConflictError ? error.message : null;
-      update({ phase: conflict ? "conflict" : "error", error: error instanceof Error ? error.message : String(error), conflict });
+      update({
+        phase: conflict ? "conflict" : "error",
+        error: error instanceof Error ? error.message : String(error),
+        conflict,
+        conflictDetails: error instanceof GitHubSyncConflictError ? error.details : null,
+      });
       throw error;
     }
   };
@@ -501,7 +508,10 @@ export function createGitHubSyncController({
     // state changes before publish_agent_checkpoint commits one coherent result.
     if (role === "agent") return;
     if (!status.connected || stopped) return;
-    if (debounceTimer) clearTimer(debounceTimer);
+    // Keep the first pending checkpoint timer. A session heartbeat updates the
+    // store every second, so resetting this timer on every notification would
+    // postpone autosave forever while the learner keeps the page open.
+    if (debounceTimer) return;
     debounceTimer = setTimer(async () => {
       debounceTimer = null;
       try { await pushNow(); } catch { /* Status already records the failure. */ }

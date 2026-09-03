@@ -270,6 +270,34 @@ test("learner checkpoints are debounced and can be pushed manually", async () =>
   assert.equal(learner.snapshot().dirty, false);
 });
 
+test("continuous learner activity cannot postpone the scheduled checkpoint forever", async () => {
+  const github = fakeGitHub();
+  const learnerState = stateHarness("Learner");
+  const scheduled = [];
+  const learner = createGitHubSyncController({
+    role: "learner",
+    client: github,
+    credentialStore: credentials(),
+    serializeState: learnerState.serialize,
+    applyState: learnerState.apply,
+    subscribeToState: learnerState.subscribe,
+    deviceId: "active-learner-device",
+    setTimer(callback) { scheduled.push(callback); return scheduled.length; },
+    clearTimer() {},
+  });
+  await learner.connect(connection(), { startPolling: false });
+
+  learnerState.mutate({ sessionSeconds: 1 });
+  learnerState.mutate({ sessionSeconds: 2, answerDraft: "latest work" });
+  learnerState.mutate({ sessionSeconds: 3, answerDraft: "latest work" });
+
+  assert.equal(scheduled.length, 1);
+  await scheduled[0]();
+  const saved = JSON.parse(parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content).stateJson);
+  assert.equal(saved.sessionSeconds, 3);
+  assert.equal(saved.answerDraft, "latest work");
+});
+
 test("agent pulls learner state, publishes a based response, and learner applies it", async () => {
   const github = fakeGitHub();
   const learnerState = stateHarness("Learner");
@@ -484,4 +512,5 @@ test("remote file changes cause optimistic push conflicts", async () => {
   await second.pushNow();
   firstState.mutate({ score: 8 });
   await assert.rejects(first.pushNow(), /newer copy/i);
+  assert.equal(first.snapshot().conflictDetails.channel, "learner");
 });

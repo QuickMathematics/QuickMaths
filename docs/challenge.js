@@ -13,7 +13,7 @@ import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260903-large-checkpoint-v1";
+} from "./github-sync.js?v=20260903-resilient-autosave-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -3216,6 +3216,13 @@ async function boot() {
   githubSyncSnapshot = githubSync.snapshot();
   githubSync.subscribe((status) => {
     githubSyncSnapshot = status;
+    if (status.phase === "conflict" && status.conflictDetails?.channel === "learner") {
+      // A newer learner checkpoint appeared after the initial connection.
+      // Pause automatic writes and restore the same explicit A/B choice used
+      // during setup, instead of leaving the workspace in an error-only state.
+      bridgeNeedsChoice = true;
+      githubSync.stop();
+    }
     if (currentSnapshot?.activeProfile && currentSnapshot.ui.route === "settings") renderSettings(currentSnapshot);
   });
   lessonStudio = createLessonStudio({
