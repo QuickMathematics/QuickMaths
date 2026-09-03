@@ -372,6 +372,28 @@ test("explicit learner conflict resolution retries one raced remote write", asyn
   assert.equal(second.snapshot().phase, "synced");
 });
 
+test("a stale open tab cannot erase the revision persisted by a successful push", async () => {
+  const github = fakeGitHub();
+  const credentialStore = credentials();
+  const firstState = stateHarness("First tab");
+  const staleState = stateHarness("Stale tab");
+  const first = controller({ role: "learner", client: github, harness: firstState, credentialStore });
+  const stale = controller({ role: "learner", client: github, harness: staleState, credentialStore });
+
+  await first.connect(connection(), { startPolling: false });
+  await stale.connect(connection(), { startPolling: false });
+  await first.pushNow();
+  stale.schedulePush();
+
+  const resumedState = stateHarness("Reloaded tab");
+  const resumed = controller({ role: "learner", client: github, harness: resumedState, credentialStore });
+  await resumed.resume({ startPolling: false });
+  await resumed.pushNow();
+
+  assert.equal(resumed.snapshot().phase, "synced");
+  assert.equal(parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content).channel, "learner");
+});
+
 test("changes made while a saved bridge is offline remain dirty for the next resume", async () => {
   const github = fakeGitHub();
   const learnerState = stateHarness("Learner");

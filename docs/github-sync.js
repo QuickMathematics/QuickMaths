@@ -381,15 +381,24 @@ export function createGitHubSyncController({
     listeners.forEach((listener) => listener(view));
   };
 
-  const persistMetadata = () => {
+  const persistMetadata = ({ revisions = false, clearRevisions = false } = {}) => {
     if (!config) return;
+    const currentRepositoryKey = repositoryKey(config);
+    const saved = credentialStore.loadMetadata?.({ role }) ?? null;
+    const sameRepository = saved?.repositoryKey === currentRepositoryKey;
+    const savedLearnerSha = sameRepository && typeof saved?.learnerSha === "string" ? saved.learnerSha : null;
+    const savedAgentSha = sameRepository && typeof saved?.agentSha === "string" ? saved.agentSha : null;
     credentialStore.saveMetadata?.({
       role,
       metadata: {
-        repositoryKey: repositoryKey(config),
+        repositoryKey: currentRepositoryKey,
         deviceId: resolvedDeviceId,
-        learnerSha,
-        agentSha,
+        // Several QuickMaths tabs can share one credential store. Routine status
+        // updates from an older tab must not erase a revision learned by the tab
+        // that just pushed or pulled. Only revision-changing operations replace
+        // these fields; clearing storage explicitly removes both.
+        learnerSha: clearRevisions ? null : revisions ? learnerSha : (savedLearnerSha ?? learnerSha),
+        agentSha: clearRevisions ? null : revisions ? agentSha : (savedAgentSha ?? agentSha),
         dirty: status.dirty,
       },
     });
@@ -544,7 +553,7 @@ export function createGitHubSyncController({
     }
     if (channel === "learner") learnerSha = result.sha;
     else agentSha = result.sha;
-    persistMetadata();
+    persistMetadata({ revisions: true });
     update({ phase: "synced", dirty: false, lastPushedAt: now().toISOString(), error: null, conflict: null, remoteAvailable: true });
     return { ...result, channel };
   }));
@@ -570,7 +579,7 @@ export function createGitHubSyncController({
     }
     if (role === "learner" && (!learnerSha || remote.envelope.baseLearnerSha !== learnerSha)) {
       agentSha = remote.sha;
-      persistMetadata();
+      persistMetadata({ revisions: true });
       consecutiveIdlePolls = 0;
       update({
         phase: status.dirty ? "idle" : "synced",
@@ -588,7 +597,7 @@ export function createGitHubSyncController({
     await applyRemote(remote.envelope.stateJson);
     if (channel === "learner") learnerSha = remote.sha;
     else agentSha = remote.sha;
-    persistMetadata();
+    persistMetadata({ revisions: true });
     consecutiveIdlePolls = 0;
     update({
       phase: "synced",
@@ -609,7 +618,7 @@ export function createGitHubSyncController({
     if (!force && status.dirty) throw new GitHubSyncConflictError("This device has unsynced changes. Push them or force the restore.");
     await applyRemote(remote.envelope.stateJson);
     learnerSha = remote.sha;
-    persistMetadata();
+    persistMetadata({ revisions: true });
     update({
       phase: "synced", dirty: false, remoteAvailable: true,
       lastPulledAt: now().toISOString(), lastRemoteUpdatedAt: remote.envelope.updatedAt,
@@ -650,7 +659,7 @@ export function createGitHubSyncController({
       });
     }
     agentSha = null;
-    persistMetadata();
+    persistMetadata({ revisions: true });
     update({ phase: "synced", error: null, conflict: null, remoteAvailable: learnerSha != null });
     return { deleted: remote.exists, path: AGENT_STATE_PATH };
   }));
@@ -675,7 +684,7 @@ export function createGitHubSyncController({
     }
     learnerSha = null;
     agentSha = null;
-    persistMetadata();
+    persistMetadata({ clearRevisions: true });
     update({ phase: "cleared", dirty: false, remoteAvailable: false, error: null, conflict: null });
     return { deletedPaths };
   }));

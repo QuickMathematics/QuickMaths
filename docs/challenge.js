@@ -13,7 +13,7 @@ import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260903-storage-manager-v2";
+} from "./github-sync.js?v=20260903-multitab-revision-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
