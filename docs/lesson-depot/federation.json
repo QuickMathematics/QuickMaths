@@ -1,14 +1,14 @@
 {
   "format": "quickmaths.lesson-depot.federation",
   "schema_version": "1.0",
-  "generated_at": "2026-09-03T12:00:00.000Z",
+  "generated_at": "2026-09-03T21:16:35.364Z",
   "registries": [
     {
       "id": "quickmathematics/qm_dev_depot",
       "name": "QuickMaths Dev Depot",
       "catalog_url": "https://raw.githubusercontent.com/QuickMathematics/QM_Dev_Depot/b986664b5f242e05d5c1ac2737d3c762188685a2/quickmaths-registry.json",
       "homepage_url": "https://github.com/QuickMathematics/QM_Dev_Depot",
-      "discussion_url": "",
+      "discussion_url": "https://github.com/QuickMathematics/QuickMaths/discussions/4",
       "submitted_by": "QuickMathematics",
       "status": "new",
       "packages": [
@@ -20,7 +20,7 @@
           "votes": 0,
           "flags": 0,
           "comments": 0,
-          "discussion_url": ""
+          "discussion_url": "https://github.com/QuickMathematics/QuickMaths/discussions/5"
         },
         {
           "id": "PACK_PROGRAMMING_FUNDAMENTALS",
@@ -30,7 +30,7 @@
           "votes": 0,
           "flags": 0,
           "comments": 0,
-          "discussion_url": ""
+          "discussion_url": "https://github.com/QuickMathematics/QuickMaths/discussions/6"
         }
       ]
     }
