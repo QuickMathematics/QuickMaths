@@ -1266,7 +1266,7 @@ function sanitizeProfile(candidate) {
     demo: Boolean(candidate.demo),
     activeSubjectId: SUBJECT_ID.test(candidate.activeSubjectId) ? candidate.activeSubjectId : DEFAULT_SUBJECT_ID,
     progressionMode: candidate.progressionMode === "soft" ? "soft" : "hard",
-    mapScope: candidate.mapScope === "all" ? "all" : "subject",
+    mapScope: "all",
     educatorGuideSeenAt: role === "educator"
       ? candidate.educatorGuideSeenAt === null ? null : cleanText(candidate.educatorGuideSeenAt, 40) || null
       : null,
@@ -1684,7 +1684,7 @@ function migrateLegacy(storage, curriculum) {
     if (!legacy || typeof legacy !== "object") return null;
     const state = initialState();
     const now = new Date().toISOString();
-    const profile = { id: "profile-migrated-demo", displayName: "Demo Learner", createdAt: now, totalLoggedSeconds: 0, demo: true, activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "subject", tutorialCompletedAt: now, tutorialSkipped: false };
+    const profile = { id: "profile-migrated-demo", displayName: "Demo Learner", createdAt: now, totalLoggedSeconds: 0, demo: true, activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "all", tutorialCompletedAt: now, tutorialSkipped: false };
     state.profiles = [profile];
     state.activeProfileId = profile.id;
     state.ui.route = "home";
@@ -2766,7 +2766,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       activeSubject: clone(visibleSubjects.find((subject) => subject.id === activeSubjectId()) ?? visibleSubjects[0] ?? catalog.subjects[0]),
       subjects: clone(visibleSubjects),
       progressionMode: effectiveProgressionMode(),
-      mapScope: activeProfile()?.mapScope ?? "subject",
+      mapScope: "all",
       profiles: clone(state.profiles),
       progressRows: clone(rows),
       allProgressRows: clone(allRows),
@@ -2900,7 +2900,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       id: makeId("profile"), displayName: name, createdAt: isoNow(), totalLoggedSeconds: 0, demo,
       role: safeRole, curriculumId: safeRole === "learner" && state.curricula.some((item) => item.id === curriculumId) ? curriculumId : null,
       activeCurriculumId: null,
-      activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "subject", tutorialCompletedAt: safeRole === "educator" ? isoNow() : null, tutorialSkipped: false,
+      activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "all", tutorialCompletedAt: safeRole === "educator" ? isoNow() : null, tutorialSkipped: false,
       educatorGuideSeenAt: null,
     };
     state.profiles.push(profile);
@@ -3031,7 +3031,11 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       if (!skillsById[skillId] || !isSkillVisible(skillId)) throw new Error("Unknown or disabled skill_id.");
       state.ui.selectedSkillId = skillId;
       state.ui.selectedMapSkillId = skillId;
-      profile.activeSubjectId = skillsById[skillId].subjectId;
+      if (profile.role === "learner" && ["lesson", "test"].includes(visibleRoute)) profile.activeSubjectId = skillsById[skillId].subjectId;
+    }
+    if (!skillId && profile.role === "learner" && ["lesson", "test"].includes(visibleRoute)) {
+      const studySkill = skillsById[state.ui.selectedSkillId];
+      if (studySkill && isSkillVisible(studySkill.id)) profile.activeSubjectId = studySkill.subjectId;
     }
     if (visibleRoute === "results") {
       const attempt = skillId
@@ -3085,10 +3089,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   const selectMapSkill = (skillId) => {
     if (!skillsById[skillId] || !isSkillVisible(skillId)) throw new Error("Unknown or disabled skill_id.");
-    const profile = activeProfile();
-    const subjectId = skillsById[skillId].subjectId;
-    if (profile.activeSubjectId === subjectId && state.ui.selectedMapSkillId === skillId && state.ui.selectedSkillId === skillId) return;
-    profile.activeSubjectId = subjectId;
+    if (state.ui.selectedMapSkillId === skillId && state.ui.selectedSkillId === skillId) return;
     state.ui.selectedMapSkillId = skillId;
     state.ui.selectedSkillId = skillId;
     notify();
@@ -3163,8 +3164,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   const updateMapPlanLayout = ({ layoutKey, positions = {}, selectedSkillIds = state.ui.mapPlanSelection, activityActor = "learner" } = {}) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
-    const allowed = new Set(["all-subjects", ...catalog.subjects.map((subject) => `subject:${subject.id}`)]);
-    if (!allowed.has(layoutKey)) throw new Error("Unknown mastery-map layout.");
+    if (layoutKey !== "all-subjects") throw new Error("The mastery map uses the all-subjects layout.");
     if (!positions || typeof positions !== "object" || Array.isArray(positions)) throw new Error("Plan positions must be an object.");
     const plan = activeMapPlan();
     plan.layouts[layoutKey] ??= {};
@@ -3205,6 +3205,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   const resetMapPlanLayout = (layoutKey, skillIds = null) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
+    if (layoutKey !== "all-subjects") throw new Error("The mastery map uses the all-subjects layout.");
     const plan = activeMapPlan();
     if (!plan.layouts[layoutKey]) return { ok: true, reset: 0 };
     const targets = skillIds == null ? null : normalizeMapPlanSelection(skillIds);
@@ -3290,8 +3291,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const safePathId = cleanText(pathId, 120) || null;
     if (safePathId) throw new Error("Path annotations are not supported. Attach the comment to selected lessons instead.");
     const targetSkillIds = normalizeMapPlanSelection(skillIds);
-    const allowedLayoutKeys = new Set(["all-subjects", ...catalog.subjects.map((subject) => `subject:${subject.id}`)]);
-    const safeLayoutKey = allowedLayoutKeys.has(layoutKey) ? layoutKey : null;
+    const safeLayoutKey = layoutKey === "all-subjects" ? layoutKey : null;
     const safePosition = safeLayoutKey && position && typeof position === "object" && !Array.isArray(position)
       && Number.isFinite(Number(position.x)) && Number.isFinite(Number(position.y))
       ? {
@@ -3318,8 +3318,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   const updateMapPlanAnnotationPosition = (annotationId, { layoutKey, position } = {}) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
-    const allowedLayoutKeys = new Set(["all-subjects", ...catalog.subjects.map((subject) => `subject:${subject.id}`)]);
-    if (!allowedLayoutKeys.has(layoutKey)) throw new Error("Unknown mastery-map layout.");
+    if (layoutKey !== "all-subjects") throw new Error("The mastery map uses the all-subjects layout.");
     if (!position || typeof position !== "object" || Array.isArray(position)
       || !Number.isFinite(Number(position.x)) || !Number.isFinite(Number(position.y))) throw new Error("Choose a valid annotation position.");
     const annotation = activeMapPlan().annotations.find((item) => item.id === annotationId);
@@ -3365,20 +3364,14 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       if (activeCurriculum()) throw new Error("Progression mode is controlled by the active curriculum.");
       profile.progressionMode = progressionMode;
     }
-    if (mapScope != null) {
-      if (!["subject", "all"].includes(mapScope)) throw new Error("map_scope must be subject or all.");
-      mapContextChanged ||= profile.mapScope !== mapScope;
-      profile.mapScope = mapScope;
-      if (mapScope === "subject" && skillsById[state.ui.selectedMapSkillId]?.subjectId !== profile.activeSubjectId) {
-        state.ui.selectedMapSkillId = skillOrder.find((id) => isSkillVisible(id) && skillsById[id]?.subjectId === profile.activeSubjectId) ?? state.ui.selectedMapSkillId;
-      }
-    }
+    if (mapScope != null && mapScope !== "all") throw new Error("The mastery map always shows all installed subjects; map_scope must be all.");
+    profile.mapScope = "all";
     if (mapContextChanged) {
       state.ui.mapPlanSelection = [];
       state.ui.selectedMapPlanPathId = null;
       state.ui.mapPlanComposer = null;
     }
-    addActivity("set_learning_preferences", `Using ${effectiveProgressionMode()} progression in ${catalog.subjects.find((subject) => subject.id === profile.activeSubjectId)?.name ?? profile.activeSubjectId}; the map shows ${profile.mapScope === "all" ? "all installed subjects" : "the current subject"}.`, undefined, activityActor);
+    addActivity("set_learning_preferences", `Using ${effectiveProgressionMode()} progression; the mastery map shows all installed subjects.`, undefined, activityActor);
     notify();
     return { ok: true, subject_id: profile.activeSubjectId, progression_mode: effectiveProgressionMode(), map_scope: profile.mapScope };
   };
@@ -3711,6 +3704,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       };
     }
     state.ui.selectedSkillId = skillId;
+    activeProfile().activeSubjectId = skillsById[skillId].subjectId;
     state.ui.activeAttemptId = null;
     state.ui.route = "test";
     addActivity("start_skill_test", `Prepared a mastery test for ${skillId}.`, undefined, activityActor);
@@ -4198,12 +4192,9 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       activeCurriculum().enabledPackIds = [...new Set([...activeCurriculum().enabledPackIds, pack.id])];
       activeCurriculum().updatedAt = isoNow();
     }
-    if (activeProfile()) {
-      if (isSkillVisible(pack.track.skills[0])) {
-        activeProfile().activeSubjectId = pack.subject.id;
-        state.ui.selectedSkillId = pack.track.skills[0];
-        state.ui.selectedMapSkillId = pack.track.skills[0];
-      }
+    if (activeProfile() && isSkillVisible(pack.track.skills[0])) {
+      state.ui.selectedSkillId = pack.track.skills[0];
+      state.ui.selectedMapSkillId = pack.track.skills[0];
     }
     addActivity("load_lesson_set", pack.mode === "override"
       ? `Installed ${pack.name}; ${pack.skills.length} native lesson${pack.skills.length === 1 ? "" : "s"} improved without resetting completed progress.${restartedDraftCount ? ` ${restartedDraftCount} unfinished test${restartedDraftCount === 1 ? " was" : "s were"} restarted.` : ""}`

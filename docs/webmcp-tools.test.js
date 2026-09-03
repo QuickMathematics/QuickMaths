@@ -65,7 +65,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /button\.closest\("\.mobile-nav"\) && route === "creator"/);
   assert.doesNotMatch(html, /class="mode-switch"|id="replay-tutorial"/);
   assert.match(js, /data-action="map-zoom-in"/);
-  assert.match(js, /data-map-scope="all"/);
+  assert.doesNotMatch(js, /data-map-scope=/);
   assert.match(js, /map-subject-lane/);
   assert.match(js, /map-node-status-dot/);
   assert.match(js, /What your proof must cover/);
@@ -120,14 +120,15 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /storage connection and token were kept/);
   assert.match(css, /\.workspace-storage-manager/);
   assert.match(css, /\.tour-depot-preview/);
-  assert.match(js, /Subject selector/);
-  assert.match(js, /Changes the visible curriculum, mastery map, and color theme/);
+  assert.doesNotMatch(html, /id="subject-select"/);
+  assert.match(js, /All installed subjects/);
+  assert.match(js, /last lesson you opened/);
   assert.match(js, /Native improvements are reversible from Settings without erasing progress/);
   assert.match(js, /Create \/ improve/);
   assert.match(css, /\.welcome-brand \{[^}]*"Times New Roman"/);
   assert.match(css, /\.sidebar-brand strong \{[^}]*"Times New Roman"/);
   assert.match(css, /touch-action: none/);
-  assert.match(css, /\.map-scope-control/);
+  assert.doesNotMatch(css, /\.map-scope-control/);
   assert.match(css, /\.map-edges \.is-cross-subject/);
   assert.match(css, /\.map-node \.map-node-subject-accent/);
   assert.match(css, /\.studio-student-preview/);
@@ -282,7 +283,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 25);
+  assert.equal(summary.guide.app_version, 26);
   assert.match(summary.guide.browser_boundary, /ChatGPT or Codex in-app browser/);
   assert.match(summary.guide.browser_boundary, /get_agent_guide with section summary/);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
@@ -428,7 +429,7 @@ test("app, curriculum, and progress tools expose the full learner state", async 
   const summary = await tools.get_progress_summary.execute({});
   assert.equal(app.has_profile, true);
   assert.equal(app.view, "tutorial");
-  assert.equal(app.map_scope, "subject");
+  assert.equal(app.map_scope, "all");
   assert.deepEqual(app.learning_plan, { plan_mode: false, plan_view: true, show_hidden_nodes: false, selected_skill_ids: [], layouts: {}, paths: [], annotations: [], hidden_skill_ids: [] });
   assert.equal(map.skills.length, 53);
   assert.equal(summary.skills.length, 53);
@@ -497,7 +498,7 @@ test("Agent activity includes tool actions but excludes learner UI actions", asy
   assert.equal(activity[0].tool, "set_learning_preferences");
 });
 
-test("subject tools switch visible curricula and open the no-code creator", async () => {
+test("subject tools describe the combined curriculum and open the no-code creator", async () => {
   const store = createStore();
   let tools = toolsFor(store);
   const nativeSubjects = await tools.list_subjects.execute({});
@@ -511,16 +512,12 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
   ]);
   const changed = await tools.set_learning_preferences.execute({ progression_mode: "soft" });
   assert.equal(changed.progression_mode, "soft");
-  const geography = await tools.set_learning_preferences.execute({ subject_id: "SUBJECT_GEOGRAPHY" });
-  assert.equal(geography.subject_id, "SUBJECT_GEOGRAPHY");
-  assert.equal((await tools.get_curriculum_map.execute({})).skills.length, 15);
-  const combinedPreference = await tools.set_learning_preferences.execute({ map_scope: "all" });
-  assert.equal(combinedPreference.map_scope, "all");
   const combinedMap = await tools.get_curriculum_map.execute({});
   assert.equal(combinedMap.scope, "all");
   assert.equal(combinedMap.skills.length, 68);
   assert.deepEqual(new Set(combinedMap.skills.map((skill) => skill.subject_id)), new Set(["SUBJECT_MATH", "SUBJECT_GEOGRAPHY"]));
-  await assert.rejects(tools.get_curriculum_map.execute({ subject_id: "SUBJECT_MATH", scope: "all" }), /cannot be combined/);
+  await assert.rejects(tools.get_curriculum_map.execute({ subject_id: "SUBJECT_MATH" }), /Unknown input property/);
+  await assert.rejects(tools.set_learning_preferences.execute({ map_scope: "subject" }), /Unknown input property/);
   const opened = await tools.open_lesson_creator.execute({ subject_id: "SUBJECT_MATH" });
   assert.equal(opened.visible_view, "creator");
   assert.equal(store.snapshot().ui.route, "creator");
@@ -529,7 +526,7 @@ test("subject tools switch visible curricula and open the no-code creator", asyn
 test("agent planning tools visibly arrange nodes, create paths, and add connected or free comments", async () => {
   const store = createStore();
   const tools = toolsFor(store);
-  const opened = await tools.set_map_plan_mode.execute({ enabled: true, map_scope: "subject", subject_id: "SUBJECT_MATH" });
+  const opened = await tools.set_map_plan_mode.execute({ enabled: true });
   assert.equal(opened.visible_view, "map");
   assert.equal(opened.plan_mode, true);
 
@@ -539,7 +536,7 @@ test("agent planning tools visibly arrange nodes, create paths, and add connecte
       { skill_id: "MATH_ARITH_002", x: 420, y: 180 },
     ],
   });
-  assert.equal(arranged.layout_key, "subject:SUBJECT_MATH");
+  assert.equal(arranged.layout_key, "all-subjects");
   assert.equal(arranged.moved, 2);
 
   const hidden = await tools.set_map_plan_nodes_hidden.execute({
@@ -568,10 +565,10 @@ test("agent planning tools visibly arrange nodes, create paths, and add connecte
   assert.deepEqual(connected.annotation.target, { skill_ids: created.path.skill_ids });
   const free = await tools.add_map_plan_annotation.execute({ body: "Exam week starts here." });
   assert.deepEqual(free.annotation.target, { map_comment: true });
-  assert.deepEqual(free.annotation.positions["subject:SUBJECT_MATH"], { x: 320, y: 160 });
+  assert.deepEqual(free.annotation.positions["all-subjects"], { x: 320, y: 160 });
 
   const app = await tools.get_app_state.execute({});
-  assert.deepEqual(app.learning_plan.layouts["subject:SUBJECT_MATH"], {
+  assert.deepEqual(app.learning_plan.layouts["all-subjects"], {
     MATH_ARITH_001: { x: -140, y: -180 },
     MATH_ARITH_002: { x: 420, y: 180 },
   });
@@ -662,7 +659,7 @@ test("agent state identifies installed native improvements without exposing thei
   store.importLessonPack(nativeImprovement(store));
   const tools = toolsFor(store);
   const app = await tools.get_app_state.execute({});
-  const map = await tools.get_curriculum_map.execute({ subject_id: "SUBJECT_MATH" });
+  const map = await tools.get_curriculum_map.execute({});
   const improved = map.skills.find((skill) => skill.skill_id === "MATH_ARITH_001");
   assert.equal(app.custom_lesson_sets.length, 0);
   assert.equal(app.lesson_changes[0].mode, "override");

@@ -54,7 +54,7 @@ class StudentDocTemplate(EducatorDocTemplate):
             canvas.drawString(18 * mm, PAGE_H - 9.5 * mm, "QUICKMATHS STUDENT GUIDE")
             canvas.setFont("Helvetica", 7.5)
             canvas.setFillColor(colors.HexColor("#5C6965"))
-            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 25")
+            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 26")
             canvas.setStrokeColor(colors.HexColor("#D8D0C2"))
             canvas.line(18 * mm, 12 * mm, PAGE_W - 18 * mm, 12 * mm)
             canvas.setFont("Helvetica", 7.5)
@@ -87,7 +87,7 @@ def cover_story() -> list:
         Spacer(1, 15 * mm),
         info,
         Spacer(1, 18 * mm),
-        Paragraph("Version 25 / September 2026", styles["CoverKicker"]),
+        Paragraph("Version 26 / September 2026", styles["CoverKicker"]),
         PageBreak(),
     ]
 

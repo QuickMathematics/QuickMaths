@@ -136,7 +136,7 @@ class EducatorDocTemplate(BaseDocTemplate):
             canvas.drawString(18 * mm, PAGE_H - 9.5 * mm, "QUICKMATHS EDUCATOR GUIDE")
             canvas.setFont("Helvetica", 7.5)
             canvas.setFillColor(MUTED)
-            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 25")
+            canvas.drawRightString(PAGE_W - 18 * mm, PAGE_H - 9.5 * mm, "APP VERSION 26")
             canvas.setStrokeColor(LINE)
             canvas.line(18 * mm, 12 * mm, PAGE_W - 18 * mm, 12 * mm)
             canvas.setFont("Helvetica", 7.5)
@@ -204,6 +204,7 @@ def parse_markdown(markdown: str) -> list:
             index += 1
             continue
         if stripped.startswith("### "):
+            story.append(CondPageBreak(28 * mm))
             story.append(Paragraph(inline_markup(stripped[4:]), styles["H2QM"]))
             index += 1
             continue
@@ -223,8 +224,11 @@ def parse_markdown(markdown: str) -> list:
             while index < len(lines) and lines[index].strip().startswith("- "):
                 items.append(Paragraph(inline_markup(lines[index].strip()[2:]), styles["BulletQM"], bulletText="-"))
                 index += 1
-            story.append(KeepTogether(items[:2]) if len(items) == 2 else items[0])
-            story.extend(items[2:] if len(items) == 2 else items[1:])
+            if len(items) <= 4:
+                story.append(KeepTogether(items))
+            else:
+                story.append(KeepTogether(items[:2]))
+                story.extend(items[2:])
             continue
         if re.match(r"^\d+\. ", stripped):
             while index < len(lines) and re.match(r"^\d+\. ", lines[index].strip()):
@@ -272,7 +276,7 @@ def cover_story() -> list:
         Spacer(1, 15 * mm),
         info,
         Spacer(1, 18 * mm),
-        Paragraph("Version 25 / September 2026", styles["CoverKicker"]),
+        Paragraph("Version 26 / September 2026", styles["CoverKicker"]),
         PageBreak(),
     ]
 

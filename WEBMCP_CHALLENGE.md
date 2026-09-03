@@ -1,6 +1,6 @@
 # QuickMaths WebMCP Challenge
 
-QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, install Geography or another Depot subject when wanted, inspect one curriculum or every installed subject in a combined bridge map, take varied mastery tests, reflect, review past work, and move progress between devices.
+QuickMaths is now a complete, zero-cost, agent-native learning app rather than a single worksheet demo. The static browser port carries the original product loop into GitHub Pages: choose a learner, install Geography or another Depot subject when wanted, inspect every installed subject and cross-curriculum bridge on one combined mastery map, take varied mastery tests, reflect, review past work, and move progress between devices.
 
 The app requires no OpenAI API key and sends no learner data to a hosted application server. GitHub Pages serves static files, browser `localStorage` holds the instant local copy, and visible JSON Save/Load controls provide portability. The optional QuickMaths Bridge uses a learner-owned private GitHub repository as a revisioned handoff channel between mobile learning and a remote Codex task. On the Codex computer, a loopback CLI serves the WebMCP workspace and uses the host Git credential manager; the GitHub credential never enters the agent page. A separate optional Community GitHub App enables in-app public Discussion votes via 👍 reactions and comments. Its stateless OAuth callback worker stores no data and is isolated from learner state and Bridge credentials.
 
@@ -58,7 +58,7 @@ When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers
 | `get_educator_agent_manifest` | Read the dedicated educator workflow, human-control boundaries, documentation link, and active curriculum policy. |
 | `get_lesson_authoring_guide` | Read a compact lesson-authoring overview or one focused authoring section on demand. |
 | `get_app_state` | Read the visible view, learner, timers, mastery counts, and current suggestion. |
-| `get_curriculum_map` | Read one subject map or the combined installed-subject map with statuses, prerequisite bridges, and unlocks. |
+| `get_curriculum_map` | Read the combined installed-subject map with statuses, subject identities, prerequisite bridges, and unlocks. |
 | `get_progress_summary` | Read per-skill mastery, attempts, and misconception tags. |
 | `get_curriculum_workspace` | Read the educator's open curriculum, installed pack choices, canonical map, and learner-agent policy. |
 | `create_curriculum` | Create and visibly open a new educator curriculum profile. |
@@ -67,7 +67,7 @@ When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers
 | `set_curriculum_pack_enabled` | Enable or disable an installed additive lesson pack only for the open curriculum. |
 | `set_curriculum_native_lessons_enabled` | Include or exclude native Mathematics while preserving a valid curriculum dependency graph. |
 | `list_subjects` | Read installed subjects and lesson totals. |
-| `set_learning_preferences` | Change the visible subject, Hard/Open path mode, and focused/combined map scope. |
+| `set_learning_preferences` | Change Hard/Open path mode; the mastery map is permanently combined across installed subjects. |
 | `navigate_learning_app` | Open the dashboard, map, lesson, test, results, Lesson studio, or Settings. |
 | `set_map_plan_mode` | Visibly open the persistent editable mastery-map plan or return to its default read-only Plan view; the human can compare it with the canonical map. |
 | `arrange_map_plan_nodes` | Move lesson nodes to absolute positions in a subject or combined Plan mode layout. |

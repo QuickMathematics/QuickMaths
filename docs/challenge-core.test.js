@@ -312,13 +312,13 @@ test("new-profile tutorial can be stepped, skipped, replayed, and completed", ()
   assert.equal(store.snapshot().activeProfile.tutorialSkipped, false);
 });
 
-test("Settings, map zoom, and combined-subject map scope persist safely", () => {
+test("Settings, map zoom, and the permanent combined-subject map persist safely", () => {
   const { store, storage } = harness();
   const firstProfile = store.createProfile("Settings Learner");
   store.completeTutorial();
   store.navigate("data");
   assert.equal(store.snapshot().ui.route, "settings");
-  assert.equal(store.snapshot().mapScope, "subject");
+  assert.equal(store.snapshot().mapScope, "all");
   assert.equal(store.setLearningPreferences({ mapScope: "all" }).map_scope, "all");
   assert.equal(store.setMapZoom(1.4), 1.4);
   assert.equal(store.setMapZoom(0.137), 0.14);
@@ -331,9 +331,10 @@ test("Settings, map zoom, and combined-subject map scope persist safely", () => 
   assert.equal(reloaded.snapshot().mapScope, "all");
 
   reloaded.createProfile("Second Learner");
-  assert.equal(reloaded.snapshot().mapScope, "subject", "new profiles start with a focused map");
+  assert.equal(reloaded.snapshot().mapScope, "all", "new profiles always use the combined map");
   reloaded.selectProfile(firstProfile.id);
-  assert.equal(reloaded.snapshot().mapScope, "all", "map scope belongs to the learner profile");
+  assert.equal(reloaded.snapshot().mapScope, "all", "all profiles use the combined map");
+  assert.throws(() => reloaded.setLearningPreferences({ mapScope: "subject" }), /always shows all installed subjects/);
   assert.throws(() => reloaded.setLearningPreferences({ mapScope: "galaxy" }), /map_scope/);
 });
 
@@ -347,7 +348,7 @@ test("results navigation selects the requested skill's saved attempt", () => {
   assert.equal(store.snapshot().ui.activeAttemptId, null, "a skill with no saved attempt must not show an unrelated latest result");
 });
 
-test("mastery-map plans persist per learner with scoped layouts, colored paths, and annotations", () => {
+test("mastery-map plans persist per learner on the combined layout with colored paths and annotations", () => {
   const { store, storage } = harness();
   const firstProfile = store.createProfile("Planning Learner");
   store.completeTutorial();
@@ -357,7 +358,7 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
   assert.equal(store.setMapPlanComposer("annotation").composer, "annotation");
   store.setMapPlanSelection(["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"]);
   store.updateMapPlanLayout({
-    layoutKey: "subject:SUBJECT_MATH",
+    layoutKey: "all-subjects",
     selectedSkillIds: ["MATH_ARITH_001", "MATH_ARITH_002", "MATH_PREALG_001"],
     positions: {
       MATH_ARITH_001: { x: -110.25, y: -90.5 },
@@ -372,11 +373,11 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
   const freeComment = store.addMapPlanAnnotation({
     body: "Remember to revisit this cluster.",
     skillIds: [],
-    layoutKey: "subject:SUBJECT_MATH",
+    layoutKey: "all-subjects",
     position: { x: 480, y: 225 },
   });
   store.updateMapPlanAnnotationPosition(freeComment.id, {
-    layoutKey: "subject:SUBJECT_MATH",
+    layoutKey: "all-subjects",
     position: { x: 505.5, y: 240.25 },
   });
   store.updateMapPlanPath(path.id, { color: "#1255aa" });
@@ -388,20 +389,20 @@ test("mastery-map plans persist per learner with scoped layouts, colored paths, 
 
   let state = store.snapshot();
   assert.equal(state.ui.mapPlanMode, true);
-  assert.deepEqual(state.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: -110.25, y: -90.5 });
+  assert.deepEqual(state.mapPlan.layouts["all-subjects"].MATH_ARITH_001, { x: -110.25, y: -90.5 });
   assert.equal(state.mapPlan.paths[0].color, "#1255aa");
   assert.deepEqual(state.mapPlan.hiddenSkillIds, ["MATH_PREALG_001"]);
   assert.equal(state.mapPlan.annotations.length, 3);
   assert.equal(state.mapPlan.annotations[2].targetType, "free");
-  assert.deepEqual(state.mapPlan.annotations[2].positions["subject:SUBJECT_MATH"], { x: 505.5, y: 240.25 });
+  assert.deepEqual(state.mapPlan.annotations[2].positions["all-subjects"], { x: 505.5, y: 240.25 });
   assert.match(store.exportBackup(), /My route into equations/);
 
   const reloaded = createQuickMathsStore({ storage, curriculum, now: () => new Date("2026-09-01T09:41:00.000Z") });
   state = reloaded.snapshot();
   assert.equal(state.mapPlan.paths[0].name, "Algebra launch");
   assert.equal(state.mapPlan.annotations[0].body, "Warm up here before Friday.");
-  assert.equal(state.mapPlan.annotations[2].positions["subject:SUBJECT_MATH"].x, 505.5);
-  assert.equal(state.mapPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_002.x, 360);
+  assert.equal(state.mapPlan.annotations[2].positions["all-subjects"].x, 505.5);
+  assert.equal(state.mapPlan.layouts["all-subjects"].MATH_ARITH_002.x, 360);
   assert.deepEqual(state.mapPlan.hiddenSkillIds, ["MATH_PREALG_001"]);
   reloaded.setMapPlanMode(false);
   assert.equal(reloaded.snapshot().ui.mapPlanMode, false);
@@ -468,7 +469,7 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
     contactEmail: "teacher@example.com",
     maxAttemptsPerLesson: 1,
   });
-  store.updateMapPlanLayout({ layoutKey: "subject:SUBJECT_MATH", positions: { MATH_ARITH_001: { x: 120, y: 80 } } });
+  store.updateMapPlanLayout({ layoutKey: "all-subjects", positions: { MATH_ARITH_001: { x: 120, y: 80 } } });
   store.createMapPlanPath({ name: "Arithmetic start", color: "#556677", skillIds: ["MATH_ARITH_001", "MATH_ARITH_002"] });
   const publicRaw = store.exportCurriculum();
   assert.match(publicRaw, /quickmaths\.curriculum/);
@@ -494,7 +495,7 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   assert.equal(state.curriculum.allSkills.length, 53);
   assert.equal(state.curriculumPlan.paths[0].name, "Arithmetic start");
   assert.equal(state.mapPlan.paths[0].name, "Arithmetic start", "the learner receives an editable copy of the canonical plan");
-  assert.deepEqual(state.curriculumPlan.layouts["subject:SUBJECT_MATH"].MATH_ARITH_001, { x: 120, y: 80 });
+  assert.deepEqual(state.curriculumPlan.layouts["all-subjects"].MATH_ARITH_001, { x: 120, y: 80 });
 
   learnerHarness.store.startTest("MATH_ARITH_001");
   answerActiveTestCorrectly(learnerHarness.store);
@@ -623,7 +624,7 @@ test("curriculum pack disabling validates hidden dependencies and offers explici
   store.setCurriculumPackEnabled(second.id, true);
   assert.throws(() => store.setCurriculumPackEnabled(first.id, false), /depends on .* disabled lesson set/i);
   store.setCurriculumPackEnabled(second.id, false);
-  store.updateMapPlanLayout({ layoutKey: "subject:SUBJECT_CHAIN", positions: { CUSTOM_CHAIN_01: { x: 10, y: 20 } } });
+  store.updateMapPlanLayout({ layoutKey: "all-subjects", positions: { CUSTOM_CHAIN_01: { x: 10, y: 20 } } });
   assert.throws(() => store.setCurriculumPackEnabled(first.id, false), (error) => error?.code === "curriculum_plan_references");
   const cleaned = store.setCurriculumPackEnabled(first.id, false, { removePlanReferences: true });
   assert.ok(cleaned.removedPlanReferences > 0);
@@ -939,7 +940,7 @@ test("native improvements enforce the built-in identity and round-trip through f
   assert.equal(restored.allProgressRows.find((row) => row.id === "MATH_ARITH_001").name, "Integer operations · revised");
 });
 
-test("subjects filter the visible map, apply bridge locks, and support per-profile Open path", () => {
+test("subjects share one visible map, apply bridge locks, and theme the last opened lesson", () => {
   const { store } = harness();
   store.createProfile("Biology Learner");
   const preview = store.previewLessonPack(biologyLessonSet());
@@ -947,17 +948,22 @@ test("subjects filter the visible map, apply bridge locks, and support per-profi
   assert.equal(preview.createsSubject, true);
   store.importLessonPack(biologyLessonSet());
   let state = store.snapshot();
-  assert.equal(state.activeSubject.id, "SUBJECT_BIOLOGY");
+  assert.equal(state.activeSubject.id, "SUBJECT_MATH", "installing a pack does not change the retained lesson theme");
   assert.equal(state.subjects.length, 2);
-  assert.equal(state.progressRows.length, 1);
+  assert.equal(state.progressRows.length, 53);
   assert.equal(state.allProgressRows.length, 54);
-  assert.equal(state.progressRows[0].status, "locked");
-  assert.deepEqual(state.progressRows[0].unmetPrerequisites, ["MATH_ARITH_005"]);
+  assert.equal(state.allProgressRows.find((row) => row.id === "CUSTOM_BIO_CELL_001").status, "locked");
+  assert.deepEqual(state.allProgressRows.find((row) => row.id === "CUSTOM_BIO_CELL_001").unmetPrerequisites, ["MATH_ARITH_005"]);
   store.setLearningPreferences({ progressionMode: "soft" });
   state = store.snapshot();
   assert.equal(state.progressionMode, "soft");
-  assert.equal(state.progressRows[0].status, "ready");
+  assert.equal(state.allProgressRows.find((row) => row.id === "CUSTOM_BIO_CELL_001").status, "ready");
+  store.selectMapSkill("CUSTOM_BIO_CELL_001");
+  assert.equal(store.snapshot().activeSubject.id, "SUBJECT_MATH", "inspecting a node leaves the retained lesson theme alone");
+  store.navigate("lesson");
+  assert.equal(store.snapshot().activeSubject.id, "SUBJECT_BIOLOGY", "opening the selected lesson applies its subject theme");
   assert.doesNotThrow(() => store.startTest("CUSTOM_BIO_CELL_001"));
+  assert.equal(store.snapshot().activeSubject.id, "SUBJECT_BIOLOGY", "starting the lesson test changes and retains its subject theme");
 });
 
 test("explicit cross-subject bridge references verify the target subject", () => {

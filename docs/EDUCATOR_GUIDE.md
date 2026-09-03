@@ -86,7 +86,6 @@ The shell keeps navigation, identity, time, and agent status visible around the 
 | Control | Behavior |
 | --- | --- |
 | QuickMaths brand | Identifies the workspace; the subtitle changes between learning and curriculum work |
-| Subject selector | Switches the visible subject and its color theme |
 | Analog clock | Shows local time |
 | Session timer | Counts the current open session |
 | Profile total | Accumulates time for the active profile |
@@ -107,7 +106,7 @@ The bottom bar keeps the highest-value destinations visible. Educators see Home,
 
 ### Subject theme
 
-Each subject supplies a safe fixed color palette. The selected subject changes interface accents. On an all-subject map, node fills and outlines retain their own subject identity while status remains visible.
+Each subject supplies a safe fixed color palette. The map always shows every installed subject, so node fills and outlines retain their own subject identity while status remains visible. For learners, opening a lesson or beginning its test applies that subject's interface theme until they study another subject; map-node inspection alone does not change the theme.
 
 ### Agent Studio
 
@@ -200,9 +199,9 @@ Exporting a curriculum embeds every enabled additive pack and verifies that an i
 
 The map below Curriculum Designer is the canonical visual plan that travels with the curriculum. It uses the same prerequisite graph as the learner map, but educator Plan mode is always on.
 
-### Map scope
+### Combined map
 
-**Current subject** shows one subject. **All subjects** creates labeled lanes and shows cross-subject prerequisite bridges. Use the all-subject view when designing interdisciplinary sequences.
+The designer always uses one combined map with labeled subject lanes and cross-subject prerequisite bridges. There is no separate subject-only scope. Hide nodes in the saved Plan presentation when a curriculum needs a deliberately quieter learner view.
 
 ### Zoom and movement
 
@@ -622,7 +621,7 @@ When authoring content, use meaningful headings, concise prompts, plain-language
 5. Browse Depot; stage packages individually or as an ordered agent-created batch.
 6. Review and approve each installation yourself.
 7. Enable only the packs needed by this curriculum.
-8. Design the canonical map in subject and all-subject scopes.
+8. Design the canonical combined map across every enabled subject.
 9. Add intentional custom paths and annotations.
 10. Audit lessons and assessments in Lesson Studio where needed.
 11. Export a public blueprint or private assignment as appropriate, then test it with a learner profile. Confirm whether the student-name rule should reuse mastery or create a blank assignment profile.
@@ -650,9 +649,9 @@ Check whether the curriculum uses Hard path and inspect the prerequisite map. Us
 
 Check Agent tutoring in the curriculum policy. When it is off, tutoring, learner-work, preference, and learner Plan mode changes are blocked by design; read-only inspection and navigation remain available.
 
-### Map planning looks different in another scope
+### A map node is hard to find
 
-Subject layouts and the all-subject layout store separate node positions. Switch to the same scope before comparing or editing.
+Use **Jump to skill** to focus any enabled lesson on the combined map. If the learner presentation should be quieter, use Plan mode to hide selected nodes; this does not remove lessons or change prerequisites.
 
 ### GitHub sync reports a conflict
 
@@ -695,4 +694,4 @@ Open QuickMaths inside the ChatGPT or Codex in-app browser, not an external brow
 - Bridge guide: https://quickmathematics.github.io/QuickMaths/bridge-guide.html
 - Source and Lesson Depot: https://github.com/QuickMathematics/QuickMaths
 
-QuickMaths educator documentation - app version 25 - September 2026.
+QuickMaths educator documentation - app version 26 - September 2026.

@@ -48,7 +48,7 @@ Schema 2.0 adds subjects, themes, and cross-subject prerequisite bridges:
 - IDs use uppercase letters, numbers, and underscores. Never change a published ID if learner progress may already reference it.
 - Use `SUBJECT_MATH` to append lessons to the built-in Mathematics curriculum. Its built-in theme is preserved.
 - Reuse an installed custom subject ID to append another pack to that subject. Include the same subject name and theme in the source file so the file stays portable.
-- Use a new subject ID to create a separate curriculum and visible subject option.
+- Use a new subject ID to create a separate subject lane and theme on the combined mastery map.
 - Themes accept only the eleven six-digit hex colors shown above. Arbitrary CSS is rejected.
 - Schema 1.0 files still load and are migrated into `SUBJECT_MATH`.
 

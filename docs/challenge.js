@@ -1,6 +1,6 @@
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-storage-manager-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-in-app-browser-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260903-storage-manager-v1";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-combined-map-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-combined-map-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260903-combined-map-v1";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
@@ -62,7 +62,6 @@ const elements = {
   lessonSetFile: document.querySelector("#lesson-set-file"),
   creatorFile: document.querySelector("#creator-file"),
   curriculumFile: document.querySelector("#curriculum-file"),
-  subjectSelect: document.querySelector("#subject-select"),
   toast: document.querySelector("#toast"),
   educatorWelcome: document.querySelector("#educator-welcome-root"),
 };
@@ -234,17 +233,17 @@ const TUTORIAL_STEPS = [
   },
   {
     eyebrow: "Subjects and learning paths",
-    title: "Choose what to learn—and how strict the path should be.",
-    lede: "The subject picker in the left sidebar and Learning path control in Settings shape the curriculum you see. Custom lesson sets can extend Mathematics or add entirely new subjects with their own colors.",
-    points: ["Subject switches the dashboard, map, lessons, and theme.", "Hard path locks tests until prerequisites are proven.", "Open path keeps the same connections as guidance but opens every test."],
-    tip: "The subject and path choice belongs to this profile and travels inside backups.",
+    title: "See every subject—and choose how strict the path should be.",
+    lede: "The mastery map keeps every installed subject together in one connected view. Custom lesson sets can extend Mathematics or add entirely new subjects with their own colors.",
+    points: ["Subject colors keep each curriculum recognizable on the combined map.", "Opening a lesson applies that subject’s theme until you study another subject.", "Hard path enforces prerequisites; Open path keeps the same connections as guidance."],
+    tip: "The learning-path choice and last studied subject theme belong to this profile and travel inside backups.",
     visual: "subjects",
   },
   {
     eyebrow: "The mastery map",
     title: "Read the map before picking your next lesson.",
     lede: "Every node is a lesson. Connections show prerequisite knowledge, including bridges between any installed subjects.",
-    points: ["Switch between the current subject and an All subjects map.", "Drag in either direction; use the mouse wheel on desktop or pinch on mobile to zoom.", "Turn on Plan mode to arrange nodes anywhere on a free canvas, hide distractions, draw colored study paths, and place draggable free or lesson-connected comment nodes without changing the canonical map."],
+    points: ["Every installed subject appears in a labeled lane, with bridge lines connecting related knowledge.", "Drag in either direction; use the mouse wheel on desktop or pinch on mobile to zoom.", "Turn on Plan mode to arrange nodes anywhere on a free canvas, hide distractions, draw colored study paths, and place draggable free or lesson-connected comment nodes without changing the canonical map."],
     tip: "Colored subject bands are guides, not fences. Use Ctrl or a selection rectangle on desktop; touch and hold lessons on mobile. Hide selected nodes for a quieter plan, then use Show hidden nodes to restore them. Your plan autosaves with this profile and travels in full backups.",
     visual: "map",
   },
@@ -286,9 +285,9 @@ function tutorialVisual(type, snapshot) {
   if (type === "welcome") return `<div class="tour-profile-preview"><img src="./quickmaths-logo.png" alt="" width="88" height="82"><div><span>Profile ready</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>Autosaving on this device</small></div><i>✓</i></div><div class="tour-local-row"><span>Free</span><span>Local-first</span><span>No account</span></div>`;
   if (type === "subjects") {
     const assigned = Boolean(snapshot.activeCurriculum);
-    return `<div class="tour-subject-preview"><p>Subject selector</p><div><span>${escapeHtml(snapshot.activeSubject.icon)}</span><strong>${escapeHtml(snapshot.activeSubject.name)}</strong><b>⌄</b></div><small>Changes the visible curriculum, mastery map, and color theme.</small></div><div class="tour-mode-preview" aria-label="${assigned ? "Educator-set learning path" : "Choose a learning path"}"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}" ${assigned ? "disabled" : ""}><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}" ${assigned ? "disabled" : ""}><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>${assigned ? `<p class="tour-assignment-note">This curriculum’s educator chose ${snapshot.progressionMode === "soft" ? "Open" : "Hard"} path. The controls demonstrate both modes but cannot override the assignment.</p>` : ""}`;
+    return `<div class="tour-subject-preview"><p>One connected curriculum</p><div><span>∞</span><strong>All installed subjects</strong><b>${snapshot.subjects.length}</b></div><small>Subject lanes stay visible together. The app theme remembers the subject of the last lesson you opened.</small></div><div class="tour-mode-preview" aria-label="${assigned ? "Educator-set learning path" : "Choose a learning path"}"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}" ${assigned ? "disabled" : ""}><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}" ${assigned ? "disabled" : ""}><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>${assigned ? `<p class="tour-assignment-note">This curriculum’s educator chose ${snapshot.progressionMode === "soft" ? "Open" : "Hard"} path. The controls demonstrate both modes but cannot override the assignment.</p>` : ""}`;
   }
-  if (type === "map") return `<div class="tour-map-preview"><div class="tour-map-controls"><span>Current subject</span><strong>All subjects</strong><b>✦ Plan mode</b><i>− &nbsp; 100% &nbsp; +</i></div><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
+  if (type === "map") return `<div class="tour-map-preview"><div class="tour-map-controls"><strong>All subjects</strong><span>Connected by default</span><b>✦ Plan mode</b><i>− &nbsp; 100% &nbsp; +</i></div><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
   if (type === "loop") return `<div class="tour-loop-preview"><article><span>01</span><b>Read</b><small>Theory and examples</small></article><i>→</i><article><span>02</span><b>Test</b><small>Answers and shown work</small></article><i>→</i><article><span>03</span><b>Reflect</b><small>Confidence and difficulty</small></article><i>→</i><article><span>04</span><b>Review</b><small>Mastery and next date</small></article></div><div class="tour-work-preview"><code>2x + 5 = 13<br>2x = 8<br>x = 4</code><span>Step check passed</span></div>`;
   if (type === "depot") return `<div class="tour-depot-preview"><header><div><small>Community curriculum</small><strong>Lesson Depot</strong></div><span>Browse · discuss · install</span></header><div><article class="is-geography"><span>Geography</span><strong>Field Cartography</strong><small>3 lessons · Published</small><footer><b>👍 18</b><b>◯ 6</b></footer></article><article class="is-biology"><span>Biology</span><strong>Cell Systems</strong><small>Concept preview</small><footer><b>Roadmap</b></footer></article></div><p><b>✓</b> Packages are hash-checked and validated before installation.</p></div>`;
   if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent studio</small><strong>Tutor in the loop</strong></div><i>In-app browser</i></div><div class="tour-agent-prompt"><span>Suggested starting prompt</span><p>${escapeHtml(agentStarterPrompt())}</p><button class="button button-secondary" type="button" data-tutorial-action="copy-agent-prompt">Copy to clipboard</button></div><div class="tour-tool-row"><code>get_agent_guide</code><code>get_progress_summary</code><code>record_tutor_feedback</code></div></div>`;
@@ -386,10 +385,9 @@ function skillOptions(snapshot, selectedId) {
 }
 
 function mapSkillOptions(snapshot, rows, selectedId) {
-  const allSubjects = snapshot.mapScope === "all";
   return rows.map((row) => {
     const subject = snapshot.subjects.find((item) => item.id === row.subjectId);
-    const subjectLabel = allSubjects ? `${subject?.icon ?? "◇"} ${subject?.shortName ?? subject?.name ?? row.subjectId} · ` : "";
+    const subjectLabel = `${subject?.icon ?? "◇"} ${subject?.shortName ?? subject?.name ?? row.subjectId} · `;
     return `<option value="${escapeHtml(row.id)}" ${row.id === selectedId ? "selected" : ""}>${escapeHtml(subjectLabel)}${escapeHtml(row.name)} · ${escapeHtml(row.subdomain)}</option>`;
   }).join("");
 }
@@ -1062,8 +1060,8 @@ function renderCurriculumWorkspace(snapshot) {
 }
 
 function renderMap(snapshot, { designer = false } = {}) {
-  const combined = snapshot.mapScope === "all";
-  const viewportKey = combined ? "all-subjects" : `subject:${snapshot.activeSubject.id}`;
+  const combined = true;
+  const viewportKey = "all-subjects";
   const previousScroller = elements.view.querySelector(".map-scroll");
   const previousViewport = previousScroller?.dataset.mapViewportKey === viewportKey
     ? {
@@ -1074,8 +1072,8 @@ function renderMap(snapshot, { designer = false } = {}) {
       viewMinY: Number(previousScroller.querySelector(".mastery-map")?.dataset.viewMinY ?? 0) || 0,
     }
     : null;
-  const mapRows = combined ? snapshot.allProgressRows : snapshot.progressRows;
-  const mapSkills = combined ? snapshot.curriculum.allSkills : snapshot.curriculum.skills;
+  const mapRows = snapshot.allProgressRows;
+  const mapSkills = snapshot.curriculum.allSkills;
   let selected = mapRows.find((row) => row.id === snapshot.ui.selectedMapSkillId) ?? mapRows[0];
   if (!selected) {
     elements.view.innerHTML = `<section class="test-empty content-card"><h2>${combined ? "No installed lessons" : `No lessons in ${escapeHtml(snapshot.activeSubject.name)}`}</h2><p>Use Lesson studio or load a custom set to add the first lesson.</p><button class="button button-primary" data-route="creator">Open Lesson studio</button></section>`;
@@ -1086,7 +1084,7 @@ function renderMap(snapshot, { designer = false } = {}) {
   const displayedPlan = planMode || planView
     ? snapshot.mapPlan
     : { layouts: {}, paths: [], annotations: [], hiddenSkillIds: [] };
-  const layout = mapLayout(mapSkills, { subjects: snapshot.subjects, combined });
+  const layout = mapLayout(mapSkills, { subjects: snapshot.subjects, combined: true });
   const savedPositions = displayedPlan.layouts?.[viewportKey] ?? {};
   const positions = Object.fromEntries(Object.entries(layout.positions).map(([id, position]) => [
     id,
@@ -1190,8 +1188,8 @@ function renderMap(snapshot, { designer = false } = {}) {
 
   elements.view.innerHTML = `${designer ? renderCurriculumWorkspace(snapshot) : ""}
     <header class="page-head">
-      <div><p class="eyebrow">${combined ? `All subjects · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula` : `${escapeHtml(snapshot.activeSubject.icon)} ${escapeHtml(snapshot.activeSubject.name)} · ${mapRows.length} connected lessons`}</p><h1>${designer ? "Canonical curriculum map" : "Mastery map"}</h1><p>${designer ? "Drag this curriculum’s canonical map into shape. Learners receive these positions, custom paths, and annotations when they load the file." : `${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} ${combined ? "Subject lanes and highlighted bridge lines show how knowledge travels across every installed curriculum." : "Cross-subject prerequisites stay listed in the detail panel; choose All subjects to draw them between curricula."}`}</p></div>
-      <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><button type="button" class="map-plan-toggle map-plan-view-toggle" data-action="toggle-plan-view" aria-pressed="${planView}" ${planMode ? "disabled" : ""}><span>◎</span><strong>Plan view</strong><small>${planMode ? "Exit editor to view" : planView ? "Showing saved plan" : "Showing canonical map"}</small></button>`}<div class="map-scope-control" role="group" aria-label="Subjects shown on mastery map"><button type="button" data-map-scope="subject" aria-pressed="${!combined}">Current subject</button><button type="button" data-map-scope="all" aria-pressed="${combined}">All subjects</button></div><label class="compact-select">Jump to skill<select id="map-skill-select">${mapSkillOptions(snapshot, renderedRows.length ? renderedRows : mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
+      <div><p class="eyebrow">All subjects · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula</p><h1>${designer ? "Canonical curriculum map" : "Mastery map"}</h1><p>${designer ? "Drag this curriculum’s canonical map into shape. Learners receive these positions, custom paths, and annotations when they load the file." : `${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Subject lanes and highlighted bridge lines show how knowledge travels across every installed curriculum.`}</p></div>
+      <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><button type="button" class="map-plan-toggle map-plan-view-toggle" data-action="toggle-plan-view" aria-pressed="${planView}" ${planMode ? "disabled" : ""}><span>◎</span><strong>Plan view</strong><small>${planMode ? "Exit editor to view" : planView ? "Showing saved plan" : "Showing canonical map"}</small></button>`}<label class="compact-select">Jump to skill<select id="map-skill-select">${mapSkillOptions(snapshot, renderedRows.length ? renderedRows : mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${planMode ? `<span class="map-plan-key">Plan mode is autosaving</span>` : planView ? `<span class="map-plan-key">Plan view · read only</span>` : combined ? `<span class="map-subject-key">Node color = subject · dot = status</span>` : ""}</div>
     <section class="map-layout ${planMode ? "is-plan-mode" : ""}">
@@ -1952,10 +1950,9 @@ function render(snapshot) {
   document.querySelector("#agent-prompt").textContent = currentAgentPrompt();
   elements.shell.classList.toggle("is-educator", educator);
   applySubjectTheme(snapshot.activeSubject);
-  elements.subjectSelect.innerHTML = snapshot.subjects.map((subject) => `<option value="${escapeHtml(subject.id)}" ${subject.id === snapshot.activeSubject.id ? "selected" : ""}>${escapeHtml(subject.icon)} ${escapeHtml(subject.name)}</option>`).join("");
   document.querySelectorAll("[data-progression-mode]").forEach((button) => button.setAttribute("aria-pressed", button.dataset.progressionMode === snapshot.progressionMode ? "true" : "false"));
   const sidebarSubtitle = document.querySelector(".sidebar-brand small");
-  if (sidebarSubtitle) sidebarSubtitle.textContent = educator ? "Curriculum workspace" : snapshot.activeSubject.name;
+  if (sidebarSubtitle) sidebarSubtitle.textContent = educator ? "Curriculum workspace" : "Learning workspace";
   document.querySelectorAll("[data-nav-role]").forEach((item) => { item.hidden = item.dataset.navRole !== (educator ? "educator" : "learner"); });
   const dashboardLabel = document.querySelector('[data-route="home"] [data-nav-label]');
   if (dashboardLabel) dashboardLabel.textContent = educator ? "Overview" : "Dashboard";
@@ -2473,12 +2470,6 @@ document.addEventListener("click", async (event) => {
     showToast(modeButton.dataset.progressionMode === "soft" ? "Open path enabled. Connections are now guidance." : "Hard path enabled. Prerequisites lock tests.");
     return;
   }
-  const mapScopeButton = event.target.closest?.("[data-map-scope]");
-  if (mapScopeButton && ["map", "curriculum"].includes(currentSnapshot?.ui.route)) {
-    store.setLearningPreferences({ mapScope: mapScopeButton.dataset.mapScope });
-    showToast(mapScopeButton.dataset.mapScope === "all" ? "Showing every installed subject and bridge." : `Showing ${store.snapshot().activeSubject.name} only.`);
-    return;
-  }
   const mapNode = event.target.closest?.("[data-map-skill]");
   if (mapNode && !currentSnapshot?.ui.mapPlanMode) store.selectMapSkill(mapNode.dataset.mapSkill);
   const routeButton = event.target.closest("[data-route]");
@@ -2540,7 +2531,7 @@ document.addEventListener("click", async (event) => {
     return;
   }
   if (["map", "curriculum"].includes(currentSnapshot?.ui.route) && (action.dataset.action.startsWith("plan-") || ["toggle-plan-mode", "toggle-plan-view"].includes(action.dataset.action))) {
-    const layoutKey = currentSnapshot.mapScope === "all" ? "all-subjects" : `subject:${currentSnapshot.activeSubject.id}`;
+    const layoutKey = "all-subjects";
     try {
       if (action.dataset.action === "toggle-plan-mode") {
         const enabled = !currentSnapshot.ui.mapPlanMode;
@@ -2707,10 +2698,6 @@ document.addEventListener("change", (event) => {
   }
   if (event.target.id === "depot-subject" || event.target.id === "depot-sort") {
     lessonDepot.setFilters({ subject: document.querySelector("#depot-subject")?.value ?? "all", sort: document.querySelector("#depot-sort")?.value ?? "popular" });
-    return;
-  }
-  if (event.target.id === "subject-select") {
-    store.setLearningPreferences({ subjectId: event.target.value });
     return;
   }
   if (event.target.id === "curriculum-select") {
@@ -2887,7 +2874,7 @@ document.addEventListener("submit", (event) => {
     event.preventDefault();
     const data = new FormData(event.target);
     const selectedSkillIds = [...currentSnapshot.ui.mapPlanSelection];
-    const layoutKey = currentSnapshot.mapScope === "all" ? "all-subjects" : `subject:${currentSnapshot.activeSubject.id}`;
+    const layoutKey = "all-subjects";
     try {
       store.addMapPlanAnnotation({
         body: data.get("body"),
@@ -3055,8 +3042,8 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, educatorManifestResponse, authoringGuideResponse] = await Promise.all([
-          fetch("./agent-manifest.json?v=20260903-in-app-browser-v1"),
-          fetch("./educator-agent-manifest.json?v=20260903-in-app-browser-v1"),
+          fetch("./agent-manifest.json?v=20260903-combined-map-v1"),
+          fetch("./educator-agent-manifest.json?v=20260903-combined-map-v1"),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1"),
     ]);
     if (manifestResponse.ok) agentManifest = await manifestResponse.json();

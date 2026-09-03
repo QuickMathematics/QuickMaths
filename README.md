@@ -21,7 +21,7 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 
 - Separate learner and educator profile paths with ownership-filtered educator views, browser autosave, full backups, and optional complete-workspace GitHub storage
 - Public curriculum blueprints and privacy-warned private assignments with exact embedded-pack integrity, canonical maps copied into learner Plan mode, explicit lesson scope with prerequisite closure, learner rules, visible supplemental agent guidance, and assignment-progress isolation
-- Native Mathematics plus installable Geography and Python Programming mastery maps from the Lesson Depot; Python adds formatted code prompts, structured trace tables, and deterministic pure-function assessments in a fresh disposable browser Worker using a self-hosted integrity-pinned runtime
+- One combined mastery map for native Mathematics plus installable Geography, Python Programming, and future Lesson Depot subjects; Python adds formatted code prompts, structured trace tables, and deterministic pure-function assessments in a fresh disposable browser Worker using a self-hosted integrity-pinned runtime
 - Persistent Plan mode with draggable layouts, desktop marquee/Ctrl selection, touch hold-selection, colored custom paths, and draggable free or connected comment nodes
 - Enforced Hard path and guideline-only Open path
 - Lesson-defined comprehensive mastery tests with generated variants, required work, proofs, trace tables, sandboxed Python functions, and review gates

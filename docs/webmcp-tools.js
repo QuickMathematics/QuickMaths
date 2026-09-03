@@ -217,29 +217,16 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
   const educatorGuide = educatorManifest && typeof educatorManifest === "object" && !Array.isArray(educatorManifest)
     ? JSON.parse(JSON.stringify(educatorManifest))
     : {};
-  const preparePlanMap = ({ skillIds = [], mapScope = null, subjectId = null, enablePlanMode = true } = {}) => {
+  const preparePlanMap = ({ skillIds = [], enablePlanMode = true } = {}) => {
     let state = store.snapshot();
     if (!state.activeProfile) throw new Error("Select a profile first.");
-    if (mapScope != null && !["subject", "all"].includes(mapScope)) throw new Error("map_scope must be subject or all.");
-    if (subjectId && !state.subjects.some((subject) => subject.id === subjectId)) throw new Error("subject_id is unknown.");
-    if (subjectId && mapScope === "all") throw new Error("subject_id cannot be combined with map_scope all.");
-    const skillSubjectIds = [...new Set(skillIds.map((id) => store.skillsById[id]?.subjectId).filter(Boolean))];
-    const scope = subjectId ? "subject" : mapScope ?? (skillSubjectIds.length > 1 ? "all" : state.mapScope);
-    const targetSubjectId = subjectId || (scope === "subject" && skillSubjectIds.length === 1 ? skillSubjectIds[0] : state.activeSubject.id);
-    if (scope === "subject" && skillSubjectIds.some((id) => id !== targetSubjectId)) {
-      throw new Error("Every skill_id must belong to the visible subject, or use map_scope all.");
-    }
-    if (state.mapScope !== scope || (scope === "subject" && state.activeSubject.id !== targetSubjectId)) {
-      store.setLearningPreferences({ subjectId: scope === "subject" ? targetSubjectId : null, mapScope: scope, activityActor: "agent" });
-      state = store.snapshot();
-    }
     const planRoute = state.activeProfile.role === "educator" ? "curriculum" : "map";
     if (state.ui.route !== planRoute) {
       store.navigate("map", null, { activityActor: "agent" });
       state = store.snapshot();
     }
     if (enablePlanMode && !state.ui.mapPlanMode) store.setMapPlanMode(true, { activityActor: "agent" });
-    return { mapScope: scope, subjectId: scope === "subject" ? targetSubjectId : null, layoutKey: scope === "all" ? "all-subjects" : `subject:${targetSubjectId}` };
+    return { mapScope: "all", subjectId: null, layoutKey: "all-subjects" };
   };
   return [
     {
@@ -346,34 +333,24 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "get_curriculum_map",
       title: "Get curriculum map",
-      description: "Read one installed subject map or the combined all-subject prerequisite map, including statuses, bridges, and unlock relationships.",
+      description: "Read the combined installed-subject prerequisite map, including statuses, subject identities, bridges, and unlock relationships.",
       inputSchema: {
         type: "object",
         properties: {
           include_locked: { type: "boolean", description: "Include locked skills; defaults to true." },
-          subject_id: stringSchema("Optional subject to inspect; defaults to the learner's visible subject.", 60),
-          scope: { type: "string", enum: ["subject", "all"], description: "Read one subject or the combined installed-subject map; defaults to the visible map scope." },
         },
         additionalProperties: false,
       },
       annotations: { readOnlyHint: true },
       async execute(input = {}) {
-        requireObject(input); rejectUnknown(input, ["include_locked", "subject_id", "scope"]);
+        requireObject(input); rejectUnknown(input, ["include_locked"]);
         if (input.include_locked !== undefined && typeof input.include_locked !== "boolean") throw new Error("include_locked must be a boolean.");
-        if (input.scope !== undefined && !["subject", "all"].includes(input.scope)) throw new Error("scope must be subject or all.");
         const state = store.snapshot();
-        const requestedSubjectId = optionalString(input, "subject_id", 60) || null;
-        if (requestedSubjectId && input.scope === "all") throw new Error("subject_id cannot be combined with scope all.");
-        const scope = requestedSubjectId ? "subject" : input.scope ?? state.mapScope;
-        const subjectId = requestedSubjectId || state.activeSubject.id;
-        if (scope === "subject" && !state.subjects.some((subject) => subject.id === subjectId)) throw new Error("subject_id is unknown.");
-        const subjectRows = scope === "all" ? state.allProgressRows : state.allProgressRows.filter((row) => row.subjectId === subjectId);
-        const rows = (input.include_locked ?? true) ? subjectRows : subjectRows.filter((row) => row.status !== "locked");
+        const rows = (input.include_locked ?? true) ? state.allProgressRows : state.allProgressRows.filter((row) => row.status !== "locked");
         return {
           ok: true,
-          scope,
-          subject: scope === "subject" ? state.subjects.find((subject) => subject.id === subjectId) : null,
-          subjects: scope === "all" ? state.subjects : undefined,
+          scope: "all",
+          subjects: state.subjects,
           progression_mode: state.progressionMode,
           active_curriculum_policy: activeCurriculumPolicy(store),
           custom_lesson_sets: state.lessonPacks.filter((pack) => pack.mode !== "override").map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
@@ -494,7 +471,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "list_subjects",
       title: "List QuickMaths subjects",
-      description: "Read every installed subject, its theme-safe metadata, lesson count, and the learner's current subject.",
+      description: "Read every installed subject, its theme-safe metadata, lesson count, and the subject theme retained from the learner's most recently opened lesson.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: true, untrustedContentHint: true },
       async execute(input = {}) {
@@ -514,25 +491,21 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     },
     {
       name: "set_learning_preferences",
-      title: "Set learning and map preferences",
-      description: "Change the visible subject, choose Hard or Open path, and switch the mastery map between the current subject and all installed subjects. This visibly updates the app.",
+      title: "Set learning preferences",
+      description: "Choose Hard or Open path. The mastery map permanently includes every installed subject, and its subject theme changes only when the learner opens a lesson or begins its test.",
       inputSchema: {
         type: "object",
         properties: {
-          subject_id: stringSchema("An installed subject ID from list_subjects.", 60),
           progression_mode: { type: "string", enum: ["hard", "soft"] },
-          map_scope: { type: "string", enum: ["subject", "all"] },
         },
         additionalProperties: false,
       },
       async execute(input = {}) {
-        requireObject(input); rejectUnknown(input, ["subject_id", "progression_mode", "map_scope"]);
+        requireObject(input); rejectUnknown(input, ["progression_mode"]);
         requireLearnerPlanningEnabled(store);
-        if (!input.subject_id && !input.progression_mode && !input.map_scope) throw new Error("Provide subject_id, progression_mode, or map_scope.");
+        if (!input.progression_mode) throw new Error("Provide progression_mode.");
         return store.setLearningPreferences({
-          subjectId: optionalString(input, "subject_id", 60) || null,
           progressionMode: input.progression_mode ?? null,
-          mapScope: input.map_scope ?? null,
           activityActor: "agent",
         });
       },
@@ -562,25 +535,23 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "set_map_plan_mode",
       title: "Open or close mastery-map Plan mode",
-      description: "Show the mastery map in its persistent editable Plan mode, or return to the default read-only Plan view. The human can separately toggle between Plan view and the untouched canonical map. Optional subject and scope inputs choose which map is visible.",
+      description: "Show the combined mastery map in its persistent editable Plan mode, or return to the default read-only Plan view. The human can separately toggle between Plan view and the untouched canonical map.",
       inputSchema: {
         type: "object",
         properties: {
           enabled: { type: "boolean", description: "True opens the editable plan; false returns to the read-only saved Plan view." },
-          map_scope: { type: "string", enum: ["subject", "all"], description: "Show one subject or every installed subject." },
-          subject_id: stringSchema("Installed subject ID when map_scope is subject.", 60),
         },
         required: ["enabled"],
         additionalProperties: false,
       },
       async execute(input) {
-        requireObject(input); rejectUnknown(input, ["enabled", "map_scope", "subject_id"]);
+        requireObject(input); rejectUnknown(input, ["enabled"]);
         requireLearnerPlanningEnabled(store);
         if (typeof input.enabled !== "boolean") throw new Error("enabled must be a boolean.");
-        const context = preparePlanMap({ mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null, enablePlanMode: false });
+        const context = preparePlanMap({ enablePlanMode: false });
         if (store.snapshot().ui.mapPlanMode !== input.enabled) store.setMapPlanMode(input.enabled, { activityActor: "agent" });
         const state = store.snapshot();
-        return { ok: true, visible_view: state.ui.route, plan_mode: state.ui.mapPlanMode, map_scope: context.mapScope, subject_id: context.subjectId };
+        return { ok: true, visible_view: state.ui.route, plan_mode: state.ui.mapPlanMode, map_scope: context.mapScope };
       },
     },
     {
@@ -595,14 +566,12 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
             description: "Lesson positions in free-canvas units; x and y must be between -20000 and 20000. Subject bands are visual guides, not placement boundaries.",
             items: { type: "object", properties: { skill_id: stringSchema("Installed lesson ID.", 60), x: { type: "number", minimum: -20000, maximum: 20000 }, y: { type: "number", minimum: -20000, maximum: 20000 } }, required: ["skill_id", "x", "y"], additionalProperties: false },
           },
-          map_scope: { type: "string", enum: ["subject", "all"] },
-          subject_id: stringSchema("Installed subject ID when arranging a subject-only map.", 60),
         },
         required: ["positions"],
         additionalProperties: false,
       },
       async execute(input) {
-        requireObject(input); rejectUnknown(input, ["positions", "map_scope", "subject_id"]);
+        requireObject(input); rejectUnknown(input, ["positions"]);
         requireLearnerPlanningEnabled(store);
         if (!Array.isArray(input.positions) || !input.positions.length || input.positions.length > 80) throw new Error("positions must contain between 1 and 80 items.");
         const positions = {};
@@ -615,7 +584,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         }
         const skillIds = Object.keys(positions);
         requiredSkillIds(store, { skill_ids: skillIds }, "skill_ids");
-        const context = preparePlanMap({ skillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
+        const context = preparePlanMap({ skillIds });
         const result = store.updateMapPlanLayout({ layoutKey: context.layoutKey, positions, selectedSkillIds: skillIds, activityActor: "agent" });
         return { ok: true, visible_view: store.snapshot().ui.route, plan_mode: true, map_scope: context.mapScope, layout_key: result.layoutKey, moved: result.moved, selected_skill_ids: result.selectedSkillIds, positions };
       },
@@ -629,18 +598,16 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         properties: {
           skill_ids: { type: "array", minItems: 1, maxItems: 80, description: "Lesson IDs to hide or restore in Plan mode.", items: stringSchema("Installed lesson ID.", 60) },
           hidden: { type: "boolean", description: "True hides the lessons from Plan mode; false restores them." },
-          map_scope: { type: "string", enum: ["subject", "all"] },
-          subject_id: stringSchema("Installed subject ID when editing a subject-only map.", 60),
         },
         required: ["skill_ids", "hidden"],
         additionalProperties: false,
       },
       async execute(input) {
-        requireObject(input); rejectUnknown(input, ["skill_ids", "hidden", "map_scope", "subject_id"]);
+        requireObject(input); rejectUnknown(input, ["skill_ids", "hidden"]);
         requireLearnerPlanningEnabled(store);
         const skillIds = requiredSkillIds(store, input, "skill_ids", 1);
         if (typeof input.hidden !== "boolean") throw new Error("hidden must be a boolean.");
-        const context = preparePlanMap({ skillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
+        const context = preparePlanMap({ skillIds });
         store.setMapPlanSelection(skillIds);
         const result = store.setMapPlanNodesHidden(skillIds, input.hidden, { activityActor: "agent" });
         return {
@@ -664,17 +631,15 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           skill_ids: { type: "array", minItems: 2, maxItems: 80, description: "Ordered lesson IDs; order becomes path order.", items: stringSchema("Installed lesson ID.", 60) },
           name: stringSchema("Optional path name; a numbered name is used when omitted.", 80),
           color: { type: "string", pattern: "^#[0-9A-Fa-f]{6}$", description: "Six-digit outline color; defaults to #df755b." },
-          map_scope: { type: "string", enum: ["subject", "all"] },
-          subject_id: stringSchema("Installed subject ID when creating a subject-only path.", 60),
         },
         required: ["skill_ids"],
         additionalProperties: false,
       },
       async execute(input) {
-        requireObject(input); rejectUnknown(input, ["skill_ids", "name", "color", "map_scope", "subject_id"]);
+        requireObject(input); rejectUnknown(input, ["skill_ids", "name", "color"]);
         requireLearnerPlanningEnabled(store);
         const skillIds = requiredSkillIds(store, input, "skill_ids", 2);
-        const context = preparePlanMap({ skillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
+        const context = preparePlanMap({ skillIds });
         store.setMapPlanSelection(skillIds);
         const path = store.createMapPlanPath({ name: optionalString(input, "name", 80), color: input.color ?? "#df755b", skillIds, activityActor: "agent" });
         return { ok: true, visible_view: store.snapshot().ui.route, plan_mode: true, map_scope: context.mapScope, path: { path_id: path.id, name: path.name, color: path.color, skill_ids: path.skillIds } };
@@ -690,20 +655,18 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           body: stringSchema("Annotation text shown on the map; plain text only.", 1200),
           skill_ids: { type: "array", maxItems: 80, description: "Optional lesson IDs to connect to the comment.", items: stringSchema("Installed lesson ID.", 60) },
           position: { type: "object", description: "Optional absolute comment position in free-canvas units.", properties: { x: { type: "number", minimum: -20000, maximum: 20000 }, y: { type: "number", minimum: -20000, maximum: 20000 } }, required: ["x", "y"], additionalProperties: false },
-          map_scope: { type: "string", enum: ["subject", "all"] },
-          subject_id: stringSchema("Installed subject ID when annotating a subject-only map.", 60),
         },
         required: ["body"],
         additionalProperties: false,
       },
       annotations: { untrustedContentHint: true },
       async execute(input) {
-        requireObject(input); rejectUnknown(input, ["body", "skill_ids", "position", "map_scope", "subject_id"]);
+        requireObject(input); rejectUnknown(input, ["body", "skill_ids", "position"]);
         requireLearnerPlanningEnabled(store);
         const body = requiredString(input, "body", 1200);
         if (input.skill_ids != null && !Array.isArray(input.skill_ids)) throw new Error("skill_ids must be an array.");
         const suppliedSkillIds = input.skill_ids?.length ? requiredSkillIds(store, input, "skill_ids", 1) : [];
-        const context = preparePlanMap({ skillIds: suppliedSkillIds, mapScope: input.map_scope ?? null, subjectId: optionalString(input, "subject_id", 60) || null });
+        const context = preparePlanMap({ skillIds: suppliedSkillIds });
         store.setMapPlanSelection(suppliedSkillIds);
         let position = input.position ?? null;
         if (position) {

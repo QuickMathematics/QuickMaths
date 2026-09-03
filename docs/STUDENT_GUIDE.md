@@ -21,7 +21,7 @@ QuickMaths connects lessons into mastery maps instead of treating every topic as
 | Layer | What it contains | What it means for you |
 | --- | --- | --- |
 | Profile | Progress, attempts, reviews, drafts, timers, personal plans, and preferences | Your learning record stays separate from other people using the browser |
-| Subject | Lessons, prerequisite graph, theme, and cross-subject bridges | Switching subject changes the visible curriculum and color identity |
+| Subject | Lessons, map lane, theme, and cross-subject bridges | Opening a lesson retains that subject's interface theme while the map continues to show every installed subject |
 | Curriculum | An educator-authored selection of packs, canonical map, learning path, and optional supplemental agent guidance | A portable learning plan can travel from an educator into an independent assignment profile |
 | Lesson pack | One subject or set of lessons, questions, grading rules, and work requirements | Installed packs extend the same map, progress, testing, and backup system |
 
@@ -95,7 +95,7 @@ The tutorial is a visual introduction, not a separate account setup.
 | Chapter | What it demonstrates |
 | --- | --- |
 | 1. Your workspace | Local profile, autosave, portable backup, and account-free use |
-| 2. Subject and path | Subject picker, Hard path, and Open path; you can choose the mode when no curriculum controls it |
+| 2. Subjects and path | Combined subject map, retained lesson theme, Hard path, and Open path |
 | 3. Mastery map | Prerequisites, status, map movement, zoom, and personal Plan mode |
 | 4. Learning loop | Theory, examples, complete authored tests, shown work, reflection, and mastery |
 | 5. Lesson ecosystem | Lesson Depot discovery and Lesson Studio authoring or native improvement |
@@ -106,19 +106,18 @@ The tutorial is a visual introduction, not a separate account setup.
 
 ## 4. Shared application shell
 
-The shell keeps navigation, subject, identity, time, and agent status around the active page.
+The shell keeps navigation, identity, time, retained lesson theme, and agent status around the active page.
 
 ### Desktop sidebar
 
 | Control | Behavior |
 | --- | --- |
-| QuickMaths brand | Identifies the app; the subtitle shows the selected subject |
-| Subject selector | Switches the visible subject and theme |
+| QuickMaths brand | Identifies the app and learning workspace |
 | Analog clock | Shows local time |
 | Session timer | Counts the current open session |
 | Profile total | Accumulates saved practice time for the learner |
 | Dashboard | Progress overview, suggestion, recent attempts, and backup status |
-| Mastery map | Prerequisite graph, lesson details, map scope, zoom, and personal Plan mode |
+| Mastery map | Combined prerequisite graph, lesson details, zoom, and personal Plan mode |
 | Lessons | Theory, worked examples, applications, and recommended preparation |
 | Mastery test | Complete authored assessment and saved response draft |
 | Results | Grading, reflection, review, and mastery update |
@@ -133,7 +132,7 @@ The bottom bar shows Home, Map, Learn, Test, Depot, and Settings. Lesson Studio 
 
 ### Subject theme
 
-Each subject has a safe fixed color palette. The selected subject changes interface accents. In the combined map, each subject's node colors remain visible while mastery status uses text and status dots.
+Each subject has a safe fixed color palette. The map always shows every installed subject, so node colors preserve subject identity while mastery status uses text and status dots. Opening a lesson or beginning its test applies that subject's interface theme; the theme stays until you study a lesson from another subject. Merely selecting a map node does not recolor the app.
 
 ### Agent Studio
 
@@ -149,11 +148,11 @@ Dashboard answers three questions: where am I, what should I do next, and is my 
 
 - **Student guide** opens this PDF.
 - **Save backup** downloads complete restorable state.
-- **Open mastery map** opens the selected subject map.
+- **Open mastery map** opens the combined map of every installed subject.
 
 ### Progress metrics
 
-Cards summarize mastery states and lesson counts. Typical states are Ready, Learning, Proven, Mastered, Rusty, and Locked. Counts respect the current subject or attached curriculum.
+Cards summarize mastery states and lesson counts. Typical states are Ready, Learning, Proven, Mastered, Rusty, and Locked. Dashboard counts follow the subject theme retained from the last opened lesson; curriculum completion still respects the complete attached curriculum.
 
 ### Suggested next lesson
 
@@ -173,9 +172,9 @@ An attached curriculum can expose its educator contact and completion context. E
 
 ## 6. Subjects and learning paths
 
-### Subject selector
+### One connected subject map
 
-The selector changes Dashboard, Map, Lessons, and Test context. A newly installed subject appears alongside Mathematics. Cross-subject prerequisites still refer to globally unique lesson IDs.
+There is no subject selector or subject-only map mode. A newly installed subject appears as another labeled lane on the same mastery map, and cross-subject prerequisites connect globally unique lesson IDs. Use the map's **Jump to skill** control or select a node to inspect any installed lesson. When you open that lesson or start its test, its subject becomes the retained theme and the default context for Dashboard, Lessons, and Test.
 
 ### Hard path
 
@@ -193,9 +192,9 @@ If an educator curriculum sets the path, the learner Settings controls are disab
 
 The map turns prerequisite structure and progress into one interactive canvas.
 
-### Current subject and all subjects
+### All subjects by default
 
-**Current subject** shows one focused graph. **All subjects** arranges installed subjects in labeled lanes, keeps each subject's colors, and draws cross-subject bridges.
+The mastery map permanently arranges every installed subject in labeled lanes, keeps each subject's colors, and draws cross-subject bridges. Hiding nodes in Plan mode is the deliberate way to make a quieter personal view without introducing a second subject-only map state.
 
 ### Node status
 
@@ -275,7 +274,7 @@ Choose **Annotation** to create a note connected to selected lessons, or free on
 
 ### Plan details and reset
 
-The side card lists selection, saved paths, and annotations. Delete individual plan items, hide or restore selected nodes, or reset node positions for the visible scope. Subject layouts and the combined all-subject layout keep separate positions. Hidden-node choices belong to the plan as a whole and remain hidden across its subject and combined views until restored.
+The side card lists selection, saved paths, and annotations. Delete individual plan items, hide or restore selected nodes, or reset positions on the combined map. All planning positions, free comments, paths, and hidden-node choices share the one `all-subjects` layout.
 
 ## 9. Lesson page
 

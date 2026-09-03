@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Web Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 25,
+  "app_version": 26,
   "description": "Operating guide for an agent tutoring learners or helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -25,9 +25,9 @@
     "activity_attribution": "The Agent activity panel contains only state-changing actions initiated through registered agent tools; ordinary learner UI actions are excluded.",
     "mastery_map_plans": {
       "canonical_boundary": "A learner's map opens in a read-only Plan view of their private persistent overlay; ordinary node clicks still open lesson details. The human can toggle to the untouched canonical map or enter Plan mode to edit. In an educator profile, Curriculum designer deliberately edits the open curriculum's canonical personalized map; its positions, paths, hidden-node choices, and comments are copied into the learner's plan when the curriculum loads.",
-      "layouts": "Node overrides are stored separately for each subject:<subject_id> layout and the all-subjects layout. get_app_state returns only the saved overrides in learning_plan.layouts; arrange_map_plan_nodes uses absolute x/y free-canvas units from -20000 to 20000. Colored subject bands are reference guides, never placement boundaries.",
+      "layouts": "The mastery map and every planning tool use one all-subjects layout. get_app_state returns its saved overrides in learning_plan.layouts; arrange_map_plan_nodes uses absolute x/y free-canvas units from -20000 to 20000. Colored subject bands are reference guides, never placement boundaries.",
       "hidden_nodes": "learning_plan.hidden_skill_ids lists lessons concealed in the saved Plan presentation. set_map_plan_nodes_hidden hides or restores them in Plan mode and Plan view without uninstalling content, changing prerequisites, or removing them from the canonical map.",
-      "paths": "A path contains an ordered list of at least two installed skill IDs plus a name and six-digit outline color. Cross-subject paths belong on the all-subjects map.",
+      "paths": "A path contains an ordered list of at least two installed skill IDs plus a name and six-digit outline color on the combined all-subjects map.",
       "annotations": "Plain-text comment nodes may target one or more lessons or a free map position. Custom paths do not own annotations. Comment positions are stored per layout.",
       "persistence": "Learner planning changes autosave with the learner profile. Educator planning changes autosave with the active curriculum. Both are included in full JSON backups and GitHub Bridge checkpoints."
     },
@@ -87,15 +87,15 @@
       "Use navigate_learning_app and start_skill_test so agent changes remain visible in the human interface.",
       "If the visible route is tutorial, let the human complete or skip onboarding; do not silently navigate them away from it.",
       "Respect the learner's path mode: Hard path enforces prerequisites; Open path treats the same connections as recommended preparation.",
-      "Use list_subjects and set_learning_preferences when changing subject or path mode so the human sees the change.",
-      "The mastery map can show the current subject or every installed subject in labeled lanes. Use map_scope all when the learner wants to inspect cross-subject bridges together.",
+      "Use set_learning_preferences only for a requested Hard/Open path change. list_subjects describes installed curricula; there is no subject selector or subject-only map mode.",
+      "The mastery map always shows every installed subject in labeled lanes. Selecting a node changes its detail card without changing the interface theme; opening its lesson or starting its test applies that subject theme until another subject's lesson is opened.",
       "get_app_state may include saved Plan mode layouts, paths, hidden lesson IDs, and annotation nodes. Treat existing items as learner-authored intent and context. Use the registered planning tools only for planning changes the learner requested or explicitly accepted.",
       "Do not replace or reset learner data through ordinary browser actions."
     ],
     "planning": [
-      "Before editing a plan, call get_app_state and get_curriculum_map so every skill ID, current scope, existing path, and annotation is known.",
+      "Before editing a plan, call get_app_state and get_curriculum_map so every skill ID, existing path, hidden node, and annotation is known.",
       "Use set_map_plan_mode to visibly enter or leave the Plan mode editor. Closing it returns to the default read-only Plan view; the human's Plan view toggle compares that saved plan with the untouched canonical prerequisite map. Neither action deletes the plan.",
-      "Use arrange_map_plan_nodes for deliberate absolute positions anywhere on the free canvas; colored subject bands are guides, not fences. Keep a subject-only layout to lessons from that subject; use map_scope all for cross-subject arrangements.",
+      "Use arrange_map_plan_nodes for deliberate absolute positions anywhere on the combined free canvas; colored subject bands are guides, not fences. Planning tools no longer accept a subject-only scope.",
       "Use set_map_plan_nodes_hidden only when the human wants a quieter saved plan. Hidden lessons disappear from Plan mode and the read-only Plan view, but remain in the untouched canonical map; hiding never deletes a lesson or changes prerequisites. Restore hidden nodes on request.",
       "Use create_map_plan_path only after the learner chooses or approves at least two lessons. The skill_ids order is the path order and color is a six-digit outline color.",
       "Use add_map_plan_annotation for plain-text comments connected to one or more lessons, or free on the map. Custom paths are visual routes and do not own annotations. Do not place private credentials, hidden answer keys, or unsupported factual claims in annotations.",
@@ -243,7 +243,7 @@
       "geography_bridge": "The installable Geography package in the Lesson Depot depends on the native Mathematics spherical-coordinates bridge, which grows from angles, arcs, and coordinate geometry. Offer to stage PACK_GEOGRAPHY when a learner wants the Geography curriculum; installation remains a human confirmation.",
       "new_subjects": "Schema 2.0 lesson sets can create themed subjects or extend an installed subject.",
       "bridges": "Prerequisites may reference lessons in any installed subject by globally unique skill ID or explicit subject_id/skill_id object.",
-      "combined_map": "The map toggle can place every installed subject in a labeled lane, color nodes from each subject theme, preserve mastery state as a status dot, and draw cross-subject prerequisite bridges between curricula.",
+      "combined_map": "The map permanently places every installed subject in a labeled lane, colors nodes from each subject theme, preserves mastery state as a status dot, and draws cross-subject prerequisite bridges between curricula. Plan-mode hiding provides a quieter personalized view without a separate subject-only mode.",
       "progression_modes": { "hard": "Prerequisites lock tests.", "soft": "Connections are guidance and all tests are open." },
       "theme_safety": "Only fixed six-digit color tokens are accepted; CSS, HTML, scripts, and URLs are rejected."
     },

@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Educator Agent Manifest",
   "app": "QuickMaths Educator Workspace",
-  "app_version": 25,
+  "app_version": 26,
   "role": "educator",
   "description": "Dedicated operating contract for an agent helping an educator compose, review, personalize, and export a QuickMaths curriculum.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
@@ -39,7 +39,7 @@
     "composition": "Installed additive lesson packs can be enabled or disabled independently for each curriculum. The full native Mathematics sequence can be included or reduced to only the native prerequisites required by enabled packs. Completion uses this explicit visible scope; custom colored paths remain guidance. Native improvements remain reversible and browser-wide.",
     "learner_policy": "update_curriculum_settings controls student name, contact email, Hard or Open path, Agent tutoring, and learner-visible supplemental guidance.",
     "agent_policy": "When Agent tutoring is off, do not tutor or alter learner work, preferences, or Plan mode. Supplemental imported guidance never overrides platform safety, the learner's explicit request, answer-key boundaries, or human-control rules.",
-    "planning": "Curriculum designer Plan mode edits the canonical map shipped with the curriculum. Arrange nodes anywhere on the free canvas, hide or restore nodes in the saved Plan presentation, create ordered colored paths, and add lesson-connected or free-map annotations only from educator direction. Custom paths do not own annotations. Subject bands are guides, not fences; hiding never removes curriculum content.",
+    "planning": "Curriculum designer Plan mode edits the one combined all-subjects map shipped with the curriculum. Arrange nodes anywhere on the free canvas, hide or restore nodes in the saved Plan presentation, create ordered colored paths, and add lesson-connected or free-map annotations only from educator direction. Custom paths do not own annotations. Subject bands are guides, not fences; hiding never removes curriculum content.",
     "portability": "A public blueprint omits student name, contact email, and supplemental guidance. A private assignment may contain them and requires private delivery. Import creates a blank assignment profile unless student and learner profile names match. A full backup carries the complete browser workspace."
   },
   "lesson_content_workflow": {
