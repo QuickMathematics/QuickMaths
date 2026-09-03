@@ -8,9 +8,9 @@ This guide documents the complete visible product: educator setup, every educato
 
 Product: https://quickmathematics.github.io/QuickMaths/
 
-Educator WebMCP command: `get_educator_agent_manifest`
+Unified WebMCP command: `get_agent_guide` with `section: "summary"`
 
-WebMCP tools register only when QuickMaths is open inside the ChatGPT or Codex in-app browser. External browsers still run the complete human app. The handoff UI protects existing local work before moving and the in-app agent begins with `get_educator_agent_manifest`.
+WebMCP tools register only when QuickMaths is open inside the ChatGPT or Codex in-app browser. External browsers still run the complete human app. The handoff UI protects existing local work before moving, and every in-app agent begins with the unified `get_agent_guide` command. The guide detects an educator profile and returns the educator contract.
 
 > QuickMaths is a learning and practice tool. It is not a substitute for supervised, identity-verified, or high-stakes assessment.
 
@@ -532,17 +532,20 @@ WebMCP connects an agent to the same store and visible routes used by the human 
 
 The app checks the WebMCP page capability. In an external browser with an existing curriculum workspace and no storage token, it offers a full backup download and private Workspace Storage setup before moving. With storage configured, **Open in ChatGPT / Codex** uses an experimental desktop deep link to open the public QuickMaths URL in the in-app browser and preload:
 
-`QuickMaths is open in your in-app browser. Call get_educator_agent_manifest through WebMCP, then follow the manifest to inspect my curriculum workspace and help me design it.`
+`QuickMaths is open in your in-app browser. Call get_agent_guide with section "summary" through WebMCP, then follow the unified manifest to route me into the right learner or educator workflow.`
 
 The URL carries no token, curriculum data, learner data, or answers. Restore the full backup or enter the storage token privately in the in-app QuickMaths form. Credential and human-control rules live in the manifest, not the prompt. Once an attributed agent action exists on the educator profile, QuickMaths hides the one-time starter prompt.
 
-The dedicated command returns the educator operating contract and the active policy revision. Full supplemental guidance is labeled as learner-visible, imported, and untrusted. Repeated state calls return only a compact policy ID and revision to avoid re-injecting the same free text.
+The unified command detects the active educator profile and returns the educator operating contract and active policy revision. Request `section: "educator"` for the detailed curriculum workflow. Full supplemental guidance is labeled as learner-visible, imported, and untrusted. Repeated state calls return only a compact policy ID and revision to avoid re-injecting the same free text.
+
+On a fresh workspace, the agent explicitly offers to help create a custom curriculum. The human first chooses **Educator** and creates an educator profile in the landing-page UI. The agent then reads the curriculum workspace, asks for the curriculum name and intended outcome, and can call `create_curriculum` after explicit approval.
 
 ### Educator read tools
 
 | Tool | Purpose |
 | --- | --- |
-| get_educator_agent_manifest | Dedicated workflow, boundaries, documentation, and active policy |
+| get_agent_guide | Unified fresh-workspace, learner, and educator routing; use section `educator` for the detailed educator contract |
+| get_quickmaths_manual | Machine-readable learner or educator manual index, one numbered chapter, or full Markdown source behind the PDF |
 | get_lesson_authoring_guide | Compact authoring overview or a focused section such as grading, Studio, graph design, or publishing |
 | get_app_state | Current profile, route, subject, scope, selection, plan, and status |
 | get_curriculum_workspace | Open curriculum identity, settings, enabled packs, and available library |
@@ -659,7 +662,7 @@ The conclusion and proof are separate judgments. Open Results and complete the r
 
 ### The page does not expose WebMCP tools
 
-Use the app's Agent handoff. Download a full backup or configure private Workspace Storage before leaving an existing external-browser workspace. Open QuickMaths inside the ChatGPT or Codex in-app browser and call `get_educator_agent_manifest`. Agent Studio reports WebMCP registration and individual failures. If the in-app workspace is empty, restore the backup or enter the token only in the QuickMaths form.
+Use the app's Agent handoff. Download a full backup or configure private Workspace Storage before leaving an existing external-browser workspace. Open QuickMaths inside the ChatGPT or Codex in-app browser and call `get_agent_guide` with `section: "summary"`. Agent Studio reports WebMCP registration and individual failures. If the in-app workspace is empty, restore the backup or enter the token only in the QuickMaths form.
 
 ## 16. Quick reference
 
@@ -685,9 +688,9 @@ Use the app's Agent handoff. Download a full backup or configure private Workspa
 ### Essential links
 
 - App: https://quickmathematics.github.io/QuickMaths/
-- Educator manifest: https://quickmathematics.github.io/QuickMaths/educator-agent-manifest.json
+- Unified agent manifest: https://quickmathematics.github.io/QuickMaths/agent-manifest.json
 - Lesson authoring guide: https://quickmathematics.github.io/QuickMaths/CUSTOM_LESSON_SETS.md
 - Bridge guide: https://quickmathematics.github.io/QuickMaths/bridge-guide.html
 - Source and Lesson Depot: https://github.com/QuickMathematics/QuickMaths
 
-QuickMaths educator documentation - app version 26 - September 2026.
+QuickMaths educator documentation - app version 27 - September 2026.

@@ -1,5 +1,5 @@
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-agent-handoff-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-agent-handoff-v1";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-unified-agent-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-unified-agent-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260903-combined-map-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -21,12 +21,11 @@ import {
 import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 import { cancelActivePythonGraders, gradePythonProgram, visiblePythonTests } from "./python-grader.js?v=20260903-sandbox-v2";
 import {
-  buildEducatorAgentPrompt,
-  buildLearnerAgentPrompt,
+  buildAgentPrompt,
   buildQuickMathsDesktopLink,
   detectBrowserName,
   webMcpAvailable,
-} from "./agent-prompts.js?v=20260903-agent-handoff-v1";
+} from "./agent-prompts.js?v=20260903-unified-agent-v1";
 
 const MAX_CURRICULUM_FILE_BYTES = 10_000_000;
 const MAX_LESSON_FILE_BYTES = 2_000_000;
@@ -109,15 +108,11 @@ const THEME_VARIABLES = {
 };
 
 function agentStarterPrompt() {
-  return buildLearnerAgentPrompt();
-}
-
-function educatorStarterPrompt() {
-  return buildEducatorAgentPrompt();
+  return buildAgentPrompt();
 }
 
 function currentAgentPrompt() {
-  return currentSnapshot?.activeProfile?.role === "educator" ? educatorStarterPrompt() : agentStarterPrompt();
+  return agentStarterPrompt();
 }
 
 function hasPriorAgentActivity(snapshot = currentSnapshot) {
@@ -161,7 +156,7 @@ function agentHandoffMarkup(snapshot, { compact = false } = {}) {
     if (previousActivity) {
       return `<section class="agent-handoff-card is-active${compact ? " is-compact" : ""}"><p class="eyebrow">Agent connected before</p><h3>Continue in this tab.</h3><p>This profile already has attributed Agent Activity, so the one-time starter prompt is hidden. Your agent can reuse this open QuickMaths tab and continue from the live workspace.</p></section>`;
     }
-    return `<section class="agent-prompt-card${compact ? " is-compact" : ""}"><div class="mini-heading"><span>Suggested start · ${role === "educator" ? "get_educator_agent_manifest" : "get_agent_guide · summary"}</span><button type="button" data-action="copy-current-agent-prompt">Copy</button></div><p>${escapeHtml(role === "educator" ? educatorStarterPrompt() : agentStarterPrompt())}</p></section>`;
+    return `<section class="agent-prompt-card${compact ? " is-compact" : ""}"><div class="mini-heading"><span>Suggested start · get_agent_guide · summary</span><button type="button" data-action="copy-current-agent-prompt">Copy</button></div><p>${escapeHtml(agentStarterPrompt())}</p></section>`;
   }
   const browserName = detectBrowserName(navigator);
   if (hasWorkspaceStorageToken()) {
@@ -191,7 +186,7 @@ function renderFreshAgentWelcome(snapshot) {
     return;
   }
   const role = welcomePath === "educator" ? "educator" : "learner";
-  elements.agentWelcome.innerHTML = `<section class="agent-welcome-backdrop" role="presentation"><article class="agent-welcome-dialog" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="agent-welcome-title" aria-describedby="agent-welcome-copy"><div class="agent-welcome-mark" aria-hidden="true">✦</div><p class="eyebrow">Optional agent support</p><h1 id="agent-welcome-title">Start where QuickMaths can work with your agent.</h1><p id="agent-welcome-copy">For an agent in the loop, open QuickMaths in the ChatGPT or Codex in-app browser. The handoff opens the app and preloads one concise instruction to read the ${role} manifest through WebMCP.</p><a class="button button-primary agent-desktop-link" href="${escapeHtml(agentDesktopLink(snapshot, { fresh: true, role }))}">Open in ChatGPT / Codex</a><button class="quiet-button agent-welcome-continue" type="button" data-action="dismiss-agent-welcome">Continue in this browser</button></article></section>`;
+  elements.agentWelcome.innerHTML = `<section class="agent-welcome-backdrop" role="presentation"><article class="agent-welcome-dialog" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="agent-welcome-title" aria-describedby="agent-welcome-copy"><div class="agent-welcome-mark" aria-hidden="true">✦</div><p class="eyebrow">Optional agent support</p><h1 id="agent-welcome-title">Start where QuickMaths can work with your agent.</h1><p id="agent-welcome-copy">For an agent in the loop, open QuickMaths in the ChatGPT or Codex in-app browser. The handoff opens the app and preloads one concise instruction to read the unified QuickMaths manifest through WebMCP.</p><a class="button button-primary agent-desktop-link" href="${escapeHtml(agentDesktopLink(snapshot, { fresh: true, role }))}">Open in ChatGPT / Codex</a><button class="quiet-button agent-welcome-continue" type="button" data-action="dismiss-agent-welcome">Continue in this browser</button></article></section>`;
   requestAnimationFrame(() => elements.agentWelcome.querySelector(".agent-welcome-dialog")?.focus({ preventScroll: true }));
 }
 
@@ -337,7 +332,7 @@ const TUTORIAL_STEPS = [
     title: "Bring a tutor into the same live workspace.",
     lede: "Agent support begins with a deliberate handoff to the ChatGPT or Codex in-app browser, where QuickMaths can expose WebMCP. The app adapts the handoff to this browser and your storage setup.",
     points: ["Without private Workspace Storage, download a full backup or set up storage before moving so no local work is stranded.", "With storage ready, one link opens QuickMaths in the in-app browser and preloads the short manifest-first instruction.", "Agent Activity records tool actions only. After the first attributed action, QuickMaths hides the one-time starter prompt for that profile."],
-    tip: "The learner start calls get_agent_guide with section \"summary\"; the educator start calls get_educator_agent_manifest. Credential safety, recovery, and tutoring rules live in those manifests instead of bloating the prompt.",
+    tip: "Every agent starts with get_agent_guide and section \"summary\". The unified manifest routes fresh visitors and then applies the learner or educator contract without making the starting prompt carry policy.",
     visual: "agent",
   },
   {
@@ -1779,7 +1774,7 @@ function renderEducatorSettings(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head educator-page-head"><div><p class="eyebrow">Educator workspace & data</p><h1>Settings</h1><p>Manage portable backups, GitHub storage, curriculum files, and installed lesson sources.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Educator guide ↗</a><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
     ${renderGitHubBridge(snapshot)}
-    <section class="content-card tutor-setup"><div class="card-heading"><div><h2>Agent handoff</h2><p>QuickMaths detects whether this tab can expose WebMCP, keeps migration steps outside the prompt, and starts the agent from the educator manifest.</p></div></div>${agentHandoffMarkup(snapshot, { compact: true })}</section>
+    <section class="content-card tutor-setup"><div class="card-heading"><div><h2>Agent handoff</h2><p>QuickMaths detects whether this tab can expose WebMCP, keeps migration steps outside the prompt, and starts every role from the unified agent guide.</p></div></div>${agentHandoffMarkup(snapshot, { compact: true })}</section>
     ${renderWorkspaceStorageManager(snapshot)}
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum exports</h2><p>Public blueprints omit names, email, and supplemental guidance. Private assignments include them with a privacy warning.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download public blueprint</button><button class="button button-outline" data-action="export-private-assignment" ${workspace ? "" : "disabled"}>Download private assignment</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
@@ -1985,7 +1980,7 @@ function renderEducatorWelcome(snapshot) {
       <div class="educator-welcome-mark" aria-hidden="true">QM</div>
       <p class="eyebrow">Educator setup</p>
       <h1 id="educator-welcome-title">Bring an agent into Curriculum Designer.</h1>
-      <p id="educator-welcome-copy">The educator guide explains every control, workflow, safety boundary, file format, and recovery path. Agent support starts from the educator manifest in the ChatGPT or Codex in-app browser.</p>
+      <p id="educator-welcome-copy">The educator guide explains every control, workflow, safety boundary, file format, and recovery path. Agent support starts from the unified QuickMaths manifest in the ChatGPT or Codex in-app browser.</p>
       <a class="educator-guide-link" href="${escapeHtml(EDUCATOR_GUIDE_URL)}" target="_blank" rel="noopener"><span><small>Complete product documentation</small><strong>Open the educator guide PDF</strong></span><b aria-hidden="true">↗</b></a>
       ${agentHandoffMarkup(snapshot, { compact: true })}
       <button class="button button-primary educator-welcome-ok" type="button" data-action="dismiss-educator-welcome">OK, open Curriculum Designer</button>
@@ -3106,18 +3101,20 @@ async function boot() {
     bundledLessonPacks = [geography.text];
   }
   let agentManifest = {};
-  let educatorManifest = {};
   let authoringGuideMarkdown = "";
+  const productManuals = { learner: "", educator: "" };
   let communityConfig = { enabled: false };
   try {
-    const [manifestResponse, educatorManifestResponse, authoringGuideResponse] = await Promise.all([
-          fetch("./agent-manifest.json?v=20260903-agent-handoff-v1"),
-          fetch("./educator-agent-manifest.json?v=20260903-agent-handoff-v1"),
-      fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1"),
+    const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
+      fetch("./agent-manifest.json?v=20260903-unified-agent-v1").catch(() => null),
+      fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
+      fetch("./STUDENT_GUIDE.md?v=20260903-unified-agent-v1").catch(() => null),
+      fetch("./EDUCATOR_GUIDE.md?v=20260903-unified-agent-v1").catch(() => null),
     ]);
-    if (manifestResponse.ok) agentManifest = await manifestResponse.json();
-    if (educatorManifestResponse.ok) educatorManifest = await educatorManifestResponse.json();
-    if (authoringGuideResponse.ok) authoringGuideMarkdown = await authoringGuideResponse.text();
+    if (manifestResponse?.ok) agentManifest = await manifestResponse.json();
+    if (authoringGuideResponse?.ok) authoringGuideMarkdown = await authoringGuideResponse.text();
+    if (learnerManualResponse?.ok) productManuals.learner = await learnerManualResponse.text();
+    if (educatorManualResponse?.ok) productManuals.educator = await educatorManualResponse.text();
   } catch {
     // The tools still work if the optional human/machine-readable guide is unavailable.
   }
@@ -3175,7 +3172,7 @@ async function boot() {
   initClock();
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code>${name}</code>`).join("");
   document.querySelector("#tool-count").textContent = String(TOOL_NAMES.length);
-  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot, lessonStudio, educatorManifest, authoringGuideMarkdown);
+  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot, lessonStudio, authoringGuideMarkdown, productManuals);
   const failedTools = new Set(bridge.failures.map((failure) => failure.name));
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code class="${failedTools.has(name) ? "tool-failed" : ""}">${escapeHtml(name)}</code>`).join("");
   elements.bridgeCard.dataset.state = bridge.available && !bridge.error ? "ready" : bridge.error ? "warning" : "idle";

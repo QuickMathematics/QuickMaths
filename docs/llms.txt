@@ -3,12 +3,13 @@
 QuickMaths is a local-first mastery learning app with WebMCP site tools.
 
 Agent operating guide: /agent-manifest.json
+Machine-readable product manuals: call `get_quickmaths_manual` for a learner or educator chapter; Markdown sources are /STUDENT_GUIDE.md and /EDUCATOR_GUIDE.md
 Agent Lesson Authoring Guide (subjects, bridges, themes, proof/rubric work): /CUSTOM_LESSON_SETS.md
 Custom lesson-set example: /lesson-set-example.json
 Challenge architecture and demo: https://github.com/QuickMathematics/QuickMaths/blob/main/WEBMCP_CHALLENGE.md
 Mobile GitHub Bridge setup and safety protocol: /QUICKMATHS_BRIDGE.md
 Dedicated top-level agent workspace: /agent-bridge.html
-WebMCP boundary: page tools register only inside the ChatGPT or Codex in-app browser and cannot attach to external Firefox, Chrome, Safari, or Edge tabs. Reuse the existing in-app QuickMaths tab. Learners start with `get_agent_guide` using `section: "summary"`; educators start with `get_educator_agent_manifest`.
+WebMCP boundary: page tools register only inside the ChatGPT or Codex in-app browser and cannot attach to external Firefox, Chrome, Safari, or Edge tabs. Reuse the existing in-app QuickMaths tab. Fresh visitors, learners, and educators all start with `get_agent_guide` using `section: "summary"`; the unified manifest routes the correct workflow.
 Preferred local Codex transport: from a QuickMaths checkout, run `python -m quickmaths.cli agent-bridge --repo https://github.com/OWNER/quickmaths-sync.git`; open the printed loopback URL in the ChatGPT or Codex in-app browser. GitHub credentials remain in the host Git credential manager.
 
 Use the registered get_agent_guide WebMCP tool for the in-context operating policy. The mastery map always contains every installed subject in one combined canvas; selecting a node does not change the theme, while opening its lesson or test retains that subject theme. In Agent Bridge, call sync_from_learner before inspecting or changing learning state and publish_agent_checkpoint after state-changing work. Never force a stale conflict. Use list_subjects before subject-aware work, validate_lesson_set before stage_custom_lesson_set, and leave final installation to the human's visible Install button. Never expose pre-submission answer keys. Recommend a portable JSON progress backup at natural stopping points, before imports or custom-content changes, and whenever get_app_state reports that a backup is recommended.

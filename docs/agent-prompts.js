@@ -19,16 +19,12 @@ export function webMcpAvailable(modelContext = globalThis.document?.modelContext
   return typeof modelContext?.registerTool === "function";
 }
 
-export function buildLearnerAgentPrompt() {
-  return "QuickMaths is open in your in-app browser. Call get_agent_guide with section \"summary\" through WebMCP, then follow the manifest to inspect my learning workspace and guide me.";
-}
-
-export function buildEducatorAgentPrompt() {
-  return "QuickMaths is open in your in-app browser. Call get_educator_agent_manifest through WebMCP, then follow the manifest to inspect my curriculum workspace and help me design it.";
+export function buildAgentPrompt() {
+  return "QuickMaths is open in your in-app browser. Call get_agent_guide with section \"summary\" through WebMCP, then follow the unified manifest to route me into the right learner or educator workflow.";
 }
 
 export function buildQuickMathsDesktopLink({ role = "learner", includePrompt = true, handoff = "workspace" } = {}) {
-  const prompt = role === "educator" ? buildEducatorAgentPrompt() : buildLearnerAgentPrompt();
+  const prompt = buildAgentPrompt();
   const browserUrl = new URL(QUICKMATHS_APP_URL);
   browserUrl.searchParams.set("handoff", handoff === "fresh" ? "fresh" : "workspace");
   const parameters = new URLSearchParams({ mode: "codex", browserUrl: browserUrl.toString() });

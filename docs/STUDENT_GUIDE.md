@@ -55,6 +55,8 @@ New learner profiles begin with the seven-chapter app tutorial. You can skip it 
 
 On a completely fresh external-browser visit, QuickMaths explains that agent-in-the-loop support requires the ChatGPT or Codex in-app browser and offers a one-click desktop handoff. Continuing manually dismisses that first-visit notice on this browser.
 
+In the in-app browser, the unified agent guide asks one routing question instead of listing the whole product: are you here to learn, or to design a custom curriculum? A returning learner restores private Workspace Storage before creating anything. A new learner enters a name and creates a learner profile. For a custom curriculum, the agent offers to help: the human chooses the visible **Educator** path and creates an educator profile, then the agent can create and configure a curriculum through visible WebMCP tools.
+
 ### Load a curriculum
 
 Use a local curriculum JSON file or a public GitHub file URL. QuickMaths previews the curriculum before attaching it. A curriculum can carry:
@@ -462,13 +464,17 @@ WebMCP lets an agent inspect the same visible QuickMaths state and use registere
 
 QuickMaths checks the WebMCP page capability rather than trusting the browser name. In an external browser with an existing workspace and no storage token, Agent Studio and tutorial chapter 6 offer **Download backup** and **Set up GitHub storage**. When private Workspace Storage is configured, **Open in ChatGPT / Codex** uses an experimental desktop deep link to open the public QuickMaths URL in the in-app browser and preload this short prompt:
 
-`QuickMaths is open in your in-app browser. Call get_agent_guide with section "summary" through WebMCP, then follow the manifest to inspect my learning workspace and guide me.`
+`QuickMaths is open in your in-app browser. Call get_agent_guide with section "summary" through WebMCP, then follow the unified manifest to route me into the right learner or educator workflow.`
 
 The handoff URL contains no token, answers, or workspace data. Browser storage is separate, so restore the backup or enter the same fine-grained token privately in the in-app QuickMaths storage form. Credential safety, recovery rules, and detailed tutoring policy live in the manifest rather than the prompt. After the first attributed agent action, the profile remembers that an agent has participated and hides the one-time starter prompt.
 
-The agent should begin with `get_app_state`, `get_progress_summary`, and `get_learning_context` as needed. Repeated calls receive a compact policy ID and revision. Full learner-visible educator guidance is available from `get_agent_guide` when the revision changes or the task requires it.
+On a fresh workspace, the agent first asks whether the human wants to learn or design a custom curriculum. For learning, it checks whether an existing Workspace Storage repository should be restored before asking for a new profile name. For curriculum design, it offers to help create the curriculum, guides the human to the **Educator** landing-page path, then uses `create_curriculum` only after the educator profile exists and the human approves the curriculum name and intent. After profile creation, it strongly recommends private Workspace Storage for durable cross-device recovery and agent handoff, then offers the separate optional Community connection if the human wants to upvote or comment on Depot packages.
+
+With a learner selected, the agent begins with `get_app_state`, `get_progress_summary`, and `get_learning_context` as needed. Its voice is conversational, curious, lightly quirky, and Socratic: one focused question or useful hint at a time, without becoming childish or revealing the answer. Repeated calls receive a compact policy ID and revision. Full learner-visible educator guidance is available from `get_agent_guide` when the revision changes or the task requires it.
 
 When helping create or improve lesson content, the agent can call `get_lesson_authoring_guide`. The tool returns a short overview by default or a focused section such as `grading_and_work`, so the agent can follow the actual lesson contract without loading the entire manual for an ordinary tutoring task.
+
+For product guidance, `get_quickmaths_manual` exposes the Markdown source behind the student and educator PDFs. It defaults to the active profile role and returns a compact chapter index; the agent can request one numbered chapter or `all` when the full manual is genuinely needed.
 
 ### What a tutor agent can do
 

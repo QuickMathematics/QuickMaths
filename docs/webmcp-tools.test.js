@@ -13,8 +13,9 @@ test("WebMCP can stage Python lessons but exposes no silent code-execution tool"
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const agentManifest = JSON.parse(readFileSync(new URL("./agent-manifest.json", import.meta.url), "utf8"));
-const educatorManifest = JSON.parse(readFileSync(new URL("./educator-agent-manifest.json", import.meta.url), "utf8"));
 const authoringGuide = readFileSync(new URL("./CUSTOM_LESSON_SETS.md", import.meta.url), "utf8");
+const learnerManual = readFileSync(new URL("./STUDENT_GUIDE.md", import.meta.url), "utf8");
+const educatorManual = readFileSync(new URL("./EDUCATOR_GUIDE.md", import.meta.url), "utf8");
 const geographyLessonSet = readFileSync(new URL("./lesson-depot/lessons/geography/1.0.0/lesson-set.json", import.meta.url), "utf8");
 
 function createStore({ profile = true } = {}) {
@@ -32,7 +33,7 @@ function createStore({ profile = true } = {}) {
 }
 
 function toolsFor(store) {
-  return Object.fromEntries(buildToolDefinitions(store, agentManifest, null, null, educatorManifest, authoringGuide).map((tool) => [tool.name, tool]));
+  return Object.fromEntries(buildToolDefinitions(store, agentManifest, null, null, authoringGuide, { learner: learnerManual, educator: educatorManual }).map((tool) => [tool.name, tool]));
 }
 
 function nativeImprovement(store) {
@@ -89,14 +90,14 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(html, /id="agent-handoff-root"/);
   assert.match(html, /QuickMaths-Student-Guide\.pdf/);
   assert.match(html, /QuickMaths-Educator-Guide\.pdf/);
-  assert.match(html, /educator-agent-manifest\.json/);
+  assert.doesNotMatch(html, /educator-agent-manifest\.json/);
   assert.match(html, /id="welcome-curriculum-url-form"/);
   assert.match(html, /data-route="curriculum"/);
   assert.match(css, /\.welcome-storage-restore \{[^}]*border-radius: 14px;[^}]*background:/);
   assert.match(css, /\.welcome-storage-restore > summary strong \{ font-size: 15px/);
   assert.match(js, /QuickMaths is for learning and practice/);
-  assert.match(agentPrompts, /get_educator_agent_manifest/);
-  assert.match(js, /activeProfile\?\.role === "educator" \? educatorStarterPrompt\(\) : agentStarterPrompt\(\)/);
+  assert.doesNotMatch(agentPrompts, /get_educator_agent_manifest/);
+  assert.match(js, /return agentStarterPrompt\(\)/);
   assert.match(js, /data-action="copy-current-agent-prompt"/);
   assert.match(js, /data-action="dismiss-educator-welcome"/);
   assert.match(js, /completeEducatorWelcome/);
@@ -109,7 +110,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.doesNotMatch(html, /QuickMaths turns \d+ connected lessons across \d+ installed subjects/);
   assert.match(js, /snapshot\.curriculum\.allSkills\.length/);
   assert.match(agentPrompts, /get_agent_guide with section/);
-  assert.match(agentPrompts, /get_educator_agent_manifest/);
+  assert.doesNotMatch(agentPrompts, /get_educator_agent_manifest/);
   assert.match(agentPrompts, /codex:\/\/threads\/new/);
   assert.match(agentPrompts, /browserUrl/);
   assert.doesNotMatch(agentPrompts, /never ask me to paste a token/);
@@ -224,7 +225,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.ok(statSync(studentPdfUrl).size > 50_000);
   assert.equal(readFileSync(studentPdfUrl).subarray(0, 5).toString(), "%PDF-");
   assert.match(educatorGuideSource, /complete visible product: educator setup, every educator control/i);
-  assert.match(educatorGuideSource, /get_educator_agent_manifest/);
+  assert.match(educatorGuideSource, /get_agent_guide/);
   assert.ok(statSync(educatorPdfUrl).size > 50_000);
   assert.equal(readFileSync(educatorPdfUrl).subarray(0, 5).toString(), "%PDF-");
 });
@@ -260,7 +261,7 @@ test("registers all thirty-one tools once with the WebMCP document context", asy
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
-  }, agentManifest, null, null, educatorManifest, authoringGuide);
+  }, agentManifest, null, null, authoringGuide, { learner: learnerManual, educator: educatorManual });
   assert.equal(result.available, true);
   assert.equal(TOOL_NAMES.length, 31);
   assert.deepEqual(result.registered, TOOL_NAMES);
@@ -288,12 +289,14 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 26);
+  assert.equal(summary.guide.app_version, 27);
   assert.match(summary.guide.browser_boundary, /ChatGPT or Codex in-app browser/);
   assert.match(summary.guide.browser_boundary, /already-open in-app QuickMaths tab/);
   assert.match(summary.guide.credential_handoff, /Never ask the human to paste a token into chat/);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
   assert.equal(summary.guide.tools.length, 31);
+  assert.equal(summary.guide.active_role_guidance.role, "learner");
+  assert.match(summary.guide.active_role_guidance.response_style.join(" "), /lightly quirky/);
   assert.ok(JSON.stringify(summary).length < JSON.stringify(full).length / 2);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /persistent Workspace Storage/);
   assert.match(bridge.guide.github_bridge.setup_recommendation, /Never ask them to paste the token into chat/);
@@ -321,18 +324,53 @@ test("agent can pull the lesson authoring guide by section through WebMCP", asyn
   await assert.rejects(tools.get_lesson_authoring_guide.execute({ section: "secrets" }), /section must be one of/i);
 });
 
+test("agent can pull machine-readable learner and educator manuals by chapter", async () => {
+  const learnerTools = toolsFor(createStore());
+  const learnerIndex = await learnerTools.get_quickmaths_manual.execute({});
+  const learnerAgentChapter = await learnerTools.get_quickmaths_manual.execute({ audience: "learner", section: "14" });
+  assert.equal(learnerIndex.audience, "learner");
+  assert.equal(learnerIndex.section, "summary");
+  assert.equal(learnerIndex.manual.chapters.length, 18);
+  assert.match(learnerAgentChapter.manual.markdown, /^## 14\. Learning with an agent/m);
+  assert.doesNotMatch(learnerAgentChapter.manual.markdown, /^## 15\./m);
+
+  const educatorStore = createStore({ profile: false });
+  educatorStore.createProfile("Manual Educator", { role: "educator" });
+  const educatorTools = toolsFor(educatorStore);
+  const educatorIndex = await educatorTools.get_quickmaths_manual.execute({});
+  const educatorWebMcpChapter = await educatorTools.get_quickmaths_manual.execute({ section: "11" });
+  assert.equal(educatorIndex.audience, "educator");
+  assert.equal(educatorIndex.manual.chapters.length, 16);
+  assert.match(educatorWebMcpChapter.manual.markdown, /^## 11\. WebMCP educator integration/m);
+  await assert.rejects(educatorTools.get_quickmaths_manual.execute({ section: "17" }), /not available in the educator manual/);
+});
+
+test("the unified guide routes fresh visitors without dumping a generic feature menu", async () => {
+  const tools = toolsFor(createStore({ profile: false }));
+  const summary = await tools.get_agent_guide.execute({ section: "summary" });
+  assert.equal(summary.guide.runtime_context.workspace_fresh, true);
+  assert.match(summary.guide.runtime_context.required_next_move, /learn or design a curriculum/);
+  assert.match(summary.guide.onboarding.fresh_workspace.rule, /Do not respond with a generic numbered menu/);
+  assert.match(summary.guide.onboarding.fresh_workspace.learner_path, /Restore existing private Workspace Storage before creating a profile/);
+  assert.match(summary.guide.onboarding.fresh_workspace.educator_path, /visible Educator landing-page path/);
+  assert.match(summary.guide.onboarding.fresh_workspace.educator_path, /create_curriculum/);
+  assert.match(summary.guide.onboarding.fresh_workspace.storage_priority, /Strongly recommend private Workspace Storage/);
+  assert.match(summary.guide.onboarding.fresh_workspace.community_follow_up, /optional and separate/);
+  assert.equal(summary.guide.recommended_sequence, summary.guide.onboarding.fresh_workspace.agent_sequence);
+});
+
 test("educator WebMCP tools compose curricula and expose learner-visible supplemental guidance", async () => {
   const store = createStore({ profile: false });
   store.createProfile("Agent Educator", { role: "educator" });
   store.importLessonPack(geographyLessonSet);
   const tools = toolsFor(store);
-  const educatorGuide = await tools.get_educator_agent_manifest.execute({});
-  assert.equal(educatorGuide.manifest.role, "educator");
-  assert.equal(educatorGuide.manifest.discovery.command, "get_educator_agent_manifest");
-  assert.match(educatorGuide.manifest.discovery.browser_boundary, /external browser tab/);
-  assert.match(educatorGuide.manifest.discovery.credential_handoff, /Never ask the educator to paste a token into chat/);
-  assert.match(educatorGuide.manifest.documentation_pdf, /QuickMaths-Educator-Guide\.pdf/);
-  assert.equal(educatorGuide.manifest.lesson_content_workflow.batch_review.includes("sequential"), true);
+  const educatorGuide = await tools.get_agent_guide.execute({ section: "educator" });
+  assert.equal(educatorGuide.guide.runtime_context.active_profile_role, "educator");
+  assert.match(educatorGuide.guide.browser_boundary, /external browser tab/);
+  assert.match(educatorGuide.guide.credential_handoff, /Never ask the human to paste a token into chat/);
+  assert.match(educatorGuide.guide.role_contract.documentation_pdf, /QuickMaths-Educator-Guide\.pdf/);
+  assert.match(educatorGuide.guide.role_contract.start.join(" "), /sequential review queue/);
+  assert.match(educatorGuide.guide.response_style.join(" "), /neutral, concise/);
   assert.equal(JSON.stringify(educatorGuide).includes("expected_answer"), false);
   const workspace = await tools.get_curriculum_workspace.execute({});
   assert.equal(workspace.active_curriculum.ownerProfileId, store.snapshot().activeProfile.id);

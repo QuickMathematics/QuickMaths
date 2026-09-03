@@ -3,8 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   QUICKMATHS_APP_URL,
-  buildEducatorAgentPrompt,
-  buildLearnerAgentPrompt,
+  buildAgentPrompt,
   buildQuickMathsDesktopLink,
   detectBrowserName,
   webMcpAvailable,
@@ -17,30 +16,26 @@ test("detects common browsers without mistaking Edge for Chrome", () => {
   assert.equal(detectBrowserName({ userAgent: "unknown" }), "this browser");
 });
 
-test("learner and educator prompts stay concise and name their manifest tools", () => {
-  const learner = buildLearnerAgentPrompt();
-  const educator = buildEducatorAgentPrompt();
-  for (const prompt of [learner, educator]) {
-    assert.match(prompt, /QuickMaths is open in your in-app browser/i);
-    assert.match(prompt, /follow the manifest/i);
-    assert.doesNotMatch(prompt, /Firefox|Chrome|Safari|Edge|token|external browser/i);
-  }
-  assert.match(learner, /get_agent_guide with section "summary"/);
-  assert.match(educator, /get_educator_agent_manifest/);
+test("the unified prompt stays concise and names the single manifest command", () => {
+  const prompt = buildAgentPrompt();
+  assert.match(prompt, /QuickMaths is open in your in-app browser/i);
+  assert.match(prompt, /unified manifest/i);
+  assert.match(prompt, /get_agent_guide with section "summary"/);
+  assert.doesNotMatch(prompt, /Firefox|Chrome|Safari|Edge|token|external browser|get_educator_agent_manifest/i);
 });
 
-test("desktop handoff opens QuickMaths and preloads the role-specific manifest prompt", () => {
+test("desktop handoff opens QuickMaths and preloads the unified manifest prompt", () => {
   const link = new URL(buildQuickMathsDesktopLink({ role: "learner" }));
   assert.equal(link.protocol, "codex:");
   assert.equal(link.searchParams.get("mode"), "codex");
   const browserUrl = new URL(link.searchParams.get("browserUrl"));
   assert.equal(`${browserUrl.origin}${browserUrl.pathname}`, QUICKMATHS_APP_URL);
   assert.equal(browserUrl.searchParams.get("handoff"), "workspace");
-  assert.equal(link.searchParams.get("prompt"), buildLearnerAgentPrompt());
+  assert.equal(link.searchParams.get("prompt"), buildAgentPrompt());
 
   const educatorLink = new URL(buildQuickMathsDesktopLink({ role: "educator", handoff: "fresh" }));
   assert.equal(new URL(educatorLink.searchParams.get("browserUrl")).searchParams.get("handoff"), "fresh");
-  assert.equal(educatorLink.searchParams.get("prompt"), buildEducatorAgentPrompt());
+  assert.equal(educatorLink.searchParams.get("prompt"), buildAgentPrompt());
 });
 
 test("desktop handoff can omit a starter prompt after prior agent activity", () => {

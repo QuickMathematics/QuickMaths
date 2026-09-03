@@ -117,19 +117,23 @@ async function connectFromForm(event) {
 }
 
 async function boot() {
-  const [curriculumResponse, geographyResponse, manifestResponse, educatorManifestResponse, authoringGuideResponse] = await Promise.all([
+  const [curriculumResponse, geographyResponse, manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
     fetch("./curriculum-data.json?v=20260902-native-math-expansion"),
     fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
-    fetch("./agent-manifest.json?v=20260903-combined-map-v1").catch(() => null),
-    fetch("./educator-agent-manifest.json?v=20260903-combined-map-v1").catch(() => null),
+    fetch("./agent-manifest.json?v=20260903-unified-agent-v1").catch(() => null),
     fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
+    fetch("./STUDENT_GUIDE.md?v=20260903-unified-agent-v1").catch(() => null),
+    fetch("./EDUCATOR_GUIDE.md?v=20260903-unified-agent-v1").catch(() => null),
   ]);
   if (!curriculumResponse.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await curriculumResponse.json();
   const bundledLessonPacks = [await geographyResponse.text()];
   const manifest = manifestResponse?.ok ? await manifestResponse.json() : {};
-  const educatorManifest = educatorManifestResponse?.ok ? await educatorManifestResponse.json() : {};
   const authoringGuideMarkdown = authoringGuideResponse?.ok ? await authoringGuideResponse.text() : "";
+  const productManuals = {
+    learner: learnerManualResponse?.ok ? await learnerManualResponse.text() : "",
+    educator: educatorManualResponse?.ok ? await educatorManualResponse.text() : "",
+  };
   store = createQuickMathsStore({ storage: createAgentStateStorage(window.localStorage), curriculum, bundledLessonPacks });
   lessonDepot = createLessonDepot({ store, showToast: toast });
   lessonDepot.load();
@@ -176,7 +180,7 @@ async function boot() {
     elements.form.elements.remember.checked = saved.rememberToken;
   }
 
-  const siteTools = await registerWebMcpTools(store, document.modelContext, manifest, lessonDepot, null, educatorManifest, authoringGuideMarkdown);
+  const siteTools = await registerWebMcpTools(store, document.modelContext, manifest, lessonDepot, null, authoringGuideMarkdown, productManuals);
   const bridgeTools = await registerBridgeWebMcpTools(sync, document.modelContext);
   const toolNames = [...TOOL_NAMES, ...BRIDGE_TOOL_NAMES];
   elements.toolCount.textContent = String(toolNames.length);

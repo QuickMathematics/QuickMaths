@@ -50,12 +50,12 @@ Challenge-period milestone evidence:
 
 ## WebMCP integration
 
-When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers thirty-one page tools through `document.modelContext.registerTool()`. External browsers retain the complete human app but cannot expose WebMCP tools. QuickMaths therefore makes the boundary explicit in the UI: an existing workspace is backed up or connected to private Workspace Storage before moving, then an experimental desktop handoff opens the public app URL in the in-app browser with a concise manifest-first prompt. No credential or workspace payload enters that URL. The tools operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. A learner agent starts with `get_agent_guide` and `section: "summary"`; an educator agent starts with `get_educator_agent_manifest`; and `get_lesson_authoring_guide` returns the bundled authoring contract by topic. The complete sources remain the machine-readable `agent-manifest.json` and `educator-agent-manifest.json`.
+When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers thirty-one page tools through `document.modelContext.registerTool()`. External browsers retain the complete human app but cannot expose WebMCP tools. QuickMaths therefore makes the boundary explicit in the UI: an existing workspace is backed up or connected to private Workspace Storage before moving, then an experimental desktop handoff opens the public app URL in the in-app browser with a concise manifest-first prompt. No credential or workspace payload enters that URL. The tools operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. Every fresh visitor, learner, and educator starts with `get_agent_guide` and `section: "summary"`; the unified manifest routes the correct role workflow, `get_quickmaths_manual` exposes the learner and educator manuals as focused Markdown, and `get_lesson_authoring_guide` returns the bundled authoring contract by topic.
 
 | Tool | Purpose |
 | --- | --- |
-| `get_agent_guide` | Read a compact operating summary or one detailed policy section on demand. |
-| `get_educator_agent_manifest` | Read the dedicated educator workflow, human-control boundaries, documentation link, and active curriculum policy. |
+| `get_agent_guide` | Read the unified fresh-workspace, learner, or educator operating contract as a compact summary or focused policy section. |
+| `get_quickmaths_manual` | Read a machine-readable learner or educator manual index, one numbered chapter, or the complete Markdown source behind the PDF. |
 | `get_lesson_authoring_guide` | Read a compact lesson-authoring overview or one focused authoring section on demand. |
 | `get_app_state` | Read the visible view, learner, timers, mastery counts, and current suggestion. |
 | `get_curriculum_map` | Read the combined installed-subject map with statuses, subject identities, prerequisite bridges, and unlocks. |
@@ -135,8 +135,7 @@ Important files:
 - `docs/bridge-webmcp-tools.js` — pull, publish, and bridge-status tools
 - `docs/bridge-guide.html` — human setup guide and copyable starting prompt
 - `docs/QUICKMATHS_BRIDGE.md` — complete setup, security, and recovery protocol
-- `docs/agent-manifest.json` — machine-readable agent operating and backup policy
-- `docs/educator-agent-manifest.json` — dedicated educator agent contract and curriculum-design workflow
+- `docs/agent-manifest.json` — unified fresh-workspace, learner, educator, persistence, community, and safety contract
 - `docs/QuickMaths-Student-Guide.pdf` — complete human-facing learner workspace and study workflow manual
 - `docs/QuickMaths-Educator-Guide.pdf` — complete human-facing frontend and educator workflow manual
 - `docs/CUSTOM_LESSON_SETS.md` — Agent Lesson Authoring Guide
