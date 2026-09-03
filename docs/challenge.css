@@ -223,10 +223,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .agent-handoff-card.needs-migration { border-left: 4px solid var(--coral); }
 .agent-handoff-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 15px; }
 .agent-desktop-link { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 46px; box-sizing: border-box; margin-top: 15px; text-align: center; text-decoration: none; }
+.mobile-remote-setup { margin: 14px 0 0; padding: 14px; border: 1px solid color-mix(in srgb,var(--coral) 32%,var(--line)); border-radius: 13px; background: color-mix(in srgb,var(--coral) 8%,var(--paper-light)); }
+.mobile-remote-setup > strong { display: block; color: var(--ink); font-size: 12px; }
+.mobile-remote-setup > p { margin: 6px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
+.mobile-remote-setup details { margin-top: 10px; }
+.mobile-remote-setup summary { color: var(--pine); cursor: pointer; font-size: 10px; font-weight: 850; }
+.mobile-remote-setup ul { display: grid; gap: 7px; margin: 10px 0; padding-left: 18px; color: var(--muted); font-size: 9px; line-height: 1.5; }
+.mobile-remote-setup > a { color: var(--pine); font-size: 9px; font-weight: 850; }
 #agent-dock .agent-handoff-card { color: #edf4ef; background: rgba(255,255,255,.055); border-color: rgba(255,255,255,.11); }
 #agent-dock .agent-handoff-card > p:not(.eyebrow), #agent-dock .agent-handoff-card > small { color: #aac3b5; }
 #agent-dock .agent-handoff-card h3 { color: #fff; }
 #agent-dock .agent-handoff-actions { grid-template-columns: 1fr; }
+#agent-dock .mobile-remote-setup { background: rgba(255,255,255,.055); border-color: rgba(255,255,255,.13); }
+#agent-dock .mobile-remote-setup > strong, #agent-dock .mobile-remote-setup summary, #agent-dock .mobile-remote-setup > a { color: var(--lime); }
+#agent-dock .mobile-remote-setup > p, #agent-dock .mobile-remote-setup ul { color: #aac3b5; }
 .mini-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #d9e4de; font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .mini-heading button { padding: 0; color: #9fb9aa; background: transparent; border: 0; cursor: pointer; font-size: 9px; }
 .mini-heading small { color: #809d8c; font-size: 8px; font-weight: 500; text-transform: none; letter-spacing: 0; }

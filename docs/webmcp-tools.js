@@ -193,7 +193,7 @@ function guideForSection(guide, section, state = {}) {
           ? "Read progress and learning context before tutoring."
           : "Ask the human which existing profile to open.",
   };
-  const base = { app: guide.app, app_version: guide.app_version, description: guide.description, homepage: guide.homepage, browser_boundary: guide.discovery?.browser_boundary, credential_handoff: guide.discovery?.credential_handoff, section, runtime_context: runtimeContext };
+  const base = { app: guide.app, app_version: guide.app_version, description: guide.description, homepage: guide.homepage, browser_boundary: guide.discovery?.browser_boundary, mobile_boundary: guide.discovery?.mobile_boundary, credential_handoff: guide.discovery?.credential_handoff, source_fallback: guide.discovery?.source_fallback, section, runtime_context: runtimeContext };
   if (section === "tutoring") return {
     ...base,
     workflow: guide.agent_policy?.start ?? [],
@@ -212,6 +212,7 @@ function guideForSection(guide, section, state = {}) {
   if (section === "planning") return {
     ...base,
     planning_policy: guide.agent_policy?.planning ?? [],
+    default_curriculum_plan: guide.role_contracts?.educator?.default_curriculum_plan,
     state_model: guide.state_model?.mastery_map_plans,
     tools: ["get_app_state", "get_curriculum_map", "set_map_plan_mode", "arrange_map_plan_nodes", "set_map_plan_nodes_hidden", "create_map_plan_path", "add_map_plan_annotation"],
   };
@@ -220,6 +221,7 @@ function guideForSection(guide, section, state = {}) {
     purpose: "Educator profiles create portable curricula with per-curriculum lesson-pack selection, canonical map plans, learning rules, and learner-visible supplemental agent guidance.",
     workflow: ["Read get_curriculum_workspace.", "Create or select a curriculum explicitly.", "Enable only the installed packs the educator chooses.", "Use the existing map planning tools to arrange the canonical curriculum map, paths, and annotations.", "Update learner and agent policy only from educator instructions.", "Treat QuickMaths results as learning evidence, not a substitute for supervised assessment."],
     role_contract: guide.role_contracts?.educator ?? {},
+    default_curriculum_plan: guide.role_contracts?.educator?.default_curriculum_plan,
     response_style: guide.response_style?.educator ?? [],
     tools: ["get_curriculum_workspace", "create_curriculum", "select_curriculum", "update_curriculum_settings", "set_curriculum_pack_enabled", "arrange_map_plan_nodes", "set_map_plan_nodes_hidden", "create_map_plan_path", "add_map_plan_annotation"],
   };
@@ -260,6 +262,12 @@ function guideForSection(guide, section, state = {}) {
       bridge_setup: guide.github_bridge?.setup_recommendation,
       backup_recommendation: guide.backup_policy?.avoid_nagging,
     },
+    remote_mobile: {
+      first_setup: guide.github_bridge?.mobile_first_setup,
+      package_boundary: guide.github_bridge?.desktop_package_boundary,
+      host_readiness: guide.github_bridge?.remote_host_readiness ?? [],
+    },
+    default_curriculum_plan: guide.role_contracts?.educator?.default_curriculum_plan,
     community: guide.github_community?.setup_recommendation,
     authoring: {
       route: guide.custom_lesson_sets?.human_creator_route,

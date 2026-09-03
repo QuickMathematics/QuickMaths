@@ -15,6 +15,13 @@ export function detectBrowserName(navigatorObject = globalThis.navigator) {
   return browserFromUserAgent(navigatorObject?.userAgent ?? "", navigatorObject?.userAgentData?.brands ?? []);
 }
 
+export function detectMobileDevice(navigatorObject = globalThis.navigator) {
+  if (navigatorObject?.userAgentData?.mobile === true) return true;
+  const userAgent = String(navigatorObject?.userAgent ?? "");
+  if (/Macintosh/i.test(userAgent) && Number(navigatorObject?.maxTouchPoints) > 1) return true;
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent);
+}
+
 export function webMcpAvailable(modelContext = globalThis.document?.modelContext) {
   return typeof modelContext?.registerTool === "function";
 }

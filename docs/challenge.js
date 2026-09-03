@@ -1,5 +1,5 @@
 import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260903-unified-agent-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-unified-agent-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-final-handoff-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260903-combined-map-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -26,8 +26,9 @@ import {
   buildAgentPrompt,
   buildQuickMathsDesktopLink,
   detectBrowserName,
+  detectMobileDevice,
   webMcpAvailable,
-} from "./agent-prompts.js?v=20260903-unified-agent-v1";
+} from "./agent-prompts.js?v=20260903-final-handoff-v1";
 
 const MAX_CURRICULUM_FILE_BYTES = 10_000_000;
 const MAX_LESSON_FILE_BYTES = 2_000_000;
@@ -153,6 +154,11 @@ function agentDesktopLink(snapshot = currentSnapshot, { fresh = false, role = ac
     includePrompt: fresh || !hasPriorAgentActivity(snapshot),
     handoff: fresh ? "fresh" : "workspace",
   });
+}
+
+function mobileRemoteSetupMarkup({ compact = false } = {}) {
+  if (!detectMobileDevice(navigator)) return "";
+  return `<aside class="mobile-remote-setup${compact ? " is-compact" : ""}"><strong>First-time agent setup needs a computer.</strong><p>A phone can continue an already-prepared remote task, but it cannot create the first desktop QuickMaths agent session.</p><details><summary>Prepare the computer before you leave</summary><ul><li>Save work, then close only apps or high-load processes you recognize and do not need. Never end Windows, security, driver, or remote-session processes in Task Manager.</li><li>Temporarily set Sleep to Never and disable hibernation for the remote session. Keep a laptop plugged in and ventilated, then restore normal power settings when you return.</li><li>For security, an agent can stage lesson packages only in the desktop QuickMaths session, and a human must approve each install. If you are working from mobile, install and approve the required packs yourself first, then ask the agent to build the curriculum from the installed library.</li></ul></details><a href="./bridge-guide.html" target="_blank" rel="noopener">Open the desktop setup guide ↗</a></aside>`;
 }
 
 function applySubjectTheme(subject) {
@@ -350,9 +356,9 @@ function agentHandoffMarkup(snapshot, { compact = false } = {}) {
   }
   const browserName = detectBrowserName(navigator);
   if (hasWorkspaceStorageToken()) {
-    return `<section class="agent-handoff-card is-ready${compact ? " is-compact" : ""}"><p class="eyebrow">Ready to hand off</p><h3>Open QuickMaths with your agent.</h3><p>Your ${browserName === "this browser" ? "current browser" : escapeHtml(browserName)} workspace has private Workspace Storage configured. Open QuickMaths in the ChatGPT or Codex in-app browser, then restore the workspace there from the same private repository.</p><a class="button button-primary agent-desktop-link" href="${escapeHtml(agentDesktopLink(snapshot))}">Open in ChatGPT / Codex</a>${previousActivity ? `<small>The starter prompt is omitted because this ${roleLabel} profile already has Agent Activity.</small>` : ""}</section>`;
+    return `<section class="agent-handoff-card is-ready${compact ? " is-compact" : ""}"><p class="eyebrow">Ready to hand off</p><h3>Open QuickMaths with your agent.</h3><p>Your ${browserName === "this browser" ? "current browser" : escapeHtml(browserName)} workspace has private Workspace Storage configured. Open QuickMaths in the ChatGPT or Codex in-app browser, then restore the workspace there from the same private repository.</p>${mobileRemoteSetupMarkup({ compact })}<a class="button button-primary agent-desktop-link" href="${escapeHtml(agentDesktopLink(snapshot))}">${detectMobileDevice(navigator) ? "Continue an already-prepared task" : "Open in ChatGPT / Codex"}</a>${previousActivity ? `<small>The starter prompt is omitted because this ${roleLabel} profile already has Agent Activity.</small>` : ""}</section>`;
   }
-  return `<section class="agent-handoff-card needs-migration${compact ? " is-compact" : ""}"><p class="eyebrow">Move your workspace first</p><h3>Protect your progress before switching browsers.</h3><p>WebMCP needs the ChatGPT or Codex in-app browser, whose browser storage is separate from this one. Download a local backup or set up private GitHub Workspace Storage, then restore it after moving.</p><div class="agent-handoff-actions"><button class="button button-primary" type="button" data-action="save-backup">Download backup</button><button class="button button-outline" type="button" data-action="open-storage-setup">Set up GitHub storage</button></div></section>`;
+  return `<section class="agent-handoff-card needs-migration${compact ? " is-compact" : ""}"><p class="eyebrow">Move your workspace first</p><h3>Protect your progress before switching browsers.</h3><p>WebMCP needs the ChatGPT or Codex in-app browser, whose browser storage is separate from this one. Download a local backup or set up private GitHub Workspace Storage, then restore it after moving.</p>${mobileRemoteSetupMarkup({ compact })}<div class="agent-handoff-actions"><button class="button button-primary" type="button" data-action="save-backup">Download backup</button><button class="button button-outline" type="button" data-action="open-storage-setup">Set up GitHub storage</button></div></section>`;
 }
 
 function renderAgentEntry(snapshot) {
@@ -376,7 +382,8 @@ function renderFreshAgentWelcome(snapshot) {
     return;
   }
   const role = welcomePath === "educator" ? "educator" : "learner";
-  elements.agentWelcome.innerHTML = `<section class="agent-welcome-backdrop" role="presentation"><article class="agent-welcome-dialog" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="agent-welcome-title" aria-describedby="agent-welcome-copy"><div class="agent-welcome-mark" aria-hidden="true">✦</div><p class="eyebrow">Optional agent support</p><h1 id="agent-welcome-title">Start where QuickMaths can work with your agent.</h1><p id="agent-welcome-copy">For an agent in the loop, open QuickMaths in the ChatGPT or Codex in-app browser. The handoff opens the app and preloads one concise instruction to read the unified QuickMaths manifest through WebMCP.</p><a class="button button-primary agent-desktop-link" href="${escapeHtml(agentDesktopLink(snapshot, { fresh: true, role }))}">Open in ChatGPT / Codex</a><button class="quiet-button agent-welcome-continue" type="button" data-action="dismiss-agent-welcome">Continue in this browser</button></article></section>`;
+  const mobile = detectMobileDevice(navigator);
+  elements.agentWelcome.innerHTML = `<section class="agent-welcome-backdrop" role="presentation"><article class="agent-welcome-dialog" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="agent-welcome-title" aria-describedby="agent-welcome-copy"><div class="agent-welcome-mark" aria-hidden="true">✦</div><p class="eyebrow">Optional agent support</p><h1 id="agent-welcome-title">${mobile ? "Prepare agent support on your computer first." : "Start where QuickMaths can work with your agent."}</h1><p id="agent-welcome-copy">${mobile ? "First-time agent-in-the-loop setup must be completed on a computer. After its QuickMaths task and in-app browser are prepared, your phone can continue that running remote session." : "For an agent in the loop, open QuickMaths in the ChatGPT or Codex in-app browser. The handoff opens the app and preloads one concise instruction to read the unified QuickMaths manifest through WebMCP."}</p>${mobileRemoteSetupMarkup()}<a class="button button-primary agent-desktop-link" href="${escapeHtml(agentDesktopLink(snapshot, { fresh: true, role }))}">${mobile ? "Continue an already-prepared task" : "Open in ChatGPT / Codex"}</a><button class="quiet-button agent-welcome-continue" type="button" data-action="dismiss-agent-welcome">Continue in this browser</button></article></section>`;
   requestAnimationFrame(() => elements.agentWelcome.querySelector(".agent-welcome-dialog")?.focus({ preventScroll: true }));
 }
 
@@ -520,9 +527,9 @@ const TUTORIAL_STEPS = [
   {
     eyebrow: "Agent-assisted learning",
     title: "Bring a tutor into the same live workspace.",
-    lede: "Agent support begins with a deliberate handoff to the ChatGPT or Codex in-app browser, where QuickMaths can expose WebMCP. The app adapts the handoff to this browser and your storage setup.",
-    points: ["Without private Workspace Storage, download a full backup or set up storage before moving so no local work is stranded.", "With storage ready, one link opens QuickMaths in the in-app browser and preloads the short manifest-first instruction.", "Agent Activity records tool actions only. After the first attributed action, QuickMaths hides the one-time starter prompt for that profile."],
-    tip: "Every agent starts with get_agent_guide and section \"summary\". The unified manifest routes fresh visitors and then applies the learner or educator contract without making the starting prompt carry policy.",
+    lede: "Agent support starts on a computer in the ChatGPT or Codex in-app browser, where QuickMaths can expose WebMCP. A phone can continue that prepared remote task after the first desktop setup.",
+    points: ["Before moving, download a full backup or configure private Workspace Storage so no local work is stranded.", "Before leaving the computer on, close only recognized unnecessary apps, keep remote-session and system processes running, and temporarily disable Sleep and hibernation.", "Lesson packages stay human-controlled: the agent stages them in the desktop session; mobile users can approve or install the required packs first, then ask the agent to compose a curriculum from them."],
+    tip: "Every agent starts with get_agent_guide and section \"summary\". Keep the computer powered, plugged in, ventilated, and reachable; restore normal power settings when you return.",
     visual: "agent",
   },
   {
@@ -3374,10 +3381,10 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260903-device-aware-sync-v1").catch(() => null),
+      fetch("./agent-manifest.json?v=20260903-final-handoff-v1").catch(() => null),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
-      fetch("./STUDENT_GUIDE.md?v=20260903-device-aware-sync-v1").catch(() => null),
-      fetch("./EDUCATOR_GUIDE.md?v=20260903-device-aware-sync-v1").catch(() => null),
+      fetch("./STUDENT_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
+      fetch("./EDUCATOR_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
     ]);
     if (manifestResponse?.ok) agentManifest = await manifestResponse.json();
     if (authoringGuideResponse?.ok) authoringGuideMarkdown = await authoringGuideResponse.text();

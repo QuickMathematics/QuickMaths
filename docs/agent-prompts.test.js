@@ -6,6 +6,7 @@ import {
   buildAgentPrompt,
   buildQuickMathsDesktopLink,
   detectBrowserName,
+  detectMobileDevice,
   webMcpAvailable,
 } from "./agent-prompts.js";
 
@@ -14,6 +15,14 @@ test("detects common browsers without mistaking Edge for Chrome", () => {
   assert.equal(detectBrowserName({ userAgent: "Mozilla/5.0 Chrome/140.0 Safari/537.36 Edg/140.0" }), "Microsoft Edge");
   assert.equal(detectBrowserName({ userAgent: "Mozilla/5.0 Version/18.0 Safari/605.1.15" }), "Safari");
   assert.equal(detectBrowserName({ userAgent: "unknown" }), "this browser");
+});
+
+test("detects mobile handoff devices without labelling desktop browsers mobile", () => {
+  assert.equal(detectMobileDevice({ userAgent: "Mozilla/5.0 (Linux; Android 15) Mobile Safari/537.36" }), true);
+  assert.equal(detectMobileDevice({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X)" }), true);
+  assert.equal(detectMobileDevice({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15)", maxTouchPoints: 5 }), true);
+  assert.equal(detectMobileDevice({ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Firefox/142.0" }), false);
+  assert.equal(detectMobileDevice({ userAgent: "desktop", userAgentData: { mobile: true } }), true);
 });
 
 test("the unified prompt stays concise and names the single manifest command", () => {

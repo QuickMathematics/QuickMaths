@@ -19,6 +19,8 @@ Agent-side changes are transactional: tool calls mark the workspace dirty but ne
 
 ## One-time setup
 
+Complete first-time agent-in-the-loop setup on the computer that will remain online. A phone can continue an already-prepared remote task, but it cannot create the first desktop WebMCP session.
+
 1. On GitHub, create a **private** repository named `quickmaths-sync`. Turn on **Add a README file** and keep the default `main` branch.
 2. Open GitHub **Settings → Developer settings → Personal access tokens → Fine-grained tokens**.
 3. Create a token with a sensible expiry. Under repository access, choose **Only select repositories** and select `quickmaths-sync`.
@@ -34,6 +36,14 @@ Agent-side changes are transactional: tool calls mark the workspace dirty but ne
 8. Open the printed `http://127.0.0.1:.../agent-bridge.html#local=...` URL as the top-level page in the Codex built-in browser. The fragment is a short-lived local capability, not a GitHub credential; the page immediately removes it from browser history. The workspace connects and pulls automatically.
 
 The older all-browser route remains available at `/agent-bridge.html`, but it needs a second copy of the fine-grained token in that browser. The CLI route is preferred for Codex because it reuses host Git authentication and never exposes the GitHub token to JavaScript or WebMCP.
+
+## Prepare the remote computer
+
+Before leaving the computer on for a phone session:
+
+- Save work and close only applications or high-load processes you recognize and do not need. In Task Manager, never end Windows, security, driver, Git credential, browser, Codex, or remote-session processes. The agent must not terminate processes without explicit human approval.
+- Temporarily set Sleep to **Never** and disable hibernation for the duration of the remote session. Keep a laptop plugged in and ventilated. Restore normal power settings when you return.
+- Prepare lesson packages on the desktop. For security, an agent may stage packages only in the desktop QuickMaths session and a human must approve each installation in the visible app. If you will work from mobile, install and approve the required packs yourself first, then tell the agent to build the custom curriculum from the installed library.
 
 ## Start the agent task
 
