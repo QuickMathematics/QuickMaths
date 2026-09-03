@@ -187,6 +187,40 @@ test("contents client reads and writes Base64 GitHub files", async () => {
   assert.equal(deleteBody.branch, "main");
 });
 
+test("contents client reads checkpoints above GitHub's one-megabyte inline limit through the blob endpoint", async () => {
+  const calls = [];
+  const checkpoint = JSON.stringify({ format: BRIDGE_FORMAT, channel: "learner", payload: "large checkpoint" });
+  const responses = [
+    new Response(JSON.stringify({ type: "file", sha: "large-sha", size: 1_122_948, encoding: "none", content: "" }), { status: 200 }),
+    new Response(JSON.stringify({ sha: "large-sha", size: checkpoint.length, encoding: "base64", content: btoa(checkpoint) }), { status: 200 }),
+  ];
+  const client = createGitHubContentsClient({
+    fetchImpl: async (url, options = {}) => { calls.push({ url, options }); return responses.shift(); },
+  });
+
+  const file = await client.readFile(connection(), LEARNER_STATE_PATH);
+
+  assert.equal(file.sha, "large-sha");
+  assert.equal(file.content, checkpoint);
+  assert.match(calls[1].url, /\/git\/blobs\/large-sha$/);
+  assert.equal(calls[1].options.headers.Authorization, "Bearer github-token");
+});
+
+test("contents client preserves a genuinely empty checkpoint instead of requesting a blob", async () => {
+  let calls = 0;
+  const client = createGitHubContentsClient({
+    fetchImpl: async () => {
+      calls += 1;
+      return new Response(JSON.stringify({ type: "file", sha: "empty-sha", size: 0, encoding: "base64", content: "" }), { status: 200 });
+    },
+  });
+
+  const file = await client.readFile(connection(), LEARNER_STATE_PATH);
+
+  assert.equal(file.content, "");
+  assert.equal(calls, 1);
+});
+
 test("learner can discard stale agent state and clear both current workspace files", async () => {
   const github = fakeGitHub();
   const learnerState = stateHarness("Learner");

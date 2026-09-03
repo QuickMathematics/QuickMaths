@@ -13,7 +13,7 @@ import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260903-multitab-revision-v1";
+} from "./github-sync.js?v=20260903-large-checkpoint-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,

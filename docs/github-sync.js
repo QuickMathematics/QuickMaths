@@ -9,6 +9,7 @@ export const BRIDGE_FORMAT = "quickmaths.github-bridge";
 export const BRIDGE_SCHEMA_VERSION = "1.0";
 export const LEARNER_STATE_PATH = "learner-state.json";
 export const AGENT_STATE_PATH = "agent-state.json";
+const MAX_BRIDGE_FILE_BYTES = 10_000_000;
 
 export class GitHubSyncError extends Error {
   constructor(message, { status = null, code = "github_sync_error", details = null } = {}) {
@@ -189,6 +190,7 @@ export function createGitHubContentsClient({ fetchImpl = globalThis.fetch, apiBa
 
   const repositoryUrl = (config) => `${base}/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}`;
   const contentsUrl = (config, path) => `${repositoryUrl(config)}/contents/${path.split("/").map(encodeURIComponent).join("/")}`;
+  const blobUrl = (config, sha) => `${repositoryUrl(config)}/git/blobs/${encodeURIComponent(sha)}`;
 
   const verify = async (candidate) => {
     const config = normalizeGitHubSyncConfig(candidate);
@@ -219,10 +221,36 @@ export function createGitHubContentsClient({ fetchImpl = globalThis.fetch, apiBa
       throw new GitHubSyncError(message || `GitHub request failed with status ${response.status}.`, { status: response.status, code: "github_error" });
     }
     const body = await response.json();
-    if (body?.type !== "file" || typeof body.content !== "string" || typeof body.sha !== "string") {
+    if (body?.type !== "file" || typeof body.sha !== "string") {
       throw new GitHubSyncError(`${path} is not a readable file.`, { code: "invalid_remote_state" });
     }
-    return { exists: true, sha: body.sha, content: decodeBase64(body.content) };
+    if (Number.isFinite(body.size) && body.size > MAX_BRIDGE_FILE_BYTES) {
+      throw new GitHubSyncError(`${path} is too large for QuickMaths Workspace Storage.`, { code: "invalid_remote_state" });
+    }
+
+    let encodedContent = typeof body.content === "string" ? body.content : null;
+    // GitHub's Contents API intentionally omits inline content for files above
+    // 1 MB. Fetch the immutable blob by SHA instead of mistaking the omission
+    // for an empty/corrupt checkpoint.
+    if ((!encodedContent && Number(body.size) > 0) || body.encoding === "none") {
+      const blobResponse = await request(blobUrl(config, body.sha), { headers: apiHeaders(config.token) }, "loading large bridge state");
+      const blob = await blobResponse.json();
+      if (blob?.encoding !== "base64" || typeof blob.content !== "string") {
+        throw new GitHubSyncError(`${path} has no readable GitHub blob.`, { code: "invalid_remote_state" });
+      }
+      if (Number.isFinite(blob.size) && blob.size > MAX_BRIDGE_FILE_BYTES) {
+        throw new GitHubSyncError(`${path} is too large for QuickMaths Workspace Storage.`, { code: "invalid_remote_state" });
+      }
+      encodedContent = blob.content;
+    }
+    if (typeof encodedContent !== "string") {
+      throw new GitHubSyncError(`${path} has no readable content.`, { code: "invalid_remote_state" });
+    }
+    const content = decodeBase64(encodedContent);
+    if (new TextEncoder().encode(content).byteLength > MAX_BRIDGE_FILE_BYTES) {
+      throw new GitHubSyncError(`${path} is too large for QuickMaths Workspace Storage.`, { code: "invalid_remote_state" });
+    }
+    return { exists: true, sha: body.sha, content };
   };
 
   const writeFile = async (candidate, path, content, { sha = null, message = null } = {}) => {
