@@ -2134,6 +2134,9 @@ async function prepareLearnerBridge({ resumed = false } = {}) {
   const local = store.snapshot();
   const metadata = githubCredentials.loadMetadata?.({ role: "learner" });
   const remoteMatchesKnown = remote.learner.exists && metadata?.learnerSha === remote.learner.sha;
+  const remoteMatchesDevice = remote.learner.exists
+    && typeof metadata?.deviceId === "string"
+    && remote.learner.envelope?.deviceId === metadata.deviceId;
   bridgeNeedsChoice = false;
   if (!remote.learner.exists) {
     if (local.profiles.length) await githubSync.pushNow();
@@ -2141,9 +2144,13 @@ async function prepareLearnerBridge({ resumed = false } = {}) {
   } else if (!local.profiles.length) {
     await githubSync.restoreLearner({ force: true });
     githubSync.start();
-  } else if (resumed && remoteMatchesKnown) {
+  } else if (resumed && (remoteMatchesKnown || remoteMatchesDevice)) {
+    // If another tab from this same browser wrote the checkpoint, its blob SHA
+    // may be newer than this tab's metadata. Adopt that same-device revision
+    // instead of presenting a false A/B conflict on every reload.
+    if (!remoteMatchesKnown) await githubSync.restoreLearner({ force: true });
     githubSync.start();
-    if (githubSync.snapshot().dirty) await githubSync.pushNow();
+    if (remoteMatchesKnown && githubSync.snapshot().dirty) await githubSync.pushNow();
   } else {
     bridgeNeedsChoice = true;
     githubSync.stop();

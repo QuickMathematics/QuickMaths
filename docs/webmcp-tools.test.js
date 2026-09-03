@@ -124,6 +124,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /title: "Use this browser's workspace\?"/);
   assert.match(js, /confirmLabel: "Replace GitHub copy"/);
   assert.doesNotMatch(js, /window\.confirm\("Replace the GitHub learner checkpoint/);
+  assert.match(js, /remoteMatchesDevice/);
+  assert.match(js, /if \(!remoteMatchesKnown\) await githubSync\.restoreLearner\(\{ force: true \}\)/);
   assert.match(js, /Are you absolutely sure/);
   assert.match(js, /clearRemoteWorkspace/);
   assert.match(js, /resumeAfterClear/);
