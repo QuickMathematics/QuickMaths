@@ -1,7 +1,7 @@
 {
   "format": "quickmaths.lesson-depot.federation",
   "schema_version": "1.0",
-  "generated_at": "2026-09-03T21:16:35.364Z",
+  "generated_at": "2026-09-05T12:48:25.541Z",
   "registries": [
     {
       "id": "quickmathematics/qm_dev_depot",
@@ -18,7 +18,7 @@
           "sha256": "651d9e1fb0fbe3f6502f0947e1d7e159e0f8fd875cde3a0831d0f9cf9d895a8d",
           "status": "new",
           "votes": 0,
-          "flags": 0,
+          "downvotes": 0,
           "comments": 0,
           "discussion_url": "https://github.com/QuickMathematics/QuickMaths/discussions/5"
         },
@@ -28,7 +28,7 @@
           "sha256": "cbd4d783e63d3f9be091afae16fd17a7875add279ceca7eede425dd60f711e98",
           "status": "new",
           "votes": 0,
-          "flags": 0,
+          "downvotes": 0,
           "comments": 0,
           "discussion_url": "https://github.com/QuickMathematics/QuickMaths/discussions/6"
         }
