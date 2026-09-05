@@ -2,7 +2,19 @@
 
 The Lesson Depot is a zero-cost, federated marketplace of declarative QuickMaths lesson sets. Authors keep immutable packages in their own public GitHub repositories. QuickMaths combines the official catalog, automatically discovered community registries, and registries a learner subscribes to directly. Browsing and installation require no account; the optional least-privilege GitHub App provides public recommendations, flags, and comments inside the app.
 
-## Federation model
+## Publish inside QuickMaths
+
+Choose **Publish a lesson** in the Depot or **Publish to Lesson Depot** in Lesson Studio. Open a lesson JSON file or use the current Studio draft, connect a GitHub publishing token, choose a public repository and license, then validate and review the release. The final button creates the repository if needed, uploads the lesson and registry in separate commits, and creates or updates the `[Registry]` submission automatically. No manual file upload, hashing, or Discussion editing is needed.
+
+GitHub still requires a one-time credential setup: the dialog links to a personal access token (classic) with `public_repo` and `write:discussion`. These scopes permit writes to public repositories the account can access. The token is held only in memory and sent only to `api.github.com`; closing the page or choosing **Disconnect publishing** clears it. Publishing does not reuse the private Workspace Storage token or change the Community GitHub App’s permissions. GitHub's [repository API](https://docs.github.com/en/rest/repos/repos#create-a-repository-for-the-authenticated-user) handles repository creation, and its [Discussions API](https://docs.github.com/en/graphql/reference/discussions) handles the submission.
+
+The review names the destination, author, license, lessons, question count and public files, and shows the exact validated lesson JSON including answers. Only schema-approved lesson content is exported; learner state, workspace backups and arbitrary imported metadata are excluded. New add-on IDs receive a stable repository-specific namespace, including prerequisite links between packages already published in that registry. Native improvements retain their native skill IDs and pass the same native-identity and combined-graph checks as installation.
+
+Existing release files are never overwritten. Increase the release version to change content or licensing. Publishing reuses completed uploads after a failed request, preserves earlier registry entries, checks for concurrent changes, and looks up an existing submission before creating another. If a step fails, choose **Validate and review publication** again and retry. Public publication receipts are stored locally, without tokens or lesson contents, so **Recent publications** can check discovery after a reload.
+
+**Uploaded and submitted** means GitHub has the public files and registry submission. **Check publication status** distinguishes pending validation, a validation rejection for that registry revision, and an exact version/digest listed in the shared Depot. Users refresh the catalog and choose whether to install it. A listed release may still be hidden by community moderation filters.
+
+## Registry format
 
 Each publisher hosts a `quickmaths-registry.json` file using the normal catalog envelope plus a registry identity:
 
@@ -47,7 +59,7 @@ The registry URL and every lesson URL must be pinned to complete commit SHAs in 
 
 Registries may retain multiple versions of a package. Every release must match its listing's ID and version and pass schema and reference checks. The Depot displays the latest version of each package; those selected versions must also form a valid combined prerequisite graph.
 
-To join global discovery, create a QuickMaths Discussion titled `[Registry] Publisher name` through the in-app **Submit a lesson** action and provide the pinned registry URL. An Action treats every file as untrusted data, checks its URL boundary, size, digest, namespace, schema, and complete prerequisite graph, and writes a small static federation index. Valid work appears immediately as **New** without a maintainer merge. Every exact package version receives a public discussion.
+To join global discovery, create a QuickMaths Discussion titled `[Registry] Publisher name` manually on GitHub, or let the in-app **Publish a lesson** flow create it and provide the pinned registry URL. An Action treats every file as untrusted data, checks its URL boundary, size, digest, namespace, schema, and complete prerequisite graph, and writes a small static federation index. Valid work appears as **New** after automated validation and a catalog refresh, without a maintainer merge. Every exact package version receives a public discussion.
 
 Users can also paste a public registry URL under **Settings → Manage lesson sources**. Direct subscriptions appear immediately and remain clearly marked **Subscribed**; they do not need the central discovery index.
 

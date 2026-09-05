@@ -1,13 +1,13 @@
 import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260905-state-fixes-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260903-combined-map-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260905-publisher-v1";
+import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
   DEFAULT_DEPOT_FEDERATION,
   DEPOT_DISCUSSIONS_URL,
   DEPOT_REPOSITORY_URL,
-  DEPOT_SUBMISSION_URL,
   filterDepotPackages,
 } from "./lesson-depot.js?v=20260905-depot-fixes-v1";
 import {
@@ -86,6 +86,7 @@ let depotSearchTimer;
 let routeHistoryReady = false;
 let applyingHistory = false;
 let lessonStudio;
+let lessonPublisher;
 let lessonDepot;
 let githubCommunity;
 let githubSync;
@@ -2147,7 +2148,7 @@ function renderLessonDepot(snapshot) {
   const connection = communityConnection();
   elements.view.innerHTML = `
     ${renderLessonHubTabs("depot")}
-    <header class="page-head depot-head"><div><p class="eyebrow">Free · open · federated</p><h1>Lesson Depot</h1><p>Install lessons published from independent community repositories alongside the official catalog. Every exact download is hash-checked and run through the same local validator before you can install it.</p></div><div class="page-actions">${connection.configured ? `<button class="button ${connection.connected ? "button-secondary" : "button-outline"}" type="button" data-depot-action="community-connect">${connection.connected ? `GitHub · ${escapeHtml(connection.viewer?.login ?? "connected")}` : "Connect GitHub"}</button>` : `<a class="button button-outline" href="${DEPOT_DISCUSSIONS_URL}" target="_blank" rel="noopener">Community ↗</a>`}<a class="button button-primary" href="${DEPOT_SUBMISSION_URL}" target="_blank" rel="noopener">Submit a lesson ↗</a></div></header>
+    <header class="page-head depot-head"><div><p class="eyebrow">Free · open · federated</p><h1>Lesson Depot</h1><p>Install lessons published from independent community repositories alongside the official catalog. Every exact download is hash-checked and run through the same local validator before you can install it.</p></div><div class="page-actions">${connection.configured ? `<button class="button ${connection.connected ? "button-secondary" : "button-outline"}" type="button" data-depot-action="community-connect">${connection.connected ? `GitHub · ${escapeHtml(connection.viewer?.login ?? "connected")}` : "Connect GitHub"}</button>` : `<a class="button button-outline" href="${DEPOT_DISCUSSIONS_URL}" target="_blank" rel="noopener">Community ↗</a>`}<button class="button button-primary" type="button" data-depot-action="publish">Publish a lesson</button></div></header>
     ${renderDepotCommunityPanel()}
     <section class="depot-trust-strip" aria-label="Lesson Depot safety model"><span><b>1</b><strong>Authors publish</strong><small>Their own GitHub repository</small></span><i>→</i><span><b>2</b><strong>Community reviews</strong><small>Recommend, flag, discuss</small></span><i>→</i><span><b>3</b><strong>QuickMaths verifies</strong><small>Hash, schema, full graph</small></span><i>→</i><span><b>4</b><strong>You approve</strong><small>Local installation only</small></span></section>
     ${preview ? `<aside class="depot-preview"><div><p class="eyebrow">Validated preview · ${escapeHtml(depotTrustLabel(preview.pack))}</p><h2>${escapeHtml(preview.pack.name)}</h2><p>${escapeHtml(preview.pack.description)}</p><div class="depot-preview-facts"><span>${preview.preview.skillCount}<small>Lessons</small></span><span>${preview.preview.problemCount}<small>Questions</small></span><span>${escapeHtml(preview.preview.subjectName)}<small>Subject</small></span><span>${escapeHtml(preview.pack.sourceName)}<small>Source</small></span></div></div><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(preview.pack.id)}" data-pack-version="${escapeHtml(preview.pack.version)}">Install this pack</button><button class="quiet-button" data-depot-action="close-preview">Close preview</button></aside>` : ""}
@@ -2548,6 +2549,7 @@ async function clearAllWorkspaceData() {
   if (connected) await githubSync.clearRemoteWorkspace();
   cancelActivePythonGraders();
   lessonStudio?.clearDraft?.();
+  lessonPublisher?.clearDraft?.();
   store.clearAllData();
   clearAuxiliaryWorkspaceData();
   if (connected) githubSync.resumeAfterClear();
@@ -2816,6 +2818,7 @@ document.addEventListener("click", async (event) => {
     const actionName = depotAction.dataset.depotAction;
     try {
       if (actionName === "reload") await lessonDepot.load({ force: true });
+      if (actionName === "publish") lessonPublisher.open();
       if (actionName === "preview") await lessonDepot.previewPack(depotAction.dataset.packId, depotAction.dataset.packVersion);
       if (actionName === "install") await lessonDepot.installPack(depotAction.dataset.packId, depotAction.dataset.packVersion);
       if (actionName === "close-preview") lessonDepot.closePreview();
@@ -3528,17 +3531,14 @@ async function boot() {
     }
     if (currentSnapshot?.activeProfile && currentSnapshot.ui.route === "settings") renderSettings(currentSnapshot);
   });
+  lessonPublisher = createLessonPublisherDialog({ curriculum, getDraft: () => lessonStudio.buildPack(), download });
   lessonStudio = createLessonStudio({
     store,
     download,
     showToast,
     getSnapshot: () => store.snapshot(),
     openFilePicker: () => elements.creatorFile.click(),
-    publishToDepot: (pack) => {
-      download(`${pack.id.toLowerCase().replaceAll("_", "-")}.json`, JSON.stringify(pack, null, 2), "application/json");
-      navigator.clipboard.writeText(buildDepotSubmissionPrompt(pack)).then(() => showToast("Lesson downloaded and Codex publishing prompt copied.")).catch(() => showToast("Lesson downloaded. Open the Depot submission form next."));
-      window.open(DEPOT_SUBMISSION_URL, "_blank", "noopener");
-    },
+    publishToDepot: (pack) => lessonPublisher.open(pack),
   });
   lessonDepot.load();
   closeAgentStudio({ focusToggle: false });

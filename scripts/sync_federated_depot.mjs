@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 import { normalizeDepotCatalog } from "../docs/lesson-depot.js";
 import { fetchTextLimited } from "../docs/safe-fetch.js";
 import {
-  federatedPackagePolicy,
+  validateFederatedNamespace,
   moderationStatus,
   packageDiscussionTitle,
   pinnedRegistryUrl,
@@ -47,7 +47,9 @@ async function createDiscussion(repositoryId, categoryId, title, body) {
 
 async function publishStatus(discussion, message) {
   const marker = "<!-- quickmaths-federation-status -->";
-  const body = `${marker}\n${message}`;
+  let revision = "";
+  try { revision = `\n\nRegistry revision: ${registryUrlFromBody(discussion.body)}`; } catch { /* Invalid submission URL is explained in the status. */ }
+  const body = `${marker}\n${message}${revision}`;
   const prior = discussion.comments?.nodes?.find((comment) => comment.viewerDidAuthor && String(comment.body ?? "").includes(marker));
   if (prior?.body === body) return;
   if (prior) {
@@ -106,20 +108,13 @@ for (const submission of submissions) {
     const packageFiles = [];
     for (const pack of normalized.packages) {
       if (pack.availability !== "published") throw new Error("Federated registries cannot publish metadata-only concept cards.");
-      const identityPolicy = federatedPackagePolicy(registryId, pack.id, namespace);
-      if (!identityPolicy.allowed) throw new Error(`${pack.id} must use registry namespace PACK_${namespace}_.`);
       if (seenPackageIds.has(pack.id)) throw new Error(`${pack.id} is already claimed by another federated registry.`);
       const packageUrl = pinnedRegistryUrl(pack.lessonUrl);
       const { text: raw } = await fetchTextLimited(fetch, packageUrl, { maximumBytes: 2_000_000, label: `${pack.name} lesson file` });
       const digest = createHash("sha256").update(raw).digest("hex");
       if (digest !== pack.sha256) throw new Error(`${pack.id} does not match its declared SHA-256 digest.`);
       const payload = JSON.parse(raw);
-      for (const skill of payload.skills ?? []) {
-        const skillId = String(skill?.id ?? "");
-        if (!skillId.startsWith(identityPolicy.skillPrefix)) {
-          throw new Error(`${skillId || "A skill"} does not belong to the ${pack.id} registry namespace.`);
-        }
-      }
+      validateFederatedNamespace(registryId, pack.id, payload, namespace);
       packageFiles.push({ pack, packageUrl, raw });
     }
     validateFederatedReleases(packageFiles, curriculum);

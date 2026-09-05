@@ -1624,3 +1624,35 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:ha
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }
+.lesson-publisher-dialog { box-sizing: border-box; width: min(780px, calc(100vw - 28px)); max-height: calc(100dvh - 36px); padding: clamp(20px, 4vw, 36px); border: 1px solid var(--line); border-radius: 24px; color: var(--ink); background: var(--paper-light); box-shadow: 0 24px 90px #0004; }
+.lesson-publisher-dialog::backdrop { background: #152f2b99; }
+.lesson-publisher-dialog p { line-height: 1.6; }
+.lesson-publisher-dialog fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.publisher-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.publisher-heading h2 { margin: 0; font-size: clamp(24px, 4vw, 34px); }
+.publisher-heading > button { flex-shrink: 0; }
+.publisher-section { padding: 22px 0; border-top: 1px solid var(--line); }
+.publisher-section h3 { margin: 0 0 14px; }
+.publisher-section label:not(.publisher-file-label) { display: grid; gap: 8px; margin: 14px 0; font-weight: 600; }
+.publisher-section input:not([type=checkbox]):not([type=file]), .publisher-section select { box-sizing: border-box; width: 100%; min-width: 0; padding: 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+.publisher-section small { display: block; margin-top: 12px; color: var(--muted); line-height: 1.6; }
+.publisher-fields { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+.publisher-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.publisher-file-label { position: relative; overflow: hidden; cursor: pointer; }
+.publisher-file-label input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
+.publisher-file-label:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; }
+.publisher-review { padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.publisher-review dl { display: grid; gap: 12px; }
+.publisher-review dl > div { display: grid; grid-template-columns: 140px 1fr; gap: 12px; }
+.publisher-review dd { margin: 0; overflow-wrap: anywhere; }
+.publisher-review dt { color: var(--muted); }
+.publisher-review pre { max-height: 280px; padding: 14px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; font-size: 12px; background: var(--paper-light); }
+.publisher-review .publisher-consent { display: flex !important; align-items: start; gap: 12px; font-weight: 400 !important; line-height: 1.6; }
+.publisher-consent input { margin-top: 7px; flex-shrink: 0; }
+.publisher-error { padding: 14px; border: 1px solid #b34535; border-radius: 10px; color: #8a291d; background: #fff0eb; overflow-wrap: anywhere; }
+.publisher-progress, .publisher-success { padding: 18px; background: var(--mint); border-radius: 12px; overflow-wrap: anywhere; }
+.publisher-status-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.publisher-history { display: grid; gap: 8px; padding: 18px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.lesson-publisher-dialog button:disabled { cursor: wait; opacity: .55; }
+.lesson-publisher-dialog summary { cursor: pointer; }
+@media (max-width: 540px) { .publisher-fields { grid-template-columns: 1fr; gap: 0; } .publisher-review dl > div { grid-template-columns: 1fr; gap: 4px; } .publisher-actions .button { width: 100%; } }
