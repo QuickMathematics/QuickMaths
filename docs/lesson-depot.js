@@ -115,6 +115,22 @@ function registryKey(url) {
   return `registry-${(hash >>> 0).toString(16).padStart(8, "0")}`;
 }
 
+function registryRepository(url) {
+  const source = new URL(url);
+  const parts = source.pathname.split("/").filter(Boolean);
+  if (source.hostname === "raw.githubusercontent.com") return parts.slice(0, 2).join("/").toLowerCase();
+  if (source.hostname.endsWith(".github.io")) {
+    const owner = source.hostname.slice(0, -".github.io".length);
+    return `${owner}/${parts.length > 1 ? parts[0] : source.hostname}`.toLowerCase();
+  }
+  return "";
+}
+
+function samePackageRelease(left, right) {
+  return Boolean(left && right && ["id", "version", "sha256", "lessonUrl", "sourceId", "sourceCatalogUrl", "availability"]
+    .every((key) => left[key] === right[key]));
+}
+
 function safeStorageGet(storage, key) {
   try { return storage?.getItem(key) ?? null; } catch { return null; }
 }
@@ -331,6 +347,7 @@ export function createLessonDepot({
     } catch { return []; }
   };
   let subscriptions = readSubscriptions();
+  let loadPromise = null;
   const state = {
     phase: "idle", error: "", warnings: [], catalog: null, sources: [], query: "", sort: "popular", subject: "all",
     showContested: false, preview: null, installingId: "",
@@ -355,9 +372,18 @@ export function createLessonDepot({
     if (source.trust !== "official" && (!declared || typeof declared !== "object" || !String(declared.id ?? "").trim() || !String(declared.name ?? "").trim())) {
       throw new Error(`${source.name} does not declare its registry identity.`);
     }
+    if (source.trust !== "official") {
+      const declaredId = text(declared.id, "Registry ID", 100).toLowerCase();
+      const repositoryId = registryRepository(source.catalogUrl);
+      if (!/^[a-z0-9_.-]+\/[a-z0-9_.-]+$/.test(declaredId)
+        || (repositoryId && declaredId !== repositoryId)
+        || (!source.subscription && declaredId !== source.id.toLowerCase())) {
+        throw new Error(`Registry ID must match its source repository${repositoryId ? `: ${repositoryId}` : ""}.`);
+      }
+    }
     const effectiveSource = source.subscription ? {
       ...source,
-      id: text(declared.id, "Registry ID", 100),
+      id: text(declared.id, "Registry ID", 100).toLowerCase(),
       name: text(declared.name, "Registry name", 160),
       homepageUrl: safeHttpUrl(declared.homepage_url, source.catalogUrl),
     } : source;
@@ -377,7 +403,7 @@ export function createLessonDepot({
       for (const pack of catalog.packages) {
         const prior = selected.get(pack.id);
         if (!prior) { selected.set(pack.id, pack); continue; }
-        if (prior.sourceId !== pack.sourceId) {
+        if (prior.sourceId !== pack.sourceId || (prior.trust === "official") !== (pack.trust === "official")) {
           if (prior.trust === "official") { collisions.push(`${pack.sourceName}: ${pack.id} conflicts with an official package.`); continue; }
           if (pack.trust === "official") { selected.set(pack.id, pack); collisions.push(`${prior.sourceName}: ${pack.id} conflicts with an official package.`); continue; }
           collisions.push(`${pack.sourceName}: ${pack.id} is already claimed by ${prior.sourceName}.`);
@@ -389,9 +415,8 @@ export function createLessonDepot({
     return { packages: [...selected.values()], collisions };
   };
 
-  const load = async ({ force = false } = {}) => {
-    if (!force && ["loading", "ready"].includes(state.phase)) return snapshot();
-    state.phase = "loading"; state.error = ""; state.warnings = []; emit();
+  const loadCatalog = async ({ force }) => {
+    state.phase = "loading"; state.error = ""; state.warnings = []; state.preview = null; emit();
     try {
       const officialSource = { id: "quickmaths-official", name: "QuickMaths Official", catalogUrl: safeHttpUrl(catalogUrl, globalThis.location?.href), homepageUrl: DEPOT_REPOSITORY_URL, discussionUrl: DEPOT_DISCUSSIONS_URL, trust: "official", status: "official", packages: [], subscription: false };
       let federated = [];
@@ -434,16 +459,38 @@ export function createLessonDepot({
     emit(); return snapshot();
   };
 
-  const fetchPack = async (pack) => {
+  const load = ({ force = false } = {}) => {
+    if (loadPromise) {
+      // A subscription change or explicit refresh must run after the current
+      // load, while ordinary readers share the work already in progress.
+      return force ? loadPromise.then(() => load({ force: true })) : loadPromise;
+    }
+    if (!force && state.phase === "ready") return Promise.resolve(snapshot());
+    loadPromise = Promise.resolve().then(() => loadCatalog({ force })).finally(() => { loadPromise = null; });
+    return loadPromise;
+  };
+
+  const downloadPack = async (pack) => {
     if (pack.availability === "preview") throw new Error(`${pack.name} is a concept preview. Installable lesson content has not been published yet.`);
     const { text: raw } = await fetchTextLimited(fetchImpl, pack.lessonUrl, { maximumBytes: 2_000_000, label: "Lesson file", request: { cache: "no-cache" } });
     if (pack.sha256) {
       const actual = await sha256(raw, cryptoImpl);
       if (actual !== pack.sha256) throw new Error("Lesson file hash does not match the reviewed Depot catalog.");
     }
+    const payload = JSON.parse(raw);
+    if (payload?.id !== pack.id || payload?.version !== pack.version) throw new Error("Lesson file identity does not match its Depot listing.");
+    return raw;
+  };
+
+  const fetchPack = async (pack) => {
+    const raw = await downloadPack(pack);
     const preview = store.previewLessonPack(raw);
-    if (preview.id !== pack.id || preview.version !== pack.version) throw new Error("Lesson file identity does not match its Depot listing.");
     return { raw, preview };
+  };
+
+  const requireCurrentRelease = (pack) => {
+    const current = state.catalog?.packages.find((item) => item.id === pack.id && item.version === pack.version);
+    if (state.phase !== "ready" || !samePackageRelease(pack, current)) throw new Error("The Depot listing changed while checking this lesson. Open its current preview and try again.");
   };
 
   const previewPack = async (id, version) => {
@@ -451,6 +498,7 @@ export function createLessonDepot({
     if (!pack) throw new Error("Lesson package was not found in the current catalog.");
     try {
       const result = await fetchPack(pack);
+      requireCurrentRelease(pack);
       state.preview = { pack, preview: result.preview, raw: result.raw };
       showToast(`${pack.name} passed local validation.`); emit(); return result.preview;
     } catch (error) { showToast(error instanceof Error ? error.message : String(error)); throw error; }
@@ -463,9 +511,10 @@ export function createLessonDepot({
     if (installed) { showToast(`${pack.name} is already installed.`); return { ok: true, installed: false }; }
     state.installingId = pack.id; emit();
     try {
-      const result = state.preview?.pack.id === id && state.preview?.pack.version === version
+      const result = samePackageRelease(state.preview?.pack, pack)
         ? { raw: state.preview.raw, preview: state.preview.preview }
         : await fetchPack(pack);
+      requireCurrentRelease(pack);
       const trustLabel = ({ official: "Official", recommended: "Community recommended", new: "New and unreviewed", subscribed: "Directly subscribed", contested: "Community contested" }[pack.trust] ?? "Unreviewed");
       const accepted = confirmInstall(`Install ${result.preview.name} from the Lesson Depot?\n\n${result.preview.skillCount} lessons · ${result.preview.problemCount} questions · ${result.preview.subjectName}\nAuthor: ${result.preview.author}\nSource: ${pack.sourceName} · ${trustLabel}\nLicense: ${pack.license}\n\nThe exact file passed SHA-256 and QuickMaths validation and will be included in progress backups.`);
       if (!accepted) return { ok: true, installed: false };
@@ -494,6 +543,7 @@ export function createLessonDepot({
     if (!pack) throw new Error("Lesson package was not found in the current catalog.");
     if (store.snapshot().lessonPacks.some((item) => item.id === id)) throw new Error(`${pack.name} is already installed.`);
     const result = await fetchPack(pack);
+    requireCurrentRelease(pack);
     return store.stageLessonPack(result.raw, { activityActor: "agent" });
   };
 
@@ -520,21 +570,22 @@ export function createLessonDepot({
     }
     if (!selected.length) throw new Error("Every requested Lesson Depot package is already installed.");
     const downloaded = [];
-    for (const pack of selected) downloaded.push({ pack, ...(await fetchPack(pack)) });
+    for (const pack of selected) downloaded.push({ pack, raw: await downloadPack(pack) });
+    selected.forEach(requireCurrentRelease);
     const staged = store.stageLessonPacks(downloaded.map((item) => item.raw), { activityActor: "agent" });
     return {
       ...staged,
       requested_count: requests.length,
       staged_count: downloaded.length,
       already_installed: alreadyInstalled,
-      review_queue: downloaded.map(({ pack, preview }, index) => ({
+      review_queue: downloaded.map(({ pack }, index) => ({
         position: index + 1,
         package_id: pack.id,
         version: pack.version,
-        name: preview.name,
-        subject_name: preview.subjectName,
-        skill_count: preview.skillCount,
-        problem_count: preview.problemCount,
+        name: staged.previews[index].name,
+        subject_name: staged.previews[index].subjectName,
+        skill_count: staged.previews[index].skillCount,
+        problem_count: staged.previews[index].problemCount,
       })),
     };
   };

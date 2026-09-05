@@ -1,6 +1,6 @@
 import { createQuickMathsStore } from "./challenge-core.js?v=20260905-state-fixes-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-final-handoff-v1";
-import { createLessonDepot } from "./lesson-depot.js?v=20260902-python-v1";
+import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260905-depot-fixes-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
@@ -135,7 +135,7 @@ async function boot() {
     educator: educatorManualResponse?.ok ? await educatorManualResponse.text() : "",
   };
   store = createQuickMathsStore({ storage: createAgentStateStorage(window.localStorage), curriculum, bundledLessonPacks });
-  lessonDepot = createLessonDepot({ store, showToast: toast });
+  lessonDepot = createLessonDepot({ store, showToast: toast, federationUrl: DEFAULT_DEPOT_FEDERATION, sourceStorage: window.localStorage });
   lessonDepot.load();
   const localCapability = resolveLocalBridgeCapability();
   let bridgeClient;

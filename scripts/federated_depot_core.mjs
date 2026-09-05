@@ -1,4 +1,35 @@
 import { githubFileRawUrl } from "../docs/safe-fetch.js";
+import { normalizeLessonPack, normalizeLessonPackCollection } from "../docs/challenge-core.js";
+import { compareVersions } from "../docs/lesson-depot.js";
+
+export function validateFederatedReleases(releases, curriculum) {
+  const parsed = releases.map(({ pack, raw }) => {
+    const payload = typeof raw === "string" ? JSON.parse(raw) : raw;
+    if (payload?.id !== pack.id || payload?.version !== pack.version) {
+      throw new Error(`${pack.id}@${pack.version} lesson file identity does not match its registry listing.`);
+    }
+    return payload;
+  });
+  const latest = new Map();
+  const identities = new Set();
+  for (const payload of parsed) {
+    const identity = `${payload.id}@${payload.version}`;
+    if (identities.has(identity)) throw new Error(`Duplicate package release: ${identity}.`);
+    identities.add(identity);
+    const prior = latest.get(payload.id);
+    if (!prior || compareVersions(payload.version, prior.version) > 0) latest.set(payload.id, payload);
+  }
+  // Historical releases remain schema-checked with their published references,
+  // but two versions of one package never occupy the same curriculum graph.
+  for (const payload of parsed) {
+    const knownSkillIds = [
+      ...curriculum.skills.map((skill) => skill.id),
+      ...parsed.filter((other) => other.id !== payload.id).flatMap((other) => (other.skills ?? []).map((skill) => skill?.id)),
+    ];
+    normalizeLessonPack(payload, { knownSkillIds, nativeSkills: curriculum.skills });
+  }
+  return normalizeLessonPackCollection([...latest.values()], curriculum);
+}
 
 const FIRST_PARTY_EXTERNAL_PACKS = new Map([
   ["quickmathematics/qm_dev_depot", new Map([

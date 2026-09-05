@@ -9,7 +9,7 @@ import {
   DEPOT_REPOSITORY_URL,
   DEPOT_SUBMISSION_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260903-federation-v1";
+} from "./lesson-depot.js?v=20260905-depot-fixes-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
@@ -100,7 +100,7 @@ let welcomeStorageOpen = new URLSearchParams(window.location.search).get("handof
 let welcomePath = "learner";
 let pendingLandingCurriculumId = null;
 let legacyGeographyMigrationPromise = null;
-const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "" };
+const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "", requestId: 0 };
 const runningPythonQuestionIds = new Set();
 
 const EDUCATOR_GUIDE_URL = "https://quickmathematics.github.io/QuickMaths/QuickMaths-Educator-Guide.pdf";
@@ -2078,11 +2078,17 @@ function rerenderDepotCommunity() {
 
 async function loadDepotDiscussion() {
   if (!githubCommunity?.configured || !communityUi.activePack) return;
-  communityUi.phase = "loading"; communityUi.error = ""; communityUi.discussion = null; rerenderDepotCommunity();
+  const pack = communityUi.activePack;
+  const requestId = ++communityUi.requestId;
+  const isCurrent = () => requestId === communityUi.requestId && communityUi.activePack === pack;
+  communityUi.phase = "loading"; communityUi.error = ""; communityUi.discussion = null; communityUi.busy = false; rerenderDepotCommunity();
   try {
-    communityUi.discussion = await githubCommunity.loadDiscussion(communityUi.activePack.discussionUrl);
+    const discussion = await githubCommunity.loadDiscussion(pack.discussionUrl);
+    if (!isCurrent()) return;
+    communityUi.discussion = discussion;
     communityUi.phase = "ready";
   } catch (error) {
+    if (!isCurrent()) return;
     communityUi.phase = "error";
     communityUi.error = error instanceof Error ? error.message : String(error);
   }
@@ -2093,7 +2099,8 @@ async function loadDepotDiscussion() {
 async function openDepotCommunity(packId, packVersion) {
   const pack = lessonDepot?.snapshot().catalog?.packages.find((item) => item.id === packId && item.version === packVersion);
   if (!pack) throw new Error("Lesson package discussion was not found.");
-  communityUi.activePack = pack; communityUi.discussion = null; communityUi.commentDraft = ""; communityUi.error = ""; communityUi.phase = "idle";
+  communityUi.requestId += 1;
+  communityUi.activePack = pack; communityUi.discussion = null; communityUi.commentDraft = ""; communityUi.error = ""; communityUi.phase = "idle"; communityUi.busy = false;
   rerenderDepotCommunity();
   if (communityConnection().connected) await loadDepotDiscussion();
   else document.querySelector("#depot-community-panel")?.scrollIntoView({ block: "start", behavior: "smooth" });
@@ -2814,7 +2821,8 @@ document.addEventListener("click", async (event) => {
       if (actionName === "close-preview") lessonDepot.closePreview();
       if (actionName === "community-open") await openDepotCommunity(depotAction.dataset.packId, depotAction.dataset.packVersion);
       if (actionName === "community-close") {
-        communityUi.activePack = null; communityUi.discussion = null; communityUi.commentDraft = ""; communityUi.error = ""; communityUi.phase = "idle";
+        communityUi.requestId += 1;
+        communityUi.activePack = null; communityUi.discussion = null; communityUi.commentDraft = ""; communityUi.error = ""; communityUi.phase = "idle"; communityUi.busy = false;
         rerenderDepotCommunity();
       }
       if (actionName === "community-connect") {
@@ -2824,24 +2832,31 @@ document.addEventListener("click", async (event) => {
       }
       if (actionName === "community-refresh") await loadDepotDiscussion();
       if (actionName === "community-vote" && communityUi.discussion && !communityUi.busy) {
+        const requestId = communityUi.requestId;
+        const discussion = communityUi.discussion;
         communityUi.busy = true; rerenderDepotCommunity();
         try {
-          const vote = await githubCommunity.setVote(communityUi.discussion.id, !communityUi.discussion.viewerHasVoted);
-          communityUi.discussion = { ...communityUi.discussion, ...vote };
+          const vote = await githubCommunity.setVote(discussion.id, !discussion.viewerHasVoted);
+          if (requestId !== communityUi.requestId) return;
+          communityUi.discussion = { ...discussion, ...vote };
           showToast(vote.viewerHasVoted ? "Lesson upvote saved on GitHub." : "GitHub upvote removed.");
-        } finally { communityUi.busy = false; rerenderDepotCommunity(); }
+        } finally { if (requestId === communityUi.requestId) { communityUi.busy = false; rerenderDepotCommunity(); } }
       }
       if (actionName === "community-flag" && communityUi.discussion && !communityUi.busy) {
+        const requestId = communityUi.requestId;
+        const discussion = communityUi.discussion;
         communityUi.busy = true; rerenderDepotCommunity();
         try {
-          const flag = await githubCommunity.setFlag(communityUi.discussion.id, !communityUi.discussion.viewerHasFlagged);
-          communityUi.discussion = { ...communityUi.discussion, ...flag };
+          const flag = await githubCommunity.setFlag(discussion.id, !discussion.viewerHasFlagged);
+          if (requestId !== communityUi.requestId) return;
+          communityUi.discussion = { ...discussion, ...flag };
           showToast(flag.viewerHasFlagged ? "Concern flagged. Add a comment explaining it." : "GitHub flag removed.");
-        } finally { communityUi.busy = false; rerenderDepotCommunity(); }
+        } finally { if (requestId === communityUi.requestId) { communityUi.busy = false; rerenderDepotCommunity(); } }
       }
       if (actionName === "community-disconnect") {
         githubCommunity?.disconnect();
-        communityUi.phase = "idle"; communityUi.discussion = null; communityUi.error = ""; communityUi.connectionError = "";
+        communityUi.requestId += 1;
+        communityUi.phase = "idle"; communityUi.discussion = null; communityUi.error = ""; communityUi.connectionError = ""; communityUi.busy = false;
         rerenderDepotCommunity();
         showToast("GitHub community disconnected on this device.");
       }
@@ -3306,19 +3321,22 @@ document.addEventListener("submit", (event) => {
     if (!communityUi.discussion || communityUi.busy) return;
     const form = event.target;
     const body = new FormData(form).get("body");
+    const requestId = communityUi.requestId;
+    const discussion = communityUi.discussion;
     communityUi.commentDraft = String(body ?? "");
     communityUi.busy = true; rerenderDepotCommunity();
-    githubCommunity.addComment(communityUi.discussion.id, body).then((comment) => {
+    githubCommunity.addComment(discussion.id, body).then((comment) => {
+      if (requestId !== communityUi.requestId) return;
       communityUi.discussion = {
-        ...communityUi.discussion,
-        commentCount: communityUi.discussion.commentCount + 1,
-        comments: [...communityUi.discussion.comments, comment].slice(-50),
+        ...discussion,
+        commentCount: discussion.commentCount + 1,
+        comments: [...discussion.comments, comment].slice(-50),
       };
-      communityUi.commentDraft = "";
+      if (communityUi.commentDraft === String(body ?? "")) communityUi.commentDraft = "";
       showToast("Comment posted to GitHub Discussions.");
     }).catch((error) => {
       showToast(error instanceof Error ? error.message : String(error));
-    }).finally(() => { communityUi.busy = false; rerenderDepotCommunity(); });
+    }).finally(() => { if (requestId === communityUi.requestId) { communityUi.busy = false; rerenderDepotCommunity(); } });
     return;
   }
   if (event.target.id === "github-sync-form") {

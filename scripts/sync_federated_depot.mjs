@@ -2,7 +2,6 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-import { normalizeLessonPackCollection } from "../docs/challenge-core.js";
 import { normalizeDepotCatalog } from "../docs/lesson-depot.js";
 import { fetchTextLimited } from "../docs/safe-fetch.js";
 import {
@@ -11,6 +10,7 @@ import {
   packageDiscussionTitle,
   pinnedRegistryUrl,
   registryUrlFromBody,
+  validateFederatedReleases,
 } from "./federated_depot_core.mjs";
 
 const FEDERATION_FORMAT = "quickmaths.lesson-depot.federation";
@@ -103,7 +103,6 @@ for (const submission of submissions) {
     const source = { id: registryId, name: registryName, catalogUrl, homepageUrl: registry.homepage_url, discussionUrl: submission.url, trust: "new", packages: [] };
     const normalized = normalizeDepotCatalog(candidate, { catalogUrl, baseUrl: catalogUrl, source, requireHashes: true });
     if (!normalized.packages.length) throw new Error("A federated registry must publish at least one package.");
-    const rawPackages = [];
     const packageFiles = [];
     for (const pack of normalized.packages) {
       if (pack.availability !== "published") throw new Error("Federated registries cannot publish metadata-only concept cards.");
@@ -121,10 +120,9 @@ for (const submission of submissions) {
           throw new Error(`${skillId || "A skill"} does not belong to the ${pack.id} registry namespace.`);
         }
       }
-      rawPackages.push(raw);
-      packageFiles.push({ pack, packageUrl });
+      packageFiles.push({ pack, packageUrl, raw });
     }
-    normalizeLessonPackCollection(rawPackages, curriculum);
+    validateFederatedReleases(packageFiles, curriculum);
 
     const packageModeration = [];
     for (const { pack, packageUrl } of packageFiles) {

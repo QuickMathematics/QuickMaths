@@ -45,6 +45,8 @@ Each publisher hosts a `quickmaths-registry.json` file using the normal catalog 
 
 The registry URL and every lesson URL must be pinned to complete commit SHAs in the same repository. Use a two-commit publication flow: first commit the final lesson file, then commit a registry that points to that immutable lesson commit and its SHA-256 digest. Pin the submitted registry URL to the second commit. `registry.id` must match the GitHub owner and repository in those URLs. Community package IDs use `PACK_NAMESPACE_*`; their authored skill IDs use `CUSTOM_NAMESPACE_*`. This prevents mutable content from inheriting another version's reviews and prevents accidental identity collisions.
 
+Registries may retain multiple versions of a package. Every release must match its listing's ID and version and pass schema and reference checks. The Depot displays the latest version of each package; those selected versions must also form a valid combined prerequisite graph.
+
 To join global discovery, create a QuickMaths Discussion titled `[Registry] Publisher name` through the in-app **Submit a lesson** action and provide the pinned registry URL. An Action treats every file as untrusted data, checks its URL boundary, size, digest, namespace, schema, and complete prerequisite graph, and writes a small static federation index. Valid work appears immediately as **New** without a maintainer merge. Every exact package version receives a public discussion.
 
 Users can also paste a public registry URL under **Settings → Manage lesson sources**. Direct subscriptions appear immediately and remain clearly marked **Subscribed**; they do not need the central discovery index.

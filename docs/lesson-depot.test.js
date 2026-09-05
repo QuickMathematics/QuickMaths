@@ -59,7 +59,7 @@ test("compares common semantic versions", () => {
 });
 
 test("controller previews before explicit install", async () => {
-  const raw = JSON.stringify({ format: "quickmaths.lesson-set", id: "PACK_BIO" });
+  const raw = JSON.stringify({ format: "quickmaths.lesson-set", id: "PACK_BIO", version: "1.1.0" });
   const store = {
     snapshot: () => ({ lessonPacks: [] }),
     previewLessonPack: () => ({ id: "PACK_BIO", version: "1.1.0", name: "Cell Biology", author: "Ada", subjectName: "Biology", skillCount: 2, problemCount: 8 }),
@@ -132,7 +132,7 @@ test("controller validates a Depot batch before opening one sequential human rev
     previewLessonPack(raw) { return JSON.parse(raw); },
     stageLessonPacks(rawItems) {
       stagedRaws = rawItems;
-      return { ok: true, status: "staged", staged_count: rawItems.length, sequential_review: true, requires_human_confirmation: true };
+      return { ok: true, status: "staged", staged_count: rawItems.length, sequential_review: true, requires_human_confirmation: true, previews: rawItems.map((raw) => JSON.parse(raw)) };
     },
   };
   const fetchImpl = async (url) => {
