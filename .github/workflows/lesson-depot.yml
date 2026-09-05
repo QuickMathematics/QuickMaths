@@ -5,6 +5,8 @@ on:
     paths:
       - "docs/lesson-depot/**"
       - "docs/challenge-core.js"
+      - "docs/depot-reactions.js"
+      - "docs/depot-reactions.test.js"
       - "scripts/lesson_depot.py"
       - "tests/test_lesson_depot.py"
       - ".github/workflows/lesson-depot.yml"
@@ -12,7 +14,10 @@ on:
     branches: [main]
     paths:
       - "docs/lesson-depot/**"
+      - "docs/depot-reactions.js"
+      - "docs/depot-reactions.test.js"
       - "scripts/lesson_depot.py"
+      - ".github/workflows/lesson-depot.yml"
 
 permissions:
   contents: read
