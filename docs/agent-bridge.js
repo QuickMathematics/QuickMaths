@@ -1,4 +1,4 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260903-combined-map-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260905-state-fixes-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-final-handoff-v1";
 import { createLessonDepot } from "./lesson-depot.js?v=20260902-python-v1";
 import {

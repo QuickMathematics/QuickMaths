@@ -709,6 +709,14 @@ test("lesson-set tools validate and stage content but cannot install it", async 
   assert.equal(store.snapshot().stagedLessonPack.id, "PACK_PERSONAL_FINANCE");
   assert.equal(store.snapshot().lessonPacks.length, 0);
   assert.equal(tools.confirm_lesson_set_install, undefined);
+  const restored = createStore({ profile: false });
+  restored.importSyncState(store.exportSyncState());
+  const restoredTools = toolsFor(restored);
+  const app = await restoredTools.get_app_state.execute({});
+  assert.equal(restored.snapshot().stagedLessonPack.id, "PACK_PERSONAL_FINANCE");
+  assert.equal(restored.snapshot().lessonPacks.length, 0);
+  assert.equal(restoredTools.confirm_lesson_set_install, undefined);
+  assert.doesNotMatch(JSON.stringify(app), /expected_answer|expectedAnswer|solution_steps|solutionSteps/);
 });
 
 test("lesson-set tools validate and stage native improvements for human confirmation", async () => {

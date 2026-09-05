@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createQuickMathsStore } from "./challenge-core.js";
 
 import {
   AGENT_STATE_PATH,
@@ -103,6 +105,46 @@ function controller({ role, client, harness, credentialStore = credentials(), da
     clearTimer: () => {},
   });
 }
+
+test("Bridge hands staged lesson batches to the learner for individual approval", async () => {
+  const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
+  const packs = ["./lesson-set-example.json", "./lesson-depot/lessons/geography/1.0.0/lesson-set.json"]
+    .map((path) => readFileSync(new URL(path, import.meta.url), "utf8"));
+  const github = fakeGitHub();
+  const learnerStore = createQuickMathsStore({ storage: new MemoryStorage(), curriculum });
+  const agentStore = createQuickMathsStore({ storage: new MemoryStorage(), curriculum });
+  learnerStore.createProfile("Bridge Learner");
+  const workspace = (store) => ({ serialize: store.exportSyncState, apply: store.importSyncState, subscribe: store.subscribe });
+  const learner = controller({ role: "learner", client: github, harness: workspace(learnerStore) });
+  const agent = controller({ role: "agent", client: github, harness: workspace(agentStore) });
+  await learner.connect(connection(), { startPolling: false });
+  await learner.pushNow();
+  await agent.connect(connection("agent"), { startPolling: false });
+  await agent.pullNow();
+  agentStore.stageLessonPacks(packs, { activityActor: "agent" });
+  await agent.pushNow();
+  assert.equal((await learner.pullNow()).updated, true);
+  assert.equal(learnerStore.snapshot().ui.route, "settings");
+  assert.equal(learnerStore.snapshot().stagedLessonPack.id, "PACK_PERSONAL_FINANCE");
+  assert.equal(learnerStore.snapshot().stagedLessonPack.batchTotal, 2);
+  assert.equal(learnerStore.snapshot().lessonPacks.length, 0);
+
+  learnerStore.installStagedLessonPack();
+  await learner.pushNow();
+  await agent.pullNow();
+  assert.equal(agentStore.snapshot().lessonPacks.length, 1);
+  assert.equal(agentStore.snapshot().stagedLessonPack.id, "PACK_GEOGRAPHY");
+  assert.equal(agentStore.snapshot().stagedLessonPack.batchIndex, 2);
+
+  learnerStore.discardStagedLessonPack();
+  await learner.pushNow();
+  await agent.pullNow();
+  assert.equal(agentStore.snapshot().stagedLessonPack, null);
+  await agent.pushNow();
+  await learner.pullNow();
+  assert.equal(learnerStore.snapshot().stagedLessonPack, null);
+  assert.equal(learnerStore.snapshot().lessonPacks.length, 1);
+});
 
 test("normalizes repository configuration and rejects unsafe identifiers", () => {
   assert.deepEqual(normalizeGitHubSyncConfig(connection()), {

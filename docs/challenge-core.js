@@ -748,7 +748,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
   };
 }
 
-export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = [] } = {}) {
+export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = [], allowMissingReferences = false } = {}) {
   let candidate = input;
   if (typeof input === "string") {
     if (utf8ByteLength(input) > MAX_LESSON_SET_BYTES) throw new Error("Lesson set is larger than 2 MB.");
@@ -801,10 +801,10 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
     const prerequisiteRefs = basePrerequisiteRefs.map((ref) => serializedBySkill.get(ref.skillId) ?? ref);
     const prerequisites = prerequisiteRefs.map((ref) => ref.skillId);
     const unlocks = idList(skillCandidate.unlocks, `${skillId} unlocks`);
-    for (const prerequisite of prerequisites) if (!allKnown.has(prerequisite)) throw new Error(`${skillId} references missing prerequisite ${prerequisite}.`);
+    for (const prerequisite of prerequisites) if (!allowMissingReferences && !allKnown.has(prerequisite)) throw new Error(`${skillId} references missing prerequisite ${prerequisite}.`);
     for (const unlock of unlocks) {
       if (mode === "add" && !packSkillSet.has(unlock)) throw new Error(`${skillId} unlock ${unlock} must belong to the same lesson set.`);
-      if (mode === "override" && !allKnown.has(unlock)) throw new Error(`${skillId} references missing unlock ${unlock}.`);
+      if (mode === "override" && !allowMissingReferences && !allKnown.has(unlock)) throw new Error(`${skillId} references missing unlock ${unlock}.`);
     }
     if (!Array.isArray(skillCandidate.problems) || !skillCandidate.problems.length || skillCandidate.problems.length > MAX_PROBLEMS_PER_SKILL) {
       throw new Error(`${skillId} must contain 1 to ${MAX_PROBLEMS_PER_SKILL} problems.`);
@@ -943,6 +943,36 @@ function sanitizeLessonPacks(value, curriculum, { strict = false } = {}) {
   return output;
 }
 
+function sanitizeStagedLessonPacks(value, curriculum, { strict = false } = {}) {
+  if (value == null) return [];
+  try {
+    if (!Array.isArray(value) || value.length > 20) throw new Error("Staged lesson sets must be a list of at most 20 review items.");
+    const packIds = new Set();
+    return value.map((item, index) => {
+      const { batchIndex, batchTotal } = item ?? {};
+      if (!Number.isInteger(batchIndex) || !Number.isInteger(batchTotal)
+        || batchIndex < 1 || batchIndex > batchTotal || batchTotal > 20
+        || batchIndex !== value[0].batchIndex + index || batchTotal !== value[0].batchTotal
+        || batchIndex + value.length - index - 1 !== batchTotal) {
+        throw new Error("Staged lesson set review positions are invalid.");
+      }
+      // These are proposals, not installed content. A prerequisite may have been
+      // skipped or removed since staging; installation rechecks the full catalog.
+      const pack = normalizeLessonPack(JSON.stringify(item.pack), {
+        knownSkillIds: curriculum.skills.map((skill) => skill.id),
+        nativeSkills: curriculum.skills,
+        allowMissingReferences: true,
+      });
+      if (packIds.has(pack.id)) throw new Error(`Duplicate staged lesson set ID: ${pack.id}.`);
+      packIds.add(pack.id);
+      return { pack, batchIndex, batchTotal };
+    });
+  } catch (error) {
+    if (strict) throw error;
+    return [];
+  }
+}
+
 function resolveCatalogSkills(curriculum, lessonPacks) {
   const builtInSkills = curriculum.skills.map((skill) => ({
     ...skill, subjectId: skill.subjectId ?? skill.subject_id ?? DEFAULT_SUBJECT_ID,
@@ -1040,6 +1070,7 @@ function initialState() {
     drafts: {},
     mapPlans: {},
     lessonPacks: [],
+    stagedLessonPacks: [],
     curricula: [],
     backup: {
       lastExportAt: null,
@@ -1448,6 +1479,7 @@ function sanitizeAttempt(candidate, profileIds, skillIds) {
     reviewStatus: cleanText(candidate.reviewStatus, 60) || "graded",
     hasPendingReview: Boolean(candidate.hasPendingReview),
     reviewMasteryDeltaApplied: cleanNumber(candidate.reviewMasteryDeltaApplied, 0, -20, 20),
+    previousMasteryStatus: ["ready", "learning", "proven", "mastered", "rusty"].includes(candidate.previousMasteryStatus) ? candidate.previousMasteryStatus : null,
     reviewResolution: candidate.reviewResolution && typeof candidate.reviewResolution === "object" ? {
       verdict: ["pass", "partial", "needs_revision", "fail"].includes(candidate.reviewResolution.verdict) ? candidate.reviewResolution.verdict : "partial",
       score: cleanNumber(candidate.reviewResolution.score, 0, 0, 1),
@@ -1630,6 +1662,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
     drafts: sanitizeDrafts(candidate.drafts, profileIds, catalog),
     mapPlans: sanitizeMapPlans(candidate.mapPlans, profileIds, skills, subjects),
     lessonPacks,
+    stagedLessonPacks: sanitizeStagedLessonPacks(candidate.stagedLessonPacks, curriculum, { strict: strictPacks }),
     backup: {
       lastExportAt: cleanText(candidate.backup?.lastExportAt, 40) || null,
       attemptCountAtExport: Math.floor(cleanNumber(candidate.backup?.attemptCountAtExport, 0, 0, MAX_ATTEMPTS)),
@@ -2455,7 +2488,6 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   let catalog = curriculum;
   let migrationLessonPacks = [...bundledLessonPacks];
   let state = loadState(storage, curriculum, { bundledLessonPacks: migrationLessonPacks });
-  let stagedLessonPacks = [];
   let lessonPacksById = new Map();
   let visibleSkillCache = null;
   const listeners = new Set();
@@ -2791,19 +2823,19 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       activity: clone(state.activity.filter((item) => item.profileId === state.activeProfileId && item.actor === "agent")),
       storageError,
       backupStatus: backupStatus(),
-      stagedLessonPack: stagedLessonPacks[0] ? {
-        id: stagedLessonPacks[0].pack.id,
-        name: stagedLessonPacks[0].pack.name,
-        mode: stagedLessonPacks[0].pack.mode,
-        author: stagedLessonPacks[0].pack.author,
-        version: stagedLessonPacks[0].pack.version,
-        subjectId: stagedLessonPacks[0].pack.subject.id,
-        subjectName: stagedLessonPacks[0].pack.subject.name,
-        skillCount: stagedLessonPacks[0].pack.skills.length,
-        problemCount: stagedLessonPacks[0].pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
-        batchIndex: stagedLessonPacks[0].batchIndex,
-        batchTotal: stagedLessonPacks[0].batchTotal,
-        queueRemaining: Math.max(0, stagedLessonPacks.length - 1),
+      stagedLessonPack: state.stagedLessonPacks[0] ? {
+        id: state.stagedLessonPacks[0].pack.id,
+        name: state.stagedLessonPacks[0].pack.name,
+        mode: state.stagedLessonPacks[0].pack.mode,
+        author: state.stagedLessonPacks[0].pack.author,
+        version: state.stagedLessonPacks[0].pack.version,
+        subjectId: state.stagedLessonPacks[0].pack.subject.id,
+        subjectName: state.stagedLessonPacks[0].pack.subject.name,
+        skillCount: state.stagedLessonPacks[0].pack.skills.length,
+        problemCount: state.stagedLessonPacks[0].pack.skills.reduce((count, skill) => count + skill.problems.length, 0),
+        batchIndex: state.stagedLessonPacks[0].batchIndex,
+        batchTotal: state.stagedLessonPacks[0].batchTotal,
+        queueRemaining: Math.max(0, state.stagedLessonPacks.length - 1),
       } : null,
       lessonPacks: state.lessonPacks.map((pack) => ({
         id: pack.id,
@@ -3004,7 +3036,6 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       reviews: state.reviews.length,
     };
     state = initialState();
-    stagedLessonPacks = [];
     storageError = null;
     rebuildCatalog();
     try { storage?.removeItem?.(LEGACY_STORAGE_KEY); } catch { /* The current empty state still prevents legacy migration. */ }
@@ -3840,7 +3871,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       && pending.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
       && reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
       && reflection.guessed !== "yes";
-    const status = hasPendingReview ? "learning" : passed ? (previous.status === "proven" ? "mastered" : "proven") : "learning";
+    const status = hasPendingReview ? "learning" : passed ? (PROVEN.has(previous.status) ? "mastered" : "proven") : "learning";
     const completedAt = isoNow();
     const mistakeTags = [...new Set(pending.results.flatMap((result) => result.mistakeTags))].slice(0, 12);
     const record = {
@@ -3874,6 +3905,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       reviewStatus: hasPendingReview ? "pending_review" : "graded",
       hasPendingReview,
       reviewMasteryDeltaApplied: 0,
+      previousMasteryStatus: previous.status,
       reviewResolution: null,
     };
     for (const review of state.reviews) {
@@ -3965,7 +3997,9 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       && attempt.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
       && attempt.reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
       && attempt.reflection.guessed !== "yes";
-    record.status = passed ? (record.status === "proven" ? "mastered" : "proven") : "learning";
+    // Revisions to one review must not count as additional passing attempts.
+    const previouslyProven = PROVEN.has(attempt.previousMasteryStatus) || record.status === "mastered";
+    record.status = passed ? (previouslyProven ? "mastered" : "proven") : "learning";
     record.nextReviewAt = reviewDate(record.status, attempt.percentScore, attempt.reflection.confidenceRating, now());
     record.updatedAt = isoNow();
     attempt.masteryUpdate = { status: record.status, masteryScore: record.masteryScore };
@@ -4218,16 +4252,16 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   const stageLessonPacks = (rawItems, { activityActor = "learner" } = {}) => {
     if (!Array.isArray(rawItems) || !rawItems.length) throw new Error("At least one lesson set is required for staging.");
     if (rawItems.length > 20) throw new Error("At most 20 lesson sets can be staged together.");
-    if (stagedLessonPacks.length) throw new Error("A lesson set is already awaiting human review. Finish or skip the current queue before staging another batch.");
+    if (state.stagedLessonPacks.length) throw new Error("A lesson set is already awaiting human review. Finish or skip the current queue before staging another batch.");
     const parsed = [];
     const workingPacks = [...state.lessonPacks];
     for (const raw of rawItems) {
       const serialized = typeof raw === "string" ? raw : JSON.stringify(raw);
       const pack = parseLessonPackAgainst(serialized, workingPacks);
       workingPacks.push(pack);
-      parsed.push({ raw: serialized, pack });
+      parsed.push({ pack });
     }
-    stagedLessonPacks = parsed.map((item, index) => ({ ...item, batchIndex: index + 1, batchTotal: parsed.length }));
+    state.stagedLessonPacks = parsed.map((item, index) => ({ ...item, batchIndex: index + 1, batchTotal: parsed.length }));
     state.ui.route = "settings";
     addActivity("stage_custom_lesson_set", parsed.length === 1
       ? `Staged ${parsed[0].pack.name}; human confirmation is required to install it.`
@@ -4247,24 +4281,24 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   const stageLessonPack = (raw, options = {}) => stageLessonPacks([raw], options);
 
   const installStagedLessonPack = () => {
-    if (!stagedLessonPacks.length) throw new Error("No lesson set is staged.");
-    const staged = stagedLessonPacks.shift();
+    if (!state.stagedLessonPacks.length) throw new Error("No lesson set is staged.");
+    const staged = state.stagedLessonPacks.shift();
     try {
-      const result = importLessonPack(staged.raw);
-      return { ...result, reviewQueueRemaining: stagedLessonPacks.length, reviewQueueTotal: staged.batchTotal };
+      const result = importLessonPack(staged.pack);
+      return { ...result, reviewQueueRemaining: state.stagedLessonPacks.length, reviewQueueTotal: staged.batchTotal };
     } catch (error) {
-      stagedLessonPacks.unshift(staged);
+      state.stagedLessonPacks.unshift(staged);
       throw error;
     }
   };
 
   const discardStagedLessonPack = () => {
-    if (!stagedLessonPacks.length) return { ok: true, discarded: false, reviewQueueRemaining: 0 };
-    const staged = stagedLessonPacks.shift();
+    if (!state.stagedLessonPacks.length) return { ok: true, discarded: false, reviewQueueRemaining: 0 };
+    const staged = state.stagedLessonPacks.shift();
     const name = staged.pack.name;
     addActivity("discard_staged_lesson_set", `Discarded staged lesson set ${name}.`);
     notify();
-    return { ok: true, discarded: true, reviewQueueRemaining: stagedLessonPacks.length, reviewQueueTotal: staged.batchTotal };
+    return { ok: true, discarded: true, reviewQueueRemaining: state.stagedLessonPacks.length, reviewQueueTotal: staged.batchTotal };
   };
 
   const restoreNativeLessons = (packId) => {

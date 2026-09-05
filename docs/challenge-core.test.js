@@ -175,6 +175,156 @@ function workFor(problem, final = String(problem.expected_answer)) {
   return Array.from({ length: Math.max(1, Number(problem.work?.minimum_steps ?? 1)) }, () => final).join("\n");
 }
 
+test("passing retakes preserve mastery and its review interval", () => {
+  const { store, advance } = harness();
+  store.createProfile("Retake Learner");
+  for (const expectedStatus of ["proven", "mastered", "mastered"]) {
+    store.startTest("MATH_ARITH_001", { force: true });
+    answerActiveTestCorrectly(store);
+    assert.equal(store.submitTest().ok, true);
+    const attempt = store.saveReflection({ confidenceRating: 4, guessed: "no" });
+    assert.equal(attempt.masteryUpdate.status, expectedStatus);
+    const progress = store.snapshot().progressRows.find((row) => row.id === "MATH_ARITH_001");
+    assert.equal(progress.status, expectedStatus);
+    assert.equal(Date.parse(progress.nextReviewAt) - Date.parse(attempt.completedAt), (expectedStatus === "mastered" ? 21 : 7) * 86_400_000);
+    advance(22 * 86_400);
+  }
+  store.startTest("MATH_ARITH_001", { force: true });
+  answerActiveTestCorrectly(store);
+  store.submitTest();
+  assert.equal(store.saveReflection({ confidenceRating: 1, guessed: "yes" }).masteryUpdate.status, "learning");
+});
+
+test("staged review queues survive reloads, backups, and Bridge checkpoints without installing", () => {
+  const { store, storage } = harness();
+  store.createProfile("Queue Learner");
+  store.stageLessonPacks([chainLessonSet(1), chainLessonSet(2, { subject_id: "SUBJECT_CHAIN", skill_id: "CUSTOM_CHAIN_01" })]);
+  const preview = store.snapshot().stagedLessonPack;
+  const reloaded = harness({ [STORAGE_KEY]: storage.value(STORAGE_KEY) }).store;
+  assert.deepEqual(reloaded.snapshot().stagedLessonPack, preview);
+  assert.equal(reloaded.snapshot().lessonPacks.length, 0);
+  const restored = harness().store;
+  restored.importBackup(reloaded.exportBackup());
+  assert.deepEqual(restored.snapshot().stagedLessonPack, preview);
+  assert.equal(restored.snapshot().lessonPacks.length, 0);
+  restored.installStagedLessonPack();
+  const synced = harness().store;
+  synced.importSyncState(restored.exportSyncState());
+  assert.equal(synced.snapshot().lessonPacks.length, 1);
+  assert.equal(synced.snapshot().stagedLessonPack.id, "PACK_CHAIN_02");
+  assert.equal(synced.snapshot().stagedLessonPack.batchIndex, 2);
+  assert.equal(synced.snapshot().stagedLessonPack.batchTotal, 2);
+  synced.installStagedLessonPack();
+  assert.equal(synced.snapshot().lessonPacks.length, 2);
+  assert.equal(synced.snapshot().stagedLessonPack, null);
+});
+
+test("replacing workspace state replaces its staged queue, including legacy snapshots", () => {
+  const { store, storage } = harness();
+  store.createProfile("Queue Learner");
+  const legacy = JSON.parse(store.exportSyncState());
+  delete legacy.stagedLessonPacks;
+  store.stageLessonPack(lessonSetExample);
+  store.importSyncState(JSON.stringify(legacy));
+  assert.equal(store.snapshot().stagedLessonPack, null);
+  store.stageLessonPack(lessonSetExample);
+  store.importBackup(JSON.stringify(legacy));
+  assert.equal(store.snapshot().stagedLessonPack, null);
+  store.stageLessonPack(lessonSetExample);
+  storage.setItem(STORAGE_KEY, JSON.stringify(legacy));
+  store.replaceFromStorage();
+  assert.equal(store.snapshot().stagedLessonPack, null);
+});
+
+test("restored proposals recheck dependencies and conflicts on approval", () => {
+  const { store, storage } = harness();
+  store.createProfile("Queue Learner");
+  store.stageLessonPacks([chainLessonSet(1), chainLessonSet(2, { subject_id: "SUBJECT_CHAIN", skill_id: "CUSTOM_CHAIN_01" })]);
+  store.discardStagedLessonPack();
+  const restored = harness().store;
+  restored.importSyncState(store.exportSyncState());
+  assert.equal(restored.snapshot().stagedLessonPack.batchIndex, 2);
+  assert.throws(() => restored.installStagedLessonPack(), /missing prerequisite/);
+  assert.equal(restored.snapshot().stagedLessonPack.id, "PACK_CHAIN_02");
+  assert.equal(restored.snapshot().lessonPacks.length, 0);
+  restored.importLessonPack(chainLessonSet(1));
+  restored.installStagedLessonPack();
+  assert.equal(restored.snapshot().lessonPacks.length, 2);
+
+  store.discardStagedLessonPack();
+  assert.equal(harness({ [STORAGE_KEY]: storage.value(STORAGE_KEY) }).store.snapshot().stagedLessonPack, null);
+  store.stageLessonPack(lessonSetExample);
+  store.importLessonPack(lessonSetExample);
+  restored.importSyncState(store.exportSyncState());
+  assert.throws(() => restored.installStagedLessonPack(), /already installed/);
+  assert.equal(restored.snapshot().lessonPacks.length, 1);
+  restored.clearAllData();
+  assert.equal(restored.snapshot().stagedLessonPack, null);
+});
+
+test("invalid serialized review queues reject imports without replacing the workspace", () => {
+  const { store } = harness();
+  store.createProfile("Queue Learner");
+  store.stageLessonPack(lessonSetExample);
+  const saved = JSON.parse(store.exportSyncState());
+  const corruptions = [
+    (state) => { state.stagedLessonPacks = {}; },
+    (state) => { state.stagedLessonPacks[0].batchIndex = 0; },
+    (state) => { state.stagedLessonPacks[0].batchTotal = 21; },
+    (state) => { state.stagedLessonPacks[0].pack.skills[0].problems[0].grading_method = "execute_code"; },
+    (state) => { state.stagedLessonPacks[0].pack = null; },
+    (state) => { state.stagedLessonPacks = Array.from({ length: 21 }, () => state.stagedLessonPacks[0]); },
+    (state) => { state.stagedLessonPacks[0].pack.description = "x".repeat(2 * 1024 * 1024); },
+  ];
+  for (const corrupt of corruptions) {
+    const invalid = structuredClone(saved);
+    corrupt(invalid);
+    for (const importState of [store.importBackup, store.importSyncState]) {
+      const before = store.snapshot();
+      assert.throws(() => importState(JSON.stringify(invalid)));
+      assert.deepEqual(store.snapshot(), before);
+    }
+    const recovered = harness({ [STORAGE_KEY]: JSON.stringify(invalid) }).store.snapshot();
+    assert.equal(recovered.activeProfile.displayName, "Queue Learner");
+    assert.equal(recovered.stagedLessonPack, null);
+  }
+});
+
+for (const mode of ["proof_obligations", "rubric_check"]) {
+  test(`${mode} retakes retain mastery across checkpoints and repeated tutor feedback`, () => {
+    let { store } = harness();
+    store.createProfile("Reviewed Learner");
+    const pack = biologyLessonSet();
+    const problem = pack.skills[0].problems[0];
+    problem.answer_mode = "final_plus_required_work";
+    problem.work = mode === "proof_obligations"
+      ? { mode, prompt: "Explain the claim.", proof_policy: { obligations: ["Connect the evidence"] } }
+      : { mode, prompt: "Explain the model.", rubric: { criteria: [{ id: "evidence", description: "Connect the evidence", weight: 1 }] } };
+    problem.review_policy = { work_review: "tutor_required", mastery_requires_review_pass: true, allow_self_review: false };
+    store.importLessonPack(pack);
+    store.setLearningPreferences({ progressionMode: "soft" });
+    for (const [index, expectedStatus] of ["proven", "mastered", "mastered"].entries()) {
+      store.startTest("CUSTOM_BIO_CELL_001", { force: true });
+      const draft = store.snapshot().activeTest;
+      for (const item of draft.problems) {
+        store.updateResponse(item.template_id, { finalAnswer: String(item.expected_answer), work: item.work.mode === mode ? "The evidence supports the claim because each step connects to the next." : workFor(item) });
+      }
+      assert.equal(store.submitTest().ok, true);
+      const attempt = store.saveReflection({ confidenceRating: 4, guessed: "no" });
+      assert.equal(attempt.masteryUpdate.status, "learning");
+      const checkpoint = store.exportSyncState();
+      store = harness().store;
+      store.importSyncState(checkpoint);
+      for (const verdict of ["partial", "pass", "pass"]) {
+        store.recordTutorFeedback({ questionId: draft.problems.find((item) => item.work.mode === mode).template_id, verdict, feedback: "Reviewed the reasoning.", nextStep: "Continue practising.", reviewerType: "human_tutor" });
+        const result = store.getAttempt(attempt.attemptId);
+        assert.equal(result.masteryUpdate.status, verdict === "pass" ? expectedStatus : "learning");
+        assert.equal(result.masteryUpdate.masteryScore, index * 12 + (verdict === "pass" ? 12 : 3));
+      }
+    }
+  });
+}
+
 test("ships the complete native Mathematics curriculum and opens at the profile picker", () => {
   const { store } = harness();
   const state = store.snapshot();
