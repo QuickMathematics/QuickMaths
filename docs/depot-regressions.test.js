@@ -408,13 +408,13 @@ test("latest federated versions must still form a complete acyclic graph", () =>
   assert.throws(() => validateFederatedReleases(releases, curriculum), /cycle/);
 });
 
-async function runIndexWorker(filename, { official, discussions, remote = new Map() }) {
+async function runIndexWorker(filename, { official, discussions, remote = new Map(), statusDenied = false }) {
   const source = readFileSync(new URL(`../scripts/${filename}`, import.meta.url), "utf8").replace(/^import[\s\S]*?;\s*/gm, "");
   const files = new Map([["catalog.json", official], ["docs/curriculum-data.json", curriculum]]), written = new Map(), queries = [];
   const globals = {
     ...federationCore, normalizeDepotCatalog, fetchTextLimited, createHash, URL, Response,
     process: { env: { GITHUB_TOKEN: "mock-token", GITHUB_REPOSITORY: "QuickMathematics/QuickMaths" }, argv: ["node", filename], exit: (code) => { throw new Error(`Unexpected worker exit ${code}`); } },
-    console: { log() {} }, resolve: (...parts) => parts.join("/"),
+    console: { log() {}, warn() {} }, resolve: (...parts) => parts.join("/"),
     readFile: async (path) => {
       const value = files.get(path) ?? files.get(path.split("/").at(-1));
       if (!value) throw new Error("No prior snapshot");
@@ -425,7 +425,9 @@ async function runIndexWorker(filename, { official, discussions, remote = new Ma
       if (remote.has(url)) return Response.json(remote.get(url));
       assert.equal(url, "https://api.github.com/graphql");
       const body = JSON.parse(options.body); queries.push(body.query);
-      if (body.query.includes("addDiscussionComment")) return Response.json({ data: { addDiscussionComment: { comment: { id: "STATUS" } } } });
+      if (body.query.includes("addDiscussionComment") || body.query.includes("updateDiscussionComment")) return statusDenied
+        ? Response.json({ errors: [{ message: "Resource not accessible by integration" }] })
+        : Response.json({ data: { addDiscussionComment: { comment: { id: "STATUS" } } } });
       assert.match(body.query, /upvoteCount/);
       assert.doesNotMatch(body.query, /reactions\(content:/);
       return Response.json({ data: { viewer: { login: "bot" }, repository: { id: "R_1", hasDiscussionsEnabled: true, discussionCategories: { nodes: [{ id: "CAT_1", name: "General" }] }, discussions: { nodes: discussions, pageInfo: { hasNextPage: false } } } } });
@@ -446,13 +448,13 @@ test("official catalog refresh reads native GitHub upvotes instead of thumbs-up 
 });
 
 test("federated refresh uses exact lesson discussion upvotes and ignores all emoji reactions", async () => {
-  for (const votes of [0, 3]) {
+  for (const [votes, statusDenied] of [[0, false], [0, true], [3, false], [3, true]]) {
     const pack = lesson("A"), entry = listing(pack);
     const registry = { id: "alice/lessons", name: "Alice Lessons", namespace: "ALICE" };
     const { written } = await runIndexWorker("sync_federated_depot.mjs", {
-      official: catalog([]), remote: new Map([[registryUrl, catalog([entry], registry)], [entry.lesson_url, pack]]),
+      official: catalog([]), statusDenied, remote: new Map([[registryUrl, catalog([entry], registry)], [entry.lesson_url, pack]]),
       discussions: [
-        { id: "SUBMISSION", title: "[Registry] alice/lessons", body: `<!-- quickmaths-registry\n${JSON.stringify({ catalog_url: registryUrl })}\n-->`, url: "https://github.com/QuickMathematics/QuickMaths/discussions/2", author: { login: "alice" }, upvoteCount: 100, comments: { nodes: [], totalCount: 0 } },
+        { id: "SUBMISSION", title: "[Registry] alice/lessons", body: `<!-- quickmaths-registry\n${JSON.stringify({ catalog_url: registryUrl })}\n-->`, url: "https://github.com/QuickMathematics/QuickMaths/discussions/2", author: { login: "alice" }, upvoteCount: 100, comments: { nodes: statusDenied ? [{ id: "OLD_STATUS", body: "<!-- quickmaths-federation-status -->\nOld status", viewerDidAuthor: true }] : [], totalCount: statusDenied ? 1 : 0 } },
         { id: "LESSON", title: federationCore.packageDiscussionTitle(registry.id, entry), upvoteCount: votes, upvotes: { totalCount: 1000 }, flags: { totalCount: 2000 }, url: "https://github.com/QuickMathematics/QuickMaths/discussions/3", comments: { totalCount: 500 } },
       ],
     });

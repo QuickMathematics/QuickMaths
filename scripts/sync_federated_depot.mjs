@@ -41,7 +41,7 @@ async function createDiscussion(repositoryId, categoryId, title, body) {
   return discussion;
 }
 
-async function publishStatus(discussion, message) {
+async function writeStatusComment(discussion, message) {
   const marker = "<!-- quickmaths-federation-status -->";
   let revision = "";
   try { revision = `\n\nRegistry revision: ${registryUrlFromBody(discussion.body)}`; } catch { /* Invalid submission URL is explained in the status. */ }
@@ -53,6 +53,17 @@ async function publishStatus(discussion, message) {
     return;
   }
   await graphql(`mutation($id:ID!,$body:String!){addDiscussionComment(input:{discussionId:$id,body:$body}){comment{id}}}`, { id: discussion.id, body });
+}
+
+async function publishStatus(discussion, message) {
+  try {
+    await writeStatusComment(discussion, message);
+  } catch (error) {
+    // A status comment is a notification, not a validation result. In
+    // particular, installation tokens may be unable to edit an older bot's
+    // comment even when GitHub reports viewerDidAuthor for that comment.
+    console.warn(`Could not publish status for discussion #${discussion.number}: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 const discussions = [];
