@@ -1,3 +1,4 @@
+import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-reaction-ranking-v3";
 import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260905-state-fixes-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260905-publisher-v1";
@@ -9,7 +10,7 @@ import {
   DEPOT_DISCUSSIONS_URL,
   DEPOT_REPOSITORY_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260905-upvotes-v1";
+} from "./lesson-depot.js?v=20260905-reaction-ranking-v3";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
@@ -21,7 +22,7 @@ import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
   GITHUB_REACTIONS,
-} from "./github-community.js?v=20260905-reactions-v1";
+} from "./github-community.js?v=20260905-reaction-ranking-v3";
 import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 import { cancelActivePythonGraders, gradePythonProgram, visiblePythonTests } from "./python-grader.js?v=20260903-sandbox-v2";
 import {
@@ -2048,23 +2049,25 @@ function formatCommunityDate(value) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
-function renderCommunityReactions(subject, { comment = false } = {}) {
-  return `<div class="community-emoji-reactions" role="group" aria-label="${comment ? `Reactions to comment by ${escapeHtml(subject.author)}` : "Reactions to this lesson"}">${GITHUB_REACTIONS.map(({ content, emoji, label }) => {
+function renderCommunityReactions(subject, { comment = false, contents = null, effect = "" } = {}) {
+  const definitions = contents ? contents.map((content) => GITHUB_REACTIONS.find((reaction) => reaction.content === content)) : GITHUB_REACTIONS;
+  return `<div class="community-emoji-reactions" role="group" aria-label="${comment ? `Reactions to comment by ${escapeHtml(subject.author)}` : "Reactions to this lesson"}">${definitions.map(({ content, emoji, lessonEmoji, label }) => {
     const reaction = subject.reactions?.find((item) => item.content === content);
     const count = reaction?.count ?? 0;
     const selected = reaction?.viewerHasReacted === true;
-    const description = `${selected ? "Remove" : "Add"} ${label} reaction · ${count}`;
-    return `<button type="button" class="community-emoji-button" data-depot-action="community-react" data-reaction-content="${content}" ${comment ? `data-comment-id="${escapeHtml(subject.id)}"` : ""} aria-pressed="${selected}" aria-label="${escapeHtml(description)}" title="${escapeHtml(description)}" ${communityUi.busy || subject.viewerCanReact === false ? "disabled" : ""}><span aria-hidden="true">${emoji}</span><b>${count}</b></button>`;
+    const description = `${selected ? "Remove" : "Add"} ${label} reaction · ${count}${effect ? ` · ${effect}` : ""}`;
+    return `<button type="button" class="community-emoji-button" data-depot-action="community-react" data-reaction-content="${content}" ${comment ? `data-comment-id="${escapeHtml(subject.id)}"` : ""} aria-pressed="${selected}" aria-label="${escapeHtml(description)}" title="${escapeHtml(description)}" ${communityUi.busy || subject.viewerCanReact === false ? "disabled" : ""}><span aria-hidden="true">${comment ? emoji : lessonEmoji || emoji}</span><b>${count}</b></button>`;
   }).join("")}</div>`;
 }
 
-function renderCommunityUpvote(subject, { comment = false } = {}) {
-  return `<button class="${comment ? "community-comment-upvote" : "community-vote-button"}" type="button" data-depot-action="community-upvote" ${comment ? `data-comment-id="${escapeHtml(subject.id)}"` : ""} aria-pressed="${subject.viewerHasUpvoted === true}" aria-label="${subject.viewerHasUpvoted ? "Remove" : "Add"} GitHub upvote${comment ? " on this comment" : " on this discussion"}" ${communityUi.busy || subject.viewerCanUpvote === false ? "disabled" : ""}><span aria-hidden="true">↑</span><strong>${subject.viewerHasUpvoted ? "Upvoted" : "Upvote"}</strong><small>${subject.upvoteCount ?? 0}${comment ? "" : " GitHub upvotes"}</small></button>`;
+function renderLessonReactions(discussion) {
+  const totals = lessonReactionTotals(discussion.reactions);
+  return `<section class="community-reaction-groups">${LESSON_REACTION_GROUPS.map((group) => `<div class="community-reaction-group is-${group.key}"><div class="community-reactions-label"><strong>${group.label}</strong><b>${totals[group.key]}</b></div>${renderCommunityReactions(discussion, { contents: group.contents, effect: group.effect })}</div>`).join("")}</section>`;
 }
 
 function renderCommunityComment(comment) {
   const body = escapeHtml(comment.body).replaceAll("\n", "<br>");
-  return `<article class="community-comment"><div class="community-comment-avatar" aria-hidden="true">${escapeHtml(comment.author.slice(0, 1).toUpperCase() || "?")}</div><div><header><strong>${escapeHtml(comment.author)}</strong>${comment.viewerDidAuthor ? "<span>You</span>" : ""}<time datetime="${escapeHtml(comment.createdAt)}">${escapeHtml(formatCommunityDate(comment.createdAt))}</time></header><p>${body}</p><a href="${escapeHtml(comment.url)}" target="_blank" rel="noopener">View on GitHub ↗</a><div class="community-comment-feedback">${renderCommunityUpvote(comment, { comment: true })}${renderCommunityReactions(comment, { comment: true })}</div></div></article>`;
+  return `<article class="community-comment"><div class="community-comment-avatar" aria-hidden="true">${escapeHtml(comment.author.slice(0, 1).toUpperCase() || "?")}</div><div><header><strong>${escapeHtml(comment.author)}</strong>${comment.viewerDidAuthor ? "<span>You</span>" : ""}<time datetime="${escapeHtml(comment.createdAt)}">${escapeHtml(formatCommunityDate(comment.createdAt))}</time></header><p>${body}</p><a href="${escapeHtml(comment.url)}" target="_blank" rel="noopener">View on GitHub ↗</a><div class="community-comment-feedback"><span class="community-comment-upvote" aria-label="${comment.upvoteCount ?? 0} GitHub upvotes"><span aria-hidden="true">↑</span><strong>${comment.upvoteCount ?? 0}</strong><small>GitHub upvotes</small></span>${renderCommunityReactions(comment, { comment: true })}</div></div></article>`;
 }
 
 function renderDepotCommunityPanel() {
@@ -2083,7 +2086,7 @@ function renderDepotCommunityPanel() {
     content = `<div class="community-connect-copy"><p class="eyebrow">Discussion unavailable</p><h2>GitHub did not return this conversation.</h2><p class="community-error" role="alert">${escapeHtml(communityUi.error)}</p><div><button class="button button-primary" type="button" data-depot-action="community-refresh">Try again</button>${external}</div></div>`;
   } else if (communityUi.discussion) {
     const discussion = communityUi.discussion;
-    content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. Upvote this discussion, react with an emoji, or leave a public comment.</p></div><div class="community-reaction-actions">${renderCommunityUpvote(discussion)}</div></div><section class="community-extra-reactions"><div class="community-reactions-label"><strong>Reactions</strong></div>${renderCommunityReactions(discussion)}</section><div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, or review…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
+    content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. React to this lesson or leave a public comment.</p></div></div>${renderLessonReactions(discussion)}<div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, or review…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
   }
   return `<aside class="depot-community-panel" id="depot-community-panel"><header><div><span>Community</span><strong>${escapeHtml(pack.name)}</strong></div><button class="quiet-button" type="button" data-depot-action="community-close" aria-label="Close lesson discussion">Close ×</button></header>${content}<footer><span>Community authorization is separate from Workspace Storage.</span>${connection.connected ? `<button class="quiet-button danger-link" type="button" data-depot-action="community-disconnect">Disconnect GitHub</button>` : ""}</footer></aside>`;
 }
@@ -2102,7 +2105,7 @@ async function loadDepotDiscussion() {
     const discussion = await githubCommunity.loadDiscussion(pack.discussionUrl);
     if (!isCurrent()) return;
     communityUi.discussion = discussion;
-    lessonDepot.updateDiscussionUpvotes(pack.discussionUrl, discussion.upvoteCount);
+    lessonDepot.updateDiscussionReactions(pack.discussionUrl, discussion.reactions);
     communityUi.phase = "ready";
   } catch (error) {
     if (!isCurrent()) return;
@@ -2181,15 +2184,16 @@ function renderLessonDepot(snapshot) {
       const busy = depot.installingId === pack.id;
       const isPreview = pack.availability === "preview";
       const live = communityUi.activePack?.id === pack.id && communityUi.activePack?.version === pack.version ? communityUi.discussion : null;
-      const votes = live?.upvoteCount ?? pack.votes;
+      const votes = live?.votes ?? pack.votes;
+      const downvotes = live?.downvotes ?? pack.downvotes;
       const comments = live?.commentCount ?? pack.comments;
       const hasDiscussion = /\/discussions\/\d+$/.test(pack.discussionUrl ?? "");
       const communityControl = isPreview
         ? `<button type="button" class="depot-preview-community" disabled><span>◇</span><b>Discussion opens when published</b></button>`
         : connection.configured && hasDiscussion
-          ? `<button type="button" data-depot-action="community-open" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" aria-label="Upvote, react, or discuss ${escapeHtml(pack.name)} inside QuickMaths"><span>↑ ${votes}</span><span>◯ ${comments}</span><b>${connection.connected ? "Join discussion" : "Review & discuss"}</b></button>`
+          ? `<button type="button" data-depot-action="community-open" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" aria-label="Upvote, react, or discuss ${escapeHtml(pack.name)} inside QuickMaths"><span aria-label="${votes} upvotes">↑ ${votes}</span><span aria-label="${downvotes} downvotes">↓ ${downvotes}</span><span>◯ ${comments}</span><b>${connection.connected ? "Join discussion" : "Review & discuss"}</b></button>`
           : hasDiscussion
-            ? `<a href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener" aria-label="Upvote, react, or comment on ${escapeHtml(pack.name)} on GitHub"><span>↑ ${votes}</span><span>◯ ${comments}</span><b>Review on GitHub ↗</b></a>`
+            ? `<a href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener" aria-label="Upvote, react, or comment on ${escapeHtml(pack.name)} on GitHub"><span aria-label="${votes} upvotes">↑ ${votes}</span><span aria-label="${downvotes} downvotes">↓ ${downvotes}</span><span>◯ ${comments}</span><b>Review on GitHub ↗</b></a>`
             : `<button type="button" disabled><span>◇</span><b>Community review pending</b></button>`;
       const actions = isPreview
         ? `<button class="button button-outline" disabled>Concept preview</button><button class="button button-primary" disabled>Coming soon</button>`
@@ -2849,29 +2853,6 @@ document.addEventListener("click", async (event) => {
         window.location.assign(authorizationUrl);
       }
       if (actionName === "community-refresh") await loadDepotDiscussion();
-      if (actionName === "community-upvote" && communityUi.discussion && !communityUi.busy) {
-        const requestId = communityUi.requestId;
-        const discussion = communityUi.discussion;
-        const commentId = depotAction.dataset.commentId;
-        const subject = commentId ? discussion.comments.find((comment) => comment.id === commentId) : discussion;
-        if (!subject || subject.viewerCanUpvote === false) return;
-        communityUi.busy = true; rerenderDepotCommunity();
-        try {
-          const result = await githubCommunity.setUpvote(subject.id, !subject.viewerHasUpvoted);
-          if (requestId !== communityUi.requestId) return;
-          communityUi.discussion = commentId
-            ? { ...discussion, comments: discussion.comments.map((comment) => comment.id === commentId ? { ...comment, ...result } : comment) }
-            : { ...discussion, ...result };
-          if (!commentId) lessonDepot.updateDiscussionUpvotes(communityUi.activePack.discussionUrl, result.upvoteCount);
-          showToast(result.viewerHasUpvoted ? "GitHub upvote saved." : "GitHub upvote removed.");
-        } finally {
-          if (requestId === communityUi.requestId) {
-            communityUi.busy = false; rerenderDepotCommunity();
-            const buttons = [...(document.querySelectorAll?.('[data-depot-action="community-upvote"]') ?? [])];
-            buttons.find((button) => button.dataset.commentId === commentId)?.focus();
-          }
-        }
-      }
       if (actionName === "community-react" && communityUi.discussion && !communityUi.busy) {
         const requestId = communityUi.requestId;
         const discussion = communityUi.discussion;
@@ -2887,7 +2868,8 @@ document.addEventListener("click", async (event) => {
           if (requestId !== communityUi.requestId) return;
           communityUi.discussion = commentId
             ? { ...discussion, comments: discussion.comments.map((comment) => comment.id === commentId ? { ...comment, ...result } : comment) }
-            : { ...discussion, ...result };
+            : { ...discussion, ...result, ...lessonReactionTotals(result.reactions) };
+          if (!commentId) lessonDepot.updateDiscussionReactions(communityUi.activePack.discussionUrl, result.reactions);
           showToast(`${definition.emoji} ${selected ? "Reaction removed from" : "Reaction saved on"} GitHub.`);
         } finally {
           if (requestId === communityUi.requestId) {
@@ -3605,7 +3587,7 @@ async function boot() {
     githubCommunity.connect().then(() => {
       communityUi.connectionError = "";
       rerenderDepotCommunity();
-      if (returnedFromCommunityAuthorization) showToast("GitHub connected. You can vote and comment inside QuickMaths.");
+      if (returnedFromCommunityAuthorization) showToast("GitHub connected. You can react and comment inside QuickMaths.");
     }).catch((error) => {
       communityUi.connectionError = error instanceof Error ? error.message : String(error);
       rerenderDepotCommunity();

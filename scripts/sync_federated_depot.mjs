@@ -1,3 +1,4 @@
+import { lessonReactionTotals } from "../docs/depot-reactions.js";
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -35,7 +36,7 @@ async function graphql(query, variables = {}) {
 }
 
 async function createDiscussion(repositoryId, categoryId, title, body) {
-  const mutation = `mutation($repositoryId:ID!,$categoryId:ID!,$title:String!,$body:String!){createDiscussion(input:{repositoryId:$repositoryId,categoryId:$categoryId,title:$title,body:$body}){discussion{id number title url body author{login} upvoteCount comments{totalCount}}}}`;
+  const mutation = `mutation($repositoryId:ID!,$categoryId:ID!,$title:String!,$body:String!){createDiscussion(input:{repositoryId:$repositoryId,categoryId:$categoryId,title:$title,body:$body}){discussion{id number title url body author{login} reactionGroups{content users{totalCount}} comments{totalCount}}}}`;
   const discussion = (await graphql(mutation, { repositoryId, categoryId, title, body }))?.createDiscussion?.discussion;
   if (!discussion?.id) throw new Error(`Could not create community discussion ${title}.`);
   return discussion;
@@ -71,7 +72,7 @@ let repositoryId = "";
 let categories = [];
 let after = null;
 do {
-  const query = `query($owner:String!,$name:String!,$after:String){viewer{login}repository(owner:$owner,name:$name){id hasDiscussionsEnabled discussionCategories(first:25){nodes{id name isAnswerable}}discussions(first:100,after:$after){pageInfo{hasNextPage endCursor}nodes{id number title url body author{login} upvoteCount comments(first:100){totalCount nodes{id body viewerDidAuthor}}}}}}`;
+  const query = `query($owner:String!,$name:String!,$after:String){viewer{login}repository(owner:$owner,name:$name){id hasDiscussionsEnabled discussionCategories(first:25){nodes{id name isAnswerable}}discussions(first:100,after:$after){pageInfo{hasNextPage endCursor}nodes{id number title url body author{login} reactionGroups{content users{totalCount}} comments(first:100){totalCount nodes{id body viewerDidAuthor}}}}}}`;
   const data = await graphql(query, { owner, name, after });
   const repositoryData = data?.repository;
   if (!repositoryData?.hasDiscussionsEnabled) throw new Error("GitHub Discussions must be enabled for federated discovery.");
@@ -131,24 +132,24 @@ for (const submission of submissions) {
       const title = packageDiscussionTitle(registryId, pack);
       let discussion = discussions.find((item) => item.title === title);
       if (!discussion) {
-        discussion = await createDiscussion(repositoryId, category.id, title, `# ${pack.name}\n\n**Registry:** ${registryName} (${registryId})  \n**Version:** ${pack.version}  \n**Author:** ${pack.author}  \n**Subject:** ${pack.subjectName}  \n**License:** ${pack.license}  \n**SHA-256:** \`${pack.sha256}\`\n\n${pack.description}\n\nUse GitHub's Upvote button to recommend this exact version. Emoji reactions and comment upvotes do not affect lesson rankings. Add comments for questions, corrections, and teaching notes.\n\n[Registry](${catalogUrl}) · [Immutable lesson file](${packageUrl}) · [Open QuickMaths](https://${owner.toLowerCase()}.github.io/${name}/#/depot)`);
+        discussion = await createDiscussion(repositoryId, category.id, title, `# ${pack.name}\n\n**Registry:** ${registryName} (${registryId})  \n**Version:** ${pack.version}  \n**Author:** ${pack.author}  \n**Subject:** ${pack.subjectName}  \n**License:** ${pack.license}  \n**SHA-256:** \`${pack.sha256}\`\n\n${pack.description}\n\nLesson reactions determine Depot ranking: ❤️ 🚀 🎉 👍 count as upvotes; 👎 😕 count as downvotes; 👀 😄 are neutral. Score is upvotes minus downvotes. Native GitHub upvotes and all comment feedback do not change lesson rankings. Add comments for questions, corrections, and teaching notes.\n\n[Registry](${catalogUrl}) · [Immutable lesson file](${packageUrl}) · [Open QuickMaths](https://${owner.toLowerCase()}.github.io/${name}/#/depot)`);
         discussions.push(discussion);
       }
-      const votes = Math.max(0, Number(discussion.upvoteCount) || 0);
+      const { votes, downvotes } = lessonReactionTotals(discussion.reactionGroups);
       packageModeration.push({
         id: pack.id,
         version: pack.version,
         sha256: pack.sha256,
-        status: moderationStatus(votes),
+        status: moderationStatus(votes, downvotes),
         votes,
-        flags: 0,
+        downvotes,
         comments: Math.max(0, Number(discussion.comments?.totalCount) || 0),
         discussion_url: discussion.url,
       });
       seenPackageIds.add(pack.id);
     }
 
-    const submissionVotes = Math.max(0, Number(submission.upvoteCount) || 0);
+    const submissionReactions = lessonReactionTotals(submission.reactionGroups);
     seenRegistryIds.add(registryId);
     registries.push({
       id: registryId,
@@ -157,7 +158,7 @@ for (const submission of submissions) {
       homepage_url: String(registry.homepage_url ?? ""),
       discussion_url: submission.url,
       submitted_by: String(submission.author?.login ?? "unknown"),
-      status: moderationStatus(submissionVotes),
+      status: moderationStatus(submissionReactions.votes, submissionReactions.downvotes),
       packages: packageModeration,
     });
     await publishStatus(submission, `✅ **Registry validated and federated.**\n\n${packageModeration.length} package${packageModeration.length === 1 ? "" : "s"} passed immutable URL, SHA-256, schema, namespace, and combined prerequisite-graph checks. Community status refreshes automatically.`);

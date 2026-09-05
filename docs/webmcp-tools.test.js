@@ -226,13 +226,16 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /closeAgentStudio\(\{ focusToggle: false \}\);/);
   assert.doesNotMatch(js, /Repository Contents: read and write/);
   assert.match(js, /\.\/agent-bridge\.html/);
-  assert.match(js, /data-depot-action="community-upvote"/);
+  assert.doesNotMatch(js, /data-depot-action="community-upvote"/);
+  assert.match(js, /community-reaction-groups/);
+  assert.match(js, /GitHub upvotes/);
   assert.match(js, /data-depot-action="community-react"/);
   assert.match(js, /id="community-comment-form"/);
   assert.match(css, /\.depot-community-panel/);
   assert.match(community, /addReaction/);
   assert.match(community, /removeReaction/);
-  assert.match(community, /THUMBS_UP/);
+  assert.match(community, /depot-reactions\.js/);
+  assert.doesNotMatch(community, /addUpvote|removeUpvote/);
   assert.match(community, /addDiscussionComment/);
   assert.match(community, /quickmaths\.github-community\.credential\.session/);
   assert.doesNotMatch(community, /client_secret/);

@@ -90,14 +90,26 @@ def test_trusted_community_overlay_is_materialized_and_url_checked(tmp_path):
     community_path = tmp_path / "community.json"
     community_path.write_text(json.dumps({
         "format": "quickmaths.lesson-depot.community", "schema_version": "1.0",
-        "packages": {"PACK_FRACTIONS": {"votes": 12, "comments": 3, "discussion_url": "https://github.com/example/repo/discussions/1"}},
+        "packages": {"PACK_FRACTIONS": {"votes": 12, "downvotes": 5, "comments": 3, "discussion_url": "https://github.com/example/repo/discussions/1"}},
     }), encoding="utf-8")
     catalog, _ = build_catalog(tmp_path)
     assert catalog["packages"][0]["community"]["votes"] == 12
+    assert catalog["packages"][0]["community"]["downvotes"] == 5
     payload = json.loads(community_path.read_text())
     payload["packages"]["PACK_FRACTIONS"]["discussion_url"] = "javascript:alert(1)"
     community_path.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(DepotError, match="github.com"):
+        build_catalog(tmp_path)
+
+
+@pytest.mark.parametrize("value", ["bad", None, {}])
+def test_rejects_invalid_community_downvotes(tmp_path, value):
+    _package(tmp_path)
+    (tmp_path / "community.json").write_text(json.dumps({
+        "format": "quickmaths.lesson-depot.community", "schema_version": "1.0",
+        "packages": {"PACK_FRACTIONS": {"downvotes": value}},
+    }), encoding="utf-8")
+    with pytest.raises(DepotError, match="downvotes"):
         build_catalog(tmp_path)
 
 

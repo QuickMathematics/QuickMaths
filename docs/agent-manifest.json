@@ -144,11 +144,11 @@
   },
   "github_community": {
     "optional": true,
-    "purpose": "Lets a human upvote a lesson discussion or comment, add emoji reactions, and comment on a lesson package's public GitHub Discussion without leaving the Lesson Depot.",
+    "purpose": "Lets a human add emoji reactions and comment on a lesson package's public GitHub Discussion without leaving the Lesson Depot.",
     "permissions": "The GitHub App is installed only on QuickMathematics/QuickMaths and requests repository Discussions read/write. It cannot read learner progress, edit lesson files, or access a learner's bridge repository.",
     "credential_separation": "The GitHub App user token is unrelated to the fine-grained learner-storage token. It is held in sessionStorage by default or localStorage only after the human chooses Keep me connected, and is excluded from backups, bridge checkpoints, WebMCP results, URLs, logs, and commits.",
     "oauth_boundary": "Authorization uses state and PKCE. A stateless callback worker holds the GitHub App client secret and exchanges or refreshes tokens without a database or retained user state.",
-    "public_actions": "Native GitHub upvotes, emoji reactions, and comments are public; all are attributed to the authorizing GitHub identity. Community write actions remain direct human UI controls and are intentionally not exposed as WebMCP tools.",
+    "public_actions": "Emoji reactions and comments are public; all are attributed to the authorizing GitHub identity. Community write actions remain direct human UI controls and are intentionally not exposed as WebMCP tools.",
     "setup_recommendation": "When the human wants to upvote, react, or comment in the Lesson Depot, explain the optional QuickMaths Community authorization and offer to guide them to Connect GitHub. Make clear that this authorization is separate from Workspace Storage and that these actions are public.",
     "agent_rule": "Never authorize, add or remove an upvote or reaction, post a comment, or disconnect GitHub on the learner's behalf. The human must operate those controls directly."
   },
@@ -265,7 +265,7 @@
     "federation_index": "https://raw.githubusercontent.com/QuickMathematics/QuickMaths/main/docs/lesson-depot/federation.json",
     "repository": "https://github.com/QuickMathematics/QuickMaths",
     "submission": "Authors use a two-commit flow in their own public GitHub repository: commit final lesson files first, then commit a quickmaths.lesson-depot.catalog registry whose lesson URLs point to those immutable content commits and SHA-256 digests. They create a [Registry] Discussion containing the registry URL pinned to the later registry commit. Automated validation adds valid feeds without a maintainer merge. Browsing, validation, staging, and installation do not require community authorization.",
-    "community": "GitHub Discussions provides native upvotes, emoji reactions, and comments for each exact package version and SHA-256 digest. New valid packages are immediately discoverable as New; three native lesson discussion upvotes mark a package Community recommended. Depot popularity uses only lesson discussion upvotes. Comment upvotes and all emoji reactions do not change lesson rankings or visibility. A human may separately authorize the least-privilege Community GitHub App to participate in-app.",
+    "community": "GitHub Discussions provides reactions and comments for each exact package version and SHA-256 digest. Lesson Heart, Rocket, Hooray and Thumbs up reactions count as upvotes; Thumbs down and Confused count as downvotes; Eyes and Laugh are neutral. Popularity uses upvotes minus downvotes. New valid packages are immediately discoverable as New; a net score of three marks a package Community recommended. Native GitHub lesson upvotes and all comment feedback do not affect rankings. Comments retain all reactions and display read-only native GitHub upvote counts. A human may separately authorize the least-privilege Community GitHub App to participate in-app.",
     "source_model": "The app quietly merges the official catalog, automatically indexed community registries, and public GitHub registries subscribed directly under Settings. Each source failure is isolated. Direct registry subscriptions are explicitly chosen browser preferences and do not grant publishers access to learner state.",
     "install_pipeline": [
       "Merge official, federated, and directly subscribed registry metadata without credentials.",

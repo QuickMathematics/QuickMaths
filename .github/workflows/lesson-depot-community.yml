@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "docs/depot-reactions.js"
       - "docs/lesson-depot/catalog.json"
       - "scripts/sync_depot_community.mjs"
       - ".github/workflows/lesson-depot-community.yml"

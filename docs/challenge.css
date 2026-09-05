@@ -1089,16 +1089,10 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .community-discussion-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 25px 28px; }
 .community-discussion-heading h2 { margin: 0; font: 600 30px/1.05 var(--serif); }
 .community-discussion-heading p:not(.eyebrow) { margin: 8px 0 0; color: var(--muted); font-size: 8px; line-height: 1.55; }
-.community-reaction-actions { flex: 0 0 auto; display: flex; gap: 8px; }
-.community-vote-button { min-width: 116px; min-height: 92px; display: grid; place-items: center; align-content: center; gap: 2px; color: var(--pine); background: var(--lime); border: 1px solid color-mix(in srgb, var(--pine) 22%, transparent); border-radius: 15px; cursor: pointer; }
-.community-vote-button span { font-size: 17px; }
-.community-vote-button strong { font-size: 9px; }
-.community-vote-button small { color: var(--pine-2); font-size: 7px; }
-.community-vote-button[aria-pressed="true"] { color: #fff; background: var(--pine-2); }
-.community-vote-button[aria-pressed="true"] small { color: var(--mint); }
-.community-vote-button:disabled { cursor: wait; opacity: .65; }
-.community-extra-reactions { padding: 0 28px 22px; }
+.community-reaction-groups { display: flex; flex-wrap: wrap; gap: 16px 24px; padding: 0 28px 22px; }
+.community-reaction-group { min-width: 0; }
 .community-reactions-label { display: flex; align-items: center; gap: 6px; color: var(--pine); font-size: 9px; }
+.community-reactions-label > b { min-width: 22px; padding: 3px 6px; text-align: center; background: var(--paper); border-radius: 6px; }
 .community-emoji-reactions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
 .community-emoji-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 55px; min-height: 40px; padding: 7px 10px; color: var(--pine); background: var(--paper-light); border: 1px solid var(--line); border-radius: 99px; cursor: pointer; }
 .community-emoji-button > span { font-size: 17px; line-height: 1; }
@@ -1108,11 +1102,9 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .community-emoji-button:disabled { opacity: .55; cursor: default; }
 .community-comment-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
 .community-comment-feedback .community-emoji-reactions { margin: 0; }
-.community-comment-upvote { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 7px 10px; color: var(--pine); background: var(--paper); border: 1px solid var(--line); border-radius: 9px; cursor: pointer; }
+.community-comment-upvote { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 7px 10px; color: var(--pine); background: var(--paper); border: 1px solid var(--line); border-radius: 9px; }
 .community-comment-upvote span { font-size: 17px; }
 .community-comment-upvote strong, .community-comment-upvote small { font-size: 10px; }
-.community-comment-upvote[aria-pressed="true"] { background: var(--mint); border-color: var(--pine); }
-.community-comment-upvote:disabled { opacity: .55; cursor: default; }
 .community-comments { margin: 0 28px 24px; border: 1px solid var(--line); border-radius: 14px; }
 .community-comments-heading { display: flex; justify-content: space-between; gap: 12px; padding: 12px 15px; background: var(--paper); border-bottom: 1px solid var(--line); }
 .community-comments-heading strong, .community-comments-heading a { color: var(--pine); font-size: 8px; }
@@ -1447,8 +1439,7 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
   .community-connect-copy h2, .community-discussion-heading h2 { font-size: 25px; }
   .community-connect-copy > div, .community-connect-copy .button { width: 100%; }
   .community-discussion-heading { align-items: stretch; flex-direction: column; padding: 21px 18px; }
-  .community-reaction-actions { width: 100%; }
-  .community-vote-button { width: 100%; min-height: 72px; grid-template-columns: auto auto auto; gap: 8px; }
+  .community-reaction-groups { padding-right: 18px; padding-left: 18px; }
   .community-comments, .community-comment-form { margin-right: 18px; margin-left: 18px; }
   .community-comment { grid-template-columns: 27px minmax(0,1fr); padding: 12px; }
   .community-comment-avatar { width: 27px; height: 27px; font-size: 12px; }

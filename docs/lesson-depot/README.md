@@ -1,6 +1,6 @@
 # QuickMaths Lesson Depot
 
-The Lesson Depot is a zero-cost, federated marketplace of declarative QuickMaths lesson sets. Authors keep immutable packages in their own public GitHub repositories. QuickMaths combines the official catalog, automatically discovered community registries, and registries a learner subscribes to directly. Browsing and installation require no account; the optional least-privilege GitHub App provides public upvotes, reactions, and comments inside the app.
+The Lesson Depot is a zero-cost, federated marketplace of declarative QuickMaths lesson sets. Authors keep immutable packages in their own public GitHub repositories. QuickMaths combines the official catalog, automatically discovered community registries, and registries a learner subscribes to directly. Browsing and installation require no account; the optional least-privilege GitHub App provides public reactions and comments inside the app.
 
 ## Publish inside QuickMaths
 
@@ -93,7 +93,7 @@ cd docs
 npm test
 ```
 
-The official catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. One Action maintains the legacy first-party package threads and `community.json`; the federation Action separately creates a digest-bound `[Lesson] registry/PACK@version#digest` Discussion for every accepted external release and materializes its GitHub upvote and comment totals into `federation.json`. Connected users fetch the selected live thread only when they open its community panel.
+The official catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. One Action maintains the legacy first-party package threads and `community.json`; the federation Action separately creates a digest-bound `[Lesson] registry/PACK@version#digest` Discussion for every accepted external release and materializes its positive reaction, negative reaction, and comment totals into `federation.json`. Connected users fetch the selected live thread when they open or refresh its community panel.
 
 ## Community flow
 
@@ -103,14 +103,14 @@ The official catalog contains a SHA-256 hash for each reviewed file. QuickMaths 
 4. Automated checks add every valid package to the federation index without a maintainer merge.
 5. Each exact version and digest receives GitHub upvotes, emoji reactions, comments, questions, and update notes.
 
-Three GitHub upvotes on a lesson discussion mark its package **Community recommended**. Popular sorting uses only lesson discussion upvotes, with published packages ahead of concept previews. Emoji reactions, comment upvotes, comment counts, and registry status do not change that order. Emoji reactions never mark a package Contested or hide it. Counts in an open community panel update immediately; shared catalog counts refresh periodically through GitHub Actions.
+Lesson reactions are grouped as **Upvotes** (Heart, Rocket, Hooray, Thumbs up), **Downvotes** (Thumbs down, Confused), and **Neutral** (Eyes, Laugh). Each reaction adds one to its group. Popular sorting uses upvotes minus downvotes, with published packages ahead of concept previews. Valid submissions appear as **New**; a net score of three marks them **Community recommended**. Native GitHub lesson upvotes and all comment feedback do not affect lesson rankings. Downvotes do not automatically hide a package. Counts in an open community panel update immediately; shared catalog counts refresh periodically through GitHub Actions.
 
 ## In-app community authorization
 
-The lesson discussion and each comment have their own native GitHub **Upvote** control, separate from all eight emoji reactions: 👍, 👎, 😄, 🎉, 😕, ❤️, 🚀 and 👀. Counts, permissions, and selected state come from GitHub. Choosing a selected upvote or reaction again removes it. Only the lesson discussion upvotes affect Depot rankings; comment upvotes and all emoji reactions are expressive feedback. The same community sign-in is used, with no additional token or app permission.
+Lesson controls label ❤️ 🚀 🎉 👍 as **Upvotes**, 👎 🙁 as **Downvotes**, and 👀 😁 as **Neutral**. The app maps 🙁 to GitHub’s Confused reaction and 😁 to its Laugh reaction. Comments keep all eight GitHub emoji reactions and display their native GitHub upvote count. That count is read-only in QuickMaths; use the comment's **View on GitHub** link to upvote it on GitHub. Selecting an active reaction again removes it. The same community sign-in is used, with no additional token or app permission.
 
 The Community GitHub App is installed only on `QuickMathematics/QuickMaths` and requests only repository Discussions read/write. The user access token is separate from the optional learner-storage bridge token. QuickMaths keeps it in `sessionStorage` by default, or in `localStorage` only when the user explicitly chooses to remain connected. It is never placed in a lesson file, learner backup, WebMCP response, URL, or Git commit.
 
-The static callback uses the OAuth authorization-code flow with state and PKCE. A free, stateless Cloudflare Worker holds the GitHub App client secret and performs only code exchange and token refresh; it has no database and retains no user token. Comments, upvotes, and reactions are public GitHub actions attributed to the authorizing GitHub account. Disconnecting clears the browser copy, and GitHub authorization can also be revoked from GitHub settings.
+The static callback uses the OAuth authorization-code flow with state and PKCE. A free, stateless Cloudflare Worker holds the GitHub App client secret and performs only code exchange and token refresh; it has no database and retains no user token. Comments and reactions are public GitHub actions attributed to the authorizing GitHub account. Disconnecting clears the browser copy, and GitHub authorization can also be revoked from GitHub settings.
 
 Answer keys are necessarily present in author packages. Do not paste raw lesson files into learner tutoring conversations or reveal solutions before submission.

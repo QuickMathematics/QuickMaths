@@ -82,9 +82,10 @@ export function registryUrlFromBody(body) {
   throw new Error("Add a quickmaths-registry machine block or the Registry manifest URL form field.");
 }
 
-export function moderationStatus(votes) {
+export function moderationStatus(votes, downvotes = 0) {
   const safeVotes = Math.max(0, Math.floor(Number(votes) || 0));
-  return safeVotes >= 3 ? "recommended" : "new";
+  const safeDownvotes = Math.max(0, Math.floor(Number(downvotes) || 0));
+  return safeVotes - safeDownvotes >= 3 ? "recommended" : "new";
 }
 
 export function packageDiscussionTitle(registryId, pack) {

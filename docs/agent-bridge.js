@@ -1,6 +1,6 @@
 import { createQuickMathsStore } from "./challenge-core.js?v=20260905-state-fixes-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-final-handoff-v1";
-import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260905-upvotes-v1";
+import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260905-reaction-ranking-v3";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,

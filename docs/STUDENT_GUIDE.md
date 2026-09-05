@@ -414,7 +414,7 @@ Lesson Depot discovers optional subjects and specialist tracks from the official
 
 ### Search and filters
 
-Search matches package name, subject, description, author, and tags. Filter published packages from roadmap concepts, choose subject, and sort by lesson discussion upvotes, recency, or name.
+Search matches package name, subject, description, author, and tags. Filter published packages from roadmap concepts, choose subject, and sort by popularity (upvotes minus downvotes), recency, or name.
 
 ### Package cards and themes
 
@@ -426,7 +426,9 @@ Published previews fetch the exact immutable package through a bounded reader, v
 
 ### Community upvotes and reactions
 
-Every federated package version is tied to one public GitHub Discussion and one exact SHA-256 digest. Use its native GitHub **Upvote** control to recommend useful work. Comments have their own upvotes, and both lessons and comments support all eight GitHub emoji reactions. Only upvotes on the lesson discussion affect Depot rankings. Comment upvotes and emoji reactions are separate feedback; they never change lesson rankings or visibility. Valid submissions appear as **New**, and three lesson discussion upvotes mark them **Community recommended**.
+Every federated package version is tied to one public GitHub Discussion and one exact SHA-256 digest. Lesson reactions are grouped as **Upvotes** (Heart, Rocket, Hooray, Thumbs up), **Downvotes** (Thumbs down, Confused), and **Neutral** (Eyes, Laugh). Each reaction adds one to its group. Popular sorting uses upvotes minus downvotes, with published packages ahead of concept previews. Valid submissions appear as **New**; a net score of three marks them **Community recommended**. Native GitHub lesson upvotes and all comment feedback do not affect lesson rankings. Downvotes do not automatically hide a package.
+
+Comments keep all eight GitHub emoji reactions and display their native GitHub upvote count. That count is read-only in QuickMaths; use the comment's **View on GitHub** link to upvote it on GitHub. Selecting an active reaction again removes it.
 
 ### Advanced lesson sources
 
@@ -440,7 +442,7 @@ An agent can stage one pack or an ordered batch for review. It cannot install. Q
 
 ### Upvotes and comments
 
-Optional **Connect GitHub** authorizes the separate QuickMaths Community GitHub App for public Discussions on the QuickMaths repository. Connected humans can upvote discussions or comments, add emoji reactions, and comment inside the app. These actions are public, use your GitHub identity, and are not WebMCP tools.
+Optional **Connect GitHub** authorizes the separate QuickMaths Community GitHub App for public Discussions on the QuickMaths repository. Connected humans can react to lessons or comments and post comments inside the app. These actions are public, use your GitHub identity, and are not WebMCP tools.
 
 Community authorization is different from the fine-grained token used for private storage.
 

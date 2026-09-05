@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "docs/depot-reactions.js"
       - "scripts/sync_federated_depot.mjs"
       - "scripts/federated_depot_core.mjs"
       - "docs/depot-validation.js"

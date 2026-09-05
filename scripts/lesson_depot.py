@@ -260,6 +260,7 @@ def build_catalog(depot_dir: str | Path, output_dir: str | Path | None = None) -
             # Package authors cannot set them in metadata.json.
             "community": {
                 "votes": _community_count(community_entry.get("votes", 0), "votes"),
+                "downvotes": _community_count(community_entry.get("downvotes", 0), "downvotes"),
                 "comments": _community_count(community_entry.get("comments", 0), "comments"),
                 "discussion_url": discussion_url,
             },

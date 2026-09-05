@@ -1,3 +1,4 @@
+import { lessonReactionTotals } from "./depot-reactions.js?v=20260905-reaction-ranking-v3";
 import { fetchTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 
 const CATALOG_FORMAT = "quickmaths.lesson-depot.catalog";
@@ -14,7 +15,7 @@ const DEFAULT_CARD_THEME = Object.freeze({
 });
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 export const DEFAULT_DEPOT_CATALOG = LOCAL_HOSTS.has(globalThis.location?.hostname)
-  ? "./lesson-depot/catalog.json?v=20260905-upvotes-v1"
+  ? "./lesson-depot/catalog.json?v=20260905-reaction-ranking-v3"
   : "https://raw.githubusercontent.com/QuickMathematics/QuickMaths/main/docs/lesson-depot/catalog.json";
 export const DEFAULT_DEPOT_FEDERATION = LOCAL_HOSTS.has(globalThis.location?.hostname)
   ? "./lesson-depot/federation.json?v=20260903-federation-v1"
@@ -202,7 +203,7 @@ export function normalizeDepotCatalog(input, {
       || safeHttpUrl(source?.discussionUrl, resolvedCatalogUrl)
       || (sourceTrust === "official" ? DEPOT_DISCUSSIONS_URL : "");
     const votes = sourceTrust === "official" ? cleanCount(community.votes) : cleanCount(moderation.votes);
-    const flags = 0; // Emoji reactions no longer count as moderation flags.
+    const downvotes = sourceTrust === "official" ? cleanCount(community.downvotes ?? community.flags) : cleanCount(moderation.downvotes ?? moderation.flags);
     const comments = sourceTrust === "official" ? cleanCount(community.comments) : cleanCount(moderation.comments);
     return {
       id,
@@ -224,7 +225,8 @@ export function normalizeDepotCatalog(input, {
       lessonUrl,
       sha256: digest,
       votes,
-      flags,
+      downvotes,
+      flags: downvotes, // Compatibility for older agent clients.
       comments,
       discussionUrl,
       trust,
@@ -232,7 +234,7 @@ export function normalizeDepotCatalog(input, {
       sourceName,
       sourceHomepage,
       sourceCatalogUrl: resolvedCatalogUrl,
-      moderationScore: votes,
+      moderationScore: votes - downvotes,
     };
   });
   return {
@@ -267,7 +269,7 @@ export function normalizeFederationIndex(input, { federationUrl = DEFAULT_DEPOT_
       sha256: /^[a-f0-9]{64}$/i.test(item?.sha256 ?? "") ? item.sha256.toLowerCase() : "",
       status: ["recommended", "new"].includes(item?.status) ? item.status : status,
       votes: cleanCount(item?.votes),
-      flags: 0,
+      downvotes: cleanCount(item?.downvotes ?? item?.flags),
       comments: cleanCount(item?.comments),
       discussion_url: safeHttpUrl(item?.discussion_url, resolvedFederationUrl),
     })).filter((item) => item.id && item.version && item.sha256) : [];
@@ -307,7 +309,7 @@ export function filterDepotPackages(packages, { query = "", sort = "popular", su
   return filtered.sort((a, b) => {
     if (sort === "newest") return String(b.updatedAt || b.publishedAt).localeCompare(String(a.updatedAt || a.publishedAt)) || a.name.localeCompare(b.name);
     if (sort === "name") return a.name.localeCompare(b.name);
-    return Number(a.availability === "preview") - Number(b.availability === "preview") || (b.votes - a.votes) || a.name.localeCompare(b.name);
+    return Number(a.availability === "preview") - Number(b.availability === "preview") || ((b.votes - (b.downvotes ?? 0)) - (a.votes - (a.downvotes ?? 0))) || a.name.localeCompare(b.name);
   });
 }
 
@@ -532,7 +534,7 @@ export function createLessonDepot({
     return filterDepotPackages(state.catalog.packages, { query, subject, sort }).slice(0, Math.max(1, Math.min(50, Number(limit) || 20))).map((pack) => ({
       id: pack.id, name: pack.name, version: pack.version, description: pack.description, author: pack.author,
       license: pack.license, subject_id: pack.subjectId, subject_name: pack.subjectName, tags: [...pack.tags],
-      skill_count: pack.skills, problem_count: pack.problems, votes: pack.votes, flags: pack.flags, comments: pack.comments, availability: pack.availability,
+      skill_count: pack.skills, problem_count: pack.problems, votes: pack.votes, downvotes: pack.downvotes, flags: pack.flags, comments: pack.comments, availability: pack.availability,
       trust: pack.trust, source_id: pack.sourceId, source_name: pack.sourceName, source_url: pack.sourceHomepage,
     }));
   };
@@ -626,15 +628,18 @@ export function createLessonDepot({
 
   const closePreview = () => { state.preview = null; emit(); };
 
-  const updateDiscussionUpvotes = (discussionUrl, upvoteCount) => {
-    if (!/\/discussions\/\d+$/.test(discussionUrl ?? "") || !Number.isInteger(upvoteCount) || upvoteCount < 0) return;
+  const updateDiscussionReactions = (discussionUrl, reactions) => {
+    if (!/\/discussions\/\d+$/.test(discussionUrl ?? "") || !Array.isArray(reactions)) return;
+    const { votes, downvotes, score } = lessonReactionTotals(reactions);
     for (const pack of state.catalog?.packages ?? []) {
       if (pack.discussionUrl !== discussionUrl) continue;
-      pack.votes = upvoteCount;
-      pack.moderationScore = upvoteCount;
-      if (["new", "recommended"].includes(pack.trust)) pack.trust = upvoteCount >= 3 ? "recommended" : "new";
+      pack.votes = votes;
+      pack.downvotes = downvotes;
+      pack.flags = downvotes;
+      pack.moderationScore = score;
+      if (["new", "recommended"].includes(pack.trust)) pack.trust = score >= 3 ? "recommended" : "new";
     }
   };
 
-  return { snapshot, load, previewPack, installPack, search, stagePack, stagePacks, setFilters, addRegistry, removeRegistry, closePreview, updateDiscussionUpvotes };
+  return { snapshot, load, previewPack, installPack, search, stagePack, stagePacks, setFilters, addRegistry, removeRegistry, closePreview, updateDiscussionReactions };
 }

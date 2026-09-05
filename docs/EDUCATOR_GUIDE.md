@@ -266,7 +266,7 @@ The Depot tab shows published and planned packages. The Studio tab opens Lesson 
 
 ### Search, filter, and sorting
 
-Search matches package names, subjects, descriptions, authors, and tags. Availability filters distinguish published packages from roadmap placeholders. Subject filters narrow the catalog. Sort by lesson discussion upvotes, recency, or name.
+Search matches package names, subjects, descriptions, authors, and tags. Availability filters distinguish published packages from roadmap placeholders. Subject filters narrow the catalog. Sort by popularity (upvotes minus downvotes), recency, or name.
 
 ### Package cards
 
@@ -276,7 +276,7 @@ Published packages can be previewed. A bounded reader fetches the immutable less
 
 ### Federation and community moderation
 
-Valid publisher registries appear automatically after a `[Registry]` Discussion and automated immutable-URL, digest, namespace, schema, and graph checks; a maintainer merge is not required. Each exact package version receives a separate public review thread. Three native GitHub upvotes on its lesson discussion mark it **Community recommended**. Depot popularity uses only lesson discussion upvotes. Comment upvotes and all emoji reactions are separate feedback and never change lesson rankings or visibility.
+Valid publisher registries appear automatically after a `[Registry]` Discussion and automated immutable-URL, digest, namespace, schema, and graph checks; a maintainer merge is not required. Each exact package version receives a separate public review thread. Lesson reactions are grouped as **Upvotes** (Heart, Rocket, Hooray, Thumbs up), **Downvotes** (Thumbs down, Confused), and **Neutral** (Eyes, Laugh). Each reaction adds one to its group. Popular sorting uses upvotes minus downvotes, with published packages ahead of concept previews. Valid submissions appear as **New**; a net score of three marks them **Community recommended**. Native GitHub lesson upvotes and all comment feedback do not affect lesson rankings. Downvotes do not automatically hide a package.
 
 Under **Settings → Manage lesson sources**, an educator can inspect active registries, add a public GitHub registry directly, remove direct subscriptions, see isolated source errors, or deliberately reveal contested packages. A registry subscription is content discovery only and receives no access to educator or learner state.
 
@@ -288,7 +288,7 @@ WebMCP can search and stage one package or an ordered batch. It cannot install. 
 
 Optional **Connect GitHub** authorizes the QuickMaths Community GitHub App for Discussions on the QuickMaths repository. This is separate from the fine-grained storage token.
 
-Connected humans can add or remove native GitHub upvotes on discussions and comments, use any of the eight emoji reactions, and post public comments inside the app. Those actions use the human's GitHub identity and are intentionally not agent tools.
+Comments keep all eight GitHub emoji reactions and display their native GitHub upvote count. That count is read-only in QuickMaths; use the comment's **View on GitHub** link to upvote it on GitHub. Selecting an active reaction again removes it. Connected humans can react to lessons or comments and post public comments inside the app. Those actions use the human's GitHub identity and are intentionally not agent tools.
 
 Popularity is not evidence that a lesson is correct, complete, accessible, or appropriate for a particular learner. Review content before installation.
 

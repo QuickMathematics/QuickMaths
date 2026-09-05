@@ -1,26 +1,10 @@
+import { GITHUB_REACTIONS, normalizeReactions, lessonReactionTotals } from "./depot-reactions.js?v=20260905-reaction-ranking-v3";
+export { GITHUB_REACTIONS } from "./depot-reactions.js?v=20260905-reaction-ranking-v3";
+
 const DEFAULT_GRAPHQL_URL = "https://api.github.com/graphql";
 const OAUTH_TRANSACTION_KEY = "quickmaths.github-community.oauth.v1";
 const SESSION_CREDENTIAL_KEY = "quickmaths.github-community.credential.session.v1";
 const PERSISTENT_CREDENTIAL_KEY = "quickmaths.github-community.credential.persistent.v1";
-
-export const GITHUB_REACTIONS = Object.freeze([
-  { content: "THUMBS_UP", emoji: "👍", label: "Thumbs up" },
-  { content: "THUMBS_DOWN", emoji: "👎", label: "Thumbs down" },
-  { content: "LAUGH", emoji: "😄", label: "Laugh" },
-  { content: "HOORAY", emoji: "🎉", label: "Hooray" },
-  { content: "CONFUSED", emoji: "😕", label: "Confused" },
-  { content: "HEART", emoji: "❤️", label: "Heart" },
-  { content: "ROCKET", emoji: "🚀", label: "Rocket" },
-  { content: "EYES", emoji: "👀", label: "Eyes" },
-].map(Object.freeze));
-
-function normalizeReactions(groups) {
-  return GITHUB_REACTIONS.map(({ content }) => {
-    const group = Array.isArray(groups) ? groups.find((item) => item?.content === content) : null;
-    const count = Number(group?.users?.totalCount);
-    return { content, count: Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0, viewerHasReacted: group?.viewerHasReacted === true };
-  });
-}
 
 export class GitHubCommunityError extends Error {
   constructor(message, { code = "github_community_error", status = null, details = null } = {}) {
@@ -188,9 +172,7 @@ function normalizeDiscussion(node, viewerLogin = "") {
     url: String(node?.url ?? ""),
     viewerCanReact: node?.viewerCanReact !== false,
     reactions: normalizeReactions(node?.reactionGroups),
-    upvoteCount: Math.max(0, Number(node?.upvoteCount) || 0),
-    viewerHasUpvoted: node?.viewerHasUpvoted === true,
-    viewerCanUpvote: node?.viewerCanUpvote !== false,
+    ...lessonReactionTotals(node?.reactionGroups),
     commentCount: Math.max(0, Number(node?.comments?.totalCount) || 0),
     comments: comments.map((comment) => ({
       id: String(comment?.id ?? ""),
@@ -205,8 +187,6 @@ function normalizeDiscussion(node, viewerLogin = "") {
       viewerCanReact: comment?.viewerCanReact !== false,
       reactions: normalizeReactions(comment?.reactionGroups),
       upvoteCount: Math.max(0, Number(comment?.upvoteCount) || 0),
-      viewerHasUpvoted: comment?.viewerHasUpvoted === true,
-      viewerCanUpvote: comment?.viewerCanUpvote !== false,
     })),
   };
 }
@@ -339,21 +319,9 @@ export function createGitHubCommunityClient({
     const number = parseDiscussionNumber(discussionUrl, config.repository);
     if (!number) throw new GitHubCommunityError("This lesson package does not have a valid QuickMaths discussion.", { code: "invalid_discussion" });
     if (!viewer) await connect();
-    const data = await graphql(`query QuickMathsLessonDiscussion($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){discussion(number:$number){id number title url upvoteCount viewerHasUpvoted viewerCanUpvote viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}comments(last:50){totalCount nodes{id bodyText createdAt updatedAt url upvoteCount viewerHasUpvoted viewerCanUpvote viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}author{login avatarUrl url}}}}}}`, { ...config.repository, number });
+    const data = await graphql(`query QuickMathsLessonDiscussion($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){discussion(number:$number){id number title url viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}comments(last:50){totalCount nodes{id bodyText createdAt updatedAt url upvoteCount viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}author{login avatarUrl url}}}}}}`, { ...config.repository, number });
     if (!data?.repository?.discussion?.id) throw new GitHubCommunityError("This package discussion no longer exists.", { code: "discussion_missing", status: 404 });
     return normalizeDiscussion(data.repository.discussion, viewer?.login);
-  };
-
-  const setUpvote = async (subjectId, shouldUpvote) => {
-    const id = String(subjectId ?? "");
-    if (!id || id.length > 200 || /\s/.test(id) || typeof shouldUpvote !== "boolean") throw new GitHubCommunityError("Upvote target is invalid.", { code: "invalid_upvote" });
-    const mutation = shouldUpvote
-      ? `mutation QuickMathsUpvote($id:ID!){addUpvote(input:{subjectId:$id}){subject{upvoteCount viewerHasUpvoted viewerCanUpvote}}}`
-      : `mutation QuickMathsRemoveUpvote($id:ID!){removeUpvote(input:{subjectId:$id}){subject{upvoteCount viewerHasUpvoted viewerCanUpvote}}}`;
-    const data = await graphql(mutation, { id });
-    const subject = shouldUpvote ? data?.addUpvote?.subject : data?.removeUpvote?.subject;
-    if (!Number.isInteger(subject?.upvoteCount) || subject.upvoteCount < 0 || typeof subject?.viewerHasUpvoted !== "boolean") throw new GitHubCommunityError("GitHub did not confirm the upvote. Refresh the discussion before trying again.", { code: "upvote_failed" });
-    return { upvoteCount: subject.upvoteCount, viewerHasUpvoted: subject.viewerHasUpvoted, viewerCanUpvote: subject.viewerCanUpvote !== false };
   };
 
   const setReaction = async (subjectId, content, shouldReact) => {
@@ -377,7 +345,7 @@ export function createGitHubCommunityClient({
     if (!id || id.length > 200) throw new GitHubCommunityError("Discussion ID is invalid.", { code: "invalid_discussion" });
     if (!cleanBody) throw new GitHubCommunityError("Write a comment first.", { code: "empty_comment" });
     if (cleanBody.length > 10_000) throw new GitHubCommunityError("Comments must be 10,000 characters or fewer.", { code: "comment_too_long" });
-    const data = await graphql(`mutation QuickMathsComment($id:ID!,$body:String!){addDiscussionComment(input:{discussionId:$id,body:$body}){comment{id bodyText createdAt updatedAt url upvoteCount viewerHasUpvoted viewerCanUpvote viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}author{login avatarUrl url}}}}`, { id, body: cleanBody });
+    const data = await graphql(`mutation QuickMathsComment($id:ID!,$body:String!){addDiscussionComment(input:{discussionId:$id,body:$body}){comment{id bodyText createdAt updatedAt url upvoteCount viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}author{login avatarUrl url}}}}`, { id, body: cleanBody });
     const comment = data?.addDiscussionComment?.comment;
     if (!comment?.id) throw new GitHubCommunityError("GitHub did not save the comment.", { code: "comment_failed" });
     return normalizeDiscussion({ comments: { totalCount: 1, nodes: [comment] } }, viewer?.login).comments[0];
@@ -386,5 +354,5 @@ export function createGitHubCommunityClient({
   const disconnect = () => { credentialStore.clear(); credential = null; viewer = null; };
   const snapshot = () => ({ configured: true, connected: Boolean(credential), remembered: credential?.remembered === true, viewer: viewer ? { ...viewer } : null });
 
-  return { configured: true, config, snapshot, beginAuthorization, completeAuthorization, connect, loadDiscussion, setUpvote, setReaction, addComment, disconnect };
+  return { configured: true, config, snapshot, beginAuthorization, completeAuthorization, connect, loadDiscussion, setReaction, addComment, disconnect };
 }
