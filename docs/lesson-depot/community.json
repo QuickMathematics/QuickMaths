@@ -3,8 +3,8 @@
   "schema_version": "1.0",
   "packages": {
     "PACK_ESTIMATION_LAB": {
-      "votes": 1,
-      "downvotes": 1,
+      "votes": 0,
+      "downvotes": 0,
       "comments": 1,
       "discussion_url": "https://github.com/QuickMathematics/QuickMaths/discussions/1"
     }
