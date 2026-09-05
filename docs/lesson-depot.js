@@ -1,4 +1,4 @@
-import { lessonReactionTotals } from "./depot-reactions.js?v=20260905-account-votes-v4";
+import { lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
 import { fetchTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 
 const CATALOG_FORMAT = "quickmaths.lesson-depot.catalog";
@@ -15,7 +15,7 @@ const DEFAULT_CARD_THEME = Object.freeze({
 });
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 export const DEFAULT_DEPOT_CATALOG = LOCAL_HOSTS.has(globalThis.location?.hostname)
-  ? "./lesson-depot/catalog.json?v=20260905-account-votes-v4"
+  ? "./lesson-depot/catalog.json?v=20260905-confused-neutral-v5"
   : "https://raw.githubusercontent.com/QuickMathematics/QuickMaths/main/docs/lesson-depot/catalog.json";
 export const DEFAULT_DEPOT_FEDERATION = LOCAL_HOSTS.has(globalThis.location?.hostname)
   ? "./lesson-depot/federation.json?v=20260903-federation-v1"

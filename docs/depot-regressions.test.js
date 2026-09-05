@@ -333,7 +333,7 @@ test("only confirmed lesson reactions update catalog rankings", async () => {
   pending[0].resolve({ id: "DISCUSSION_A", votes: 0, reactions: [], comments: [{ id: "C_1", votes: 0, reactions: [] }] }); await loading;
   const updates = [];
   context.lessonDepot.updateDiscussionReactions = (...args) => updates.push(args);
-  context.githubCommunity.setReaction = async (_id, content) => ({ reactions: [{ content, count: 4, viewerHasReacted: true, userIds: ["A", "B", "C", "D"] }], votes: content === "HEART" ? 4 : 0, downvotes: content === "CONFUSED" ? 4 : 0 });
+  context.githubCommunity.setReaction = async (_id, content) => ({ reactions: [{ content, count: 4, viewerHasReacted: true, userIds: ["A", "B", "C", "D"] }], votes: content === "HEART" ? 4 : 0, downvotes: content === "THUMBS_DOWN" ? 4 : 0 });
   await click("community-react", { commentId: "C_1", reactionContent: "HEART" });
   assert.equal(state.discussion.comments[0].votes, 4);
   assert.equal(state.discussion.votes, 0);
@@ -343,7 +343,7 @@ test("only confirmed lesson reactions update catalog rankings", async () => {
   assert.equal(state.discussion.score, 4);
   assert.equal(updates.length, 1);
   assert.equal(updates[0][1][0].content, "HEART");
-  await click("community-react", { reactionContent: "CONFUSED" });
+  await click("community-react", { reactionContent: "THUMBS_DOWN" });
   assert.equal(state.discussion.downvotes, 4);
   assert.equal(state.discussion.score, -4);
   assert.equal(state.discussion.comments[0].votes, 4);
@@ -422,7 +422,7 @@ test("federated refresh uses reaction scores and survives status-comment permiss
       official: catalog([]), statusDenied, remote: new Map([[registryUrl, catalog([entry], registry)], [entry.lesson_url, pack]]),
       discussions: [
         { id: "SUBMISSION", title: "[Registry] alice/lessons", body: `<!-- quickmaths-registry\n${JSON.stringify({ catalog_url: registryUrl })}\n-->`, url: "https://github.com/QuickMathematics/QuickMaths/discussions/2", author: { login: "alice" }, upvoteCount: 100, comments: { nodes: statusDenied ? [{ id: "OLD_STATUS", body: "<!-- quickmaths-federation-status -->\nOld status", viewerDidAuthor: true }] : [], totalCount: statusDenied ? 1 : 0 } },
-        { id: "LESSON", title: federationCore.packageDiscussionTitle(registry.id, entry), upvoteCount: 1000, reactions: { nodes: Array.from({ length: votes }, (_, i) => ["HEART", "ROCKET"].map((content) => ({ content, user: { id: `POS_${i}` } }))).flat().concat([0, 1].map((i) => ({ content: "CONFUSED", user: { id: `NEG_${i}` } }))), pageInfo: { hasNextPage: false } }, reactionGroups: [{ content: "HEART", users: { totalCount: votes } }, { content: "CONFUSED", users: { totalCount: 2 } }, { content: "LAUGH", users: { totalCount: 2000 } }], url: "https://github.com/QuickMathematics/QuickMaths/discussions/3", comments: { totalCount: 500 } },
+        { id: "LESSON", title: federationCore.packageDiscussionTitle(registry.id, entry), upvoteCount: 1000, reactions: { nodes: Array.from({ length: votes }, (_, i) => ["HEART", "ROCKET"].map((content) => ({ content, user: { id: `POS_${i}` } }))).flat().concat([0, 1].map((i) => ({ content: "THUMBS_DOWN", user: { id: `NEG_${i}` } }))), pageInfo: { hasNextPage: false } }, reactionGroups: [{ content: "HEART", users: { totalCount: votes } }, { content: "THUMBS_DOWN", users: { totalCount: 2 } }, { content: "LAUGH", users: { totalCount: 2000 } }], url: "https://github.com/QuickMathematics/QuickMaths/discussions/3", comments: { totalCount: 500 } },
       ],
     });
     const indexed = written.get("federation.json").registries[0];

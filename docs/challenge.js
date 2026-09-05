@@ -1,4 +1,4 @@
-import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-account-votes-v4";
+import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
 import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260905-state-fixes-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260905-publisher-v1";
@@ -10,7 +10,7 @@ import {
   DEPOT_DISCUSSIONS_URL,
   DEPOT_REPOSITORY_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260905-account-votes-v4";
+} from "./lesson-depot.js?v=20260905-confused-neutral-v5";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
@@ -22,7 +22,7 @@ import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
   GITHUB_REACTIONS,
-} from "./github-community.js?v=20260905-account-votes-v4";
+} from "./github-community.js?v=20260905-confused-neutral-v5";
 import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 import { cancelActivePythonGraders, gradePythonProgram, visiblePythonTests } from "./python-grader.js?v=20260903-sandbox-v2";
 import {

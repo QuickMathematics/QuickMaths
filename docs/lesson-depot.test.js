@@ -69,7 +69,7 @@ test("confirmed lesson reactions update ranking and persist after closing the di
   const depot = createLessonDepot({ store: {}, catalogUrl: "https://example.com/catalog.json", federationUrl: "", fetchImpl: async () => Response.json(data) });
   await depot.load();
   const url = data.packages[0].community.discussion_url;
-  depot.updateDiscussionReactions(url, [{ content: "HEART", count: 15, userIds: Array.from({ length: 15 }, (_, i) => `HEART_${i}`) }, { content: "CONFUSED", count: 3, userIds: Array.from({ length: 3 }, (_, i) => `CONFUSED_${i}`) }]);
+  depot.updateDiscussionReactions(url, [{ content: "HEART", count: 15, userIds: Array.from({ length: 15 }, (_, i) => `HEART_${i}`) }, { content: "THUMBS_DOWN", count: 3, userIds: Array.from({ length: 3 }, (_, i) => `THUMBS_DOWN_${i}`) }]);
   assert.deepEqual(filterDepotPackages(depot.snapshot().catalog.packages).map((pack) => pack.id), ["PACK_BIO", "PACK_MONEY"]);
   assert.equal(depot.snapshot().catalog.packages[0].downvotes, 3);
   depot.updateDiscussionReactions(url, null);

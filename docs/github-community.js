@@ -1,5 +1,5 @@
-import { GITHUB_REACTIONS, normalizeReactions, lessonReactionTotals, REACTION_FIELDS, loadReactionGroups } from "./depot-reactions.js?v=20260905-account-votes-v4";
-export { GITHUB_REACTIONS } from "./depot-reactions.js?v=20260905-account-votes-v4";
+import { GITHUB_REACTIONS, normalizeReactions, lessonReactionTotals, REACTION_FIELDS, loadReactionGroups } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
+export { GITHUB_REACTIONS } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
 
 const DEFAULT_GRAPHQL_URL = "https://api.github.com/graphql";
 const OAUTH_TRANSACTION_KEY = "quickmaths.github-community.oauth.v1";

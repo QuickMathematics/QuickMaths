@@ -13,16 +13,16 @@ test("every GitHub reaction belongs to exactly one requested voting group", () =
   for (const content of ["HEART", "ROCKET", "HOORAY", "THUMBS_UP"]) {
     assert.deepEqual(lessonReactionTotals([group(content, "A", "B")]), { votes: 2, downvotes: 0, neutral: 0, score: 2 });
   }
-  for (const content of ["THUMBS_DOWN", "CONFUSED"]) {
+  for (const content of ["THUMBS_DOWN"]) {
     assert.deepEqual(lessonReactionTotals([group(content, "A", "B")]), { votes: 0, downvotes: 2, neutral: 0, score: -2 });
   }
-  for (const content of ["EYES", "LAUGH"]) {
+  for (const content of ["EYES", "LAUGH", "CONFUSED"]) {
     assert.deepEqual(lessonReactionTotals([group(content, "A", "B")]), { votes: 0, downvotes: 0, neutral: 2, score: 0 });
   }
 });
 
-test("multiple positive or negative emojis count only once per GitHub account", () => {
-  assert.deepEqual(lessonReactionTotals([group("HEART", "A", "B"), group("ROCKET", "A"), group("HOORAY", "A"), group("THUMBS_UP", "A"), group("THUMBS_DOWN", "C"), group("CONFUSED", "C")]), { votes: 2, downvotes: 1, neutral: 0, score: 1 });
+test("multiple reactions count only once per GitHub account", () => {
+  assert.deepEqual(lessonReactionTotals([group("HEART", "A", "B"), group("ROCKET", "A"), group("HOORAY", "A"), group("THUMBS_UP", "A"), group("THUMBS_DOWN", "C"), group("CONFUSED", "C")]), { votes: 2, downvotes: 1, neutral: 1, score: 1 });
 });
 
 test("mixed positive and negative reactions exclude the account from both vote totals", () => {
@@ -43,12 +43,12 @@ test("anonymous counts, missing identities, duplicates and viewer state cannot i
 for (const id of ["D_lesson", "DC_comment"]) {
   test(`${id}: votes include later pages and deduplicate accounts across page boundaries`, async () => {
     const first = Array.from({ length: 100 }, (_, i) => reaction("HEART", `USER_${i}`));
-    const subject = { id, reactionGroups: [{ content: "HEART", reactors: { totalCount: 100 } }, { content: "ROCKET", reactors: { totalCount: 1 } }, { content: "CONFUSED", reactors: { totalCount: 1 } }], reactions: page(first, true, "PAGE_1") };
+    const subject = { id, reactionGroups: [{ content: "HEART", reactors: { totalCount: 100 } }, { content: "ROCKET", reactors: { totalCount: 1 } }, { content: "THUMBS_DOWN", reactors: { totalCount: 1 } }], reactions: page(first, true, "PAGE_1") };
     const calls = [];
     const groups = await loadReactionGroups(subject, async (query, variables) => {
       calls.push(variables);
       assert.match(query, /on Reactable/);
-      return { node: { reactions: page([reaction("ROCKET", "USER_0"), reaction("CONFUSED", "USER_1"), reaction("HEART", null), reaction("HEART", "USER_2")]) } };
+      return { node: { reactions: page([reaction("ROCKET", "USER_0"), reaction("THUMBS_DOWN", "USER_1"), reaction("HEART", null), reaction("HEART", "USER_2")]) } };
     });
     assert.deepEqual(calls, [{ id, after: "PAGE_1" }]);
     assert.deepEqual(lessonReactionTotals(groups), { votes: 99, downvotes: 0, neutral: 0, score: 99 });
@@ -62,4 +62,11 @@ test("missing and failed pagination never silently publish partial totals", asyn
   await assert.rejects(loadReactionGroups(subject, async () => { throw new Error("Rate limit"); }), /Rate limit/);
   await assert.rejects(loadReactionGroups(subject, async () => ({ node: { reactions: page([], true, "NEXT") } })), /incomplete/);
   await assert.rejects(loadReactionGroups({ ...subject, reactions: page([], true) }, async () => ({})), /incomplete/);
+});
+
+test("Confused is neutral and does not cancel an account's positive or negative vote", () => {
+  assert.deepEqual(lessonReactionTotals([group("CONFUSED", "A")]), { votes: 0, downvotes: 0, neutral: 1, score: 0 });
+  assert.deepEqual(lessonReactionTotals([group("HEART", "A"), group("ROCKET", "A"), group("CONFUSED", "A")]), { votes: 1, downvotes: 0, neutral: 1, score: 1 });
+  assert.deepEqual(lessonReactionTotals([group("THUMBS_DOWN", "A"), group("CONFUSED", "A")]), { votes: 0, downvotes: 1, neutral: 1, score: -1 });
+  assert.deepEqual(lessonReactionTotals([group("HEART", "A"), group("THUMBS_DOWN", "A"), group("CONFUSED", "A")]), { votes: 0, downvotes: 0, neutral: 1, score: 0 });
 });

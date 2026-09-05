@@ -3,7 +3,7 @@ export const GITHUB_REACTIONS = Object.freeze([
   { content: "THUMBS_DOWN", emoji: "👎", label: "Thumbs down" },
   { content: "LAUGH", emoji: "😄", lessonEmoji: "😁", label: "Laugh" },
   { content: "HOORAY", emoji: "🎉", label: "Hooray" },
-  { content: "CONFUSED", emoji: "😕", lessonEmoji: "🙁", label: "Confused" },
+  { content: "CONFUSED", emoji: "😕", label: "Confused" },
   { content: "HEART", emoji: "❤️", label: "Heart" },
   { content: "ROCKET", emoji: "🚀", label: "Rocket" },
   { content: "EYES", emoji: "👀", label: "Eyes" },
@@ -11,8 +11,8 @@ export const GITHUB_REACTIONS = Object.freeze([
 
 export const LESSON_REACTION_GROUPS = Object.freeze([
   { key: "votes", label: "Upvotes", effect: "counts as an upvote", contents: ["HEART", "ROCKET", "HOORAY", "THUMBS_UP"] },
-  { key: "downvotes", label: "Downvotes", effect: "counts as a downvote", contents: ["THUMBS_DOWN", "CONFUSED"] },
-  { key: "neutral", label: "Neutral", effect: "does not affect ranking", contents: ["EYES", "LAUGH"] },
+  { key: "downvotes", label: "Downvotes", effect: "counts as a downvote", contents: ["THUMBS_DOWN"] },
+  { key: "neutral", label: "Neutral", effect: "does not affect ranking", contents: ["EYES", "LAUGH", "CONFUSED"] },
 ].map((group) => Object.freeze({ ...group, contents: Object.freeze(group.contents) })));
 
 const REACTION_PAGE_FIELDS = "nodes{content user{id}}pageInfo{hasNextPage endCursor}";
