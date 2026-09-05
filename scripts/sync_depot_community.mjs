@@ -1,4 +1,4 @@
-import { lessonReactionTotals } from "../docs/depot-reactions.js";
+import { lessonReactionTotals, REACTION_FIELDS, loadReactionGroups } from "../docs/depot-reactions.js";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
@@ -26,7 +26,7 @@ let repositoryId = "";
 let categories = [];
 let after = null;
 do {
-  const query = `query($owner:String!,$name:String!,$after:String){repository(owner:$owner,name:$name){id hasDiscussionsEnabled discussionCategories(first:25){nodes{id name isAnswerable}}discussions(first:100,after:$after){pageInfo{hasNextPage endCursor}nodes{title url comments{totalCount}reactionGroups{content users{totalCount}}}}}}`;
+  const query = `query($owner:String!,$name:String!,$after:String){repository(owner:$owner,name:$name){id hasDiscussionsEnabled discussionCategories(first:25){nodes{id name isAnswerable}}discussions(first:100,after:$after){pageInfo{hasNextPage endCursor}nodes{id title url comments{totalCount}${REACTION_FIELDS}}}}}`;
   const repositoryData = (await graphql(query, { owner, name, after }))?.repository;
   if (repositoryData?.hasDiscussionsEnabled === false) {
     console.log("GitHub Discussions is not enabled; keeping the checked-in community totals unchanged.");
@@ -48,8 +48,8 @@ if (!category) throw new Error("GitHub Discussions has no category available for
 for (const entry of catalog.packages.filter((item) => item.availability !== "preview")) {
   const title = `[Lesson] ${entry.id}`;
   if (discussions.some((item) => item.title.trim().toUpperCase() === title.toUpperCase())) continue;
-  const body = `# ${entry.name}\n\n**Version:** ${entry.version}  \n**Author:** ${entry.author}  \n**Subject:** ${entry.subject_name}  \n**License:** ${entry.license}\n\n${entry.description}\n\nLesson reactions determine Depot ranking: ❤️ 🚀 🎉 👍 count as upvotes; 👎 😕 count as downvotes; 👀 😄 are neutral. Score is upvotes minus downvotes. Native GitHub upvotes and all comment feedback do not change lesson rankings. Add comments for questions, corrections, teaching notes, and update requests. Report licensing, safety, or correctness concerns through the repository's Depot report form.\n\n[View the reviewed package](https://github.com/${repository}/tree/main/docs/lesson-depot/lessons/${entry.slug}/${entry.version}) · [Open QuickMaths](https://${owner.toLowerCase()}.github.io/${name}/#/depot)`;
-  const mutation = `mutation($repositoryId:ID!,$categoryId:ID!,$title:String!,$body:String!){createDiscussion(input:{repositoryId:$repositoryId,categoryId:$categoryId,title:$title,body:$body}){discussion{title url comments{totalCount}reactionGroups{content users{totalCount}}}}}`;
+  const body = `# ${entry.name}\n\n**Version:** ${entry.version}  \n**Author:** ${entry.author}  \n**Subject:** ${entry.subject_name}  \n**License:** ${entry.license}\n\n${entry.description}\n\nLesson reactions determine Depot ranking: ❤️ 🚀 🎉 👍 count as upvotes; 👎 😕 count as downvotes; 👀 😄 are neutral. Each GitHub account contributes at most one upvote or one downvote, even with multiple emojis. Accounts with both positive and negative reactions count toward neither total. Comments use the same voting system. Score is upvotes minus downvotes. Native GitHub upvotes and all comment feedback do not change lesson rankings. Add comments for questions, corrections, teaching notes, and update requests. Report licensing, safety, or correctness concerns through the repository's Depot report form.\n\n[View the reviewed package](https://github.com/${repository}/tree/main/docs/lesson-depot/lessons/${entry.slug}/${entry.version}) · [Open QuickMaths](https://${owner.toLowerCase()}.github.io/${name}/#/depot)`;
+  const mutation = `mutation($repositoryId:ID!,$categoryId:ID!,$title:String!,$body:String!){createDiscussion(input:{repositoryId:$repositoryId,categoryId:$categoryId,title:$title,body:$body}){discussion{id title url comments{totalCount}${REACTION_FIELDS}}}}`;
   const created = (await graphql(mutation, { repositoryId, categoryId: category.id, title, body }))?.createDiscussion?.discussion;
   if (!created) throw new Error(`Could not create the discussion for ${entry.id}.`);
   discussions.push(created);
@@ -59,9 +59,10 @@ const packages = {};
 for (const entry of catalog.packages.filter((item) => item.availability !== "preview")) {
   const discussion = discussions.find((item) => item.title.trim().toUpperCase() === `[LESSON] ${entry.id}`);
   if (!discussion) continue;
+  const { votes, downvotes } = lessonReactionTotals(await loadReactionGroups(discussion, graphql));
   packages[entry.id] = {
-    votes: lessonReactionTotals(discussion.reactionGroups).votes,
-    downvotes: lessonReactionTotals(discussion.reactionGroups).downvotes,
+    votes,
+    downvotes,
     comments: discussion.comments.totalCount,
     discussion_url: discussion.url,
   };

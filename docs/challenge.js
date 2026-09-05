@@ -1,4 +1,4 @@
-import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-reaction-ranking-v3";
+import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-account-votes-v4";
 import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260905-state-fixes-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260905-publisher-v1";
@@ -10,7 +10,7 @@ import {
   DEPOT_DISCUSSIONS_URL,
   DEPOT_REPOSITORY_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260905-reaction-ranking-v3";
+} from "./lesson-depot.js?v=20260905-account-votes-v4";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
@@ -22,7 +22,7 @@ import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
   GITHUB_REACTIONS,
-} from "./github-community.js?v=20260905-reaction-ranking-v3";
+} from "./github-community.js?v=20260905-account-votes-v4";
 import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 import { cancelActivePythonGraders, gradePythonProgram, visiblePythonTests } from "./python-grader.js?v=20260903-sandbox-v2";
 import {
@@ -2056,18 +2056,18 @@ function renderCommunityReactions(subject, { comment = false, contents = null, e
     const count = reaction?.count ?? 0;
     const selected = reaction?.viewerHasReacted === true;
     const description = `${selected ? "Remove" : "Add"} ${label} reaction · ${count}${effect ? ` · ${effect}` : ""}`;
-    return `<button type="button" class="community-emoji-button" data-depot-action="community-react" data-reaction-content="${content}" ${comment ? `data-comment-id="${escapeHtml(subject.id)}"` : ""} aria-pressed="${selected}" aria-label="${escapeHtml(description)}" title="${escapeHtml(description)}" ${communityUi.busy || subject.viewerCanReact === false ? "disabled" : ""}><span aria-hidden="true">${comment ? emoji : lessonEmoji || emoji}</span><b>${count}</b></button>`;
+    return `<button type="button" class="community-emoji-button" data-depot-action="community-react" data-reaction-content="${content}" ${comment ? `data-comment-id="${escapeHtml(subject.id)}"` : ""} aria-pressed="${selected}" aria-label="${escapeHtml(description)}" title="${escapeHtml(description)}" ${communityUi.busy || subject.viewerCanReact === false ? "disabled" : ""}><span aria-hidden="true">${lessonEmoji || emoji}</span><b>${count}</b></button>`;
   }).join("")}</div>`;
 }
 
-function renderLessonReactions(discussion) {
-  const totals = lessonReactionTotals(discussion.reactions);
-  return `<section class="community-reaction-groups">${LESSON_REACTION_GROUPS.map((group) => `<div class="community-reaction-group is-${group.key}"><div class="community-reactions-label"><strong>${group.label}</strong><b>${totals[group.key]}</b></div>${renderCommunityReactions(discussion, { contents: group.contents, effect: group.effect })}</div>`).join("")}</section>`;
+function renderGroupedReactions(subject, { comment = false } = {}) {
+  const totals = lessonReactionTotals(subject.reactions);
+  return `<section class="community-reaction-groups">${LESSON_REACTION_GROUPS.map((group) => `<div class="community-reaction-group is-${group.key}"><div class="community-reactions-label"><strong>${group.label}</strong><b>${totals[group.key]}</b></div>${renderCommunityReactions(subject, { comment, contents: group.contents, effect: group.effect })}</div>`).join("")}</section>`;
 }
 
 function renderCommunityComment(comment) {
   const body = escapeHtml(comment.body).replaceAll("\n", "<br>");
-  return `<article class="community-comment"><div class="community-comment-avatar" aria-hidden="true">${escapeHtml(comment.author.slice(0, 1).toUpperCase() || "?")}</div><div><header><strong>${escapeHtml(comment.author)}</strong>${comment.viewerDidAuthor ? "<span>You</span>" : ""}<time datetime="${escapeHtml(comment.createdAt)}">${escapeHtml(formatCommunityDate(comment.createdAt))}</time></header><p>${body}</p><a href="${escapeHtml(comment.url)}" target="_blank" rel="noopener">View on GitHub ↗</a><div class="community-comment-feedback"><span class="community-comment-upvote" aria-label="${comment.upvoteCount ?? 0} GitHub upvotes"><span aria-hidden="true">↑</span><strong>${comment.upvoteCount ?? 0}</strong><small>GitHub upvotes</small></span>${renderCommunityReactions(comment, { comment: true })}</div></div></article>`;
+  return `<article class="community-comment"><div class="community-comment-avatar" aria-hidden="true">${escapeHtml(comment.author.slice(0, 1).toUpperCase() || "?")}</div><div><header><strong>${escapeHtml(comment.author)}</strong>${comment.viewerDidAuthor ? "<span>You</span>" : ""}<time datetime="${escapeHtml(comment.createdAt)}">${escapeHtml(formatCommunityDate(comment.createdAt))}</time></header><p>${body}</p><a href="${escapeHtml(comment.url)}" target="_blank" rel="noopener">View on GitHub ↗</a><div class="community-comment-feedback">${renderGroupedReactions(comment, { comment: true })}</div></div></article>`;
 }
 
 function renderDepotCommunityPanel() {
@@ -2086,7 +2086,7 @@ function renderDepotCommunityPanel() {
     content = `<div class="community-connect-copy"><p class="eyebrow">Discussion unavailable</p><h2>GitHub did not return this conversation.</h2><p class="community-error" role="alert">${escapeHtml(communityUi.error)}</p><div><button class="button button-primary" type="button" data-depot-action="community-refresh">Try again</button>${external}</div></div>`;
   } else if (communityUi.discussion) {
     const discussion = communityUi.discussion;
-    content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. React to this lesson or leave a public comment.</p></div></div>${renderLessonReactions(discussion)}<div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, or review…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
+    content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. React to this lesson or leave a public comment.</p><p>Lessons and comments: one vote per GitHub account. Positive and negative reactions together count as zero.</p></div></div>${renderGroupedReactions(discussion)}<div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, or review…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
   }
   return `<aside class="depot-community-panel" id="depot-community-panel"><header><div><span>Community</span><strong>${escapeHtml(pack.name)}</strong></div><button class="quiet-button" type="button" data-depot-action="community-close" aria-label="Close lesson discussion">Close ×</button></header>${content}<footer><span>Community authorization is separate from Workspace Storage.</span>${connection.connected ? `<button class="quiet-button danger-link" type="button" data-depot-action="community-disconnect">Disconnect GitHub</button>` : ""}</footer></aside>`;
 }

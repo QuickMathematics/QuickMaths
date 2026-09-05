@@ -1,4 +1,4 @@
-import { GITHUB_REACTIONS, lessonReactionTotals } from "./depot-reactions.js";
+import { GITHUB_REACTIONS, lessonReactionTotals, loadReactionGroups, REACTION_FIELDS, ReactionVotesError } from "./depot-reactions.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -264,19 +264,19 @@ test("a pending comment stays with its original discussion when the lesson chang
   assert.equal(state.busy, false);
 });
 
-test("comment reactions update only the selected comment and preserve native comment upvotes and lesson ranking", async () => {
+test("comment reactions update only the selected comment and leave other comment and lesson votes unchanged", async () => {
   const { context, state, pending, click } = communityHarness();
   const loading = context.openDepotCommunity("A", "1");
-  pending[0].resolve({ id: "DISCUSSION_A", votes: 3, comments: [{ id: "C_1", upvoteCount: 7, reactions: [] }, { id: "C_2", reactions: [] }] }); await loading;
+  pending[0].resolve({ id: "DISCUSSION_A", votes: 3, comments: [{ id: "C_1", votes: 0, reactions: [] }, { id: "C_2", reactions: [] }] }); await loading;
   context.githubCommunity.setReaction = async (id, content, selected) => {
     assert.equal(id, "C_1"); assert.equal(content, "THUMBS_UP"); assert.equal(selected, true);
-    return { reactions: [{ content, count: 9, viewerHasReacted: true }] };
+    return { reactions: [{ content, count: 9, viewerHasReacted: true, userIds: ["A"] }], votes: 1, downvotes: 0, score: 1 };
   };
   await click("community-react", { commentId: "C_1", reactionContent: "THUMBS_UP" });
   assert.equal(state.discussion.comments[0].reactions[0].count, 9);
   assert.equal(state.discussion.comments[1].reactions.length, 0);
   assert.equal(state.discussion.votes, 3);
-  assert.equal(state.discussion.comments[0].upvoteCount, 7);
+  assert.equal(state.discussion.comments[0].votes, 1);
   assert.equal(state.busy, false);
 });
 
@@ -330,12 +330,12 @@ test("unavailable targets, denied permissions and failed reactions preserve the 
 test("only confirmed lesson reactions update catalog rankings", async () => {
   const { context, state, pending, click } = communityHarness();
   const loading = context.openDepotCommunity("A", "1");
-  pending[0].resolve({ id: "DISCUSSION_A", votes: 0, reactions: [], comments: [{ id: "C_1", upvoteCount: 10, reactions: [] }] }); await loading;
+  pending[0].resolve({ id: "DISCUSSION_A", votes: 0, reactions: [], comments: [{ id: "C_1", votes: 0, reactions: [] }] }); await loading;
   const updates = [];
   context.lessonDepot.updateDiscussionReactions = (...args) => updates.push(args);
-  context.githubCommunity.setReaction = async (_id, content) => ({ reactions: [{ content, count: 4, viewerHasReacted: true }] });
+  context.githubCommunity.setReaction = async (_id, content) => ({ reactions: [{ content, count: 4, viewerHasReacted: true, userIds: ["A", "B", "C", "D"] }], votes: content === "HEART" ? 4 : 0, downvotes: content === "CONFUSED" ? 4 : 0 });
   await click("community-react", { commentId: "C_1", reactionContent: "HEART" });
-  assert.equal(state.discussion.comments[0].upvoteCount, 10);
+  assert.equal(state.discussion.comments[0].votes, 4);
   assert.equal(state.discussion.votes, 0);
   assert.equal(updates.length, 0);
   await click("community-react", { reactionContent: "HEART" });
@@ -346,7 +346,7 @@ test("only confirmed lesson reactions update catalog rankings", async () => {
   await click("community-react", { reactionContent: "CONFUSED" });
   assert.equal(state.discussion.downvotes, 4);
   assert.equal(state.discussion.score, -4);
-  assert.equal(state.discussion.comments[0].upvoteCount, 10);
+  assert.equal(state.discussion.comments[0].votes, 4);
 });
 
 test("federation rejects a release whose ID or version differs from its listing", () => {
@@ -375,8 +375,9 @@ test("latest federated versions must still form a complete acyclic graph", () =>
 async function runIndexWorker(filename, { official, discussions, remote = new Map(), statusDenied = false }) {
   const source = readFileSync(new URL(`../scripts/${filename}`, import.meta.url), "utf8").replace(/^import[\s\S]*?;\s*/gm, "");
   const files = new Map([["catalog.json", official], ["docs/curriculum-data.json", curriculum]]), written = new Map(), queries = [];
+  discussions = discussions.map((subject) => ({ ...subject, reactions: subject.reactions ?? { nodes: (subject.reactionGroups ?? []).flatMap((group) => Array.from({ length: group.users?.totalCount ?? 0 }, (_, i) => ({ content: group.content, user: { id: `${group.content}_${i}` } }))), pageInfo: { hasNextPage: false, endCursor: null } } }));
   const globals = {
-    ...federationCore, lessonReactionTotals, normalizeDepotCatalog, fetchTextLimited, createHash, URL, Response,
+    ...federationCore, lessonReactionTotals, loadReactionGroups, REACTION_FIELDS, ReactionVotesError, normalizeDepotCatalog, fetchTextLimited, createHash, URL, Response,
     process: { env: { GITHUB_TOKEN: "mock-token", GITHUB_REPOSITORY: "QuickMathematics/QuickMaths" }, argv: ["node", filename], exit: (code) => { throw new Error(`Unexpected worker exit ${code}`); } },
     console: { log() {}, warn() {} }, resolve: (...parts) => parts.join("/"),
     readFile: async (path) => {
@@ -402,14 +403,14 @@ async function runIndexWorker(filename, { official, discussions, remote = new Ma
   return { written, queries };
 }
 
-test("official catalog refresh totals positive and negative reactions independently", async () => {
+test("official catalog refresh counts each account once across positive and negative emojis", async () => {
   const pack = lesson("A");
   const { written } = await runIndexWorker("sync_depot_community.mjs", {
     official: catalog([listing(pack)]),
-    discussions: [{ title: `[Lesson] ${pack.id}`, url: "https://github.com/QuickMathematics/QuickMaths/discussions/1", upvoteCount: 999, reactionGroups: [{ content: "HEART", users: { totalCount: 4 } }, { content: "ROCKET", users: { totalCount: 3 } }, { content: "HOORAY", users: { totalCount: 2 } }, { content: "THUMBS_UP", users: { totalCount: 1 } }, { content: "THUMBS_DOWN", users: { totalCount: 2 } }, { content: "CONFUSED", users: { totalCount: 1 } }, { content: "EYES", users: { totalCount: 500 } }], comments: { totalCount: 800 } }],
+    discussions: [{ title: `[Lesson] ${pack.id}`, url: "https://github.com/QuickMathematics/QuickMaths/discussions/1", upvoteCount: 999, reactions: { nodes: ["HEART", "ROCKET", "HOORAY", "THUMBS_UP"].map((content) => ({ content, user: { id: "POSITIVE" } })).concat(["THUMBS_DOWN", "CONFUSED"].map((content) => ({ content, user: { id: "NEGATIVE" } }))), pageInfo: { hasNextPage: false } }, reactionGroups: [{ content: "HEART", users: { totalCount: 4 } }, { content: "ROCKET", users: { totalCount: 3 } }, { content: "HOORAY", users: { totalCount: 2 } }, { content: "THUMBS_UP", users: { totalCount: 1 } }, { content: "THUMBS_DOWN", users: { totalCount: 2 } }, { content: "CONFUSED", users: { totalCount: 1 } }, { content: "EYES", users: { totalCount: 500 } }], comments: { totalCount: 800 } }],
   });
-  assert.equal(written.get("community.json").packages[pack.id].votes, 10);
-  assert.equal(written.get("community.json").packages[pack.id].downvotes, 3);
+  assert.equal(written.get("community.json").packages[pack.id].votes, 1);
+  assert.equal(written.get("community.json").packages[pack.id].downvotes, 1);
   assert.equal(written.get("community.json").packages[pack.id].comments, 800);
 });
 
@@ -421,7 +422,7 @@ test("federated refresh uses reaction scores and survives status-comment permiss
       official: catalog([]), statusDenied, remote: new Map([[registryUrl, catalog([entry], registry)], [entry.lesson_url, pack]]),
       discussions: [
         { id: "SUBMISSION", title: "[Registry] alice/lessons", body: `<!-- quickmaths-registry\n${JSON.stringify({ catalog_url: registryUrl })}\n-->`, url: "https://github.com/QuickMathematics/QuickMaths/discussions/2", author: { login: "alice" }, upvoteCount: 100, comments: { nodes: statusDenied ? [{ id: "OLD_STATUS", body: "<!-- quickmaths-federation-status -->\nOld status", viewerDidAuthor: true }] : [], totalCount: statusDenied ? 1 : 0 } },
-        { id: "LESSON", title: federationCore.packageDiscussionTitle(registry.id, entry), upvoteCount: 1000, reactionGroups: [{ content: "HEART", users: { totalCount: votes } }, { content: "CONFUSED", users: { totalCount: 2 } }, { content: "LAUGH", users: { totalCount: 2000 } }], url: "https://github.com/QuickMathematics/QuickMaths/discussions/3", comments: { totalCount: 500 } },
+        { id: "LESSON", title: federationCore.packageDiscussionTitle(registry.id, entry), upvoteCount: 1000, reactions: { nodes: Array.from({ length: votes }, (_, i) => ["HEART", "ROCKET"].map((content) => ({ content, user: { id: `POS_${i}` } }))).flat().concat([0, 1].map((i) => ({ content: "CONFUSED", user: { id: `NEG_${i}` } }))), pageInfo: { hasNextPage: false } }, reactionGroups: [{ content: "HEART", users: { totalCount: votes } }, { content: "CONFUSED", users: { totalCount: 2 } }, { content: "LAUGH", users: { totalCount: 2000 } }], url: "https://github.com/QuickMathematics/QuickMaths/discussions/3", comments: { totalCount: 500 } },
       ],
     });
     const indexed = written.get("federation.json").registries[0];
@@ -430,4 +431,15 @@ test("federated refresh uses reaction scores and survives status-comment permiss
     assert.equal(indexed.packages[0].downvotes, 2);
     assert.equal(indexed.packages[0].status, votes - 2 >= 3 ? "recommended" : "new");
   }
+});
+
+test("a failed reaction page preserves the federation snapshot instead of delisting a valid registry", async () => {
+  const pack = lesson("A"), entry = listing(pack);
+  await assert.rejects(runIndexWorker("sync_federated_depot.mjs", {
+    official: catalog([]), remote: new Map([[registryUrl, catalog([entry], { id: "alice/lessons", name: "Alice Lessons", namespace: "ALICE" })], [entry.lesson_url, pack]]),
+    discussions: [
+      { id: "SUBMISSION", title: "[Registry] alice/lessons", body: `<!-- quickmaths-registry\n${JSON.stringify({ catalog_url: registryUrl })}\n-->`, url: "https://github.com/QuickMathematics/QuickMaths/discussions/2", author: { login: "alice" }, comments: { nodes: [], totalCount: 0 } },
+      { id: "LESSON", title: federationCore.packageDiscussionTitle("alice/lessons", entry), reactions: { nodes: [], pageInfo: { hasNextPage: true } }, reactionGroups: [], url: "https://github.com/QuickMathematics/QuickMaths/discussions/3", comments: { totalCount: 0 } },
+    ],
+  }), /incomplete reaction pages/);
 });

@@ -228,7 +228,8 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /\.\/agent-bridge\.html/);
   assert.doesNotMatch(js, /data-depot-action="community-upvote"/);
   assert.match(js, /community-reaction-groups/);
-  assert.match(js, /GitHub upvotes/);
+  assert.match(js, /renderGroupedReactions\(comment, \{ comment: true \}\)/);
+  assert.doesNotMatch(js, /community-comment-upvote/);
   assert.match(js, /data-depot-action="community-react"/);
   assert.match(js, /id="community-comment-form"/);
   assert.match(css, /\.depot-community-panel/);

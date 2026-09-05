@@ -33,6 +33,17 @@ function credentialStore({ accessToken = "ghu_access", refreshToken = "ghr_refre
   return store;
 }
 
+function reactionAccounts(value) {
+  if (!value || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map(reactionAccounts);
+  const result = Object.fromEntries(Object.entries(value).map(([key, item]) => [key, reactionAccounts(item)]));
+  if (value.reactionGroups || value.bodyText) {
+    result.reactionGroups ??= [];
+    result.reactions ??= { nodes: result.reactionGroups.flatMap((group) => Array.from({ length: group.users?.totalCount ?? 0 }, (_, i) => ({ content: group.content, user: { id: `${group.content}_${i}` } }))), pageInfo: { hasNextPage: false, endCursor: null } };
+  }
+  return result;
+}
+
 test("community config is least-privilege HTTPS metadata", () => {
   assert.deepEqual(normalizeGitHubCommunityConfig({ enabled: false }), { enabled: false });
   const result = normalizeGitHubCommunityConfig(config);
@@ -93,7 +104,7 @@ test("OAuth callback rejects mismatched state before contacting the broker", asy
   assert.equal(store.load(), null);
 });
 
-test("authenticated community client uses lesson reaction votes and copies native comment upvotes", async () => {
+test("authenticated community client uses account reaction votes for lessons and comments", async () => {
   const calls = [];
   const responses = [
     { data: { viewer: { login: "ada", avatarUrl: "https://avatars.example/ada", url: "https://github.com/ada" }, repository: { id: "R_repo", nameWithOwner: "QuickMathematics/QuickMaths", hasDiscussionsEnabled: true } } },
@@ -106,7 +117,7 @@ test("authenticated community client uses lesson reaction votes and copies nativ
     config,
     credentialStore: credentialStore(),
     transactionStorage: new MemoryStorage(),
-    fetchImpl: async (url, options) => { calls.push({ url, options, body: JSON.parse(options.body) }); return Response.json(responses.shift()); },
+    fetchImpl: async (url, options) => { calls.push({ url, options, body: JSON.parse(options.body) }); return Response.json(reactionAccounts(responses.shift())); },
     cryptoImpl: crypto,
   });
   const discussion = await client.loadDiscussion("https://github.com/QuickMathematics/QuickMaths/discussions/1");
@@ -114,13 +125,14 @@ test("authenticated community client uses lesson reaction votes and copies nativ
   assert.equal(discussion.downvotes, 1);
   assert.equal(discussion.score, 2);
   assert.equal(discussion.upvoteCount, undefined);
-  assert.equal(discussion.comments[0].upvoteCount, 7);
+  assert.equal(discussion.comments[0].upvoteCount, undefined);
+  assert.equal(discussion.comments[0].votes, 0);
   assert.equal(client.setUpvote, undefined);
   assert.equal(discussion.reactions.find((reaction) => reaction.content === "THUMBS_UP").count, 3);
   assert.equal(discussion.reactions.find((reaction) => reaction.content === "THUMBS_DOWN").count, 1);
   assert.equal(discussion.comments[0].body, "Useful pack");
   const reaction = await client.setReaction(discussion.id, "THUMBS_DOWN", true);
-  assert.deepEqual(reaction.reactions.find((item) => item.content === "THUMBS_DOWN"), { content: "THUMBS_DOWN", count: 2, viewerHasReacted: true });
+  assert.deepEqual(reaction.reactions.find((item) => item.content === "THUMBS_DOWN"), { content: "THUMBS_DOWN", count: 2, viewerHasReacted: true, userIds: ["THUMBS_DOWN_0", "THUMBS_DOWN_1"] });
   const comment = await client.addComment(discussion.id, "My note");
   assert.equal(comment.viewerDidAuthor, true);
   assert.ok(calls.every((call) => !/addUpvote|removeUpvote/.test(call.body.query)));
@@ -161,14 +173,14 @@ for (const { content } of GITHUB_REACTIONS) {
         const body = JSON.parse(options.body); calls.push(body);
         const adding = body.query.includes("addReaction");
         const subject = { reactionGroups: [{ content, viewerHasReacted: adding, users: { totalCount: adding ? 3 : 2 } }] };
-        return Response.json({ data: { [adding ? "addReaction" : "removeReaction"]: { subject } } });
+        return Response.json(reactionAccounts({ data: { [adding ? "addReaction" : "removeReaction"]: { subject } } }));
       },
     });
     for (const id of ["D_lesson", "DC_comment"]) {
       const added = await client.setReaction(id, content, true);
       const removed = await client.setReaction(id, content, false);
-      assert.deepEqual(added.reactions.find((reaction) => reaction.content === content), { content, count: 3, viewerHasReacted: true });
-      assert.deepEqual(removed.reactions.find((reaction) => reaction.content === content), { content, count: 2, viewerHasReacted: false });
+      assert.deepEqual(added.reactions.find((reaction) => reaction.content === content), { content, count: 3, viewerHasReacted: true, userIds: [0, 1, 2].map((i) => `${content}_${i}`) });
+      assert.deepEqual(removed.reactions.find((reaction) => reaction.content === content), { content, count: 2, viewerHasReacted: false, userIds: [0, 1].map((i) => `${content}_${i}`) });
       assert.equal(added.reactions.length, 8);
       assert.ok(added.reactions.filter((reaction) => reaction.content !== content).every((reaction) => reaction.count === 0 && !reaction.viewerHasReacted));
     }
@@ -202,7 +214,7 @@ test("discussion and comment reactions load independently with permission and se
     fetchImpl: async (_url, options) => {
       const query = JSON.parse(options.body).query; queries.push(query);
       if (query.includes("QuickMathsCommunityViewer")) return Response.json({ data: { viewer: { login: "ada" }, repository: { id: "R_1", hasDiscussionsEnabled: true } } });
-      return Response.json({ data: { repository: { discussion: { id: "D_1", viewerCanReact: false, reactionGroups: [{ content: "ROCKET", viewerHasReacted: true, users: { totalCount: 9 } }], comments: { nodes: [{ id: "DC_1", upvoteCount: 13, viewerCanReact: true, reactionGroups: [{ content: "HEART", viewerHasReacted: false, users: { totalCount: 2 } }] }] } } } } });
+      return Response.json(reactionAccounts({ data: { repository: { discussion: { id: "D_1", viewerCanReact: false, reactionGroups: [{ content: "ROCKET", viewerHasReacted: true, users: { totalCount: 9 } }], comments: { nodes: [{ id: "DC_1", upvoteCount: 13, viewerCanReact: true, reactionGroups: [{ content: "HEART", viewerHasReacted: false, users: { totalCount: 2 } }] }] } } } } }));
     },
   });
   const discussion = await client.loadDiscussion("https://github.com/QuickMathematics/QuickMaths/discussions/1");
@@ -210,8 +222,45 @@ test("discussion and comment reactions load independently with permission and se
   assert.equal(discussion.reactions.find((reaction) => reaction.content === "ROCKET").count, 9);
   assert.equal(discussion.reactions.find((reaction) => reaction.content === "ROCKET").viewerHasReacted, true);
   assert.equal(discussion.comments[0].viewerCanReact, true);
-  assert.equal(discussion.comments[0].upvoteCount, 13);
+  assert.equal(discussion.comments[0].upvoteCount, undefined);
+  assert.equal(discussion.comments[0].votes, 2);
   assert.equal(discussion.comments[0].reactions.find((reaction) => reaction.content === "HEART").count, 2);
   assert.equal(discussion.comments[0].reactions.find((reaction) => reaction.content === "ROCKET").count, 0);
-  assert.match(queries[1], /comments\(last:50\).*upvoteCount viewerCanReact reactionGroups/);
+  assert.match(queries[1], /comments\(last:50\).*viewerCanReact reactionGroups/);
+});
+
+test("confirmed lesson and comment mutations count accounts across all reaction pages", async () => {
+  for (const id of ["D_lesson", "DC_comment"]) {
+    const calls = [];
+    const client = createGitHubCommunityClient({
+      config, credentialStore: credentialStore(), transactionStorage: new MemoryStorage(), cryptoImpl: crypto,
+      fetchImpl: async (_url, options) => {
+        const request = JSON.parse(options.body); calls.push(request);
+        if (request.query.includes("QuickMathsReactionAccounts")) {
+          assert.deepEqual(request.variables, { id, after: "NEXT" });
+          return Response.json({ data: { node: { reactions: { nodes: [{ content: "ROCKET", user: { id: "A" } }, { content: "THUMBS_DOWN", user: { id: "B" } }], pageInfo: { hasNextPage: false } } } } });
+        }
+        return Response.json({ data: { addReaction: { subject: { reactionGroups: [{ content: "HEART", reactors: { totalCount: 2 } }, { content: "ROCKET", reactors: { totalCount: 1 }, viewerHasReacted: true }, { content: "THUMBS_DOWN", reactors: { totalCount: 1 } }], reactions: { nodes: [{ content: "HEART", user: { id: "A" } }, { content: "HEART", user: { id: "B" } }], pageInfo: { hasNextPage: true, endCursor: "NEXT" } } } } } });
+      },
+    });
+    const result = await client.setReaction(id, "ROCKET", true);
+    assert.equal(result.votes, 1);
+    assert.equal(result.downvotes, 0);
+    assert.equal(result.reactions.find((item) => item.content === "ROCKET").viewerHasReacted, true);
+    assert.equal(calls.length, 2);
+  }
+});
+
+test("a failed read after a saved reaction reports the saved state without repeating the mutation", async () => {
+  const calls = [];
+  const client = createGitHubCommunityClient({
+    config, credentialStore: credentialStore(), transactionStorage: new MemoryStorage(), cryptoImpl: crypto,
+    fetchImpl: async (_url, options) => {
+      const request = JSON.parse(options.body); calls.push(request);
+      if (request.query.includes("QuickMathsReactionAccounts")) return Response.json({ errors: [{ message: "Rate limit" }] });
+      return Response.json({ data: { addReaction: { subject: { reactionGroups: [], reactions: { nodes: [], pageInfo: { hasNextPage: true, endCursor: "NEXT" } } } } } });
+    },
+  });
+  await assert.rejects(client.setReaction("D_1", "HEART", true), /saved the reaction.*Reopen/);
+  assert.equal(calls.filter((call) => call.query.startsWith("mutation")).length, 1);
 });

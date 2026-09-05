@@ -1,5 +1,5 @@
-import { GITHUB_REACTIONS, normalizeReactions, lessonReactionTotals } from "./depot-reactions.js?v=20260905-reaction-ranking-v3";
-export { GITHUB_REACTIONS } from "./depot-reactions.js?v=20260905-reaction-ranking-v3";
+import { GITHUB_REACTIONS, normalizeReactions, lessonReactionTotals, REACTION_FIELDS, loadReactionGroups } from "./depot-reactions.js?v=20260905-account-votes-v4";
+export { GITHUB_REACTIONS } from "./depot-reactions.js?v=20260905-account-votes-v4";
 
 const DEFAULT_GRAPHQL_URL = "https://api.github.com/graphql";
 const OAUTH_TRANSACTION_KEY = "quickmaths.github-community.oauth.v1";
@@ -186,7 +186,7 @@ function normalizeDiscussion(node, viewerLogin = "") {
       viewerDidAuthor: Boolean(viewerLogin && String(comment?.author?.login ?? "").toLowerCase() === viewerLogin.toLowerCase()),
       viewerCanReact: comment?.viewerCanReact !== false,
       reactions: normalizeReactions(comment?.reactionGroups),
-      upvoteCount: Math.max(0, Number(comment?.upvoteCount) || 0),
+      ...lessonReactionTotals(comment?.reactionGroups),
     })),
   };
 }
@@ -319,9 +319,13 @@ export function createGitHubCommunityClient({
     const number = parseDiscussionNumber(discussionUrl, config.repository);
     if (!number) throw new GitHubCommunityError("This lesson package does not have a valid QuickMaths discussion.", { code: "invalid_discussion" });
     if (!viewer) await connect();
-    const data = await graphql(`query QuickMathsLessonDiscussion($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){discussion(number:$number){id number title url viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}comments(last:50){totalCount nodes{id bodyText createdAt updatedAt url upvoteCount viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}author{login avatarUrl url}}}}}}`, { ...config.repository, number });
+    const data = await graphql(`query QuickMathsLessonDiscussion($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){discussion(number:$number){id number title url viewerCanReact ${REACTION_FIELDS}comments(last:50){totalCount nodes{id bodyText createdAt updatedAt url viewerCanReact ${REACTION_FIELDS}author{login avatarUrl url}}}}}}`, { ...config.repository, number });
     if (!data?.repository?.discussion?.id) throw new GitHubCommunityError("This package discussion no longer exists.", { code: "discussion_missing", status: 404 });
-    return normalizeDiscussion(data.repository.discussion, viewer?.login);
+    const discussion = data.repository.discussion;
+    const subjects = [discussion, ...(discussion.comments?.nodes ?? [])];
+    const groups = await Promise.all(subjects.map((subject) => loadReactionGroups(subject, graphql)));
+    subjects.forEach((subject, index) => { subject.reactionGroups = groups[index]; });
+    return normalizeDiscussion(discussion, viewer?.login);
   };
 
   const setReaction = async (subjectId, content, shouldReact) => {
@@ -331,12 +335,17 @@ export function createGitHubCommunityClient({
       throw new GitHubCommunityError("Choose a supported GitHub reaction.", { code: "invalid_reaction" });
     }
     const mutation = shouldReact
-      ? `mutation QuickMathsReact($id:ID!,$content:ReactionContent!){addReaction(input:{subjectId:$id,content:$content}){subject{reactionGroups{content viewerHasReacted users{totalCount}}}}}`
-      : `mutation QuickMathsRemoveReaction($id:ID!,$content:ReactionContent!){removeReaction(input:{subjectId:$id,content:$content}){subject{reactionGroups{content viewerHasReacted users{totalCount}}}}}`;
+      ? `mutation QuickMathsReact($id:ID!,$content:ReactionContent!){addReaction(input:{subjectId:$id,content:$content}){subject{${REACTION_FIELDS}}}}`
+      : `mutation QuickMathsRemoveReaction($id:ID!,$content:ReactionContent!){removeReaction(input:{subjectId:$id,content:$content}){subject{${REACTION_FIELDS}}}}`;
     const data = await graphql(mutation, { id, content });
     const subject = shouldReact ? data?.addReaction?.subject : data?.removeReaction?.subject;
     if (!Array.isArray(subject?.reactionGroups)) throw new GitHubCommunityError("GitHub did not confirm the reaction. Refresh the discussion before trying again.", { code: "reaction_failed" });
-    return { reactions: normalizeReactions(subject.reactionGroups) };
+    try {
+      const reactions = await loadReactionGroups({ ...subject, id }, graphql);
+      return { reactions, ...lessonReactionTotals(reactions) };
+    } catch (error) {
+      throw new GitHubCommunityError("GitHub saved the reaction, but vote totals could not be refreshed. Reopen the discussion to load them.", { code: "reaction_refresh_failed" });
+    }
   };
 
   const addComment = async (discussionId, body) => {
@@ -345,9 +354,10 @@ export function createGitHubCommunityClient({
     if (!id || id.length > 200) throw new GitHubCommunityError("Discussion ID is invalid.", { code: "invalid_discussion" });
     if (!cleanBody) throw new GitHubCommunityError("Write a comment first.", { code: "empty_comment" });
     if (cleanBody.length > 10_000) throw new GitHubCommunityError("Comments must be 10,000 characters or fewer.", { code: "comment_too_long" });
-    const data = await graphql(`mutation QuickMathsComment($id:ID!,$body:String!){addDiscussionComment(input:{discussionId:$id,body:$body}){comment{id bodyText createdAt updatedAt url upvoteCount viewerCanReact reactionGroups{content viewerHasReacted users{totalCount}}author{login avatarUrl url}}}}`, { id, body: cleanBody });
+    const data = await graphql(`mutation QuickMathsComment($id:ID!,$body:String!){addDiscussionComment(input:{discussionId:$id,body:$body}){comment{id bodyText createdAt updatedAt url viewerCanReact ${REACTION_FIELDS}author{login avatarUrl url}}}}`, { id, body: cleanBody });
     const comment = data?.addDiscussionComment?.comment;
     if (!comment?.id) throw new GitHubCommunityError("GitHub did not save the comment.", { code: "comment_failed" });
+    comment.reactionGroups = await loadReactionGroups(comment, graphql);
     return normalizeDiscussion({ comments: { totalCount: 1, nodes: [comment] } }, viewer?.login).comments[0];
   };
 

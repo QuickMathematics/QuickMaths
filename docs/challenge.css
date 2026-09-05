@@ -1102,9 +1102,8 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .community-emoji-button:disabled { opacity: .55; cursor: default; }
 .community-comment-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
 .community-comment-feedback .community-emoji-reactions { margin: 0; }
-.community-comment-upvote { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 7px 10px; color: var(--pine); background: var(--paper); border: 1px solid var(--line); border-radius: 9px; }
-.community-comment-upvote span { font-size: 17px; }
-.community-comment-upvote strong, .community-comment-upvote small { font-size: 10px; }
+.community-comment-feedback .community-reaction-groups { padding: 0; gap: 14px 20px; }
+.community-comment-feedback .community-reactions-label { margin-bottom: 8px; }
 .community-comments { margin: 0 28px 24px; border: 1px solid var(--line); border-radius: 14px; }
 .community-comments-heading { display: flex; justify-content: space-between; gap: 12px; padding: 12px 15px; background: var(--paper); border-bottom: 1px solid var(--line); }
 .community-comments-heading strong, .community-comments-heading a { color: var(--pine); font-size: 8px; }

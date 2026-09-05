@@ -69,14 +69,14 @@ test("confirmed lesson reactions update ranking and persist after closing the di
   const depot = createLessonDepot({ store: {}, catalogUrl: "https://example.com/catalog.json", federationUrl: "", fetchImpl: async () => Response.json(data) });
   await depot.load();
   const url = data.packages[0].community.discussion_url;
-  depot.updateDiscussionReactions(url, [{ content: "HEART", count: 15 }, { content: "CONFUSED", count: 3 }]);
+  depot.updateDiscussionReactions(url, [{ content: "HEART", count: 15, userIds: Array.from({ length: 15 }, (_, i) => `HEART_${i}`) }, { content: "CONFUSED", count: 3, userIds: Array.from({ length: 3 }, (_, i) => `CONFUSED_${i}`) }]);
   assert.deepEqual(filterDepotPackages(depot.snapshot().catalog.packages).map((pack) => pack.id), ["PACK_BIO", "PACK_MONEY"]);
   assert.equal(depot.snapshot().catalog.packages[0].downvotes, 3);
   depot.updateDiscussionReactions(url, null);
   assert.equal(depot.snapshot().catalog.packages[0].votes, 15);
-  depot.updateDiscussionReactions("https://github.com/QuickMathematics/QuickMaths/discussions/99", [{ content: "HEART", count: 99 }]);
+  depot.updateDiscussionReactions("https://github.com/QuickMathematics/QuickMaths/discussions/99", [{ content: "HEART", count: 99, userIds: Array.from({ length: 99 }, (_, i) => `HEART_${i}`) }]);
   assert.equal(depot.snapshot().catalog.packages[1].votes, 9);
-  depot.updateDiscussionReactions(url, [{ content: "HEART", count: 15 }, { content: "THUMBS_DOWN", count: 20 }, { content: "EYES", count: 1000 }]);
+  depot.updateDiscussionReactions(url, [{ content: "HEART", count: 15, userIds: Array.from({ length: 15 }, (_, i) => `HEART_${i}`) }, { content: "THUMBS_DOWN", count: 20, userIds: Array.from({ length: 20 }, (_, i) => `THUMBS_DOWN_${i}`) }, { content: "EYES", count: 1000, userIds: Array.from({ length: 1000 }, (_, i) => `EYES_${i}`) }]);
   assert.equal(depot.snapshot().catalog.packages[0].moderationScore, -5);
   assert.deepEqual(filterDepotPackages(depot.snapshot().catalog.packages).map((pack) => pack.id), ["PACK_MONEY", "PACK_BIO"]);
 });
