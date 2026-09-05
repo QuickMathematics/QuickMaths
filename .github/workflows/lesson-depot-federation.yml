@@ -1,6 +1,13 @@
 name: Refresh federated Lesson Depot
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/sync_federated_depot.mjs"
+      - "scripts/federated_depot_core.mjs"
+      - "docs/depot-validation.js"
+      - ".github/workflows/lesson-depot-federation.yml"
   discussion:
     types: [created, edited, deleted]
   discussion_comment:

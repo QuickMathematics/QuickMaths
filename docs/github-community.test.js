@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
+  GITHUB_REACTIONS,
   normalizeGitHubCommunityConfig,
   parseDiscussionNumber,
 } from "./github-community.js";
@@ -92,15 +93,16 @@ test("OAuth callback rejects mismatched state before contacting the broker", asy
   assert.equal(store.load(), null);
 });
 
-test("authenticated community client loads live votes, flags, and comments and writes every action", async () => {
+test("authenticated community client keeps native upvotes separate from reactions and comments", async () => {
   const calls = [];
   const responses = [
     { data: { viewer: { login: "ada", avatarUrl: "https://avatars.example/ada", url: "https://github.com/ada" }, repository: { id: "R_repo", nameWithOwner: "QuickMathematics/QuickMaths", hasDiscussionsEnabled: true } } },
     { data: { repository: { discussion: { id: "D_1", number: 1, title: "Estimation Lab", url: "https://github.com/QuickMathematics/QuickMaths/discussions/1", viewerCanReact: true, reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: false, users: { totalCount: 3 } }, { content: "THUMBS_DOWN", viewerHasReacted: false, users: { totalCount: 1 } }], comments: { totalCount: 1, nodes: [{ id: "C_1", bodyText: "Useful pack", createdAt: "2026-09-01T10:00:00Z", updatedAt: "2026-09-01T10:00:00Z", url: "https://github.com/comment", author: { login: "bo", avatarUrl: "", url: "https://github.com/bo" } }] } } } } },
-    { data: { addReaction: { subject: { reactionGroups: [{ content: "THUMBS_UP", viewerHasReacted: true, users: { totalCount: 4 } }] } } } },
+    { data: { addUpvote: { subject: { upvoteCount: 11, viewerHasUpvoted: true, viewerCanUpvote: true } } } },
     { data: { addReaction: { subject: { reactionGroups: [{ content: "THUMBS_DOWN", viewerHasReacted: true, users: { totalCount: 2 } }] } } } },
     { data: { addDiscussionComment: { comment: { id: "C_2", bodyText: "My note", createdAt: "2026-09-01T11:00:00Z", updatedAt: "2026-09-01T11:00:00Z", url: "https://github.com/comment2", author: { login: "ada", avatarUrl: "", url: "https://github.com/ada" } } } } },
   ];
+  Object.assign(responses[1].data.repository.discussion, { upvoteCount: 10, viewerHasUpvoted: false, viewerCanUpvote: true });
   const client = createGitHubCommunityClient({
     config,
     credentialStore: credentialStore(),
@@ -109,17 +111,19 @@ test("authenticated community client loads live votes, flags, and comments and w
     cryptoImpl: crypto,
   });
   const discussion = await client.loadDiscussion("https://github.com/QuickMathematics/QuickMaths/discussions/1");
-  assert.equal(discussion.votes, 3);
-  assert.equal(discussion.flags, 1);
+  assert.equal(discussion.upvoteCount, 10);
+  assert.equal(discussion.reactions.find((reaction) => reaction.content === "THUMBS_UP").count, 3);
+  assert.equal(discussion.reactions.find((reaction) => reaction.content === "THUMBS_DOWN").count, 1);
   assert.equal(discussion.comments[0].body, "Useful pack");
-  const vote = await client.setVote(discussion.id, true);
-  assert.deepEqual(vote, { votes: 4, viewerHasVoted: true });
-  const flag = await client.setFlag(discussion.id, true);
-  assert.deepEqual(flag, { flags: 2, viewerHasFlagged: true });
+  const vote = await client.setUpvote(discussion.id, true);
+  assert.deepEqual(vote, { upvoteCount: 11, viewerHasUpvoted: true, viewerCanUpvote: true });
+  const reaction = await client.setReaction(discussion.id, "THUMBS_DOWN", true);
+  assert.deepEqual(reaction.reactions.find((item) => item.content === "THUMBS_DOWN"), { content: "THUMBS_DOWN", count: 2, viewerHasReacted: true });
   const comment = await client.addComment(discussion.id, "My note");
   assert.equal(comment.viewerDidAuthor, true);
-  assert.match(calls[2].body.query, /addReaction/);
-  assert.match(calls[3].body.query, /THUMBS_DOWN/);
+  assert.match(calls[2].body.query, /addUpvote/);
+  assert.match(calls[3].body.query, /addReaction/);
+  assert.equal(calls[3].body.variables.content, "THUMBS_DOWN");
   assert.equal(calls[4].body.variables.body, "My note");
   assert.ok(calls.every((call) => call.options.headers.authorization === "Bearer ghu_access"));
 });
@@ -144,4 +148,93 @@ test("expired access token refreshes through the broker without leaking into Gra
   assert.equal(calls[1].options.headers.authorization, "Bearer ghu_new");
   assert.equal(calls[1].options.body.includes("ghu_new"), false);
   assert.equal(store.load().remembered, true);
+});
+
+for (const { content } of GITHUB_REACTIONS) {
+  test(`${content} can be added and removed on a discussion or comment`, async () => {
+    const calls = [];
+    const client = createGitHubCommunityClient({
+      config, credentialStore: credentialStore(), transactionStorage: new MemoryStorage(), cryptoImpl: crypto,
+      fetchImpl: async (_url, options) => {
+        const body = JSON.parse(options.body); calls.push(body);
+        const adding = body.query.includes("addReaction");
+        const subject = { reactionGroups: [{ content, viewerHasReacted: adding, users: { totalCount: adding ? 3 : 2 } }] };
+        return Response.json({ data: { [adding ? "addReaction" : "removeReaction"]: { subject } } });
+      },
+    });
+    for (const id of ["D_lesson", "DC_comment"]) {
+      const added = await client.setReaction(id, content, true);
+      const removed = await client.setReaction(id, content, false);
+      assert.deepEqual(added.reactions.find((reaction) => reaction.content === content), { content, count: 3, viewerHasReacted: true });
+      assert.deepEqual(removed.reactions.find((reaction) => reaction.content === content), { content, count: 2, viewerHasReacted: false });
+      assert.equal(added.reactions.length, 8);
+      assert.ok(added.reactions.filter((reaction) => reaction.content !== content).every((reaction) => reaction.count === 0 && !reaction.viewerHasReacted));
+    }
+    assert.match(calls[0].query, /\$content:ReactionContent!/);
+    assert.deepEqual(calls[0].variables, { id: "D_lesson", content });
+    assert.deepEqual(calls[2].variables, { id: "DC_comment", content });
+    assert.match(calls[1].query, /removeReaction/);
+  });
+}
+
+test("unsupported reactions and malformed targets are rejected before contacting GitHub", async () => {
+  let calls = 0;
+  const client = createGitHubCommunityClient({ config, credentialStore: credentialStore(), transactionStorage: new MemoryStorage(), cryptoImpl: crypto, fetchImpl: async () => { calls += 1; return Response.json({}); } });
+  for (const [id, content, active] of [["D_1", "BOGUS", true], ["", "HEART", true], ["bad id", "HEART", true], ["D_1", "HEART", "true"]]) {
+    await assert.rejects(client.setReaction(id, content, active), /invalid|supported/);
+  }
+  assert.equal(calls, 0);
+});
+
+test("missing mutation confirmation and permission errors cannot report a successful reaction", async () => {
+  for (const response of [Response.json({ data: { addReaction: null } }), Response.json({ errors: [{ message: "Reactions are disabled" }] }, { status: 403 })]) {
+    const client = createGitHubCommunityClient({ config, credentialStore: credentialStore(), transactionStorage: new MemoryStorage(), cryptoImpl: crypto, fetchImpl: async () => response });
+    await assert.rejects(client.setReaction("D_1", "HEART", true), /confirm|disabled/);
+  }
+});
+
+test("discussion and comment reactions load independently with permission and selected state", async () => {
+  const queries = [];
+  const client = createGitHubCommunityClient({
+    config, credentialStore: credentialStore(), transactionStorage: new MemoryStorage(), cryptoImpl: crypto,
+    fetchImpl: async (_url, options) => {
+      const query = JSON.parse(options.body).query; queries.push(query);
+      if (query.includes("QuickMathsCommunityViewer")) return Response.json({ data: { viewer: { login: "ada" }, repository: { id: "R_1", hasDiscussionsEnabled: true } } });
+      return Response.json({ data: { repository: { discussion: { id: "D_1", viewerCanReact: false, reactionGroups: [{ content: "ROCKET", viewerHasReacted: true, users: { totalCount: 9 } }], comments: { nodes: [{ id: "DC_1", viewerCanReact: true, reactionGroups: [{ content: "HEART", viewerHasReacted: false, users: { totalCount: 2 } }] }] } } } } });
+    },
+  });
+  const discussion = await client.loadDiscussion("https://github.com/QuickMathematics/QuickMaths/discussions/1");
+  assert.equal(discussion.viewerCanReact, false);
+  assert.equal(discussion.reactions.find((reaction) => reaction.content === "ROCKET").count, 9);
+  assert.equal(discussion.reactions.find((reaction) => reaction.content === "ROCKET").viewerHasReacted, true);
+  assert.equal(discussion.comments[0].viewerCanReact, true);
+  assert.equal(discussion.comments[0].reactions.find((reaction) => reaction.content === "HEART").count, 2);
+  assert.equal(discussion.comments[0].reactions.find((reaction) => reaction.content === "ROCKET").count, 0);
+  assert.match(queries[1], /comments\(last:50\).*viewerCanReact reactionGroups/);
+});
+
+test("native upvotes can be added and removed on discussions and comments without reaction mutations", async () => {
+  const calls = [];
+  const client = createGitHubCommunityClient({
+    config, credentialStore: credentialStore(), transactionStorage: new MemoryStorage(), cryptoImpl: crypto,
+    fetchImpl: async (_url, options) => {
+      const body = JSON.parse(options.body); calls.push(body);
+      const adding = body.query.includes("addUpvote");
+      return Response.json({ data: { [adding ? "addUpvote" : "removeUpvote"]: { subject: { upvoteCount: adding ? 11 : 10, viewerHasUpvoted: adding, viewerCanUpvote: true } } } });
+    },
+  });
+  for (const id of ["D_lesson", "DC_comment"]) {
+    assert.deepEqual(await client.setUpvote(id, true), { upvoteCount: 11, viewerHasUpvoted: true, viewerCanUpvote: true });
+    assert.deepEqual(await client.setUpvote(id, false), { upvoteCount: 10, viewerHasUpvoted: false, viewerCanUpvote: true });
+  }
+  assert.deepEqual(calls.map((call) => call.variables), [{ id: "D_lesson" }, { id: "D_lesson" }, { id: "DC_comment" }, { id: "DC_comment" }]);
+  assert.ok(calls.every((call) => !/Reaction|THUMBS/.test(call.query)));
+});
+
+test("invalid upvote targets and unconfirmed mutations never report success", async () => {
+  let calls = 0;
+  const client = createGitHubCommunityClient({ config, credentialStore: credentialStore(), transactionStorage: new MemoryStorage(), cryptoImpl: crypto, fetchImpl: async () => { calls += 1; return Response.json({ data: { addUpvote: { subject: { upvoteCount: -1 } } } }); } });
+  for (const [id, active] of [["", true], ["bad id", true], ["D_1", "true"]]) await assert.rejects(client.setUpvote(id, active), /invalid/);
+  assert.equal(calls, 0);
+  await assert.rejects(client.setUpvote("D_1", true), /confirm/);
 });

@@ -52,6 +52,28 @@ test("searches by subject, tag, and author and sorts predictably", () => {
   assert.deepEqual(filterDepotPackages(packages, { sort: "newest" }).map((pack) => pack.id), ["PACK_MONEY", "PACK_BIO"]);
 });
 
+test("popular ranking uses lesson upvotes without comment, flag, or source-status weights", () => {
+  const packs = normalizeDepotCatalog(catalog, { baseUrl: "https://example.com/" }).packages;
+  Object.assign(packs[0], { trust: "official", comments: 10000, flags: 0 });
+  Object.assign(packs[1], { trust: "new", comments: 0, flags: 10000 });
+  assert.deepEqual(filterDepotPackages(packs).map((pack) => pack.id), ["PACK_MONEY", "PACK_BIO"]);
+  packs[0].votes = 9;
+  assert.deepEqual(filterDepotPackages(packs).map((pack) => pack.id), ["PACK_BIO", "PACK_MONEY"]);
+});
+
+test("confirmed live lesson upvotes update ranking and persist after closing the discussion", async () => {
+  const data = structuredClone(catalog);
+  data.packages.forEach((pack, index) => { pack.community.discussion_url = `https://github.com/QuickMathematics/QuickMaths/discussions/${index + 1}`; });
+  const depot = createLessonDepot({ store: {}, catalogUrl: "https://example.com/catalog.json", federationUrl: "", fetchImpl: async () => Response.json(data) });
+  await depot.load();
+  depot.updateDiscussionUpvotes(data.packages[0].community.discussion_url, 15);
+  assert.deepEqual(filterDepotPackages(depot.snapshot().catalog.packages).map((pack) => pack.id), ["PACK_BIO", "PACK_MONEY"]);
+  depot.updateDiscussionUpvotes(data.packages[0].community.discussion_url, -1);
+  assert.equal(depot.snapshot().catalog.packages[0].votes, 15);
+  depot.updateDiscussionUpvotes("https://github.com/QuickMathematics/QuickMaths/discussions/99", 99);
+  assert.equal(depot.snapshot().catalog.packages[1].votes, 9);
+});
+
 test("compares common semantic versions", () => {
   assert.equal(compareVersions("1.2.0", "1.1.9"), 1);
   assert.equal(compareVersions("1.0.0", "2.0.0"), -1);

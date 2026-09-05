@@ -1,6 +1,6 @@
 # QuickMaths Lesson Depot
 
-The Lesson Depot is a zero-cost, federated marketplace of declarative QuickMaths lesson sets. Authors keep immutable packages in their own public GitHub repositories. QuickMaths combines the official catalog, automatically discovered community registries, and registries a learner subscribes to directly. Browsing and installation require no account; the optional least-privilege GitHub App provides public recommendations, flags, and comments inside the app.
+The Lesson Depot is a zero-cost, federated marketplace of declarative QuickMaths lesson sets. Authors keep immutable packages in their own public GitHub repositories. QuickMaths combines the official catalog, automatically discovered community registries, and registries a learner subscribes to directly. Browsing and installation require no account; the optional least-privilege GitHub App provides public upvotes, reactions, and comments inside the app.
 
 ## Publish inside QuickMaths
 
@@ -93,7 +93,7 @@ cd docs
 npm test
 ```
 
-The official catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. One Action maintains the legacy first-party package threads and `community.json`; the federation Action separately creates a digest-bound `[Lesson] registry/PACK@version#digest` Discussion for every accepted external release and materializes its recommendation, flag, and comment totals into `federation.json`. Connected users fetch the selected live thread only when they open its community panel.
+The official catalog contains a SHA-256 hash for each reviewed file. QuickMaths checks that hash and then runs its local lesson validator before showing the install confirmation. One Action maintains the legacy first-party package threads and `community.json`; the federation Action separately creates a digest-bound `[Lesson] registry/PACK@version#digest` Discussion for every accepted external release and materializes its GitHub upvote and comment totals into `federation.json`. Connected users fetch the selected live thread only when they open its community panel.
 
 ## Community flow
 
@@ -101,14 +101,16 @@ The official catalog contains a SHA-256 hash for each reviewed file. QuickMaths 
 2. Publish the lesson and registry in the author's own public GitHub repository.
 3. Pin the lesson URL to its content commit and the registry URL to the later registry commit, then register the feed in a `[Registry]` Discussion.
 4. Automated checks add every valid package to the federation index without a maintainer merge.
-5. Each exact version and digest receives recommendations, flags, comments, questions, and update notes.
+5. Each exact version and digest receives GitHub upvotes, emoji reactions, comments, questions, and update notes.
 
-Three recommendations with at least a four-to-one recommendation/flag ratio mark a package **Community recommended**. Two serious flags that reach at least half the recommendation count mark it **Contested** and hide it from ordinary search. Contested work is not erased: users can reveal it deliberately in **Manage lesson sources**. Explain flags in comments so authors can correct their work. A corrected release uses a new semantic version, immutable URL, digest, and review thread.
+Three GitHub upvotes on a lesson discussion mark its package **Community recommended**. Popular sorting uses only lesson discussion upvotes, with published packages ahead of concept previews. Emoji reactions, comment upvotes, comment counts, and registry status do not change that order. Emoji reactions never mark a package Contested or hide it. Counts in an open community panel update immediately; shared catalog counts refresh periodically through GitHub Actions.
 
 ## In-app community authorization
 
-The Community GitHub App is installed only on `QuickMathematics/QuickMaths` and requests only repository Discussions read/write. The user access token is separate from the optional learner-storage bridge token. QuickMaths keeps it in `sessionStorage` by default, or in `localStorage` only when the user explicitly chooses to remain connected. It is never placed in a lesson file, learner backup, WebMCP response, URL, or Git commit. A recommendation uses 👍. A serious correctness, licensing, or safety flag uses 👎 and should be accompanied by an explanatory comment.
+The lesson discussion and each comment have their own native GitHub **Upvote** control, separate from all eight emoji reactions: 👍, 👎, 😄, 🎉, 😕, ❤️, 🚀 and 👀. Counts, permissions, and selected state come from GitHub. Choosing a selected upvote or reaction again removes it. Only the lesson discussion upvotes affect Depot rankings; comment upvotes and all emoji reactions are expressive feedback. The same community sign-in is used, with no additional token or app permission.
 
-The static callback uses the OAuth authorization-code flow with state and PKCE. A free, stateless Cloudflare Worker holds the GitHub App client secret and performs only code exchange and token refresh; it has no database and retains no user token. Comments and 👍 votes are public GitHub actions attributed to the authorizing GitHub account. Disconnecting clears the browser copy, and GitHub authorization can also be revoked from GitHub settings.
+The Community GitHub App is installed only on `QuickMathematics/QuickMaths` and requests only repository Discussions read/write. The user access token is separate from the optional learner-storage bridge token. QuickMaths keeps it in `sessionStorage` by default, or in `localStorage` only when the user explicitly chooses to remain connected. It is never placed in a lesson file, learner backup, WebMCP response, URL, or Git commit.
+
+The static callback uses the OAuth authorization-code flow with state and PKCE. A free, stateless Cloudflare Worker holds the GitHub App client secret and performs only code exchange and token refresh; it has no database and retains no user token. Comments, upvotes, and reactions are public GitHub actions attributed to the authorizing GitHub account. Disconnecting clears the browser copy, and GitHub authorization can also be revoked from GitHub settings.
 
 Answer keys are necessarily present in author packages. Do not paste raw lesson files into learner tutoring conversations or reveal solutions before submission.

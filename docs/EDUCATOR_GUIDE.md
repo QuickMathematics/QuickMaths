@@ -95,7 +95,7 @@ The shell keeps navigation, identity, time, and agent status visible around the 
 | Lessons | Learner-only lesson theory, examples, and applications |
 | Mastery test | Learner-only complete authored assessment |
 | Results | Learner-only grading, reflection, review, and mastery update |
-| Lesson Depot | Federated pack discovery, provenance, preview, staging, installation, recommendations, flags, and comments |
+| Lesson Depot | Federated pack discovery, provenance, preview, staging, installation, upvotes, reactions, and comments |
 | Lesson Studio | Visual authoring and native-lesson improvement workspace |
 | Settings | Backups, curriculum files, storage, and installed content |
 | Profile badge | Opens Overview; the arrow returns to profile selection |
@@ -266,17 +266,17 @@ The Depot tab shows published and planned packages. The Studio tab opens Lesson 
 
 ### Search, filter, and sorting
 
-Search matches package names, subjects, descriptions, authors, and tags. Availability filters distinguish published packages from roadmap placeholders. Subject filters narrow the catalog. Sorting can emphasize recommendations, recency, package size, or community signal.
+Search matches package names, subjects, descriptions, authors, and tags. Availability filters distinguish published packages from roadmap placeholders. Subject filters narrow the catalog. Sort by lesson discussion upvotes, recency, or name.
 
 ### Package cards
 
-Cards inherit their designated subject palette. A card shows package identity, subject, description, version, author, tags, lesson count, source, and a compact **Official**, **Community recommended**, **New**, **Subscribed**, or **Contested** provenance badge.
+Cards inherit their designated subject palette. A card shows package identity, subject, description, version, author, tags, lesson count, source, and a compact **Official**, **Community recommended**, **New**, or **Subscribed** provenance badge.
 
 Published packages can be previewed. A bounded reader fetches the immutable lesson file, verifies its registry SHA-256 hash, validates the full schema locally, and summarizes content without exposing answer keys. If WebCrypto is unavailable, QuickMaths stops rather than treating the file as verified. Registry failures remain isolated.
 
 ### Federation and community moderation
 
-Valid publisher registries appear automatically after a `[Registry]` Discussion and automated immutable-URL, digest, namespace, schema, and graph checks; a maintainer merge is not required. Each exact package version receives a separate public review thread. Recommendations can promote it to **Community recommended**. Serious correctness, licensing, or safety flags can mark it **Contested** and hide it from normal search without erasing its public history.
+Valid publisher registries appear automatically after a `[Registry]` Discussion and automated immutable-URL, digest, namespace, schema, and graph checks; a maintainer merge is not required. Each exact package version receives a separate public review thread. Three native GitHub upvotes on its lesson discussion mark it **Community recommended**. Depot popularity uses only lesson discussion upvotes. Comment upvotes and all emoji reactions are separate feedback and never change lesson rankings or visibility.
 
 Under **Settings → Manage lesson sources**, an educator can inspect active registries, add a public GitHub registry directly, remove direct subscriptions, see isolated source errors, or deliberately reveal contested packages. A registry subscription is content discovery only and receives no access to educator or learner state.
 
@@ -288,7 +288,7 @@ WebMCP can search and stage one package or an ordered batch. It cannot install. 
 
 Optional **Connect GitHub** authorizes the QuickMaths Community GitHub App for Discussions on the QuickMaths repository. This is separate from the fine-grained storage token.
 
-Connected humans can upvote with GitHub's public thumbs-up reaction, flag serious correctness, licensing, or safety concerns with thumbs-down, and post public comments inside the app. Those actions use the human's GitHub identity and are intentionally not agent tools.
+Connected humans can add or remove native GitHub upvotes on discussions and comments, use any of the eight emoji reactions, and post public comments inside the app. Those actions use the human's GitHub identity and are intentionally not agent tools.
 
 Popularity is not evidence that a lesson is correct, complete, accessible, or appropriate for a particular learner. Review content before installation.
 

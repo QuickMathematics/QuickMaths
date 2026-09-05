@@ -36,12 +36,13 @@ test("federation submissions accept pinned GitHub form and machine-block links",
   assert.throws(() => pinnedRegistryUrl("https://github.com/alice/lessons/blob/main/quickmaths-registry.json"), /40-character/);
 });
 
-test("community moderation is deterministic and resistant to a lone flag", () => {
+test("community recommendations use native upvotes and ignore legacy reaction flags", () => {
   assert.equal(moderationStatus(0, 0), "new");
   assert.equal(moderationStatus(3, 0), "recommended");
   assert.equal(moderationStatus(8, 2), "recommended");
   assert.equal(moderationStatus(1, 1), "new");
-  assert.equal(moderationStatus(2, 2), "contested");
+  assert.equal(moderationStatus(2, 2), "new");
+  assert.equal(moderationStatus(3, 999), "recommended");
   assert.equal(moderationStatus(20, 2), "recommended");
 });
 

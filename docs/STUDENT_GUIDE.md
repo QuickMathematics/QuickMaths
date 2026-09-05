@@ -125,7 +125,7 @@ The shell keeps navigation, identity, time, retained lesson theme, and agent sta
 | Lessons | Theory, worked examples, applications, and recommended preparation |
 | Mastery test | Complete authored assessment and saved response draft |
 | Results | Grading, reflection, review, and mastery update |
-| Lesson Depot | Federated lesson-pack discovery, provenance, preview, installation, recommendations, flags, and comments |
+| Lesson Depot | Federated lesson-pack discovery, provenance, preview, installation, upvotes, reactions, and comments |
 | Lesson Studio | Friendly authoring and reversible native-lesson improvements |
 | Settings | Path mode, tutorial, curriculum, backups, storage, exports, and installed content |
 | Profile badge | Opens Dashboard; the arrow returns to profile selection |
@@ -414,19 +414,19 @@ Lesson Depot discovers optional subjects and specialist tracks from the official
 
 ### Search and filters
 
-Search matches package name, subject, description, author, and tags. Filter published packages from roadmap concepts, choose subject, and sort by recommendation, recency, name, or community signal.
+Search matches package name, subject, description, author, and tags. Filter published packages from roadmap concepts, choose subject, and sort by lesson discussion upvotes, recency, or name.
 
 ### Package cards and themes
 
-Cards use their designated subject colors. They identify version, author, lesson count, tags, source, availability, and a compact provenance badge: **Official**, **Community recommended**, **New**, **Subscribed**, or **Contested**.
+Cards use their designated subject colors. They identify version, author, lesson count, tags, source, availability, and a compact provenance badge: **Official**, **Community recommended**, **New**, or **Subscribed**.
 
 ### Preview and installation safety
 
 Published previews fetch the exact immutable package through a bounded reader, verify its registry SHA-256 hash, and run local schema, size, graph, grader, theme, and content-shape validation. If this browser cannot perform hash verification, installation stops instead of continuing unverified. You see the source and preview before confirming installation. A broken community registry is isolated and cannot prevent the official catalog or other feeds from loading.
 
-### Community recommendations and flags
+### Community upvotes and reactions
 
-Every federated package version is tied to one public GitHub Discussion and one exact SHA-256 digest. Use **Upvote** to recommend useful work. Use the flag control only for a serious correctness, licensing, or safety concern, then explain it in a comment. Valid submissions appear immediately as **New**; community support can promote them, while significant negative feedback marks them **Contested** and hides them from ordinary search without deleting them.
+Every federated package version is tied to one public GitHub Discussion and one exact SHA-256 digest. Use its native GitHub **Upvote** control to recommend useful work. Comments have their own upvotes, and both lessons and comments support all eight GitHub emoji reactions. Only upvotes on the lesson discussion affect Depot rankings. Comment upvotes and emoji reactions are separate feedback; they never change lesson rankings or visibility. Valid submissions appear as **New**, and three lesson discussion upvotes mark them **Community recommended**.
 
 ### Advanced lesson sources
 
@@ -440,7 +440,7 @@ An agent can stage one pack or an ordered batch for review. It cannot install. Q
 
 ### Upvotes and comments
 
-Optional **Connect GitHub** authorizes the separate QuickMaths Community GitHub App for public Discussions on the QuickMaths repository. Connected humans can upvote, flag a serious concern, and comment inside the app. These actions are public, use your GitHub identity, and are not WebMCP tools.
+Optional **Connect GitHub** authorizes the separate QuickMaths Community GitHub App for public Discussions on the QuickMaths repository. Connected humans can upvote discussions or comments, add emoji reactions, and comment inside the app. These actions are public, use your GitHub identity, and are not WebMCP tools.
 
 Community authorization is different from the fine-grained token used for private storage.
 
@@ -476,7 +476,7 @@ QuickMaths checks the WebMCP page capability rather than trusting the browser na
 
 The handoff URL contains no token, answers, or workspace data. Browser storage is separate, so restore the backup or enter the same fine-grained token privately in the in-app QuickMaths storage form. Credential safety, recovery rules, and detailed tutoring policy live in the manifest rather than the prompt. After the first attributed agent action, the profile remembers that an agent has participated and hides the one-time starter prompt.
 
-On a fresh workspace, the agent first asks whether the human wants to learn or design a custom curriculum. For learning, it checks whether an existing Workspace Storage repository should be restored before asking for a new profile name. For curriculum design, it offers to help create the curriculum, guides the human to the **Educator** landing-page path, then uses `create_curriculum` only after the educator profile exists and the human approves the curriculum name and intent. After profile creation, it strongly recommends private Workspace Storage for durable cross-device recovery and agent handoff, then offers the separate optional Community connection if the human wants to upvote, flag, or comment on Depot packages.
+On a fresh workspace, the agent first asks whether the human wants to learn or design a custom curriculum. For learning, it checks whether an existing Workspace Storage repository should be restored before asking for a new profile name. For curriculum design, it offers to help create the curriculum, guides the human to the **Educator** landing-page path, then uses `create_curriculum` only after the educator profile exists and the human approves the curriculum name and intent. After profile creation, it strongly recommends private Workspace Storage for durable cross-device recovery and agent handoff, then offers the separate optional Community connection if the human wants to upvote, react, or comment on Depot packages.
 
 With a learner selected, the agent begins with `get_app_state`, `get_progress_summary`, and `get_learning_context` as needed. Its voice is conversational, curious, lightly quirky, and Socratic: one focused question or useful hint at a time, without becoming childish or revealing the answer. Repeated calls receive a compact policy ID and revision. Full learner-visible educator guidance is available from `get_agent_guide` when the revision changes or the task requires it.
 

@@ -9,7 +9,7 @@ import {
   DEPOT_DISCUSSIONS_URL,
   DEPOT_REPOSITORY_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260905-depot-fixes-v1";
+} from "./lesson-depot.js?v=20260905-upvotes-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
@@ -20,7 +20,8 @@ import {
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
-} from "./github-community.js?v=20260903-federation-v1";
+  GITHUB_REACTIONS,
+} from "./github-community.js?v=20260905-reactions-v1";
 import { fetchTextLimited, githubFileRawUrl, readFileTextLimited } from "./safe-fetch.js?v=20260902-python-v1";
 import { cancelActivePythonGraders, gradePythonProgram, visiblePythonTests } from "./python-grader.js?v=20260903-sandbox-v2";
 import {
@@ -552,7 +553,7 @@ function tutorialVisual(type, snapshot) {
   }
   if (type === "map") return `<div class="tour-map-preview"><div class="tour-map-controls"><strong>All subjects</strong><span>Connected by default</span><b>✦ Plan mode</b><i>− &nbsp; 100% &nbsp; +</i></div><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
   if (type === "loop") return `<div class="tour-loop-preview"><article><span>01</span><b>Read</b><small>Theory and examples</small></article><i>→</i><article><span>02</span><b>Test</b><small>Answers and shown work</small></article><i>→</i><article><span>03</span><b>Reflect</b><small>Confidence and difficulty</small></article><i>→</i><article><span>04</span><b>Review</b><small>Mastery and next date</small></article></div><div class="tour-work-preview"><code>2x + 5 = 13<br>2x = 8<br>x = 4</code><span>Step check passed</span></div>`;
-  if (type === "depot") return `<div class="tour-depot-preview"><header><div><small>Community curriculum</small><strong>Lesson Depot</strong></div><span>Browse · discuss · install</span></header><div><article class="is-geography"><span>Geography</span><strong>Field Cartography</strong><small>3 lessons · Published</small><footer><b>👍 18</b><b>◯ 6</b></footer></article><article class="is-biology"><span>Biology</span><strong>Cell Systems</strong><small>Concept preview</small><footer><b>Roadmap</b></footer></article></div><p><b>✓</b> Packages are hash-checked and validated before installation.</p></div>`;
+  if (type === "depot") return `<div class="tour-depot-preview"><header><div><small>Community curriculum</small><strong>Lesson Depot</strong></div><span>Browse · discuss · install</span></header><div><article class="is-geography"><span>Geography</span><strong>Field Cartography</strong><small>3 lessons · Published</small><footer><b>↑ 18</b><b>◯ 6</b></footer></article><article class="is-biology"><span>Biology</span><strong>Cell Systems</strong><small>Concept preview</small><footer><b>Roadmap</b></footer></article></div><p><b>✓</b> Packages are hash-checked and validated before installation.</p></div>`;
   if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent handoff</small><strong>Tutor in the loop</strong></div><i>${webMcpAvailable(document.modelContext) ? "Agent-ready" : "Move safely"}</i></div>${agentHandoffMarkup(snapshot, { compact: true })}<div class="tour-tool-row"><code>get_agent_guide</code><code>get_progress_summary</code><code>record_tutor_feedback</code></div></div>`;
   return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, subjects, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>↔</span><div><strong>Optional GitHub Bridge</strong><small>Checkpoint learner state and exchange agent updates across sessions</small></div><b>Sync</b></article><article><span>✎</span><div><strong>Lesson Studio</strong><small>Create lesson packs or install reversible improvements over native lessons</small></div><b>Create / improve</b></article></div>`;
 }
@@ -2047,9 +2048,23 @@ function formatCommunityDate(value) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
+function renderCommunityReactions(subject, { comment = false } = {}) {
+  return `<div class="community-emoji-reactions" role="group" aria-label="${comment ? `Reactions to comment by ${escapeHtml(subject.author)}` : "Reactions to this lesson"}">${GITHUB_REACTIONS.map(({ content, emoji, label }) => {
+    const reaction = subject.reactions?.find((item) => item.content === content);
+    const count = reaction?.count ?? 0;
+    const selected = reaction?.viewerHasReacted === true;
+    const description = `${selected ? "Remove" : "Add"} ${label} reaction · ${count}`;
+    return `<button type="button" class="community-emoji-button" data-depot-action="community-react" data-reaction-content="${content}" ${comment ? `data-comment-id="${escapeHtml(subject.id)}"` : ""} aria-pressed="${selected}" aria-label="${escapeHtml(description)}" title="${escapeHtml(description)}" ${communityUi.busy || subject.viewerCanReact === false ? "disabled" : ""}><span aria-hidden="true">${emoji}</span><b>${count}</b></button>`;
+  }).join("")}</div>`;
+}
+
+function renderCommunityUpvote(subject, { comment = false } = {}) {
+  return `<button class="${comment ? "community-comment-upvote" : "community-vote-button"}" type="button" data-depot-action="community-upvote" ${comment ? `data-comment-id="${escapeHtml(subject.id)}"` : ""} aria-pressed="${subject.viewerHasUpvoted === true}" aria-label="${subject.viewerHasUpvoted ? "Remove" : "Add"} GitHub upvote${comment ? " on this comment" : " on this discussion"}" ${communityUi.busy || subject.viewerCanUpvote === false ? "disabled" : ""}><span aria-hidden="true">↑</span><strong>${subject.viewerHasUpvoted ? "Upvoted" : "Upvote"}</strong><small>${subject.upvoteCount ?? 0}${comment ? "" : " GitHub upvotes"}</small></button>`;
+}
+
 function renderCommunityComment(comment) {
   const body = escapeHtml(comment.body).replaceAll("\n", "<br>");
-  return `<article class="community-comment"><div class="community-comment-avatar" aria-hidden="true">${escapeHtml(comment.author.slice(0, 1).toUpperCase() || "?")}</div><div><header><strong>${escapeHtml(comment.author)}</strong>${comment.viewerDidAuthor ? "<span>You</span>" : ""}<time datetime="${escapeHtml(comment.createdAt)}">${escapeHtml(formatCommunityDate(comment.createdAt))}</time></header><p>${body}</p><a href="${escapeHtml(comment.url)}" target="_blank" rel="noopener">View on GitHub ↗</a></div></article>`;
+  return `<article class="community-comment"><div class="community-comment-avatar" aria-hidden="true">${escapeHtml(comment.author.slice(0, 1).toUpperCase() || "?")}</div><div><header><strong>${escapeHtml(comment.author)}</strong>${comment.viewerDidAuthor ? "<span>You</span>" : ""}<time datetime="${escapeHtml(comment.createdAt)}">${escapeHtml(formatCommunityDate(comment.createdAt))}</time></header><p>${body}</p><a href="${escapeHtml(comment.url)}" target="_blank" rel="noopener">View on GitHub ↗</a><div class="community-comment-feedback">${renderCommunityUpvote(comment, { comment: true })}${renderCommunityReactions(comment, { comment: true })}</div></div></article>`;
 }
 
 function renderDepotCommunityPanel() {
@@ -2068,7 +2083,7 @@ function renderDepotCommunityPanel() {
     content = `<div class="community-connect-copy"><p class="eyebrow">Discussion unavailable</p><h2>GitHub did not return this conversation.</h2><p class="community-error" role="alert">${escapeHtml(communityUi.error)}</p><div><button class="button button-primary" type="button" data-depot-action="community-refresh">Try again</button>${external}</div></div>`;
   } else if (communityUi.discussion) {
     const discussion = communityUi.discussion;
-    content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. Recommend useful work, flag serious correctness, licensing, or safety concerns, and explain flags in a public comment.</p></div><div class="community-reaction-actions"><button class="community-vote-button" type="button" data-depot-action="community-vote" aria-pressed="${discussion.viewerHasVoted}" ${communityUi.busy ? "disabled" : ""}><span>👍</span><strong>${discussion.viewerHasVoted ? "Upvoted" : "Upvote"}</strong><small>${discussion.votes} vote${discussion.votes === 1 ? "" : "s"}</small></button><button class="community-flag-button" type="button" data-depot-action="community-flag" aria-pressed="${discussion.viewerHasFlagged}" ${communityUi.busy ? "disabled" : ""}><span>⚑</span><strong>${discussion.viewerHasFlagged ? "Flagged" : "Flag concern"}</strong><small>${discussion.flags} flag${discussion.flags === 1 ? "" : "s"}</small></button></div></div><div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, review, or reason for a flag…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
+    content = `<div class="community-discussion-heading"><div><p class="eyebrow">Live GitHub Discussion</p><h2>${escapeHtml(discussion.title || pack.name)}</h2><p>Participating as <strong>${escapeHtml(connection.viewer?.login ?? "GitHub user")}</strong>. Upvote this discussion, react with an emoji, or leave a public comment.</p></div><div class="community-reaction-actions">${renderCommunityUpvote(discussion)}</div></div><section class="community-extra-reactions"><div class="community-reactions-label"><strong>Reactions</strong></div>${renderCommunityReactions(discussion)}</section><div class="community-comments"><div class="community-comments-heading"><strong>${discussion.commentCount} comment${discussion.commentCount === 1 ? "" : "s"}</strong><a href="${escapeHtml(discussion.url)}" target="_blank" rel="noopener">Full thread ↗</a></div>${discussion.comments.length ? discussion.comments.map(renderCommunityComment).join("") : `<div class="community-empty">No comments yet. Start the conversation.</div>`}</div><form id="community-comment-form" class="community-comment-form"><label for="community-comment-body">Add a public comment</label><textarea id="community-comment-body" name="body" maxlength="10000" rows="4" placeholder="Question, correction, teaching note, or review…" required>${escapeHtml(communityUi.commentDraft)}</textarea><div><small>Your GitHub username and comment will be public.</small><button class="button button-primary" type="submit" ${communityUi.busy ? "disabled" : ""}>${communityUi.busy ? "Sending…" : "Post comment"}</button></div></form>`;
   }
   return `<aside class="depot-community-panel" id="depot-community-panel"><header><div><span>Community</span><strong>${escapeHtml(pack.name)}</strong></div><button class="quiet-button" type="button" data-depot-action="community-close" aria-label="Close lesson discussion">Close ×</button></header>${content}<footer><span>Community authorization is separate from Workspace Storage.</span>${connection.connected ? `<button class="quiet-button danger-link" type="button" data-depot-action="community-disconnect">Disconnect GitHub</button>` : ""}</footer></aside>`;
 }
@@ -2087,6 +2102,7 @@ async function loadDepotDiscussion() {
     const discussion = await githubCommunity.loadDiscussion(pack.discussionUrl);
     if (!isCurrent()) return;
     communityUi.discussion = discussion;
+    lessonDepot.updateDiscussionUpvotes(pack.discussionUrl, discussion.upvoteCount);
     communityUi.phase = "ready";
   } catch (error) {
     if (!isCurrent()) return;
@@ -2150,7 +2166,7 @@ function renderLessonDepot(snapshot) {
     ${renderLessonHubTabs("depot")}
     <header class="page-head depot-head"><div><p class="eyebrow">Free · open · federated</p><h1>Lesson Depot</h1><p>Install lessons published from independent community repositories alongside the official catalog. Every exact download is hash-checked and run through the same local validator before you can install it.</p></div><div class="page-actions">${connection.configured ? `<button class="button ${connection.connected ? "button-secondary" : "button-outline"}" type="button" data-depot-action="community-connect">${connection.connected ? `GitHub · ${escapeHtml(connection.viewer?.login ?? "connected")}` : "Connect GitHub"}</button>` : `<a class="button button-outline" href="${DEPOT_DISCUSSIONS_URL}" target="_blank" rel="noopener">Community ↗</a>`}<button class="button button-primary" type="button" data-depot-action="publish">Publish a lesson</button></div></header>
     ${renderDepotCommunityPanel()}
-    <section class="depot-trust-strip" aria-label="Lesson Depot safety model"><span><b>1</b><strong>Authors publish</strong><small>Their own GitHub repository</small></span><i>→</i><span><b>2</b><strong>Community reviews</strong><small>Recommend, flag, discuss</small></span><i>→</i><span><b>3</b><strong>QuickMaths verifies</strong><small>Hash, schema, full graph</small></span><i>→</i><span><b>4</b><strong>You approve</strong><small>Local installation only</small></span></section>
+    <section class="depot-trust-strip" aria-label="Lesson Depot safety model"><span><b>1</b><strong>Authors publish</strong><small>Their own GitHub repository</small></span><i>→</i><span><b>2</b><strong>Community reviews</strong><small>Upvote, react, discuss</small></span><i>→</i><span><b>3</b><strong>QuickMaths verifies</strong><small>Hash, schema, full graph</small></span><i>→</i><span><b>4</b><strong>You approve</strong><small>Local installation only</small></span></section>
     ${preview ? `<aside class="depot-preview"><div><p class="eyebrow">Validated preview · ${escapeHtml(depotTrustLabel(preview.pack))}</p><h2>${escapeHtml(preview.pack.name)}</h2><p>${escapeHtml(preview.pack.description)}</p><div class="depot-preview-facts"><span>${preview.preview.skillCount}<small>Lessons</small></span><span>${preview.preview.problemCount}<small>Questions</small></span><span>${escapeHtml(preview.preview.subjectName)}<small>Subject</small></span><span>${escapeHtml(preview.pack.sourceName)}<small>Source</small></span></div></div><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(preview.pack.id)}" data-pack-version="${escapeHtml(preview.pack.version)}">Install this pack</button><button class="quiet-button" data-depot-action="close-preview">Close preview</button></aside>` : ""}
     <section class="depot-toolbar" aria-label="Filter lesson packages">
       <label><span>Search</span><input id="depot-search" type="search" value="${escapeHtml(depot.query)}" placeholder="Percentages, biology, author…"></label>
@@ -2160,21 +2176,20 @@ function renderLessonDepot(snapshot) {
     </section>
     ${depot.phase === "loading" ? `<section class="depot-state"><span class="depot-spinner" aria-hidden="true"></span><h2>Opening the catalog…</h2><p>The app itself remains fully local-first.</p></section>` : ""}
     ${depot.phase === "error" ? `<section class="depot-state is-error"><span>!</span><h2>The catalog is unavailable</h2><p>${escapeHtml(depot.error)}</p><button class="button button-primary" data-depot-action="reload">Try again</button></section>` : ""}
-    ${depot.phase === "ready" ? `<section class="depot-results-heading"><div><p class="eyebrow">Catalog</p><h2>${packages.length} package${packages.length === 1 ? "" : "s"}</h2></div><small>${connection.connected ? "Open a package’s community panel for live recommendations, flags, and comments." : "Community totals are cached from GitHub Discussions. Connect GitHub to participate inside the app."}</small></section><section id="lesson-depot" class="depot-grid">${packages.map((pack) => {
+    ${depot.phase === "ready" ? `<section class="depot-results-heading"><div><p class="eyebrow">Catalog</p><h2>${packages.length} package${packages.length === 1 ? "" : "s"}</h2></div><small>${connection.connected ? "Open a package’s community panel for live upvotes, reactions, and comments." : "Community totals are cached from GitHub Discussions. Connect GitHub to participate inside the app."}</small></section><section id="lesson-depot" class="depot-grid">${packages.map((pack) => {
       const installed = installedById.get(pack.id);
       const busy = depot.installingId === pack.id;
       const isPreview = pack.availability === "preview";
       const live = communityUi.activePack?.id === pack.id && communityUi.activePack?.version === pack.version ? communityUi.discussion : null;
-      const votes = live?.votes ?? pack.votes;
-      const flags = live?.flags ?? pack.flags;
+      const votes = live?.upvoteCount ?? pack.votes;
       const comments = live?.commentCount ?? pack.comments;
       const hasDiscussion = /\/discussions\/\d+$/.test(pack.discussionUrl ?? "");
       const communityControl = isPreview
         ? `<button type="button" class="depot-preview-community" disabled><span>◇</span><b>Discussion opens when published</b></button>`
         : connection.configured && hasDiscussion
-          ? `<button type="button" data-depot-action="community-open" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" aria-label="Recommend, flag, or discuss ${escapeHtml(pack.name)} inside QuickMaths"><span>👍 ${votes}</span><span>⚑ ${flags}</span><span>◯ ${comments}</span><b>${connection.connected ? "Join discussion" : "Review & discuss"}</b></button>`
+          ? `<button type="button" data-depot-action="community-open" data-pack-id="${escapeHtml(pack.id)}" data-pack-version="${escapeHtml(pack.version)}" aria-label="Upvote, react, or discuss ${escapeHtml(pack.name)} inside QuickMaths"><span>↑ ${votes}</span><span>◯ ${comments}</span><b>${connection.connected ? "Join discussion" : "Review & discuss"}</b></button>`
           : hasDiscussion
-            ? `<a href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener" aria-label="Recommend, flag, or comment on ${escapeHtml(pack.name)} on GitHub"><span>👍 ${votes}</span><span>⚑ ${flags}</span><span>◯ ${comments}</span><b>Review on GitHub ↗</b></a>`
+            ? `<a href="${escapeHtml(pack.discussionUrl)}" target="_blank" rel="noopener" aria-label="Upvote, react, or comment on ${escapeHtml(pack.name)} on GitHub"><span>↑ ${votes}</span><span>◯ ${comments}</span><b>Review on GitHub ↗</b></a>`
             : `<button type="button" disabled><span>◇</span><b>Community review pending</b></button>`;
       const actions = isPreview
         ? `<button class="button button-outline" disabled>Concept preview</button><button class="button button-primary" disabled>Coming soon</button>`
@@ -2834,27 +2849,53 @@ document.addEventListener("click", async (event) => {
         window.location.assign(authorizationUrl);
       }
       if (actionName === "community-refresh") await loadDepotDiscussion();
-      if (actionName === "community-vote" && communityUi.discussion && !communityUi.busy) {
+      if (actionName === "community-upvote" && communityUi.discussion && !communityUi.busy) {
         const requestId = communityUi.requestId;
         const discussion = communityUi.discussion;
+        const commentId = depotAction.dataset.commentId;
+        const subject = commentId ? discussion.comments.find((comment) => comment.id === commentId) : discussion;
+        if (!subject || subject.viewerCanUpvote === false) return;
         communityUi.busy = true; rerenderDepotCommunity();
         try {
-          const vote = await githubCommunity.setVote(discussion.id, !discussion.viewerHasVoted);
+          const result = await githubCommunity.setUpvote(subject.id, !subject.viewerHasUpvoted);
           if (requestId !== communityUi.requestId) return;
-          communityUi.discussion = { ...discussion, ...vote };
-          showToast(vote.viewerHasVoted ? "Lesson upvote saved on GitHub." : "GitHub upvote removed.");
-        } finally { if (requestId === communityUi.requestId) { communityUi.busy = false; rerenderDepotCommunity(); } }
+          communityUi.discussion = commentId
+            ? { ...discussion, comments: discussion.comments.map((comment) => comment.id === commentId ? { ...comment, ...result } : comment) }
+            : { ...discussion, ...result };
+          if (!commentId) lessonDepot.updateDiscussionUpvotes(communityUi.activePack.discussionUrl, result.upvoteCount);
+          showToast(result.viewerHasUpvoted ? "GitHub upvote saved." : "GitHub upvote removed.");
+        } finally {
+          if (requestId === communityUi.requestId) {
+            communityUi.busy = false; rerenderDepotCommunity();
+            const buttons = [...(document.querySelectorAll?.('[data-depot-action="community-upvote"]') ?? [])];
+            buttons.find((button) => button.dataset.commentId === commentId)?.focus();
+          }
+        }
       }
-      if (actionName === "community-flag" && communityUi.discussion && !communityUi.busy) {
+      if (actionName === "community-react" && communityUi.discussion && !communityUi.busy) {
         const requestId = communityUi.requestId;
         const discussion = communityUi.discussion;
+        const commentId = depotAction.dataset.commentId;
+        const subject = commentId ? discussion.comments.find((comment) => comment.id === commentId) : discussion;
+        const content = depotAction.dataset.reactionContent;
+        const definition = GITHUB_REACTIONS.find((reaction) => reaction.content === content);
+        if (!subject || subject.viewerCanReact === false || !definition) return;
+        const selected = subject.reactions?.find((reaction) => reaction.content === content)?.viewerHasReacted === true;
         communityUi.busy = true; rerenderDepotCommunity();
         try {
-          const flag = await githubCommunity.setFlag(discussion.id, !discussion.viewerHasFlagged);
+          const result = await githubCommunity.setReaction(subject.id, content, !selected);
           if (requestId !== communityUi.requestId) return;
-          communityUi.discussion = { ...discussion, ...flag };
-          showToast(flag.viewerHasFlagged ? "Concern flagged. Add a comment explaining it." : "GitHub flag removed.");
-        } finally { if (requestId === communityUi.requestId) { communityUi.busy = false; rerenderDepotCommunity(); } }
+          communityUi.discussion = commentId
+            ? { ...discussion, comments: discussion.comments.map((comment) => comment.id === commentId ? { ...comment, ...result } : comment) }
+            : { ...discussion, ...result };
+          showToast(`${definition.emoji} ${selected ? "Reaction removed from" : "Reaction saved on"} GitHub.`);
+        } finally {
+          if (requestId === communityUi.requestId) {
+            communityUi.busy = false; rerenderDepotCommunity();
+            const buttons = [...(document.querySelectorAll?.('[data-depot-action="community-react"]') ?? [])];
+            buttons.find((button) => button.dataset.reactionContent === content && button.dataset.commentId === commentId)?.focus();
+          }
+        }
       }
       if (actionName === "community-disconnect") {
         githubCommunity?.disconnect();

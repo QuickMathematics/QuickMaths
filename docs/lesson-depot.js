@@ -12,8 +12,10 @@ const DEFAULT_CARD_THEME = Object.freeze({
   paperLight: "#fffdf8", primary: "#153f36", primaryAlt: "#205c4e",
   tint: "#b8d9c9", highlight: "#dceca9", accent: "#df755b",
 });
-export const DEFAULT_DEPOT_CATALOG = "./lesson-depot/catalog.json?v=20260902-geography-depot-v2";
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+export const DEFAULT_DEPOT_CATALOG = LOCAL_HOSTS.has(globalThis.location?.hostname)
+  ? "./lesson-depot/catalog.json?v=20260905-upvotes-v1"
+  : "https://raw.githubusercontent.com/QuickMathematics/QuickMaths/main/docs/lesson-depot/catalog.json";
 export const DEFAULT_DEPOT_FEDERATION = LOCAL_HOSTS.has(globalThis.location?.hostname)
   ? "./lesson-depot/federation.json?v=20260903-federation-v1"
   : "https://raw.githubusercontent.com/QuickMathematics/QuickMaths/main/docs/lesson-depot/federation.json";
@@ -200,7 +202,7 @@ export function normalizeDepotCatalog(input, {
       || safeHttpUrl(source?.discussionUrl, resolvedCatalogUrl)
       || (sourceTrust === "official" ? DEPOT_DISCUSSIONS_URL : "");
     const votes = sourceTrust === "official" ? cleanCount(community.votes) : cleanCount(moderation.votes);
-    const flags = sourceTrust === "official" ? 0 : cleanCount(moderation.flags);
+    const flags = 0; // Emoji reactions no longer count as moderation flags.
     const comments = sourceTrust === "official" ? cleanCount(community.comments) : cleanCount(moderation.comments);
     return {
       id,
@@ -230,7 +232,7 @@ export function normalizeDepotCatalog(input, {
       sourceName,
       sourceHomepage,
       sourceCatalogUrl: resolvedCatalogUrl,
-      moderationScore: Math.max(-1_000_000, votes - (flags * 2)),
+      moderationScore: votes,
     };
   });
   return {
@@ -258,14 +260,14 @@ export function normalizeFederationIndex(input, { federationUrl = DEFAULT_DEPOT_
     const catalogUrl = canonicalRegistryUrl(entry.catalog_url, resolvedFederationUrl);
     if (!catalogUrl) throw new Error(`Federated registry ${id} has an unsupported catalog URL.`);
     if (!immutableRegistryUrl(catalogUrl)) throw new Error(`Federated registry ${id} is not pinned to a complete Git commit SHA.`);
-    const status = ["recommended", "new", "contested"].includes(entry.status) ? entry.status : "new";
+    const status = ["recommended", "new"].includes(entry.status) ? entry.status : "new";
     const packages = Array.isArray(entry.packages) ? entry.packages.slice(0, 200).map((item) => ({
       id: optionalText(item?.id, 60),
       version: optionalText(item?.version, 40),
       sha256: /^[a-f0-9]{64}$/i.test(item?.sha256 ?? "") ? item.sha256.toLowerCase() : "",
-      status: ["recommended", "new", "contested"].includes(item?.status) ? item.status : status,
+      status: ["recommended", "new"].includes(item?.status) ? item.status : status,
       votes: cleanCount(item?.votes),
-      flags: cleanCount(item?.flags),
+      flags: 0,
       comments: cleanCount(item?.comments),
       discussion_url: safeHttpUrl(item?.discussion_url, resolvedFederationUrl),
     })).filter((item) => item.id && item.version && item.sha256) : [];
@@ -305,8 +307,7 @@ export function filterDepotPackages(packages, { query = "", sort = "popular", su
   return filtered.sort((a, b) => {
     if (sort === "newest") return String(b.updatedAt || b.publishedAt).localeCompare(String(a.updatedAt || a.publishedAt)) || a.name.localeCompare(b.name);
     if (sort === "name") return a.name.localeCompare(b.name);
-    const trustWeight = (pack) => ({ official: 4, recommended: 3, new: 2, subscribed: 1, contested: 0, preview: -1 }[pack.trust] ?? 0);
-    return (trustWeight(b) - trustWeight(a)) || (b.moderationScore - a.moderationScore) || (b.comments - a.comments) || a.name.localeCompare(b.name);
+    return Number(a.availability === "preview") - Number(b.availability === "preview") || (b.votes - a.votes) || a.name.localeCompare(b.name);
   });
 }
 
@@ -625,5 +626,15 @@ export function createLessonDepot({
 
   const closePreview = () => { state.preview = null; emit(); };
 
-  return { snapshot, load, previewPack, installPack, search, stagePack, stagePacks, setFilters, addRegistry, removeRegistry, closePreview };
+  const updateDiscussionUpvotes = (discussionUrl, upvoteCount) => {
+    if (!/\/discussions\/\d+$/.test(discussionUrl ?? "") || !Number.isInteger(upvoteCount) || upvoteCount < 0) return;
+    for (const pack of state.catalog?.packages ?? []) {
+      if (pack.discussionUrl !== discussionUrl) continue;
+      pack.votes = upvoteCount;
+      pack.moderationScore = upvoteCount;
+      if (["new", "recommended"].includes(pack.trust)) pack.trust = upvoteCount >= 3 ? "recommended" : "new";
+    }
+  };
+
+  return { snapshot, load, previewPack, installPack, search, stagePack, stagePacks, setFilters, addRegistry, removeRegistry, closePreview, updateDiscussionUpvotes };
 }

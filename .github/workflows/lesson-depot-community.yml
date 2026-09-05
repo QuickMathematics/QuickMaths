@@ -12,7 +12,7 @@ on:
   discussion_comment:
     types: [created, edited, deleted]
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "17,47 * * * *"
   workflow_dispatch:
 
 permissions:

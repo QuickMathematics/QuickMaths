@@ -5,7 +5,10 @@ import { createHash, webcrypto } from "node:crypto";
 import { runInNewContext } from "node:vm";
 import { createQuickMathsStore } from "./challenge-core.js";
 import { createLessonDepot } from "./lesson-depot.js";
-import { validateFederatedReleases } from "../scripts/federated_depot_core.mjs";
+import { normalizeDepotCatalog } from "./lesson-depot.js";
+import { fetchTextLimited } from "./safe-fetch.js";
+import * as federationCore from "../scripts/federated_depot_core.mjs";
+const { validateFederatedReleases } = federationCore;
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
 const example = JSON.parse(readFileSync(new URL("./lesson-set-example.json", import.meta.url), "utf8"));
@@ -188,8 +191,9 @@ function communityHarness() {
   const packs = ["A", "B"].map((id) => ({ id, version: "1", discussionUrl: `discussion-${id}` }));
   const context = {
     communityUi: state,
+    GITHUB_REACTIONS: [{ content: "HEART", emoji: "❤️" }, { content: "THUMBS_UP", emoji: "👍" }],
     githubCommunity: { configured: true, disconnect() {}, loadDiscussion: (url) => { const request = { url, ...deferred() }; pending.push(request); return request.promise; } },
-    lessonDepot: { snapshot: () => ({ catalog: { packages: packs } }) },
+    lessonDepot: { snapshot: () => ({ catalog: { packages: packs } }), updateDiscussionUpvotes() {} },
     communityConnection: () => ({ connected: true }), rerenderDepotCommunity() {}, showToast() {},
     currentSnapshot: { ui: { route: "depot" } },
     document: { querySelector: () => null, addEventListener: (type, handler) => handlers.set(type, handler) },
@@ -200,7 +204,7 @@ function communityHarness() {
     const start = appSource.indexOf(`document.addEventListener("${type}"`);
     runInNewContext(appSource.slice(start, appSource.indexOf(`document.addEventListener("${next}"`, start)), context);
   }
-  const click = (action) => handlers.get("click")({ preventDefault() {}, target: { closest: (selector) => selector === "[data-depot-action]" ? { dataset: { depotAction: action } } : null } });
+  const click = (action, dataset = {}) => handlers.get("click")({ preventDefault() {}, target: { closest: (selector) => selector === "[data-depot-action]" ? { dataset: { depotAction: action, ...dataset } } : null } });
   const comment = (body) => handlers.get("submit")({ preventDefault() {}, target: { id: "community-comment-form", body } });
   return { context, state, pending, click, comment };
 }
@@ -241,19 +245,19 @@ test("closing or disconnecting a community panel invalidates its pending respons
   }
 });
 
-test("pending votes and flags cannot update a different lesson's discussion", async () => {
-  for (const [action, method, field] of [["community-vote", "setVote", "votes"], ["community-flag", "setFlag", "flags"]]) {
+test("pending discussion and comment upvotes cannot update a different lesson", async () => {
+  for (const commentId of [undefined, "C_1"]) {
     const { context, state, pending, click } = communityHarness();
     const opening = context.openDepotCommunity("A", "1");
-    pending[0].resolve({ id: "DISCUSSION_A", votes: 0, flags: 0 }); await opening;
+    pending[0].resolve({ id: "DISCUSSION_A", upvoteCount: 0, comments: [{ id: "C_1", upvoteCount: 0 }] }); await opening;
     const gate = deferred();
-    context.githubCommunity[method] = (id) => { assert.equal(id, "DISCUSSION_A"); return gate.promise; };
-    const saving = click(action);
+    context.githubCommunity.setUpvote = (id) => { assert.equal(id, commentId ?? "DISCUSSION_A"); return gate.promise; };
+    const saving = click("community-upvote", { commentId });
     const switching = context.openDepotCommunity("B", "1");
-    pending[1].resolve({ id: "DISCUSSION_B", votes: 0, flags: 0 }); await switching;
-    gate.resolve({ [field]: 1 }); await saving;
+    pending[1].resolve({ id: "DISCUSSION_B", upvoteCount: 0 }); await switching;
+    gate.resolve({ upvoteCount: 1 }); await saving;
     assert.equal(state.discussion.id, "DISCUSSION_B");
-    assert.equal(state.discussion[field], 0);
+    assert.equal(state.discussion.upvoteCount, 0);
     assert.equal(state.busy, false);
   }
 });
@@ -273,6 +277,111 @@ test("a pending comment stays with its original discussion when the lesson chang
   assert.equal(state.discussion.id, "DISCUSSION_B");
   assert.equal(state.discussion.commentCount, 0);
   assert.equal(state.commentDraft, "Draft for B");
+  assert.equal(state.busy, false);
+});
+
+test("comment reactions update only the selected comment and never lesson upvotes", async () => {
+  const { context, state, pending, click } = communityHarness();
+  const loading = context.openDepotCommunity("A", "1");
+  pending[0].resolve({ id: "DISCUSSION_A", upvoteCount: 3, comments: [{ id: "C_1", reactions: [] }, { id: "C_2", reactions: [] }] }); await loading;
+  context.githubCommunity.setReaction = async (id, content, selected) => {
+    assert.equal(id, "C_1"); assert.equal(content, "THUMBS_UP"); assert.equal(selected, true);
+    return { reactions: [{ content, count: 9, viewerHasReacted: true }] };
+  };
+  await click("community-react", { commentId: "C_1", reactionContent: "THUMBS_UP" });
+  assert.equal(state.discussion.comments[0].reactions[0].count, 9);
+  assert.equal(state.discussion.comments[1].reactions.length, 0);
+  assert.equal(state.discussion.upvoteCount, 3);
+  assert.equal(state.busy, false);
+});
+
+test("reaction toggles use the viewer's saved state and ignore a duplicate click while busy", async () => {
+  const { context, state, pending, click } = communityHarness();
+  const loading = context.openDepotCommunity("A", "1");
+  pending[0].resolve({ id: "DISCUSSION_A", reactions: [{ content: "HEART", count: 2, viewerHasReacted: true }], comments: [] }); await loading;
+  const gate = deferred(); let calls = 0;
+  context.githubCommunity.setReaction = (id, content, selected) => {
+    calls += 1; assert.equal(id, "DISCUSSION_A"); assert.equal(selected, false); return gate.promise;
+  };
+  const saving = click("community-react", { reactionContent: "HEART" });
+  await click("community-react", { reactionContent: "HEART" });
+  assert.equal(calls, 1);
+  gate.resolve({ reactions: [{ content: "HEART", count: 1, viewerHasReacted: false }] }); await saving;
+  assert.equal(state.discussion.reactions[0].viewerHasReacted, false);
+});
+
+test("a pending reaction cannot update another lesson or a newly opened comment", async () => {
+  for (const commentId of [undefined, "C_1"]) {
+    const { context, state, pending, click } = communityHarness();
+    const loading = context.openDepotCommunity("A", "1");
+    pending[0].resolve({ id: "DISCUSSION_A", reactions: [], comments: [{ id: "C_1", reactions: [] }] }); await loading;
+    const gate = deferred(); context.githubCommunity.setReaction = () => gate.promise;
+    const saving = click("community-react", { commentId, reactionContent: "HEART" });
+    const switching = context.openDepotCommunity("B", "1");
+    pending[1].resolve({ id: "DISCUSSION_B", reactions: [], comments: [{ id: "C_2", reactions: [] }] }); await switching;
+    gate.resolve({ reactions: [{ content: "HEART", count: 4, viewerHasReacted: true }] }); await saving;
+    assert.equal(state.discussion.id, "DISCUSSION_B");
+    assert.equal(state.discussion.reactions.length, 0);
+    assert.equal(state.discussion.comments[0].reactions.length, 0);
+    assert.equal(state.busy, false);
+  }
+});
+
+test("unavailable targets, denied permissions and failed reactions preserve the discussion", async () => {
+  const { context, state, pending, click } = communityHarness();
+  const loading = context.openDepotCommunity("A", "1");
+  pending[0].resolve({ id: "DISCUSSION_A", viewerCanReact: false, reactions: [], comments: [{ id: "C_1", viewerCanReact: false, reactions: [] }] }); await loading;
+  let calls = 0;
+  context.githubCommunity.setReaction = async () => { calls += 1; throw new Error("GitHub unavailable"); };
+  for (const commentId of [undefined, "C_1", "NOT_IN_THIS_DISCUSSION"]) await click("community-react", { commentId, reactionContent: "HEART" });
+  assert.equal(calls, 0);
+  state.discussion.viewerCanReact = true;
+  await click("community-react", { reactionContent: "HEART" });
+  assert.equal(calls, 1);
+  assert.equal(state.discussion.reactions.length, 0);
+  assert.equal(state.busy, false);
+});
+
+test("comment upvotes toggle independently and only discussion upvotes update catalog rankings", async () => {
+  const { context, state, pending, click } = communityHarness();
+  const loading = context.openDepotCommunity("A", "1");
+  const reactions = [{ content: "THUMBS_UP", count: 20, viewerHasReacted: true }];
+  pending[0].resolve({ id: "DISCUSSION_A", upvoteCount: 3, viewerHasUpvoted: false, viewerCanReact: false, reactions, comments: [{ id: "C_1", upvoteCount: 10, viewerHasUpvoted: true, reactions }] }); await loading;
+  const updates = [];
+  context.lessonDepot.updateDiscussionUpvotes = (...args) => updates.push(args);
+  context.githubCommunity.setUpvote = async (id, selected) => {
+    assert.equal(selected, id === "DISCUSSION_A");
+    return { upvoteCount: id === "DISCUSSION_A" ? 4 : 9, viewerHasUpvoted: selected, viewerCanUpvote: true };
+  };
+  await click("community-upvote", { commentId: "C_1" });
+  assert.equal(state.discussion.comments[0].upvoteCount, 9);
+  assert.equal(state.discussion.comments[0].viewerHasUpvoted, false);
+  assert.equal(state.discussion.upvoteCount, 3);
+  assert.equal(updates.length, 0);
+  await click("community-upvote");
+  assert.equal(state.discussion.upvoteCount, 4);
+  assert.equal(state.discussion.comments[0].upvoteCount, 9);
+  assert.deepEqual(state.discussion.reactions, reactions);
+  assert.deepEqual(state.discussion.comments[0].reactions, reactions);
+  assert.equal(updates.length, 1);
+  assert.equal(updates[0][1], 4);
+});
+
+test("upvotes honor permissions, ignore duplicate clicks and preserve state on failure", async () => {
+  const { context, state, pending, click } = communityHarness();
+  const loading = context.openDepotCommunity("A", "1");
+  pending[0].resolve({ id: "DISCUSSION_A", upvoteCount: 3, viewerCanUpvote: false, viewerCanReact: true, comments: [{ id: "C_1", upvoteCount: 1, viewerCanUpvote: false }] }); await loading;
+  let calls = 0; const gate = deferred();
+  context.githubCommunity.setUpvote = () => { calls += 1; return gate.promise; };
+  for (const commentId of [undefined, "C_1", "UNKNOWN"]) await click("community-upvote", { commentId });
+  assert.equal(calls, 0);
+  state.discussion.viewerCanUpvote = true;
+  const saving = click("community-upvote");
+  await click("community-upvote");
+  assert.equal(calls, 1);
+  gate.reject(new Error("GitHub unavailable")); await saving;
+  assert.equal(state.discussion.upvoteCount, 3);
+  assert.equal(state.discussion.comments[0].upvoteCount, 1);
   assert.equal(state.busy, false);
 });
 
@@ -297,4 +406,60 @@ test("latest federated versions must still form a complete acyclic graph", () =>
   const first = lesson("A", "2.0.0", "CUSTOM_ALICE_B"), second = lesson("B", "1.0.0", "CUSTOM_ALICE_A");
   const releases = [first, second].map((pack) => ({ pack: listing(pack), raw: JSON.stringify(pack) }));
   assert.throws(() => validateFederatedReleases(releases, curriculum), /cycle/);
+});
+
+async function runIndexWorker(filename, { official, discussions, remote = new Map() }) {
+  const source = readFileSync(new URL(`../scripts/${filename}`, import.meta.url), "utf8").replace(/^import[\s\S]*?;\s*/gm, "");
+  const files = new Map([["catalog.json", official], ["docs/curriculum-data.json", curriculum]]), written = new Map(), queries = [];
+  const globals = {
+    ...federationCore, normalizeDepotCatalog, fetchTextLimited, createHash, URL, Response,
+    process: { env: { GITHUB_TOKEN: "mock-token", GITHUB_REPOSITORY: "QuickMathematics/QuickMaths" }, argv: ["node", filename], exit: (code) => { throw new Error(`Unexpected worker exit ${code}`); } },
+    console: { log() {} }, resolve: (...parts) => parts.join("/"),
+    readFile: async (path) => {
+      const value = files.get(path) ?? files.get(path.split("/").at(-1));
+      if (!value) throw new Error("No prior snapshot");
+      return JSON.stringify(value);
+    },
+    writeFile: async (path, text) => written.set(path.split("/").at(-1), JSON.parse(text)),
+    fetch: async (url, options) => {
+      if (remote.has(url)) return Response.json(remote.get(url));
+      assert.equal(url, "https://api.github.com/graphql");
+      const body = JSON.parse(options.body); queries.push(body.query);
+      if (body.query.includes("addDiscussionComment")) return Response.json({ data: { addDiscussionComment: { comment: { id: "STATUS" } } } });
+      assert.match(body.query, /upvoteCount/);
+      assert.doesNotMatch(body.query, /reactions\(content:/);
+      return Response.json({ data: { viewer: { login: "bot" }, repository: { id: "R_1", hasDiscussionsEnabled: true, discussionCategories: { nodes: [{ id: "CAT_1", name: "General" }] }, discussions: { nodes: discussions, pageInfo: { hasNextPage: false } } } } });
+    },
+  };
+  await runInNewContext(`(async () => { ${source}\n })()`, globals);
+  return { written, queries };
+}
+
+test("official catalog refresh reads native GitHub upvotes instead of thumbs-up or comment counts", async () => {
+  const pack = lesson("A");
+  const { written } = await runIndexWorker("sync_depot_community.mjs", {
+    official: catalog([listing(pack)]),
+    discussions: [{ title: `[Lesson] ${pack.id}`, url: "https://github.com/QuickMathematics/QuickMaths/discussions/1", upvoteCount: 4, reactions: { totalCount: 900 }, comments: { totalCount: 800 } }],
+  });
+  assert.equal(written.get("community.json").packages[pack.id].votes, 4);
+  assert.equal(written.get("community.json").packages[pack.id].comments, 800);
+});
+
+test("federated refresh uses exact lesson discussion upvotes and ignores all emoji reactions", async () => {
+  for (const votes of [0, 3]) {
+    const pack = lesson("A"), entry = listing(pack);
+    const registry = { id: "alice/lessons", name: "Alice Lessons", namespace: "ALICE" };
+    const { written } = await runIndexWorker("sync_federated_depot.mjs", {
+      official: catalog([]), remote: new Map([[registryUrl, catalog([entry], registry)], [entry.lesson_url, pack]]),
+      discussions: [
+        { id: "SUBMISSION", title: "[Registry] alice/lessons", body: `<!-- quickmaths-registry\n${JSON.stringify({ catalog_url: registryUrl })}\n-->`, url: "https://github.com/QuickMathematics/QuickMaths/discussions/2", author: { login: "alice" }, upvoteCount: 100, comments: { nodes: [], totalCount: 0 } },
+        { id: "LESSON", title: federationCore.packageDiscussionTitle(registry.id, entry), upvoteCount: votes, upvotes: { totalCount: 1000 }, flags: { totalCount: 2000 }, url: "https://github.com/QuickMathematics/QuickMaths/discussions/3", comments: { totalCount: 500 } },
+      ],
+    });
+    const indexed = written.get("federation.json").registries[0];
+    assert.ok(indexed, "Valid registry must remain listed despite thumbs-down reactions");
+    assert.equal(indexed.packages[0].votes, votes);
+    assert.equal(indexed.packages[0].flags, 0);
+    assert.equal(indexed.packages[0].status, votes >= 3 ? "recommended" : "new");
+  }
 });
