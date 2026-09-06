@@ -2,7 +2,8 @@ id: MATH_RAT_003
 schema_version: 0.2
 name: Adding and subtracting rational expressions
 domain: Math
-subdomain: Rational Expressions and Equations
+subdomain: Algebra
+topic: Rational Expressions and Equations
 description: Find least common denominators, combine rational expressions, simplify the result, and preserve
   restrictions from every original denominator.
 prerequisites:

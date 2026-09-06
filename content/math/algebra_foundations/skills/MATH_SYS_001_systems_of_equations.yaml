@@ -2,7 +2,8 @@ id: MATH_SYS_001
 schema_version: 0.2
 name: Systems of equations
 domain: Math
-subdomain: Systems of Equations
+subdomain: Algebra
+topic: Systems of Equations
 description: Solve and classify systems of two linear equations.
 prerequisites:
   - MATH_GRAPH_005

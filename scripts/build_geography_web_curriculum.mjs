@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizeLessonTaxonomy } from "../docs/learning-fields.js";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = resolve(projectRoot, "content", "geography", "foundations", "web-curriculum.json");
@@ -1029,6 +1030,8 @@ const depotPayload = {
   })),
 };
 
+payload.skills = payload.skills.map((skill) => normalizeLessonTaxonomy(skill));
+depotPayload.skills = depotPayload.skills.map((skill) => normalizeLessonTaxonomy(skill, geographySubject.id));
 mkdirSync(dirname(outputPath), { recursive: true });
 writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 mkdirSync(dirname(depotOutputPath), { recursive: true });

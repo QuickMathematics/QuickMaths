@@ -1,4 +1,4 @@
-import { learningFields } from "./learning-fields.js?v=20260906-fields-storage-v1";
+import { learningFields } from "./learning-fields.js?v=20260906-branch-migration-v1";
 export const TOOL_NAMES = Object.freeze([
   "get_agent_guide",
   "get_quickmaths_manual",
@@ -429,7 +429,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           custom_lesson_sets: state.lessonPacks.filter((pack) => pack.mode !== "override").map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
           lesson_changes: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, mode: pack.mode, skill_count: pack.skillCount, overrides_native_skills: pack.overridesNativeSkills })),
           skills: rows.map((row) => ({
-            skill_id: row.id, field_id: row.subjectId, branch: row.subdomain, subject_id: row.subjectId, name: row.name, subdomain: row.subdomain, status: row.status,
+            skill_id: row.id, field_id: row.subjectId, branch: row.subdomain, topic: row.topic ?? "", subject_id: row.subjectId, name: row.name, subdomain: row.subdomain, status: row.status,
             native: row.native, overridden: row.overridden, pack_id: row.packId,
             mastery_score: row.masteryScore, prerequisites: row.prerequisites, unmet_prerequisites: row.unmetPrerequisites, unlocks: row.unlocks,
           })),

@@ -1,4 +1,4 @@
-import { learningFields } from "./learning-fields.js?v=20260906-fields-storage-v1";
+import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-branch-migration-v1";
 
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
@@ -835,7 +835,10 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
       prerequisiteRefs,
       name: requiredText(skillCandidate.name, `${skillId} name`, 160),
       domain: optionalText(skillCandidate.domain, `${skillId} domain`, 80) || "Custom",
-      subdomain: optionalText(skillCandidate.subdomain, `${skillId} subdomain`, 120) || requiredText(candidate.name, "Lesson set name", 160),
+      ...normalizeLessonTaxonomy({
+        subdomain: optionalText(skillCandidate.subdomain, `${skillId} branch`, 120) || "Foundations",
+        ...(skillCandidate.topic != null ? { topic: optionalText(skillCandidate.topic, `${skillId} topic`, 120) } : {}),
+      }, subject.id),
       description: requiredText(skillCandidate.description, `${skillId} description`, 1000),
       prerequisites,
       unlocks,
@@ -1000,7 +1003,7 @@ function resolveCatalogSkills(curriculum, lessonPacks) {
       additions.push(skill);
     }
   }
-  return [...builtInSkills.map((skill) => nativeById.get(skill.id)), ...additions];
+  return [...builtInSkills.map((skill) => nativeById.get(skill.id)), ...additions].map((skill) => normalizeLessonTaxonomy(skill));
 }
 
 function validateCatalogGraph(curriculum, lessonPacks) {
@@ -2730,7 +2733,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       overridden: Boolean(skill.overridden),
       subjectId: skill.subjectId,
       name: skill.name,
-      subdomain: skill.subdomain,
+      subdomain: skill.subdomain, branch: skill.subdomain, fieldId: skill.subjectId, topic: skill.topic ?? "",
       description: skill.description,
       prerequisites: [...skill.prerequisites],
       unlocks: [...(unlocks[skill.id] ?? [])],
@@ -2871,7 +2874,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
           overridden: Boolean(skill.overridden),
           subjectId: skill.subjectId,
           name: skill.name,
-          subdomain: skill.subdomain,
+          subdomain: skill.subdomain, branch: skill.subdomain, fieldId: skill.subjectId, topic: skill.topic ?? "",
           description: skill.description,
           questionCount: assessmentLength(skill),
           prerequisites: [...skill.prerequisites],
@@ -2880,7 +2883,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         })),
         allSkills: catalog.skills.filter((skill) => visible.has(skill.id)).map((skill) => ({
           id: skill.id, packId: skill.packId ?? null, custom: Boolean(skill.custom), native: Boolean(skill.native), overridden: Boolean(skill.overridden), subjectId: skill.subjectId,
-          name: skill.name, subdomain: skill.subdomain, description: skill.description, questionCount: assessmentLength(skill),
+          name: skill.name, subdomain: skill.subdomain, branch: skill.subdomain, fieldId: skill.subjectId, topic: skill.topic ?? "", description: skill.description, questionCount: assessmentLength(skill),
           prerequisites: [...skill.prerequisites], unlocks: [...(unlocks[skill.id] ?? [])],
         })),
       },

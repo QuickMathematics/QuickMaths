@@ -2,7 +2,8 @@ id: MATH_POLY_001
 schema_version: 0.2
 name: Adding and subtracting polynomials
 domain: Math
-subdomain: Exponents and Polynomials
+subdomain: Algebra
+topic: Exponents and Polynomials
 description: Identify polynomial structure and add or subtract polynomials by organizing and combining like terms.
 prerequisites:
   - MATH_EXP_001

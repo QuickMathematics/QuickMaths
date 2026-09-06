@@ -2,7 +2,8 @@ id: MATH_ALG_005
 schema_version: 0.2
 name: Literal equations
 domain: Math
-subdomain: Algebra Foundations
+subdomain: Algebra
+topic: Algebra Foundations
 description: Rearrange formulas and equations to solve for a chosen variable.
 prerequisites:
   - MATH_ALG_002

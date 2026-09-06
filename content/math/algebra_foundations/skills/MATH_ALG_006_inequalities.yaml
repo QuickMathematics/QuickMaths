@@ -2,7 +2,8 @@ id: MATH_ALG_006
 schema_version: 0.2
 name: Inequalities
 domain: Math
-subdomain: Algebra Foundations
+subdomain: Algebra
+topic: Algebra Foundations
 description: Solve one-step and two-step linear inequalities without needing to reverse the inequality sign.
 prerequisites:
   - MATH_ALG_002

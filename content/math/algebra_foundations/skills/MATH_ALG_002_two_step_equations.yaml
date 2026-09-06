@@ -2,7 +2,8 @@ id: MATH_ALG_002
 schema_version: 0.2
 name: Two-step equations
 domain: Math
-subdomain: Algebra Foundations
+subdomain: Algebra
+topic: Algebra Foundations
 description: Solve two-step linear equations by undoing addition or subtraction and then undoing multiplication or division.
 prerequisites:
   - MATH_PREALG_004

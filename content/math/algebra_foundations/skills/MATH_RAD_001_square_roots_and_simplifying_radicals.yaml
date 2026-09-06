@@ -2,7 +2,8 @@ id: MATH_RAD_001
 schema_version: 0.2
 name: Square roots and simplifying radicals
 domain: Math
-subdomain: Radicals and Quadratics
+subdomain: Algebra
+topic: Radicals and Quadratics
 description: Interpret principal square roots, simplify numerical radicals using perfect-square factors, combine
   like radicals, and reason about real square roots.
 prerequisites:

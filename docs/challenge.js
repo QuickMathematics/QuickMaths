@@ -1,10 +1,11 @@
-import { learningFields, branchName } from "./learning-fields.js?v=20260906-fields-storage-v1";
-import { storageStatus } from "./storage-status.js?v=20260906-fields-storage-v1";
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-fields-storage-v1";
+import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-branch-migration-v1";
+import { learningFields, branchName } from "./learning-fields.js?v=20260906-branch-migration-v1";
+import { storageStatus } from "./storage-status.js?v=20260906-branch-migration-v1";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-branch-migration-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-fields-storage-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-fields-storage-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260906-fields-storage-v1";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-branch-migration-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-branch-migration-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260906-branch-migration-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -19,7 +20,7 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-fields-storage-v1";
+} from "./github-sync.js?v=20260906-branch-migration-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -623,57 +624,7 @@ function mapBrowseMarkup(snapshot, rows) {
   if (!fields.some((field) => field.id === mapBrowseField)) { mapBrowseField = ""; mapBrowseBranch = ""; }
   const branches = fields.find((field) => field.id === mapBrowseField)?.branches ?? [];
   if (!branches.some((branch) => branch.name === mapBrowseBranch)) mapBrowseBranch = "";
-  return `<label class="compact-select">Field<select id="map-field-select" title="Browse lessons by field, such as Mathematics. The full map stays visible."><option value="">All fields</option>${fields.map((field) => `<option value="${escapeHtml(field.id)}" ${field.id === mapBrowseField ? "selected" : ""}>${escapeHtml(field.name)}</option>`).join("")}</select></label><label class="compact-select">Branch<select id="map-branch-select" ${mapBrowseField ? "" : "disabled"} title="A branch is a topic within a field, such as Geometry within Mathematics."><option value="">${mapBrowseField ? "All branches" : "Choose a field first"}</option>${branches.map((branch) => `<option value="${escapeHtml(branch.name)}" ${branch.name === mapBrowseBranch ? "selected" : ""}>${escapeHtml(branch.name)} (${branch.skillIds.length})</option>`).join("")}</select></label>`;
-}
-
-function mapLayout(skills, { subjects = [], combined = false } = {}) {
-  const byId = Object.fromEntries(skills.map((skill) => [skill.id, skill]));
-  const cache = {};
-  const depthOf = (id, trail = new Set()) => {
-    if (cache[id] != null) return cache[id];
-    if (trail.has(id)) return 0;
-    const skill = byId[id];
-    if (!skill?.prerequisites.length) return (cache[id] = 0);
-    const nextTrail = new Set(trail).add(id);
-    return (cache[id] = Math.max(...skill.prerequisites.map((prerequisite) => depthOf(prerequisite, nextTrail))) + 1);
-  };
-  const depthById = Object.fromEntries(skills.map((skill) => [skill.id, depthOf(skill.id)]));
-  const maxDepth = Math.max(...Object.values(depthById), 0);
-  if (combined) {
-    const positions = {};
-    const lanes = [];
-    let laneTop = 24;
-    subjects.filter((subject) => skills.some((skill) => skill.subjectId === subject.id)).forEach((subject) => {
-      const subjectSkills = skills.filter((skill) => skill.subjectId === subject.id);
-      const groups = {};
-      subjectSkills.forEach((skill) => { (groups[depthById[skill.id]] ??= []).push(skill); });
-      const widest = Math.max(...Object.values(groups).map((group) => group.length), 1);
-      const laneHeight = Math.max(220, widest * 112 + 92);
-      Object.entries(groups).forEach(([depth, group]) => {
-        const columnHeight = group.length * 112;
-        const offset = laneTop + 68 + Math.max(0, (laneHeight - 92 - columnHeight) / 2);
-        group.forEach((skill, index) => { positions[skill.id] = { x: 54 + Number(depth) * 224, y: offset + index * 112 }; });
-      });
-      lanes.push({ subject, y: laneTop, height: laneHeight });
-      laneTop += laneHeight + 20;
-    });
-    return {
-      positions,
-      lanes,
-      width: Math.max(900, 108 + (maxDepth + 1) * 224),
-      height: Math.max(620, laneTop + 4),
-    };
-  }
-  const groups = {};
-  skills.forEach((skill) => { const depth = depthById[skill.id]; (groups[depth] ??= []).push(skill); });
-  const positions = {};
-  const widest = Math.max(...Object.values(groups).map((group) => group.length), 1);
-  Object.entries(groups).forEach(([depth, group]) => {
-    const columnHeight = group.length * 112;
-    const offset = Math.max(32, (widest * 112 - columnHeight) / 2 + 32);
-    group.forEach((skill, index) => { positions[skill.id] = { x: 42 + Number(depth) * 224, y: offset + index * 112 }; });
-  });
-  return { positions, lanes: [], width: Math.max(900, 84 + (maxDepth + 1) * 224), height: Math.max(620, widest * 112 + 64) };
+  return `<label class="compact-select">Field<select id="map-field-select" title="Browse lessons by field, such as Mathematics. The full map stays visible."><option value="">All fields</option>${fields.map((field) => `<option value="${escapeHtml(field.id)}" ${field.id === mapBrowseField ? "selected" : ""}>${escapeHtml(field.name)}</option>`).join("")}</select></label><label class="compact-select">Branch<select id="map-branch-select" ${mapBrowseField ? "" : "disabled"} title="A branch is a broad division of a field, such as Geometry within Mathematics."><option value="">${mapBrowseField ? "All branches" : "Choose a field first"}</option>${branches.map((branch) => `<option value="${escapeHtml(branch.name)}" ${branch.name === mapBrowseBranch ? "selected" : ""}>${escapeHtml(branch.name)} (${branch.skillIds.length})</option>`).join("")}</select></label>`;
 }
 
 function splitLabel(value, max = 22) {
@@ -1267,7 +1218,7 @@ function renderMapPlanPanel(snapshot, mapRows, layoutKey) {
     <div class="map-plan-heading"><div><p class="eyebrow">Visual learning planner</p><h2>${composer === "path" ? "Custom path" : composer === "annotation" ? "Annotation" : "Plan details"}</h2></div>${composer ? `<button type="button" data-action="plan-close-composer" aria-label="Close Plan mode card">×</button>` : `<span>${snapshot.mapPlan.paths.length} paths · ${snapshot.mapPlan.annotations.length} comments</span>`}</div>
     <p class="map-plan-intro">The map stays in view while you plan. Everything here autosaves with ${snapshot.activeProfile.role === "educator" ? "this curriculum" : "this profile"}.</p>
     ${body}
-    <div class="map-plan-footer">${composer === "path" || composer === "annotation" ? `<button class="button button-outline" type="button" data-action="plan-close-composer">Cancel</button>` : `<button class="quiet-button" type="button" data-action="plan-reset-layout" ${hasMovedLayout ? "" : "disabled"}>Reset this layout</button>${snapshot.activeProfile.role === "educator" ? "" : `<button class="button button-outline" type="button" data-action="toggle-plan-mode">Exit Plan mode</button>`}`}</div>
+    <div class="map-plan-footer">${composer === "path" || composer === "annotation" ? `<button class="button button-outline" type="button" data-action="plan-close-composer">Cancel</button>` : `<button class="quiet-button" type="button" data-action="plan-reset-layout" ${hasMovedLayout ? "" : "disabled"}>Group by field & branch</button>${snapshot.activeProfile.role === "educator" ? "" : `<button class="button button-outline" type="button" data-action="toggle-plan-mode">Exit Plan mode</button>`}`}</div>
   </aside>`;
 }
 
@@ -1391,8 +1342,9 @@ function renderMap(snapshot, { designer = false } = {}) {
       <text class="map-plan-comment-meta" x="174" y="72" text-anchor="end">${targetSkillIds.length ? `${targetSkillIds.length} linked` : "free"}</text>
     </g>`;
   }).join("") : "";
-  const subjectLanes = lanes.map(({ subject, y, height: laneHeight }) => `<g class="map-subject-lane">
+  const subjectLanes = lanes.map(({ subject, y, height: laneHeight, branches }) => `<g class="map-subject-lane">
     <rect x="12" y="${y}" width="${layout.width - 24}" height="${laneHeight}" rx="22" fill="${escapeHtml(subject.theme?.tint ?? "#dceca9")}"></rect>
+    ${branches.map((branch, index) => `<g class="map-branch-lane" data-map-branch="${escapeHtml(branch.id)}" aria-label="${escapeHtml(`${subject.name} → ${branch.name}: ${branch.count} lessons`)}"><rect x="28" y="${branch.y}" width="${layout.width - 56}" height="${branch.height}" rx="14" fill="${index % 2 ? '#ffffff' : escapeHtml(subject.theme?.paperLight ?? '#ffffff')}" stroke="${escapeHtml(subject.theme?.primary ?? '#153f36')}"></rect><text x="42" y="${branch.y + 27}" fill="${escapeHtml(subject.theme?.primary ?? '#153f36')}">${escapeHtml(branch.name)} · ${branch.count} lessons</text></g>`).join("")}
     <line x1="28" y1="${y + 42}" x2="${layout.width - 28}" y2="${y + 42}" stroke="${escapeHtml(subject.theme?.primary ?? "#153f36")}"></line>
     <text x="30" y="${y + 29}" fill="${escapeHtml(subject.theme?.primary ?? "#153f36")}">${escapeHtml(subject.icon)} ${escapeHtml(subject.name)}</text>
   </g>`).join("");
@@ -1423,7 +1375,7 @@ function renderMap(snapshot, { designer = false } = {}) {
 
   elements.view.innerHTML = `${designer ? renderCurriculumWorkspace(snapshot) : ""}
     <header class="page-head">
-      <div><p class="eyebrow">All fields · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula</p><h1>${designer ? "Canonical curriculum map" : "Mastery map"}</h1><p>${designer ? "Drag this curriculum’s canonical map into shape. Learners receive these positions, custom paths, and annotations when they load the file." : `${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Field lanes and highlighted bridge lines show how knowledge travels across every installed curriculum.`}</p></div>
+      <div><p class="eyebrow">All fields · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula</p><h1>${designer ? "Canonical curriculum map" : "Mastery map"}</h1><p>${designer ? "Drag this curriculum’s canonical map into shape. Learners receive these positions, custom paths, and annotations when they load the file." : `${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Field lanes contain labeled branch groups. Prerequisite lines connect lessons across branches and fields.`}</p></div>
       <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><button type="button" class="map-plan-toggle map-plan-view-toggle" data-action="toggle-plan-view" aria-pressed="${planView}" ${planMode ? "disabled" : ""}><span>◎</span><strong>Plan view</strong><small>${planMode ? "Exit editor to view" : planView ? "Showing saved plan" : "Showing canonical map"}</small></button>`}${mapBrowseMarkup(snapshot, renderedRows.length ? renderedRows : mapRows)}<label class="compact-select">Lesson<select id="map-skill-select">${mapSkillOptions(snapshot, renderedRows.length ? renderedRows : mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${planMode ? `<span class="map-plan-key">Plan mode is autosaving</span>` : planView ? `<span class="map-plan-key">Plan view · read only</span>` : combined ? `<span class="map-subject-key">Node color = field · dot = status</span>` : ""}</div>
@@ -1452,7 +1404,7 @@ function renderMap(snapshot, { designer = false } = {}) {
       </div>
       ${planMode ? renderMapPlanPanel(snapshot, mapRows, viewportKey) : `<aside class="map-detail">
         <div class="map-detail-top">${statusChip(selected.status)}<code>${escapeHtml(selected.id)}</code></div>
-        <p class="eyebrow">${combined ? `${escapeHtml(selectedSubject.icon)} ${escapeHtml(selectedSubject.name)} · ` : ""}${escapeHtml(selected.subdomain)}</p>
+        <p class="eyebrow">${combined ? `${escapeHtml(selectedSubject.icon)} ${escapeHtml(selectedSubject.name)} · ` : ""}${escapeHtml(selected.subdomain)}${selected.topic ? ` · ${escapeHtml(selected.topic)}` : ""}</p>
         <h2>${escapeHtml(selected.name)}</h2>
         <p>${escapeHtml(selected.description)}</p>
         <div class="detail-metrics">
@@ -1506,7 +1458,7 @@ function renderLesson(snapshot) {
   const row = rowForSkill(snapshot, skill.id);
   elements.view.innerHTML = `
     <header class="page-head">
-      <div><p class="eyebrow">Lesson library</p><h1>${escapeHtml(skill.name)}</h1><p>${escapeHtml(skill.description)}</p></div>
+      <div><p class="eyebrow">${escapeHtml(snapshot.activeSubject.name)} → ${escapeHtml(skill.subdomain)}${skill.topic ? ` · ${escapeHtml(skill.topic)}` : ""}</p><h1>${escapeHtml(skill.name)}</h1><p>${escapeHtml(skill.description)}</p></div>
       <div class="page-actions"><label class="compact-select">Choose lesson<select id="lesson-select">${skillOptions(snapshot, skill.id)}</select></label></div>
     </header>
     <section class="lesson-overview">
@@ -2956,7 +2908,7 @@ document.addEventListener("click", async (event) => {
         showToast(`${result.reset} selected position${result.reset === 1 ? "" : "s"} reset.`);
       }
       if (action.dataset.action === "plan-reset-layout") {
-        if (window.confirm("Reset every moved node in this map layout?\n\nSaved paths and annotations will stay intact.")) {
+        if (window.confirm("Arrange all lessons in their field and branch groups?\n\nSaved paths and annotations will stay intact.")) {
           const result = store.resetMapPlanLayout(layoutKey);
           showToast(`${result.reset} position${result.reset === 1 ? "" : "s"} reset.`);
         }
@@ -3440,7 +3392,7 @@ function initClock() {
 }
 
 async function boot() {
-  const response = await fetch("./curriculum-data.json?v=20260902-native-math-expansion");
+  const response = await fetch("./curriculum-data.json?v=20260906-branch-migration-v1");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];
@@ -3452,7 +3404,7 @@ async function boot() {
     // The store's normal malformed-state recovery remains authoritative.
   }
   if (needsLegacyGeography) {
-    const geography = await fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+    const geography = await fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-branch-migration-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
     bundledLessonPacks = [geography.text];
   }
   let agentManifest = {};
@@ -3461,10 +3413,10 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260906-fields-storage-v1").catch(() => null),
-      fetch("./CUSTOM_LESSON_SETS.md?v=20260906-fields-storage-v1").catch(() => null),
-      fetch("./STUDENT_GUIDE.md?v=20260906-fields-storage-v1").catch(() => null),
-      fetch("./EDUCATOR_GUIDE.md?v=20260906-fields-storage-v1").catch(() => null),
+      fetch("./agent-manifest.json?v=20260906-branch-migration-v1").catch(() => null),
+      fetch("./CUSTOM_LESSON_SETS.md?v=20260906-branch-migration-v1").catch(() => null),
+      fetch("./STUDENT_GUIDE.md?v=20260906-branch-migration-v1").catch(() => null),
+      fetch("./EDUCATOR_GUIDE.md?v=20260906-branch-migration-v1").catch(() => null),
     ]);
     if (manifestResponse?.ok) agentManifest = await manifestResponse.json();
     if (authoringGuideResponse?.ok) authoringGuideMarkdown = await authoringGuideResponse.text();
@@ -3587,7 +3539,7 @@ async function ensureLegacyGeographyMigration(raw) {
   let version = APP_VERSION;
   try { version = Number(JSON.parse(raw)?.version ?? APP_VERSION); } catch { return; }
   if (version >= APP_VERSION) return;
-  legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+  legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-branch-migration-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
   const result = await legacyGeographyMigrationPromise;
   store.registerBundledLessonPacks([result.text]);
 }

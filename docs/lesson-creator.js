@@ -1,4 +1,4 @@
-import { learningFields } from "./learning-fields.js?v=20260906-fields-storage-v1";
+import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-branch-migration-v1";
 const DRAFT_KEY = "quickmaths.lesson-creator.v1";
 
 const DEFAULT_THEME = {
@@ -100,7 +100,7 @@ function blankProblem(skillId, index = 0) {
 function blankSkill(index = 0) {
   const id = `CUSTOM_NEW_LESSON_${String(index + 1).padStart(3, "0")}`;
   return {
-    id, name: "New lesson", description: "A short description of what learners will master.", subdomain: "Foundations",
+    id, name: "New lesson", description: "A short description of what learners will master.", subdomain: "Foundations", topic: "",
     theory: "Explain the core idea here.\n\n- Add a useful rule\n- Point out a common mistake", tags: "foundation",
     prerequisites: [], passingScore: 0.8, minimumConfidence: 3, reviewMasteredDays: 7, reviewLearningDays: 2,
     examples: [{ prompt: "A worked example", solution: "Show the result", explanation: "Explain why each step works." }],
@@ -118,14 +118,14 @@ function blankDraft(snapshot) {
     id: "PACK_MY_LESSONS", name: "My lesson set", description: "A custom curriculum built in QuickMaths.", author: "", version: "1.0.0",
     subjectMode: "extend", subjectId: subject?.id ?? "SUBJECT_MATH", subjectName: subject?.name ?? "Mathematics",
     subjectShortName: subject?.shortName ?? "Maths", subjectIcon: subject?.icon ?? "∑", subjectDescription: subject?.description ?? "",
-    theme: { ...(subject?.theme ?? DEFAULT_THEME) }, skills: [blankSkill(0)],
+    theme: { ...(subject?.theme ?? DEFAULT_THEME) }, skills: [{ ...blankSkill(0), subdomain: standardBranches(subject?.id ?? "SUBJECT_MATH")[0] ?? "Foundations" }],
   };
 }
 
 function restoreDraft(snapshot) {
   try {
     const parsed = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "null");
-    if (parsed && Array.isArray(parsed.skills) && parsed.skills.length) return { mode: "add", nativeSkillId: "", ...parsed };
+    if (parsed && Array.isArray(parsed.skills) && parsed.skills.length) return { mode: "add", nativeSkillId: "", ...parsed, skills: parsed.skills.map((skill) => normalizeLessonTaxonomy(skill, parsed.subjectId)) };
   } catch { /* Start from a clean author draft. */ }
   return blankDraft(snapshot);
 }
@@ -343,8 +343,9 @@ function buildPack(draft) {
   const skillIds = draft.skills.map((skill) => draft.mode === "override" ? skill.id : cleanId(skill.id, "CUSTOM_"));
   const skills = draft.skills.map((skill, skillIndex) => {
     const skillId = skillIds[skillIndex];
+    const classification = lessonClassification(skill, subjectId);
     return {
-      id: skillId, name: skill.name, domain: draft.subjectName, subdomain: String(skill.subdomain ?? "").trim() || "Foundations", description: skill.description,
+      id: skillId, name: skill.name, domain: draft.subjectName, subdomain: classification.branch, ...(classification.topic ? { topic: classification.topic } : {}), description: skill.description,
       prerequisites: skill.prerequisites, unlocks: [], tags: lines(skill.tags),
       mastery: {
         passing_score: Number(skill.passingScore), minimum_confidence: Number(skill.minimumConfidence), max_guessing_allowed: "maybe",
@@ -461,7 +462,7 @@ function draftFromPack(pack, snapshot) {
     base.subjectMode = snapshot.subjects.some((subject) => subject.id === base.subjectId) ? "extend" : "create";
   }
   base.skills = (pack.skills ?? []).map((skill, skillIndex) => ({
-    ...blankSkill(skillIndex), activeProblem: 0, id: skill.id, name: skill.name, description: skill.description, subdomain: skill.subdomain ?? "Foundations",
+    ...blankSkill(skillIndex), activeProblem: 0, id: skill.id, name: skill.name, description: skill.description, subdomain: skill.subdomain ?? "Foundations", topic: skill.topic,
     theory: skill.theory, tags: (skill.tags ?? []).join("\n"), prerequisites: (skill.prerequisites ?? []).map((ref) => typeof ref === "string" ? ref : ref.skill_id),
     passingScore: skill.mastery?.passing_score ?? .8, minimumConfidence: skill.mastery?.minimum_confidence ?? 3,
     reviewMasteredDays: skill.mastery?.review_after_days_if_mastered ?? 7, reviewLearningDays: skill.mastery?.review_after_days_if_learning ?? 2,
@@ -501,6 +502,7 @@ function draftFromPack(pack, snapshot) {
     })),
   }));
   if (!base.skills.length) base.skills = [blankSkill(0)];
+  base.skills = base.skills.map((skill) => normalizeLessonTaxonomy(skill, base.subjectId));
   return base;
 }
 
@@ -516,15 +518,25 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     && draft.skills[0]?.name === "New lesson"
     && draft.skills[0]?.problems?.length === 1
     && draft.skills[0].problems[0]?.prompt === "What should the learner solve?";
+  const updateStarterBranch = (previousFieldId) => {
+    if (isUntouchedStarter() && !draft.skills[0].topic && draft.skills[0].subdomain === (standardBranches(previousFieldId)[0] ?? "Foundations")) {
+      draft.skills[0].subdomain = standardBranches(draft.subjectId)[0] ?? "Foundations";
+    }
+  };
+  let lastActiveSubjectId = getSnapshot()?.activeSubject?.id;
   const adoptActiveSubjectForStarter = (snapshot) => {
     const subject = snapshot?.activeSubject;
+    if (lastActiveSubjectId === subject?.id) return;
+    lastActiveSubjectId = subject?.id;
     if (!subject || !isUntouchedStarter() || draft.subjectMode !== "extend" || draft.subjectId === subject.id) return;
+    const previousFieldId = draft.subjectId;
     draft.subjectId = subject.id;
     draft.subjectName = subject.name;
     draft.subjectShortName = subject.shortName;
     draft.subjectIcon = subject.icon;
     draft.subjectDescription = subject.description;
     draft.theme = { ...subject.theme };
+    updateStarterBranch(previousFieldId);
     save();
   };
   const currentSkill = () => draft.skills[Math.max(0, Math.min(draft.activeSkill, draft.skills.length - 1))];
@@ -555,6 +567,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
 
   const setField = (path, value, target) => {
     const skill = currentSkill();
+    const previousFieldId = draft.subjectId;
     if (path.startsWith("draft.")) draft[path.slice(6)] = value;
     else if (path.startsWith("theme.")) draft.theme[path.slice(6)] = value;
     else if (path.startsWith("skill.")) skill[path.slice(6)] = value;
@@ -588,6 +601,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
         draft.subjectDescription = subject.description; draft.theme = { ...subject.theme };
       }
     }
+    if (draft.subjectId !== previousFieldId) updateStarterBranch(previousFieldId);
     draft.lastValidation = null;
     save();
   };
@@ -612,6 +626,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     const validation = draft.lastValidation;
     const subjectOptions = snapshot.subjects.map((subject) => [subject.id, `${subject.icon} ${subject.name} · ${subject.skillIds.length} lessons`]);
     const branches = learningFields([{ id: draft.subjectId }], [...snapshot.curriculum.allSkills, ...draft.skills.map((item) => ({ ...item, subjectId: draft.subjectId }))])[0].branches;
+    for (const name of standardBranches(draft.subjectId)) if (!branches.some((branch) => branch.name === name)) branches.push({ name });
     return `
       <header class="page-head studio-head"><div><p class="eyebrow">Human Lesson Creator</p><h1>Create something new—or improve what ships with QuickMaths.</h1><p>These friendly forms produce the same validated add-on and native-improvement formats an agent can author directly.</p></div><div class="page-actions"><button class="button button-outline" data-creator-action="import">Open JSON</button><button class="button button-primary" data-creator-action="download">Download lesson set</button></div></header>
       <section class="studio-native-picker"><div><p class="eyebrow">Improve our work</p><h2>Edit a native lesson</h2><p>Open any built-in lesson as a reversible override. Its ID and completed learner progress stay intact; unfinished tests restart on install, and restoring the original later does not erase mastery.</p></div><label><span>Native lesson</span><select data-creator-field="draft.nativeSkillId">${nativeSkills.map((item) => `<option value="${esc(item.id)}" ${item.id === draft.nativeSkillId ? "selected" : ""}>${esc(snapshot.subjects.find((subject) => subject.id === item.subjectId)?.name ?? "QuickMaths")} › ${esc(item.subdomain || "Foundations")} › ${esc(item.name)}</option>`).join("")}</select></label><button class="button button-secondary" data-creator-action="load-native">Open editable copy</button></section>
@@ -638,7 +653,8 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
           <section class="studio-card">
             <div class="studio-section-title"><div><p class="eyebrow">2 · Lesson ${draft.activeSkill + 1}</p><h2>${esc(skill.name)}</h2></div>${draft.skills.length > 1 ? `<button class="danger-link" data-creator-action="remove-skill">Remove lesson</button>` : ""}</div>
             <div class="studio-two">${field("Lesson name", "skill.name", skill.name)}${field("Lesson ID", "skill.id", skill.id, { readonly: draft.mode === "override", help: draft.mode === "override" ? "Locked so existing learner progress remains attached to this native lesson." : "Stable and globally unique. The studio enforces the CUSTOM_ prefix." })}</div>
-            <div class="studio-two"><label class="studio-field"><span>Branch ${helpButton("A topic within this field: for example Geometry within Mathematics. Choose an existing branch or type a new name.")}</span><input data-creator-field="skill.subdomain" list="studio-branches" value="${esc(skill.subdomain)}" placeholder="e.g. Geometry"><datalist id="studio-branches">${branches.map((branch) => `<option value="${esc(branch.name)}"></option>`).join("")}</datalist></label>${field("Tags, one per line", "skill.tags", skill.tags)}</div>
+            <div class="studio-two"><label class="studio-field"><span>Branch ${helpButton("A topic within this field: for example Geometry within Mathematics. Choose an existing branch or type a new name.")}</span><input data-creator-field="skill.subdomain" list="studio-branches" value="${esc(skill.subdomain)}" placeholder="e.g. Geometry"><datalist id="studio-branches">${branches.map((branch) => `<option value="${esc(branch.name)}"></option>`).join("")}</datalist></label>${field("Topic (optional)", "skill.topic", skill.topic ?? "", { help: "A focused subject within the broad branch, such as Quadratic Equations within Algebra. Existing category detail is preserved here." })}</div>
+            ${field("Tags, one per line", "skill.tags", skill.tags)}
             ${area("What will learners master?", "skill.description", skill.description, { rows: 3 })}
             ${area("Lesson theory", "skill.theory", skill.theory, { rows: 9, help: "Plain text only. Blank lines make paragraphs; lines beginning with - make lists." })}
             <label class="studio-field"><span>Prerequisite bridges ${helpButton("Choose lessons from any installed field or from this draft. In Hard path they lock this test; in Open path they are guidance.")}</span><select data-creator-prerequisites multiple size="${Math.min(8, Math.max(4, allSkills.length))}">${allSkills.map((item) => `<option value="${esc(item.id)}" ${skill.prerequisites.includes(item.id) ? "selected" : ""}>${esc(snapshot.subjects.find((subject) => subject.id === item.subjectId)?.name ?? "This set")} › ${esc(item.subdomain || "Foundations")} › ${esc(item.name)}</option>`).join("")}</select><small>Ctrl/Cmd-click to choose more than one.</small></label>
@@ -702,7 +718,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     if (action === "close-tutorial") draft.tutorialOpen = false;
     if (action === "open-tutorial") draft.tutorialOpen = true;
     if (action === "select-skill") draft.activeSkill = index;
-    if (action === "add-skill") { draft.skills.push(blankSkill(draft.skills.length)); draft.activeSkill = draft.skills.length - 1; }
+    if (action === "add-skill") { draft.skills.push({ ...blankSkill(draft.skills.length), subdomain: currentSkill().subdomain }); draft.activeSkill = draft.skills.length - 1; }
     if (action === "remove-skill" && draft.skills.length > 1 && confirm("Remove this lesson from the studio draft?")) { draft.skills.splice(draft.activeSkill, 1); draft.activeSkill = Math.max(0, draft.activeSkill - 1); }
     if (action === "select-problem") skill.activeProblem = index;
     if (action === "reroll-native-preview") draft.nativePreviewVariation = Number(draft.nativePreviewVariation ?? 0) + 1;

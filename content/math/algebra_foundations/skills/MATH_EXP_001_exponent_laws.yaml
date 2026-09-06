@@ -2,7 +2,8 @@ id: MATH_EXP_001
 schema_version: 0.2
 name: Exponent laws
 domain: Math
-subdomain: Exponents and Polynomials
+subdomain: Algebra
+topic: Exponents and Polynomials
 description: Simplify powers and monomials using product, quotient, power, zero-exponent, and negative-exponent rules.
 prerequisites:
   - MATH_PREALG_002

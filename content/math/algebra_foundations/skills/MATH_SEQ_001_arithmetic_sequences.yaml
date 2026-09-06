@@ -2,7 +2,8 @@ id: MATH_SEQ_001
 schema_version: 0.2
 name: Arithmetic sequences
 domain: Math
-subdomain: Sequences
+subdomain: Algebra
+topic: Sequences
 description: Recognize arithmetic sequences, use common differences, and write recursive and explicit rules for
   linear patterns.
 prerequisites:

@@ -2,7 +2,8 @@ id: MATH_POLY_003
 schema_version: 0.2
 name: Factoring common factors
 domain: Math
-subdomain: Exponents and Polynomials
+subdomain: Algebra
+topic: Exponents and Polynomials
 description: Factor numerical and monomial greatest common factors from polynomial expressions and verify the result by
   distribution.
 prerequisites:

@@ -2,7 +2,8 @@ id: MATH_RAT_005
 schema_version: 0.2
 name: Extraneous solutions in rational equations
 domain: Math
-subdomain: Rational Expressions and Equations
+subdomain: Algebra
+topic: Rational Expressions and Equations
 description: Solve rational equations that produce multiple candidates, reject excluded or non-real candidates, and distinguish
   valid roots from extraneous solutions.
 prerequisites:

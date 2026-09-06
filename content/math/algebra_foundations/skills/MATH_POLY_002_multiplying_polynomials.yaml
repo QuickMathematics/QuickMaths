@@ -2,7 +2,8 @@ id: MATH_POLY_002
 schema_version: 0.2
 name: Multiplying polynomials
 domain: Math
-subdomain: Exponents and Polynomials
+subdomain: Algebra
+topic: Exponents and Polynomials
 description: Expand and simplify products of monomials, binomials, and simple polynomials using distribution and exponent laws.
 prerequisites:
   - MATH_POLY_001

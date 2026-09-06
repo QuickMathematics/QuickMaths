@@ -2,7 +2,8 @@ id: MATH_EXP_003
 schema_version: 0.2
 name: Exponential equations with common bases
 domain: Math
-subdomain: Exponential Functions
+subdomain: Algebra
+topic: Exponential Functions
 description: Solve exponential equations by isolating powers, rewriting expressions with a common base, and equating
   exponents.
 prerequisites:

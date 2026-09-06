@@ -2,7 +2,8 @@ id: MATH_GRAPH_002
 schema_version: 0.2
 name: Slope from two points
 domain: Math
-subdomain: Coordinate Graphing
+subdomain: Geometry
+topic: Coordinate Graphing
 description: Find the slope of a line using two points on the coordinate plane.
 prerequisites:
   - MATH_GRAPH_001

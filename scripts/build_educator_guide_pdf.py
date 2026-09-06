@@ -83,6 +83,9 @@ styles.add(ParagraphStyle(
     leading=11.5, textColor=MUTED, spaceAfter=5,
 ))
 styles.add(ParagraphStyle(
+    name="TableHeaderQM", parent=styles["SmallQM"], fontName="Helvetica-Bold", textColor=colors.white,
+))
+styles.add(ParagraphStyle(
     name="BulletQM", parent=styles["BodyQM"], leftIndent=14, firstLineIndent=-8,
     bulletIndent=2, spaceAfter=4,
 ))
@@ -164,7 +167,7 @@ def parse_table(lines: list[str]) -> LongTable:
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
         if index == 1 and all(re.fullmatch(r"[-: ]+", cell) for cell in cells):
             continue
-        style = styles["SmallQM"]
+        style = styles["TableHeaderQM"] if index == 0 else styles["SmallQM"]
         rows.append([Paragraph(inline_markup(cell), style) for cell in cells])
     count = max(len(row) for row in rows)
     widths = [((PAGE_W - 36 * mm) / count)] * count

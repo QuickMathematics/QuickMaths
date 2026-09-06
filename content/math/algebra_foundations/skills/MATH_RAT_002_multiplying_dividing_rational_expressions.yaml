@@ -2,7 +2,8 @@ id: MATH_RAT_002
 schema_version: 0.2
 name: Multiplying and dividing rational expressions
 domain: Math
-subdomain: Rational Expressions and Equations
+subdomain: Algebra
+topic: Rational Expressions and Equations
 description: Multiply rational expressions by factoring and canceling, divide by multiplying by the reciprocal, and
   track every denominator and zero-divisor restriction.
 prerequisites:

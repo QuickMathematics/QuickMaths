@@ -2,7 +2,8 @@ id: MATH_GRAPH_006
 schema_version: 0.2
 name: Writing equations of lines
 domain: Math
-subdomain: Linear Functions
+subdomain: Geometry
+topic: Linear Functions
 description: Write linear equations in slope-intercept form from slope, intercept, and point information.
 prerequisites:
   - MATH_GRAPH_004

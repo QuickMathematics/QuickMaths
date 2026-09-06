@@ -2,7 +2,8 @@ id: MATH_PREALG_004
 schema_version: 0.2
 name: Simplifying linear expressions
 domain: Math
-subdomain: Pre-Algebra
+subdomain: Algebra
+topic: Pre-Algebra
 description: Simplify linear expressions by distributing when needed and combining like terms.
 prerequisites:
   - MATH_PREALG_003

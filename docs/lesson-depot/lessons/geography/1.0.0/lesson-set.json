@@ -61,7 +61,7 @@
       "id": "GEO_FOUND_001",
       "name": "Spatial thinking and geographic inquiry",
       "domain": "Geography",
-      "subdomain": "Geographic Foundations",
+      "subdomain": "Geographic Methods",
       "description": "Ask geographic questions using location, scale, spatial pattern, process, place, and human–environment relationships.",
       "prerequisites": [],
       "tags": [
@@ -603,13 +603,14 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Geographic Foundations"
     },
     {
       "id": "GEO_CART_001",
       "name": "Map scale, projection, and cartographic argument",
       "domain": "Geography",
-      "subdomain": "Cartography",
+      "subdomain": "Cartography and GIS",
       "description": "Read scale, compare projections, recognize distortion, and evaluate how classification and symbol choices shape a map’s argument.",
       "prerequisites": [
         "GEO_FOUND_001"
@@ -1139,13 +1140,14 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Cartography"
     },
     {
       "id": "GEO_CART_002",
       "name": "Latitude, longitude, and geodetic reference",
       "domain": "Geography",
-      "subdomain": "Cartography",
+      "subdomain": "Cartography and GIS",
       "description": "Use latitude and longitude responsibly, convert coordinate formats, interpret datums, and estimate position and distance on Earth.",
       "prerequisites": [
         "GEO_CART_001",
@@ -1653,13 +1655,14 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Cartography"
     },
     {
       "id": "GEO_GIS_001",
       "name": "GIS layers, spatial data, and remote sensing",
       "domain": "Geography",
-      "subdomain": "Geospatial Methods",
+      "subdomain": "Cartography and GIS",
       "description": "Distinguish vector and raster data, reason about resolution and uncertainty, and combine GIS and remote-sensing evidence without overclaiming.",
       "prerequisites": [
         "GEO_CART_001",
@@ -2206,7 +2209,8 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Geospatial Methods"
     },
     {
       "id": "GEO_PHYS_001",
@@ -5492,7 +5496,7 @@
       "id": "GEO_URBAN_001",
       "name": "Urban systems, land use, and spatial inequality",
       "domain": "Geography",
-      "subdomain": "Urban Geography",
+      "subdomain": "Human Geography",
       "description": "Analyze cities as networked systems shaped by land markets, planning, infrastructure, segregation, informality, and unequal access.",
       "prerequisites": [
         "GEO_GIS_001",
@@ -6038,13 +6042,14 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Urban Geography"
     },
     {
       "id": "GEO_ECON_001",
       "name": "Resources, trade, and global production networks",
       "domain": "Geography",
-      "subdomain": "Economic Geography",
+      "subdomain": "Human Geography",
       "description": "Trace production through places and networks, distinguish comparative advantage from power, and evaluate resource and trade dependencies.",
       "prerequisites": [
         "GEO_HUMAN_001",
@@ -6591,13 +6596,14 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Economic Geography"
     },
     {
       "id": "GEO_POL_001",
       "name": "States, nations, territory, and geopolitics",
       "domain": "Geography",
-      "subdomain": "Political Geography",
+      "subdomain": "Human Geography",
       "description": "Distinguish state, nation, sovereignty, borders, and territory while analyzing geopolitical claims across scales and perspectives.",
       "prerequisites": [
         "GEO_HUMAN_002",
@@ -7143,13 +7149,14 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Political Geography"
     },
     {
       "id": "GEO_RISK_001",
       "name": "Hazard, vulnerability, resilience, and climate adaptation",
       "domain": "Geography",
-      "subdomain": "Risk and Environment",
+      "subdomain": "Environmental Geography",
       "description": "Treat disaster risk as an interaction among hazard, exposure, vulnerability, capacity, and decision-making under uncertainty.",
       "prerequisites": [
         "GEO_GIS_001",
@@ -7681,13 +7688,14 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Risk and Environment"
     },
     {
       "id": "GEO_SYNTH_001",
       "name": "Regional synthesis: evidence, scale, and place",
       "domain": "Geography",
-      "subdomain": "Regional Synthesis",
+      "subdomain": "Geographic Methods",
       "description": "Build a defensible regional explanation by integrating physical systems, population, economy, politics, risk, maps, and uncertainty.",
       "prerequisites": [
         "GEO_CART_002",
@@ -8239,7 +8247,8 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Regional Synthesis"
     }
   ]
 }

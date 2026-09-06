@@ -72,7 +72,7 @@
       "id": "CUSTOM_PROG_001",
       "name": "Algorithms and program execution",
       "domain": "Programming",
-      "subdomain": "Programming Foundations",
+      "subdomain": "Programming Fundamentals",
       "description": "Describe programs as precise sequences of instructions, trace state changes, and distinguish algorithms, syntax, runtime behaviour, and logic.",
       "prerequisites": [
         {
@@ -627,13 +627,14 @@
             "allow_self_review": true
           }
         }
-      ]
+      ],
+      "topic": "Programming Foundations"
     },
     {
       "id": "CUSTOM_PROG_002",
       "name": "Values, variables, and data types",
       "domain": "Programming",
-      "subdomain": "Programming Foundations",
+      "subdomain": "Programming Fundamentals",
       "description": "Store and update values with variables, distinguish core Python data types, and reason about assignment and type compatibility.",
       "prerequisites": [
         "CUSTOM_PROG_001",
@@ -1246,13 +1247,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Programming Foundations"
     },
     {
       "id": "CUSTOM_PROG_003",
       "name": "Expressions, assignment, and input/output",
       "domain": "Programming",
-      "subdomain": "Programming Foundations",
+      "subdomain": "Programming Fundamentals",
       "description": "Evaluate Python expressions with correct precedence, use arithmetic operators and conversions, update variables, and connect keyboard input to displayed output.",
       "prerequisites": [
         "CUSTOM_PROG_002",
@@ -1665,13 +1667,14 @@
             "allow_self_review": true
           }
         }
-      ]
+      ],
+      "topic": "Programming Foundations"
     },
     {
       "id": "CUSTOM_PROG_004",
       "name": "Boolean expressions and comparisons",
       "domain": "Programming",
-      "subdomain": "Control Flow",
+      "subdomain": "Programming Fundamentals",
       "description": "Build Boolean expressions with comparisons and logical operators, distinguish equality from assignment, and reason about compound conditions and boundaries.",
       "prerequisites": [
         "CUSTOM_PROG_003"
@@ -2263,13 +2266,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Control Flow"
     },
     {
       "id": "CUSTOM_PROG_005",
       "name": "Conditional execution",
       "domain": "Programming",
-      "subdomain": "Control Flow",
+      "subdomain": "Programming Fundamentals",
       "description": "Use if, elif, else, indentation, and nested decisions to select exactly the statements appropriate for a program's current state.",
       "prerequisites": [
         "CUSTOM_PROG_004"
@@ -2924,13 +2928,14 @@
             "allow_self_review": true
           }
         }
-      ]
+      ],
+      "topic": "Control Flow"
     },
     {
       "id": "CUSTOM_PROG_006",
       "name": "While loops and changing state",
       "domain": "Programming",
-      "subdomain": "Iteration",
+      "subdomain": "Programming Fundamentals",
       "description": "Control repetition with while conditions, updates, sentinels, accumulators, and termination reasoning while avoiding infinite and off-by-one loops.",
       "prerequisites": [
         "CUSTOM_PROG_005"
@@ -3443,13 +3448,14 @@
             "allow_self_review": true
           }
         }
-      ]
+      ],
+      "topic": "Iteration"
     },
     {
       "id": "CUSTOM_PROG_007",
       "name": "For loops, ranges, and accumulators",
       "domain": "Programming",
-      "subdomain": "Iteration",
+      "subdomain": "Programming Fundamentals",
       "description": "Repeat a known number of times with for and range, interpret start–stop–step rules, accumulate results, and reason about simple nested loops.",
       "prerequisites": [
         "CUSTOM_PROG_006"
@@ -4003,13 +4009,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Iteration"
     },
     {
       "id": "CUSTOM_PROG_008",
       "name": "Functions, parameters, and return values",
       "domain": "Programming",
-      "subdomain": "Program Structure",
+      "subdomain": "Software Engineering",
       "description": "Define and call reusable functions, pass arguments through parameters, return values, use local scope, and test function behaviour.",
       "prerequisites": [
         "CUSTOM_PROG_007",
@@ -4627,13 +4634,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Program Structure"
     },
     {
       "id": "CUSTOM_PROG_009",
       "name": "Strings and text processing",
       "domain": "Programming",
-      "subdomain": "Data and Collections",
+      "subdomain": "Data Structures",
       "description": "Index, slice, combine, search, and transform strings while understanding immutability and common text-processing methods.",
       "prerequisites": [
         "CUSTOM_PROG_008"
@@ -5205,13 +5213,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Data and Collections"
     },
     {
       "id": "CUSTOM_PROG_010",
       "name": "Lists, indexing, and mutation",
       "domain": "Programming",
-      "subdomain": "Data and Collections",
+      "subdomain": "Data Structures",
       "description": "Create ordered collections with lists, access and slice elements, mutate contents, and distinguish aliases from independent copies.",
       "prerequisites": [
         "CUSTOM_PROG_009"
@@ -5848,13 +5857,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Data and Collections"
     },
     {
       "id": "CUSTOM_PROG_011",
       "name": "Traversing and transforming collections",
       "domain": "Programming",
-      "subdomain": "Data and Collections",
+      "subdomain": "Data Structures",
       "description": "Process every collection element with loops, build sums and counts, filter and transform values, use enumerate, and handle empty collections safely.",
       "prerequisites": [
         "CUSTOM_PROG_010",
@@ -6480,13 +6490,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Data and Collections"
     },
     {
       "id": "CUSTOM_PROG_012",
       "name": "Dictionaries and structured data",
       "domain": "Programming",
-      "subdomain": "Data and Collections",
+      "subdomain": "Data Structures",
       "description": "Represent key–value relationships with dictionaries, retrieve and update entries, handle missing keys, iterate through items, and build frequency tables.",
       "prerequisites": [
         "CUSTOM_PROG_011"
@@ -7106,13 +7117,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Data and Collections"
     },
     {
       "id": "CUSTOM_PROG_013",
       "name": "Debugging, testing, and edge cases",
       "domain": "Programming",
-      "subdomain": "Software Quality",
+      "subdomain": "Software Engineering",
       "description": "Classify defects, use tracebacks and small reproductions, test boundaries and edge cases, write assertions, and preserve fixes with regression tests.",
       "prerequisites": [
         "CUSTOM_PROG_008",
@@ -7700,13 +7712,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Software Quality"
     },
     {
       "id": "CUSTOM_PROG_014",
       "name": "Problem decomposition and practical algorithms",
       "domain": "Programming",
-      "subdomain": "Algorithm Design",
+      "subdomain": "Algorithms",
       "description": "Turn requirements into smaller functions, design searches and scans, state accumulator meaning, handle missing results, and compare linear with quadratic work.",
       "prerequisites": [
         "CUSTOM_PROG_012",
@@ -8329,13 +8342,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Algorithm Design"
     },
     {
       "id": "CUSTOM_PROG_015",
       "name": "Capstone: build a tested data-summary program",
       "domain": "Programming",
-      "subdomain": "Capstone",
+      "subdomain": "Software Engineering",
       "description": "Combine functions, validation, conditionals, loops, lists, dictionaries, percentages, testing, and decomposition in a complete score-analysis program.",
       "prerequisites": [
         "CUSTOM_PROG_014",
@@ -8813,7 +8827,8 @@
             "allow_self_review": false
           }
         }
-      ]
+      ],
+      "topic": "Capstone"
     },
     {
       "id": "CUSTOM_PROG_016",
@@ -9439,7 +9454,7 @@
       "id": "CUSTOM_PROG_017",
       "name": "Nested collections and records",
       "domain": "Programming",
-      "subdomain": "Structured Data",
+      "subdomain": "Data Structures",
       "description": "Model table-like records with nested lists and dictionaries, traverse them safely, and reason about nested mutation and copying.",
       "prerequisites": [
         "CUSTOM_PROG_016",
@@ -10038,13 +10053,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Structured Data"
     },
     {
       "id": "CUSTOM_PROG_018",
       "name": "Files, paths, and context managers",
       "domain": "Programming",
-      "subdomain": "Persistence",
+      "subdomain": "Software Engineering",
       "description": "Read and write text files safely with explicit modes, paths, encodings, and context-managed resource cleanup.",
       "prerequisites": [
         "CUSTOM_PROG_017",
@@ -10497,13 +10513,14 @@
             "allow_self_review": true
           }
         }
-      ]
+      ],
+      "topic": "Persistence"
     },
     {
       "id": "CUSTOM_PROG_019",
       "name": "Exceptions and defensive programming",
       "domain": "Programming",
-      "subdomain": "Reliability",
+      "subdomain": "Software Engineering",
       "description": "Handle expected failures with narrow exceptions, validate contracts explicitly, and preserve useful diagnostic information.",
       "prerequisites": [
         "CUSTOM_PROG_018",
@@ -10974,13 +10991,14 @@
             "allow_self_review": true
           }
         }
-      ]
+      ],
+      "topic": "Reliability"
     },
     {
       "id": "CUSTOM_PROG_020",
       "name": "Modules, imports, and the standard library",
       "domain": "Programming",
-      "subdomain": "Program Organization",
+      "subdomain": "Software Engineering",
       "description": "Organize reusable code into modules and use selected standard-library tools through clear, testable imports.",
       "prerequisites": [
         "CUSTOM_PROG_019",
@@ -11432,13 +11450,14 @@
             "allow_self_review": true
           }
         }
-      ]
+      ],
+      "topic": "Program Organization"
     },
     {
       "id": "CUSTOM_PROG_021",
       "name": "Comprehensions and data pipelines",
       "domain": "Programming",
-      "subdomain": "Data Transformation",
+      "subdomain": "Data Structures",
       "description": "Transform, filter, and aggregate collections with readable comprehensions and staged data-processing pipelines.",
       "prerequisites": [
         "CUSTOM_PROG_020",
@@ -12003,13 +12022,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Data Transformation"
     },
     {
       "id": "CUSTOM_PROG_022",
       "name": "Classes, objects, and methods",
       "domain": "Programming",
-      "subdomain": "Object-Oriented Programming",
+      "subdomain": "Software Engineering",
       "description": "Bundle related state and behavior into small classes with clear constructors, instance methods, invariants, and composition.",
       "prerequisites": [
         "CUSTOM_PROG_020",
@@ -12427,7 +12447,8 @@
             "allow_self_review": true
           }
         }
-      ]
+      ],
+      "topic": "Object-Oriented Programming"
     },
     {
       "id": "CUSTOM_PROG_023",
@@ -12990,7 +13011,7 @@
       "id": "CUSTOM_PROG_024",
       "name": "Program architecture and command-line applications",
       "domain": "Programming",
-      "subdomain": "Software Design",
+      "subdomain": "Software Engineering",
       "description": "Separate domain logic, state, persistence, parsing, and interaction to build testable command-line applications.",
       "prerequisites": [
         "CUSTOM_PROG_018",
@@ -13580,13 +13601,14 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Software Design"
     },
     {
       "id": "CUSTOM_PROG_025",
       "name": "Capstone: build a persistent study tracker",
       "domain": "Programming",
-      "subdomain": "Capstone Projects",
+      "subdomain": "Software Engineering",
       "description": "Build and test a multi-module command-line application with structured state, JSON persistence, validation, statistics, and recovery policies.",
       "prerequisites": [
         "CUSTOM_PROG_024"
@@ -14222,7 +14244,8 @@
             }
           }
         }
-      ]
+      ],
+      "topic": "Capstone Projects"
     }
   ]
 }

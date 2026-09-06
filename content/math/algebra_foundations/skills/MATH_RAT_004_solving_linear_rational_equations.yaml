@@ -2,7 +2,8 @@ id: MATH_RAT_004
 schema_version: 0.2
 name: Solving linear rational equations
 domain: Math
-subdomain: Rational Expressions and Equations
+subdomain: Algebra
+topic: Rational Expressions and Equations
 description: Solve rational equations that reduce to linear equations by recording restrictions, clearing denominators,
   solving, and checking the original equation.
 prerequisites:

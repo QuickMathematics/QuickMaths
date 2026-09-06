@@ -2,7 +2,8 @@ id: MATH_GRAPH_001
 schema_version: 0.2
 name: Coordinate plane
 domain: Math
-subdomain: Coordinate Graphing
+subdomain: Geometry
+topic: Coordinate Graphing
 description: Read and interpret points on the coordinate plane using x-coordinates,
   y-coordinates, axes, and quadrants.
 prerequisites:

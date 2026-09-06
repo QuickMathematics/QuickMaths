@@ -2,7 +2,8 @@ id: MATH_PREALG_003
 schema_version: 0.2
 name: Distributive property
 domain: Math
-subdomain: Pre-Algebra
+subdomain: Algebra
+topic: Pre-Algebra
 description: Use the distributive property to multiply a factor across every term inside parentheses.
 prerequisites:
   - MATH_PREALG_002

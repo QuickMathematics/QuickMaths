@@ -2,7 +2,8 @@ id: MATH_RAT_006
 schema_version: 0.2
 name: Rational functions, holes, and asymptotes
 domain: Math
-subdomain: Rational Functions
+subdomain: Algebra
+topic: Rational Functions
 description: Analyze rational functions by reducing formulas while preserving domains, locating holes and asymptotes,
   and finding intercepts and end behavior.
 prerequisites:

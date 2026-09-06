@@ -2,7 +2,8 @@ id: MATH_GRAPH_004
 schema_version: 0.2
 name: Slope-intercept form
 domain: Math
-subdomain: Linear Functions
+subdomain: Geometry
+topic: Linear Functions
 description: Interpret and write linear equations in slope-intercept form y = mx + b.
 prerequisites:
   - MATH_ALG_005

@@ -2,7 +2,8 @@ id: MATH_INEQ_002
 schema_version: 0.2
 name: Polynomial inequalities and sign charts
 domain: Math
-subdomain: Inequalities and Solution Sets
+subdomain: Algebra
+topic: Inequalities and Solution Sets
 description: Solve factored and factorable polynomial inequalities by finding real zeros, building sign charts, tracking
   multiplicity, and selecting intervals with the required sign.
 prerequisites:

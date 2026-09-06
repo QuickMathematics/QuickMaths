@@ -19,7 +19,7 @@
       "subjectId": "SUBJECT_MATH",
       "name": "Angles, bearings, and degree measure",
       "domain": "Math",
-      "subdomain": "Coordinate Geometry",
+      "subdomain": "Geometry",
       "description": "Measure rotation in degrees, distinguish direction from orientation, and use bearings as angular descriptions of location.",
       "prerequisites": [
         "MATH_ARITH_003",
@@ -487,14 +487,15 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Coordinate Geometry"
     },
     {
       "id": "MATH_GEOM_002",
       "subjectId": "SUBJECT_MATH",
       "name": "Circles, arcs, and angular distance",
       "domain": "Math",
-      "subdomain": "Coordinate Geometry",
+      "subdomain": "Geometry",
       "description": "Relate central angles to arc length and use radians or degree fractions to measure distance along a circle.",
       "prerequisites": [
         "MATH_GEOM_001",
@@ -961,14 +962,15 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Coordinate Geometry"
     },
     {
       "id": "MATH_GEOM_003",
       "subjectId": "SUBJECT_MATH",
       "name": "Spherical coordinates and great-circle models",
       "domain": "Math",
-      "subdomain": "Coordinate Geometry",
+      "subdomain": "Geometry",
       "description": "Extend coordinate reasoning from a plane to a sphere and model angular separation, meridians, parallels, and great-circle distance.",
       "prerequisites": [
         "MATH_GEOM_002",
@@ -1468,7 +1470,8 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Coordinate Geometry"
     }
   ]
 }

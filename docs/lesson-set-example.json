@@ -18,20 +18,33 @@
     "name": "Personal Finance Practice",
     "domain": "Math",
     "description": "Use percentages in everyday money decisions.",
-    "entry_skills": ["CUSTOM_FINANCE_DISCOUNTS"],
-    "exit_skills": ["CUSTOM_FINANCE_DISCOUNTS"],
-    "skills": ["CUSTOM_FINANCE_DISCOUNTS"]
+    "entry_skills": [
+      "CUSTOM_FINANCE_DISCOUNTS"
+    ],
+    "exit_skills": [
+      "CUSTOM_FINANCE_DISCOUNTS"
+    ],
+    "skills": [
+      "CUSTOM_FINANCE_DISCOUNTS"
+    ]
   },
   "skills": [
     {
       "id": "CUSTOM_FINANCE_DISCOUNTS",
       "name": "Discounts, tips, and tax",
       "domain": "Math",
-      "subdomain": "Personal Finance",
+      "subdomain": "Arithmetic",
       "description": "Calculate percentage increases and decreases in practical money situations.",
-      "prerequisites": ["MATH_ARITH_005"],
+      "prerequisites": [
+        "MATH_ARITH_005"
+      ],
       "unlocks": [],
-      "tags": ["percent", "money", "discount", "tax"],
+      "tags": [
+        "percent",
+        "money",
+        "discount",
+        "tax"
+      ],
       "mastery": {
         "passing_score": 0.8,
         "minimum_confidence": 3,
@@ -66,10 +79,17 @@
           "expected_answer": "40",
           "answer_type": "numeric",
           "grading_method": "exact_numeric",
-          "solution_steps": ["20% of 50 is 10. Subtract 10 from 50 to get 40."],
-          "mistake_tags": ["percent_conversion", "discount_direction"],
+          "solution_steps": [
+            "20% of 50 is 10. Subtract 10 from 50 to get 40."
+          ],
+          "mistake_tags": [
+            "percent_conversion",
+            "discount_direction"
+          ],
           "answer_mode": "final_only",
-          "work": { "mode": "none" }
+          "work": {
+            "mode": "none"
+          }
         },
         {
           "template_id": "CUSTOM_FINANCE_Q02",
@@ -80,10 +100,17 @@
           "answer_type": "numeric",
           "grading_method": "numeric_with_tolerance",
           "tolerance": 0.01,
-          "solution_steps": ["Multiply 24 by 1.15 to include the original cost and the 15% tip: 27.60."],
-          "mistake_tags": ["percent_conversion", "increase_direction"],
+          "solution_steps": [
+            "Multiply 24 by 1.15 to include the original cost and the 15% tip: 27.60."
+          ],
+          "mistake_tags": [
+            "percent_conversion",
+            "increase_direction"
+          ],
           "answer_mode": "final_only",
-          "work": { "mode": "none" }
+          "work": {
+            "mode": "none"
+          }
         },
         {
           "template_id": "CUSTOM_FINANCE_Q03",
@@ -93,10 +120,17 @@
           "expected_answer": "24",
           "answer_type": "numeric",
           "grading_method": "exact_numeric",
-          "solution_steps": ["Convert 30% to 0.30, then multiply 80 by 0.30 to get 24."],
-          "mistake_tags": ["percent_conversion", "discount_amount"],
+          "solution_steps": [
+            "Convert 30% to 0.30, then multiply 80 by 0.30 to get 24."
+          ],
+          "mistake_tags": [
+            "percent_conversion",
+            "discount_amount"
+          ],
           "answer_mode": "final_only",
-          "work": { "mode": "none" }
+          "work": {
+            "mode": "none"
+          }
         },
         {
           "template_id": "CUSTOM_FINANCE_Q04",
@@ -107,8 +141,13 @@
           "answer_type": "numeric",
           "grading_method": "numeric_with_tolerance",
           "tolerance": 0.01,
-          "solution_steps": ["Multiply 120 by 1.08 to include the original price and 8% tax: 129.60."],
-          "mistake_tags": ["percent_conversion", "tax_direction"],
+          "solution_steps": [
+            "Multiply 120 by 1.08 to include the original price and 8% tax: 129.60."
+          ],
+          "mistake_tags": [
+            "percent_conversion",
+            "tax_direction"
+          ],
           "answer_mode": "final_plus_required_work",
           "work": {
             "mode": "procedural_steps",
@@ -125,8 +164,13 @@
           "expected_answer": "187",
           "answer_type": "numeric",
           "grading_method": "exact_numeric",
-          "solution_steps": ["Apply the discount: 200 × 0.85 = 170. Then apply tax: 170 × 1.10 = 187."],
-          "mistake_tags": ["successive_percentages", "operation_order"],
+          "solution_steps": [
+            "Apply the discount: 200 × 0.85 = 170. Then apply tax: 170 × 1.10 = 187."
+          ],
+          "mistake_tags": [
+            "successive_percentages",
+            "operation_order"
+          ],
           "answer_mode": "final_plus_required_work",
           "work": {
             "mode": "procedural_steps",
@@ -135,7 +179,8 @@
             "require_final_answer_match": true
           }
         }
-      ]
+      ],
+      "topic": "Personal Finance"
     }
   ]
 }

@@ -2,7 +2,8 @@ id: MATH_QUAD_003
 schema_version: 0.2
 name: Quadratic formula and discriminant
 domain: Math
-subdomain: Quadratic Equations
+subdomain: Algebra
+topic: Quadratic Equations
 description: Use the discriminant to classify quadratic roots and apply the quadratic formula to rational and irrational
   solutions.
 prerequisites:

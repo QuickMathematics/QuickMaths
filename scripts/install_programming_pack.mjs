@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { normalizeLessonTaxonomy } from "../docs/learning-fields.js";
 
 if (!process.argv[2]) {
   throw new Error("Usage: node scripts/install_programming_pack.mjs <extracted-programming-pack-directory>");
@@ -251,6 +252,7 @@ for (const problem of codeProblems) {
 }
 
 pack.version = "1.2.0";
+pack.skills = pack.skills.map((skill) => normalizeLessonTaxonomy(skill, pack.subject.id));
 pack.description = `${pack.description} Version 1.2 adds formatted Python prompts, deterministic trace-table checks, and isolated pure-function programming assessments.`;
 pack.track.schema_version = "2.0";
 

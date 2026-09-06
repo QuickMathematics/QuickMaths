@@ -2,7 +2,8 @@ id: MATH_QUAD_005
 schema_version: 0.2
 name: Quadratic modeling and optimization
 domain: Math
-subdomain: Quadratic Functions
+subdomain: Algebra
+topic: Quadratic Functions
 description: Interpret and solve quadratic models involving maximums, minimums, intercepts, physical domains, fixed-perimeter
   area, and constant second differences.
 prerequisites:

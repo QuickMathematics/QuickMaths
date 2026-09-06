@@ -255,3 +255,35 @@ test("Studio lists field-scoped branches and exports compatible lesson file keys
   assert.equal(pack.subject.id, "SUBJECT_MATH");
   assert.equal(pack.skills[0].subdomain, "Geometry");
 });
+
+
+test("Studio opens old lesson categories as branch and topic and round-trips both", () => {
+  const { studio, state } = studioHarness();
+  studio.loadNativeLesson(state.selectedSkill.id);
+  const pack = studio.buildPack();
+  pack.skills[0].subdomain = "Quadratic Equations"; delete pack.skills[0].topic;
+  assert.equal(studio.loadRaw(JSON.stringify(pack)), true);
+  const migrated = studio.buildPack();
+  assert.equal(migrated.skills[0].subdomain, "Algebra");
+  assert.equal(migrated.skills[0].topic, "Quadratic Equations");
+  assert.deepEqual(migrated.skills[0].problems, pack.skills[0].problems);
+  assert.match(studio.render(state), /Topic \(optional\)/);
+});
+
+
+test("Studio field choices persist across renders and update only the untouched default branch", () => {
+  const { studio, state } = studioHarness();
+  state.subjects.push({ ...state.activeSubject, id: "SUBJECT_PROGRAMMING", name: "Programming" });
+  const change = (path, value) => studio.handleInput({ value, type: "text", matches: () => false, dataset: { creatorField: path } });
+  change("draft.subjectId", "SUBJECT_PROGRAMMING");
+  studio.render(state);
+  assert.equal(studio.buildPack().subject.id, "SUBJECT_PROGRAMMING");
+  assert.equal(studio.buildPack().skills[0].subdomain, "Programming Fundamentals");
+  change("skill.subdomain", "My custom branch");
+  change("skill.topic", "My topic");
+  change("draft.subjectId", "SUBJECT_MATH");
+  studio.render(state);
+  assert.equal(studio.buildPack().subject.id, "SUBJECT_MATH");
+  assert.equal(studio.buildPack().skills[0].subdomain, "My custom branch");
+  assert.equal(studio.buildPack().skills[0].topic, "My topic");
+});

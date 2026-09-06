@@ -131,9 +131,31 @@
         "lesson"
       ],
       "example": "Mathematics → Geometry → Lesson",
-      "compatibility": "Field is stored as subject / subjectId / subject_id; branch is stored as subdomain on each lesson. Keep the existing JSON keys and stable IDs. list_fields and list_branches expose field-scoped branch membership; list_subjects is retained for compatibility.",
-      "map_navigation": "Field and Branch filter the Lesson jump list. The combined mastery map and saved node positions remain unchanged.",
-      "authoring": "Select or create the field in Lesson Studio, then select or type the branch for each lesson. A lesson set can span multiple branches in its field. Prerequisites can cross branches and fields."
+      "compatibility": "Keep subject / subjectId / subject_id and subdomain file keys and stable lesson IDs. subdomain stores the broad branch; optional topic preserves finer subject matter. Legacy known categories are normalized when loading installed packs, curricula, backups and Studio drafts. Unknown custom branch names are preserved. list_subjects remains compatible.",
+      "map_navigation": "The canonical map groups lessons in labeled branch bands within fields. Field and Branch filter the Lesson jump list. Saved Plan-view coordinates are preserved; Group by field & branch in Plan details resets positions to the new grouping only when selected by the human.",
+      "authoring": "Use the documented broad branches: e.g. Mathematics → Algebra, topic Quadratic Equations. Reuse a branch before creating a new broad area. Studio has separate Branch and Topic fields. Prerequisites can cross branches and fields; taxonomy changes must preserve assessment content, IDs, learning evidence and custom map work.",
+      "taxonomy_url": "https://quickmathematics.github.io/QuickMaths/learning-taxonomy.json",
+      "lesson_reference_url": "https://quickmathematics.github.io/QuickMaths/FIELDS_AND_BRANCHES.md",
+      "branches": {
+        "Mathematics": [
+          "Arithmetic",
+          "Algebra",
+          "Geometry"
+        ],
+        "Geography": [
+          "Geographic Methods",
+          "Cartography and GIS",
+          "Physical Geography",
+          "Human Geography",
+          "Environmental Geography"
+        ],
+        "Programming": [
+          "Programming Fundamentals",
+          "Data Structures",
+          "Algorithms",
+          "Software Engineering"
+        ]
+      }
     }
   },
   "github_bridge": {

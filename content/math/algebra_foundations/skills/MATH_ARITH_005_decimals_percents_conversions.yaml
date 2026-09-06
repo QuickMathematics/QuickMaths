@@ -2,7 +2,8 @@ id: MATH_ARITH_005
 schema_version: 0.2
 name: Decimals, percents, and conversions
 domain: Math
-subdomain: Arithmetic Foundations
+subdomain: Arithmetic
+topic: Arithmetic Foundations
 description: Convert between fractions, decimals, and percents using place value, equivalent forms, and percent calculations.
 prerequisites:
   - MATH_ARITH_003

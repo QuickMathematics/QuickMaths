@@ -2,7 +2,8 @@ id: MATH_INEQ_001
 schema_version: 0.2
 name: Interval notation and compound inequalities
 domain: Math
-subdomain: Inequalities and Solution Sets
+subdomain: Algebra
+topic: Inequalities and Solution Sets
 description: Represent real solution sets with interval notation and solve compound and absolute-value inequalities involving
   unions, intersections, empty sets, and all real numbers.
 prerequisites:

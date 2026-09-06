@@ -2,7 +2,8 @@ id: MATH_ARITH_001
 schema_version: 0.2
 name: Integer operations
 domain: Math
-subdomain: Arithmetic Foundations
+subdomain: Arithmetic
+topic: Arithmetic Foundations
 description: Add, subtract, multiply, and divide positive and negative integers.
 prerequisites: []
 tags:

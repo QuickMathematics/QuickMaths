@@ -73,6 +73,7 @@ class Skill:
     draft: bool = False
     deprecated: bool = False
     replacement_skill_id: str = ""
+    topic: str = ""
 
 
 @dataclass(frozen=True)

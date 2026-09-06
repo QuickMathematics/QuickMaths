@@ -85,7 +85,8 @@
       "id": "MATH_ARITH_001",
       "name": "Integer operations",
       "domain": "Math",
-      "subdomain": "Arithmetic Foundations",
+      "subdomain": "Arithmetic",
+      "topic": "Arithmetic Foundations",
       "description": "Add, subtract, multiply, and divide positive and negative integers.",
       "prerequisites": [],
       "unlocks": [
@@ -1924,7 +1925,8 @@
       "id": "MATH_ARITH_002",
       "name": "Order of operations",
       "domain": "Math",
-      "subdomain": "Arithmetic Foundations",
+      "subdomain": "Arithmetic",
+      "topic": "Arithmetic Foundations",
       "description": "Evaluate arithmetic expressions using grouping, exponents, multiplication and division, and addition and subtraction in the correct order.",
       "prerequisites": [
         "MATH_ARITH_001"
@@ -5157,7 +5159,8 @@
       "id": "MATH_ARITH_003",
       "name": "Fractions basics",
       "domain": "Math",
-      "subdomain": "Arithmetic Foundations",
+      "subdomain": "Arithmetic",
+      "topic": "Arithmetic Foundations",
       "description": "Understand fractions as parts of a whole, simplify fractions, recognize equivalent fractions, and compare simple fractions.",
       "prerequisites": [
         "MATH_ARITH_001"
@@ -9348,7 +9351,8 @@
       "id": "MATH_GRAPH_001",
       "name": "Coordinate plane",
       "domain": "Math",
-      "subdomain": "Coordinate Graphing",
+      "subdomain": "Geometry",
+      "topic": "Coordinate Graphing",
       "description": "Read and interpret points on the coordinate plane using x-coordinates, y-coordinates, axes, and quadrants.",
       "prerequisites": [
         "MATH_ARITH_001"
@@ -10629,7 +10633,8 @@
       "id": "MATH_PREALG_001",
       "name": "Variables and substitution",
       "domain": "Math",
-      "subdomain": "Pre-Algebra",
+      "subdomain": "Algebra",
+      "topic": "Pre-Algebra",
       "description": "Evaluate expressions by replacing variables with given values and simplifying correctly.",
       "prerequisites": [
         "MATH_ARITH_002"
@@ -14931,7 +14936,8 @@
       "id": "MATH_FUNC_001",
       "name": "Function notation and representations",
       "domain": "Math",
-      "subdomain": "Functions",
+      "subdomain": "Algebra",
+      "topic": "Functions",
       "description": "Interpret functions as input-output rules, evaluate function notation, and connect formulas, tables, ordered pairs, domains, and ranges.",
       "prerequisites": [
         "MATH_PREALG_001",
@@ -16756,7 +16762,8 @@
       "id": "MATH_PREALG_002",
       "name": "Combining like terms",
       "domain": "Math",
-      "subdomain": "Pre-Algebra",
+      "subdomain": "Algebra",
+      "topic": "Pre-Algebra",
       "description": "Simplify expressions by combining terms that have the same variable part.",
       "prerequisites": [
         "MATH_PREALG_001"
@@ -19909,7 +19916,8 @@
       "id": "MATH_PREALG_003",
       "name": "Distributive property",
       "domain": "Math",
-      "subdomain": "Pre-Algebra",
+      "subdomain": "Algebra",
+      "topic": "Pre-Algebra",
       "description": "Use the distributive property to multiply a factor across every term inside parentheses.",
       "prerequisites": [
         "MATH_PREALG_002"
@@ -23113,7 +23121,8 @@
       "id": "MATH_EXP_001",
       "name": "Exponent laws",
       "domain": "Math",
-      "subdomain": "Exponents and Polynomials",
+      "subdomain": "Algebra",
+      "topic": "Exponents and Polynomials",
       "description": "Simplify powers and monomials using product, quotient, power, zero-exponent, and negative-exponent rules.",
       "prerequisites": [
         "MATH_PREALG_002",
@@ -25079,7 +25088,8 @@
       "id": "MATH_RAD_001",
       "name": "Square roots and simplifying radicals",
       "domain": "Math",
-      "subdomain": "Radicals and Quadratics",
+      "subdomain": "Algebra",
+      "topic": "Radicals and Quadratics",
       "description": "Interpret principal square roots, simplify numerical radicals using perfect-square factors, combine like radicals, and reason about real square roots.",
       "prerequisites": [
         "MATH_EXP_001"
@@ -26956,7 +26966,8 @@
       "id": "MATH_POLY_001",
       "name": "Adding and subtracting polynomials",
       "domain": "Math",
-      "subdomain": "Exponents and Polynomials",
+      "subdomain": "Algebra",
+      "topic": "Exponents and Polynomials",
       "description": "Identify polynomial structure and add or subtract polynomials by organizing and combining like terms.",
       "prerequisites": [
         "MATH_EXP_001",
@@ -28908,7 +28919,8 @@
       "id": "MATH_POLY_002",
       "name": "Multiplying polynomials",
       "domain": "Math",
-      "subdomain": "Exponents and Polynomials",
+      "subdomain": "Algebra",
+      "topic": "Exponents and Polynomials",
       "description": "Expand and simplify products of monomials, binomials, and simple polynomials using distribution and exponent laws.",
       "prerequisites": [
         "MATH_POLY_001"
@@ -31031,7 +31043,8 @@
       "id": "MATH_POLY_003",
       "name": "Factoring common factors",
       "domain": "Math",
-      "subdomain": "Exponents and Polynomials",
+      "subdomain": "Algebra",
+      "topic": "Exponents and Polynomials",
       "description": "Factor numerical and monomial greatest common factors from polynomial expressions and verify the result by distribution.",
       "prerequisites": [
         "MATH_POLY_002"
@@ -33519,7 +33532,8 @@
       "id": "MATH_POLY_004",
       "name": "Factoring monic quadratics",
       "domain": "Math",
-      "subdomain": "Exponents and Polynomials",
+      "subdomain": "Algebra",
+      "topic": "Exponents and Polynomials",
       "description": "Factor quadratic expressions of the form x^2 + bx + c using factor pairs, sign patterns, common factors, and special products.",
       "prerequisites": [
         "MATH_POLY_003"
@@ -36057,7 +36071,8 @@
       "id": "MATH_ALG_001",
       "name": "One-step equations",
       "domain": "Math",
-      "subdomain": "Algebra Foundations",
+      "subdomain": "Algebra",
+      "topic": "Algebra Foundations",
       "description": "Solve equations that require one inverse operation to isolate the variable.",
       "prerequisites": [
         "MATH_PREALG_002"
@@ -40268,7 +40283,8 @@
       "id": "MATH_GRAPH_002",
       "name": "Slope from two points",
       "domain": "Math",
-      "subdomain": "Coordinate Graphing",
+      "subdomain": "Geometry",
+      "topic": "Coordinate Graphing",
       "description": "Find the slope of a line using two points on the coordinate plane.",
       "prerequisites": [
         "MATH_GRAPH_001",
@@ -41717,7 +41733,8 @@
       "id": "MATH_ARITH_004",
       "name": "Multiplying and dividing fractions",
       "domain": "Math",
-      "subdomain": "Arithmetic Foundations",
+      "subdomain": "Arithmetic",
+      "topic": "Arithmetic Foundations",
       "description": "Multiply and divide fractions, including whole-number, reciprocal, zero, and signed fraction cases.",
       "prerequisites": [
         "MATH_ARITH_003"
@@ -45191,7 +45208,8 @@
       "id": "MATH_RAT_001",
       "name": "Rational expressions and domain restrictions",
       "domain": "Math",
-      "subdomain": "Rational Expressions and Equations",
+      "subdomain": "Algebra",
+      "topic": "Rational Expressions and Equations",
       "description": "Identify excluded values, factor rational expressions, cancel common factors correctly, and preserve the original domain after simplification.",
       "prerequisites": [
         "MATH_ARITH_004",
@@ -47600,7 +47618,8 @@
       "id": "MATH_RAT_002",
       "name": "Multiplying and dividing rational expressions",
       "domain": "Math",
-      "subdomain": "Rational Expressions and Equations",
+      "subdomain": "Algebra",
+      "topic": "Rational Expressions and Equations",
       "description": "Multiply rational expressions by factoring and canceling, divide by multiplying by the reciprocal, and track every denominator and zero-divisor restriction.",
       "prerequisites": [
         "MATH_RAT_001"
@@ -50077,7 +50096,8 @@
       "id": "MATH_RAT_003",
       "name": "Adding and subtracting rational expressions",
       "domain": "Math",
-      "subdomain": "Rational Expressions and Equations",
+      "subdomain": "Algebra",
+      "topic": "Rational Expressions and Equations",
       "description": "Find least common denominators, combine rational expressions, simplify the result, and preserve restrictions from every original denominator.",
       "prerequisites": [
         "MATH_RAT_002"
@@ -51996,7 +52016,8 @@
       "id": "MATH_ARITH_005",
       "name": "Decimals, percents, and conversions",
       "domain": "Math",
-      "subdomain": "Arithmetic Foundations",
+      "subdomain": "Arithmetic",
+      "topic": "Arithmetic Foundations",
       "description": "Convert between fractions, decimals, and percents using place value, equivalent forms, and percent calculations.",
       "prerequisites": [
         "MATH_ARITH_003"
@@ -56778,7 +56799,8 @@
       "id": "MATH_PREALG_005",
       "name": "Translating words into expressions",
       "domain": "Math",
-      "subdomain": "Pre-Algebra",
+      "subdomain": "Algebra",
+      "topic": "Pre-Algebra",
       "description": "Translate common word phrases into algebraic expressions using variables, operations, and grouping.",
       "prerequisites": [
         "MATH_PREALG_001"
@@ -60440,7 +60462,8 @@
       "id": "MATH_PREALG_004",
       "name": "Simplifying linear expressions",
       "domain": "Math",
-      "subdomain": "Pre-Algebra",
+      "subdomain": "Algebra",
+      "topic": "Pre-Algebra",
       "description": "Simplify linear expressions by distributing when needed and combining like terms.",
       "prerequisites": [
         "MATH_PREALG_003"
@@ -64892,7 +64915,8 @@
       "id": "MATH_ALG_008",
       "name": "Absolute value as distance",
       "domain": "Math",
-      "subdomain": "Algebra Foundations",
+      "subdomain": "Algebra",
+      "topic": "Algebra Foundations",
       "description": "Interpret absolute value as distance from zero and solve simple absolute value equations.",
       "prerequisites": [
         "MATH_ARITH_001",
@@ -66543,7 +66567,8 @@
       "id": "MATH_ALG_002",
       "name": "Two-step equations",
       "domain": "Math",
-      "subdomain": "Algebra Foundations",
+      "subdomain": "Algebra",
+      "topic": "Algebra Foundations",
       "description": "Solve two-step linear equations by undoing addition or subtraction and then undoing multiplication or division.",
       "prerequisites": [
         "MATH_PREALG_004",
@@ -70659,7 +70684,8 @@
       "id": "MATH_GRAPH_003",
       "name": "Slope as rate of change",
       "domain": "Math",
-      "subdomain": "Linear Functions",
+      "subdomain": "Geometry",
+      "topic": "Linear Functions",
       "description": "Interpret slope as a rate of change between two quantities in tables, graphs, and real-world contexts.",
       "prerequisites": [
         "MATH_GRAPH_002"
@@ -72309,7 +72335,8 @@
       "id": "MATH_SEQ_001",
       "name": "Arithmetic sequences",
       "domain": "Math",
-      "subdomain": "Sequences",
+      "subdomain": "Algebra",
+      "topic": "Sequences",
       "description": "Recognize arithmetic sequences, use common differences, and write recursive and explicit rules for linear patterns.",
       "prerequisites": [
         "MATH_FUNC_001",
@@ -74247,7 +74274,8 @@
       "id": "MATH_SEQ_002",
       "name": "Geometric sequences",
       "domain": "Math",
-      "subdomain": "Sequences",
+      "subdomain": "Algebra",
+      "topic": "Sequences",
       "description": "Recognize geometric sequences, use common ratios, and write recursive and explicit rules for multiplicative patterns.",
       "prerequisites": [
         "MATH_SEQ_001",
@@ -76109,7 +76137,8 @@
       "id": "MATH_EXP_002",
       "name": "Exponential functions and percent change",
       "domain": "Math",
-      "subdomain": "Exponential Functions",
+      "subdomain": "Algebra",
+      "topic": "Exponential Functions",
       "description": "Interpret and evaluate exponential functions, including initial values, growth factors, decay factors, repeated percent change, and asymptotes.",
       "prerequisites": [
         "MATH_SEQ_002",
@@ -78165,7 +78194,8 @@
       "id": "MATH_ALG_003",
       "name": "Variables on both sides",
       "domain": "Math",
-      "subdomain": "Algebra Foundations",
+      "subdomain": "Algebra",
+      "topic": "Algebra Foundations",
       "description": "Solve linear equations that have variable terms on both sides by moving variable terms to one side first.",
       "prerequisites": [
         "MATH_ALG_002"
@@ -82399,7 +82429,8 @@
       "id": "MATH_EXP_003",
       "name": "Exponential equations with common bases",
       "domain": "Math",
-      "subdomain": "Exponential Functions",
+      "subdomain": "Algebra",
+      "topic": "Exponential Functions",
       "description": "Solve exponential equations by isolating powers, rewriting expressions with a common base, and equating exponents.",
       "prerequisites": [
         "MATH_EXP_002",
@@ -84278,7 +84309,8 @@
       "id": "MATH_QUAD_001",
       "name": "Solving quadratics by factoring",
       "domain": "Math",
-      "subdomain": "Quadratic Equations",
+      "subdomain": "Algebra",
+      "topic": "Quadratic Equations",
       "description": "Solve factorable quadratic equations by writing them in standard form, factoring, and applying the zero-product property.",
       "prerequisites": [
         "MATH_POLY_004",
@@ -85821,7 +85853,8 @@
       "id": "MATH_QUAD_002",
       "name": "Completing the square",
       "domain": "Math",
-      "subdomain": "Quadratic Equations",
+      "subdomain": "Algebra",
+      "topic": "Quadratic Equations",
       "description": "Rewrite quadratic expressions as perfect squares, solve quadratic equations by taking square roots, and interpret vertex form.",
       "prerequisites": [
         "MATH_QUAD_001",
@@ -87724,7 +87757,8 @@
       "id": "MATH_QUAD_003",
       "name": "Quadratic formula and discriminant",
       "domain": "Math",
-      "subdomain": "Quadratic Equations",
+      "subdomain": "Algebra",
+      "topic": "Quadratic Equations",
       "description": "Use the discriminant to classify quadratic roots and apply the quadratic formula to rational and irrational solutions.",
       "prerequisites": [
         "MATH_QUAD_002"
@@ -89848,7 +89882,8 @@
       "id": "MATH_RAT_004",
       "name": "Solving linear rational equations",
       "domain": "Math",
-      "subdomain": "Rational Expressions and Equations",
+      "subdomain": "Algebra",
+      "topic": "Rational Expressions and Equations",
       "description": "Solve rational equations that reduce to linear equations by recording restrictions, clearing denominators, solving, and checking the original equation.",
       "prerequisites": [
         "MATH_RAT_003",
@@ -91696,7 +91731,8 @@
       "id": "MATH_RAT_005",
       "name": "Extraneous solutions in rational equations",
       "domain": "Math",
-      "subdomain": "Rational Expressions and Equations",
+      "subdomain": "Algebra",
+      "topic": "Rational Expressions and Equations",
       "description": "Solve rational equations that produce multiple candidates, reject excluded or non-real candidates, and distinguish valid roots from extraneous solutions.",
       "prerequisites": [
         "MATH_RAT_004",
@@ -93445,7 +93481,8 @@
       "id": "MATH_ALG_006",
       "name": "Inequalities",
       "domain": "Math",
-      "subdomain": "Algebra Foundations",
+      "subdomain": "Algebra",
+      "topic": "Algebra Foundations",
       "description": "Solve one-step and two-step linear inequalities without needing to reverse the inequality sign.",
       "prerequisites": [
         "MATH_ALG_002"
@@ -97316,7 +97353,8 @@
       "id": "MATH_ALG_005",
       "name": "Literal equations",
       "domain": "Math",
-      "subdomain": "Algebra Foundations",
+      "subdomain": "Algebra",
+      "topic": "Algebra Foundations",
       "description": "Rearrange formulas and equations to solve for a chosen variable.",
       "prerequisites": [
         "MATH_ALG_002"
@@ -99181,7 +99219,8 @@
       "id": "MATH_ALG_004",
       "name": "No and infinite solutions",
       "domain": "Math",
-      "subdomain": "Algebra Foundations",
+      "subdomain": "Algebra",
+      "topic": "Algebra Foundations",
       "description": "Classify linear equations as having one solution, no solution, or infinitely many solutions.",
       "prerequisites": [
         "MATH_ALG_003"
@@ -104126,7 +104165,8 @@
       "id": "MATH_ALG_007",
       "name": "Inequality sign reversal",
       "domain": "Math",
-      "subdomain": "Algebra Foundations",
+      "subdomain": "Algebra",
+      "topic": "Algebra Foundations",
       "description": "Solve inequalities that require reversing the inequality sign after multiplying or dividing by a negative number.",
       "prerequisites": [
         "MATH_ALG_006"
@@ -105455,7 +105495,8 @@
       "id": "MATH_INEQ_001",
       "name": "Interval notation and compound inequalities",
       "domain": "Math",
-      "subdomain": "Inequalities and Solution Sets",
+      "subdomain": "Algebra",
+      "topic": "Inequalities and Solution Sets",
       "description": "Represent real solution sets with interval notation and solve compound and absolute-value inequalities involving unions, intersections, empty sets, and all real numbers.",
       "prerequisites": [
         "MATH_ALG_007",
@@ -107747,7 +107788,8 @@
       "id": "MATH_INEQ_002",
       "name": "Polynomial inequalities and sign charts",
       "domain": "Math",
-      "subdomain": "Inequalities and Solution Sets",
+      "subdomain": "Algebra",
+      "topic": "Inequalities and Solution Sets",
       "description": "Solve factored and factorable polynomial inequalities by finding real zeros, building sign charts, tracking multiplicity, and selecting intervals with the required sign.",
       "prerequisites": [
         "MATH_INEQ_001",
@@ -110483,7 +110525,8 @@
       "id": "MATH_GRAPH_004",
       "name": "Slope-intercept form",
       "domain": "Math",
-      "subdomain": "Linear Functions",
+      "subdomain": "Geometry",
+      "topic": "Linear Functions",
       "description": "Interpret and write linear equations in slope-intercept form y = mx + b.",
       "prerequisites": [
         "MATH_ALG_005",
@@ -111787,7 +111830,8 @@
       "id": "MATH_GRAPH_005",
       "name": "Graphing lines",
       "domain": "Math",
-      "subdomain": "Linear Functions",
+      "subdomain": "Geometry",
+      "topic": "Linear Functions",
       "description": "Graph lines in slope-intercept form by using the y-intercept and slope to find points on the line.",
       "prerequisites": [
         "MATH_GRAPH_004"
@@ -113416,7 +113460,8 @@
       "id": "MATH_RAT_006",
       "name": "Rational functions, holes, and asymptotes",
       "domain": "Math",
-      "subdomain": "Rational Functions",
+      "subdomain": "Algebra",
+      "topic": "Rational Functions",
       "description": "Analyze rational functions by reducing formulas while preserving domains, locating holes and asymptotes, and finding intercepts and end behavior.",
       "prerequisites": [
         "MATH_RAT_005",
@@ -115605,7 +115650,8 @@
       "id": "MATH_RAT_007",
       "name": "Rational inequalities and sign charts",
       "domain": "Math",
-      "subdomain": "Rational Functions",
+      "subdomain": "Algebra",
+      "topic": "Rational Functions",
       "description": "Solve rational inequalities by combining expressions, factoring numerators and denominators, marking zeros and excluded values, completing sign charts, and reporting interval unions.",
       "prerequisites": [
         "MATH_INEQ_002",
@@ -119155,7 +119201,8 @@
       "id": "MATH_QUAD_004",
       "name": "Quadratic functions and parabolas",
       "domain": "Math",
-      "subdomain": "Quadratic Functions",
+      "subdomain": "Algebra",
+      "topic": "Quadratic Functions",
       "description": "Connect quadratic equations to parabolas by identifying vertices, axes of symmetry, intercepts, opening direction, transformations, and ranges.",
       "prerequisites": [
         "MATH_FUNC_001",
@@ -120943,7 +120990,8 @@
       "id": "MATH_QUAD_005",
       "name": "Quadratic modeling and optimization",
       "domain": "Math",
-      "subdomain": "Quadratic Functions",
+      "subdomain": "Algebra",
+      "topic": "Quadratic Functions",
       "description": "Interpret and solve quadratic models involving maximums, minimums, intercepts, physical domains, fixed-perimeter area, and constant second differences.",
       "prerequisites": [
         "MATH_QUAD_003",
@@ -122635,7 +122683,8 @@
       "id": "MATH_GRAPH_006",
       "name": "Writing equations of lines",
       "domain": "Math",
-      "subdomain": "Linear Functions",
+      "subdomain": "Geometry",
+      "topic": "Linear Functions",
       "description": "Write linear equations in slope-intercept form from slope, intercept, and point information.",
       "prerequisites": [
         "MATH_GRAPH_004"
@@ -123999,7 +124048,8 @@
       "id": "MATH_SYS_001",
       "name": "Systems of equations",
       "domain": "Math",
-      "subdomain": "Systems of Equations",
+      "subdomain": "Algebra",
+      "topic": "Systems of Equations",
       "description": "Solve and classify systems of two linear equations.",
       "prerequisites": [
         "MATH_GRAPH_005",
@@ -125551,7 +125601,7 @@
       "subjectId": "SUBJECT_MATH",
       "name": "Angles, bearings, and degree measure",
       "domain": "Math",
-      "subdomain": "Coordinate Geometry",
+      "subdomain": "Geometry",
       "description": "Measure rotation in degrees, distinguish direction from orientation, and use bearings as angular descriptions of location.",
       "prerequisites": [
         "MATH_ARITH_003",
@@ -126019,14 +126069,15 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Coordinate Geometry"
     },
     {
       "id": "MATH_GEOM_002",
       "subjectId": "SUBJECT_MATH",
       "name": "Circles, arcs, and angular distance",
       "domain": "Math",
-      "subdomain": "Coordinate Geometry",
+      "subdomain": "Geometry",
       "description": "Relate central angles to arc length and use radians or degree fractions to measure distance along a circle.",
       "prerequisites": [
         "MATH_GEOM_001",
@@ -126493,14 +126544,15 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Coordinate Geometry"
     },
     {
       "id": "MATH_GEOM_003",
       "subjectId": "SUBJECT_MATH",
       "name": "Spherical coordinates and great-circle models",
       "domain": "Math",
-      "subdomain": "Coordinate Geometry",
+      "subdomain": "Geometry",
       "description": "Extend coordinate reasoning from a plane to a sphere and model angular separation, meridians, parallels, and great-circle distance.",
       "prerequisites": [
         "MATH_GEOM_002",
@@ -127000,7 +127052,8 @@
           },
           "work_required": true
         }
-      ]
+      ],
+      "topic": "Coordinate Geometry"
     }
   ]
 }

@@ -2,7 +2,8 @@ id: MATH_QUAD_004
 schema_version: 0.2
 name: Quadratic functions and parabolas
 domain: Math
-subdomain: Quadratic Functions
+subdomain: Algebra
+topic: Quadratic Functions
 description: Connect quadratic equations to parabolas by identifying vertices, axes of symmetry, intercepts, opening
   direction, transformations, and ranges.
 prerequisites:

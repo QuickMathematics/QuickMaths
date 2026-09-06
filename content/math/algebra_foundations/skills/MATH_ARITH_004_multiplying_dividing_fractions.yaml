@@ -2,7 +2,8 @@ id: MATH_ARITH_004
 schema_version: 0.2
 name: Multiplying and dividing fractions
 domain: Math
-subdomain: Arithmetic Foundations
+subdomain: Arithmetic
+topic: Arithmetic Foundations
 description: Multiply and divide fractions, including whole-number, reciprocal, zero, and signed fraction cases.
 prerequisites:
   - MATH_ARITH_003

@@ -2,7 +2,8 @@ id: MATH_ARITH_002
 schema_version: 0.2
 name: Order of operations
 domain: Math
-subdomain: Arithmetic Foundations
+subdomain: Arithmetic
+topic: Arithmetic Foundations
 description: Evaluate arithmetic expressions using grouping, exponents, multiplication and division, and addition and subtraction in the correct order.
 prerequisites:
   - MATH_ARITH_001

@@ -2,7 +2,8 @@ id: MATH_SEQ_002
 schema_version: 0.2
 name: Geometric sequences
 domain: Math
-subdomain: Sequences
+subdomain: Algebra
+topic: Sequences
 description: Recognize geometric sequences, use common ratios, and write recursive and explicit rules for multiplicative
   patterns.
 prerequisites:

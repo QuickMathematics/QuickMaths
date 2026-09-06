@@ -167,6 +167,7 @@ def _skill_from_dict(data: dict[str, Any], path: Path, content_hash: str) -> Ski
             name=data["name"],
             domain=data["domain"],
             subdomain=data["subdomain"],
+            topic=str(data.get("topic", "")),
             description=data["description"],
             prerequisites=list(data.get("prerequisites", [])),
             mastery=MasteryRules(**data.get("mastery", {})),

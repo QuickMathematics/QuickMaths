@@ -2,7 +2,8 @@ id: MATH_ALG_003
 schema_version: 0.2
 name: Variables on both sides
 domain: Math
-subdomain: Algebra Foundations
+subdomain: Algebra
+topic: Algebra Foundations
 description: Solve linear equations that have variable terms on both sides by moving variable terms to one side first.
 prerequisites:
   - MATH_ALG_002

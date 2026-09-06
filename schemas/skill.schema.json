@@ -8,6 +8,7 @@
     "name": { "type": "string" },
     "domain": { "type": "string" },
     "subdomain": { "type": "string" },
+    "topic": { "type": "string", "description": "Optional focused topic within the field's broad branch (subdomain)." },
     "description": { "type": "string" },
     "prerequisites": { "type": "array", "items": { "type": "string" } },
     "tags": { "type": "array", "items": { "type": "string" } },

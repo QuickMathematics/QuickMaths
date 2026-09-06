@@ -2,7 +2,8 @@ id: MATH_PREALG_002
 schema_version: 0.2
 name: Combining like terms
 domain: Math
-subdomain: Pre-Algebra
+subdomain: Algebra
+topic: Pre-Algebra
 description: Simplify expressions by combining terms that have the same variable part.
 prerequisites:
   - MATH_PREALG_001

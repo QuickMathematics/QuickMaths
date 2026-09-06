@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { learningFields } from "./learning-fields.js";
+import { learningFields, lessonClassification } from "./learning-fields.js";
 import { storageStatus } from "./storage-status.js";
 
 test("legacy subjects and subdomains form separate field-scoped branches without moving nodes", () => {
@@ -22,4 +22,13 @@ test("global storage age uses only successful GitHub saves and has readable non-
   assert.equal(storageStatus({ lastPulledAt: new Date(now).toISOString() }, { now }).age, "No GitHub save yet");
   assert.equal(storageStatus({ ...base, lastPushedAt: "invalid" }, { now }).age, "No GitHub save yet");
   assert.equal(storageStatus(base, { now: now - 86400000 }).age, "GitHub · just now");
+});
+
+
+test("legacy aliases become topics in broad branches without guessing custom field categories", () => {
+  assert.deepEqual(lessonClassification({ subdomain: "Quadratic Equations" }, "SUBJECT_MATH"), { branch: "Algebra", topic: "Quadratic Equations" });
+  assert.deepEqual(lessonClassification({ subdomain: "Quadratic Equations", topic: "" }, "SUBJECT_MATH"), { branch: "Algebra", topic: "Quadratic Equations" });
+  assert.deepEqual(lessonClassification({ subdomain: "Political Geography" }, "SUBJECT_GEOGRAPHY"), { branch: "Human Geography", topic: "Political Geography" });
+  assert.deepEqual(lessonClassification({ subdomain: "My special branch" }, "SUBJECT_MATH"), { branch: "My special branch", topic: "" });
+  assert.equal(lessonClassification({ subdomain: "Control Flow" }, "SUBJECT_OTHER").branch, "Control Flow");
 });

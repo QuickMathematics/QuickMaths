@@ -2,7 +2,8 @@ id: MATH_FUNC_001
 schema_version: 0.2
 name: Function notation and representations
 domain: Math
-subdomain: Functions
+subdomain: Algebra
+topic: Functions
 description: Interpret functions as input-output rules, evaluate function notation, and connect formulas, tables,
   ordered pairs, domains, and ranges.
 prerequisites:

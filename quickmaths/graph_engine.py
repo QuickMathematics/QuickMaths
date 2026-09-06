@@ -65,6 +65,7 @@ def graph_rows(skills: dict[str, Skill], progress: dict[str, ProgressRecord]) ->
                 "name": skill.name,
                 "domain": skill.domain,
                 "subdomain": skill.subdomain,
+                "topic": skill.topic,
                 "description": skill.description,
                 "prerequisites": skill.prerequisites,
                 "unlocks": unlocks.get(skill.id, []),

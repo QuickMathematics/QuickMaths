@@ -106,3 +106,5 @@ Start each Agent Bridge prompt with `begin_agent_task`. It records UTC time loca
 ### Fields, branches, and storage management
 
 QuickMaths now exposes Field → Branch → Lesson browsing and Studio branch suggestions while retaining compatible subject/subdomain file keys. The profile-adjacent status shows GitHub connection/save progress and time since the last successful save. Settings offers manual change review (default) or selective automatic merging with agent priority at conflicts; independent work survives from both copies. Missing history or invalid dependencies falls back to review. See the updated student, educator, authoring and Bridge guides.
+
+The native curriculum and bundled packages now classify 94 lessons into 12 broad branches across Mathematics, Geography, and Programming. Canonical maps render nested field/branch bands. Older categories migrate to the optional lesson topic, while saved learning and plan data are preserved. See [the complete field/branch reference](docs/FIELDS_AND_BRANCHES.md).

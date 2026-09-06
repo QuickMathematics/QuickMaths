@@ -2,7 +2,8 @@ id: MATH_ALG_001
 schema_version: 0.2
 name: One-step equations
 domain: Math
-subdomain: Algebra Foundations
+subdomain: Algebra
+topic: Algebra Foundations
 description: Solve equations that require one inverse operation to isolate the variable.
 prerequisites:
   - MATH_PREALG_002

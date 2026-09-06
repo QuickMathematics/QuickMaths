@@ -2,7 +2,8 @@ id: MATH_ARITH_003
 schema_version: 0.2
 name: Fractions basics
 domain: Math
-subdomain: Arithmetic Foundations
+subdomain: Arithmetic
+topic: Arithmetic Foundations
 description: Understand fractions as parts of a whole, simplify fractions, recognize equivalent fractions, and compare simple fractions.
 prerequisites:
   - MATH_ARITH_001

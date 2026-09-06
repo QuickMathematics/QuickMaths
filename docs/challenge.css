@@ -1718,3 +1718,8 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:ha
 @media (max-width: 360px) {
   .sidebar-profile .profile-copy { display: none; }
 }
+
+/* Branch groups inside each learning field. */
+.map-branch-lane > rect { fill-opacity: .38; stroke-opacity: .18; stroke-width: 1; }
+.map-branch-lane > text { font-size: 15px; font-weight: 800; letter-spacing: .015em; text-transform: none; }
+.map-subject-lane > text { font-size: 18px; }

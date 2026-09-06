@@ -2,7 +2,8 @@ id: MATH_RAT_001
 schema_version: 0.2
 name: Rational expressions and domain restrictions
 domain: Math
-subdomain: Rational Expressions and Equations
+subdomain: Algebra
+topic: Rational Expressions and Equations
 description: Identify excluded values, factor rational expressions, cancel common factors correctly, and preserve the
   original domain after simplification.
 prerequisites:

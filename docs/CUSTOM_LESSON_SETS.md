@@ -13,7 +13,20 @@ QuickMaths organizes learning as **Field → Branch → Lesson**. Mathematics is
 
 On the map, choose a **Field**, then a **Branch**, then a **Lesson** to jump to. These selectors narrow the lesson list; the combined map and your saved positions stay intact. In Lesson Studio, select or create the field, then choose an existing branch or type a new branch name for each lesson. Prerequisites can connect lessons across branches and fields.
 
-Existing lesson files and backups remain compatible: the saved `subject` object and `subjectId` / `subject_id` identifiers describe the field; each lesson's `subdomain` is its branch. Keep these stable file keys and lesson IDs when editing older files. The agent tools `list_fields` and `list_branches` expose the hierarchy; `list_subjects` remains a compatibility alias.
+
+The shipped curriculum uses these broad branches:
+
+| Field | Branches |
+| --- | --- |
+| Mathematics | Arithmetic; Algebra; Geometry |
+| Geography | Geographic Methods; Cartography and GIS; Physical Geography; Human Geography; Environmental Geography |
+| Programming | Programming Fundamentals; Data Structures; Algorithms; Software Engineering |
+
+A focused category such as **Quadratic Equations** is a topic within **Algebra**, rather than a separate branch. Lesson details and Studio retain that topic. Legacy category names in installed lesson sets, imported curricula, old backups, and Studio drafts are converted automatically. Custom branch names outside the documented aliases are preserved.
+
+The canonical map places lessons inside labeled branch bands within each field. Prerequisite connections remain intact across branch and field boundaries. Saved Plan-view coordinates, notes, paths, hidden-node choices, mastery, and unfinished tests are preserved. Switch off **Plan view** to see the canonical grouping; to adopt it for an existing custom layout, open **Plan mode → Plan details → Group by field & branch**. That action resets moved node positions while retaining notes and paths.
+
+Existing lesson files and backups remain compatible: the saved `subject` object and `subjectId` / `subject_id` identifiers describe the field; each lesson's `subdomain` is its broad branch and optional `topic` retains finer subject matter. Keep these stable file keys and lesson IDs when editing older files. The agent tools `list_fields` and `list_branches` expose the hierarchy; `list_subjects` remains a compatibility alias.
 
 ## Envelope and field
 
@@ -153,7 +166,8 @@ Each skill supports:
   "id": "CUSTOM_BIO_CELL_001",
   "name": "Cell structure",
   "domain": "Biology",
-  "subdomain": "Cells",
+  "subdomain": "Cell Biology",
+  "topic": "Cells",
   "description": "Identify organelles and connect structure to function.",
   "prerequisites": [],
   "unlocks": [],
@@ -641,3 +655,7 @@ Installed lesson content, field metadata/themes, per-profile field and path choi
 Import is rejected without changing state when a file has an unsupported version, duplicate IDs, missing or mislabelled prerequisite bridges, a cycle anywhere in the combined graph, mismatched question/skill IDs, unsupported grading/work/review modes, malformed choices/rubrics/proof obligations, executable content, or exceeded safety limits.
 
 Built-in Mathematics lessons use trusted runtime templates shipped with QuickMaths, so each retake draws fresh values while still covering every authored scenario. Uploaded, Depot, and Studio-authored lesson sets are deliberately fixed-data packages: they may contain large validated question banks, but they cannot ship or execute generator code. When editing a native Mathematics lesson, Lesson Studio includes a rerollable author preview and downloadable audit of the original runtime generator before you install a fixed reversible override.
+
+## Branch reference
+
+Consult [the complete lesson classification](./FIELDS_AND_BRANCHES.md) and [the machine-readable taxonomy](./learning-taxonomy.json). Keep file keys `subject`, `subjectId` / `subject_id`, and `subdomain` compatible. Add optional `topic` for focused subject matter. Prefer an existing broad branch; create another branch only when it describes a distinct area of the field. The map automatically creates its band.

@@ -2,7 +2,8 @@ id: MATH_GRAPH_003
 schema_version: 0.2
 name: Slope as rate of change
 domain: Math
-subdomain: Linear Functions
+subdomain: Geometry
+topic: Linear Functions
 description: Interpret slope as a rate of change between two quantities in tables, graphs, and real-world contexts.
 prerequisites:
   - MATH_GRAPH_002

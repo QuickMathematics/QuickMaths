@@ -2,7 +2,8 @@ id: MATH_PREALG_001
 schema_version: 0.2
 name: Variables and substitution
 domain: Math
-subdomain: Pre-Algebra
+subdomain: Algebra
+topic: Pre-Algebra
 description: Evaluate expressions by replacing variables with given values and simplifying correctly.
 prerequisites:
   - MATH_ARITH_002

@@ -2,7 +2,8 @@ id: MATH_ALG_007
 schema_version: 0.2
 name: Inequality sign reversal
 domain: Math
-subdomain: Algebra Foundations
+subdomain: Algebra
+topic: Algebra Foundations
 description: Solve inequalities that require reversing the inequality sign after multiplying or dividing by a negative number.
 prerequisites:
   - MATH_ALG_006

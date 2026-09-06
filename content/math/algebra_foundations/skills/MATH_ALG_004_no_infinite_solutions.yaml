@@ -2,7 +2,8 @@ id: MATH_ALG_004
 schema_version: 0.2
 name: No and infinite solutions
 domain: Math
-subdomain: Algebra Foundations
+subdomain: Algebra
+topic: Algebra Foundations
 description: Classify linear equations as having one solution, no solution, or infinitely many solutions.
 prerequisites:
   - MATH_ALG_003

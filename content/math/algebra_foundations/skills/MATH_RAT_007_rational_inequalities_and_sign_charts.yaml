@@ -2,7 +2,8 @@ id: MATH_RAT_007
 schema_version: 0.2
 name: Rational inequalities and sign charts
 domain: Math
-subdomain: Rational Functions
+subdomain: Algebra
+topic: Rational Functions
 description: Solve rational inequalities by combining expressions, factoring numerators and denominators, marking zeros
   and excluded values, completing sign charts, and reporting interval unions.
 prerequisites:

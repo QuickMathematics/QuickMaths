@@ -2,7 +2,8 @@ id: MATH_EXP_002
 schema_version: 0.2
 name: Exponential functions and percent change
 domain: Math
-subdomain: Exponential Functions
+subdomain: Algebra
+topic: Exponential Functions
 description: Interpret and evaluate exponential functions, including initial values, growth factors, decay factors,
   repeated percent change, and asymptotes.
 prerequisites:

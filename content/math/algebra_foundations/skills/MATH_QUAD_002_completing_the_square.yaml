@@ -2,7 +2,8 @@ id: MATH_QUAD_002
 schema_version: 0.2
 name: Completing the square
 domain: Math
-subdomain: Quadratic Equations
+subdomain: Algebra
+topic: Quadratic Equations
 description: Rewrite quadratic expressions as perfect squares, solve quadratic equations by taking square roots,
   and interpret vertex form.
 prerequisites:

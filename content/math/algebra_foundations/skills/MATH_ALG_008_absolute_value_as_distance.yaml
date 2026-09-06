@@ -2,7 +2,8 @@ id: MATH_ALG_008
 schema_version: 0.2
 name: Absolute value as distance
 domain: Math
-subdomain: Algebra Foundations
+subdomain: Algebra
+topic: Algebra Foundations
 description: Interpret absolute value as distance from zero and solve simple absolute value equations.
 prerequisites:
   - MATH_ARITH_001
