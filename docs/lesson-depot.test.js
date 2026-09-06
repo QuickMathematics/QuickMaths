@@ -263,6 +263,53 @@ test("controller merges official and federated catalogs while isolating a failed
   assert.match(state.warnings.join(" "), /Broken feed/);
 });
 
+test("registry requests overlap within a bound and keep source priority when responses arrive out of order", async () => {
+  const commit = "a".repeat(40);
+  const federationUrl = "https://raw.githubusercontent.com/QuickMathematics/QuickMaths/main/docs/lesson-depot/federation.json";
+  const officialUrl = "https://example.com/catalog.json";
+  const registries = Array.from({ length: 6 }, (_, index) => ({
+    id: `author${index}/lessons`, name: `Author ${index}`,
+    catalog_url: `https://raw.githubusercontent.com/author${index}/lessons/${commit}/registry.json`,
+    status: "new", packages: [],
+  }));
+  const pending = new Map();
+  let active = 0, peak = 0, completed = 0;
+  const fetchImpl = async url => {
+    if (url === federationUrl) return { ok: true, text: async () => JSON.stringify({ format: "quickmaths.lesson-depot.federation", schema_version: "1.0", registries }) };
+    const index = url === officialUrl ? 0 : registries.findIndex(registry => registry.catalog_url === url) + 1;
+    assert.ok(url === officialUrl || index > 0, `Unexpected registry URL: ${url}`);
+    active += 1; peak = Math.max(peak, active);
+    await new Promise(resolve => pending.set(index, resolve));
+    active -= 1; completed += 1;
+    if (index === 5) throw new Error("Registry unavailable");
+    const source = index ? registries[index - 1] : null;
+    const payload = source ? {
+      ...catalog, registry: { id: source.id, name: source.name },
+      packages: [{ ...catalog.packages[0], sha256: "b".repeat(64) }, { ...catalog.packages[1], id: "PACK_SHARED", sha256: "b".repeat(64) }],
+    } : catalog;
+    return { ok: true, text: async () => JSON.stringify(payload) };
+  };
+  const depot = createLessonDepot({ store: { snapshot: () => ({ lessonPacks: [] }) }, fetchImpl, catalogUrl: officialUrl, federationUrl });
+  const loading = depot.load();
+  const flush = () => new Promise(resolve => setImmediate(resolve));
+  await flush();
+  assert.equal(pending.size, 4);
+  while (pending.size) {
+    const index = Math.max(...pending.keys());
+    const resolve = pending.get(index); pending.delete(index); resolve();
+    await flush();
+  }
+  const state = await loading;
+  assert.equal(peak, 4);
+  assert.equal(completed, 7);
+  assert.equal(state.phase, "ready");
+  assert.deepEqual(state.sources.map(source => source.id), ["quickmaths-official", ...registries.map(source => source.id)]);
+  assert.equal(state.catalog.packages.find(pack => pack.id === "PACK_BIO").trust, "official");
+  assert.equal(state.catalog.packages.find(pack => pack.id === "PACK_SHARED").sourceId, registries[0].id);
+  assert.equal(state.sources[5].available, false);
+  assert.match(state.warnings.join(" "), /Registry unavailable/);
+});
+
 test("contested packages are hidden by default but can be deliberately revealed", () => {
   const packs = [{ ...normalizeDepotCatalog(catalog, { baseUrl: "https://example.com/" }).packages[0], trust: "contested" }];
   assert.equal(filterDepotPackages(packs).length, 0);

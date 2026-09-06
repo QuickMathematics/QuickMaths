@@ -1,4 +1,4 @@
-import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-app-audit-v2";
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-optimization-v1";
 
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;

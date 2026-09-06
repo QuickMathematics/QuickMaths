@@ -7,6 +7,7 @@ const FEDERATION_FORMAT = "quickmaths.lesson-depot.federation";
 const FEDERATION_SCHEMA = "1.0";
 const MAX_PACKAGES = 1000;
 const MAX_REGISTRIES = 40;
+const MAX_CONCURRENT_REGISTRIES = 4;
 const MAX_CATALOG_BYTES = 500_000;
 const REGISTRY_STORAGE_KEY = "quickmaths.lesson-depot.registries.v1";
 const DEFAULT_CARD_THEME = Object.freeze({
@@ -418,6 +419,19 @@ export function createLessonDepot({
     return { packages: [...selected.values()], collisions };
   };
 
+  const fetchCatalogs = async (sources) => {
+    const results = new Array(sources.length);
+    let nextIndex = 0;
+    await Promise.all(Array.from({ length: Math.min(MAX_CONCURRENT_REGISTRIES, sources.length) }, async () => {
+      while (nextIndex < sources.length) {
+        const index = nextIndex++;
+        try { results[index] = { catalog: await fetchCatalog(sources[index]) }; }
+        catch (error) { results[index] = { error }; }
+      }
+    }));
+    return results;
+  };
+
   const loadCatalog = async ({ force }) => {
     state.phase = "loading"; state.error = ""; state.warnings = []; state.preview = null; emit();
     try {
@@ -440,9 +454,13 @@ export function createLessonDepot({
       }
       const catalogs = [];
       state.sources = [];
-      for (const source of uniqueSources) {
+      const results = await fetchCatalogs(uniqueSources);
+      // Fetch concurrently, then merge in declared order so network timing cannot
+      // change which author owns a colliding package or weaken official priority.
+      for (const [index, source] of uniqueSources.entries()) {
         try {
-          const normalized = await fetchCatalog(source);
+          if ("error" in results[index]) throw results[index].error;
+          const normalized = results[index].catalog;
           catalogs.push(normalized);
           state.sources.push({ ...source, packageCount: normalized.packages.length, available: true, error: "" });
         } catch (error) {

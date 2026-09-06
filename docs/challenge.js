@@ -1,11 +1,11 @@
-import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-app-audit-v2";
-import { learningFields, branchName } from "./learning-fields.js?v=20260906-app-audit-v2";
-import { storageStatus } from "./storage-status.js?v=20260906-app-audit-v2";
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-app-audit-v2";
+import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-optimization-v1";
+import { learningFields, branchName } from "./learning-fields.js?v=20260906-optimization-v1";
+import { storageStatus } from "./storage-status.js?v=20260906-optimization-v1";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-optimization-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-app-audit-v2";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-app-audit-v2";
-import { createLessonStudio } from "./lesson-creator.js?v=20260906-app-audit-v2";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-optimization-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-optimization-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260906-optimization-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -14,13 +14,13 @@ import {
   DEPOT_DISCUSSIONS_URL,
   DEPOT_REPOSITORY_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260905-confused-neutral-v5";
+} from "./lesson-depot.js?v=20260906-optimization-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-app-audit-v2";
+} from "./github-sync.js?v=20260906-optimization-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -3378,6 +3378,7 @@ document.addEventListener("keydown", (event) => {
 document.querySelector("#agent-toggle").addEventListener("click", () => openAgentStudio());
 document.querySelector("#agent-close").addEventListener("click", () => closeAgentStudio());
 function initClock() {
+  const clock = document.querySelector("#analog-clock");
   const svgNS = "http://www.w3.org/2000/svg";
   const minutes = document.querySelector("#clock-minute-marks");
   const hours = document.querySelector("#clock-hour-marks");
@@ -3396,21 +3397,84 @@ function initClock() {
     line.setAttribute("class", hour ? "clock-tick-hour" : "clock-tick-minute");
     (hour ? hours : minutes).appendChild(line);
   }
+  const secondHand = clock.querySelector("#clock-second");
+  const minuteHand = clock.querySelector("#clock-minute");
+  const hourHand = clock.querySelector("#clock-hour");
+  let frame = null;
+  let inView = typeof IntersectionObserver !== "function";
+  let pageActive = true;
   const update = () => {
     const date = new Date();
     const seconds = date.getSeconds() + date.getMilliseconds() / 1000;
     const minute = date.getMinutes() + seconds / 60;
     const hour = (date.getHours() % 12) + minute / 60;
-    document.querySelector("#clock-second").setAttribute("transform", `rotate(${seconds * 6} 60 60)`);
-    document.querySelector("#clock-minute").setAttribute("transform", `rotate(${minute * 6} 60 60)`);
-    document.querySelector("#clock-hour").setAttribute("transform", `rotate(${hour * 30} 60 60)`);
-    requestAnimationFrame(update);
+    secondHand.setAttribute("transform", `rotate(${seconds * 6} 60 60)`);
+    minuteHand.setAttribute("transform", `rotate(${minute * 6} 60 60)`);
+    hourHand.setAttribute("transform", `rotate(${hour * 30} 60 60)`);
+    frame = requestAnimationFrame(update);
   };
-  update();
+  const updateVisibility = () => {
+    if (inView && pageActive && !document.hidden) {
+      if (frame === null) update();
+    } else {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = null;
+    }
+  };
+  if (typeof IntersectionObserver === "function") {
+    new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; updateVisibility(); }).observe(clock);
+  }
+  document.addEventListener("visibilitychange", updateVisibility);
+  window.addEventListener("pagehide", () => { pageActive = false; updateVisibility(); });
+  window.addEventListener("pageshow", () => { pageActive = true; updateVisibility(); });
+  updateVisibility();
+}
+
+async function loadAgentGuides() {
+  const read = async (path, type, fallback) => {
+    try {
+      const response = await fetch(`./${path}?v=20260906-optimization-v1`);
+      return response.ok ? await response[type]() : fallback;
+    } catch { return fallback; }
+  };
+  const [manifest, authoringGuide, learner, educator] = await Promise.all([
+    read("agent-manifest.json", "json", {}),
+    read("CUSTOM_LESSON_SETS.md", "text", ""),
+    read("STUDENT_GUIDE.md", "text", ""),
+    read("EDUCATOR_GUIDE.md", "text", ""),
+  ]);
+  return { manifest, authoringGuide, manuals: { learner, educator } };
+}
+
+async function connectPageTools(guidesPromise) {
+  try {
+    const { manifest, authoringGuide, manuals } = await guidesPromise;
+    const bridge = await registerWebMcpTools(store, document.modelContext, manifest, lessonDepot, lessonStudio, authoringGuide, manuals);
+    const failedTools = new Set(bridge.failures.map((failure) => failure.name));
+    document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code class="${failedTools.has(name) ? "tool-failed" : ""}">${escapeHtml(name)}</code>`).join("");
+    elements.bridgeCard.dataset.state = bridge.available && !bridge.error ? "ready" : bridge.error ? "warning" : "idle";
+    elements.bridgeStatus.textContent = bridge.error ? "WebMCP partly connected" : bridge.available ? "Agent tools connected in this tab" : "WebMCP unavailable in this browser";
+    elements.bridgeDetail.textContent = bridge.error
+      ? `${bridge.registered.length} of ${TOOL_NAMES.length} tools registered. Failed: ${bridge.failures.map((failure) => failure.name).join(", ")}.`
+      : bridge.available
+        ? `${bridge.registered.length} tools can navigate and tutor across this in-app QuickMaths tab.`
+        : "This browser cannot expose page tools. Use the backup/storage handoff below before opening QuickMaths in the ChatGPT or Codex in-app browser.";
+  } catch (error) {
+    elements.bridgeCard.dataset.state = "warning";
+    elements.bridgeStatus.textContent = "Agent tools could not connect";
+    elements.bridgeDetail.textContent = error instanceof Error ? error.message : String(error);
+  }
 }
 
 async function boot() {
-  const response = await fetch("./curriculum-data.json?v=20260906-app-audit-v2");
+  // Agent reference material and registration must not delay the learner workspace.
+  const guidesPromise = typeof document.modelContext?.registerTool === "function"
+    ? loadAgentGuides()
+    : Promise.resolve({ manifest: {}, authoringGuide: "", manuals: {} });
+  const communityConfigPromise = fetch("./github-community-config.json", { cache: "no-store" })
+    .then(response => response.ok ? response.json() : { enabled: false })
+    .catch(() => ({ enabled: false }));
+  const response = await fetch("./curriculum-data.json?v=20260906-optimization-v1");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];
@@ -3422,33 +3486,10 @@ async function boot() {
     // The store's normal malformed-state recovery remains authoritative.
   }
   if (needsLegacyGeography) {
-    const geography = await fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-app-audit-v2", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+    const geography = await fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-optimization-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
     bundledLessonPacks = [geography.text];
   }
-  let agentManifest = {};
-  let authoringGuideMarkdown = "";
-  const productManuals = { learner: "", educator: "" };
-  let communityConfig = { enabled: false };
-  try {
-    const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260906-app-audit-v2").catch(() => null),
-      fetch("./CUSTOM_LESSON_SETS.md?v=20260906-app-audit-v2").catch(() => null),
-      fetch("./STUDENT_GUIDE.md?v=20260906-app-audit-v2").catch(() => null),
-      fetch("./EDUCATOR_GUIDE.md?v=20260906-app-audit-v2").catch(() => null),
-    ]);
-    if (manifestResponse?.ok) agentManifest = await manifestResponse.json();
-    if (authoringGuideResponse?.ok) authoringGuideMarkdown = await authoringGuideResponse.text();
-    if (learnerManualResponse?.ok) productManuals.learner = await learnerManualResponse.text();
-    if (educatorManualResponse?.ok) productManuals.educator = await educatorManualResponse.text();
-  } catch {
-    // The tools still work if the optional human/machine-readable guide is unavailable.
-  }
-  try {
-    const communityResponse = await fetch("./github-community-config.json", { cache: "no-store" });
-    if (communityResponse.ok) communityConfig = await communityResponse.json();
-  } catch {
-    // External GitHub links remain available if optional in-app community authorization is unavailable.
-  }
+  const communityConfig = await communityConfigPromise;
   store = createQuickMathsStore({ storage: window.localStorage, curriculum, bundledLessonPacks });
   lessonDepot = createLessonDepot({
     store,
@@ -3505,17 +3546,8 @@ async function boot() {
   initClock();
   document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code>${name}</code>`).join("");
   document.querySelector("#tool-count").textContent = String(TOOL_NAMES.length);
-  const bridge = await registerWebMcpTools(store, document.modelContext, agentManifest, lessonDepot, lessonStudio, authoringGuideMarkdown, productManuals);
-  const failedTools = new Set(bridge.failures.map((failure) => failure.name));
-  document.querySelector("#tool-list").innerHTML = TOOL_NAMES.map((name) => `<code class="${failedTools.has(name) ? "tool-failed" : ""}">${escapeHtml(name)}</code>`).join("");
-  elements.bridgeCard.dataset.state = bridge.available && !bridge.error ? "ready" : bridge.error ? "warning" : "idle";
-  elements.bridgeStatus.textContent = bridge.error ? "WebMCP partly connected" : bridge.available ? "Agent tools connected in this tab" : "WebMCP unavailable in this browser";
-  elements.bridgeDetail.textContent = bridge.error
-    ? `${bridge.registered.length} of ${TOOL_NAMES.length} tools registered. Failed: ${bridge.failures.map((failure) => failure.name).join(", ")}.`
-    : bridge.available
-      ? `${bridge.registered.length} tools can navigate and tutor across this in-app QuickMaths tab.`
-      : "This browser cannot expose page tools. Use the backup/storage handoff below before opening QuickMaths in the ChatGPT or Codex in-app browser.";
   render(store.snapshot());
+  void connectPageTools(guidesPromise);
   const returnedFromCommunityAuthorization = new URLSearchParams(window.location.search).get("community") === "connected";
   if (returnedFromCommunityAuthorization) history.replaceState(null, "", `${window.location.pathname}${window.location.hash}`);
   if (communityConnection().connected) {
@@ -3531,9 +3563,9 @@ async function boot() {
   window.setInterval(() => {
     renderGlobalStorageStatus();
     store.heartbeat();
-    const snapshot = store.snapshot();
-    elements.sessionTime.textContent = formatDuration(snapshot.timers.sessionSeconds);
-    elements.profileTime.textContent = formatDuration(snapshot.timers.profileSeconds);
+    const timers = store.getTimers();
+    elements.sessionTime.textContent = formatDuration(timers.sessionSeconds);
+    elements.profileTime.textContent = formatDuration(timers.profileSeconds);
   }, 1000);
   document.addEventListener("visibilitychange", () => { if (document.hidden) store.heartbeat(true); });
   window.addEventListener("pagehide", () => store.heartbeat(true));
@@ -3560,7 +3592,7 @@ async function ensureLegacyGeographyMigration(raw) {
   let version = APP_VERSION;
   try { version = Number(JSON.parse(raw)?.version ?? APP_VERSION); } catch { return; }
   if (version >= APP_VERSION) return;
-  legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-app-audit-v2", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+  legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-optimization-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
   const result = await legacyGeographyMigrationPromise;
   store.registerBundledLessonPacks([result.text]);
 }

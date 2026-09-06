@@ -1008,6 +1008,28 @@ test("the analog-clock timers accumulate and persist profile time", () => {
   assert.match(storage.value(STORAGE_KEY), /"totalLoggedSeconds":31/);
 });
 
+test("lightweight timer reads stay current without saving or exposing mutable state", () => {
+  const { store, storage, advance } = harness();
+  assert.deepEqual(store.getTimers(), { sessionSeconds: 0, profileSeconds: 0 });
+  const first = store.createProfile("First timer");
+  const saved = storage.value(STORAGE_KEY);
+  advance(12);
+  const timers = store.getTimers();
+  assert.deepEqual(timers, { sessionSeconds: 12, profileSeconds: 12 });
+  timers.profileSeconds = 1000;
+  assert.equal(store.getTimers().profileSeconds, 12);
+  assert.equal(storage.value(STORAGE_KEY), saved);
+  store.heartbeat(true);
+  assert.deepEqual(store.getTimers(), store.snapshot().timers);
+  store.createProfile("Second timer");
+  advance(7);
+  assert.deepEqual(store.getTimers(), { sessionSeconds: 7, profileSeconds: 7 });
+  store.selectProfile(first.id);
+  assert.deepEqual(store.getTimers(), { sessionSeconds: 0, profileSeconds: 12 });
+  store.logout();
+  assert.deepEqual(store.getTimers(), { sessionSeconds: 0, profileSeconds: 0 });
+});
+
 test("a complete mastery-test reflection records an attempt and unlocks dependent skills", () => {
   const { store } = harness();
   store.createProfile("Test Learner");

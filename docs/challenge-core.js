@@ -1,4 +1,4 @@
-import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-app-audit-v2";
+import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-optimization-v1";
 
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
@@ -2550,6 +2550,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   const notify = () => {
     persist();
+    if (!listeners.size) return;
     const view = snapshot();
     listeners.forEach((listener) => listener(view));
   };
@@ -2701,9 +2702,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (activeProfile()?.role === "educator" && workspace) workspace.updatedAt = isoNow();
   };
   const profileAttempts = () => state.attempts.filter((attempt) => attempt.profileId === state.activeProfileId);
-  const activeSubjectId = () => {
+  const activeSubjectId = (visible = visibleSkillIds()) => {
     const preferred = activeProfile()?.activeSubjectId ?? DEFAULT_SUBJECT_ID;
-    const visible = visibleSkillIds();
     return catalog.skills.some((skill) => visible.has(skill.id) && skill.subjectId === preferred)
       ? preferred
       : catalog.skills.find((skill) => visible.has(skill.id))?.subjectId ?? DEFAULT_SUBJECT_ID;
@@ -2721,45 +2721,48 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     }
   };
 
-  const statusForSkill = (skillId) => {
+  const statusForSkill = (skillId, { progress = activeProgress(), progressionMode = effectiveProgressionMode(), at = milliseconds() } = {}) => {
     const skill = skillsById[skillId];
     if (!skill) return "locked";
-    const record = activeProgress()[skillId];
+    const record = progress[skillId];
     if (record) {
-      if (record.status === "locked" && effectiveProgressionMode() === "soft") return "ready";
-      if (PROVEN.has(record.status) && record.nextReviewAt && new Date(record.nextReviewAt).getTime() < milliseconds()) return "rusty";
+      if (record.status === "locked" && progressionMode === "soft") return "ready";
+      if (PROVEN.has(record.status) && record.nextReviewAt && new Date(record.nextReviewAt).getTime() < at) return "rusty";
       return record.status;
     }
-    if (effectiveProgressionMode() === "soft") return "ready";
-    return skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status)) ? "ready" : "locked";
+    if (progressionMode === "soft") return "ready";
+    return skill.prerequisites.every((id) => PROVEN.has(progress[id]?.status)) ? "ready" : "locked";
   };
 
-  const progressRows = ({ subjectId = null } = {}) => skillOrder.filter((skillId) => isSkillVisible(skillId) && (!subjectId || skillsById[skillId]?.subjectId === subjectId)).map((skillId) => {
-    const skill = skillsById[skillId];
-    const record = activeProgress()[skillId] ?? {};
-    return {
-      id: skill.id,
-      packId: skill.packId ?? null,
-      custom: Boolean(skill.custom),
-      native: Boolean(skill.native),
-      overridden: Boolean(skill.overridden),
-      subjectId: skill.subjectId,
-      name: skill.name,
-      subdomain: skill.subdomain, branch: skill.subdomain, fieldId: skill.subjectId, topic: skill.topic ?? "",
-      description: skill.description,
-      prerequisites: [...skill.prerequisites],
-      unlocks: [...(unlocks[skill.id] ?? [])],
-      status: statusForSkill(skill.id),
-      masteryScore: record.masteryScore ?? 0,
-      latestScore: record.lastTestScore ?? null,
-      bestScore: record.bestTestScore ?? null,
-      confidence: record.confidenceRating ?? null,
-      attemptCount: record.attemptCount ?? 0,
-      nextReviewAt: record.nextReviewAt ?? null,
-      mistakeTags: [...(record.mistakeTags ?? [])],
-      unmetPrerequisites: skill.prerequisites.filter((id) => !PROVEN.has(activeProgress()[id]?.status)),
-    };
-  });
+  const progressRows = ({ subjectId = null, visible = visibleSkillIds() } = {}) => {
+    const context = { progress: activeProgress(), progressionMode: effectiveProgressionMode(), at: milliseconds() };
+    return skillOrder.filter((skillId) => visible.has(skillId) && (!subjectId || skillsById[skillId]?.subjectId === subjectId)).map((skillId) => {
+      const skill = skillsById[skillId];
+      const record = context.progress[skillId] ?? {};
+      return {
+        id: skill.id,
+        packId: skill.packId ?? null,
+        custom: Boolean(skill.custom),
+        native: Boolean(skill.native),
+        overridden: Boolean(skill.overridden),
+        subjectId: skill.subjectId,
+        name: skill.name,
+        subdomain: skill.subdomain, branch: skill.subdomain, fieldId: skill.subjectId, topic: skill.topic ?? "",
+        description: skill.description,
+        prerequisites: [...skill.prerequisites],
+        unlocks: [...(unlocks[skill.id] ?? [])],
+        status: statusForSkill(skill.id, context),
+        masteryScore: record.masteryScore ?? 0,
+        latestScore: record.lastTestScore ?? null,
+        bestScore: record.bestTestScore ?? null,
+        confidence: record.confidenceRating ?? null,
+        attemptCount: record.attemptCount ?? 0,
+        nextReviewAt: record.nextReviewAt ?? null,
+        mistakeTags: [...(record.mistakeTags ?? [])],
+        unmetPrerequisites: skill.prerequisites.filter((id) => !PROVEN.has(context.progress[id]?.status)),
+      };
+    });
+  };
 
   const timers = () => {
     const profile = activeProfile();
@@ -2804,10 +2807,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   };
 
   const snapshot = () => {
-    const allRows = state.activeProfileId ? progressRows() : [];
-    const rows = state.activeProfileId ? progressRows({ subjectId: activeSubjectId() }) : [];
     const visible = visibleSkillIds();
-    const visibleSubjects = catalog.subjects.filter((subject) => catalog.skills.some((skill) => visible.has(skill.id) && skill.subjectId === subject.id));
+    const subjectId = activeSubjectId(visible);
+    const allRows = state.activeProfileId ? progressRows({ visible }) : [];
+    const rows = allRows.filter(row => row.subjectId === subjectId);
+    const visibleSkills = catalog.skills.filter(skill => visible.has(skill.id));
+    const visibleSubjectIds = new Set(visibleSkills.map(skill => skill.subjectId));
+    const visibleSubjects = catalog.subjects.filter(subject => visibleSubjectIds.has(subject.id));
     const curriculumWorkspace = activeCurriculum();
     const counts = Object.fromEntries(["locked", "ready", "learning", "proven", "mastered", "rusty"].map((key) => [key, rows.filter((row) => row.status === key).length]));
     const suggested = rows.find((row) => row.status === "rusty")
@@ -2823,9 +2829,9 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         enabledPackIds: [...item.enabledPackIds], includeNativeLessons: item.includeNativeLessons !== false, settings: item.settings, createdAt: item.createdAt, updatedAt: item.updatedAt,
       }))),
       curriculumPlan: clone(assignedCurriculumPlan()),
-      activeSubject: clone(visibleSubjects.find((subject) => subject.id === activeSubjectId()) ?? visibleSubjects[0] ?? catalog.subjects[0]),
+      activeSubject: clone(visibleSubjects.find((subject) => subject.id === subjectId) ?? visibleSubjects[0] ?? catalog.subjects[0]),
       subjects: clone(visibleSubjects),
-      fields: clone(learningFields(visibleSubjects, catalog.skills.filter((skill) => visible.has(skill.id)))),
+      fields: clone(learningFields(visibleSubjects, visibleSkills)),
       progressionMode: effectiveProgressionMode(),
       mapScope: "all",
       profiles: clone(state.profiles),
@@ -2878,7 +2884,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         track: clone({ ...catalog.track, skills: catalog.track.skills.filter((id) => visible.has(id)), entry_skills: catalog.track.entry_skills.filter((id) => visible.has(id)), exit_skills: catalog.track.exit_skills.filter((id) => visible.has(id)) }),
         subjects: clone(visibleSubjects),
         lessonPacks: state.lessonPacks.filter((pack) => pack.mode === "override" || !curriculumWorkspace || curriculumWorkspace.enabledPackIds.includes(pack.id)).map((pack) => ({ id: pack.id, name: pack.name, mode: pack.mode, skill_ids: [...pack.track.skills] })),
-        skills: catalog.skills.filter((skill) => visible.has(skill.id) && skill.subjectId === activeSubjectId()).map((skill) => ({
+        skills: visibleSkills.filter((skill) => skill.subjectId === subjectId).map((skill) => ({
           id: skill.id,
           packId: skill.packId ?? null,
           custom: Boolean(skill.custom),
@@ -2893,7 +2899,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
           unlocks: [...(unlocks[skill.id] ?? [])],
           applications: clone(skill.applications),
         })),
-        allSkills: catalog.skills.filter((skill) => visible.has(skill.id)).map((skill) => ({
+        allSkills: visibleSkills.map((skill) => ({
           id: skill.id, packId: skill.packId ?? null, custom: Boolean(skill.custom), native: Boolean(skill.native), overridden: Boolean(skill.overridden), subjectId: skill.subjectId,
           name: skill.name, subdomain: skill.subdomain, branch: skill.subdomain, fieldId: skill.subjectId, topic: skill.topic ?? "", description: skill.description, questionCount: assessmentLength(skill),
           prerequisites: [...skill.prerequisites], unlocks: [...(unlocks[skill.id] ?? [])],
@@ -4373,13 +4379,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     state.backup.curriculumUpdatedAtAtExport = state.curricula.map((item) => item.updatedAt).filter(Boolean).sort().at(-1) ?? null;
     addActivity("export_progress_backup", "Downloaded a portable progress backup.");
     notify();
-    return JSON.stringify({ ...clone(state), exportedAt: isoNow(), app: "QuickMaths Web" }, null, 2);
+    return JSON.stringify({ ...state, exportedAt: isoNow(), app: "QuickMaths Web" }, null, 2);
   };
 
   const exportSyncState = () => {
     heartbeat();
     return JSON.stringify({
-      ...clone(state),
+      ...state,
       syncedAt: isoNow(),
       app: "QuickMaths Web",
       transport: "QuickMaths Bridge",
@@ -4613,6 +4619,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   return {
     snapshot,
+    getTimers: timers,
     subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
     createProfile,
     selectProfile,

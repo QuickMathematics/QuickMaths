@@ -1,4 +1,4 @@
-import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-app-audit-v2";
+import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-optimization-v1";
 const DRAFT_KEY = "quickmaths.lesson-creator.v1";
 
 const DEFAULT_THEME = {
