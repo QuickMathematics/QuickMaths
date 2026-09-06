@@ -1687,3 +1687,34 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:ha
 .lesson-publisher-dialog button:disabled { cursor: wait; opacity: .55; }
 .lesson-publisher-dialog summary { cursor: pointer; }
 @media (max-width: 540px) { .publisher-fields { grid-template-columns: 1fr; gap: 0; } .publisher-review dl > div { grid-template-columns: 1fr; gap: 4px; } .publisher-actions .button { width: 100%; } }
+
+/* Persistent GitHub save status beside the profile, including narrow phones. */
+.global-storage-status { display: flex; align-items: center; gap: 7px; padding: 8px 0; min-height: 44px; min-width: 0; text-align: left; color: inherit; background: transparent; border: 0; cursor: pointer; grid-row: 2; grid-column: 1 / -1; }
+.global-storage-status i { flex: 0 0 9px; width: 9px; height: 9px; border-radius: 50%; background: #aab7b2; box-shadow: 0 0 0 3px #ffffff13; }
+.global-storage-status[data-tone="connected"] i { background: #b6df81; }
+.global-storage-status[data-tone="pending"] i { background: #ffce73; }
+.global-storage-status[data-tone="error"] i { background: #ff927b; }
+.sidebar-profile .global-storage-status strong { display: block; font-size: 10px; }
+.sidebar-profile .global-storage-status small { display: block; color: #c7dbd0; font-size: 9px; margin-top: 3px; }
+.global-storage-status:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; border-radius: 5px; }
+.storage-merge-setting { min-width: 0; margin: 22px 0; padding: 18px; border: 1px solid var(--line); border-radius: 16px; }
+.storage-merge-setting legend { padding: 0 8px; font-weight: 800; }
+.storage-merge-setting > label { display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
+.storage-merge-setting > label:has(input:checked) { background: color-mix(in srgb, var(--mint) 30%, transparent); border-color: var(--pine); }
+.storage-merge-setting input { flex: 0 0 18px; width: 18px; height: 18px; margin: 3px 0; accent-color: var(--pine); }
+.storage-merge-setting small { display: block; color: var(--muted); margin-top: 7px; line-height: 1.6; }
+@media (max-width: 860px) {
+  .sidebar { grid-template-columns: auto minmax(0, 1fr); gap: 10px; }
+  .sidebar-profile { grid-template-columns: minmax(0, 1fr) auto 24px; gap: 12px; min-width: 0; }
+  .global-storage-status { grid-column: 2; grid-row: 1; padding: 0; }
+  .sidebar-profile .profile-copy { max-width: 110px; }
+}
+@media (max-width: 420px) {
+  .sidebar { padding: 10px; }
+  .sidebar-profile { gap: 8px; }
+  .sidebar-profile .profile-copy { max-width: 74px; }
+  .sidebar-profile .global-storage-status small { font-size: 9px; }
+}
+@media (max-width: 360px) {
+  .sidebar-profile .profile-copy { display: none; }
+}

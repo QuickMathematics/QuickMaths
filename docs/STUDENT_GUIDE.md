@@ -4,7 +4,7 @@
 
 QuickMaths is a local-first mastery-learning workspace. It helps you see prerequisite relationships, study substantial lessons, complete comprehensive assessments, reflect honestly, and use a browser agent as a tutor without handing control of your work to the agent.
 
-This guide documents the complete learner-facing product: profiles, curricula, dashboard, subjects, map controls, personal Plan mode, lessons, tests, proofs, structured review, Lesson Depot, Lesson Studio, agent support, backups, GitHub storage, mobile behavior, accessibility, and recovery.
+This guide documents the complete learner-facing product: profiles, curricula, dashboard, fields, map controls, personal Plan mode, lessons, tests, proofs, structured review, Lesson Depot, Lesson Studio, agent support, backups, GitHub storage, mobile behavior, accessibility, and recovery.
 
 Product: https://quickmathematics.github.io/QuickMaths/
 
@@ -16,14 +16,14 @@ WebMCP tools register only when QuickMaths is open inside the ChatGPT or Codex i
 
 ## 1. How QuickMaths works
 
-QuickMaths connects lessons into mastery maps instead of treating every topic as an isolated quiz. A lesson can recommend or require earlier lessons, unlock later work, and bridge into another subject.
+QuickMaths connects lessons into mastery maps instead of treating every topic as an isolated quiz. A lesson can recommend or require earlier lessons, unlock later work, and bridge into another field.
 
 | Layer | What it contains | What it means for you |
 | --- | --- | --- |
 | Profile | Progress, attempts, reviews, drafts, timers, personal plans, and preferences | Your learning record stays separate from other people using the browser |
-| Subject | Lessons, map lane, theme, and cross-subject bridges | Opening a lesson retains that subject's interface theme while the map continues to show every installed subject |
+| Field | Lessons, map lane, theme, and cross-field bridges | Opening a lesson retains that field's interface theme while the map continues to show every installed field |
 | Curriculum | An educator-authored selection of packs, canonical map, learning path, and optional supplemental agent guidance | A portable learning plan can travel from an educator into an independent assignment profile |
-| Lesson pack | One subject or set of lessons, questions, grading rules, and work requirements | Installed packs extend the same map, progress, testing, and backup system |
+| Lesson pack | One field or set of lessons, questions, grading rules, and work requirements | Installed packs extend the same map, progress, testing, and backup system |
 
 ### Mastery is more than a score
 
@@ -99,7 +99,7 @@ The tutorial is a visual introduction, not a separate account setup.
 | Chapter | What it demonstrates |
 | --- | --- |
 | 1. Your workspace | Browser-local autosave, full JSON backup, and optional private Workspace Storage |
-| 2. Subjects and path | Combined subject map, retained lesson theme, Hard path, and Open path |
+| 2. Fields and path | Combined field map, retained lesson theme, Hard path, and Open path |
 | 3. Mastery map | Prerequisites, status, map movement, zoom, and personal Plan mode |
 | 4. Learning loop | Theory, examples, complete authored tests, shown work, reflection, and mastery |
 | 5. Lesson ecosystem | Lesson Depot discovery and Lesson Studio authoring or native improvement |
@@ -134,9 +134,18 @@ The shell keeps navigation, identity, time, retained lesson theme, and agent sta
 
 The bottom bar shows Home, Map, Learn, Test, Depot, and Settings. Lesson Studio is available from the Depot tab when it cannot fit as a separate item. The fixed navigation stays reachable while the page scrolls.
 
-### Subject theme
 
-Each subject has a safe fixed color palette. The map always shows every installed subject, so node colors preserve subject identity while mastery status uses text and status dots. Opening a lesson or beginning its test applies that subject's interface theme; the theme stays until you study a lesson from another subject. Merely selecting a map node does not recolor the app.
+### Fields and branches
+
+QuickMaths organizes learning as **Field → Branch → Lesson**. Mathematics is a field; Geometry is a branch within Mathematics. A field owns its theme and can contain many branches. A branch groups lessons in that field; the same branch name in another field is a separate group. Lesson sets can contain several branches.
+
+On the map, choose a **Field**, then a **Branch**, then a **Lesson** to jump to. These selectors narrow the lesson list; the combined map and your saved positions stay intact. In Lesson Studio, select or create the field, then choose an existing branch or type a new branch name for each lesson. Prerequisites can connect lessons across branches and fields.
+
+Existing lesson files and backups remain compatible: the saved `subject` object and `subjectId` / `subject_id` identifiers describe the field; each lesson's `subdomain` is its branch. Keep these stable file keys and lesson IDs when editing older files. The agent tools `list_fields` and `list_branches` expose the hierarchy; `list_subjects` remains a compatibility alias.
+
+### Field theme
+
+Each field has a safe fixed color palette. The map always shows every installed field, so node colors preserve field identity while mastery status uses text and status dots. Opening a lesson or beginning its test applies that field's interface theme; the theme stays until you study a lesson from another field. Merely selecting a map node does not recolor the app.
 
 ### Agent Studio
 
@@ -152,11 +161,11 @@ Dashboard answers three questions: where am I, what should I do next, and is my 
 
 - **Student guide** opens this PDF.
 - **Save backup** downloads complete restorable state.
-- **Open mastery map** opens the combined map of every installed subject.
+- **Open mastery map** opens the combined map of every installed field.
 
 ### Progress metrics
 
-Cards summarize mastery states and lesson counts. Typical states are Ready, Learning, Proven, Mastered, Rusty, and Locked. Dashboard counts follow the subject theme retained from the last opened lesson; curriculum completion still respects the complete attached curriculum.
+Cards summarize mastery states and lesson counts. Typical states are Ready, Learning, Proven, Mastered, Rusty, and Locked. Dashboard counts follow the field theme retained from the last opened lesson; curriculum completion still respects the complete attached curriculum.
 
 ### Suggested next lesson
 
@@ -174,11 +183,11 @@ QuickMaths recommends a portable backup after meaningful new work, installed-con
 
 An attached curriculum can expose its educator contact and completion context. Email buttons open a draft in your mail app. QuickMaths does not send messages or attachments automatically.
 
-## 6. Subjects and learning paths
+## 6. Fields and learning paths
 
-### One connected subject map
+### One connected field map
 
-There is no subject selector or subject-only map mode. A newly installed subject appears as another labeled lane on the same mastery map, and cross-subject prerequisites connect globally unique lesson IDs. Use the map's **Jump to skill** control or select a node to inspect any installed lesson. When you open that lesson or start its test, its subject becomes the retained theme and the default context for Dashboard, Lessons, and Test.
+There is no field selector or field-only map mode. A newly installed field appears as another labeled lane on the same mastery map, and cross-field prerequisites connect globally unique lesson IDs. Use the map's **Lesson** control or select a node to inspect any installed lesson. When you open that lesson or start its test, its field becomes the retained theme and the default context for Dashboard, Lessons, and Test.
 
 ### Hard path
 
@@ -196,9 +205,9 @@ If an educator curriculum sets the path, the learner Settings controls are disab
 
 The map turns prerequisite structure and progress into one interactive canvas.
 
-### All subjects by default
+### All fields by default
 
-The mastery map permanently arranges every installed subject in labeled lanes, keeps each subject's colors, and draws cross-subject bridges. Hiding nodes in Plan mode is the deliberate way to make a quieter personal view without introducing a second subject-only map state.
+The mastery map permanently arranges every installed field in labeled lanes, keeps each field's colors, and draws cross-field bridges. Hiding nodes in Plan mode is the deliberate way to make a quieter personal view without introducing a second field-only map state.
 
 ### Node status
 
@@ -215,7 +224,7 @@ Selecting a node updates the detail card and routed lesson without resetting the
 
 ### Detail card
 
-The card shows lesson name, subdomain, description, mastery score, latest score, confidence, prerequisites, unlocks, why the lesson matters, and available lesson/test actions. Hard path identifies unmet preparation; Open path labels it as guidance.
+The card shows lesson name, branch, description, mastery score, latest score, confidence, prerequisites, unlocks, why the lesson matters, and available lesson/test actions. Hard path identifies unmet preparation; Open path labels it as guidance.
 
 ### Zoom and movement on desktop
 
@@ -225,7 +234,7 @@ Use the plus and minus buttons or the mouse wheel while the pointer is over the 
 
 Pinch inside the map to zoom. Drag empty space to pan. The map viewport remains a stable window so pinch zoom changes the canvas rather than the entire page scale.
 
-### Jump to skill
+### Field, branch, and lesson navigation
 
 The skill selector moves focus to a known lesson and updates the detail card. It is useful on large combined maps.
 
@@ -241,7 +250,7 @@ Plan mode is the editor for the private working copy layered over the canonical 
 
 ### Enter and leave Plan mode
 
-Choose **Plan mode** in the map header. A toolbar and Plan details card appear while the map remains visible. The editable canvas extends beyond the colored subject bands: those bands are reference guides, not fences, so selected nodes can be placed anywhere on the surrounding canvas. Changes autosave with your learner profile and travel in full backups and Bridge checkpoints.
+Choose **Plan mode** in the map header. A toolbar and Plan details card appear while the map remains visible. The editable canvas extends beyond the colored field bands: those bands are reference guides, not fences, so selected nodes can be placed anywhere on the surrounding canvas. Changes autosave with your learner profile and travel in full backups and Bridge checkpoints.
 
 ### Desktop selection
 
@@ -286,7 +295,7 @@ The lesson page is the study surface before and between assessments.
 
 ### Lesson header
 
-The header identifies subject, subdomain, lesson, description, preparation state, and available actions. A locked Hard-path test can still leave theory available for study.
+The header identifies field, branch, lesson, description, preparation state, and available actions. A locked Hard-path test can still leave theory available for study.
 
 ### Theory
 
@@ -298,7 +307,7 @@ Examples separate prompt, solution, and explanation. Try the prompt before readi
 
 ### Applications
 
-Applications connect the skill to real decisions, modeling, geometry, another subject, or later mathematics. They explain why the lesson belongs in the map.
+Applications connect the skill to real decisions, modeling, geometry, another field, or later mathematics. They explain why the lesson belongs in the map.
 
 ### Recommended preparation and unlocks
 
@@ -410,15 +419,15 @@ Retaking is always available as learning practice. Native lessons can generate f
 
 ## 12. Lesson Depot
 
-Lesson Depot discovers optional subjects and specialist tracks from the official catalog and independent public GitHub registries. QuickMaths merges those sources behind the same cards. Browsing, previewing, validating, and installing published packs do not require community authorization.
+Lesson Depot discovers optional fields and specialist tracks from the official catalog and independent public GitHub registries. QuickMaths merges those sources behind the same cards. Browsing, previewing, validating, and installing published packs do not require community authorization.
 
 ### Search and filters
 
-Search matches package name, subject, description, author, and tags. Filter published packages from roadmap concepts, choose subject, and sort by popularity (upvotes minus downvotes), recency, or name.
+Search matches package name, field, description, author, and tags. Filter published packages from roadmap concepts, choose field, and sort by popularity (upvotes minus downvotes), recency, or name.
 
 ### Package cards and themes
 
-Cards use their designated subject colors. They identify version, author, lesson count, tags, source, availability, and a compact provenance badge: **Official**, **Community recommended**, **New**, or **Subscribed**.
+Cards use their designated field colors. They identify version, author, lesson count, tags, source, availability, and a compact provenance badge: **Official**, **Community recommended**, **New**, or **Subscribed**.
 
 ### Preview and installation safety
 
@@ -452,7 +461,7 @@ Lesson Studio is available to everyone because explaining and authoring are powe
 
 ### Friendly authoring flow
 
-Choose a subject, write one or more lessons, add theory, worked examples, applications, prerequisites, and mastery questions, then validate and install. Question-mark controls provide hover, keyboard, and mobile-tap help.
+Choose a field, write one or more lessons, add theory, worked examples, applications, prerequisites, and mastery questions, then validate and install. Question-mark controls provide hover, keyboard, and mobile-tap help.
 
 ### Response and review design
 
@@ -460,7 +469,7 @@ Studio separates final-answer grading, shown work, and review. It explains ordin
 
 ### Native improvements
 
-Open a built-in lesson as an editable override while keeping its exact ID and subject. Completed progress and map identity stay attached. Affected unfinished tests restart. Settings can restore the original.
+Open a built-in lesson as an editable override while keeping its exact ID and field. Completed progress and map identity stay attached. Affected unfinished tests restart. Settings can restore the original.
 
 ### Human control
 
@@ -527,17 +536,29 @@ Choose Hard or Open path when no curriculum controls the setting. **Replay app t
 
 Settings names the current educator curriculum or lets you load one from a local file or public GitHub blueprint URL. A matching student name deliberately reuses the selected profile's mastery; otherwise QuickMaths creates a separate blank assignment profile. The educator's canonical paths, annotations, and positions are copied into that learner's independently editable Plan mode. Full educator guidance remains visible here after import.
 
+
+### Storage status and merge management
+
+The light beside your profile is visible throughout the app, including the mobile top bar. Green means connected and checkpointed; amber means syncing or a save is pending; coral means a problem or a review needs attention; gray means local-only storage. Its text reports time since this device's last successful GitHub save, retained after reload. Tap it to open Workspace Storage. Browser autosave and receiving an update do not reset the GitHub-save time.
+
+In **Settings → Workspace Storage → Storage management**, choose:
+
+- **Manually review storage merges** (default): review the detected changes with checkboxes. Independent changes start checked; choose which side to keep when the same content conflicts.
+- **Automatically merge · agent priority**: keep independent changes from both copies. If an agent and a device change the same content, the agent's value wins for that change. Local-only notes, node moves, lessons, mastery, profiles, curricula, tests, and feedback remain. Between device checkpoints, this device wins conflicts. This is a selective merge, not replacement of the complete workspace.
+
+The choice belongs to this device and repository connection. It does not bypass human approval to install agent-staged lesson packages. Both modes preserve the existing activity-history combination and device-local settings. Missing starting history or an invalid combination of related saved work opens the comparison for a manual decision. Actual concurrent edits are checked again before saving; clocks, navigation, and bookkeeping alone do not invalidate the review. Agents still record the original task start before editing and publish it with the finished update.
+
 ### GitHub Bridge
 
 Workspace Storage is optional persistence in a dedicated private GitHub data repository. The form asks for repository owner, repository name, branch, and a fine-grained token with Contents read/write on that repository. QuickMaths refuses public repositories and tokens without write access before saving the connection.
 
 Enter the token only in the app. It is never included in backups, commits, lesson files, URLs, logs, or WebMCP results. Choose whether to keep it for this tab session or remember it in this browser.
 
-Bridge status shows local dirty state and device label, last workspace push, the last remote writer, token storage, and remote availability. **Sync now** publishes the complete browser workspace. **Check agent updates** checks the agent checkpoint and opens a merge window if work overlaps.
+Bridge status shows local dirty state and device label, last workspace push, the last remote writer, token storage, and remote availability. **Sync now** publishes the complete browser workspace. **Check agent updates** checks the agent checkpoint and uses your selected merge mode if work overlaps.
 
 Workspace Storage runs across the entire app, not only while Settings is open. QuickMaths gives each browser installation a random privacy-safe device ID and a friendly label such as **Firefox on Android**; it does not read a hardware serial number. Checkpoints also identify their last writer as that device or **QuickMaths agent**.
 
-Each agent prompt starts by noting its UTC start time locally with **begin_agent_task**. The agent pushes that original timestamp together with the finished checkpoint and its starting learner revision. If neither your device nor the GitHub learner workspace changed from that starting copy, QuickMaths applies the update automatically. If you kept working, sync pauses and a merge window describes individual changes with checkboxes across profiles, curricula, lessons, mastery, feedback, tests, and map plans. Independent changes are checked for you. For example, keep a new GitHub note and two local node moves together. Uncheck a change to keep its starting value. For overlapping edits, choose one version or **Keep the starting value**, then **Save merged workspace**. Questions, attempts, and unfinished tests stay intact. Activity history is combined automatically. Session clocks and viewport changes alone do not cause a merge. The window works on every app page.
+Each agent prompt starts by noting its UTC start time locally with **begin_agent_task**. The agent pushes that original timestamp together with the finished checkpoint and its starting learner revision. If neither your device nor the GitHub learner workspace changed from that starting copy, QuickMaths applies the update automatically. If you kept working in manual mode, sync pauses and a merge window describes individual changes with checkboxes across profiles, curricula, lessons, mastery, feedback, tests, and map plans. Independent changes are checked for you. For example, keep a new GitHub note and two local node moves together. Uncheck a change to keep its starting value. For overlapping edits, choose one version or **Keep the starting value**, then **Save merged workspace**. Questions, attempts, and unfinished tests stay intact. Activity history is combined automatically. Session clocks and viewport changes alone do not cause a merge. The window works on every app page.
 
 **Manage GitHub storage** opens the deletion manager. A profile deletion removes that profile's progress, attempts, reviews, drafts, map plan, and any educator curriculum it owns. With storage connected, QuickMaths writes the reduced learner workspace and deletes the stale agent checkpoint so it cannot remain as the current remote copy. **Clear all data** resets every local profile, curriculum, lesson pack, attempt, review, plan, Lesson Studio draft, and same-browser Agent Bridge working copy; when connected, it also deletes `learner-state.json` and `agent-state.json` from the current repository branch.
 
@@ -571,7 +592,7 @@ Native improvements apply browser-wide and are never installed silently through 
 
 ### Accessibility
 
-QuickMaths uses semantic navigation, headings, forms, dialogs, labels, and live status messages. Controls have accessible names. Reduced-motion preferences disable nonessential movement. Subject colors are paired with text, structure, and status indicators.
+QuickMaths uses semantic navigation, headings, forms, dialogs, labels, and live status messages. Controls have accessible names. Reduced-motion preferences disable nonessential movement. Field colors are paired with text, structure, and status indicators.
 
 ### Privacy boundaries
 
@@ -624,7 +645,7 @@ The attached curriculum may have Agent tutoring turned off. That policy delibera
 
 ### GitHub sync reports a conflict
 
-A comparison appears when local and remote work overlap, or when an existing workspace first connects to an independent GitHub copy. Review the changed fields and choose a version for each item. **Select all from this device** and **Select all from GitHub** only select choices; **Save merged workspace** applies and syncs them. **Not now** leaves sync paused. If either copy changes during review, use **Refresh comparison** before saving. If the starting copy is unavailable, every difference needs an explicit choice. GitHub history remains a recovery aid.
+In manual mode, a comparison appears when local and remote work overlap, or when an existing workspace first connects to an independent GitHub copy. Review the changed fields and choose a version for each item. **Keep all independent changes** and **Uncheck independent changes** adjust the checklist; **Save merged workspace** applies and syncs them. **Not now** leaves sync paused. If either copy changes during review, use **Refresh comparison** before saving. If the starting copy is unavailable, every difference needs an explicit choice. GitHub history remains a recovery aid.
 
 ### WebMCP tools are unavailable
 

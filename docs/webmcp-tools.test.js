@@ -143,7 +143,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(css, /\.workspace-storage-manager/);
   assert.match(css, /\.tour-depot-preview/);
   assert.doesNotMatch(html, /id="subject-select"/);
-  assert.match(js, /All installed subjects/);
+  assert.match(js, /All installed fields/);
   assert.match(js, /last lesson you opened/);
   assert.match(js, /Native improvements are reversible from Settings without erasing progress/);
   assert.match(js, /Create \/ improve/);
@@ -193,7 +193,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /data-action="plan-open-path"/);
   assert.match(js, /data-action="plan-toggle-hidden"/);
   assert.match(js, /data-action="plan-hide-selected"/);
-  assert.match(js, /Subject bands are guides/);
+  assert.match(js, /Field bands are guides/);
   assert.match(css, /\.map-node\.is-plan-hidden/);
   assert.match(js, /data-plan-comment=/);
   assert.match(js, /updateMapPlanAnnotationPosition/);
@@ -278,13 +278,13 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /local-git-transport/);
 });
 
-test("registers all thirty-one tools once with the WebMCP document context", async () => {
+test("registers all thirty-three tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
   }, agentManifest, null, null, authoringGuide, { learner: learnerManual, educator: educatorManual });
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 31);
+  assert.equal(TOOL_NAMES.length, 33);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(result.failures, []);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
@@ -318,7 +318,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.match(summary.guide.source_fallback, /github\.com\/QuickMathematics\/QuickMaths/);
   assert.match(summary.guide.source_fallback, /fallback source of truth/);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
-  assert.equal(summary.guide.tools.length, 31);
+  assert.equal(summary.guide.tools.length, 33);
   assert.equal(summary.guide.active_role_guidance.role, "learner");
   assert.match(summary.guide.active_role_guidance.response_style.join(" "), /lightly quirky/);
   assert.match(summary.guide.remote_mobile.first_setup, /computer that will remain online/);
@@ -850,4 +850,18 @@ test("registration reports partial failure without duplicating names", async () 
   assert.deepEqual(result.registered, TOOL_NAMES.filter((name) => name !== TOOL_NAMES[3]));
   assert.deepEqual(result.failures, [{ name: TOOL_NAMES[3], error: "unsupported schema keyword" }]);
   assert.match(result.error, new RegExp(TOOL_NAMES[3]));
+});
+
+
+test("field and branch tools expose scoped lesson membership and reject unknown fields", async () => {
+  const store = createStore(); const tools = toolsFor(store);
+  const fields = await tools.list_fields.execute({});
+  assert.equal(fields.fields[0].id, "SUBJECT_MATH");
+  const branches = await tools.list_branches.execute({ field_id: "SUBJECT_MATH" });
+  assert.ok(branches.branches.length > 1);
+  assert.ok(branches.branches.every((branch) => branch.fieldId === "SUBJECT_MATH" && branch.skillIds.length));
+  await assert.rejects(tools.list_branches.execute({ field_id: "missing" }), /Unknown field_id/);
+  assert.deepEqual((await tools.list_subjects.execute({})).subjects.map((subject) => subject.subject_id), fields.fields.map((field) => field.id));
+  const guide = await tools.get_lesson_authoring_guide.execute({ section: "envelope" });
+  assert.match(JSON.stringify(guide), /Envelope and field/);
 });

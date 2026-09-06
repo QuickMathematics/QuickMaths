@@ -23,7 +23,7 @@ QuickMaths separates four things that are easy to confuse.
 | Browser workspace | Profiles, curricula, installed packs, maps, attempts, reviews, drafts, and settings saved on this site origin | The person using this browser |
 | Curriculum | One named plan: enabled additive packs, canonical map, learner policy, and learner-visible supplemental agent guidance | The educator |
 | Learner profile | Progress, attempts, shown work, reflections, personal Plan mode, and attached curriculum | The learner |
-| Lesson pack | A subject or set of lessons, questions, grading rules, work requirements, and optional theme | Its author; installation requires human approval |
+| Lesson pack | A field or set of lessons, questions, grading rules, work requirements, and optional theme | Its author; installation requires human approval |
 
 Native Mathematics is always available. Additive packs from the Lesson Depot form a local library. Each curriculum chooses which installed additive packs are visible. A curriculum export includes normalized copies of those chosen packs so the plan behaves reproducibly on another device.
 
@@ -104,9 +104,18 @@ The shell keeps navigation, identity, time, and agent status visible around the 
 
 The bottom bar keeps the highest-value destinations visible. Educators see Home, Designer, Depot, and Settings. Lesson Studio is available through the Depot's Studio tab when horizontal space is limited. Learners see Home, Map, Learn, Test, Depot, and Settings.
 
-### Subject theme
 
-Each subject supplies a safe fixed color palette. The map always shows every installed subject, so node fills and outlines retain their own subject identity while status remains visible. For learners, opening a lesson or beginning its test applies that subject's interface theme until they study another subject; map-node inspection alone does not change the theme.
+### Fields and branches
+
+QuickMaths organizes learning as **Field → Branch → Lesson**. Mathematics is a field; Geometry is a branch within Mathematics. A field owns its theme and can contain many branches. A branch groups lessons in that field; the same branch name in another field is a separate group. Lesson sets can contain several branches.
+
+On the map, choose a **Field**, then a **Branch**, then a **Lesson** to jump to. These selectors narrow the lesson list; the combined map and your saved positions stay intact. In Lesson Studio, select or create the field, then choose an existing branch or type a new branch name for each lesson. Prerequisites can connect lessons across branches and fields.
+
+Existing lesson files and backups remain compatible: the saved `subject` object and `subjectId` / `subject_id` identifiers describe the field; each lesson's `subdomain` is its branch. Keep these stable file keys and lesson IDs when editing older files. The agent tools `list_fields` and `list_branches` expose the hierarchy; `list_subjects` remains a compatibility alias.
+
+### Field theme
+
+Each field supplies a safe fixed color palette. The map always shows every installed field, so node fills and outlines retain their own field identity while status remains visible. For learners, opening a lesson or beginning its test applies that field's interface theme until they study another field; map-node inspection alone does not change the theme.
 
 ### Agent Studio
 
@@ -165,7 +174,7 @@ Curriculum Designer edits one open curriculum at a time. Every change autosaves.
 
 **Name** identifies the portable plan. **Description** records audience, purpose, and intended outcome. **Save profile** persists the fields. **New curriculum** creates another independent workspace under the educator profile.
 
-Use distinct names. A useful description states learner level, subject scope, duration or milestone, and what successful completion should mean.
+Use distinct names. A useful description states learner level, field scope, duration or milestone, and what successful completion should mean.
 
 ### Learner and agent policy
 
@@ -201,15 +210,15 @@ The map below Curriculum Designer is the canonical visual plan that travels with
 
 ### Combined map
 
-The designer always uses one combined map with labeled subject lanes and cross-subject prerequisite bridges. There is no separate subject-only scope. Hide nodes in the saved Plan presentation when a curriculum needs a deliberately quieter learner view.
+The designer always uses one combined map with labeled field lanes and cross-field prerequisite bridges. There is no separate field-only scope. Hide nodes in the saved Plan presentation when a curriculum needs a deliberately quieter learner view.
 
 ### Zoom and movement
 
-Desktop users can use zoom buttons, the mouse wheel over the map, and click-drag empty space to pan horizontally and vertically. Mobile users use pinch zoom and drag empty space. Zoom changes the map content, not the page viewport. In Plan mode the canvas extends beyond the colored subject bands. Those bands are reference guides, not placement boundaries, and selected lessons may be arranged anywhere on the surrounding free canvas.
+Desktop users can use zoom buttons, the mouse wheel over the map, and click-drag empty space to pan horizontally and vertically. Mobile users use pinch zoom and drag empty space. Zoom changes the map content, not the page viewport. In Plan mode the canvas extends beyond the colored field bands. Those bands are reference guides, not placement boundaries, and selected lessons may be arranged anywhere on the surrounding free canvas.
 
 ### Node meaning
 
-Each node is one lesson. Color identifies subject. Status is learner-specific when viewed by a learner: Locked, Ready, Learning, Proven, Mastered, or Rusty. Selecting a node opens its details without resetting the map's pan position.
+Each node is one lesson. Color identifies field. Status is learner-specific when viewed by a learner: Locked, Ready, Learning, Proven, Mastered, or Rusty. Selecting a node opens its details without resetting the map's pan position.
 
 Learner maps open in a read-only **Plan view** that shows the saved personalized arrangement while preserving ordinary node selection, detail cards, panning, and zoom. The learner can switch off Plan view to compare it with the untouched canonical prerequisite map, or enter Plan mode to edit their independent copy. Curriculum Designer itself remains the editable canonical-plan surface for the educator.
 
@@ -266,11 +275,11 @@ The Depot tab shows published and planned packages. The Studio tab opens Lesson 
 
 ### Search, filter, and sorting
 
-Search matches package names, subjects, descriptions, authors, and tags. Availability filters distinguish published packages from roadmap placeholders. Subject filters narrow the catalog. Sort by popularity (upvotes minus downvotes), recency, or name.
+Search matches package names, fields, descriptions, authors, and tags. Availability filters distinguish published packages from roadmap placeholders. Field filters narrow the catalog. Sort by popularity (upvotes minus downvotes), recency, or name.
 
 ### Package cards
 
-Cards inherit their designated subject palette. A card shows package identity, subject, description, version, author, tags, lesson count, source, and a compact **Official**, **Community recommended**, **New**, or **Subscribed** provenance badge.
+Cards inherit their designated field palette. A card shows package identity, field, description, version, author, tags, lesson count, source, and a compact **Official**, **Community recommended**, **New**, or **Subscribed** provenance badge.
 
 Published packages can be previewed. A bounded reader fetches the immutable lesson file, verifies its registry SHA-256 hash, validates the full schema locally, and summarizes content without exposing answer keys. If WebCrypto is unavailable, QuickMaths stops rather than treating the file as verified. Registry failures remain isolated.
 
@@ -309,28 +318,28 @@ Lesson Studio is a visual editor for new packs and reversible improvements to bu
 
 ### Improve our work
 
-Choose a native lesson and select **Open editable copy**. Studio creates a schema 2.0 override that keeps the exact native lesson ID and subject.
+Choose a native lesson and select **Open editable copy**. Studio creates a schema 2.0 override that keeps the exact native lesson ID and field.
 
 Installing the improvement replaces content while preserving completed progress, reviews, and map identity. Unfinished tests for that lesson restart so answers cannot cross between different question banks. Settings can restore the original.
 
 The original native runtime generator remains auditable through **Reroll values** and **Download full audit**. Uploaded custom/community files never execute generators.
 
-### Subject setup
+### Field setup
 
-For a new pack, choose **Extend a subject** or **Create a subject**.
+For a new pack, choose **Extend a field** or **Create a field**.
 
-An extension adds lessons into an installed subject. A new subject requires a stable uppercase ID, name, short label, icon, description, and safe fixed theme colors. Theme values are colors only; CSS, HTML, scripts, and URLs are rejected.
+An extension adds lessons into an installed field. A new field requires a stable uppercase ID, name, short label, icon, description, and safe fixed theme colors. Theme values are colors only; CSS, HTML, scripts, and URLs are rejected.
 
 ### Lesson bank
 
 The left lesson list selects the active lesson. Add, remove, or reorder content deliberately. Each lesson defines:
 
 - stable lesson ID;
-- name, subdomain, and description;
-- prerequisite lesson IDs, including cross-subject bridges;
+- name, branch, and description;
+- prerequisite lesson IDs, including cross-field bridges;
 - theory sections;
 - worked examples with prompt, solution, and explanation;
-- real-world or cross-subject applications;
+- real-world or cross-field applications;
 - mastery questions.
 
 Prerequisite IDs must already exist in native content, installed packs, or the same imported set. The validator rejects missing references and cycles.
@@ -458,7 +467,7 @@ Educators should understand what the exported curriculum controls on the learner
 
 ### Learner tutorial
 
-New learners receive a seven-chapter tour covering local profiles, subjects and path strictness, mastery map and Plan mode, lesson/test/reflection flow, Lesson Depot and Studio, agent use, and ownership/backup. It can be skipped and replayed from learner Settings.
+New learners receive a seven-chapter tour covering local profiles, fields and path strictness, mastery map and Plan mode, lesson/test/reflection flow, Lesson Depot and Studio, agent use, and ownership/backup. It can be skipped and replayed from learner Settings.
 
 ### Dashboard
 
@@ -496,6 +505,18 @@ Settings is the recovery, portability, and installed-library page.
 
 **Educator guide** opens this PDF. **Load backup** previews a full workspace backup before replacement. **Save full backup** downloads complete restorable state.
 
+
+### Storage status and merge management
+
+The light beside your profile is visible throughout the app, including the mobile top bar. Green means connected and checkpointed; amber means syncing or a save is pending; coral means a problem or a review needs attention; gray means local-only storage. Its text reports time since this device's last successful GitHub save, retained after reload. Tap it to open Workspace Storage. Browser autosave and receiving an update do not reset the GitHub-save time.
+
+In **Settings → Workspace Storage → Storage management**, choose:
+
+- **Manually review storage merges** (default): review the detected changes with checkboxes. Independent changes start checked; choose which side to keep when the same content conflicts.
+- **Automatically merge · agent priority**: keep independent changes from both copies. If an agent and a device change the same content, the agent's value wins for that change. Local-only notes, node moves, lessons, mastery, profiles, curricula, tests, and feedback remain. Between device checkpoints, this device wins conflicts. This is a selective merge, not replacement of the complete workspace.
+
+The choice belongs to this device and repository connection. It does not bypass human approval to install agent-staged lesson packages. Both modes preserve the existing activity-history combination and device-local settings. Missing starting history or an invalid combination of related saved work opens the comparison for a manual decision. Actual concurrent edits are checked again before saving; clocks, navigation, and bookkeeping alone do not invalidate the review. Agents still record the original task start before editing and publish it with the finished update.
+
 ### GitHub Bridge
 
 Workspace Storage is optional persistence in a dedicated private GitHub data repository. The form asks for repository owner, repository name, branch, and a fine-grained token. QuickMaths verifies that the repository is private and the token has Contents read/write access before saving the connection.
@@ -506,7 +527,7 @@ The token is entered privately in the app. It is never included in backups, agen
 
 Bridge status distinguishes local browser state and device label, last workspace push, the last remote writer, credential storage, and source choices. **Sync now** pushes the complete workspace checkpoint. **Check agent updates** pulls a revision-bound agent checkpoint. Sync polling runs throughout the educator app, including Overview, Curriculum Designer, Depot, Lesson Studio, and Settings.
 
-Each agent prompt starts by noting its UTC start time locally with **begin_agent_task**. The agent pushes that original timestamp together with the finished checkpoint and its starting learner revision. If neither your device nor the GitHub learner workspace changed from that starting copy, QuickMaths applies the update automatically. If you kept working, sync pauses and a merge window describes individual changes with checkboxes across profiles, curricula, lessons, mastery, feedback, tests, and map plans. Independent changes are checked for you. For example, keep a new GitHub note and two local node moves together. Uncheck a change to keep its starting value. For overlapping edits, choose one version or **Keep the starting value**, then **Save merged workspace**. Questions, attempts, and unfinished tests stay intact. Activity history is combined automatically. Session clocks and viewport changes alone do not cause a merge. The window works on every app page.
+Each agent prompt starts by noting its UTC start time locally with **begin_agent_task**. The agent pushes that original timestamp together with the finished checkpoint and its starting learner revision. If neither your device nor the GitHub learner workspace changed from that starting copy, QuickMaths applies the update automatically. If you kept working in manual mode, sync pauses and a merge window describes individual changes with checkboxes across profiles, curricula, lessons, mastery, feedback, tests, and map plans. Independent changes are checked for you. For example, keep a new GitHub note and two local node moves together. Uncheck a change to keep its starting value. For overlapping edits, choose one version or **Keep the starting value**, then **Save merged workspace**. Questions, attempts, and unfinished tests stay intact. Activity history is combined automatically. Session clocks and viewport changes alone do not cause a merge. The window works on every app page.
 
 **Open Agent Bridge** launches the remote-session companion. **Setup guide** opens human instructions. **Disconnect** removes the active connection on this device.
 
@@ -530,7 +551,7 @@ Native improvements apply to every profile in the browser. QuickMaths therefore 
 
 ### Installed lesson packs
 
-The shared library lists package descriptions, subject, lesson count, and question count. **Download source** exports a pack. **Load lesson file** previews and installs a local validated package. Curriculum-specific enable/disable choices belong in Curriculum Designer.
+The shared library lists package descriptions, field, lesson count, and question count. **Download source** exports a pack. **Load lesson file** previews and installs a local validated package. Curriculum-specific enable/disable choices belong in Curriculum Designer.
 
 ## 11. WebMCP educator integration
 
@@ -555,11 +576,13 @@ On a fresh workspace, the agent explicitly offers to help create a custom curric
 | get_agent_guide | Unified fresh-workspace, learner, and educator routing; use section `educator` for the detailed educator contract |
 | get_quickmaths_manual | Machine-readable learner or educator manual index, one numbered chapter, or full Markdown source behind the PDF |
 | get_lesson_authoring_guide | Compact authoring overview or a focused section such as grading, Studio, graph design, or publishing |
-| get_app_state | Current profile, route, subject, scope, selection, plan, and status |
+| get_app_state | Current profile, route, field, scope, selection, plan, and status |
 | get_curriculum_workspace | Open curriculum identity, settings, enabled packs, and available library |
 | get_curriculum_map | Visible lesson graph and prerequisite relationships |
 | set_curriculum_native_lessons_enabled | Include the full native Mathematics sequence or keep only native prerequisites required by enabled packs |
-| list_subjects | Installed subjects and theme identity |
+| list_fields | Fields with their branches and lesson IDs |
+| list_branches | Branch membership within a field |
+| list_subjects | Compatibility alias for fields and theme identity |
 | search_lesson_depot | Public catalog metadata without answer keys |
 
 ### Curriculum change tools
@@ -568,7 +591,7 @@ On a fresh workspace, the agent explicitly offers to help create a custom curric
 
 ### Planning tools
 
-`set_map_plan_mode`, `arrange_map_plan_nodes`, `set_map_plan_nodes_hidden`, `create_map_plan_path`, and `add_map_plan_annotation` operate on the open curriculum's canonical map when an educator profile is active. Free-canvas coordinates may be negative; colored subject bands are guides rather than coordinate limits. Hiding through WebMCP changes the saved Plan presentation shown in Plan mode and Plan view, but never removes curriculum content or alters the canonical prerequisite map.
+`set_map_plan_mode`, `arrange_map_plan_nodes`, `set_map_plan_nodes_hidden`, `create_map_plan_path`, and `add_map_plan_annotation` operate on the open curriculum's canonical map when an educator profile is active. Free-canvas coordinates may be negative; colored field bands are guides rather than coordinate limits. Hiding through WebMCP changes the saved Plan presentation shown in Plan mode and Plan view, but never removes curriculum content or alters the canonical prerequisite map.
 
 ### Content tools
 
@@ -602,7 +625,7 @@ An educator agent must:
 | Reviews CSV | No | Review/audit analysis |
 | Tutor summary / review packet | No | Human or agent review context |
 
-QuickMaths validates imported schemas, sizes, IDs, normalized package equality, filtered graph relationships, grading modes, colors, and content shape. Validation does not certify factual correctness. Educators remain responsible for subject review, licensing, age appropriateness, accessibility, and local policy.
+QuickMaths validates imported schemas, sizes, IDs, normalized package equality, filtered graph relationships, grading modes, colors, and content shape. Validation does not certify factual correctness. Educators remain responsible for field review, licensing, age appropriateness, accessibility, and local policy.
 
 Local grading requires portable lesson packs and assignments to contain expected answers and solution steps. WebMCP withholds them before submission, but a technically knowledgeable learner can inspect client-side JSON or memory. QuickMaths must not be presented as answer-key secrecy, identity verification, or supervised assessment.
 
@@ -628,7 +651,7 @@ When authoring content, use meaningful headings, concise prompts, plain-language
 5. Browse Depot; stage packages individually or as an ordered agent-created batch.
 6. Review and approve each installation yourself.
 7. Enable only the packs needed by this curriculum.
-8. Design the canonical combined map across every enabled subject.
+8. Design the canonical combined map across every enabled field.
 9. Add intentional custom paths and annotations.
 10. Audit lessons and assessments in Lesson Studio where needed.
 11. Export a public blueprint or private assignment as appropriate, then test it with a learner profile. Confirm whether the student-name rule should reuse mastery or create a blank assignment profile.
@@ -658,11 +681,11 @@ Check Agent tutoring in the curriculum policy. When it is off, tutoring, learner
 
 ### A map node is hard to find
 
-Use **Jump to skill** to focus any enabled lesson on the combined map. If the learner presentation should be quieter, use Plan mode to hide selected nodes; this does not remove lessons or change prerequisites.
+Use **Lesson** to focus any enabled lesson on the combined map. If the learner presentation should be quieter, use Plan mode to hide selected nodes; this does not remove lessons or change prerequisites.
 
 ### GitHub sync reports a conflict
 
-A comparison appears when local and remote work overlap, or when an existing workspace first connects to an independent GitHub copy. Review the changed fields and choose a version for each item. **Select all from this device** and **Select all from GitHub** only select choices; **Save merged workspace** applies and syncs them. **Not now** leaves sync paused. If either copy changes during review, use **Refresh comparison** before saving. If the starting copy is unavailable, every difference needs an explicit choice. GitHub history remains a recovery aid.
+In manual mode, a comparison appears when local and remote work overlap, or when an existing workspace first connects to an independent GitHub copy. Review the changed fields and choose a version for each item. **Keep all independent changes** and **Uncheck independent changes** adjust the checklist; **Save merged workspace** applies and syncs them. **Not now** leaves sync paused. If either copy changes during review, use **Refresh comparison** before saving. If the starting copy is unavailable, every difference needs an explicit choice. GitHub history remains a recovery aid.
 
 ### A proof has the correct conclusion but no mastery
 

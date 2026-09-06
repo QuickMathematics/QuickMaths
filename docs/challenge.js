@@ -1,8 +1,10 @@
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-merge-v7";
+import { learningFields, branchName } from "./learning-fields.js?v=20260906-fields-storage-v1";
+import { storageStatus } from "./storage-status.js?v=20260906-fields-storage-v1";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-fields-storage-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-merge-v7";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260905-publisher-v1";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-fields-storage-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-fields-storage-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260906-fields-storage-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -17,7 +19,7 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-merge-v7";
+} from "./github-sync.js?v=20260906-fields-storage-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -261,7 +263,8 @@ function setBridgeSourceChoice(_remote, kind = "learner", { recover = false } = 
   bridgeNeedsChoice = true;
   // Open before any reads or automatic history merge. Failures and retries stay
   // in this same window; closing it leaves Compare versions available.
-  openBridgeSourceChoice({ force: true }).showLoading();
+  const automatic = githubSync.snapshot().config?.mergeMode === "agent-priority";
+  if (!automatic) openBridgeSourceChoice({ force: true }).showLoading();
   const renderBridge = () => { if (store.snapshot().ui.route === "settings") renderSettings(store.snapshot()); };
   renderBridge();
   bridgeReviewPromise = (async () => {
@@ -276,21 +279,27 @@ function setBridgeSourceChoice(_remote, kind = "learner", { recover = false } = 
         bridgeReviewChannel = error.details?.channel === "agent" ? "agent" : "learner";
       }
     }
-    review ??= await githubSync.prepareMerge({ channel: bridgeReviewChannel });
+    review ??= await (automatic ? githubSync.mergeAutomatically({ channel: bridgeReviewChannel }) : githubSync.prepareMerge({ channel: bridgeReviewChannel }));
+    if (!review.resolved && !automatic && githubSync.snapshot().config?.mergeMode === "agent-priority") review = await githubSync.mergeAutomatically({ channel: review.channel });
     if (!githubSync.snapshot().connected) return;
     if (review.resolved) {
       bridgeNeedsChoice = false;
       closeBridgeSourceChoice();
       githubSync.start();
-      showToast("Workspace is up to date. No changes need a choice.");
+      showToast(automatic ? "Workspace merged and saved to GitHub." : "Workspace is up to date. No changes need a choice.");
     } else {
       bridgeChoiceDetails = review;
       bridgeReviewChannel = review.channel;
+      if (automatic) {
+        openBridgeSourceChoice({ force: true });
+        if (!review.hasBase || review.automaticReviewReason) showToast(review.automaticReviewReason || "The starting version is unavailable. Choose which changes to keep.");
+      }
       // Respect Not now while loading; the ready review can be reopened later.
       activeBridgeDecision?.setReview(review);
     }
   })().catch((error) => {
     bridgeReviewError = error;
+    if (automatic) openBridgeSourceChoice({ force: true });
     activeBridgeDecision?.showError(error);
     if (!activeBridgeDecision) showToast(error instanceof Error ? error.message : String(error));
   }).finally(() => {
@@ -450,19 +459,19 @@ const TUTORIAL_STEPS = [
     visual: "welcome",
   },
   {
-    eyebrow: "Subjects and learning paths",
-    title: "See every subject—and choose how strict the path should be.",
-    lede: "The mastery map keeps every installed subject together in one connected view. Custom lesson sets can extend Mathematics or add entirely new subjects with their own colors.",
-    points: ["Subject colors keep each curriculum recognizable on the combined map.", "Opening a lesson applies that subject’s theme until you study another subject.", "Hard path enforces prerequisites; Open path keeps the same connections as guidance."],
-    tip: "The learning-path choice and last studied subject theme belong to this profile and travel inside backups.",
+    eyebrow: "Fields, branches and learning paths",
+    title: "See every field—and choose how strict the path should be.",
+    lede: "The mastery map keeps every installed field together in one connected view. Custom lesson sets can extend Mathematics or add entirely new fields with their own colors. Each field contains branches, such as Geometry within Mathematics.",
+    points: ["Field colors keep each curriculum recognizable on the combined map.", "Opening a lesson applies that subject’s theme until you study another subject.", "Hard path enforces prerequisites; Open path keeps the same connections as guidance."],
+    tip: "The learning-path choice and last studied field theme belong to this profile and travel inside backups.",
     visual: "subjects",
   },
   {
     eyebrow: "The mastery map",
     title: "Read the map before picking your next lesson.",
-    lede: "Every node is a lesson. Connections show prerequisite knowledge, including bridges between any installed subjects.",
-    points: ["Every installed subject appears in a labeled lane, with bridge lines connecting related knowledge.", "Drag in either direction; use the mouse wheel on desktop or pinch on mobile to zoom.", "Turn on Plan mode to arrange nodes anywhere on a free canvas, hide distractions, draw colored study paths, and place draggable free or lesson-connected comment nodes without changing the canonical map."],
-    tip: "Colored subject bands are guides, not fences. Use Ctrl or a selection rectangle on desktop; touch and hold lessons on mobile. Hide selected nodes for a quieter plan, then use Show hidden nodes to restore them. Your plan autosaves with this profile and travels in full backups.",
+    lede: "Every node is a lesson. Connections show prerequisite knowledge, including bridges between any installed fields.",
+    points: ["Every installed field appears in a labeled lane, with bridge lines connecting related knowledge.", "Drag in either direction; use the mouse wheel on desktop or pinch on mobile to zoom.", "Turn on Plan mode to arrange nodes anywhere on a free canvas, hide distractions, draw colored study paths, and place draggable free or lesson-connected comment nodes without changing the canonical map."],
+    tip: "Colored field bands are guides, not fences. Use Ctrl or a selection rectangle on desktop; touch and hold lessons on mobile. Hide selected nodes for a quieter plan, then use Show hidden nodes to restore them. Your plan autosaves with this profile and travels in full backups.",
     visual: "map",
   },
   {
@@ -476,7 +485,7 @@ const TUTORIAL_STEPS = [
   {
     eyebrow: "Lesson Depot",
     title: "Find lessons—and join the conversation.",
-    lede: "Browse published lesson packs and clearly labelled roadmap concepts. Every card follows its subject’s color scheme, and published packages can carry live GitHub-backed upvotes and discussion.",
+    lede: "Browse published lesson packs and clearly labelled roadmap concepts. Every card follows its field’s color scheme, and published packages can carry live GitHub-backed upvotes and discussion.",
     points: ["Preview, hash-check, and validate a published pack before installing it.", "Connect GitHub Community to upvote and comment without leaving the app.", "Open Lesson Studio from the Depot to build new lessons or improve a native one."],
     tip: "Community authorization is separate from Workspace Storage. Installing content and posting publicly always remain human-controlled actions.",
     visual: "depot",
@@ -493,7 +502,7 @@ const TUTORIAL_STEPS = [
     eyebrow: "Settings, sync, and creation",
     title: "Keep it portable. Extend it when you are ready.",
     lede: "Settings brings together learning-path controls, JSON save and load, the optional GitHub Bridge, and this replayable tour. Lesson Studio creates lesson packs and safely improves built-in lessons without requiring raw JSON; educator profiles compose those packs into curricula.",
-    points: ["Download full backups containing profiles, progress, subjects, lessons, improvements, reviews, and timers.", "Optionally sync learner and remote-agent checkpoints through your own GitHub repository.", "Create new lessons—or edit a native lesson while keeping its ID, map position, and completed learner progress."],
+    points: ["Download full backups containing profiles, progress, fields, lessons, improvements, reviews, and timers.", "Optionally sync learner and remote-agent checkpoints through your own GitHub repository.", "Create new lessons—or edit a native lesson while keeping its ID, map position, and completed learner progress."],
     tip: "Agents may validate and stage content, but only you can install it. Native improvements are reversible from Settings without erasing progress.",
     visual: "ownership",
   },
@@ -503,13 +512,13 @@ function tutorialVisual(type, snapshot) {
   if (type === "welcome") return `<div class="tour-profile-preview"><img src="./quickmaths-logo.png" alt="" width="88" height="82"><div><span>Profile ready</span><strong>${escapeHtml(snapshot.activeProfile.displayName)}</strong><small>Autosaving in this browser</small></div><i>✓</i></div><div class="tour-local-row"><span>Browser autosave</span><span>JSON backup</span><span>Private GitHub storage</span></div>`;
   if (type === "subjects") {
     const assigned = Boolean(snapshot.activeCurriculum);
-    return `<div class="tour-subject-preview"><p>One connected curriculum</p><div><span>∞</span><strong>All installed subjects</strong><b>${snapshot.subjects.length}</b></div><small>Subject lanes stay visible together. The app theme remembers the subject of the last lesson you opened.</small></div><div class="tour-mode-preview" aria-label="${assigned ? "Educator-set learning path" : "Choose a learning path"}"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}" ${assigned ? "disabled" : ""}><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}" ${assigned ? "disabled" : ""}><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>${assigned ? `<p class="tour-assignment-note">This curriculum’s educator chose ${snapshot.progressionMode === "soft" ? "Open" : "Hard"} path. The controls demonstrate both modes but cannot override the assignment.</p>` : ""}`;
+    return `<div class="tour-subject-preview"><p>One connected curriculum</p><div><span>∞</span><strong>All installed fields</strong><b>${snapshot.subjects.length}</b></div><small>Field lanes stay visible together. The app theme remembers the field of the last lesson you opened.</small></div><div class="tour-mode-preview" aria-label="${assigned ? "Educator-set learning path" : "Choose a learning path"}"><button type="button" data-progression-mode="hard" class="${snapshot.progressionMode === "hard" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "hard"}" ${assigned ? "disabled" : ""}><span>Hard path</span><strong>Prerequisites enforced</strong><small>Connected tests unlock in order.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "hard" ? "Selected" : "Choose hard"}</i></button><button type="button" data-progression-mode="soft" class="${snapshot.progressionMode === "soft" ? "is-active" : ""}" aria-pressed="${snapshot.progressionMode === "soft"}" ${assigned ? "disabled" : ""}><span>Open path</span><strong>Explore freely</strong><small>Connections become recommendations.</small><i>${assigned ? "Set by educator" : snapshot.progressionMode === "soft" ? "Selected" : "Choose open"}</i></button></div>${assigned ? `<p class="tour-assignment-note">This curriculum’s educator chose ${snapshot.progressionMode === "soft" ? "Open" : "Hard"} path. The controls demonstrate both modes but cannot override the assignment.</p>` : ""}`;
   }
-  if (type === "map") return `<div class="tour-map-preview"><div class="tour-map-controls"><strong>All subjects</strong><span>Connected by default</span><b>✦ Plan mode</b><i>− &nbsp; 100% &nbsp; +</i></div><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
+  if (type === "map") return `<div class="tour-map-preview"><div class="tour-map-controls"><strong>All fields</strong><span>Connected by default</span><b>✦ Plan mode</b><i>− &nbsp; 100% &nbsp; +</i></div><svg viewBox="0 0 560 250" role="img" aria-label="Example connected mastery map"><path d="M110 125 C170 125 165 65 235 65 M110 125 C170 125 165 185 235 185 M335 65 C395 65 390 125 455 125 M335 185 C395 185 390 125 455 125"></path><g transform="translate(20 90)"><rect width="90" height="70" rx="13"></rect><text x="45" y="34">Ready</text><text x="45" y="50">0 / 100</text></g><g transform="translate(235 30)" class="learning"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Learning</text><text x="50" y="50">46 / 100</text></g><g transform="translate(235 150)" class="proven"><rect width="100" height="70" rx="13"></rect><text x="50" y="34">Proven</text><text x="50" y="50">74 / 100</text></g><g transform="translate(455 90)" class="locked"><rect width="85" height="70" rx="13"></rect><text x="42" y="34">Locked</text><text x="42" y="50">0 / 100</text></g></svg></div><div class="tour-statuses">${["ready", "learning", "proven", "mastered", "rusty", "locked"].map(statusChip).join("")}</div>`;
   if (type === "loop") return `<div class="tour-loop-preview"><article><span>01</span><b>Read</b><small>Theory and examples</small></article><i>→</i><article><span>02</span><b>Test</b><small>Answers and shown work</small></article><i>→</i><article><span>03</span><b>Reflect</b><small>Confidence and difficulty</small></article><i>→</i><article><span>04</span><b>Review</b><small>Mastery and next date</small></article></div><div class="tour-work-preview"><code>2x + 5 = 13<br>2x = 8<br>x = 4</code><span>Step check passed</span></div>`;
   if (type === "depot") return `<div class="tour-depot-preview"><header><div><small>Community curriculum</small><strong>Lesson Depot</strong></div><span>Browse · discuss · install</span></header><div><article class="is-geography"><span>Geography</span><strong>Field Cartography</strong><small>3 lessons · Published</small><footer><b>↑ 18</b><b>◯ 6</b></footer></article><article class="is-biology"><span>Biology</span><strong>Cell Systems</strong><small>Concept preview</small><footer><b>Roadmap</b></footer></article></div><p><b>✓</b> Packages are hash-checked and validated before installation.</p></div>`;
   if (type === "agent") return `<div class="tour-agent-preview"><div class="tour-agent-head"><span>✦</span><div><small>Agent handoff</small><strong>Tutor in the loop</strong></div><i>${webMcpAvailable(document.modelContext) ? "Agent-ready" : "Move safely"}</i></div>${agentHandoffMarkup(snapshot, { compact: true })}<div class="tour-tool-row"><code>get_agent_guide</code><code>get_progress_summary</code><code>record_tutor_feedback</code></div></div>`;
-  return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, subjects, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>↔</span><div><strong>Optional GitHub Bridge</strong><small>Checkpoint learner state and exchange agent updates across sessions</small></div><b>Sync</b></article><article><span>✎</span><div><strong>Lesson Studio</strong><small>Create lesson packs or install reversible improvements over native lessons</small></div><b>Create / improve</b></article></div>`;
+  return `<div class="tour-ownership-preview"><article><span>↧</span><div><strong>Full progress backup</strong><small>Profiles, fields, lessons, attempts, reviews, themes, and timers</small></div><b>JSON</b></article><article><span>↔</span><div><strong>Optional GitHub Bridge</strong><small>Checkpoint learner state and exchange agent updates across sessions</small></div><b>Sync</b></article><article><span>✎</span><div><strong>Lesson Studio</strong><small>Create lesson packs or install reversible improvements over native lessons</small></div><b>Create / improve</b></article></div>`;
 }
 
 function renderTutorial(snapshot) {
@@ -603,11 +612,18 @@ function skillOptions(snapshot, selectedId) {
 }
 
 function mapSkillOptions(snapshot, rows, selectedId) {
-  return rows.map((row) => {
-    const subject = snapshot.subjects.find((item) => item.id === row.subjectId);
-    const subjectLabel = `${subject?.icon ?? "◇"} ${subject?.shortName ?? subject?.name ?? row.subjectId} · `;
-    return `<option value="${escapeHtml(row.id)}" ${row.id === selectedId ? "selected" : ""}>${escapeHtml(subjectLabel)}${escapeHtml(row.name)} · ${escapeHtml(row.subdomain)}</option>`;
-  }).join("");
+  const filtered = rows.filter((row) => (!mapBrowseField || row.subjectId === mapBrowseField) && (!mapBrowseBranch || branchName(row) === mapBrowseBranch));
+  return `<option value="">Choose a lesson…</option>` + learningFields(snapshot.subjects, filtered).flatMap((field) => field.branches.map((branch) => `<optgroup label="${escapeHtml(`${field.name} → ${branch.name}`)}">${branch.skillIds.map((id) => { const row = filtered.find((item) => item.id === id); return `<option value="${escapeHtml(id)}" ${id === selectedId ? "selected" : ""}>${escapeHtml(row.name)}</option>`; }).join("")}</optgroup>`)).join("");
+}
+
+let mapBrowseField = "";
+let mapBrowseBranch = "";
+function mapBrowseMarkup(snapshot, rows) {
+  const fields = learningFields(snapshot.subjects, rows).filter((field) => field.skillIds.length);
+  if (!fields.some((field) => field.id === mapBrowseField)) { mapBrowseField = ""; mapBrowseBranch = ""; }
+  const branches = fields.find((field) => field.id === mapBrowseField)?.branches ?? [];
+  if (!branches.some((branch) => branch.name === mapBrowseBranch)) mapBrowseBranch = "";
+  return `<label class="compact-select">Field<select id="map-field-select" title="Browse lessons by field, such as Mathematics. The full map stays visible."><option value="">All fields</option>${fields.map((field) => `<option value="${escapeHtml(field.id)}" ${field.id === mapBrowseField ? "selected" : ""}>${escapeHtml(field.name)}</option>`).join("")}</select></label><label class="compact-select">Branch<select id="map-branch-select" ${mapBrowseField ? "" : "disabled"} title="A branch is a topic within a field, such as Geometry within Mathematics."><option value="">${mapBrowseField ? "All branches" : "Choose a field first"}</option>${branches.map((branch) => `<option value="${escapeHtml(branch.name)}" ${branch.name === mapBrowseBranch ? "selected" : ""}>${escapeHtml(branch.name)} (${branch.skillIds.length})</option>`).join("")}</select></label>`;
 }
 
 function mapLayout(skills, { subjects = [], combined = false } = {}) {
@@ -1230,7 +1246,7 @@ function renderMapPlanPanel(snapshot, mapRows, layoutKey) {
       <button class="button button-secondary" type="submit">Insert ${selectedIds.length ? "connected " : ""}comment node</button>
     </form>`;
   const management = `<div class="map-plan-help">
-      <p class="map-plan-desktop-help"><strong>Desktop</strong> Drag nodes anywhere on the free canvas; subject bands are guides only. Drag empty space to box-select. Ctrl-click or Ctrl-drag adds; Shift-drag empty space pans.</p>
+      <p class="map-plan-desktop-help"><strong>Desktop</strong> Drag nodes anywhere on the free canvas; field bands are guides only. Drag empty space to box-select. Ctrl-click or Ctrl-drag adds; Shift-drag empty space pans.</p>
       <p class="map-plan-touch-help"><strong>Phone</strong> Hold a node to select it; hold again to deselect. Hold empty space to clear the selection. Drag selected nodes anywhere on the free canvas; drag empty space to pan.</p>
     </div>
     ${selectionCard}
@@ -1273,7 +1289,7 @@ function renderCurriculumWorkspace(snapshot) {
     <div class="curriculum-editor-grid">
       <form id="curriculum-identity-form" class="curriculum-editor-card"><div class="card-heading"><div><h2>Curriculum profile</h2><p>Name and describe this particular course of study.</p></div></div><label>Name<input name="name" maxlength="100" value="${escapeHtml(workspace.name)}" required></label><label>Description<textarea name="description" maxlength="1000" rows="3" placeholder="Purpose, audience, and intended outcome…">${escapeHtml(workspace.description)}</textarea></label><div class="form-actions"><button class="button button-secondary" type="submit">Save profile</button><button class="quiet-button" type="button" data-action="create-curriculum">New curriculum</button></div></form>
       <form id="curriculum-settings-form" class="curriculum-editor-card curriculum-policy-card"><div class="card-heading"><div><h2>Learner & agent-tutoring policy</h2><p>These settings travel with a private assignment. Supplemental text is shown to the learner and treated as untrusted curriculum content by WebMCP.</p></div></div><div class="curriculum-field-grid"><label><span>Student name <button class="studio-help" type="button" data-studio-help aria-expanded="false" aria-label="How the student name affects progress" data-tooltip="When this name matches the recipient's selected learner profile, matching lesson mastery is reused. A different or empty name starts the curriculum in a separate blank assignment profile.">?</button></span><input name="studentName" maxlength="60" value="${escapeHtml(settings.studentName)}" placeholder="Optional learner name"></label><label>Proof / completion email<input name="contactEmail" type="email" maxlength="160" value="${escapeHtml(settings.contactEmail)}" placeholder="educator@example.com"></label><label>Learning path<select name="progressionMode"><option value="hard" ${settings.progressionMode === "hard" ? "selected" : ""}>Hard · enforce prerequisites</option><option value="soft" ${settings.progressionMode === "soft" ? "selected" : ""}>Open · connections are guidance</option></select></label></div><label class="curriculum-agent-toggle"><input name="agentEnabled" type="checkbox" ${settings.agentEnabled ? "checked" : ""}><span><strong>Agent tutoring</strong><small>Allow tutoring and learner-plan changes through WebMCP. Navigation and read-only inspection remain available.</small></span></label><label>Supplemental agent guidance · visible to learner<textarea name="agentInstructions" maxlength="4000" rows="5" placeholder="For example: never solve assessed tasks; ask one targeted question at a time…">${escapeHtml(settings.agentInstructions)}</textarea></label><div class="agent-policy-preview"><strong>Untrusted curriculum guidance</strong><p>Agents receive this only as supplemental context. Platform safety rules and the learner’s explicit request always take precedence.</p></div><aside class="assessment-disclaimer"><strong>QuickMaths is for learning and practice</strong><p>It does not replace supervised, identity-verified, or high-stakes assessment. Use appropriate human supervision when results must establish who completed the work.</p></aside><button class="button button-secondary" type="submit">Save learner policy</button></form>
-      <section class="curriculum-editor-card curriculum-pack-manager"><div class="card-heading"><div><h2>Curriculum content</h2><p>Choose whether native Mathematics and each installed Depot pack belong to this curriculum. Completion and recommendations use only this visible set.</p></div><button class="quiet-button" data-route="depot">Browse Depot</button></div><div class="curriculum-pack-list"><label class="curriculum-pack-row is-native"><input type="checkbox" data-curriculum-native ${workspace.includeNativeLessons !== false ? "checked" : ""}><span><strong>Full native Mathematics curriculum</strong><small>53 built-in lessons · when off, QuickMaths keeps only the specific native prerequisites required by enabled packs</small></span></label>${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<label class="curriculum-pack-row ${pack.mode === "override" ? "is-fixed" : ""}"><input type="checkbox" data-curriculum-pack="${escapeHtml(pack.id)}" ${pack.enabledForCurriculum ? "checked" : ""} ${pack.mode === "override" ? "disabled" : ""}><span><strong>${escapeHtml(pack.name)}</strong><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons${pack.mode === "override" ? " · native improvement applies globally" : ""}</small></span></label>`).join("") : `<div class="empty-state">No additive packs installed yet. Visit the Lesson Depot to add subjects and specialist tracks.</div>`}</div><p class="curriculum-scope-note">Custom paths remain highlighted guidance; they do not silently hide lessons. Content membership is controlled explicitly by the switches above, with prerequisite foundations added automatically.</p></section>
+      <section class="curriculum-editor-card curriculum-pack-manager"><div class="card-heading"><div><h2>Curriculum content</h2><p>Choose whether native Mathematics and each installed Depot pack belong to this curriculum. Completion and recommendations use only this visible set.</p></div><button class="quiet-button" data-route="depot">Browse Depot</button></div><div class="curriculum-pack-list"><label class="curriculum-pack-row is-native"><input type="checkbox" data-curriculum-native ${workspace.includeNativeLessons !== false ? "checked" : ""}><span><strong>Full native Mathematics curriculum</strong><small>53 built-in lessons · when off, QuickMaths keeps only the specific native prerequisites required by enabled packs</small></span></label>${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<label class="curriculum-pack-row ${pack.mode === "override" ? "is-fixed" : ""}"><input type="checkbox" data-curriculum-pack="${escapeHtml(pack.id)}" ${pack.enabledForCurriculum ? "checked" : ""} ${pack.mode === "override" ? "disabled" : ""}><span><strong>${escapeHtml(pack.name)}</strong><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons${pack.mode === "override" ? " · native improvement applies globally" : ""}</small></span></label>`).join("") : `<div class="empty-state">No additive packs installed yet. Visit the Lesson Depot to add fields and specialist tracks.</div>`}</div><p class="curriculum-scope-note">Custom paths remain highlighted guidance; they do not silently hide lessons. Content membership is controlled explicitly by the switches above, with prerequisite foundations added automatically.</p></section>
     </div>
   </section>`;
 }
@@ -1389,7 +1405,7 @@ function renderMap(snapshot, { designer = false } = {}) {
     const memberPaths = (planMode || displayedPlan.paths.length) ? displayedPlan.paths.filter((path) => path.skillIds.includes(row.id)).slice(0, 4) : [];
     const noteCount = (planMode || displayedPlan.annotations.length) ? displayedPlan.annotations.filter((annotation) => annotation.skillIds.includes(row.id)).length : 0;
     return `<g class="map-node ${row.id === selected.id && !planMode ? "is-selected" : ""} ${planMode && snapshot.ui.mapPlanSelection.includes(row.id) ? "is-plan-selected" : ""} ${planMode && hiddenIds.has(row.id) ? "is-plan-hidden" : ""}" role="button" tabindex="0" data-map-skill="${escapeHtml(row.id)}" aria-label="${escapeHtml(row.name)}${planMode && hiddenIds.has(row.id) ? ", hidden in Plan mode" : ""}" transform="translate(${position.x} ${position.y})">
-      <title>${escapeHtml(subject?.name ?? row.subjectId)}: ${escapeHtml(row.name)} · ${escapeHtml(row.status)}</title>
+      <title>${escapeHtml(subject?.name ?? row.subjectId)} → ${escapeHtml(row.subdomain)} → ${escapeHtml(row.name)} · ${escapeHtml(row.status)}</title>
       ${memberPaths.map((path, index) => `<rect class="map-node-plan-outline ${path.id === snapshot.ui.selectedMapPlanPathId ? "is-active" : ""}" x="${-4 - index * 3}" y="${-4 - index * 3}" width="${186 + index * 6}" height="${78 + index * 6}" rx="${17 + index * 2}" fill="none" stroke="${escapeHtml(path.color)}"></rect>`).join("")}
       <rect class="map-node-body" width="178" height="70" rx="13" fill="${escapeHtml(nodeFill)}"></rect>
       ${combined ? `<rect class="map-node-subject-accent" x="13" y="8" width="152" height="4" rx="2" fill="${escapeHtml(nodeAccent)}"></rect>` : ""}
@@ -1407,14 +1423,14 @@ function renderMap(snapshot, { designer = false } = {}) {
 
   elements.view.innerHTML = `${designer ? renderCurriculumWorkspace(snapshot) : ""}
     <header class="page-head">
-      <div><p class="eyebrow">All subjects · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula</p><h1>${designer ? "Canonical curriculum map" : "Mastery map"}</h1><p>${designer ? "Drag this curriculum’s canonical map into shape. Learners receive these positions, custom paths, and annotations when they load the file." : `${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Subject lanes and highlighted bridge lines show how knowledge travels across every installed curriculum.`}</p></div>
-      <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><button type="button" class="map-plan-toggle map-plan-view-toggle" data-action="toggle-plan-view" aria-pressed="${planView}" ${planMode ? "disabled" : ""}><span>◎</span><strong>Plan view</strong><small>${planMode ? "Exit editor to view" : planView ? "Showing saved plan" : "Showing canonical map"}</small></button>`}<label class="compact-select">Jump to skill<select id="map-skill-select">${mapSkillOptions(snapshot, renderedRows.length ? renderedRows : mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
+      <div><p class="eyebrow">All fields · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula</p><h1>${designer ? "Canonical curriculum map" : "Mastery map"}</h1><p>${designer ? "Drag this curriculum’s canonical map into shape. Learners receive these positions, custom paths, and annotations when they load the file." : `${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Field lanes and highlighted bridge lines show how knowledge travels across every installed curriculum.`}</p></div>
+      <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><button type="button" class="map-plan-toggle map-plan-view-toggle" data-action="toggle-plan-view" aria-pressed="${planView}" ${planMode ? "disabled" : ""}><span>◎</span><strong>Plan view</strong><small>${planMode ? "Exit editor to view" : planView ? "Showing saved plan" : "Showing canonical map"}</small></button>`}${mapBrowseMarkup(snapshot, renderedRows.length ? renderedRows : mapRows)}<label class="compact-select">Lesson<select id="map-skill-select">${mapSkillOptions(snapshot, renderedRows.length ? renderedRows : mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
     </header>
-    <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${planMode ? `<span class="map-plan-key">Plan mode is autosaving</span>` : planView ? `<span class="map-plan-key">Plan view · read only</span>` : combined ? `<span class="map-subject-key">Node color = subject · dot = status</span>` : ""}</div>
+    <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${planMode ? `<span class="map-plan-key">Plan mode is autosaving</span>` : planView ? `<span class="map-plan-key">Plan view · read only</span>` : combined ? `<span class="map-subject-key">Node color = field · dot = status</span>` : ""}</div>
     <section class="map-layout ${planMode ? "is-plan-mode" : ""}">
       <div class="map-canvas-shell">
       ${planMode ? `<div class="map-plan-actionbar" role="toolbar" aria-label="Plan mode actions">
-        <div><strong>${snapshot.ui.mapPlanSelection.length} selected · ${hiddenCount} hidden</strong><small>Subject bands are guides · the whole canvas is editable</small></div>
+        <div><strong>${snapshot.ui.mapPlanSelection.length} selected · ${hiddenCount} hidden</strong><small>Field bands are guides · the whole canvas is editable</small></div>
         <button type="button" data-action="plan-open-annotation"><span>✎</span><strong>Annotation</strong><small>${snapshot.ui.mapPlanSelection.length ? "Connect to selection" : "Free comment node"}</small></button>
         <button type="button" data-action="plan-open-path"><span>↝</span><strong>Custom path</strong><small>${snapshot.ui.mapPlanSelection.length > 1 ? `${snapshot.ui.mapPlanSelection.length} lessons selected` : "Select multiple lessons"}</small></button>
         <button type="button" data-action="${selectedHiddenCount ? "plan-unhide-selected" : "plan-hide-selected"}" ${selectedHiddenCount || selectedVisibleCount ? "" : "disabled"}><span>${selectedHiddenCount ? "◉" : "◌"}</span><strong>${selectedHiddenCount ? "Unhide selected" : "Hide selected"}</strong><small>${selectedHiddenCount ? `${selectedHiddenCount} hidden lesson${selectedHiddenCount === 1 ? "" : "s"}` : selectedVisibleCount ? `${selectedVisibleCount} lesson${selectedVisibleCount === 1 ? "" : "s"}` : "Select lesson nodes"}</small></button>
@@ -1783,10 +1799,29 @@ function bridgePhaseLabel(status) {
   if (bridgeNeedsChoice) return "Needs your choice";
   if (status.phase === "conflict") return "Sync paused";
   if (status.error) return "Connection problem";
-  if (["connecting", "checking", "pulling", "pushing", "deleting"].includes(status.phase)) return `${status.phase[0].toUpperCase()}${status.phase.slice(1)}…`;
+  if (["connecting", "checking", "pulling", "pushing", "merging", "reviewing", "deleting"].includes(status.phase)) return `${status.phase[0].toUpperCase()}${status.phase.slice(1)}…`;
   if (status.connected && status.dirty) return "Waiting to sync";
   if (status.connected) return "Connected";
   return "Not connected";
+}
+
+function renderGlobalStorageStatus() {
+  const button = document.querySelector("#global-storage-status");
+  if (!button) return;
+  const display = storageStatus(githubSyncSnapshot, { needsReview: bridgeNeedsChoice && (!bridgeReviewPromise || githubSyncSnapshot.config?.mergeMode !== "agent-priority") });
+  button.dataset.tone = display.tone;
+  button.title = display.title;
+  button.setAttribute("aria-label", `${display.label}. ${display.age}. Open storage settings`);
+  button.querySelector("strong").textContent = display.label;
+  button.querySelector("small").textContent = display.age;
+}
+
+function renderStorageMergeSetting() {
+  const mode = githubSyncSnapshot.config?.mergeMode ?? "manual";
+  return `<fieldset class="storage-merge-setting"><legend>Storage management</legend><p>Choose how changes from this device, other devices and your agent are combined.</p>
+    <label><input type="radio" name="storage-merge-mode" value="manual" ${mode === "manual" ? "checked" : ""}><span><strong>Manually review storage merges</strong><small>Review detected changes and choose what to keep. Independent changes start checked.</small></span></label>
+    <label><input type="radio" name="storage-merge-mode" value="agent-priority" ${mode === "agent-priority" ? "checked" : ""}><span><strong>Automatically merge · agent priority</strong><small>Keep independent changes from both copies. Agent edits win only where the same content conflicts. Between devices, this device wins conflicts. If a starting version or required related work is missing, review the comparison.</small></span></label>
+    <p class="bridge-form-note">This setting belongs to this device and connection. It does not change lesson-installation approval.</p></fieldset>`;
 }
 
 function bridgeFormValues() {
@@ -1874,16 +1909,17 @@ function renderGitHubBridge(snapshot) {
 
   return `
     <section class="content-card github-bridge-card" id="github-bridge">
-      <div class="bridge-card-heading"><div><p class="eyebrow">Workspace Storage · experimental</p><h2>${escapeHtml(repository)}</h2><p>The complete browser workspace is checkpointed after a short pause. Agent updates include when work began. If you made changes too, review and merge the versions before syncing.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
+      <div class="bridge-card-heading"><div><p class="eyebrow">Workspace Storage · experimental</p><h2>${escapeHtml(repository)}</h2><p>The complete browser workspace is checkpointed after a short pause. Agent updates include when work began. If you made changes too, your storage management setting controls how the versions are merged.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
       ${status.error ? `<aside class="bridge-warning"><strong>${status.phase === "conflict" ? "Sync conflict" : "Bridge paused"}</strong><p>${escapeHtml(status.error)}</p></aside>` : ""}
       ${bridgeNeedsChoice || status.conflict ? `<aside class="bridge-choice"><div><strong>A workspace decision is waiting.</strong><p>${bridgeReviewPromise ? "Loading the latest copies for comparison." : bridgeReviewError ? "The comparison could not finish. Open it to retry." : "Review the changes from this device and GitHub."}${choice ? ` Last GitHub writer: ${escapeHtml(choice.remoteLabel)}.` : ""}</p></div><button class="button button-primary" data-action="bridge-review-choice">Compare versions</button></aside>` : ""}
       <div class="bridge-status-grid">
         <article><span>Local state</span><strong>${status.dirty ? "Pending checkpoint" : "Checkpointed"}</strong><small>${escapeHtml(status.deviceLabel ?? bridgeDeviceLabel())}</small></article>
-        <article><span>Last workspace push</span><strong>${status.lastPushedAt ? escapeHtml(formatDate(status.lastPushedAt)) : "This session: not yet"}</strong><small>${escapeHtml(status.config.branch)}</small></article>
+        <article><span>Last workspace push</span><strong>${status.lastPushedAt ? escapeHtml(formatDate(status.lastPushedAt)) : "No GitHub save yet"}</strong><small>${escapeHtml(status.config.branch)}</small></article>
         <article><span>Last remote writer</span><strong>${escapeHtml(status.lastRemoteActor ?? "Waiting for remote work")}</strong><small>${status.lastRemoteUpdatedAt ? escapeHtml(formatDate(status.lastRemoteUpdatedAt)) : "No newer checkpoint seen"}</small></article>
         <article><span>Token storage</span><strong>${saved?.rememberToken ? "Remembered here" : "This tab session"}</strong><small>Never committed</small></article>
       </div>
       <div class="bridge-toolbar"><button class="button button-primary" data-action="bridge-push" ${bridgeNeedsChoice ? "disabled" : ""}>Sync now</button><button class="button button-outline" data-action="bridge-pull-agent" ${bridgeNeedsChoice ? "disabled" : ""}>Check agent updates</button><button class="button button-outline" data-action="manage-workspace-storage">Manage GitHub storage</button><a class="button button-outline" href="./agent-bridge.html" target="_blank" rel="noopener">Open Agent Bridge ↗</a><a class="quiet-button" href="./bridge-guide.html" target="_blank" rel="noopener">Setup guide ↗</a><button class="quiet-button danger-link" data-action="bridge-disconnect">Disconnect</button></div>
+      ${renderStorageMergeSetting()}
       <p class="bridge-form-note"><strong>Remote-session flow:</strong> keep the Agent Bridge open in the paired computer’s Codex browser, then start or guide that task from ChatGPT Remote on your phone.</p>
     </section>`;
 }
@@ -1956,7 +1992,7 @@ function renderSettings(snapshot) {
     <header class="page-head"><div><p class="eyebrow">Profile preferences & data</p><h1>Settings</h1><p>Choose how this profile moves through the curriculum, replay the guided tour, and manage every save, export, custom lesson, and restore point.</p></div><div class="page-actions"><a class="button button-outline" href="./QuickMaths-Student-Guide.pdf" target="_blank" rel="noopener">Student guide ↗</a><button class="button button-outline" data-action="load-backup">Load backup</button><button class="button button-primary" data-action="save-backup">Save full backup</button></div></header>
     <section class="settings-controls">
       <article class="settings-control-card"><h2>Learning path</h2><p>${snapshot.activeCurriculum ? `Controlled by ${escapeHtml(snapshot.activeCurriculum.name)}. Ask the educator for a revised curriculum file to change it.` : `This setting belongs to ${escapeHtml(snapshot.activeProfile.displayName)} and travels inside full backups.`}</p><div class="settings-mode-grid" role="group" aria-label="Progression mode"><button type="button" data-progression-mode="hard" aria-pressed="${snapshot.progressionMode === "hard"}" ${snapshot.activeCurriculum ? "disabled" : ""}><strong>Hard path</strong><small>Prerequisites must be proven before connected mastery tests unlock.</small></button><button type="button" data-progression-mode="soft" aria-pressed="${snapshot.progressionMode === "soft"}" ${snapshot.activeCurriculum ? "disabled" : ""}><strong>Open path</strong><small>Connections remain guidance, while every lesson and test stays available.</small></button></div></article>
-      <article class="settings-control-card settings-tour-action"><div><h2>App tutorial</h2><p>Replay all seven chapters without resetting progress, subjects, lessons, or preferences.</p></div><button class="button button-secondary" type="button" data-action="replay-tutorial">Replay app tour</button></article>
+      <article class="settings-control-card settings-tour-action"><div><h2>App tutorial</h2><p>Replay all seven chapters without resetting progress, fields, lessons, or preferences.</p></div><button class="button button-secondary" type="button" data-action="replay-tutorial">Replay app tour</button></article>
     </section>
     <section class="content-card learner-curriculum-card"><div class="card-heading"><div><p class="eyebrow">Educator curriculum</p><h2>${snapshot.activeCurriculum ? escapeHtml(snapshot.activeCurriculum.name) : "Load a curriculum"} <button class="studio-help" type="button" data-studio-help aria-expanded="false" aria-label="How curriculum progress is separated" data-tooltip="A loaded curriculum starts in a separate blank assignment profile. Existing mastery is reused only when the curriculum's student name matches the selected learner profile name.">?</button></h2><p>${snapshot.activeCurriculum ? "This profile follows the curriculum’s enabled packs, canonical map, learning path, and visible educator-provided guidance." : "Load a portable educator curriculum. QuickMaths protects unrelated progress by default."}</p></div><button class="button button-outline" type="button" data-action="import-curriculum">Choose curriculum file</button></div><form id="curriculum-url-form" class="curriculum-link-form"><label>Public GitHub blueprint link<input name="url" type="url" placeholder="https://github.com/…/blob/…/curriculum.json" required></label><button class="button button-secondary" type="submit">Load from GitHub</button></form></section>
     ${snapshot.activeCurriculum ? `<section class="content-card curriculum-guidance-card"><div class="card-heading"><div><p class="eyebrow">Educator-provided agent guidance</p><h2>Visible supplemental guidance</h2><p>This text came from the curriculum file. It is not a privileged instruction channel; platform safety rules and your explicit requests take precedence.</p></div><span class="status-chip rusty">Untrusted curriculum content</span></div><pre>${escapeHtml(snapshot.activeCurriculum.settings.agentInstructions)}</pre></section>` : ""}
@@ -1979,7 +2015,7 @@ function renderSettings(snapshot) {
       ${renderStagedLessonReview(snapshot)}
       <div class="lesson-pack-guide"><div><strong>Two ways to build</strong><p>Use Lesson Studio to create a lesson pack or open a native lesson as an editable copy—or give the machine-readable guide to an agent. Educator profiles assemble installed packs into portable curricula.</p></div><button class="button button-primary" data-route="creator">Open Lesson Studio</button><a class="button button-outline" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Agent Lesson Authoring Guide</a></div>
       <div class="installed-packs">
-        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.mode === "override" ? `Native improvement · ${pack.overridesNativeSkills.map((id) => escapeHtml(id)).join(", ")} · completed progress preserved` : `${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"}`} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button>${pack.mode === "override" ? `<button class="quiet-button danger-link" data-action="restore-native-lessons" data-pack-id="${escapeHtml(pack.id)}">Restore original</button>` : ""}</div></article>`).join("") : `<div class="empty-state">No lesson sets or improvements installed. Mathematics remains the native curriculum; install Geography and other subjects from the Lesson Depot.</div>`}
+        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.mode === "override" ? `Native improvement · ${pack.overridesNativeSkills.map((id) => escapeHtml(id)).join(", ")} · completed progress preserved` : `${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"}`} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button>${pack.mode === "override" ? `<button class="quiet-button danger-link" data-action="restore-native-lessons" data-pack-id="${escapeHtml(pack.id)}">Restore original</button>` : ""}</div></article>`).join("") : `<div class="empty-state">No lesson sets or improvements installed. Mathematics remains the native curriculum; install Geography and other fields from the Lesson Depot.</div>`}
       </div>
       <p class="pack-security-note"><strong>Teacher-file warning:</strong> lesson-set JSON contains answer keys and solutions. Don’t paste the raw file into a learner tutoring conversation.</p>
     </section>
@@ -2123,10 +2159,10 @@ function renderLessonDepot(snapshot) {
     <header class="page-head depot-head"><div><p class="eyebrow">Free · open · federated</p><h1>Lesson Depot</h1><p>Install lessons published from independent community repositories alongside the official catalog. Every exact download is hash-checked and run through the same local validator before you can install it.</p></div><div class="page-actions">${connection.configured ? `<button class="button ${connection.connected ? "button-secondary" : "button-outline"}" type="button" data-depot-action="community-connect">${connection.connected ? `GitHub · ${escapeHtml(connection.viewer?.login ?? "connected")}` : "Connect GitHub"}</button>` : `<a class="button button-outline" href="${DEPOT_DISCUSSIONS_URL}" target="_blank" rel="noopener">Community ↗</a>`}<button class="button button-primary" type="button" data-depot-action="publish">Publish a lesson</button></div></header>
     ${renderDepotCommunityPanel()}
     <section class="depot-trust-strip" aria-label="Lesson Depot safety model"><span><b>1</b><strong>Authors publish</strong><small>Their own GitHub repository</small></span><i>→</i><span><b>2</b><strong>Community reviews</strong><small>Upvote, react, discuss</small></span><i>→</i><span><b>3</b><strong>QuickMaths verifies</strong><small>Hash, schema, full graph</small></span><i>→</i><span><b>4</b><strong>You approve</strong><small>Local installation only</small></span></section>
-    ${preview ? `<aside class="depot-preview"><div><p class="eyebrow">Validated preview · ${escapeHtml(depotTrustLabel(preview.pack))}</p><h2>${escapeHtml(preview.pack.name)}</h2><p>${escapeHtml(preview.pack.description)}</p><div class="depot-preview-facts"><span>${preview.preview.skillCount}<small>Lessons</small></span><span>${preview.preview.problemCount}<small>Questions</small></span><span>${escapeHtml(preview.preview.subjectName)}<small>Subject</small></span><span>${escapeHtml(preview.pack.sourceName)}<small>Source</small></span></div></div><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(preview.pack.id)}" data-pack-version="${escapeHtml(preview.pack.version)}">Install this pack</button><button class="quiet-button" data-depot-action="close-preview">Close preview</button></aside>` : ""}
+    ${preview ? `<aside class="depot-preview"><div><p class="eyebrow">Validated preview · ${escapeHtml(depotTrustLabel(preview.pack))}</p><h2>${escapeHtml(preview.pack.name)}</h2><p>${escapeHtml(preview.pack.description)}</p><div class="depot-preview-facts"><span>${preview.preview.skillCount}<small>Lessons</small></span><span>${preview.preview.problemCount}<small>Questions</small></span><span>${escapeHtml(preview.preview.subjectName)}<small>Field</small></span><span>${escapeHtml(preview.pack.sourceName)}<small>Source</small></span></div></div><button class="button button-primary" data-depot-action="install" data-pack-id="${escapeHtml(preview.pack.id)}" data-pack-version="${escapeHtml(preview.pack.version)}">Install this pack</button><button class="quiet-button" data-depot-action="close-preview">Close preview</button></aside>` : ""}
     <section class="depot-toolbar" aria-label="Filter lesson packages">
       <label><span>Search</span><input id="depot-search" type="search" value="${escapeHtml(depot.query)}" placeholder="Percentages, biology, author…"></label>
-      <label><span>Subject</span><select id="depot-subject"><option value="all">All subjects</option>${subjects.map(([id, name]) => `<option value="${escapeHtml(id)}" ${depot.subject === id ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}</select></label>
+      <label><span>Field</span><select id="depot-subject"><option value="all">All fields</option>${subjects.map(([id, name]) => `<option value="${escapeHtml(id)}" ${depot.subject === id ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}</select></label>
       <label><span>Sort</span><select id="depot-sort"><option value="popular" ${depot.sort === "popular" ? "selected" : ""}>Most supported</option><option value="newest" ${depot.sort === "newest" ? "selected" : ""}>Newest</option><option value="name" ${depot.sort === "name" ? "selected" : ""}>Name</option></select></label>
       <button class="quiet-button" data-depot-action="reload">Refresh catalog</button>
     </section>
@@ -2208,6 +2244,7 @@ function renderEducatorWelcome(snapshot) {
 }
 
 function render(snapshot) {
+  renderGlobalStorageStatus();
   captureBridgeFormDraft();
   const welcomeStorageDetails = document.querySelector("#welcome-storage-details");
   if (welcomeStorageDetails) welcomeStorageOpen = welcomeStorageDetails.open;
@@ -2381,6 +2418,7 @@ async function connectLearnerBridge(form, { restoreOnly = false } = {}) {
     branch: container.querySelector('[name="branch"]')?.value,
     token: String(container.querySelector('[name="token"]')?.value || saved?.token || ""),
     rememberToken: Boolean(container.querySelector('[name="remember"]')?.checked),
+    mergeMode: githubCredentials.load({ role: "learner" })?.mergeMode ?? "manual",
   }, { startPolling: false });
   if (restoreOnly) {
     const remote = await githubSync.inspectRemote();
@@ -2665,7 +2703,7 @@ elements.lessonSetFile.addEventListener("change", async () => {
       ? `Native lessons improved: ${preview.overridesNativeSkills.join(", ")}\n\nTheir IDs, map positions, and completed learner progress stay intact. Any unfinished tests for those lessons restart so answers cannot cross between question-bank versions. The original content can be restored later from Settings.`
       : "The set will be added to the mastery map and embedded in future full backups. Download a progress backup first if you want a restore point before changing installed content.";
     const confirmed = window.confirm(
-      `Install ${preview.name}?\n\nSubject: ${preview.subjectName}${preview.createsSubject ? " (new subject)" : ""}\n${preview.skillCount} lesson(s) · ${preview.problemCount} questions\nAuthor: ${preview.author}\nVersion: ${preview.version}\n\n${installDetail}`,
+      `Install ${preview.name}?\n\nSubject: ${preview.subjectName}${preview.createsSubject ? " (new field)" : ""}\n${preview.skillCount} lesson(s) · ${preview.problemCount} questions\nAuthor: ${preview.author}\nVersion: ${preview.version}\n\n${installDetail}`,
     );
     if (!confirmed) return;
     const result = store.importLessonPack(raw);
@@ -3030,6 +3068,15 @@ document.addEventListener("click", async (event) => {
 });
 
 document.addEventListener("change", (event) => {
+  if (event.target.name === "storage-merge-mode") {
+    githubSync.setMergeMode(event.target.value);
+    if (bridgeNeedsChoice && event.target.value === "agent-priority" && !bridgeReviewPromise) {
+      closeBridgeSourceChoice();
+      void setBridgeSourceChoice(null, bridgeReviewChannel);
+    }
+    showToast(event.target.value === "manual" ? "Manual merge review enabled." : "Automatic merge with agent priority enabled.");
+    return;
+  }
   if (event.target.id === "depot-show-contested") {
     lessonDepot.setFilters({ showContested: event.target.checked });
     if (currentSnapshot?.ui.route === "settings") renderSettings(store.snapshot());
@@ -3115,7 +3162,9 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (event.target.id === "lesson-select") store.navigate("lesson", event.target.value);
-  if (event.target.id === "map-skill-select") store.selectMapSkill(event.target.value);
+  if (event.target.id === "map-field-select") { mapBrowseField = event.target.value; mapBrowseBranch = ""; renderMap(store.snapshot()); }
+  if (event.target.id === "map-branch-select") { mapBrowseBranch = event.target.value; renderMap(store.snapshot()); }
+  if (event.target.id === "map-skill-select" && event.target.value) store.selectMapSkill(event.target.value);
   if (event.target.id === "test-skill-select") store.navigate("test", event.target.value);
 });
 
@@ -3412,10 +3461,10 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260906-merge-v7").catch(() => null),
-      fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
-      fetch("./STUDENT_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
-      fetch("./EDUCATOR_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
+      fetch("./agent-manifest.json?v=20260906-fields-storage-v1").catch(() => null),
+      fetch("./CUSTOM_LESSON_SETS.md?v=20260906-fields-storage-v1").catch(() => null),
+      fetch("./STUDENT_GUIDE.md?v=20260906-fields-storage-v1").catch(() => null),
+      fetch("./EDUCATOR_GUIDE.md?v=20260906-fields-storage-v1").catch(() => null),
     ]);
     if (manifestResponse?.ok) agentManifest = await manifestResponse.json();
     if (authoringGuideResponse?.ok) authoringGuideMarkdown = await authoringGuideResponse.text();
@@ -3462,6 +3511,7 @@ async function boot() {
   githubSyncSnapshot = githubSync.snapshot();
   githubSync.subscribe((status) => {
     githubSyncSnapshot = status;
+    renderGlobalStorageStatus();
     if (status.phase === "conflict" && ["learner", "agent"].includes(status.conflictDetails?.channel)) {
       // Polling runs on every route. Overlapping local, device and agent work
       // opens the global merge window before anything can be overwritten.
@@ -3509,6 +3559,7 @@ async function boot() {
     });
   }
   window.setInterval(() => {
+    renderGlobalStorageStatus();
     store.heartbeat();
     const snapshot = store.snapshot();
     elements.sessionTime.textContent = formatDuration(snapshot.timers.sessionSeconds);

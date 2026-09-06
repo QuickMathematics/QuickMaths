@@ -60,7 +60,7 @@ export function preserveDeviceState(raw, localRaw, otherRaw = null) {
 }
 
 const words = (value) => String(value).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
-const fieldNames = { displayName: "Name", status: "Mastery level", masteryScore: "Mastery score", body: "Note", skillIds: "Linked lessons", hiddenSkillIds: "Hidden lessons", enabledPackIds: "Enabled lesson sets", theory: "Lesson text", progressionMode: "Learning path", activeSubjectId: "Selected subject", mapScope: "Map scope", nextReviewAt: "Next review", pendingResults: "Pending test result" };
+const fieldNames = { displayName: "Name", status: "Mastery level", masteryScore: "Mastery score", body: "Note", skillIds: "Linked lessons", hiddenSkillIds: "Hidden lessons", enabledPackIds: "Enabled lesson sets", theory: "Lesson text", progressionMode: "Learning path", activeSubjectId: "Selected field", subject: "Field", subjectId: "Field", subdomain: "Branch", mapScope: "Map scope", nextReviewAt: "Next review", pendingResults: "Pending test result" };
 const fieldName = (key) => get(fieldNames, key) ?? words(key);
 const recordId = (item) => item?.id ?? item?.attemptId ?? item?.reviewId ?? item?.template_id ?? item?.pack?.id;
 function valueAt(state, path) {
@@ -138,7 +138,7 @@ export function createWorkspaceMerge({ baseJson = null, localJson, remoteJson, s
       } else if (path[0] === "stagedLessonPacks" && path.length === 2) subject = `Lesson approval · ${record?.pack?.name || name(path[1])}`;
       title = `${before === undefined ? "Added" : after === undefined ? "Removed" : "Changed"} ${subject}`;
     }
-    return { title, context: [context, pp?.[0] === "layouts" ? pp[1] === "all-subjects" ? "All subjects map" : name(pp[1].replace(/^subject:/, "")) : null].filter(Boolean).join(" · "), preview: pp?.[0] === "annotations" && pp.length === 2 ? record?.body : null, details: details(before, after, path.length > 2 && !object(record) ? fieldName(path.at(-1)) : "") };
+    return { title, context: [context, pp?.[0] === "layouts" ? pp[1] === "all-subjects" ? "All fields map" : name(pp[1].replace(/^subject:/, "")) : null].filter(Boolean).join(" · "), preview: pp?.[0] === "annotations" && pp.length === 2 ? record?.body : null, details: details(before, after, path.length > 2 && !object(record) ? fieldName(path.at(-1)) : "") };
   }
   function atomic(b, l, r, path) {
     const localChanged = base === undefined || !equal(l, b);

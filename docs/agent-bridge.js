@@ -1,17 +1,17 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260906-merge-v7";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-final-handoff-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260906-fields-storage-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-fields-storage-v1";
 import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260905-confused-neutral-v5";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260906-merge-v7";
-import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js?v=20260906-merge-v7";
+} from "./github-sync.js?v=20260906-fields-storage-v1";
+import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js?v=20260906-fields-storage-v1";
 import {
   createLocalBridgeCredentialStore,
   createLocalGitContentsClient,
   resolveLocalBridgeCapability,
-} from "./local-git-client.js?v=20260906-merge-v7";
+} from "./local-git-client.js?v=20260906-fields-storage-v1";
 
 const elements = {
   liveStatus: document.querySelector("#live-status"),
@@ -120,10 +120,10 @@ async function boot() {
   const [curriculumResponse, geographyResponse, manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
     fetch("./curriculum-data.json?v=20260902-native-math-expansion"),
     fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
-    fetch("./agent-manifest.json?v=20260906-merge-v7").catch(() => null),
-    fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
-    fetch("./STUDENT_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
-    fetch("./EDUCATOR_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
+    fetch("./agent-manifest.json?v=20260906-fields-storage-v1").catch(() => null),
+    fetch("./CUSTOM_LESSON_SETS.md?v=20260906-fields-storage-v1").catch(() => null),
+    fetch("./STUDENT_GUIDE.md?v=20260906-fields-storage-v1").catch(() => null),
+    fetch("./EDUCATOR_GUIDE.md?v=20260906-fields-storage-v1").catch(() => null),
   ]);
   if (!curriculumResponse.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await curriculumResponse.json();

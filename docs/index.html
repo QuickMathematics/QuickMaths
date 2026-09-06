@@ -13,8 +13,8 @@
     <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
     <link rel="help" href="./QuickMaths-Student-Guide.pdf" title="QuickMaths Student Guide">
     <link rel="help" href="./QuickMaths-Educator-Guide.pdf" title="QuickMaths Educator Guide">
-    <link rel="stylesheet" href="./challenge.css?v=20260906-merge-v7">
-    <script type="module" src="./challenge.js?v=20260906-merge-v7"></script>
+    <link rel="stylesheet" href="./challenge.css?v=20260906-fields-storage-v1">
+    <script type="module" src="./challenge.js?v=20260906-fields-storage-v1"></script>
   </head>
   <body>
     <a class="skip-link" href="#view-root">Skip to learning workspace</a>
@@ -42,7 +42,7 @@
         <section class="welcome-copy">
           <p class="eyebrow">Local-first mastery learning</p>
           <h1 id="welcome-title">Master what you know.<br><em>Conquer what comes next.</em></h1>
-          <p class="welcome-lede">QuickMaths turns lessons into living mastery maps. Explore connected subjects, practice, reflect, save your progress, and let a browser agent tutor from the work actually on screen.</p>
+          <p class="welcome-lede">QuickMaths turns lessons into living mastery maps. Explore connected fields and branches, practice, reflect, save your progress, and let a browser agent tutor from the work actually on screen.</p>
           <div class="welcome-proof">
             <span><strong id="welcome-lesson-count">…</strong> connected lessons</span>
             <span><strong id="welcome-question-count">…</strong> varied mastery questions</span>
@@ -162,6 +162,7 @@
             <span class="avatar" id="profile-avatar" aria-hidden="true">Q</span>
             <span class="profile-copy"><strong id="sidebar-profile-name">Learner</strong><small>Saved in this browser</small></span>
           </button>
+          <button id="global-storage-status" class="global-storage-status" type="button" data-action="open-storage-setup" data-tone="idle"><i aria-hidden="true"></i><span><strong>Local only</strong><small>No GitHub save yet</small></span></button>
           <button id="logout-button" type="button" aria-label="Change learner" title="Change learner">↪</button>
         </div>
       </aside>

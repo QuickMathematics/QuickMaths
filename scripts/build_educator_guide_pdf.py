@@ -45,7 +45,8 @@ LINE = colors.HexColor("#D8D0C2")
 
 
 def inline_markup(text: str) -> str:
-    value = escape(text.strip())
+    # Core PDF fonts lack portable arrow glyphs on some readers/renderers.
+    value = escape(text.strip().replace("→", " > "))
     value = re.sub(r"`([^`]+)`", r'<font name="Courier" color="#123F3A">\1</font>', value)
     value = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", value)
     value = re.sub(r"(?<![\"'=])(https://[^\s<]+)", r'<link href="\1" color="#0B625A"><u>\1</u></link>', value)

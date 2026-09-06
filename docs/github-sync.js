@@ -1,4 +1,4 @@
-import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v7";
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-fields-storage-v1";
 
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;
@@ -98,6 +98,7 @@ export function normalizeGitHubSyncConfig(candidate, { requireToken = true } = {
     token,
     role,
     rememberToken: candidate.rememberToken === true,
+    mergeMode: candidate.mergeMode === "agent-priority" ? "agent-priority" : "manual",
   };
 }
 
@@ -142,6 +143,7 @@ export function createGitHubCredentialStore({
       branch: config.branch,
       role: config.role,
       rememberToken: config.rememberToken,
+      mergeMode: config.mergeMode,
     }));
     storageRemove(sessionCredentialStorage, sessionTokenKey(config.role));
     storageRemove(persistentCredentialStorage, persistentTokenKey(config.role));
@@ -494,7 +496,7 @@ export function createGitHubSyncController({
     connected: false,
     dirty: metadata?.dirty === true,
     remoteAvailable: false,
-    lastPushedAt: null,
+    lastPushedAt: Number.isFinite(Date.parse(metadata?.lastPushedAt)) ? metadata.lastPushedAt : null,
     lastPulledAt: null,
     lastRemoteUpdatedAt: null,
     error: null,
@@ -518,6 +520,8 @@ export function createGitHubSyncController({
     const currentRepositoryKey = repositoryKey(config);
     const saved = credentialStore.loadMetadata?.({ role }) ?? null;
     const sameRepository = saved?.repositoryKey === currentRepositoryKey;
+    if (clearRevisions) status.lastPushedAt = null;
+    else if (sameRepository && Date.parse(saved.lastPushedAt) > (Date.parse(status.lastPushedAt) || 0)) status.lastPushedAt = saved.lastPushedAt;
     const savedLearnerSha = sameRepository && typeof saved?.learnerSha === "string" ? saved.learnerSha : null;
     const savedAgentSha = !sameRepository ? null : role === "learner" ? confirmedAgentSha(saved?.agentSha, saved?.resolvedAgentSha) : typeof saved?.agentSha === "string" ? saved.agentSha : null;
     const nextAgentSha = clearRevisions ? null : revisions ? agentSha : (savedAgentSha ?? agentSha);
@@ -537,6 +541,7 @@ export function createGitHubSyncController({
         resolvedAgentSha: role === "learner" ? nextAgentSha : null,
         dirty: status.dirty,
         localChangedAt,
+        lastPushedAt: status.lastPushedAt,
         pendingActor: clearRevisions ? null : revisions ? pendingLearnerActor : (pendingLearnerActor ?? savedPendingActor),
         agentTask: clearRevisions ? null : agentTask,
       },
@@ -693,6 +698,7 @@ export function createGitHubSyncController({
       pendingReview = null;
       bases.clear();
       status.dirty = false;
+      status.lastPushedAt = null;
     }
     status.config = config;
     stopped = false;
@@ -966,7 +972,7 @@ export function createGitHubSyncController({
       pendingReview = { id, channel, plan, localJson, learner, agent, remote };
       if (plan.rows.length) {
         update({ phase: "reviewing", error: null, conflict: null });
-        return { id, channel, rows: plan.rows, hasBase: plan.hasBase, remoteLabel: remote.envelope.actorLabel, taskStartedAt: remote.envelope.taskStartedAt, remoteUpdatedAt: remote.envelope.updatedAt };
+        return { id, channel, rows: plan.rows, hasBase: plan.hasBase, remoteIsAgent: channel === "agent" || remote.envelope.actorKind === "agent", remoteLabel: remote.envelope.actorLabel, taskStartedAt: remote.envelope.taskStartedAt, remoteUpdatedAt: remote.envelope.updatedAt };
       }
       try { await applyPreparedMerge({ reviewId: id }); }
       catch (error) {
@@ -1004,7 +1010,7 @@ export function createGitHubSyncController({
     return sameReviewContent(before.envelope.stateJson, after.envelope.stateJson);
   };
 
-  const applyPreparedMerge = async ({ reviewId, choices = {} } = {}) => {
+  const applyPreparedMerge = async ({ reviewId, choices = {}, automatic = false } = {}) => {
     const review = pendingReview;
     if (!review || review.id !== reviewId) throw new GitHubSyncConflictError("This comparison has expired. Refresh the comparison.", { channel: review?.channel ?? "learner" });
     const changed = (source = "GitHub") => new GitHubSyncConflictError(`The workspace changed during review (${source}). Refresh the comparison before saving.`, { channel: review.channel, reason: "stale_review", source });
@@ -1035,6 +1041,12 @@ export function createGitHubSyncController({
       const acknowledged = review.channel === "agent" ? agent.sha : learner.envelope?.resolvedAgentSha ?? agentSha;
       const envelope = createBridgeEnvelope({ channel: "learner", stateJson: merged, deviceId: resolvedDeviceId, deviceLabel: resolvedDeviceLabel, appliedAgentSha: acknowledged, resolvedAgentSha: acknowledged, now });
       let result;
+      const savedPreference = automatic ? credentialStore.load({ role }) : null;
+      if (automatic && repositoryKey(savedPreference) === repositoryKey(config)) {
+        config = { ...config, mergeMode: savedPreference.mergeMode };
+        status.config = config;
+      }
+      if (automatic && (config?.mergeMode !== "agent-priority" || repositoryKey(savedPreference) !== repositoryKey(config) || savedPreference?.mergeMode !== "agent-priority")) throw new GitHubSyncConflictError("Automatic merging is now off. Review these changes before saving.", { channel: review.channel });
       try {
         result = await client.writeFile(requireConfig(), LEARNER_STATE_PATH, envelope, { sha: learner.sha, message: "QuickMaths Bridge: merge reviewed workspace changes" });
       } catch (error) {
@@ -1065,6 +1077,32 @@ export function createGitHubSyncController({
   };
 
   const applyMerge = (selection) => runSerial(() => withPhase("merging", () => applyPreparedMerge(selection)));
+
+  // Use the same semantic merge and validation as the review window. A missing
+  // ancestor cannot distinguish a deletion from new work, so ask for a review.
+  const mergeAutomatically = async ({ channel = "learner" } = {}) => {
+    for (let pass = 0; pass < 6; pass += 1) {
+      const review = await prepareMerge({ channel });
+      if (review.resolved || config?.mergeMode !== "agent-priority" || !review.hasBase) return review;
+      const choices = Object.fromEntries(review.rows.map((row) => [row.id,
+        row.conflict ? (review.remoteIsAgent ? "remote" : "local") : row.suggested]));
+      try { await applyMerge({ reviewId: review.id, choices, automatic: true }); }
+      catch (error) {
+        if (error.details?.reason === "stale_review") { channel = review.channel; continue; }
+        if (error.details?.reason === "dependencies") return { ...review, automaticReviewReason: error.message };
+        throw error;
+      }
+      channel = "learner";
+    }
+    throw new GitHubSyncConflictError("The workspace keeps changing. Review the latest comparison before saving.", { channel });
+  };
+
+  const setMergeMode = (mode) => {
+    if (!["manual", "agent-priority"].includes(mode)) throw new GitHubSyncError("Unknown storage merge mode.");
+    config = credentialStore.save({ ...requireConfig(), mergeMode: mode });
+    update({ config });
+    return statusClone(status);
+  };
 
   const pauseRemoteActivity = () => {
     stopped = true;
@@ -1140,7 +1178,7 @@ export function createGitHubSyncController({
     bases.clear();
     update({
       phase: "disconnected", connected: false, dirty: false, remoteAvailable: false,
-      error: null, conflict: null, config: null, repository: null,
+      error: null, conflict: null, config: null, repository: null, lastPushedAt: null,
     });
   };
 
@@ -1179,6 +1217,8 @@ export function createGitHubSyncController({
     },
     prepareMerge,
     applyMerge,
+    mergeAutomatically,
+    setMergeMode,
     restoreLearner,
     inspectRemote,
     syncLearnerNow,

@@ -238,3 +238,20 @@ test("an untouched Studio draft follows the active subject instead of defaulting
   assert.equal(studio.buildPack().subject.id, "SUBJECT_PROGRAMMING");
   assert.equal(studio.buildPack().subject.name, "Programming");
 });
+
+
+test("Studio lists field-scoped branches and exports compatible lesson file keys", () => {
+  const { studio, state } = studioHarness();
+  state.curriculum.allSkills.push({ id: "OTHER", name: "Other lesson", subjectId: "SUBJECT_OTHER", subdomain: "Other branch", custom: true });
+  const html = studio.render(state);
+  assert.doesNotMatch(html, /Word for lesson files/);
+  assert.match(html, /Existing field/);
+  assert.match(html, /datalist id="studio-branches"/);
+  const branches = html.match(/<datalist id="studio-branches">(.*?)<\/datalist>/)[1];
+  assert.match(branches, /Arithmetic/);
+  assert.doesNotMatch(branches, /Other branch/);
+  studio.handleInput({ value: "Geometry", type: "text", matches: () => false, dataset: { creatorField: "skill.subdomain" } });
+  const pack = studio.buildPack();
+  assert.equal(pack.subject.id, "SUBJECT_MATH");
+  assert.equal(pack.skills[0].subdomain, "Geometry");
+});

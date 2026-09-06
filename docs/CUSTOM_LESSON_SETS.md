@@ -1,14 +1,23 @@
 # Agent Lesson Authoring Guide
 
-This is the machine-oriented guide for creating portable QuickMaths subjects and lesson sets. Human authors can use **Lesson studio** inside the app instead: it provides forms, tooltips, a short tutorial, live validation, color pickers, and buttons for every browser-supported feature.
+This is the machine-oriented guide for creating portable QuickMaths fields and lesson sets. Human authors can use **Lesson studio** inside the app instead: it provides forms, tooltips, a short tutorial, live validation, color pickers, and buttons for every browser-supported feature.
 
 Lesson sets are declarative JSON. QuickMaths never executes uploaded code, HTML, CSS, URLs, generators, or scripts. The browser validates the entire prerequisite graph before installing anything, and an agent may only **stage** a set: a human must click **Install**.
 
 Start with [`lesson-set-example.json`](lesson-set-example.json), or ask an agent to call `get_agent_guide` and `validate_lesson_set`.
 
-## Envelope and subject
 
-Schema 2.0 adds subjects, themes, and cross-subject prerequisite bridges:
+### Fields and branches
+
+QuickMaths organizes learning as **Field → Branch → Lesson**. Mathematics is a field; Geometry is a branch within Mathematics. A field owns its theme and can contain many branches. A branch groups lessons in that field; the same branch name in another field is a separate group. Lesson sets can contain several branches.
+
+On the map, choose a **Field**, then a **Branch**, then a **Lesson** to jump to. These selectors narrow the lesson list; the combined map and your saved positions stay intact. In Lesson Studio, select or create the field, then choose an existing branch or type a new branch name for each lesson. Prerequisites can connect lessons across branches and fields.
+
+Existing lesson files and backups remain compatible: the saved `subject` object and `subjectId` / `subject_id` identifiers describe the field; each lesson's `subdomain` is its branch. Keep these stable file keys and lesson IDs when editing older files. The agent tools `list_fields` and `list_branches` expose the hierarchy; `list_subjects` remains a compatibility alias.
+
+## Envelope and field
+
+Schema 2.0 adds fields, themes, and cross-field prerequisite bridges:
 
 ```json
 {
@@ -44,11 +53,11 @@ Schema 2.0 adds subjects, themes, and cross-subject prerequisite bridges:
 }
 ```
 
-- Pack IDs start with `PACK_`; new skill IDs in the default `add` mode start with `CUSTOM_`; subject IDs start with `SUBJECT_`.
+- Pack IDs start with `PACK_`; new skill IDs in the default `add` mode start with `CUSTOM_`; field IDs start with `SUBJECT_`.
 - IDs use uppercase letters, numbers, and underscores. Never change a published ID if learner progress may already reference it.
 - Use `SUBJECT_MATH` to append lessons to the built-in Mathematics curriculum. Its built-in theme is preserved.
-- Reuse an installed custom subject ID to append another pack to that subject. Include the same subject name and theme in the source file so the file stays portable.
-- Use a new subject ID to create a separate subject lane and theme on the combined mastery map.
+- Reuse an installed custom field ID to append another pack to that field. Include the same field name and theme in the source file so the file stays portable.
+- Use a new field ID to create a separate field lane and theme on the combined mastery map.
 - Themes accept only the eleven six-digit hex colors shown above. Arbitrary CSS is rejected.
 - Schema 1.0 files still load and are migrated into `SUBJECT_MATH`.
 
@@ -63,7 +72,7 @@ In Lesson Studio, choose **Edit a native lesson**, select the lesson, and click 
 An agent has the same safe pipeline:
 
 1. Call `open_lesson_creator` with `skill_id` when the human wants to edit visibly in Lesson Studio; or author an override file directly.
-2. Keep the exact native lesson ID, its original subject, and every required problem field.
+2. Keep the exact native lesson ID, its original field, and every required problem field.
 3. Call `validate_lesson_set`, then `stage_custom_lesson_set`.
 4. Ask the human to review the staged improvement and click **Install improvement**. The agent cannot install or restore it silently.
 
@@ -129,7 +138,7 @@ The override envelope differs only in `mode` and its IDs:
 }
 ```
 
-Guardrails are strict: override mode accepts only IDs from the built-in curriculum, rejects a changed subject, rejects two installed improvements targeting the same native lesson, and never changes the total lesson count. New/custom lessons still use `mode: "add"` (or omit `mode`) and must use `CUSTOM_` IDs. To revise an already installed improvement, download its source, restore the original in Settings, then validate and install the replacement. Native improvements apply browser-wide and are not silently embedded into portable curricula; Curriculum Designer blocks export until installed improvements are restored.
+Guardrails are strict: override mode accepts only IDs from the built-in curriculum, rejects a changed field, rejects two installed improvements targeting the same native lesson, and never changes the total lesson count. New/custom lessons still use `mode: "add"` (or omit `mode`) and must use `CUSTOM_` IDs. To revise an already installed improvement, download its source, restore the original in Settings, then validate and install the replacement. Native improvements apply browser-wide and are not silently embedded into portable curricula; Curriculum Designer blocks export until installed improvements are restored.
 
 Lesson files contain private answer-key fields. Even while helping an author, an agent must not return `expected_answer` or `solution_steps` through learner-facing tool results or tutoring conversation.
 
@@ -170,9 +179,9 @@ Each skill supports:
 
 `question_count` is the number of questions in one mastery attempt. It must be a whole number from 1 through the number of entries in `problems`; when omitted, QuickMaths uses the complete bank. Supplying a larger bank than `question_count` gives comprehensive retakes fresh variants without making one attempt endless. The Lesson Studio uses the complete bank for new lessons and preserves the original assessment length when improving a native lesson.
 
-`unlocks` is optional and may contain only skills from the same pack. QuickMaths also derives unlock relationships from prerequisites, including cross-subject links.
+`unlocks` is optional and may contain only skills from the same pack. QuickMaths also derives unlock relationships from prerequisites, including cross-field links.
 
-## Cross-subject prerequisite bridges
+## Cross-field prerequisite bridges
 
 A prerequisite may be a globally unique skill ID:
 
@@ -180,7 +189,7 @@ A prerequisite may be a globally unique skill ID:
 "prerequisites": ["MATH_ARITH_005", "CUSTOM_CHEM_MOLES_001"]
 ```
 
-Or use an explicit bridge reference, which also verifies that the referenced skill belongs to the subject you intended:
+Or use an explicit bridge reference, which also verifies that the referenced skill belongs to the field you intended:
 
 ```json
 "prerequisites": [
@@ -189,12 +198,12 @@ Or use an explicit bridge reference, which also verifies that the referenced ski
 ]
 ```
 
-The referenced skill must already be built in, appear in the same file, or belong to an installed pack. Install dependency packs before dependent packs. Missing references, incorrect subject references, and cycles anywhere in the combined multi-subject graph are rejected.
+The referenced skill must already be built in, appear in the same file, or belong to an installed pack. Install dependency packs before dependent packs. Missing references, incorrect field references, and cycles anywhere in the combined multi-field graph are rejected.
 
 Each learner chooses graph behavior in the sidebar:
 
 - **Hard path**: unmet prerequisites lock mastery tests. Lessons remain readable.
-- **Open path**: every lesson and test is available; prerequisite lines and cross-subject bridges become recommended preparation.
+- **Open path**: every lesson and test is available; prerequisite lines and cross-field bridges become recommended preparation.
 
 The file does not force a learner’s mode. The choice belongs to each learner profile and is included in progress backups.
 
@@ -546,7 +555,7 @@ The repository’s trusted built-in Mathematics YAML is exported as browser-safe
 
 | Original YAML capability | Web lesson-set path |
 | --- | --- |
-| Track metadata and graph | `track`, `skills`, `prerequisites`, subjects, and bridge references |
+| Track metadata and graph | `track`, `skills`, `prerequisites`, fields, and bridge references |
 | Skill metadata, theory, examples, applications, tags | Same learner-facing fields in each skill |
 | Mastery thresholds and review intervals | `mastery` block |
 | Final answer block and accepted forms | Flattened `expected_answer`, `answer_type`, grader, tolerance, and `accepted_forms` |
@@ -566,9 +575,9 @@ The security boundary is intentional: variables, derived expressions, constraint
 
 Open **Lesson studio** in the left sidebar. It can:
 
-- extend an installed subject or create a themed subject;
+- extend an installed field or create a themed field;
 - create, remove, and switch between multiple lessons;
-- select prerequisites across every subject;
+- select prerequisites across every field;
 - add theory, examples, applications, tags, mastery thresholds, and review timing;
 - add fixed questions with every supported grader;
 - configure answer modes, capture/procedural/proof/rubric work, and review gates;
@@ -623,11 +632,11 @@ Portable curriculum imports compare the complete normalized package content, inc
 
 1. Download a full progress backup before changing installed content.
 2. Use **Settings → Load lesson set**, use Lesson studio, or ask an agent to stage a set.
-3. Review the subject, author, version, lesson count, question count, and prerequisite links.
+3. Review the field, author, version, lesson count, question count, and prerequisite links.
 4. Confirm installation.
-5. Choose the subject in the left sidebar.
+5. Choose the field in the left sidebar.
 
-Installed lesson content, subject metadata/themes, per-profile subject and path choices, progress, drafts, attempts, reviews, and timers are included in full JSON backups. CSV files are analysis-only.
+Installed lesson content, field metadata/themes, per-profile field and path choices, progress, drafts, attempts, reviews, and timers are included in full JSON backups. CSV files are analysis-only.
 
 Import is rejected without changing state when a file has an unsupported version, duplicate IDs, missing or mislabelled prerequisite bridges, a cycle anywhere in the combined graph, mismatched question/skill IDs, unsupported grading/work/review modes, malformed choices/rubrics/proof obligations, executable content, or exceeded safety limits.
 

@@ -1,3 +1,4 @@
+import { learningFields } from "./learning-fields.js?v=20260906-fields-storage-v1";
 export const TOOL_NAMES = Object.freeze([
   "get_agent_guide",
   "get_quickmaths_manual",
@@ -12,6 +13,8 @@ export const TOOL_NAMES = Object.freeze([
   "set_curriculum_pack_enabled",
   "set_curriculum_native_lessons_enabled",
   "list_subjects",
+  "list_fields",
+  "list_branches",
   "set_learning_preferences",
   "navigate_learning_app",
   "set_map_plan_mode",
@@ -99,7 +102,7 @@ function authoringGuideSection(markdown, section) {
     recommended_next: ["envelope", "questions", "grading_and_work", "webmcp"],
   };
   const headings = {
-    envelope: "Envelope and subject",
+    envelope: "Envelope and field",
     native_improvements: "Improving a native QuickMaths lesson",
     curriculum_graph: "Track and skills",
     questions: "Fixed mastery questions",
@@ -340,7 +343,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "get_lesson_authoring_guide",
       title: "Get QuickMaths lesson authoring guide",
-      description: "Read the bundled Agent Lesson Authoring Guide by topic before creating or modifying lesson packs, structured questions, subjects, bridges, or native improvements.",
+      description: "Read the bundled Agent Lesson Authoring Guide by topic before creating or modifying lesson packs, structured questions, fields, bridges, or native improvements.",
       inputSchema: { type: "object", properties: { section: { type: "string", enum: AUTHORING_GUIDE_SECTIONS, description: "Guide section; defaults to summary. Request all only for a full authoring pass." } }, additionalProperties: false },
       annotations: { readOnlyHint: true, untrustedContentHint: true },
       async execute(input = {}) {
@@ -402,7 +405,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "get_curriculum_map",
       title: "Get curriculum map",
-      description: "Read the combined installed-subject prerequisite map, including statuses, subject identities, bridges, and unlock relationships.",
+      description: "Read the combined installed-field prerequisite map, including statuses, field identities, bridges, and unlock relationships.",
       inputSchema: {
         type: "object",
         properties: {
@@ -420,12 +423,13 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
           ok: true,
           scope: "all",
           subjects: state.subjects,
+          fields: state.fields,
           progression_mode: state.progressionMode,
           active_curriculum_policy: activeCurriculumPolicy(store),
           custom_lesson_sets: state.lessonPacks.filter((pack) => pack.mode !== "override").map((pack) => ({ id: pack.id, name: pack.name, skill_count: pack.skillCount })),
           lesson_changes: state.lessonPacks.map((pack) => ({ id: pack.id, name: pack.name, mode: pack.mode, skill_count: pack.skillCount, overrides_native_skills: pack.overridesNativeSkills })),
           skills: rows.map((row) => ({
-            skill_id: row.id, subject_id: row.subjectId, name: row.name, subdomain: row.subdomain, status: row.status,
+            skill_id: row.id, field_id: row.subjectId, branch: row.subdomain, subject_id: row.subjectId, name: row.name, subdomain: row.subdomain, status: row.status,
             native: row.native, overridden: row.overridden, pack_id: row.packId,
             mastery_score: row.masteryScore, prerequisites: row.prerequisites, unmet_prerequisites: row.unmetPrerequisites, unlocks: row.unlocks,
           })),
@@ -539,8 +543,8 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     },
     {
       name: "list_subjects",
-      title: "List QuickMaths subjects",
-      description: "Read every installed subject, its theme-safe metadata, lesson count, and the subject theme retained from the learner's most recently opened lesson.",
+      title: "List QuickMaths fields (legacy alias)",
+      description: "Read every installed field, its theme-safe metadata, lesson count, and the field theme retained from the learner's most recently opened lesson.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: true, untrustedContentHint: true },
       async execute(input = {}) {
@@ -559,9 +563,36 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       },
     },
     {
+      name: "list_fields",
+      title: "List learning fields",
+      description: "Read the Field → Branch → Lesson hierarchy visible in the current curriculum. Mathematics is a field; Geometry is a branch within it. Field IDs retain existing subject IDs.",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      async execute(input = {}) {
+        requireObject(input); rejectUnknown(input, []);
+        const state = store.snapshot();
+        return { ok: true, active_field_id: state.activeSubject?.id ?? null, fields: state.fields ?? learningFields(state.subjects, state.curriculum.allSkills) };
+      },
+    },
+    {
+      name: "list_branches",
+      title: "List branches in a field",
+      description: "Read field-scoped branch IDs, names, and lesson IDs. Identically named branches in different fields remain separate. Use the returned lesson IDs to navigate or author prerequisites.",
+      inputSchema: { type: "object", properties: { field_id: stringSchema("Optional field ID from list_fields; omit for all fields.", 60) }, additionalProperties: false },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      async execute(input = {}) {
+        requireObject(input); rejectUnknown(input, ["field_id"]);
+        const fieldId = optionalString(input, "field_id", 60);
+        const state = store.snapshot();
+        const fields = state.fields ?? learningFields(state.subjects, state.curriculum.allSkills);
+        if (fieldId && !fields.some((field) => field.id === fieldId)) throw new Error("Unknown field_id in this curriculum.");
+        return { ok: true, branches: fields.filter((field) => !fieldId || field.id === fieldId).flatMap((field) => field.branches) };
+      },
+    },
+    {
       name: "set_learning_preferences",
       title: "Set learning preferences",
-      description: "Choose Hard or Open path. The mastery map permanently includes every installed subject, and its subject theme changes only when the learner opens a lesson or begins its test.",
+      description: "Choose Hard or Open path. The mastery map permanently includes every installed field, and its field theme changes only when the learner opens a lesson or begins its test.",
       inputSchema: {
         type: "object",
         properties: {
@@ -632,7 +663,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         properties: {
           positions: {
             type: "array", minItems: 1, maxItems: 80,
-            description: "Lesson positions in free-canvas units; x and y must be between -20000 and 20000. Subject bands are visual guides, not placement boundaries.",
+            description: "Lesson positions in free-canvas units; x and y must be between -20000 and 20000. Field bands are visual guides, not placement boundaries.",
             items: { type: "object", properties: { skill_id: stringSchema("Installed lesson ID.", 60), x: { type: "number", minimum: -20000, maximum: 20000 }, y: { type: "number", minimum: -20000, maximum: 20000 } }, required: ["skill_id", "x", "y"], additionalProperties: false },
           },
         },
@@ -753,14 +784,16 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
       inputSchema: {
         type: "object",
         properties: {
-          subject_id: stringSchema("Optional installed subject ID for a new lesson set.", 60),
+          field_id: stringSchema("Optional installed field ID for a new lesson set.", 60),
+          subject_id: stringSchema("Compatibility alias for field_id.", 60),
           skill_id: stringSchema("Optional native lesson ID to open as a reversible editable improvement. Do not use for custom lessons.", 60),
         },
         additionalProperties: false,
       },
       async execute(input = {}) {
-        requireObject(input); rejectUnknown(input, ["subject_id", "skill_id"]);
-        const subjectId = optionalString(input, "subject_id", 60);
+        requireObject(input); rejectUnknown(input, ["field_id", "subject_id", "skill_id"]);
+        if (input.field_id && input.subject_id && input.field_id !== input.subject_id) throw new Error("field_id and subject_id must agree.");
+        const subjectId = optionalString(input, "field_id", 60) || optionalString(input, "subject_id", 60);
         const skillId = optionalString(input, "skill_id", 60);
         if (skillId) {
           const skill = store.skillsById[skillId];
@@ -780,7 +813,7 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "validate_lesson_set",
       title: "Validate a lesson set or native improvement",
-      description: "Validate declarative QuickMaths lesson-set JSON for new lessons or reversible native improvements, including subjects, bridges, graders, proof/rubric policies, graph cycles, and safety limits. This does not install anything.",
+      description: "Validate declarative QuickMaths lesson-set JSON for new lessons or reversible native improvements, including fields, bridges, graders, proof/rubric policies, graph cycles, and safety limits. This does not install anything.",
       inputSchema: {
         type: "object",
         properties: { lesson_set_json: stringSchema("Declarative QuickMaths lesson-set JSON. No scripts, HTML, generators, or executable code.", 1800000) },
@@ -813,12 +846,12 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
     {
       name: "search_lesson_depot",
       title: "Search the QuickMaths Lesson Depot",
-      description: "Search the merged official, federated-community, and directly subscribed Lesson Depot by title, author, subject, or tag. Results contain metadata and provenance/trust signals only—never answer keys; availability says whether a result can be staged.",
+      description: "Search the merged official, federated-community, and directly subscribed Lesson Depot by title, author, field, or tag. Results contain metadata and provenance/trust signals only—never answer keys; availability says whether a result can be staged.",
       inputSchema: {
         type: "object",
         properties: {
-          query: stringSchema("Optional title, author, subject, or tag search.", 120),
-          subject_id: stringSchema("Optional Depot subject ID.", 60),
+          query: stringSchema("Optional title, author, field, or tag search.", 120),
+          subject_id: stringSchema("Optional Depot field ID (compatible subject_id key).", 60),
           sort: { type: "string", enum: ["popular", "newest", "name"] },
           limit: { type: "integer", minimum: 1, maximum: 50 },
         },

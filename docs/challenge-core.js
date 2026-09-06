@@ -1,3 +1,5 @@
+import { learningFields } from "./learning-fields.js?v=20260906-fields-storage-v1";
+
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
 export const APP_VERSION = 16;
@@ -2808,6 +2810,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       curriculumPlan: clone(assignedCurriculumPlan()),
       activeSubject: clone(visibleSubjects.find((subject) => subject.id === activeSubjectId()) ?? visibleSubjects[0] ?? catalog.subjects[0]),
       subjects: clone(visibleSubjects),
+      fields: clone(learningFields(visibleSubjects, catalog.skills.filter((skill) => visible.has(skill.id)))),
       progressionMode: effectiveProgressionMode(),
       mapScope: "all",
       profiles: clone(state.profiles),

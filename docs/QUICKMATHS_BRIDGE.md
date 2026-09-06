@@ -60,10 +60,22 @@ The bridge page exposes the QuickMaths learning and authoring tools plus:
 
 Codex Remote continues the task that is running on the computer; it does not make a static GitHub Pages tab execute a local agent by itself. The host computer still needs to be online, signed in, and running the task with the Agent Bridge open.
 
+
+### Storage status and merge management
+
+The light beside your profile is visible throughout the app, including the mobile top bar. Green means connected and checkpointed; amber means syncing or a save is pending; coral means a problem or a review needs attention; gray means local-only storage. Its text reports time since this device's last successful GitHub save, retained after reload. Tap it to open Workspace Storage. Browser autosave and receiving an update do not reset the GitHub-save time.
+
+In **Settings → Workspace Storage → Storage management**, choose:
+
+- **Manually review storage merges** (default): review the detected changes with checkboxes. Independent changes start checked; choose which side to keep when the same content conflicts.
+- **Automatically merge · agent priority**: keep independent changes from both copies. If an agent and a device change the same content, the agent's value wins for that change. Local-only notes, node moves, lessons, mastery, profiles, curricula, tests, and feedback remain. Between device checkpoints, this device wins conflicts. This is a selective merge, not replacement of the complete workspace.
+
+The choice belongs to this device and repository connection. It does not bypass human approval to install agent-staged lesson packages. Both modes preserve the existing activity-history combination and device-local settings. Missing starting history or an invalid combination of related saved work opens the comparison for a manual decision. Actual concurrent edits are checked again before saving; clocks, navigation, and bookkeeping alone do not invalidate the review. Agents still record the original task start before editing and publish it with the finished update.
+
 ## Conflict and recovery rules
 
 - The app compares both the current GitHub learner snapshot and the local device with the task's starting revision. If unchanged, the agent update is applied automatically. Timers and viewport changes alone do not cause a merge.
-- If either contains other changes, the app opens a merge window on the current page before loading the comparison. Loading failures stay in that window with **Refresh comparison** available. **Not now** closes it while keeping **Compare versions** available in Settings. It preserves the original local workspace until the merge is successfully saved.
+- If either contains other changes, manual mode opens a merge window on the current page before loading the comparison. Loading failures stay in that window with **Refresh comparison** available. **Not now** closes it while keeping **Compare versions** available in Settings. It preserves the original local workspace until the merge is successfully saved.
 - The comparison describes individual changes with checkboxes: profile preferences, curriculum settings, lesson text and questions, mastery updates, feedback, test attempts, unfinished tests, queued lesson sets, map notes, node positions, paths, and hidden lessons. Independent changes are checked by default; unchecking restores that item's starting value. A GitHub note and two local node moves can all be kept together. Overlapping edits and deletions require one choice, or **Keep the starting value**. Complete questions, attempts, feedback assessments, unfinished tests, and paired mastery level/score values stay together to avoid invalid combinations.
 - **Keep all independent changes** and **Uncheck independent changes** adjust checkboxes without resolving conflicts. Activity history is combined automatically; device navigation and session time remain local. **Save merged workspace** saves the chosen combination to GitHub and this device. **Not now** leaves synchronization paused; reopen it with **Compare versions** in Settings.
 - Missing starting Git history requires explicit two-way choices for every difference. A timestamp alone never authorizes overwriting learner work.

@@ -51,7 +51,7 @@ Challenge-period milestone evidence:
 
 ## WebMCP integration
 
-When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers thirty-one page tools through `document.modelContext.registerTool()`. External browsers retain the complete human app but cannot expose WebMCP tools. QuickMaths therefore makes the boundary explicit in the UI: an existing workspace is backed up or connected to private Workspace Storage before moving, then an experimental desktop handoff opens the public app URL in the in-app browser with a concise manifest-first prompt. No credential or workspace payload enters that URL. The tools operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. Every fresh visitor, learner, and educator starts with `get_agent_guide` and `section: "summary"`; the unified manifest routes the correct role workflow, `get_quickmaths_manual` exposes the learner and educator manuals as focused Markdown, and `get_lesson_authoring_guide` returns the bundled authoring contract by topic.
+When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers thirty-three page tools through `document.modelContext.registerTool()`. External browsers retain the complete human app but cannot expose WebMCP tools. QuickMaths therefore makes the boundary explicit in the UI: an existing workspace is backed up or connected to private Workspace Storage before moving, then an experimental desktop handoff opens the public app URL in the in-app browser with a concise manifest-first prompt. No credential or workspace payload enters that URL. The tools operate on the same store and visible routes as the human interface—there is no separate agent-only demo state. Every fresh visitor, learner, and educator starts with `get_agent_guide` and `section: "summary"`; the unified manifest routes the correct role workflow, `get_quickmaths_manual` exposes the learner and educator manuals as focused Markdown, and `get_lesson_authoring_guide` returns the bundled authoring contract by topic.
 
 | Tool | Purpose |
 | --- | --- |
@@ -67,7 +67,9 @@ When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers
 | `update_curriculum_settings` | Set student, agent, progression, and contact rules for the open curriculum. |
 | `set_curriculum_pack_enabled` | Enable or disable an installed additive lesson pack only for the open curriculum. |
 | `set_curriculum_native_lessons_enabled` | Include or exclude native Mathematics while preserving a valid curriculum dependency graph. |
-| `list_subjects` | Read installed subjects and lesson totals. |
+| `list_subjects` | Compatibility alias for installed fields and lesson totals. |
+| `list_fields` | Read the Field → Branch → Lesson hierarchy. |
+| `list_branches` | Read branch membership scoped to a field. |
 | `set_learning_preferences` | Change Hard/Open path mode; the mastery map is permanently combined across installed subjects. |
 | `navigate_learning_app` | Open the dashboard, map, lesson, test, results, Lesson studio, or Settings. |
 | `set_map_plan_mode` | Visibly open the persistent editable mastery-map plan or return to its default read-only Plan view; the human can compare it with the canonical map. |
@@ -87,7 +89,7 @@ When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers
 | `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
-The top-level `agent-bridge.html` workspace registers the same thirty-one learning tools plus three transport tools:
+The top-level `agent-bridge.html` workspace registers the same thirty-three learning tools plus three transport tools:
 
 | Bridge tool | Purpose |
 | --- | --- |
