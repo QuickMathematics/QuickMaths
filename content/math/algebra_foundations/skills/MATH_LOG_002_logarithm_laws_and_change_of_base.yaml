@@ -1,0 +1,671 @@
+id: MATH_LOG_002
+schema_version: 0.2
+name: Logarithm laws and change of base
+domain: Math
+subdomain: Algebra
+topic: Logarithms and Exponential Functions
+description: Expand and condense logarithmic expressions, evaluate exact logarithms with exponent laws, apply change
+  of base, and preserve logarithm domains.
+prerequisites:
+- MATH_LOG_001
+- MATH_EXP_001
+tags:
+- logarithms
+- logarithm_laws
+- product_law
+- quotient_law
+- power_law
+- expanding_logs
+- condensing_logs
+- change_of_base
+- domain
+unlocks:
+- MATH_LOG_003
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Logarithm laws come from exponent laws.
+
+  Assume the logarithm base b is positive and not 1. Every logarithm argument must also be positive.
+
+  Product law:
+
+  log_b(MN) = log_b(M) + log_b(N)
+
+  A product inside one logarithm becomes a sum of logarithms.
+
+  Quotient law:
+
+  log_b(M/N) = log_b(M) - log_b(N)
+
+  A quotient becomes a difference. The numerator logarithm comes first.
+
+  Power law:
+
+  log_b(M^p) = p*log_b(M)
+
+  An exponent on the argument becomes a coefficient in front of the logarithm.
+
+  Expanding:
+  To expand a logarithm, break products, quotients, and powers into a sum or difference of simpler logarithms.
+
+  Example:
+
+  log_2((x^3*y)/z^2)
+
+  = 3log_2(x) + log_2(y) - 2log_2(z)
+
+  for x, y, and z positive.
+
+  Condensing:
+  Condensing reverses the laws.
+
+  2log_5(x) - log_5(y)
+
+  = log_5(x^2) - log_5(y)
+
+  = log_5(x^2/y)
+
+  There is no sum law:
+
+  log_b(M + N) is not generally equal to log_b(M) + log_b(N).
+
+  The laws apply to multiplication, division, and powers—not to addition or subtraction inside an argument.
+
+  Exact evaluation with laws:
+
+  log_3(3^4 * 3^2)
+
+  = log_3(3^6)
+
+  = 6.
+
+  Change of base:
+  A calculator may provide only log base 10 and ln. Any valid base can be converted:
+
+  log_b(a) = ln(a)/ln(b)
+
+  or
+
+  log_b(a) = log(a)/log(b).
+
+  Example:
+
+  log_2(10) = ln(10)/ln(2) approximately 3.322.
+
+  Domain conditions do not disappear when expressions are expanded or condensed.
+
+  Example:
+
+  log_2(x - 1) + log_2(5 - x)
+
+  requires both:
+
+  x - 1 > 0
+
+  and
+
+  5 - x > 0.
+
+  Therefore 1 < x < 5.
+
+  Method for expanding:
+  1. Apply the quotient law to separate numerator and denominator.
+  2. Apply the product law to separate factors.
+  3. Apply the power law to move exponents in front.
+  4. Keep subtraction signs attached to denominator terms.
+
+  Method for condensing:
+  1. Move coefficients into arguments as exponents.
+  2. Turn sums of logs into products.
+  3. Turn differences of logs into quotients.
+  4. Write one logarithm and preserve the original domain conditions.
+
+  Common mistake:
+  Do not write log_b(MN) = log_b(M)*log_b(N). A product inside becomes addition outside.
+
+  Another common mistake:
+  Do not reverse the quotient. log_b(M/N) = log_b(M) - log_b(N), not the other way around.
+
+  Another common mistake:
+  Change of base uses log(argument)/log(base). Reversing the fraction gives the reciprocal of the desired value.
+
+  Another common mistake:
+  Algebraically equivalent condensed formulas may have different apparent domains. Keep the restrictions from every original logarithm argument.
+examples:
+- prompt: Expand log_3(5x), assuming x > 0.
+  solution: log_3(5) + log_3(x)
+  explanation: Use the product law.
+- prompt: Expand log_2(x/7), assuming x > 0.
+  solution: log_2(x) - log_2(7)
+  explanation: Use the quotient law.
+- prompt: Expand log_5(x^4), assuming x > 0.
+  solution: 4log_5(x)
+  explanation: Use the power law.
+- prompt: Condense log_4(x) + log_4(y).
+  solution: log_4(xy)
+  explanation: A sum of logs becomes a product.
+- prompt: Condense 3log_2(x) - log_2(y).
+  solution: log_2(x^3/y)
+  explanation: Use the power law, then the quotient law.
+- prompt: Evaluate log_7(7^3 * 7^2).
+  solution: '5'
+  explanation: The product is 7^5.
+- prompt: Write log_3(11) using natural logarithms.
+  solution: ln(11)/ln(3)
+  explanation: Use log_b(a) = ln(a)/ln(b).
+- prompt: Find the domain of log(x - 2) + log(9 - x).
+  solution: (2, 9)
+  explanation: Both arguments must be positive.
+applications:
+- title: Solving equations
+  description: Logarithm laws combine several logarithms before converting to exponential form.
+- title: Scientific formulas
+  description: Products and powers inside scientific models become sums and coefficients on a logarithmic scale.
+- title: Data analysis
+  description: Log transformations convert multiplicative relationships into additive ones.
+- title: Calculator work
+  description: Change of base evaluates logarithms whose bases do not have dedicated calculator buttons.
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: LOG_LAW_EXPAND_PRODUCT_001
+    type: generated
+    prompt_template: Which expression is equivalent to log_{base}(M*N), assuming M > 0 and N > 0?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 9
+    options:
+    - id: A
+      label: log_{base}(M) + log_{base}(N)
+    - id: B
+      label: log_{base}(M) * log_{base}(N)
+    - id: C
+      label: log_{base}(M + N)
+    - id: D
+      label: log_{base}(M) - log_{base}(N)
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The product law states log_b(MN) = log_b(M) + log_b(N).
+      Therefore log_{base}(M*N) expands to log_{base}(M) + log_{base}(N).
+    mistake_tags:
+    - logarithm_laws
+    - product_law
+    - operation_error
+    difficulty: easy
+  - id: LOG_LAW_EXPAND_QUOTIENT_001
+    type: generated
+    prompt_template: Which expression is equivalent to log_{base}(M/N), assuming M > 0 and N > 0?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 9
+    options:
+    - id: A
+      label: log_{base}(M) + log_{base}(N)
+    - id: B
+      label: log_{base}(N) - log_{base}(M)
+    - id: C
+      label: log_{base}(M) - log_{base}(N)
+    - id: D
+      label: log_{base}(M/N) / log_{base}(N)
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The quotient law states log_b(M/N) = log_b(M) - log_b(N).
+      The numerator logarithm comes first and the denominator logarithm is subtracted.
+    mistake_tags:
+    - logarithm_laws
+    - quotient_law
+    - subtraction_order_error
+    difficulty: easy
+  - id: LOG_LAW_EXPAND_POWER_001
+    type: generated
+    prompt_template: Which expression is equivalent to log_{base}(x^{power}), assuming x > 0?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 9
+      power:
+        type: int
+        min: 2
+        max: 7
+    options:
+    - id: A
+      label: log_{base}(x)^{power}
+    - id: B
+      label: '{power}*log_{base}(x)'
+    - id: C
+      label: log_{base}({power}x)
+    - id: D
+      label: log_{base}(x)/{power}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The power law moves the exponent in front as a multiplier.
+      Thus log_{base}(x^{power}) = {power}*log_{base}(x).
+    mistake_tags:
+    - logarithm_laws
+    - power_law
+    - coefficient_error
+    difficulty: easy
+  - id: LOG_LAW_CONDENSE_SUM_001
+    type: generated
+    prompt_template: Condense log_{base}(M) + log_{base}(N) into one logarithm. Which answer is correct?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 9
+    options:
+    - id: A
+      label: log_{base}(M + N)
+    - id: B
+      label: log_{base}(M/N)
+    - id: C
+      label: log_{base}(M - N)
+    - id: D
+      label: log_{base}(M*N)
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A sum of logarithms with the same base condenses to the logarithm of a product.
+      Therefore the result is log_{base}(M*N).
+    mistake_tags:
+    - logarithm_laws
+    - condensing_logs
+    - product_law
+    difficulty: easy
+  - id: LOG_LAW_CONDENSE_DIFFERENCE_001
+    type: generated
+    prompt_template: Condense log_{base}(M) - log_{base}(N) into one logarithm. Which answer is correct?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 9
+    options:
+    - id: A
+      label: log_{base}(M/N)
+    - id: B
+      label: log_{base}(N/M)
+    - id: C
+      label: log_{base}(M - N)
+    - id: D
+      label: log_{base}(M*N)
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A difference of logarithms with the same base condenses to a quotient.
+      The first argument is the numerator, so the result is log_{base}(M/N).
+    mistake_tags:
+    - logarithm_laws
+    - condensing_logs
+    - quotient_law
+    difficulty: easy
+  - id: LOG_LAW_CONDENSE_COEFFICIENT_001
+    type: generated
+    prompt_template: Condense {power}*log_{base}(x) into one logarithm, assuming x > 0.
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 9
+      power:
+        type: int
+        min: 2
+        max: 7
+    options:
+    - id: A
+      label: log_{base}({power}x)
+    - id: B
+      label: log_{base}(x/{power})
+    - id: C
+      label: log_{base}(x^{power})
+    - id: D
+      label: log_{base}(x)^{power}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Reverse the power law.
+      A coefficient of {power} becomes an exponent on the argument, giving log_{base}(x^{power}).
+    mistake_tags:
+    - logarithm_laws
+    - condensing_logs
+    - power_law
+    difficulty: medium
+  - id: LOG_LAW_EXPAND_MIXED_001
+    type: generated
+    prompt_template: Expand log_{base}((x^{p}*y^{q})/z^{r}), assuming x, y, and z are positive.
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 9
+      p:
+        type: int
+        min: 2
+        max: 5
+      q:
+        type: int
+        min: 2
+        max: 5
+      r:
+        type: int
+        min: 2
+        max: 5
+    options:
+    - id: A
+      label: '{p}*log_{base}(x) - {q}*log_{base}(y) + {r}*log_{base}(z)'
+    - id: B
+      label: '{p}*log_{base}(x) + {q}*log_{base}(y) - {r}*log_{base}(z)'
+    - id: C
+      label: log_{base}(x + y - z)
+    - id: D
+      label: '{p + q - r}*log_{base}(xyz)'
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use the quotient law first, then the product and power laws.
+      The numerator contributes addition, the denominator contributes subtraction, and each exponent becomes a coefficient.
+      The expansion is {p}*log_{base}(x) + {q}*log_{base}(y) - {r}*log_{base}(z).
+    mistake_tags:
+    - logarithm_laws
+    - mixed_expansion
+    - sign_error
+    - power_law
+    difficulty: hard
+  - id: LOG_LAW_EXACT_PRODUCT_EVALUATION_001
+    type: generated
+    prompt_template: Evaluate log_{base}({base}^{m} * {base}^{n}).
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      m:
+        type: int
+        min: 1
+        max: 6
+      n:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      total: m + n
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use either exponent laws or the logarithm product law to reduce the expression to one exponent.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      {base}^{m} * {base}^{n} = {base}^{total}.
+      Therefore log_{base}({base}^{total}) = {total}.
+    mistake_tags:
+    - logarithm_laws
+    - product_law
+    - exponent_laws
+    difficulty: medium
+  - id: LOG_LAW_EXACT_QUOTIENT_EVALUATION_001
+    type: generated
+    prompt_template: Evaluate log_{base}(({base}^{m})/({base}^{n})).
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      n:
+        type: int
+        min: 1
+        max: 4
+      difference:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      m: n + difference
+    answer:
+      type: numeric
+      value: '{difference}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use the quotient rule for exponents or logarithms, then identify the remaining exponent.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      {base}^{m} / {base}^{n} = {base}^({m} - {n}) = {base}^{difference}.
+      Therefore the logarithm equals {difference}.
+    mistake_tags:
+    - logarithm_laws
+    - quotient_law
+    - exponent_laws
+    difficulty: medium
+  - id: LOG_LAW_NO_SUM_RULE_001
+    type: fixed
+    prompt: Which statement about logarithms is false in general?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: log_b(MN) = log_b(M) + log_b(N)
+    - id: B
+      label: log_b(M/N) = log_b(M) - log_b(N)
+    - id: C
+      label: log_b(M^p) = p*log_b(M)
+    - id: D
+      label: log_b(M + N) = log_b(M) + log_b(N)
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      There is no logarithm law that splits a sum inside the argument.
+      The product, quotient, and power laws are valid under their domain conditions, but log_b(M + N) does not generally equal log_b(M) + log_b(N).
+    mistake_tags:
+    - logarithm_laws
+    - false_sum_rule
+    - rule_selection_error
+    difficulty: medium
+  - id: LOG_CHANGE_OF_BASE_FORMULA_001
+    type: generated
+    prompt_template: Which expression equals log_{base}({argument}) by the change-of-base formula?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 9
+      argument:
+        type: int
+        min: 10
+        max: 60
+    constraints:
+    - argument != base
+    options:
+    - id: A
+      label: ln({argument})/ln({base})
+    - id: B
+      label: ln({base})/ln({argument})
+    - id: C
+      label: ln({argument} - {base})
+    - id: D
+      label: ln({argument}) - ln({base})
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The change-of-base formula is log_b(a) = ln(a)/ln(b).
+      Substitute a = {argument} and b = {base} to get ln({argument})/ln({base}).
+    mistake_tags:
+    - change_of_base
+    - fraction_order_error
+    - logarithm_laws
+    difficulty: medium
+  - id: LOG_CHANGE_OF_BASE_APPROXIMATION_001
+    type: fixed
+    prompt: Approximate log_2(10) to three decimal places.
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '3.322'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    work:
+      mode: capture_only
+      prompt: Use the change-of-base formula ln(10)/ln(2), show the calculator quotient, and round to three decimal
+        places.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use change of base:
+      log_2(10) = ln(10)/ln(2) approximately 3.321928.
+      Rounded to three decimal places, the value is 3.322.
+    mistake_tags:
+    - change_of_base
+    - calculator_error
+    - rounding_error
+    difficulty: hard
+  - id: LOG_LAWS_DOMAIN_INTERSECTION_001
+    type: generated
+    prompt_template: Which compound inequality describes the domain of log_2(x - {left}) + log_2({right} - x)?
+    answer_mode: final_plus_required_work
+    variables:
+      left:
+        type: int
+        min: -6
+        max: 3
+      gap:
+        type: int
+        min: 3
+        max: 10
+    derived:
+      right: left + gap
+    constraints:
+    - right != 0
+    options:
+    - id: A
+      label: x < {left}
+    - id: B
+      label: '{left} < x < {right}'
+    - id: C
+      label: x > {right}
+    - id: D
+      label: x < {left} or x > {right}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Require both logarithm arguments to be positive, solve both inequalities, and intersect them.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The first argument requires x - {left} > 0, so x > {left}.
+      The second requires {right} - x > 0, so x < {right}.
+      Both must hold, giving {left} < x < {right}.
+    mistake_tags:
+    - logarithm_domain
+    - intersection
+    - compound_inequality
+    - argument_positive
+    difficulty: hard

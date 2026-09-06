@@ -1,0 +1,680 @@
+id: MATH_TRIG_006
+schema_version: 0.2
+name: Laws of sines and cosines
+domain: Math
+subdomain: Geometry
+topic: Trigonometry
+description: Solve non-right triangles using angle sums, the Law of Sines, the Law of Cosines, area formulas, and
+  the ambiguous SSA case.
+prerequisites:
+- MATH_TRIG_002
+- MATH_ALG_002
+tags:
+- trigonometry
+- non_right_triangles
+- law_of_sines
+- law_of_cosines
+- triangle_area
+- ambiguous_case
+- ssa
+- sas
+- sss
+- navigation
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  The basic right-triangle ratios apply directly only to right triangles. General triangles require formulas that connect all three sides and angles.
+
+  Notation:
+  - Side a is opposite angle A.
+  - Side b is opposite angle B.
+  - Side c is opposite angle C.
+
+  Triangle angle sum:
+
+  A + B + C = 180 degrees
+
+  Law of Sines:
+
+  a/sin(A) = b/sin(B) = c/sin(C)
+
+  Use the Law of Sines when you know an opposite side-angle pair and at least one other side or angle. It is especially natural for ASA and AAS information.
+
+  Law of Cosines:
+
+  c^2 = a^2 + b^2 - 2ab cos(C)
+
+  Cyclic versions solve for a or b. Use the Law of Cosines for:
+  - SAS: two sides and the included angle;
+  - SSS: all three sides.
+
+  The Law of Cosines contains the Pythagorean theorem as the special case C = 90 degrees, because cos(90 degrees) = 0.
+
+  Finding an angle from three sides:
+
+  cos(C) = (a^2 + b^2 - c^2)/(2ab)
+
+  The comparison behind this formula also classifies angle C:
+  - c^2 < a^2 + b^2 means C is acute;
+  - c^2 = a^2 + b^2 means C is right;
+  - c^2 > a^2 + b^2 means C is obtuse.
+
+  Area with two sides and their included angle:
+
+  K = (1/2)ab sin(C)
+
+  This generalizes the familiar one-half base times height formula.
+
+  The ambiguous SSA case:
+  Suppose angle A is acute and sides a and b are known, where a is opposite A. Draw the altitude:
+
+  h = b sin(A)
+
+  Then:
+  - if a < h, no triangle exists;
+  - if a = h, one right triangle exists;
+  - if h < a < b, two triangles exist;
+  - if a >= b, one triangle exists.
+
+  This ambiguity occurs because a sine value can correspond to two supplementary angles.
+
+  Choosing a method:
+  1. Find a missing angle from the 180-degree sum if possible.
+  2. Identify whether an opposite side-angle pair is known.
+  3. Use the Law of Sines for ASA or AAS.
+  4. Use the Law of Cosines for SAS or SSS.
+  5. In SSA, test the altitude before assuming there is one triangle.
+  6. Keep several decimal places during calculations and round only the final answer.
+  7. Check that side lengths satisfy the triangle inequality and that angles total 180 degrees.
+
+  Common mistake:
+  In the Law of Cosines, C must be the angle between sides a and b when solving for side c.
+
+  Another common mistake:
+  Do not pair a side with the wrong angle in the Law of Sines. Each side must be matched with its opposite angle.
+
+  Another common mistake:
+  SSA can produce zero, one, or two triangles. A calculator's first inverse-sine output does not settle the question.
+
+  Another common mistake:
+  Do not round an intermediate sine, cosine, or square root too aggressively.
+examples:
+- prompt: Angles A and B are 52 degrees and 71 degrees. Find C.
+  solution: 57 degrees
+  explanation: Subtract the two known angles from 180 degrees.
+- prompt: A = 30 degrees, C = 90 degrees, and a = 6. Find c.
+  solution: '12'
+  explanation: By the Law of Sines, c/sin(90) = 6/sin(30), so c = 12.
+- prompt: Two sides have length 7 with included angle 60 degrees. Find the third side.
+  solution: '7'
+  explanation: The Law of Cosines gives c^2 = 49 + 49 - 98(1/2) = 49.
+- prompt: Sides adjacent to angle C are 5 and 7, and side c is 8. Find cos(C).
+  solution: 1/7
+  explanation: Use (5^2 + 7^2 - 8^2)/(2*5*7) = 10/70.
+  media:
+  - type: image
+    src: media/trigonometry/oblique-triangle.svg
+    alt: Angle C lies between sides 5 and 7, opposite side 8.
+    caption: Angle C lies between sides 5 and 7, opposite side 8.
+    width: 720
+    height: 640
+- prompt: Find the area when a = 8, b = 5, and C = 30 degrees.
+  solution: '10'
+  explanation: K = (1/2)(8)(5)(1/2) = 10.
+- prompt: A = 30 degrees, a = 5, and b = 8. How many triangles are possible?
+  solution: Two
+  explanation: The altitude is 8sin(30)=4, and 4 < 5 < 8.
+applications:
+- title: Surveying
+  description: General triangle formulas determine inaccessible distances from measured sides and angles.
+- title: Navigation
+  description: Two travel legs and the angle between them determine the direct displacement.
+- title: Engineering
+  description: Triangulated structures use side and angle calculations to determine forces and dimensions.
+- title: Astronomy
+  description: Triangulation converts angular observations and known baselines into large distances.
+test:
+  question_count: 16
+  randomize_order: true
+  questions:
+  - id: TRIG_TRI_CHOOSE_SINE_AAS_001
+    type: fixed
+    prompt: You know angles A and B and side a. Which method should you use first to find side b?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Law of Sines
+    - id: B
+      label: Law of Cosines
+    - id: C
+      label: Pythagorean theorem
+    - id: D
+      label: Slope formula
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: An opposite side-angle pair is known, and the data are AAS or ASA. Use the Law of Sines.
+    mistake_tags:
+    - method_selection_error
+    - law_of_sines_error
+    difficulty: easy
+  - id: TRIG_TRI_CHOOSE_COSINE_SAS_001
+    type: fixed
+    prompt: You know sides a and b and the included angle C. Which method directly finds side c?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Law of Sines
+    - id: B
+      label: Law of Cosines
+    - id: C
+      label: Distance formula only
+    - id: D
+      label: Arithmetic sequence formula
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Two sides and their included angle form SAS data, so use the Law of Cosines.
+    mistake_tags:
+    - method_selection_error
+    - included_angle_error
+    - law_of_cosines_error
+    difficulty: easy
+  - id: TRIG_TRI_ANGLE_SUM_001
+    type: generated
+    prompt_template: A triangle has angles A = {angle_a} degrees and B = {angle_b} degrees. Find angle C in degrees.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      angle_a:
+        type: int
+        min: 20
+        max: 80
+      angle_b:
+        type: int
+        min: 20
+        max: 100
+    derived:
+      angle_c: 180 - angle_a - angle_b
+    constraints:
+    - angle_c >= 15
+    - angle_c <= 130
+    answer:
+      type: numeric
+      value: '{angle_c}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use the triangle angle sum and show the subtraction from 180 degrees.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: A + B + C = 180 degrees, so C = 180 - {angle_a} - {angle_b} = {angle_c} degrees.
+    mistake_tags:
+    - triangle_sum_error
+    - subtraction_error
+    difficulty: easy
+  - id: TRIG_TRI_SINE_30_90_001
+    type: generated
+    prompt_template: In triangle ABC, A = 30 degrees, C = 90 degrees, and side a = {short_side}. Find side c.
+    answer_mode: final_plus_required_work
+    variables:
+      short_side:
+        type: int
+        min: 2
+        max: 18
+    derived:
+      hypotenuse: 2 * short_side
+    answer:
+      type: numeric
+      value: '{hypotenuse}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Pair each side with its opposite angle, apply the Law of Sines, and solve exactly.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use a/sin(A) = c/sin(C).
+      {short_side}/sin(30) = c/sin(90).
+      Because sin(30)=1/2 and sin(90)=1, c = {hypotenuse}.
+    mistake_tags:
+    - law_of_sines_error
+    - opposite_pair_error
+    - special_angle_error
+    difficulty: easy
+  - id: TRIG_TRI_SINE_45_90_001
+    type: generated
+    prompt_template: In triangle ABC, A = 45 degrees, C = 90 degrees, and side a = {leg}. Find side c exactly.
+    answer_mode: final_plus_required_work
+    variables:
+      leg:
+        type: int
+        min: 2
+        max: 15
+    answer:
+      type: numeric
+      value: '{leg}*sqrt(2)'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use the Law of Sines with exact special-angle values and simplify the radical.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      a/sin(45) = c/sin(90).
+      {leg}/(sqrt(2)/2) = c.
+      Therefore c = {leg}sqrt(2).
+    mistake_tags:
+    - law_of_sines_error
+    - radical_error
+    - special_angle_error
+    difficulty: medium
+  - id: TRIG_TRI_SINE_30_60_001
+    type: generated
+    prompt_template: In triangle ABC, A = 30 degrees, B = 60 degrees, and side a = {short_side}. Find side b exactly.
+    answer_mode: final_plus_required_work
+    variables:
+      short_side:
+        type: int
+        min: 2
+        max: 14
+    answer:
+      type: numeric
+      value: '{short_side}*sqrt(3)'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Apply the Law of Sines using sin(30) and sin(60), then simplify exactly.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      a/sin(30) = b/sin(60).
+      b = {short_side}(sqrt(3)/2)/(1/2) = {short_side}sqrt(3).
+    mistake_tags:
+    - law_of_sines_error
+    - opposite_pair_error
+    - radical_error
+    difficulty: medium
+  - id: TRIG_TRI_COSINE_EQUAL_SIDES_60_001
+    type: generated
+    prompt_template: Two sides of a triangle each have length {side}, and their included angle is 60 degrees. Find
+      the third side.
+    answer_mode: final_plus_required_work
+    variables:
+      side:
+        type: int
+        min: 2
+        max: 20
+    answer:
+      type: numeric
+      value: '{side}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use the Law of Cosines with cos(60)=1/2 and simplify the resulting square root.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      c^2 = {side}^2 + {side}^2 - 2({side})({side})(1/2).
+      Thus c^2 = {side}^2 and c = {side}.
+    mistake_tags:
+    - law_of_cosines_error
+    - included_angle_error
+    - square_root_error
+    difficulty: medium
+  - id: TRIG_TRI_COSINE_EQUAL_SIDES_120_001
+    type: generated
+    prompt_template: Two sides of a triangle each have length {side}, and their included angle is 120 degrees. Find
+      the third side exactly.
+    answer_mode: final_plus_required_work
+    variables:
+      side:
+        type: int
+        min: 2
+        max: 15
+    answer:
+      type: numeric
+      value: '{side}*sqrt(3)'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use the Law of Cosines with cos(120)=-1/2 and simplify exactly.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      c^2 = {side}^2 + {side}^2 - 2({side})({side})(-1/2).
+      So c^2 = 3({side}^2), and c = {side}sqrt(3).
+    mistake_tags:
+    - law_of_cosines_error
+    - negative_cosine_error
+    - radical_error
+    difficulty: hard
+  - id: TRIG_TRI_COSINE_FROM_SSS_001
+    type: generated
+    prompt_template: A triangle has a = {side_a}, b = {side_b}, and c = {side_c}, where angle C is opposite side
+      c. Find cos(C).
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      side_a: 5 * scale
+      side_b: 7 * scale
+      side_c: 8 * scale
+    answer:
+      type: numeric
+      value: 1/7
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Rearrange the Law of Cosines for cos(C), substitute all three sides, and simplify the fraction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      cos(C) = (a^2 + b^2 - c^2)/(2ab).
+      The common scale cancels.
+      (5^2 + 7^2 - 8^2)/(2*5*7) = 10/70 = 1/7.
+    mistake_tags:
+    - law_of_cosines_error
+    - side_angle_pair_error
+    - fraction_error
+    difficulty: hard
+  - id: TRIG_TRI_CLASSIFY_OBTUSE_001
+    type: generated
+    prompt_template: A triangle has side lengths {side_a}, {side_b}, and {side_c}, with {side_c} the longest side.
+      Classify the angle opposite {side_c}.
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      side_a: 5 * scale
+      side_b: 6 * scale
+      side_c: 8 * scale
+    options:
+    - id: A
+      label: Acute
+    - id: B
+      label: Right
+    - id: C
+      label: Obtuse
+    - id: D
+      label: The sides do not form a triangle
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Compare the square of the longest side with the sum of the squares of the other two sides.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Compare 8^2 with 5^2 + 6^2.
+      64 > 25 + 36 = 61, so the angle opposite the longest side is obtuse.
+      Scaling all sides does not change the angles.
+    mistake_tags:
+    - angle_classification_error
+    - longest_side_error
+    - square_error
+    difficulty: medium
+  - id: TRIG_TRI_AREA_INCLUDED_30_001
+    type: generated
+    prompt_template: Find the exact area of a triangle with sides {side_a} and {side_b} enclosing a 30-degree angle.
+    answer_mode: final_plus_required_work
+    variables:
+      side_a:
+        type: int
+        min: 2
+        max: 18
+      side_b:
+        type: int
+        min: 2
+        max: 18
+    answer:
+      type: numeric
+      value: '{side_a}*{side_b}/4'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use K = (1/2)ab sin(C), substitute sin(30)=1/2, and simplify.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      K = (1/2)({side_a})({side_b})sin(30).
+      Since sin(30)=1/2, K = {side_a}*{side_b}/4.
+    mistake_tags:
+    - triangle_area_formula_error
+    - included_angle_error
+    - special_angle_error
+    difficulty: medium
+  - id: TRIG_TRI_AREA_INCLUDED_90_001
+    type: generated
+    prompt_template: Find the area of a triangle with sides {side_a} and {side_b} enclosing a 90-degree angle.
+    answer_mode: final_plus_required_work
+    variables:
+      side_a:
+        type: int
+        min: 2
+        max: 20
+      side_b:
+        type: int
+        min: 2
+        max: 20
+    answer:
+      type: numeric
+      value: '{side_a}*{side_b}/2'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use K = (1/2)ab sin(C) and the exact value sin(90)=1.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      K = (1/2)({side_a})({side_b})sin(90).
+      Because sin(90)=1, K = {side_a}*{side_b}/2.
+    mistake_tags:
+    - triangle_area_formula_error
+    - multiplication_error
+    difficulty: easy
+  - id: TRIG_TRI_NAVIGATION_COSINE_001
+    type: generated
+    prompt_template: Two hikers leave the same point. One walks {distance_a} km and the other walks {distance_b}
+      km, with a 60-degree angle between their paths. Find the exact distance between their endpoints.
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      distance_a: 3 * scale
+      distance_b: 5 * scale
+    answer:
+      type: numeric
+      value: '{scale}*sqrt(19)'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Model the two paths as sides with included angle 60 degrees, apply the Law of Cosines, and simplify
+        exactly.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      d^2 = {distance_a}^2 + {distance_b}^2 - 2({distance_a})({distance_b})cos(60).
+      After factoring out the common scale, d^2 = 19({scale}^2).
+      Therefore d = {scale}sqrt(19) km.
+    mistake_tags:
+    - law_of_cosines_error
+    - included_angle_error
+    - navigation_model_error
+    difficulty: hard
+  - id: TRIG_TRI_SSA_ZERO_001
+    type: generated
+    prompt_template: Angle A is 30 degrees, side a = {side_a}, and side b = {side_b}. How many triangles are possible?
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 3
+        max: 10
+    derived:
+      side_a: scale - 1
+      side_b: 2 * scale
+    options:
+    - id: A
+      label: 0 triangles
+    - id: B
+      label: 1 triangle
+    - id: C
+      label: 2 triangles
+    - id: D
+      label: More than 2 triangles
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Compute the altitude h = b sin(A), then compare a with h and b.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The altitude is h = {side_b}sin(30) = {scale}.
+      Here a = {side_a}, so a < h.
+      The opposite side cannot reach the base, so no triangle exists.
+    mistake_tags:
+    - ambiguous_case_error
+    - altitude_test_error
+    - triangle_count_error
+    difficulty: medium
+  - id: TRIG_TRI_SSA_ONE_001
+    type: generated
+    prompt_template: Angle A is 30 degrees, side a = {side_a}, and side b = {side_b}. How many triangles are possible?
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      side_a: scale
+      side_b: 2 * scale
+    options:
+    - id: A
+      label: 0 triangles
+    - id: B
+      label: 1 triangle
+    - id: C
+      label: 2 triangles
+    - id: D
+      label: More than 2 triangles
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Compute h = b sin(A) and compare a with the altitude.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The altitude is h = {side_b}sin(30) = {scale}.
+      Here a = h = {side_a}.
+      Exactly one right triangle is possible.
+    mistake_tags:
+    - ambiguous_case_error
+    - altitude_test_error
+    - right_triangle_case_error
+    difficulty: medium
+  - id: TRIG_TRI_SSA_TWO_001
+    type: generated
+    prompt_template: Angle A is 30 degrees, side a = {side_a}, and side b = {side_b}. How many triangles are possible?
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      side_a: scale + 1
+      side_b: 2 * scale
+    constraints:
+    - side_a < side_b
+    options:
+    - id: A
+      label: 0 triangles
+    - id: B
+      label: 1 triangle
+    - id: C
+      label: 2 triangles
+    - id: D
+      label: More than 2 triangles
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: capture_only
+      prompt: Compute h = b sin(A) and compare h, a, and b.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The altitude is h = {side_b}sin(30) = {scale}.
+      Here {scale} < {side_a} < {side_b}, so h < a < b.
+      Two different triangles satisfy the SSA data.
+    mistake_tags:
+    - ambiguous_case_error
+    - altitude_test_error
+    - missing_second_triangle
+    difficulty: hard

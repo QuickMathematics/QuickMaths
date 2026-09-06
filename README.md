@@ -3,7 +3,7 @@
 [![Full test suite](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml/badge.svg)](https://github.com/QuickMathematics/QuickMaths/actions/workflows/ci.yml)
 [![Live app](https://img.shields.io/badge/live-QuickMaths-123f35)](https://quickmathematics.github.io/QuickMaths/)
 
-QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, educator-authored portable curricula, a substantial native Mathematics curriculum, installable Geography and 25-lesson Python Programming curricula, structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
+QuickMaths is a browser-first, local-first mastery learning app with prerequisite maps, educator-authored portable curricula, a substantial native Mathematics curriculum, installable Geography and Python Programming curricula (25 foundations lessons plus a three-lesson extension), structured proof/review workflows, lesson authoring, and an optional WebMCP tutor surface.
 
 [![QuickMaths combined Mathematics and Geography mastery map](docs/assets/quickmaths-mastery-map.png)](https://quickmathematics.github.io/QuickMaths/#/map)
 
@@ -109,13 +109,19 @@ Start each Agent Bridge prompt with `begin_agent_task`. It records UTC time loca
 
 QuickMaths now exposes Field → Branch → Lesson browsing and Studio branch suggestions while retaining compatible subject/subdomain file keys. The profile-adjacent status shows GitHub connection/save progress and time since the last successful save. Settings offers manual change review (default) or selective automatic merging with agent priority at conflicts; independent work survives from both copies. Missing history or invalid dependencies falls back to review. See the updated student, educator, authoring and Bridge guides.
 
-The native curriculum and bundled packages now classify 95 lessons into 12 broad branches across Mathematics, Geography, and Programming. Canonical maps render nested field/branch bands. Older categories migrate to the optional lesson topic, while saved learning and plan data are preserved. See [the complete field/branch reference](docs/FIELDS_AND_BRANCHES.md).
+The native curriculum and bundled packages now classify 107 lessons into 12 broad branches across Mathematics, Geography, and Programming. Canonical maps render nested field/branch bands. Older categories migrate to the optional lesson topic, while saved learning and plan data are preserved. See [the complete field/branch reference](docs/FIELDS_AND_BRANCHES.md).
+
+## September lesson additions
+
+Native Mathematics now includes three logarithm lessons and six trigonometry lessons from the QM Dev Depot batches, bringing it to 63 lessons. The overlapping interval, polynomial-inequality and rational-inequality lessons retain their existing content and IDs.
+
+For learners with Programming Fundamentals with Python already installed, the [three-lesson Python extension](https://quickmathematics.github.io/QuickMaths/lesson-depot/lessons/python-extensions/1.0.0/lesson-set.json) adds type hints and dataclasses, iterators and generators, and recursion with trees and memoization. Download the JSON, then choose **Settings → Load lesson file**. This is an additive download; it keeps the original 25 lessons, code-grading improvements and saved work intact. It requires the existing foundations package and does not replace its published 1.2.0 release.
 
 ## Lesson media and Matplotlib
 
 Lesson packs support images, video and audio in explanations, examples, applications and test questions. Studio attaches small files; folder publishing uploads larger media separately. Author in YAML/JSON, generate Matplotlib figures as PNG/SVG, and keep paths relative to the manifest. See the [media guide](docs/LESSON_MEDIA.md) and [geometry example](docs/examples/geometry-media/lesson-set.yaml).
 
-Native Mathematics includes **Triangle area: base and perpendicular height**, with eight worked examples and 21 assessment scenarios. All ten Geometry lessons now include Matplotlib illustrations, covering triangle heights, coordinates, slope, lines, bearings, arcs and spherical coordinates. These figures are embedded for offline use; run `python scripts/build_geometry_figures.py` followed by `python scripts/export_web_curriculum.py` to rebuild them.
+Native Mathematics includes **Triangle area: base and perpendicular height**, with eight worked examples and 21 assessment scenarios. All sixteen Geometry lessons now include Matplotlib illustrations, covering triangle heights, coordinates, slope, lines, bearings, arcs, spherical coordinates, and trigonometry. These figures are embedded for offline use; run `python scripts/build_geometry_figures.py` and `python scripts/build_trigonometry_figures.py`, followed by `python scripts/export_web_curriculum.py` to rebuild them.
 
 Native Geometry mastery tests also include diagrams: coordinate and line graphs follow each randomized question's givens, with additional illustrations for bearings, arcs and spherical coordinates. Restored drafts and saved results retain the original question's picture. The app draws these test diagrams locally; authored Matplotlib attachments remain available through the same lesson-media support.
 

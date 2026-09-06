@@ -24,12 +24,14 @@ export const FIELD_TAXONOMY = {
           "Inequalities and Solution Sets",
           "Rational Functions",
           "Quadratic Functions",
-          "Systems of Equations"
+          "Systems of Equations",
+          "Logarithms and Exponential Functions"
         ],
         "Geometry": [
           "Coordinate Graphing",
           "Coordinate Geometry",
-          "Linear Functions"
+          "Linear Functions",
+          "Trigonometry"
         ]
       }
     },
@@ -71,7 +73,8 @@ export const FIELD_TAXONOMY = {
           "Data Transformation"
         ],
         "Algorithms": [
-          "Algorithm Design"
+          "Algorithm Design",
+          "Recursive Algorithms"
         ],
         "Software Engineering": [
           "Program Structure",
@@ -82,7 +85,8 @@ export const FIELD_TAXONOMY = {
           "Object-Oriented Programming",
           "Software Design",
           "Capstone",
-          "Capstone Projects"
+          "Capstone Projects",
+          "Program Design"
         ]
       }
     }

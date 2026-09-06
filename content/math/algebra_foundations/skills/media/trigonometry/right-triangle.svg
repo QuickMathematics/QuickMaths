@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="460.8pt" viewBox="0 0 518.4 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 518.4 460.8
+L 518.4 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 88.128 366.48
+L 399.168 366.48
+L 399.168 133.2
+z
+" clip-path="url(#pd44d301581)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 3; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 375.84 366.48
+L 375.84 343.152
+L 399.168 343.152
+" clip-path="url(#pd44d301581)" style="fill: none; stroke: #153f36; stroke-width: 2; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 150.336 366.48
+L 150.3323 365.801523
+L 150.3212 365.123127
+L 150.302702 364.444893
+L 150.276808 363.7669
+L 150.243521 363.089231
+L 150.202845 362.411964
+L 150.154784 361.735182
+L 150.099345 361.058964
+L 150.036534 360.383391
+L 149.966359 359.708543
+L 149.888827 359.0345
+L 149.803949 358.361344
+L 149.711734 357.689153
+L 149.612193 357.018008
+L 149.505338 356.347988
+L 149.391182 355.679174
+L 149.269738 355.011644
+L 149.14102 354.345479
+L 149.005045 353.680757
+L 148.861828 353.017558
+L 148.711387 352.35596
+L 148.553738 351.696043
+L 148.388902 351.037884
+L 148.216897 350.381562
+L 148.037744 349.727155
+L 147.851464 349.07474
+L 147.65808 348.424397
+L 147.457615 347.776201
+L 147.250091 347.13023
+L 147.035535 346.486561
+L 146.813971 345.84527
+L 146.585426 345.206434
+L 146.349927 344.570129
+L 146.107503 343.93643
+L 145.858181 343.305413
+L 145.601991 342.677152
+L 145.338965 342.051723
+L 145.069133 341.4292
+L 144.792528 340.809657
+L 144.509182 340.193167
+L 144.219129 339.579805
+L 143.922404 338.969642
+L 143.619041 338.362752
+L 143.309077 337.759207
+L 142.99255 337.159078
+L 142.669495 336.562437
+L 142.339953 335.969356
+L 142.003962 335.379903
+L 141.661561 334.79415
+L 141.312793 334.212167
+L 140.957698 333.634022
+L 140.596318 333.059784
+L 140.228697 332.489522
+L 139.854878 331.923303
+L 139.474906 331.361195
+L 139.088826 330.803264
+L 138.696684 330.249578
+L 138.298526 329.700201
+L 137.8944 329.1552
+" clip-path="url(#pd44d301581)" style="fill: none; stroke: #bc503b; stroke-width: 2; stroke-linecap: square"/>
+   </g>
+   <g id="text_1">
+    <g id="patch_3">
+     <path d="M 165.854512 354.698831
+L 184.583888 354.698831
+L 184.583888 328.494769
+L 165.854512 328.494769
+z
+" style="fill: #fffdf8"/>
+    </g>
+    <text style="font-size: 21px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="175.2192" y="347.391487" transform="rotate(-0 175.2192 347.391487)">θ</text>
+   </g>
+   <g id="text_2">
+    <g id="patch_4">
+     <path d="M 173.097844 414.574031
+L 314.198156 414.574031
+L 314.198156 388.369969
+L 173.097844 388.369969
+z
+" style="fill: #fffdf8"/>
+    </g>
+    <text style="font-size: 21px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="243.648" y="407.266687" transform="rotate(-0 243.648 407.266687)">adjacent = 4</text>
+   </g>
+   <g id="text_3">
+    <g id="patch_5">
+     <path d="M 405.514922 274.699734
+L 501.685078 274.699734
+L 501.685078 224.980266
+L 405.514922 224.980266
+z
+" style="fill: #fffdf8"/>
+    </g>
+    <text style="font-size: 21px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(408.454922 243.876984)">opposite</text>
+    <text style="font-size: 21px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(446.919375 267.392391)">3</text>
+   </g>
+   <g id="text_4">
+    <g id="patch_6">
+     <path d="M 154.939969 285.367089
+L 293.694029 180.808405
+L 277.924031 159.880911
+L 139.169971 264.439595
+z
+" style="fill: #fffdf8"/>
+    </g>
+    <text style="font-size: 21px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(152.890288 277.761849) rotate(-37)">hypotenuse = 5</text>
+   </g>
+   <g id="text_5">
+    <g id="patch_7">
+     <path d="M 118.160953 68.542031
+L 384.687047 68.542031
+L 384.687047 42.337969
+L 118.160953 42.337969
+z
+" style="fill: #fffdf8"/>
+    </g>
+    <text style="font-size: 21px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="251.424" y="61.234688" transform="rotate(-0 251.424 61.234688)">sin θ = 3/5    cos θ = 4/5</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pd44d301581">
+   <rect x="10.368" y="16.56" width="497.664" height="427.68"/>
+  </clipPath>
+ </defs>
+</svg>

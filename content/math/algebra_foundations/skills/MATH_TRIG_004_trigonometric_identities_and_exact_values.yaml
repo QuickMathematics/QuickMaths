@@ -1,0 +1,534 @@
+id: MATH_TRIG_004
+schema_version: 0.2
+name: Trigonometric identities and exact values
+domain: Math
+subdomain: Geometry
+topic: Trigonometry
+description: Use reciprocal, quotient, Pythagorean, even-odd, and cofunction identities to find exact trigonometric
+  values and verify equivalent forms.
+prerequisites:
+- MATH_TRIG_003
+- MATH_EXP_001
+tags:
+- trigonometry
+- trigonometric_identities
+- exact_values
+- reciprocal_identities
+- quotient_identities
+- pythagorean_identities
+- even_odd_identities
+- cofunction_identities
+unlocks:
+- MATH_TRIG_005
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A trigonometric identity is an equation that is true for every input where both sides are defined.
+
+  Identities let you replace one trigonometric expression with an equivalent form. They are useful for finding missing values, simplifying formulas, and solving equations.
+
+  Reciprocal identities:
+  - csc(x) = 1/sin(x)
+  - sec(x) = 1/cos(x)
+  - cot(x) = 1/tan(x)
+
+  Quotient identities:
+  - tan(x) = sin(x)/cos(x)
+  - cot(x) = cos(x)/sin(x)
+
+  Pythagorean identities:
+  - sin(x)^2 + cos(x)^2 = 1
+  - 1 + tan(x)^2 = sec(x)^2
+  - 1 + cot(x)^2 = csc(x)^2
+
+  The first identity comes from the unit circle. A point on the unit circle is (cos(x), sin(x)), and every such point satisfies:
+
+  cos(x)^2 + sin(x)^2 = 1
+
+  Even and odd identities:
+  - cos(-x) = cos(x), so cosine is even.
+  - sin(-x) = -sin(x), so sine is odd.
+  - tan(-x) = -tan(x), so tangent is odd.
+
+  Cofunction identities connect complementary angles:
+  - sin(pi/2 - x) = cos(x)
+  - cos(pi/2 - x) = sin(x)
+
+  Finding a missing value:
+  1. Identify the known ratio and the quadrant.
+  2. Choose a Pythagorean identity containing the known and unknown ratios.
+  3. Solve for the square of the missing ratio.
+  4. Take the square root.
+  5. Choose the sign from the quadrant.
+
+  Example:
+  If sin(theta) = 3/5 and theta is in Quadrant I, then:
+
+  cos(theta)^2 = 1 - 9/25 = 16/25
+  cos(theta) = 4/5
+
+  The positive sign is chosen because cosine is positive in Quadrant I.
+
+  Verifying an identity:
+  1. Work with one side at a time.
+  2. Replace functions using reciprocal or quotient identities when useful.
+  3. Use a Pythagorean identity to replace a sum or difference of squares.
+  4. Simplify algebraically.
+  5. Stop when the transformed side matches the other side.
+
+  Domain warning:
+  An identity is asserted only where both original expressions are defined. For example, tan(x) = sin(x)/cos(x) requires cos(x) != 0.
+
+  Common mistake:
+  Do not take only the positive square root. The quadrant determines whether a trigonometric ratio is positive or negative.
+
+  Another common mistake:
+  Do not distribute a square incorrectly. In general, (sin(x) + cos(x))^2 is not sin(x)^2 + cos(x)^2 because it also contains 2sin(x)cos(x).
+
+  Another common mistake:
+  An equation that is true for one special angle is not automatically an identity. An identity must hold throughout its domain.
+examples:
+- prompt: If sin(theta) = 3/5 and theta is in Quadrant I, find cos(theta).
+  solution: 4/5
+  explanation: Use sin(theta)^2 + cos(theta)^2 = 1 and choose the positive sign in Quadrant I.
+  media:
+  - type: image
+    src: media/trigonometry/right-triangle.svg
+    alt: The 3–4–5 triangle shows the positive sine and cosine ratios in Quadrant I.
+    caption: The 3–4–5 triangle shows the positive sine and cosine ratios in Quadrant I.
+    width: 720
+    height: 640
+- prompt: If cos(theta) = -12/13 and theta is in Quadrant II, find tan(theta).
+  solution: -5/12
+  explanation: Sine is positive in Quadrant II, so sin(theta) = 5/13. Then tan(theta) = sin(theta)/cos(theta).
+- prompt: If tan(theta) = 3/4 in Quadrant I, find sec(theta).
+  solution: 5/4
+  explanation: Use 1 + tan(theta)^2 = sec(theta)^2 and choose the positive sign.
+- prompt: Simplify sec(x)^2 - tan(x)^2.
+  solution: '1'
+  explanation: Rearrange 1 + tan(x)^2 = sec(x)^2.
+- prompt: Simplify tan(x)cos(x).
+  solution: sin(x)
+  explanation: Replace tan(x) with sin(x)/cos(x), then cancel cos(x) where defined.
+- prompt: Rewrite sin(-x).
+  solution: -sin(x)
+  explanation: Sine is an odd function.
+- prompt: Rewrite cos(pi/2 - x).
+  solution: sin(x)
+  explanation: Cosine of a complementary angle equals sine.
+applications:
+- title: Equation solving
+  description: Identities rewrite trigonometric equations into forms whose solutions are easier to recognize.
+- title: Wave models
+  description: Equivalent sine and cosine forms describe the same oscillation with different starting points.
+- title: Physics components
+  description: Pythagorean identities connect perpendicular components and normalized vectors.
+- title: Calculus preparation
+  description: Simplifying with identities is essential before differentiating and integrating trigonometric expressions.
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: TRIG_ID_RECIPROCAL_CSC_001
+    type: generated
+    prompt_template: For an acute angle theta, sin(theta) = {opposite}/{hypotenuse}. Find csc(theta).
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      opposite: 3 * scale
+      hypotenuse: 5 * scale
+    answer:
+      type: numeric
+      value: 5/3
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use the reciprocal identity csc(theta) = 1/sin(theta), substitute, and simplify.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      csc(theta) is the reciprocal of sin(theta).
+      sin(theta) = {opposite}/{hypotenuse} = 3/5.
+      Therefore csc(theta) = 5/3.
+    mistake_tags:
+    - reciprocal_identity_error
+    - sine_cosecant_mixup
+    - fraction_error
+    difficulty: easy
+  - id: TRIG_ID_RECIPROCAL_SEC_QII_001
+    type: generated
+    prompt_template: Angle theta is in Quadrant II and cos(theta) = {adjacent}/{hypotenuse}. Find sec(theta).
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      adjacent: 0 - 5 * scale
+      hypotenuse: 13 * scale
+    answer:
+      type: numeric
+      value: -13/5
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use sec(theta) = 1/cos(theta), keep the quadrant sign, and simplify.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      sec(theta) is the reciprocal of cosine.
+      cos(theta) = {adjacent}/{hypotenuse} = -5/13.
+      Therefore sec(theta) = -13/5.
+    mistake_tags:
+    - reciprocal_identity_error
+    - quadrant_sign_error
+    - cosine_secant_mixup
+    difficulty: easy
+  - id: TRIG_ID_QUOTIENT_TANGENT_QII_001
+    type: generated
+    prompt_template: Angle theta is in Quadrant II with sin(theta) = {opposite}/{hypotenuse} and cos(theta) = {adjacent}/{hypotenuse}.
+      Find tan(theta).
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 7
+    derived:
+      opposite: 5 * scale
+      adjacent: 0 - 12 * scale
+      hypotenuse: 13 * scale
+    answer:
+      type: numeric
+      value: -5/12
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use tan(theta) = sin(theta)/cos(theta), substitute both ratios, and simplify.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Use the quotient identity tan(theta) = sin(theta)/cos(theta).
+      (5/13)/(-12/13) = -5/12.
+      The negative sign agrees with Quadrant II.
+    mistake_tags:
+    - quotient_identity_error
+    - complex_fraction_error
+    - quadrant_sign_error
+    difficulty: medium
+  - id: TRIG_ID_PYTHAGOREAN_COS_QI_001
+    type: generated
+    prompt_template: Angle theta is in Quadrant I and sin(theta) = {opposite}/{hypotenuse}. Find cos(theta).
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 10
+    derived:
+      opposite: 3 * scale
+      hypotenuse: 5 * scale
+    answer:
+      type: numeric
+      value: 4/5
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use sin(theta)^2 + cos(theta)^2 = 1, solve for cosine, and justify the sign from the quadrant.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      sin(theta) = 3/5.
+      cos(theta)^2 = 1 - 9/25 = 16/25.
+      Cosine is positive in Quadrant I, so cos(theta) = 4/5.
+    mistake_tags:
+    - pythagorean_identity_error
+    - square_root_error
+    - quadrant_sign_error
+    difficulty: medium
+  - id: TRIG_ID_PYTHAGOREAN_SIN_QII_001
+    type: generated
+    prompt_template: Angle theta is in Quadrant II and cos(theta) = {adjacent}/{hypotenuse}. Find sin(theta).
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      adjacent: 0 - 12 * scale
+      hypotenuse: 13 * scale
+    answer:
+      type: numeric
+      value: 5/13
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use sin(theta)^2 + cos(theta)^2 = 1, solve for sine, and choose the quadrant sign.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      cos(theta) = -12/13.
+      sin(theta)^2 = 1 - 144/169 = 25/169.
+      Sine is positive in Quadrant II, so sin(theta) = 5/13.
+    mistake_tags:
+    - pythagorean_identity_error
+    - quadrant_sign_error
+    - fraction_error
+    difficulty: medium
+  - id: TRIG_ID_SEC_FROM_TAN_QI_001
+    type: generated
+    prompt_template: Angle theta is in Quadrant I and tan(theta) = {opposite}/{adjacent}. Find sec(theta).
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      opposite: 3 * scale
+      adjacent: 4 * scale
+    answer:
+      type: numeric
+      value: 5/4
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use 1 + tan(theta)^2 = sec(theta)^2, solve for secant, and justify the sign.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      tan(theta) = 3/4.
+      sec(theta)^2 = 1 + 9/16 = 25/16.
+      Secant is positive in Quadrant I, so sec(theta) = 5/4.
+    mistake_tags:
+    - pythagorean_identity_error
+    - secant_error
+    - square_root_error
+    difficulty: medium
+  - id: TRIG_ID_CSC_FROM_COT_QIII_001
+    type: generated
+    prompt_template: Angle theta is in Quadrant III and cot(theta) = {adjacent}/{opposite}. Find csc(theta).
+    answer_mode: final_plus_required_work
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 7
+    derived:
+      adjacent: 12 * scale
+      opposite: 5 * scale
+    answer:
+      type: numeric
+      value: -13/5
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use 1 + cot(theta)^2 = csc(theta)^2, then choose the sign from Quadrant III.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      cot(theta) = 12/5.
+      csc(theta)^2 = 1 + 144/25 = 169/25.
+      Sine is negative in Quadrant III, so csc(theta) = -13/5.
+    mistake_tags:
+    - pythagorean_identity_error
+    - cosecant_error
+    - quadrant_sign_error
+    difficulty: hard
+  - id: TRIG_ID_PYTHAGOREAN_SIMPLIFY_001
+    type: fixed
+    prompt: Which expression is equivalent to sin(x)^2 + cos(x)^2 wherever both functions are defined?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: '0'
+    - id: B
+      label: '1'
+    - id: C
+      label: tan(x)^2
+    - id: D
+      label: sec(x)^2
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The unit-circle Pythagorean identity is sin(x)^2 + cos(x)^2 = 1.
+    mistake_tags:
+    - pythagorean_identity_error
+    - identity_recall_error
+    difficulty: easy
+  - id: TRIG_ID_SECANT_DIFFERENCE_001
+    type: fixed
+    prompt: Simplify sec(x)^2 - tan(x)^2.
+    answer_mode: final_only
+    options:
+    - id: A
+      label: '-1'
+    - id: B
+      label: '0'
+    - id: C
+      label: '1'
+    - id: D
+      label: cos(x)^2
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: From 1 + tan(x)^2 = sec(x)^2, subtract tan(x)^2 to obtain sec(x)^2 - tan(x)^2 = 1.
+    mistake_tags:
+    - pythagorean_identity_error
+    - algebra_rearrangement_error
+    difficulty: medium
+  - id: TRIG_ID_QUOTIENT_PRODUCT_001
+    type: fixed
+    prompt: Simplify tan(x)cos(x) where the original expression is defined.
+    answer_mode: final_only
+    options:
+    - id: A
+      label: sin(x)
+    - id: B
+      label: cos(x)
+    - id: C
+      label: tan(x)
+    - id: D
+      label: '1'
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: tan(x) = sin(x)/cos(x), so tan(x)cos(x) = sin(x).
+    mistake_tags:
+    - quotient_identity_error
+    - cancellation_error
+    difficulty: medium
+  - id: TRIG_ID_ODD_SINE_001
+    type: generated
+    prompt_template: If sin(alpha) = {numerator}/{denominator}, find sin(-alpha).
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      numerator:
+        type: int
+        min: 1
+        max: 9
+      denominator:
+        type: int
+        min: 2
+        max: 12
+    constraints:
+    - numerator < denominator
+    answer:
+      type: numeric
+      value: (0 - {numerator})/{denominator}
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use the odd-function identity for sine and simplify the signed fraction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Sine is odd: sin(-alpha) = -sin(alpha).
+      Therefore sin(-alpha) = -{numerator}/{denominator}.
+    mistake_tags:
+    - even_odd_identity_error
+    - sign_error
+    difficulty: medium
+  - id: TRIG_ID_COFUNCTION_001
+    type: fixed
+    prompt: Which expression is equivalent to cos(pi/2 - x)?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: -sin(x)
+    - id: B
+      label: sin(x)
+    - id: C
+      label: -cos(x)
+    - id: D
+      label: tan(x)
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The cofunction identity states cos(pi/2 - x) = sin(x).
+    mistake_tags:
+    - cofunction_identity_error
+    - complement_error
+    difficulty: medium
+  - id: TRIG_ID_FALSE_IDENTITY_001
+    type: fixed
+    prompt: Which statement is not a trigonometric identity?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: tan(x) = sin(x)/cos(x)
+    - id: B
+      label: 1 + tan(x)^2 = sec(x)^2
+    - id: C
+      label: cos(-x) = cos(x)
+    - id: D
+      label: sin(x) + cos(x) = 1
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: sin(x) + cos(x) is not always 1. The other three statements are identities on their domains.
+    mistake_tags:
+    - identity_definition_error
+    - special_value_overgeneralization
+    difficulty: hard

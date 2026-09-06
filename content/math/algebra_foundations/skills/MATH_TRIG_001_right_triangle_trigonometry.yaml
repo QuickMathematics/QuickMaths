@@ -1,0 +1,514 @@
+id: MATH_TRIG_001
+schema_version: 0.2
+name: Right-triangle trigonometry
+domain: Math
+subdomain: Geometry
+topic: Trigonometry
+description: Use the Pythagorean theorem and sine, cosine, tangent, inverse trigonometry, and special triangles
+  to solve right triangles.
+prerequisites:
+- MATH_RAD_001
+- MATH_ALG_002
+tags:
+- trigonometry
+- right_triangles
+- pythagorean_theorem
+- sine
+- cosine
+- tangent
+- inverse_trigonometry
+- special_triangles
+- angle_of_elevation
+unlocks:
+- MATH_TRIG_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A right triangle has one 90-degree angle. The side opposite the right angle is the hypotenuse, and it is always the longest side.
+
+  Before using trigonometry, choose one acute angle and label the other sides relative to that angle:
+  - The opposite side is across from the chosen angle.
+  - The adjacent leg touches the chosen angle.
+  - The hypotenuse is opposite the right angle.
+
+  Pythagorean theorem:
+
+  a^2 + b^2 = c^2
+
+  Here c is the hypotenuse. Use this theorem when two side lengths are known and the third is unknown.
+
+  The three basic trigonometric ratios are often remembered as SOH-CAH-TOA:
+
+  sin(theta) = opposite / hypotenuse
+  cos(theta) = adjacent / hypotenuse
+  tan(theta) = opposite / adjacent
+
+  A ratio does not depend on the triangle's scale. Every right triangle with the same acute angle has the same sine, cosine, and tangent values.
+
+  Choosing a ratio:
+  1. Mark the known side or sides.
+  2. Mark the unknown side or angle.
+  3. Choose the ratio that contains the needed quantities.
+  4. Substitute values.
+  5. Solve the resulting equation.
+  6. Check that a leg is shorter than the hypotenuse and that an acute angle lies between 0 and 90 degrees.
+
+  Finding an angle:
+  Use an inverse trigonometric operation:
+  - theta = arcsin(opposite/hypotenuse)
+  - theta = arccos(adjacent/hypotenuse)
+  - theta = arctan(opposite/adjacent)
+
+  When the question asks for degrees, make sure the calculator is in degree mode.
+
+  Special right triangles:
+
+  45-45-90:
+  - The legs are equal.
+  - The side ratio is 1 : 1 : sqrt(2).
+
+  30-60-90:
+  - The side ratio short leg : long leg : hypotenuse is 1 : sqrt(3) : 2.
+  - The short leg is opposite 30 degrees.
+  - The long leg is opposite 60 degrees.
+
+  Angle of elevation:
+  An angle measured upward from a horizontal line is an angle of elevation. A vertical height, a horizontal distance, and a line of sight form a right triangle.
+
+  Common mistake:
+  Opposite and adjacent depend on the chosen angle. The same physical leg can be opposite one acute angle and adjacent to the other.
+
+  Another common mistake:
+  Sine and cosine use the hypotenuse, but tangent does not.
+
+  Another common mistake:
+  Do not round intermediate values too early. Keep exact values or several decimal places, then round once at the end.
+examples:
+- prompt: In a 3-4-5 right triangle, find sin(theta) when the side opposite theta is 3.
+  solution: 3/5
+  explanation: Sine is opposite divided by hypotenuse.
+  media:
+  - type: image
+    src: media/trigonometry/right-triangle.svg
+    alt: The 3–4–5 triangle labels the opposite, adjacent and hypotenuse relative to theta.
+    caption: The 3–4–5 triangle labels the opposite, adjacent and hypotenuse relative to theta.
+    width: 720
+    height: 640
+- prompt: A right triangle has legs 6 and 8. Find the hypotenuse.
+  solution: '10'
+  explanation: sqrt(6^2 + 8^2) = sqrt(100) = 10.
+- prompt: A right triangle has opposite side 3 and adjacent side 4. Find theta.
+  solution: Approximately 36.9 degrees
+  explanation: theta = arctan(3/4) in degree mode.
+- prompt: A 45-45-90 triangle has leg 7. Find its hypotenuse.
+  solution: 7*sqrt(2)
+  explanation: Multiply a leg by sqrt(2).
+- prompt: A 30-60-90 triangle has short leg 5. Find its long leg.
+  solution: 5*sqrt(3)
+  explanation: The long leg is the short leg times sqrt(3).
+- prompt: A tower is viewed from 20 meters away at a 45-degree angle of elevation.
+  solution: 20 meters
+  explanation: tan(45 degrees) = height/20 = 1.
+applications:
+- title: Surveying
+  description: Angles and measured baselines can determine inaccessible heights and distances.
+- title: Construction
+  description: Right-triangle calculations check roof pitches, ramps, braces, and square corners.
+- title: Navigation
+  description: Bearings and line-of-sight measurements use triangle ratios to locate positions.
+- title: Physics
+  description: Forces and velocities are split into perpendicular components using sine and cosine.
+test:
+  question_count: 12
+  randomize_order: true
+  questions:
+  - id: TRIG_RIGHT_SINE_345_001
+    type: generated
+    prompt_template: A right triangle has opposite side {opposite}, adjacent side {adjacent}, and hypotenuse {hypotenuse}
+      relative to angle theta. Find sin(theta).
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: State the sine ratio, substitute the side lengths, and simplify the fraction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      opposite: 3 * scale
+      adjacent: 4 * scale
+      hypotenuse: 5 * scale
+    answer:
+      type: numeric
+      value: 3/5
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Sine compares the opposite side with the hypotenuse.
+      sin(theta) = {opposite}/{hypotenuse} = 3/5.
+      The scale factor cancels from the ratio.
+    mistake_tags:
+    - trig_ratio_error
+    - opposite_hypotenuse_mixup
+    - fraction_error
+    difficulty: easy
+  - id: TRIG_RIGHT_COSINE_51213_001
+    type: generated
+    prompt_template: A right triangle has opposite side {opposite}, adjacent side {adjacent}, and hypotenuse {hypotenuse}
+      relative to angle theta. Find cos(theta).
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: State the cosine ratio, substitute the side lengths, and simplify the fraction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      opposite: 5 * scale
+      adjacent: 12 * scale
+      hypotenuse: 13 * scale
+    answer:
+      type: numeric
+      value: 12/13
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Cosine compares the adjacent side with the hypotenuse.
+      cos(theta) = {adjacent}/{hypotenuse} = 12/13.
+    mistake_tags:
+    - trig_ratio_error
+    - adjacent_hypotenuse_mixup
+    - fraction_error
+    difficulty: easy
+  - id: TRIG_RIGHT_TANGENT_81517_001
+    type: generated
+    prompt_template: A right triangle has opposite side {opposite}, adjacent side {adjacent}, and hypotenuse {hypotenuse}
+      relative to angle theta. Find tan(theta).
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: State the tangent ratio, substitute the side lengths, and simplify the fraction.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      opposite: 8 * scale
+      adjacent: 15 * scale
+      hypotenuse: 17 * scale
+    answer:
+      type: numeric
+      value: 8/15
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Tangent compares the opposite side with the adjacent side.
+      tan(theta) = {opposite}/{adjacent} = 8/15.
+    mistake_tags:
+    - trig_ratio_error
+    - opposite_adjacent_mixup
+    - fraction_error
+    difficulty: easy
+  - id: TRIG_RIGHT_PYTHAGOREAN_HYPOTENUSE_001
+    type: generated
+    prompt_template: A right triangle has legs {leg_a} and {leg_b}. Find the hypotenuse.
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show a numeric expression using sqrt(leg_a^2 + leg_b^2), then simplify to the final length.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      leg_a: 3 * scale
+      leg_b: 4 * scale
+      hypotenuse: 5 * scale
+    answer:
+      type: numeric
+      value: '{hypotenuse}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The hypotenuse satisfies c^2 = {leg_a}^2 + {leg_b}^2.
+      c = sqrt({leg_a}^2 + {leg_b}^2) = {hypotenuse}.
+    mistake_tags:
+    - pythagorean_theorem_error
+    - hypotenuse_error
+    - square_root_error
+    difficulty: easy
+  - id: TRIG_RIGHT_PYTHAGOREAN_MISSING_LEG_001
+    type: generated
+    prompt_template: A right triangle has hypotenuse {hypotenuse} and one leg {known_leg}. Find the other leg.
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show a numeric expression using sqrt(hypotenuse^2 - known_leg^2), then simplify to the final length.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 7
+    derived:
+      known_leg: 5 * scale
+      missing_leg: 12 * scale
+      hypotenuse: 13 * scale
+    answer:
+      type: numeric
+      value: '{missing_leg}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Let the missing leg be b.
+      b = sqrt({hypotenuse}^2 - {known_leg}^2) = {missing_leg}.
+    mistake_tags:
+    - pythagorean_theorem_error
+    - subtraction_error
+    - square_root_error
+    difficulty: medium
+  - id: TRIG_RIGHT_FIND_OPPOSITE_SIN30_001
+    type: generated
+    prompt_template: In a right triangle, theta = 30 degrees and the hypotenuse is {hypotenuse}. Find the side opposite
+      theta.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Use sin(30 degrees) = opposite/hypotenuse and solve for the opposite side.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      scale:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      hypotenuse: 2 * scale
+      opposite: scale
+    answer:
+      type: numeric
+      value: '{opposite}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      sin(30 degrees) = 1/2.
+      opposite/{hypotenuse} = 1/2, so the opposite side is {opposite}.
+    mistake_tags:
+    - sine_error
+    - special_angle_error
+    - equation_setup_error
+    difficulty: medium
+  - id: TRIG_RIGHT_FIND_ADJACENT_COS60_001
+    type: generated
+    prompt_template: In a right triangle, theta = 60 degrees and the hypotenuse is {hypotenuse}. Find the side adjacent
+      to theta.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Use cos(60 degrees) = adjacent/hypotenuse and solve for the adjacent side.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      scale:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      hypotenuse: 2 * scale
+      adjacent: scale
+    answer:
+      type: numeric
+      value: '{adjacent}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      cos(60 degrees) = 1/2.
+      adjacent/{hypotenuse} = 1/2, so the adjacent side is {adjacent}.
+    mistake_tags:
+    - cosine_error
+    - special_angle_error
+    - equation_setup_error
+    difficulty: medium
+  - id: TRIG_RIGHT_INVERSE_TANGENT_345_001
+    type: generated
+    prompt_template: A right triangle has opposite side {opposite} and adjacent side {adjacent}. Find theta in degrees.
+      Round to the nearest tenth.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Write tan(theta) = opposite/adjacent, apply inverse tangent in degree mode, and report the rounded
+        angle.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 12
+    derived:
+      opposite: 3 * scale
+      adjacent: 4 * scale
+    answer:
+      type: numeric
+      value: '36.9'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.05
+    explanation_template: |-
+      tan(theta) = {opposite}/{adjacent} = 3/4.
+      theta = arctan(3/4) is approximately 36.9 degrees.
+    mistake_tags:
+    - inverse_trig_error
+    - degree_mode_error
+    - rounding_error
+    difficulty: medium
+  - id: TRIG_RIGHT_INVERSE_SINE_51213_001
+    type: generated
+    prompt_template: A right triangle has opposite side {opposite} and hypotenuse {hypotenuse}. Find theta in degrees.
+      Round to the nearest tenth.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Write sin(theta) = opposite/hypotenuse, apply inverse sine in degree mode, and report the rounded
+        angle.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      scale:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      opposite: 5 * scale
+      hypotenuse: 13 * scale
+    answer:
+      type: numeric
+      value: '22.6'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.05
+    explanation_template: |-
+      sin(theta) = {opposite}/{hypotenuse} = 5/13.
+      theta = arcsin(5/13) is approximately 22.6 degrees.
+    mistake_tags:
+    - inverse_trig_error
+    - degree_mode_error
+    - opposite_hypotenuse_mixup
+    difficulty: hard
+  - id: TRIG_RIGHT_454590_HYPOTENUSE_001
+    type: generated
+    prompt_template: A 45-45-90 triangle has a leg of length {leg}. Find the hypotenuse exactly.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: 'Use the 45-45-90 side ratio 1 : 1 : sqrt(2) and state the exact length.'
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      leg:
+        type: int
+        min: 2
+        max: 15
+    answer:
+      type: numeric
+      value: '{leg}*sqrt(2)'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      In a 45-45-90 triangle, the hypotenuse is a leg times sqrt(2).
+      The exact hypotenuse is {leg}*sqrt(2).
+    mistake_tags:
+    - special_triangle_error
+    - radical_error
+    - hypotenuse_error
+    difficulty: medium
+  - id: TRIG_RIGHT_306090_LONG_LEG_001
+    type: generated
+    prompt_template: A 30-60-90 triangle has shorter leg {short_leg}. Find the longer leg exactly.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: 'Use the 30-60-90 side ratio 1 : sqrt(3) : 2 and state the exact longer leg.'
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      short_leg:
+        type: int
+        min: 2
+        max: 15
+    answer:
+      type: numeric
+      value: '{short_leg}*sqrt(3)'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The side ratio is short : long : hypotenuse = 1 : sqrt(3) : 2.
+      The exact longer leg is {short_leg}*sqrt(3).
+    mistake_tags:
+    - special_triangle_error
+    - radical_error
+    - side_ratio_error
+    difficulty: medium
+  - id: TRIG_RIGHT_ANGLE_OF_ELEVATION_45_001
+    type: generated
+    prompt_template: From a point {distance} meters from the base of a vertical tower, the angle of elevation to
+      the top is 45 degrees. Ignore eye height. Find the tower height.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Sketch or describe the right triangle, use tangent, and solve for the height.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      distance:
+        type: int
+        min: 5
+        max: 60
+    answer:
+      type: numeric
+      value: '{distance}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      tan(45 degrees) = height/{distance} = 1.
+      Therefore the height equals the horizontal distance: {distance} meters.
+    mistake_tags:
+    - angle_of_elevation_error
+    - tangent_error
+    - modeling_error
+    difficulty: hard

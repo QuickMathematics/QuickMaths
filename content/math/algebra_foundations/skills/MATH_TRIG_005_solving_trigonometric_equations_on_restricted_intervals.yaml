@@ -1,0 +1,546 @@
+id: MATH_TRIG_005
+schema_version: 0.2
+name: Solving trigonometric equations on restricted intervals
+domain: Math
+subdomain: Geometry
+topic: Trigonometry
+description: Solve sine, cosine, and tangent equations on a stated interval and report every exact solution as a
+  finite set.
+prerequisites:
+- MATH_TRIG_004
+- MATH_INEQ_001
+tags:
+- trigonometry
+- trigonometric_equations
+- restricted_intervals
+- unit_circle
+- finite_solution_sets
+- exact_angles
+- double_angle
+- factoring
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A trigonometric equation asks for every angle that makes a trigonometric statement true.
+
+  Because sine, cosine, and tangent repeat, an unrestricted equation usually has infinitely many solutions. This lesson restricts x to a stated interval, so the answer is a finite set of exact angles.
+
+  Core method:
+  1. Isolate one trigonometric expression.
+  2. Simplify with identities or factor if needed.
+  3. Find the reference angle from the unit circle.
+  4. Use the sign of the target value to select the correct quadrants.
+  5. Account for any multiplier or shift inside the angle.
+  6. List every solution in the stated interval.
+  7. Check endpoints carefully.
+  8. Substitute each proposed angle into the original equation.
+
+  Basic solution patterns on [0, 2pi):
+  - sin(x) = 0 at x = 0 and x = pi.
+  - cos(x) = 0 at x = pi/2 and x = 3pi/2.
+  - tan(x) = 0 at x = 0 and x = pi.
+
+  Quadrant signs:
+  - Sine is positive in Quadrants I and II.
+  - Cosine is positive in Quadrants I and IV.
+  - Tangent is positive in Quadrants I and III.
+
+  Example:
+  Solve sin(x) = 1/2 on [0, 2pi).
+
+  The reference angle is pi/6. Sine is positive in Quadrants I and II, so:
+
+  x = pi/6 or x = 5pi/6
+
+  Equations involving squares:
+  Solve 2cos(x)^2 - 1 = 0.
+
+  cos(x)^2 = 1/2
+  cos(x) = plus or minus sqrt(2)/2
+
+  Both signs are required because the equation contains cos(x)^2. On [0, 2pi), this gives four solutions.
+
+  Factoring:
+  Solve sin(x)^2 = sin(x).
+
+  sin(x)^2 - sin(x) = 0
+  sin(x)(sin(x) - 1) = 0
+
+  So sin(x) = 0 or sin(x) = 1. Combine the solutions from both cases.
+
+  Multiple angles:
+  For cos(2x) = 0, first solve for the angle 2x. Because x covers one full turn, 2x covers two full turns, producing additional solutions.
+
+  Shifted angles:
+  For sin(x - pi/4) = 0, solve x - pi/4 = 0 or pi modulo the sine period, then keep only values in the requested interval.
+
+  No-solution check:
+  The range of sine and cosine is [-1, 1]. An equation such as sin(x) = 4/3 has no real solution.
+
+  Endpoint warning:
+  The intervals [0, 2pi) and [0, 2pi] are different. The first excludes 2pi; the second includes it. Although 0 and 2pi are coterminal, they are distinct numbers and both belong to the closed interval.
+
+  Common mistake:
+  Do not report only the reference angle. Use the quadrant sign to find every angle in the interval.
+
+  Another common mistake:
+  When taking a square root, include both positive and negative branches unless the original problem rules one out.
+
+  Another common mistake:
+  Do not forget to divide by an inside multiplier after solving for a multiple angle.
+
+  Another common mistake:
+  Do not include an endpoint that the interval excludes.
+examples:
+- prompt: Solve sin(x) = 1/2 on [0, 2pi).
+  solution: '{pi/6, 5pi/6}'
+  explanation: The reference angle is pi/6 and sine is positive in Quadrants I and II.
+  media:
+  - type: image
+    src: media/trigonometry/sine-solutions.svg
+    alt: The graph of sine crosses y = 1/2 at pi/6 and 5pi/6 on [0, 2pi).
+    caption: The graph of sine crosses y = 1/2 at pi/6 and 5pi/6 on [0, 2pi).
+    width: 720
+    height: 640
+- prompt: Solve cos(x) = -sqrt(2)/2 on [0, 2pi).
+  solution: '{3pi/4, 5pi/4}'
+  explanation: Cosine is negative in Quadrants II and III.
+- prompt: Solve tan(x) = -1 on [0, 2pi).
+  solution: '{3pi/4, 7pi/4}'
+  explanation: Tangent is negative in Quadrants II and IV.
+- prompt: Solve 2cos(x)^2 - 1 = 0 on [0, 2pi).
+  solution: '{pi/4, 3pi/4, 5pi/4, 7pi/4}'
+  explanation: Cosine can be positive or negative sqrt(2)/2.
+- prompt: Solve sin(x)^2 = sin(x) on [0, 2pi).
+  solution: '{0, pi/2, pi}'
+  explanation: Factor to sin(x)(sin(x)-1)=0 and solve both cases.
+- prompt: Solve 3sin(x) = 4.
+  solution: empty set
+  explanation: The equation would require sin(x)=4/3, outside the sine range.
+applications:
+- title: Wave intersections
+  description: Restricted trigonometric equations identify when a periodic signal reaches a target level.
+- title: Rotating systems
+  description: Solutions give the times or angles when a rotating object reaches a specified position.
+- title: Seasonal models
+  description: A finite interval can represent one year, one cycle, or another practical observation window.
+- title: Physics
+  description: Oscillation, alternating current, and circular motion often require every solution within a time
+    interval.
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: TRIG_EQ_SINE_ZERO_001
+    type: generated
+    prompt_template: 'Solve on [0, 2pi): {k}*sin(x) = 0'
+    answer_mode: final_plus_required_work
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 9
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - '0'
+      - pi
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Isolate the trigonometric expression, identify reference angles and quadrants, list every solution
+        in the interval, and check each angle.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide by {k}: sin(x) = 0.
+      On [0, 2pi), sine is zero at x = 0 and x = pi.
+    mistake_tags:
+    - trig_equation_error
+    - missing_solution
+    - interval_endpoint_error
+    difficulty: easy
+  - id: TRIG_EQ_COSINE_ZERO_001
+    type: generated
+    prompt_template: 'Solve on [0, 2pi): {k}*cos(x) = 0'
+    answer_mode: final_plus_required_work
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 9
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - pi/2
+      - 3*pi/2
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Isolate the trigonometric expression, identify reference angles and quadrants, list every solution
+        in the interval, and check each angle.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide by {k}: cos(x) = 0.
+      On [0, 2pi), cosine is zero at pi/2 and 3pi/2.
+    mistake_tags:
+    - trig_equation_error
+    - missing_solution
+    - unit_circle_error
+    difficulty: easy
+  - id: TRIG_EQ_COSINE_ONE_CLOSED_INTERVAL_001
+    type: generated
+    prompt_template: 'Solve on [0, 2pi]: {k}*cos(x) = {k}'
+    answer_mode: final_plus_required_work
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 9
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - '0'
+      - 2*pi
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Isolate cosine, use the unit circle, and check both endpoints of the closed interval.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide by {k}: cos(x) = 1.
+      On the closed interval [0, 2pi], both x = 0 and x = 2pi are included.
+    mistake_tags:
+    - interval_endpoint_error
+    - coterminal_angle_error
+    - missing_solution
+    difficulty: medium
+  - id: TRIG_EQ_SINE_HALF_001
+    type: generated
+    prompt_template: 'Solve on [0, 2pi): {coefficient}*sin(x) = {k}'
+    answer_mode: final_plus_required_work
+    variables:
+      k:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      coefficient: 2 * k
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - pi/6
+      - 5*pi/6
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Isolate the trigonometric expression, identify reference angles and quadrants, list every solution
+        in the interval, and check each angle.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide by {coefficient}: sin(x) = 1/2.
+      The reference angle is pi/6.
+      Sine is positive in Quadrants I and II, giving pi/6 and 5pi/6.
+    mistake_tags:
+    - reference_angle_error
+    - quadrant_error
+    - missing_solution
+    difficulty: medium
+  - id: TRIG_EQ_COSINE_NEG_SQRT2_001
+    type: generated
+    prompt_template: 'Solve on [0, 2pi): {coefficient}*cos(x) = -{k}*sqrt(2)'
+    answer_mode: final_plus_required_work
+    variables:
+      k:
+        type: int
+        min: 1
+        max: 7
+    derived:
+      coefficient: 2 * k
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - 3*pi/4
+      - 5*pi/4
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Isolate the trigonometric expression, identify reference angles and quadrants, list every solution
+        in the interval, and check each angle.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide by {coefficient}: cos(x) = -sqrt(2)/2.
+      The reference angle is pi/4.
+      Cosine is negative in Quadrants II and III.
+    mistake_tags:
+    - reference_angle_error
+    - quadrant_error
+    - radical_value_error
+    difficulty: medium
+  - id: TRIG_EQ_TANGENT_NEG_ONE_001
+    type: generated
+    prompt_template: 'Solve on [0, 2pi): {k}*tan(x) = -{k}'
+    answer_mode: final_plus_required_work
+    variables:
+      k:
+        type: int
+        min: 1
+        max: 9
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - 3*pi/4
+      - 7*pi/4
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Isolate the trigonometric expression, identify reference angles and quadrants, list every solution
+        in the interval, and check each angle.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide by {k}: tan(x) = -1.
+      The reference angle is pi/4.
+      Tangent is negative in Quadrants II and IV.
+    mistake_tags:
+    - tangent_sign_error
+    - quadrant_error
+    - missing_solution
+    difficulty: medium
+  - id: TRIG_EQ_SINE_SQRT3_001
+    type: fixed
+    prompt: 'Solve on [0, 2pi): 2sin(x) - sqrt(3) = 0'
+    answer_mode: final_plus_required_work
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - pi/3
+      - 2*pi/3
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Isolate the trigonometric expression, identify reference angles and quadrants, list every solution
+        in the interval, and check each angle.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Isolate sine: sin(x) = sqrt(3)/2.
+      The reference angle is pi/3.
+      Sine is positive in Quadrants I and II.
+    mistake_tags:
+    - isolation_error
+    - unit_circle_error
+    - quadrant_error
+    difficulty: medium
+  - id: TRIG_EQ_COSINE_SQUARED_001
+    type: fixed
+    prompt: 'Solve on [0, 2pi): 2cos(x)^2 - 1 = 0'
+    answer_mode: final_plus_required_work
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - pi/4
+      - 3*pi/4
+      - 5*pi/4
+      - 7*pi/4
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Isolate cos(x)^2, take both square-root branches, then use all applicable quadrants and check the
+        interval.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      cos(x)^2 = 1/2, so cos(x) = plus or minus sqrt(2)/2.
+      Those two values occur at pi/4, 3pi/4, 5pi/4, and 7pi/4.
+    mistake_tags:
+    - missing_negative_branch
+    - missing_solution
+    - square_root_error
+    difficulty: hard
+  - id: TRIG_EQ_SINE_EQUALS_COSINE_001
+    type: fixed
+    prompt: 'Solve on [0, 2pi): sin(x) = cos(x)'
+    answer_mode: final_plus_required_work
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - pi/4
+      - 5*pi/4
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Rewrite the equation using tangent where cosine is nonzero, solve the reference equation, and verify
+        all candidates in the original equation.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Where cosine is nonzero, divide by cos(x): tan(x) = 1.
+      Tangent is positive in Quadrants I and III, giving pi/4 and 5pi/4.
+      The points where cosine is zero do not satisfy the original equation.
+    mistake_tags:
+    - quotient_identity_error
+    - division_domain_error
+    - missing_solution
+    difficulty: hard
+  - id: TRIG_EQ_FACTOR_SINE_001
+    type: fixed
+    prompt: 'Solve on [0, 2pi): sin(x)^2 = sin(x)'
+    answer_mode: final_plus_required_work
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - '0'
+      - pi/2
+      - pi
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Move all terms to one side, factor the trigonometric expression, solve each factor, and combine the
+        valid angles.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      sin(x)^2 - sin(x) = sin(x)(sin(x) - 1) = 0.
+      So sin(x) = 0 or sin(x) = 1.
+      The solutions are 0, pi/2, and pi.
+    mistake_tags:
+    - factoring_error
+    - zero_product_error
+    - missing_solution
+    difficulty: hard
+  - id: TRIG_EQ_DOUBLE_ANGLE_COSINE_001
+    type: fixed
+    prompt: 'Solve on [0, 2pi): cos(2x) = 0'
+    answer_mode: final_plus_required_work
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - pi/4
+      - 3*pi/4
+      - 5*pi/4
+      - 7*pi/4
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Solve first for the angle 2x over its full induced interval, then divide by 2 and retain every x in
+        [0, 2pi).
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      As x runs through [0, 2pi), the angle 2x runs through [0, 4pi).
+      Cosine is zero at pi/2, 3pi/2, 5pi/2, and 7pi/2.
+      Dividing by 2 gives pi/4, 3pi/4, 5pi/4, and 7pi/4.
+    mistake_tags:
+    - multiple_angle_error
+    - period_error
+    - missing_solution
+    difficulty: hard
+  - id: TRIG_EQ_SHIFTED_SINE_001
+    type: generated
+    prompt_template: 'Solve on [0, 2pi): sin(x - {n}*pi/4) = 0'
+    answer_mode: final_plus_required_work
+    variables:
+      n:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 3
+    answer:
+      type: finite_set
+      variable: x
+      values:
+      - '{n}*pi/4'
+      - '{n + 4}*pi/4'
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Set the shifted angle equal to consecutive sine zeros, solve for x, and keep the values in the stated
+        interval.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Sine is zero when its angle is 0 or pi within one full cycle.
+      Set x - {n}pi/4 = 0 or pi.
+      Thus x = {n}pi/4 or {n + 4}pi/4.
+    mistake_tags:
+    - phase_shift_error
+    - period_error
+    - interval_filter_error
+    difficulty: hard
+  - id: TRIG_EQ_OUTSIDE_RANGE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: {k}*sin(x) = {target}'
+    answer_mode: final_plus_required_work
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      target: k + 1
+    answer:
+      type: finite_set
+      variable: x
+      values: []
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Isolate sine and compare the required value with the range [-1, 1].
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Dividing by {k} gives sin(x) = {target}/{k}.
+      Because {target}/{k} is greater than 1, no real angle satisfies the equation.
+      The solution set is empty.
+    mistake_tags:
+    - range_error
+    - no_solution_error
+    - division_error
+    difficulty: medium

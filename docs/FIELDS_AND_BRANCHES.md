@@ -1,6 +1,6 @@
 # Fields and branches
 
-The shipped library contains 95 lessons. Field IDs and lesson IDs are unchanged. `subdomain` stores the broad branch; optional `topic` preserves the previous focused category.
+The shipped library contains 107 lessons. Field IDs and lesson IDs are unchanged. `subdomain` stores the broad branch; optional `topic` preserves the previous focused category.
 
 Canonical maps group lessons inside branch bands within each field. Existing saved coordinates remain in Plan view; **Plan mode → Plan details → Group by field & branch** adopts the canonical positions while retaining notes and paths.
 
@@ -17,7 +17,7 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Decimals, percents, and conversions | Arithmetic Foundations | `MATH_ARITH_005` |
 | Estimate before calculating | Number Sense | `CUSTOM_ESTIMATION_SANITY` |
 
-### Algebra (39 lessons)
+### Algebra (42 lessons)
 
 | Lesson | Topic | Stable lesson ID |
 | --- | --- | --- |
@@ -60,21 +60,30 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Quadratic functions and parabolas | Quadratic Functions | `MATH_QUAD_004` |
 | Quadratic modeling and optimization | Quadratic Functions | `MATH_QUAD_005` |
 | Systems of equations | Systems of Equations | `MATH_SYS_001` |
+| Logarithms as inverse exponents | Logarithms and Exponential Functions | `MATH_LOG_001` |
+| Logarithm laws and change of base | Logarithms and Exponential Functions | `MATH_LOG_002` |
+| Solving exponential and logarithmic equations | Logarithms and Exponential Functions | `MATH_LOG_003` |
 
-### Geometry (10 lessons)
+### Geometry (16 lessons)
 
 | Lesson | Topic | Stable lesson ID |
 | --- | --- | --- |
 | Coordinate plane | Coordinate Graphing | `MATH_GRAPH_001` |
 | Slope from two points | Coordinate Graphing | `MATH_GRAPH_002` |
+| Triangle area: base and perpendicular height | Plane Geometry | `MATH_GEOM_004` |
 | Slope as rate of change | Linear Functions | `MATH_GRAPH_003` |
 | Slope-intercept form | Linear Functions | `MATH_GRAPH_004` |
 | Graphing lines | Linear Functions | `MATH_GRAPH_005` |
 | Writing equations of lines | Linear Functions | `MATH_GRAPH_006` |
+| Right-triangle trigonometry | Trigonometry | `MATH_TRIG_001` |
+| Radian measure and the unit circle | Trigonometry | `MATH_TRIG_002` |
+| Trigonometric functions and graphs | Trigonometry | `MATH_TRIG_003` |
+| Trigonometric identities and exact values | Trigonometry | `MATH_TRIG_004` |
+| Solving trigonometric equations on restricted intervals | Trigonometry | `MATH_TRIG_005` |
+| Laws of sines and cosines | Trigonometry | `MATH_TRIG_006` |
 | Angles, bearings, and degree measure | Coordinate Geometry | `MATH_GEOM_001` |
 | Circles, arcs, and angular distance | Coordinate Geometry | `MATH_GEOM_002` |
 | Spherical coordinates and great-circle models | Coordinate Geometry | `MATH_GEOM_003` |
-| Triangle area: base and perpendicular height | Plane Geometry | `MATH_GEOM_004` |
 
 ## Geography
 
@@ -120,7 +129,7 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 
 ## Programming
 
-### Programming Fundamentals (7 lessons)
+### Programming Fundamentals (8 lessons)
 
 | Lesson | Topic | Stable lesson ID |
 | --- | --- | --- |
@@ -131,6 +140,7 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Conditional execution | Control Flow | `CUSTOM_PROG_005` |
 | While loops and changing state | Iteration | `CUSTOM_PROG_006` |
 | For loops, ranges, and accumulators | Iteration | `CUSTOM_PROG_007` |
+| Iterators, generators, and lazy pipelines | Iteration | `CUSTOM_PROG_027` |
 
 ### Data Structures (7 lessons)
 
@@ -144,14 +154,15 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Nested collections and records | Structured Data | `CUSTOM_PROG_017` |
 | Comprehensions and data pipelines | Data Transformation | `CUSTOM_PROG_021` |
 
-### Algorithms (2 lessons)
+### Algorithms (3 lessons)
 
 | Lesson | Topic | Stable lesson ID |
 | --- | --- | --- |
 | Problem decomposition and practical algorithms | Algorithm Design | `CUSTOM_PROG_014` |
 | Searching, sorting, and algorithmic efficiency | - | `CUSTOM_PROG_023` |
+| Recursion, trees, and memoization | Recursive Algorithms | `CUSTOM_PROG_028` |
 
-### Software Engineering (9 lessons)
+### Software Engineering (10 lessons)
 
 | Lesson | Topic | Stable lesson ID |
 | --- | --- | --- |
@@ -164,6 +175,7 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Classes, objects, and methods | Object-Oriented Programming | `CUSTOM_PROG_022` |
 | Program architecture and command-line applications | Software Design | `CUSTOM_PROG_024` |
 | Capstone: build a persistent study tracker | Capstone Projects | `CUSTOM_PROG_025` |
+| Type hints, dataclasses, and explicit contracts | Program Design | `CUSTOM_PROG_026` |
 
 ## Compatibility
 

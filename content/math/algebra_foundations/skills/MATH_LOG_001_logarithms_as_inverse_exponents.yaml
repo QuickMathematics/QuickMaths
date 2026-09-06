@@ -1,0 +1,585 @@
+id: MATH_LOG_001
+schema_version: 0.2
+name: Logarithms as inverse exponents
+domain: Math
+subdomain: Algebra
+topic: Logarithms and Exponential Functions
+description: Interpret logarithms as exponents, convert between logarithmic and exponential form, evaluate exact
+  logarithms, and identify basic domains and graph behavior.
+prerequisites:
+- MATH_EXP_003
+- MATH_FUNC_001
+tags:
+- logarithms
+- inverse_functions
+- exponential_form
+- logarithmic_form
+- common_logarithm
+- natural_logarithm
+- domain
+- logarithm_graphs
+unlocks:
+- MATH_LOG_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  A logarithm answers an exponent question.
+
+  Definition:
+
+  log_b(a) = c exactly when b^c = a.
+
+  The logarithm base is b, the argument is a, and the logarithm value is c.
+
+  Example:
+
+  log_2(8) = 3 because 2^3 = 8.
+
+  Logarithms and exponential functions undo one another:
+
+  log_b(b^x) = x
+
+  and
+
+  b^(log_b(x)) = x, for x > 0.
+
+  Valid real logarithms:
+  - The base must be positive.
+  - The base cannot equal 1.
+  - The argument must be positive.
+
+  So log_2(7) is defined, but log_2(0) and log_2(-7) are not real.
+
+  Zero and negative logarithm values:
+
+  log_b(1) = 0 because b^0 = 1.
+
+  For a base b > 1, positive arguments between 0 and 1 have negative logarithms.
+
+  Example:
+
+  log_3(1/9) = -2 because 3^(-2) = 1/9.
+
+  Two common notations:
+  - log(x) usually means log base 10.
+  - ln(x) means log base e, where e is approximately 2.71828.
+
+  Examples:
+
+  log(1000) = 3 because 10^3 = 1000.
+
+  ln(e^4) = 4.
+
+  Graphs:
+  The graph of y = log_b(x) is the inverse of y = b^x. Their coordinates are swapped.
+
+  If b > 1, y = log_b(x) is increasing.
+  If 0 < b < 1, y = log_b(x) is decreasing.
+
+  Every basic logarithm graph:
+  - has domain x > 0;
+  - passes through (1, 0);
+  - has a vertical asymptote at x = 0.
+
+  A horizontal shift changes the domain.
+
+  For f(x) = log_b(x - h), the argument must satisfy x - h > 0, so the domain is x > h.
+
+  Method:
+  1. Identify the base, argument, and logarithm value.
+  2. Rewrite log_b(a) = c as b^c = a when evaluation is exact.
+  3. Use zero and negative exponent rules when the argument is 1 or a reciprocal.
+  4. Require every logarithm argument to be positive.
+  5. Use inverse-function reasoning to connect points on exponential and logarithmic graphs.
+
+  Common mistake:
+  Do not confuse the argument and the exponent. In log_2(8) = 3, the argument is 8 and the answer is the exponent 3.
+
+  Another common mistake:
+  The logarithm of a negative number is not a real number. The argument—not merely the base—must be positive.
+
+  Another common mistake:
+  A logarithm base may lie between 0 and 1. It must be positive and not equal to 1; it does not have to be greater than 1.
+examples:
+- prompt: Evaluate log_2(32).
+  solution: '5'
+  explanation: 2^5 = 32.
+- prompt: Evaluate log_5(1).
+  solution: '0'
+  explanation: 5^0 = 1.
+- prompt: Evaluate log_3(1/27).
+  solution: '-3'
+  explanation: 3^(-3) = 1/27.
+- prompt: Rewrite log_4(64) = 3 in exponential form.
+  solution: 4^3 = 64
+  explanation: The logarithm value is the exponent.
+- prompt: Rewrite 7^2 = 49 in logarithmic form.
+  solution: log_7(49) = 2
+  explanation: The exponential base becomes the logarithm base.
+- prompt: Evaluate ln(e^6).
+  solution: '6'
+  explanation: ln and e^x are inverse functions.
+- prompt: Find the domain of f(x) = log_2(x - 5).
+  solution: (5, inf)
+  explanation: Require x - 5 > 0.
+- prompt: Is log_(1/3)(x) increasing or decreasing?
+  solution: Decreasing
+  explanation: Its base lies between 0 and 1.
+applications:
+- title: Measurement scales
+  description: Logarithms compress wide ranges in scales for acidity, sound, and earthquake magnitude.
+- title: Computing
+  description: Logarithms describe how many repeated multiplications, halvings, or binary splits are needed.
+- title: Exponential models
+  description: Logarithms solve for time when growth or decay does not reach a convenient common-base value.
+- title: Inverse functions
+  description: Logarithms are a central example of reversing a function and swapping graph coordinates.
+test:
+  question_count: 12
+  randomize_order: true
+  questions:
+  - id: LOG_EVAL_POSITIVE_INTEGER_001
+    type: generated
+    prompt_template: Evaluate log_{base}({argument}).
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      exponent:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      argument: base ** exponent
+    answer:
+      type: numeric
+      value: '{exponent}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Rewrite the logarithmic statement as an equivalent exponential equation, then state the exponent.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      log_{base}({argument}) asks for the exponent on {base} that produces {argument}.
+      Because {base}^{exponent} = {argument}, log_{base}({argument}) = {exponent}.
+    mistake_tags:
+    - logarithm_evaluation
+    - inverse_operation
+    - exponent_error
+    difficulty: easy
+  - id: LOG_EVAL_ONE_001
+    type: generated
+    prompt_template: Evaluate log_{base}(1).
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 9
+    answer:
+      type: numeric
+      value: '0'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Identify the exponent that makes the base equal 1 and explain the zero-exponent connection.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Every nonzero base satisfies {base}^0 = 1.
+      Therefore log_{base}(1) = 0.
+    mistake_tags:
+    - logarithm_evaluation
+    - zero_exponent_error
+    - inverse_operation
+    difficulty: easy
+  - id: LOG_EVAL_RECIPROCAL_POWER_001
+    type: generated
+    prompt_template: Evaluate log_{base}(1/{power}).
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      exponent:
+        type: int
+        min: 1
+        max: 4
+    derived:
+      power: base ** exponent
+      negative_exponent: 0 - exponent
+    answer:
+      type: numeric
+      value: '{negative_exponent}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Rewrite the reciprocal as a negative power of the base, then read the exponent.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      1/{power} = {base}^({negative_exponent}).
+      Therefore log_{base}(1/{power}) = {negative_exponent}.
+    mistake_tags:
+    - logarithm_evaluation
+    - negative_exponent_error
+    - reciprocal_error
+    difficulty: medium
+  - id: LOG_CONVERT_TO_EXPONENTIAL_FORM_001
+    type: generated
+    prompt_template: Which exponential equation is equivalent to log_{base}({argument}) = {exponent}?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      exponent:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      argument: base ** exponent
+    constraints:
+    - base != exponent
+    options:
+    - id: A
+      label: '{exponent}^{base} = {argument}'
+    - id: B
+      label: '{base}^{exponent} = {argument}'
+    - id: C
+      label: '{base}^{argument} = {exponent}'
+    - id: D
+      label: '{argument}^{exponent} = {base}'
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The definition is log_b(a) = c exactly when b^c = a.
+      Here the base is {base}, the exponent is {exponent}, and the result is {argument}.
+      So {base}^{exponent} = {argument}.
+    mistake_tags:
+    - logarithm_definition
+    - form_conversion
+    - base_argument_mixup
+    difficulty: easy
+    max_attempts: 200
+  - id: LOG_CONVERT_FROM_EXPONENTIAL_FORM_001
+    type: generated
+    prompt_template: Which logarithmic equation is equivalent to {base}^{exponent} = {argument}?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      exponent:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      argument: base ** exponent
+    constraints:
+    - base != exponent
+    options:
+    - id: A
+      label: log_{exponent}({argument}) = {base}
+    - id: B
+      label: log_{argument}({base}) = {exponent}
+    - id: C
+      label: log_{base}({exponent}) = {argument}
+    - id: D
+      label: log_{base}({argument}) = {exponent}
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The base of the exponential expression becomes the logarithm base.
+      The result {argument} becomes the logarithm argument, and the exponent is the logarithm value.
+      Thus log_{base}({argument}) = {exponent}.
+    mistake_tags:
+    - logarithm_definition
+    - form_conversion
+    - base_argument_mixup
+    difficulty: easy
+    max_attempts: 200
+  - id: LOG_DOMAIN_SHIFTED_ARGUMENT_001
+    type: generated
+    prompt_template: Find the domain of f(x) = log_3(x - {shift}). Give the answer as an inequality in x.
+    answer_mode: final_plus_required_work
+    variables:
+      shift:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    answer:
+      type: text
+      value: x > {shift}
+    grading:
+      method: inequality_solution
+    work:
+      mode: capture_only
+      prompt: Require the logarithm argument to be positive and solve the resulting inequality for x.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A real logarithm requires a positive argument.
+      x - {shift} > 0, so x > {shift}.
+      The domain is x > {shift}.
+    mistake_tags:
+    - logarithm_domain
+    - argument_positive
+    - inequality_solution
+    difficulty: medium
+  - id: LOG_COMMON_BASE_TEN_001
+    type: generated
+    prompt_template: Evaluate log_10(10^{exponent}).
+    answer_mode: final_plus_required_work
+    variables:
+      exponent:
+        type: choice
+        values:
+        - -5
+        - -3
+        - -2
+        - -1
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+    answer:
+      type: numeric
+      value: '{exponent}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use that a base-10 logarithm asks for the exponent on 10.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The logarithm and the base-10 power undo each other.
+      Therefore log_10(10^{exponent}) = {exponent}.
+    mistake_tags:
+    - common_logarithm
+    - inverse_function
+    - exponent_error
+    difficulty: medium
+  - id: LOG_NATURAL_BASE_E_001
+    type: generated
+    prompt_template: Evaluate ln(e^{exponent}).
+    answer_mode: final_plus_required_work
+    variables:
+      exponent:
+        type: int
+        min: -5
+        max: 6
+        exclude:
+        - 0
+    answer:
+      type: numeric
+      value: '{exponent}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Use that ln is logarithm base e and is the inverse of raising e to a power.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      ln means logarithm base e.
+      The functions ln and e^x undo each other, so ln(e^{exponent}) = {exponent}.
+    mistake_tags:
+    - natural_logarithm
+    - inverse_function
+    - exponent_error
+    difficulty: medium
+  - id: LOG_INVERSE_COMPOSITION_001
+    type: generated
+    prompt_template: Evaluate {base}^(log_{base}({argument})).
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      exponent:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      argument: base ** exponent
+    answer:
+      type: numeric
+      value: '{argument}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Explain how exponentiation with base b and logarithm base b undo one another.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      log_{base}({argument}) = {exponent} because {base}^{exponent} = {argument}.
+      Therefore {base}^(log_{base}({argument})) = {base}^{exponent} = {argument}.
+    mistake_tags:
+    - inverse_function
+    - logarithm_evaluation
+    - composition_error
+    difficulty: medium
+  - id: LOG_VALID_BASE_001
+    type: fixed
+    prompt: Which number can be used as the base of a real logarithm?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: '1'
+    - id: B
+      label: '0'
+    - id: C
+      label: 1/2
+    - id: D
+      label: '-2'
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A real logarithm base must be positive and cannot equal 1.
+      The value 1/2 is positive and is not 1, so it is a valid base.
+    mistake_tags:
+    - logarithm_base
+    - domain_restriction
+    - definition_error
+    difficulty: easy
+  - id: LOG_GRAPH_POINT_001
+    type: generated
+    prompt_template: The function f(x) = log_{base}(x) contains which point?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 6
+      exponent:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      argument: base ** exponent
+    constraints:
+    - base != exponent
+    options:
+    - id: A
+      label: ({exponent}, {argument})
+    - id: B
+      label: ({base}, {argument})
+    - id: C
+      label: ({argument}, {exponent})
+    - id: D
+      label: ({argument}, {base})
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Because {base}^{exponent} = {argument}, log_{base}({argument}) = {exponent}.
+      An input of {argument} therefore gives an output of {exponent}, so the point is ({argument}, {exponent}).
+    mistake_tags:
+    - logarithm_graph
+    - ordered_pair_error
+    - inverse_function
+    difficulty: hard
+    max_attempts: 200
+  - id: LOG_RECIPROCAL_BASE_DIRECTION_001
+    type: generated
+    prompt_template: For f(x) = log_(1/{base})(x), how does f behave on x > 0?
+    answer_mode: final_only
+    variables:
+      base:
+        type: int
+        min: 2
+        max: 8
+    options:
+    - id: A
+      label: It is increasing.
+    - id: B
+      label: It is decreasing.
+    - id: C
+      label: It is constant.
+    - id: D
+      label: It is undefined for every positive x.
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The base 1/{base} lies between 0 and 1.
+      A logarithmic function with a base between 0 and 1 is decreasing on its positive domain.
+    mistake_tags:
+    - logarithm_graph
+    - reciprocal_base
+    - growth_direction_error
+    difficulty: hard

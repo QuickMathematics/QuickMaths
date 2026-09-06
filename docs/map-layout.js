@@ -1,4 +1,4 @@
-import { learningFields } from "./learning-fields.js?v=20260906-optimization-v1";
+import { learningFields } from "./learning-fields.js?v=20260906-lesson-batches-v1";
 
 // Branch bands organize the canonical map; saved plan coordinates are overlaid
 // by the caller and remain free to sit outside these reference bands.

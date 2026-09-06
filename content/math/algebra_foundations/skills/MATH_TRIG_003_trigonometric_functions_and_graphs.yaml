@@ -1,0 +1,699 @@
+id: MATH_TRIG_003
+schema_version: 0.2
+name: Trigonometric functions and graphs
+domain: Math
+subdomain: Geometry
+topic: Trigonometry
+description: Interpret and model sine and cosine graphs using amplitude, period, midline, phase shift, range, and
+  key points.
+prerequisites:
+- MATH_TRIG_002
+- MATH_FUNC_001
+- MATH_GRAPH_005
+tags:
+- trigonometry
+- sine_functions
+- cosine_functions
+- amplitude
+- period
+- midline
+- phase_shift
+- range
+- sinusoidal_models
+- function_graphs
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Sine and cosine turn circular motion into repeating graphs.
+
+  Basic graphs:
+  - y = sin(x) starts at 0, rises to 1, returns to 0, falls to -1, and returns to 0.
+  - y = cos(x) starts at 1, falls to 0, reaches -1, returns to 0, and returns to 1.
+  - Both basic functions repeat every 2pi radians.
+  - Both have range [-1, 1] and midline y = 0.
+
+  A transformed sinusoidal function can be written as:
+
+  y = A sin(B(x - h)) + D
+
+  or
+
+  y = A cos(B(x - h)) + D
+
+  Parameters:
+  - Amplitude = |A|.
+  - Period = 2pi/|B|.
+  - Phase shift = h.
+  - Midline = y = D.
+  - Range = [D - |A|, D + |A|].
+
+  The amplitude measures the vertical distance from the midline to a maximum or minimum.
+
+  A negative A reflects the graph across its midline. It does not make the amplitude negative.
+
+  The coefficient B changes horizontal scale:
+  - Larger |B| means more cycles in the same x-distance and therefore a shorter period.
+  - Smaller positive |B| means a longer period.
+
+  Horizontal shifts:
+  - x - h shifts the graph right h units.
+  - x + h is x - (-h), so it shifts the graph left h units.
+
+  Vertical shifts:
+  Adding D moves every point up or down and changes the midline from y = 0 to y = D.
+
+  Five key points divide one cycle into quarters.
+
+  For positive sine over one cycle beginning at its midline:
+  midline, maximum, midline, minimum, midline.
+
+  For positive cosine over one cycle beginning at a maximum:
+  maximum, midline, minimum, midline, maximum.
+
+  The x-distance between consecutive key points is one quarter of the period.
+
+  Modeling:
+  A cosine model is often convenient when the quantity begins at a maximum or minimum.
+  A sine model is often convenient when the quantity begins on its midline.
+
+  Example model:
+
+  h(t) = 12 cos(2pi*t/8) + 15
+
+  This has:
+  - amplitude 12;
+  - period 8;
+  - midline 15;
+  - maximum 27;
+  - minimum 3.
+
+  Method:
+  1. Identify A, B, h, and D from the equation.
+  2. Compute amplitude |A|.
+  3. Compute period 2pi/|B|.
+  4. Record the phase shift and midline.
+  5. Compute the range.
+  6. Use quarter-period steps to locate key points.
+  7. Check that a model begins at the stated position and repeats at the stated interval.
+
+  Common mistake:
+  Period is not 2pi*B. It is 2pi divided by |B|.
+
+  Another common mistake:
+  Amplitude is never negative. Use |A|.
+
+  Another common mistake:
+  The sign inside a horizontal shift looks reversed: x - 3 shifts right 3, while x + 3 shifts left 3.
+
+  Another common mistake:
+  Do not confuse amplitude with maximum. Maximum is midline plus amplitude.
+examples:
+- prompt: Find the amplitude of y = -4sin(x) + 7.
+  solution: '4'
+  explanation: Amplitude is the absolute value of the sine coefficient.
+- prompt: Find the period of y = cos(3x).
+  solution: 2pi/3
+  explanation: Period = 2pi/3.
+- prompt: Find the midline and range of y = 5sin(x) - 2.
+  solution: Midline y = -2; range [-7, 3]
+  explanation: Move 5 units above and below -2.
+  media:
+  - type: image
+    src: media/trigonometry/sine-graph.svg
+    alt: The graph of y = 5sin(x) - 2 has midline -2, amplitude 5 and range [-7, 3].
+    caption: The graph of y = 5sin(x) - 2 has midline -2, amplitude 5 and range [-7, 3].
+    width: 720
+    height: 640
+- prompt: Describe the phase shift in y = sin(x - pi/4).
+  solution: Right pi/4
+  explanation: The form x - h shifts right h.
+- prompt: Find y at x = 0 for y = 6cos(x) + 2.
+  solution: '8'
+  explanation: cos(0) = 1.
+- prompt: A cosine model has period 10 and starts at a maximum. When does it first reach a minimum?
+  solution: '5'
+  explanation: A minimum occurs half a period later.
+- prompt: Write a model with amplitude 3, period 8, midline 4, starting at a maximum.
+  solution: y = 3cos(2pi*x/8) + 4
+  explanation: Positive cosine starts at a maximum.
+- prompt: Find the range of y = -2cos(x) + 5.
+  solution: '[3, 7]'
+  explanation: The amplitude is 2 and the midline is 5.
+applications:
+- title: Sound and vibration
+  description: Amplitude and period describe oscillations in sound waves and mechanical systems.
+- title: Seasonal data
+  description: Sinusoidal models approximate repeating temperature, daylight, and demand patterns.
+- title: Rotating objects
+  description: Ferris wheels, pistons, and circular motion produce sine and cosine height models.
+- title: Alternating current
+  description: Voltage and current in AC circuits vary periodically and are modeled with sinusoids.
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: TRIG_GRAPH_AMPLITUDE_001
+    type: generated
+    prompt_template: Find the amplitude of y = {a}sin({b}x) + {d}.
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      b:
+        type: int
+        min: 1
+        max: 6
+      d:
+        type: int
+        min: -10
+        max: 10
+    derived:
+      amplitude: abs(a)
+    answer:
+      type: numeric
+      value: '{amplitude}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      In y = A sin(Bx) + D, amplitude is |A|.
+      Here A = {a}, so the amplitude is {amplitude}.
+    mistake_tags:
+    - amplitude_error
+    - coefficient_error
+    - absolute_value_error
+    difficulty: easy
+  - id: TRIG_GRAPH_PERIOD_001
+    type: generated
+    prompt_template: Find the period of y = cos({b}x). Give an exact answer in terms of pi.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Use period = 2pi/|B|, substitute B, and simplify the exact value.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      b:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    derived:
+      abs_b: abs(b)
+    answer:
+      type: numeric
+      value: 2*pi/{abs_b}
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The period of cos(Bx) is 2pi/|B|.
+      Here |B| = {abs_b}, so the period is 2pi/{abs_b}.
+    mistake_tags:
+    - period_error
+    - frequency_coefficient_error
+    - absolute_value_error
+    difficulty: easy
+  - id: TRIG_GRAPH_MIDLINE_001
+    type: generated
+    prompt_template: Find the midline value of y = {a}cos({b}x) + {d}. Enter the y-value only.
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      b:
+        type: int
+        min: 1
+        max: 6
+      d:
+        type: int
+        min: -12
+        max: 12
+    answer:
+      type: numeric
+      value: '{d}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      In y = A cos(Bx) + D, the midline is y = D.
+      The midline value is {d}.
+    mistake_tags:
+    - midline_error
+    - vertical_shift_error
+    - constant_error
+    difficulty: easy
+  - id: TRIG_GRAPH_RANGE_001
+    type: generated
+    prompt_template: Find the range of y = {a}sin({b}x) + {d}. Use interval notation.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Find the amplitude and midline, then compute D - |A| and D + |A|. Include both endpoints.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+      b:
+        type: int
+        min: 1
+        max: 6
+      d:
+        type: int
+        min: -12
+        max: 12
+    derived:
+      amplitude: abs(a)
+      lower: d - amplitude
+      upper: d + amplitude
+    answer:
+      type: interval_set
+      variable: y
+      value: '[{lower}, {upper}]'
+    grading:
+      method: interval_set
+    explanation_template: |-
+      The graph stays amplitude {amplitude} above and below the midline {d}.
+      Minimum: {d} - {amplitude} = {lower}.
+      Maximum: {d} + {amplitude} = {upper}.
+      The range is [{lower}, {upper}].
+    mistake_tags:
+    - range_error
+    - amplitude_error
+    - endpoint_error
+    difficulty: medium
+  - id: TRIG_GRAPH_MAXIMUM_001
+    type: generated
+    prompt_template: Find the maximum value of y = {a}cos({b}x) + {d}.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Use maximum = midline + amplitude, taking the absolute value of the leading coefficient.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      b:
+        type: int
+        min: 1
+        max: 6
+      d:
+        type: int
+        min: -12
+        max: 12
+    derived:
+      amplitude: abs(a)
+      maximum: d + amplitude
+    answer:
+      type: numeric
+      value: '{maximum}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The midline is {d} and the amplitude is {amplitude}.
+      Maximum = {d} + {amplitude} = {maximum}.
+    mistake_tags:
+    - maximum_error
+    - amplitude_error
+    - vertical_shift_error
+    difficulty: medium
+  - id: TRIG_GRAPH_MINIMUM_001
+    type: generated
+    prompt_template: Find the minimum value of y = {a}sin({b}x) + {d}.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Use minimum = midline - amplitude, taking the absolute value of the leading coefficient.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      b:
+        type: int
+        min: 1
+        max: 6
+      d:
+        type: int
+        min: -12
+        max: 12
+    derived:
+      amplitude: abs(a)
+      minimum: d - amplitude
+    answer:
+      type: numeric
+      value: '{minimum}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The midline is {d} and the amplitude is {amplitude}.
+      Minimum = {d} - {amplitude} = {minimum}.
+    mistake_tags:
+    - minimum_error
+    - amplitude_error
+    - vertical_shift_error
+    difficulty: medium
+  - id: TRIG_GRAPH_PHASE_SHIFT_RIGHT_001
+    type: generated
+    prompt_template: Find the phase shift of y = {a}sin({b}(x - {h})) + {d}. Enter a positive number for a shift
+      right.
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 8
+      b:
+        type: int
+        min: 1
+        max: 6
+      h:
+        type: int
+        min: 1
+        max: 10
+      d:
+        type: int
+        min: -8
+        max: 8
+    answer:
+      type: numeric
+      value: '{h}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The form x - h shifts the graph h units right.
+      Here h = {h}, so the phase shift is {h}.
+    mistake_tags:
+    - phase_shift_error
+    - horizontal_shift_sign_error
+    - parameter_error
+    difficulty: easy
+  - id: TRIG_GRAPH_PHASE_SHIFT_LEFT_001
+    type: generated
+    prompt_template: Find the signed phase shift of y = {a}cos({b}(x + {h})) + {d}. Use a negative number for a
+      shift left.
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 8
+      b:
+        type: int
+        min: 1
+        max: 6
+      h:
+        type: int
+        min: 1
+        max: 10
+      d:
+        type: int
+        min: -8
+        max: 8
+    derived:
+      shift: 0 - h
+    answer:
+      type: numeric
+      value: '{shift}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      x + {h} is x - ({shift}).
+      The graph shifts {h} units left, so the signed phase shift is {shift}.
+    mistake_tags:
+    - phase_shift_error
+    - horizontal_shift_sign_error
+    - parameter_error
+    difficulty: medium
+  - id: TRIG_GRAPH_SINE_VALUE_AT_ZERO_001
+    type: generated
+    prompt_template: For y = {a}sin({b}x) + {d}, find y when x = 0.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Use sin(0) = 0, substitute x = 0, and simplify.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      b:
+        type: int
+        min: 1
+        max: 6
+      d:
+        type: int
+        min: -12
+        max: 12
+    answer:
+      type: numeric
+      value: '{d}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      sin(0) = 0.
+      y = {a}*0 + {d} = {d}.
+    mistake_tags:
+    - function_evaluation_error
+    - sine_value_error
+    - vertical_shift_error
+    difficulty: easy
+  - id: TRIG_GRAPH_COSINE_VALUE_AT_ZERO_001
+    type: generated
+    prompt_template: For y = {a}cos({b}x) + {d}, find y when x = 0.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Use cos(0) = 1, substitute x = 0, and simplify.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      b:
+        type: int
+        min: 1
+        max: 6
+      d:
+        type: int
+        min: -12
+        max: 12
+    derived:
+      value: a + d
+    answer:
+      type: numeric
+      value: '{value}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      cos(0) = 1.
+      y = {a}*1 + {d} = {value}.
+    mistake_tags:
+    - function_evaluation_error
+    - cosine_value_error
+    - vertical_shift_error
+    difficulty: easy
+  - id: TRIG_GRAPH_SINE_QUARTER_PERIOD_001
+    type: generated
+    prompt_template: For y = {a}sin(2*pi*x/{period}) + {d}, find y when x = {quarter_period}.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Recognize x as one quarter of the period, so the sine input is pi/2. Then use sin(pi/2) = 1.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 9
+      period:
+        type: choice
+        values:
+        - 4
+        - 8
+        - 12
+        - 16
+        - 20
+        - 24
+      d:
+        type: int
+        min: -10
+        max: 10
+    derived:
+      quarter_period: period / 4
+      value: a + d
+    answer:
+      type: numeric
+      value: '{value}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      At x = {quarter_period}, the angle is 2pi*({quarter_period})/{period} = pi/2.
+      sin(pi/2) = 1.
+      Therefore y = {a} + {d} = {value}.
+    mistake_tags:
+    - period_error
+    - special_angle_error
+    - function_evaluation_error
+    difficulty: medium
+  - id: TRIG_GRAPH_FIRST_COSINE_MINIMUM_001
+    type: generated
+    prompt_template: The function h(t) = {amplitude}cos(2*pi*t/{period}) + {midline} starts at a maximum when t
+      = 0. At what first positive time does it reach a minimum?
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: A cosine wave starting at a maximum reaches its minimum after half a period. Compute period/2.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      amplitude:
+        type: int
+        min: 2
+        max: 10
+      period:
+        type: choice
+        values:
+        - 4
+        - 6
+        - 8
+        - 10
+        - 12
+        - 14
+        - 16
+        - 20
+      midline:
+        type: int
+        min: -5
+        max: 20
+    derived:
+      half_period: period / 2
+    answer:
+      type: numeric
+      value: '{half_period}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      A cosine cycle travels from maximum to minimum in half a period.
+      {period}/2 = {half_period}.
+    mistake_tags:
+    - period_error
+    - cosine_graph_error
+    - half_cycle_error
+    difficulty: medium
+  - id: TRIG_GRAPH_MODEL_STARTS_AT_MAXIMUM_001
+    type: generated
+    prompt_template: A periodic quantity has amplitude {amplitude}, period {period}, midline y = {midline}, and
+      starts at a maximum when x = 0. Which equation matches?
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      amplitude:
+        type: int
+        min: 2
+        max: 8
+      period:
+        type: choice
+        values:
+        - 4
+        - 6
+        - 8
+        - 10
+        - 12
+        - 16
+        - 20
+      midline:
+        type: int
+        min: -10
+        max: 10
+    derived:
+      wrong_midline: midline + 1
+    options:
+    - id: A
+      label: y = {amplitude}sin(2*pi*x/{period}) + {midline}
+    - id: B
+      label: y = {amplitude}cos(pi*x/{period}) + {midline}
+    - id: C
+      label: y = {amplitude}cos(2*pi*x/{period}) + {midline}
+    - id: D
+      label: y = {amplitude}cos(2*pi*x/{period}) + {wrong_midline}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Positive cosine starts at its maximum.
+      The factor 2*pi/{period} gives period {period}.
+      Adding {midline} gives the stated midline.
+    mistake_tags:
+    - sinusoidal_model_error
+    - period_error
+    - sine_cosine_start_error
+    - midline_error
+    difficulty: hard

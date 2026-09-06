@@ -1,0 +1,702 @@
+id: MATH_LOG_003
+schema_version: 0.2
+name: Solving exponential and logarithmic equations
+domain: Math
+subdomain: Algebra
+topic: Logarithms and Exponential Functions
+description: Solve logarithmic equations with domain checks and use logarithms to solve exponential equations and
+  growth models without convenient common bases.
+prerequisites:
+- MATH_LOG_002
+- MATH_ALG_003
+tags:
+- logarithmic_equations
+- exponential_equations
+- domain_restrictions
+- finite_solution_sets
+- change_of_base
+- natural_logarithm
+- growth_models
+- checking_solutions
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Logarithms solve equations in which the unknown appears inside a logarithm or in an exponent.
+
+  Solving one logarithm:
+
+  log_b(g(x)) = c
+
+  is equivalent to:
+
+  g(x) = b^c.
+
+  After solving, check that the original logarithm argument is positive.
+
+  Example:
+
+  log_2(x - 3) = 4
+
+  x - 3 = 2^4
+
+  x - 3 = 16
+
+  x = 19.
+
+  The check succeeds because 19 - 3 = 16 > 0.
+
+  Equal logarithms:
+  For a valid base b, logarithms are one-to-one.
+
+  If log_b(M) = log_b(N), then M = N, provided both M and N are positive.
+
+  Example:
+
+  log_5(2x + 1) = log_5(x + 7)
+
+  2x + 1 = x + 7
+
+  x = 6.
+
+  Both arguments equal 13, so the solution is valid.
+
+  Combining logarithms before solving:
+
+  log_b(M) + log_b(N) = log_b(MN)
+
+  log_b(M) - log_b(N) = log_b(M/N).
+
+  Example:
+
+  log_2(x) + log_2(4) = 5
+
+  log_2(4x) = 5
+
+  4x = 2^5 = 32
+
+  x = 8.
+
+  Domain restrictions matter:
+  A candidate obtained after algebra is not automatically a solution.
+
+  Example:
+
+  log_3(x - 4) = log_3(2 - x)
+
+  The first logarithm requires x > 4.
+  The second requires x < 2.
+  No real number satisfies both conditions, so the solution set is empty.
+
+  Solving a general exponential equation:
+  If b^x = A, where b > 0, b is not 1, and A > 0, take logarithms:
+
+  x*ln(b) = ln(A)
+
+  x = ln(A)/ln(b).
+
+  Example:
+
+  3*2^x = 20
+
+  2^x = 20/3
+
+  x = ln(20/3)/ln(2)
+
+  x is approximately 2.737.
+
+  Shifted exponents:
+
+  5^(x + 1) = 70
+
+  (x + 1)ln(5) = ln(70)
+
+  x = ln(70)/ln(5) - 1.
+
+  Applications:
+  For an exponential model A(t) = A_0*b^t, set the model equal to the target, divide by A_0, then take logarithms.
+
+  Method for logarithmic equations:
+  1. State every argument restriction.
+  2. Isolate one logarithm, or combine logarithms with valid laws.
+  3. Convert to exponential form or use the one-to-one property.
+  4. Solve the resulting algebraic equation.
+  5. Substitute each candidate into every original logarithm argument.
+  6. Reject candidates that make any argument zero or negative.
+
+  Method for exponential equations:
+  1. Isolate the exponential expression.
+  2. Use common bases when convenient.
+  3. Otherwise take log or ln of both sides.
+  4. Use the power law to move the exponent in front.
+  5. Solve the resulting linear equation.
+  6. Round only at the end if an approximation is requested.
+
+  Common mistake:
+  Do not take a logarithm of a nonpositive quantity in the real-number system.
+
+  Another common mistake:
+  Do not forget to distribute or isolate before using logs. In 3*2^x = 20, divide by 3 before solving for x.
+
+  Another common mistake:
+  A logarithmic equation may produce an algebraic candidate outside its domain. Always check the original equation.
+
+  Another common mistake:
+  Do not round intermediate logarithms too early. Keep full calculator precision until the final answer.
+examples:
+- prompt: Solve log_2(x) = 6.
+  solution: '{64}'
+  explanation: Convert to x = 2^6.
+- prompt: Solve log_3(x - 5) = 2.
+  solution: '{14}'
+  explanation: x - 5 = 9, so x = 14.
+- prompt: Solve log_4(x) = log_4(3x - 10).
+  solution: '{5}'
+  explanation: 'Equate positive arguments: x = 3x - 10.'
+- prompt: Solve log_2(x) + log_2(4) = 5.
+  solution: '{8}'
+  explanation: Combine to log_2(4x) = 5.
+- prompt: Solve log_5(x) - log_5(5) = 2.
+  solution: '{125}'
+  explanation: Combine to log_5(x/5) = 2.
+- prompt: Solve ln(x - 2) = 3.
+  solution: '{e^3 + 2}'
+  explanation: Convert to x - 2 = e^3.
+- prompt: Solve 3*2^x = 20.
+  solution: x approximately 2.737
+  explanation: Use x = ln(20/3)/ln(2).
+- prompt: Why can log_3(x - 4) = log_3(2 - x) have no real solution?
+  solution: Its domain conditions are incompatible.
+  explanation: It would require x > 4 and x < 2 simultaneously.
+applications:
+- title: Growth and decay time
+  description: Logarithms find when a population, investment, or decaying quantity reaches a target.
+- title: Compound interest
+  description: Unknown investment time appears in an exponent and is isolated with logarithms.
+- title: Scientific scales
+  description: Equations involving pH, sound intensity, and magnitude often require undoing a logarithm.
+- title: Algorithm analysis
+  description: Logarithmic equations count repeated doublings, halvings, and search steps.
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: LOG_EQ_BASIC_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: log_{base}(x) = {exponent}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      exponent:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      solution: base ** exponent
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Convert the logarithmic equation to exponential form, solve for x, and verify that the argument is
+        positive.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Convert to exponential form: x = {base}^{exponent}.
+      Therefore x = {solution}.
+      The argument is positive, so the solution set contains only x = {solution}.
+    mistake_tags:
+    - logarithmic_equation
+    - exponential_form
+    - domain_check
+    difficulty: easy
+  - id: LOG_EQ_SHIFTED_ARGUMENT_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: log_{base}(x - {shift}) = {exponent}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      exponent:
+        type: int
+        min: 1
+        max: 4
+      shift:
+        type: int
+        min: -8
+        max: 8
+        exclude:
+        - 0
+    derived:
+      power: base ** exponent
+      solution: shift + power
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Convert to exponential form, solve the resulting linear equation, and check the original logarithm
+        argument.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Convert to exponential form: x - {shift} = {base}^{exponent} = {power}.
+      Thus x = {solution}.
+      At this value the argument is {power}, which is positive.
+    mistake_tags:
+    - logarithmic_equation
+    - inverse_operations
+    - domain_check
+    difficulty: easy
+  - id: LOG_EQ_SCALED_ARGUMENT_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: log_{base}(x/{scale}) = {exponent}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      exponent:
+        type: int
+        min: 1
+        max: 4
+      scale:
+        type: int
+        min: 2
+        max: 7
+    derived:
+      power: base ** exponent
+      solution: scale * power
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Convert to exponential form, solve x divided by the scale, and check that the logarithm argument is
+        positive.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Convert to exponential form: x/{scale} = {power}.
+      Multiply by {scale}: x = {solution}.
+      The original argument becomes {power} > 0.
+    mistake_tags:
+    - logarithmic_equation
+    - exponential_form
+    - multiplication_error
+    difficulty: medium
+  - id: LOG_EQ_NEGATIVE_VALUE_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: log_{base}(x + {shift}) = -{exponent}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      exponent:
+        type: int
+        min: 1
+        max: 4
+      shift:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      power: base ** exponent
+    answer:
+      type: finite_set
+      values:
+      - 1/{power} - {shift}
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Rewrite the negative logarithm value as a reciprocal power, solve for x, and verify the argument is
+        positive.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Convert to exponential form: x + {shift} = {base}^(-{exponent}) = 1/{power}.
+      Therefore x = 1/{power} - {shift}.
+      The original argument equals 1/{power}, which is positive.
+    mistake_tags:
+    - logarithmic_equation
+    - negative_exponent_error
+    - domain_check
+    difficulty: medium
+  - id: LOG_EQ_EQUAL_LOGS_LINEAR_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: log_{base}({a}x + {c}) = log_{base}({d}x + {right_constant})'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 7
+      a:
+        type: int
+        min: 2
+        max: 7
+      d:
+        type: int
+        min: 1
+        max: 6
+      solution:
+        type: int
+        min: -5
+        max: 8
+        exclude:
+        - 0
+      c:
+        type: int
+        min: 2
+        max: 18
+    derived:
+      right_constant: a * solution + c - d * solution
+      common_argument: a * solution + c
+    constraints:
+    - a != d
+    - common_argument > 0
+    - right_constant != 0
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Use the one-to-one property to equate the positive arguments, solve the linear equation, and check
+        both arguments.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Equal logarithms with the same valid base have equal positive arguments.
+      Set {a}x + {c} = {d}x + {right_constant} and solve to obtain x = {solution}.
+      Both arguments equal {common_argument}, which is positive, so the solution is valid.
+    mistake_tags:
+    - logarithmic_equation
+    - one_to_one_property
+    - variables_on_both_sides
+    - domain_check
+    difficulty: hard
+    max_attempts: 400
+  - id: LOG_EQ_SUM_PRODUCT_LAW_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: log_{base}(x) + log_{base}({base}^{known_power}) = {total_power}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      known_power:
+        type: int
+        min: 1
+        max: 4
+      solution_power:
+        type: int
+        min: 1
+        max: 4
+    derived:
+      total_power: known_power + solution_power
+      solution: base ** solution_power
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Combine the logarithms with the product law, convert to exponential form, solve, and check x > 0.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Combine the left side: log_{base}(x*{base}^{known_power}) = {total_power}.
+      Convert to exponential form: x*{base}^{known_power} = {base}^{total_power}.
+      Divide by {base}^{known_power}: x = {base}^{solution_power} = {solution}.
+    mistake_tags:
+    - logarithmic_equation
+    - product_law
+    - exponent_laws
+    - domain_check
+    difficulty: hard
+  - id: LOG_EQ_DIFFERENCE_QUOTIENT_LAW_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: log_{base}(x) - log_{base}({base}^{known_power}) = {difference}'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      known_power:
+        type: int
+        min: 1
+        max: 4
+      difference:
+        type: int
+        min: 1
+        max: 4
+    derived:
+      total_power: known_power + difference
+      solution: base ** total_power
+    answer:
+      type: finite_set
+      values:
+      - '{solution}'
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Combine the logarithms with the quotient law, convert to exponential form, solve, and check the argument.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Combine the left side: log_{base}(x/{base}^{known_power}) = {difference}.
+      Then x/{base}^{known_power} = {base}^{difference}.
+      Therefore x = {base}^{total_power} = {solution}, which is positive.
+    mistake_tags:
+    - logarithmic_equation
+    - quotient_law
+    - exponent_laws
+    - domain_check
+    difficulty: hard
+  - id: LOG_EQ_DISJOINT_DOMAINS_NO_SOLUTION_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: log_{base}(x - {left}) = log_{base}({right} - x)'
+    answer_mode: final_plus_required_work
+    variables:
+      base:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 5
+        - 7
+      left:
+        type: int
+        min: -5
+        max: 8
+      gap:
+        type: int
+        min: 1
+        max: 7
+    derived:
+      right: left - gap
+    constraints:
+    - right != 0
+    answer:
+      type: finite_set
+      values: []
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Find the domain requirements for both logarithms before solving. Explain why their intersection is
+        empty.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The first logarithm requires x > {left}.
+      The second requires x < {right}.
+      Because {right} < {left}, no real x satisfies both requirements, so the solution set is empty.
+    mistake_tags:
+    - logarithmic_equation
+    - domain_check
+    - empty_set
+    - extraneous_solution
+    difficulty: hard
+  - id: LOG_EQ_NATURAL_LOG_SHIFT_001
+    type: generated
+    prompt_template: 'Solve over the real numbers: ln(x - {shift}) = {exponent}'
+    answer_mode: final_plus_required_work
+    variables:
+      shift:
+        type: int
+        min: -6
+        max: 8
+        exclude:
+        - 0
+      exponent:
+        type: int
+        min: 1
+        max: 4
+    answer:
+      type: finite_set
+      values:
+      - e^{exponent} + {shift}
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: Use that ln has base e, convert to exponential form, solve for x, and check the domain.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Because ln has base e, x - {shift} = e^{exponent}.
+      Thus x = e^{exponent} + {shift}.
+      The argument is e^{exponent} > 0, so the solution is valid.
+    mistake_tags:
+    - natural_logarithm
+    - logarithmic_equation
+    - exponential_form
+    - domain_check
+    difficulty: medium
+  - id: EXP_EQ_SOLVE_WITH_LOGS_001
+    type: fixed
+    prompt: Solve 3*2^x = 20. Round x to three decimal places.
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '2.737'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    work:
+      mode: capture_only
+      prompt: Isolate 2^x, take logarithms of both sides, use change of base, and round only at the end.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Divide by 3: 2^x = 20/3.
+      Take logarithms: x = ln(20/3)/ln(2).
+      This is approximately 2.736966, which rounds to 2.737.
+    mistake_tags:
+    - exponential_equation
+    - logarithm_method
+    - change_of_base
+    - rounding_error
+    difficulty: medium
+  - id: EXP_EQ_SHIFTED_EXPONENT_WITH_LOGS_001
+    type: fixed
+    prompt: Solve 5^(x + 1) = 70. Round x to three decimal places.
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '1.640'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    work:
+      mode: capture_only
+      prompt: Take logarithms, solve for x + 1, subtract 1, and round only the final result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Take logarithms: (x + 1)ln(5) = ln(70).
+      So x = ln(70)/ln(5) - 1.
+      This is approximately 1.639739, which rounds to 1.640.
+    mistake_tags:
+    - exponential_equation
+    - logarithm_method
+    - inverse_operations
+    - rounding_error
+    difficulty: hard
+  - id: EXP_MODEL_DOUBLING_TIME_WITH_LOGS_001
+    type: fixed
+    prompt: A population follows P(t) = 500*(1.08)^t. At what real-valued time does it reach 1000? Round to three
+      decimal places.
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '9.006'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    work:
+      mode: capture_only
+      prompt: Set the model equal to 1000, isolate the exponential factor, use logarithms to solve for t, and state
+        the time units.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Set 500*(1.08)^t = 1000 and divide by 500.
+      Then (1.08)^t = 2, so t = ln(2)/ln(1.08).
+      This is approximately 9.006468, so the population reaches 1000 at t approximately 9.006 periods.
+    mistake_tags:
+    - exponential_model
+    - logarithm_method
+    - doubling_time
+    - rounding_error
+    difficulty: hard
+  - id: LOG_EQ_ARGUMENT_CANDIDATE_REJECTION_001
+    type: fixed
+    prompt: 'Solve over the real numbers: log_3(x - 4) = log_3(2 - x)'
+    answer_mode: final_plus_required_work
+    answer:
+      type: finite_set
+      values: []
+    grading:
+      method: finite_set
+    work:
+      mode: capture_only
+      prompt: State both domain inequalities, compare the arguments, and explain why any algebraic candidate is
+        invalid.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The first argument requires x > 4, while the second requires x < 2.
+      These domain conditions cannot both hold.
+      Although equating the arguments produces an algebraic candidate, it is outside the logarithm domain, so the real solution set is empty.
+    mistake_tags:
+    - logarithmic_equation
+    - domain_check
+    - extraneous_solution
+    - empty_set
+    difficulty: hard

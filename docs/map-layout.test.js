@@ -8,15 +8,15 @@ import { createQuickMathsStore, DEFAULT_SUBJECT, normalizeLessonPackCollection }
 
 const read = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8"));
 const curriculum = read("./curriculum-data.json");
-const packages = ["estimation-lab/1.0.0", "geography/1.0.0", "programming-fundamentals-python/1.2.0"].map((path) => read(`./lesson-depot/lessons/${path}/lesson-set.json`));
+const packages = ["estimation-lab/1.0.0", "geography/1.0.0", "programming-fundamentals-python/1.2.0", "python-extensions/1.0.0"].map((path) => read(`./lesson-depot/lessons/${path}/lesson-set.json`));
 
-test("all 95 shipped lessons use the shared broad-branch standard", () => {
+test("all 107 shipped lessons use the shared broad-branch standard", () => {
   assert.deepEqual(FIELD_TAXONOMY, read("./learning-taxonomy.json"));
   const entries = [
     ...curriculum.skills.map((skill) => ["SUBJECT_MATH", skill]),
     ...packages.flatMap((pack) => pack.skills.map((skill) => [pack.subject.id, skill])),
   ];
-  assert.equal(entries.length, 95);
+  assert.equal(entries.length, 107);
   for (const [fieldId, skill] of entries) {
     assert.ok(standardBranches(fieldId).includes(skill.subdomain), `${skill.id}: ${skill.subdomain}`);
     assert.equal(normalizeLessonTaxonomy(skill, fieldId).subdomain, skill.subdomain);
@@ -28,10 +28,10 @@ test("all 95 shipped lessons use the shared broad-branch standard", () => {
 
 test("canonical nodes sit in non-overlapping field/branch bands and prerequisites stay left of dependents", () => {
   const packs = normalizeLessonPackCollection(packages, curriculum);
-  const subjects = [DEFAULT_SUBJECT, ...packs.filter((pack) => pack.subject.id !== DEFAULT_SUBJECT.id).map((pack) => pack.subject)];
+  const subjects = [...new Map([DEFAULT_SUBJECT, ...packs.map(pack => pack.subject)].map(subject => [subject.id, subject])).values()];
   const skills = [...curriculum.skills.map((skill) => ({ ...skill, subjectId: "SUBJECT_MATH" })), ...packs.flatMap((pack) => pack.skills)];
   const layout = fieldBranchMapLayout(skills, { subjects });
-  assert.equal(Object.keys(layout.positions).length, 95);
+  assert.equal(Object.keys(layout.positions).length, 107);
   assert.equal(layout.lanes.length, 3);
   assert.equal(layout.lanes.flatMap((lane) => lane.branches).length, 12);
   let end = 0;

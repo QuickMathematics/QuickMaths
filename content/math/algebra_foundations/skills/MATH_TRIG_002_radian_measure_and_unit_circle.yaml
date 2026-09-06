@@ -1,0 +1,604 @@
+id: MATH_TRIG_002
+schema_version: 0.2
+name: Radian measure and the unit circle
+domain: Math
+subdomain: Geometry
+topic: Trigonometry
+description: Convert angle measures, use radians in circle formulas, find coterminal and reference angles, and evaluate
+  exact unit-circle values.
+prerequisites:
+- MATH_TRIG_001
+- MATH_GRAPH_001
+- MATH_ARITH_003
+tags:
+- trigonometry
+- radians
+- degrees
+- unit_circle
+- coterminal_angles
+- reference_angles
+- arc_length
+- special_angles
+- exact_trig_values
+unlocks:
+- MATH_TRIG_003
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Angles can be measured in degrees or radians.
+
+  One complete turn is:
+
+  360 degrees = 2pi radians
+
+  Therefore:
+
+  180 degrees = pi radians
+
+  Conversion formulas:
+  - degrees to radians: multiply by pi/180;
+  - radians to degrees: multiply by 180/pi.
+
+  Radian measure comes from arc length. An angle of theta radians cuts off an arc whose length is:
+
+  s = r*theta
+
+  where r is the radius. This formula requires theta to be in radians.
+
+  Coterminal angles:
+  Angles that differ by a whole number of full turns end on the same ray.
+
+  In degrees:
+  theta + 360k
+
+  In radians:
+  theta + 2pi*k
+
+  where k is any integer.
+
+  Reference angle:
+  The reference angle is the positive acute angle between the terminal side and the x-axis.
+
+  For an angle from 0 to 360 degrees:
+  - Quadrant I: reference angle = theta.
+  - Quadrant II: reference angle = 180 - theta.
+  - Quadrant III: reference angle = theta - 180.
+  - Quadrant IV: reference angle = 360 - theta.
+
+  Unit circle:
+  The unit circle has center (0, 0) and radius 1.
+
+  The point at angle theta is:
+
+  (cos(theta), sin(theta))
+
+  So cosine is the x-coordinate and sine is the y-coordinate.
+
+  Since tan(theta) = sin(theta)/cos(theta), tangent is undefined wherever cos(theta) = 0.
+
+  Core exact values in Quadrant I:
+
+  theta       cos(theta)       sin(theta)       tan(theta)
+  0           1                0                0
+  pi/6        sqrt(3)/2        1/2              sqrt(3)/3
+  pi/4        sqrt(2)/2        sqrt(2)/2        1
+  pi/3        1/2              sqrt(3)/2        sqrt(3)
+  pi/2        0                1                undefined
+
+  Use the reference angle for the size of the coordinates and the quadrant for their signs:
+  - Quadrant I: cosine positive, sine positive.
+  - Quadrant II: cosine negative, sine positive.
+  - Quadrant III: cosine negative, sine negative.
+  - Quadrant IV: cosine positive, sine negative.
+
+  Method for an exact unit-circle value:
+  1. Find a coterminal angle from 0 to 2pi.
+  2. Identify its quadrant.
+  3. Find its reference angle.
+  4. Use the exact Quadrant-I value.
+  5. Apply the correct sign.
+  6. For tangent, divide sine by cosine.
+
+  Common mistake:
+  Do not swap the unit-circle coordinates. The order is (cosine, sine), not (sine, cosine).
+
+  Another common mistake:
+  Radian measure is not a unitless copy of degrees. pi radians equals 180 degrees, not 360 degrees.
+
+  Another common mistake:
+  The reference angle is always positive and acute. It is not the same as the original angle unless the angle is already in Quadrant I.
+examples:
+- prompt: Convert 150 degrees to radians.
+  solution: 5pi/6
+  explanation: 150*pi/180 simplifies to 5pi/6.
+- prompt: Convert 7pi/4 radians to degrees.
+  solution: 315 degrees
+  explanation: Multiply by 180/pi.
+- prompt: Find the arc length when r = 6 and theta = pi/3.
+  solution: 2pi
+  explanation: s = r*theta = 6*pi/3 = 2pi.
+- prompt: Find the smallest nonnegative angle coterminal with -30 degrees.
+  solution: 330 degrees
+  explanation: Add 360 degrees.
+- prompt: Find the reference angle for 225 degrees.
+  solution: 45 degrees
+  explanation: 225 - 180 = 45.
+- prompt: Find the unit-circle point at 2pi/3.
+  solution: (-1/2, sqrt(3)/2)
+  explanation: The reference angle is pi/3 in Quadrant II.
+  media:
+  - type: image
+    src: media/trigonometry/unit-circle.svg
+    alt: The unit-circle point at 2pi/3 is (-1/2, sqrt(3)/2), with projections onto the axes.
+    caption: The unit-circle point at 2pi/3 is (-1/2, sqrt(3)/2), with projections onto the axes.
+    width: 720
+    height: 640
+- prompt: Evaluate sin(5pi/6).
+  solution: 1/2
+  explanation: Sine is positive in Quadrant II.
+- prompt: Evaluate tan(3pi/4).
+  solution: '-1'
+  explanation: Sine is positive and cosine is negative in Quadrant II.
+applications:
+- title: Rotational motion
+  description: Radians make angular velocity and circular motion formulas direct and consistent.
+- title: Waves
+  description: Sound, light, tides, and electrical signals use angles around the unit circle.
+- title: Computer graphics
+  description: Sine and cosine convert angles into horizontal and vertical coordinates.
+- title: Engineering
+  description: Arc length and angular displacement describe gears, wheels, and rotating mechanisms.
+test:
+  question_count: 12
+  randomize_order: true
+  questions:
+  - id: TRIG_RAD_DEGREES_TO_RADIANS_001
+    type: generated
+    prompt_template: Convert {degrees} degrees to radians. Give an exact answer in terms of pi.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Multiply by pi/180, simplify the fraction, and state the exact radian measure.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      degrees:
+        type: choice
+        values:
+        - 30
+        - 45
+        - 60
+        - 90
+        - 120
+        - 135
+        - 150
+        - 210
+        - 225
+        - 240
+        - 300
+        - 315
+        - 330
+    answer:
+      type: numeric
+      value: '{degrees}*pi/180'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Multiply degrees by pi/180.
+      {degrees} degrees = {degrees}*pi/180 radians.
+      Any algebraically equivalent simplified form is correct.
+    mistake_tags:
+    - degree_radian_conversion
+    - pi_factor_error
+    - fraction_error
+    difficulty: easy
+  - id: TRIG_RAD_RADIANS_TO_DEGREES_001
+    type: generated
+    prompt_template: Convert {numerator}pi/{denominator} radians to degrees.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Multiply by 180/pi, cancel pi, and simplify the degree measure.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    max_attempts: 200
+    variables:
+      numerator:
+        type: int
+        min: 1
+        max: 11
+      denominator:
+        type: choice
+        values:
+        - 3
+        - 4
+        - 6
+    derived:
+      degrees: 180 * numerator / denominator
+    constraints:
+    - numerator < 2 * denominator
+    - numerator != denominator
+    - not (numerator % 2 == 0 and denominator % 2 == 0)
+    - not (numerator % 3 == 0 and denominator % 3 == 0)
+    answer:
+      type: numeric
+      value: '{degrees}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Multiply radians by 180/pi.
+      ({numerator}pi/{denominator}) * (180/pi) = {degrees} degrees.
+    mistake_tags:
+    - radian_degree_conversion
+    - pi_cancellation_error
+    - fraction_error
+    difficulty: easy
+  - id: TRIG_RAD_ARC_LENGTH_001
+    type: generated
+    prompt_template: A circle has radius {radius}. Find the exact arc length subtended by an angle of {numerator}pi/{denominator}
+      radians.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Use s = r*theta with theta in radians, substitute, and simplify exactly.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    max_attempts: 200
+    variables:
+      radius:
+        type: int
+        min: 2
+        max: 15
+      numerator:
+        type: int
+        min: 1
+        max: 7
+      denominator:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 6
+    derived:
+      coefficient: radius * numerator
+    constraints:
+    - numerator < 2 * denominator
+    - not (numerator % 2 == 0 and denominator % 2 == 0)
+    - not (numerator % 3 == 0 and denominator % 3 == 0)
+    answer:
+      type: numeric
+      value: '{coefficient}*pi/{denominator}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Arc length is s = r*theta when theta is measured in radians.
+      s = {radius} * ({numerator}pi/{denominator}) = {coefficient}pi/{denominator}.
+    mistake_tags:
+    - arc_length_error
+    - radian_measure_error
+    - multiplication_error
+    difficulty: medium
+  - id: TRIG_RAD_COTERMINAL_DEGREES_001
+    type: generated
+    prompt_template: Find the smallest nonnegative angle coterminal with {presented_angle} degrees.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Add or subtract whole turns of 360 degrees until the result lies from 0 degrees inclusive to 360 degrees
+        exclusive.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      base_angle:
+        type: choice
+        values:
+        - 30
+        - 45
+        - 60
+        - 120
+        - 135
+        - 150
+        - 210
+        - 225
+        - 240
+        - 300
+        - 315
+        - 330
+      turns:
+        type: int
+        min: -3
+        max: 3
+        exclude:
+        - 0
+    derived:
+      presented_angle: base_angle + 360 * turns
+    answer:
+      type: numeric
+      value: '{base_angle}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Coterminal angles differ by whole multiples of 360 degrees.
+      {presented_angle} degrees is coterminal with {base_angle} degrees.
+    mistake_tags:
+    - coterminal_angle_error
+    - full_rotation_error
+    - sign_error
+    difficulty: medium
+  - id: TRIG_RAD_REFERENCE_ANGLE_QII_001
+    type: generated
+    prompt_template: Find the reference angle for {angle} degrees.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Identify the quadrant and subtract the angle from 180 degrees.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      reference:
+        type: choice
+        values:
+        - 30
+        - 45
+        - 60
+    derived:
+      angle: 180 - reference
+    answer:
+      type: numeric
+      value: '{reference}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      {angle} degrees lies in Quadrant II.
+      Its reference angle is 180 - {angle} = {reference} degrees.
+    mistake_tags:
+    - reference_angle_error
+    - quadrant_error
+    - subtraction_error
+    difficulty: easy
+  - id: TRIG_RAD_REFERENCE_ANGLE_QIII_001
+    type: generated
+    prompt_template: Find the reference angle for {angle} degrees.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Identify the quadrant and subtract 180 degrees from the angle.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      reference:
+        type: choice
+        values:
+        - 30
+        - 45
+        - 60
+    derived:
+      angle: 180 + reference
+    answer:
+      type: numeric
+      value: '{reference}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      {angle} degrees lies in Quadrant III.
+      Its reference angle is {angle} - 180 = {reference} degrees.
+    mistake_tags:
+    - reference_angle_error
+    - quadrant_error
+    - subtraction_error
+    difficulty: medium
+  - id: TRIG_RAD_REFERENCE_ANGLE_QIV_001
+    type: generated
+    prompt_template: Find the reference angle for {angle} degrees.
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Identify the quadrant and subtract the angle from 360 degrees.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      reference:
+        type: choice
+        values:
+        - 30
+        - 45
+        - 60
+    derived:
+      angle: 360 - reference
+    answer:
+      type: numeric
+      value: '{reference}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      {angle} degrees lies in Quadrant IV.
+      Its reference angle is 360 - {angle} = {reference} degrees.
+    mistake_tags:
+    - reference_angle_error
+    - quadrant_error
+    - subtraction_error
+    difficulty: medium
+  - id: TRIG_UNIT_COORDINATE_PI_OVER_4_001
+    type: generated
+    prompt_template: Which point on the unit circle corresponds to the coterminal angle {numerator}pi/4?
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      turns:
+        type: int
+        min: -2
+        max: 2
+    derived:
+      numerator: 1 + 8 * turns
+    options:
+    - id: A
+      label: (sqrt(2)/2, sqrt(2)/2)
+    - id: B
+      label: (-sqrt(2)/2, sqrt(2)/2)
+    - id: C
+      label: (-sqrt(2)/2, -sqrt(2)/2)
+    - id: D
+      label: (sqrt(2)/2, -sqrt(2)/2)
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      {numerator}pi/4 is coterminal with pi/4.
+      At pi/4, cosine and sine are both sqrt(2)/2.
+      The point is (sqrt(2)/2, sqrt(2)/2).
+    mistake_tags:
+    - unit_circle_error
+    - coterminal_angle_error
+    - coordinate_sign_error
+    difficulty: medium
+  - id: TRIG_UNIT_COORDINATE_TWO_PI_OVER_3_001
+    type: generated
+    prompt_template: Which point on the unit circle corresponds to the coterminal angle {numerator}pi/3?
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      turns:
+        type: int
+        min: -2
+        max: 2
+    derived:
+      numerator: 2 + 6 * turns
+    options:
+    - id: A
+      label: (1/2, sqrt(3)/2)
+    - id: B
+      label: (-1/2, sqrt(3)/2)
+    - id: C
+      label: (-sqrt(3)/2, 1/2)
+    - id: D
+      label: (-1/2, -sqrt(3)/2)
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      {numerator}pi/3 is coterminal with 2pi/3.
+      The reference angle is pi/3 and the angle is in Quadrant II.
+      The point is (-1/2, sqrt(3)/2).
+    mistake_tags:
+    - unit_circle_error
+    - quadrant_sign_error
+    - reference_angle_error
+    difficulty: hard
+  - id: TRIG_UNIT_SINE_FIVE_PI_OVER_6_001
+    type: generated
+    prompt_template: 'Evaluate exactly: sin({numerator}pi/6)'
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Reduce to a coterminal angle, identify the reference angle and quadrant, then read the unit-circle
+        y-coordinate.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      turns:
+        type: int
+        min: -2
+        max: 2
+    derived:
+      numerator: 5 + 12 * turns
+    answer:
+      type: numeric
+      value: 1/2
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      {numerator}pi/6 is coterminal with 5pi/6.
+      Its reference angle is pi/6, and sine is positive in Quadrant II.
+      Therefore the exact value is 1/2.
+    mistake_tags:
+    - unit_circle_error
+    - sine_error
+    - quadrant_sign_error
+    difficulty: medium
+  - id: TRIG_UNIT_COSINE_SEVEN_PI_OVER_4_001
+    type: generated
+    prompt_template: 'Evaluate exactly: cos({numerator}pi/4)'
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Reduce to a coterminal angle, identify the reference angle and quadrant, then read the unit-circle
+        x-coordinate.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      turns:
+        type: int
+        min: -2
+        max: 2
+    derived:
+      numerator: 7 + 8 * turns
+    answer:
+      type: numeric
+      value: sqrt(2)/2
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      {numerator}pi/4 is coterminal with 7pi/4.
+      Its reference angle is pi/4, and cosine is positive in Quadrant IV.
+      Therefore the exact value is sqrt(2)/2.
+    mistake_tags:
+    - unit_circle_error
+    - cosine_error
+    - quadrant_sign_error
+    difficulty: medium
+  - id: TRIG_UNIT_TANGENT_THREE_PI_OVER_4_001
+    type: generated
+    prompt_template: 'Evaluate exactly: tan({numerator}pi/4)'
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Reduce to a coterminal angle and use tan(theta) = sin(theta)/cos(theta), including the quadrant sign.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    variables:
+      turns:
+        type: int
+        min: -2
+        max: 2
+    derived:
+      numerator: 3 + 8 * turns
+    answer:
+      type: numeric
+      value: '-1'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      {numerator}pi/4 is coterminal with 3pi/4.
+      Sine is sqrt(2)/2 and cosine is -sqrt(2)/2.
+      Their quotient is -1.
+    mistake_tags:
+    - unit_circle_error
+    - tangent_error
+    - quadrant_sign_error
+    difficulty: hard

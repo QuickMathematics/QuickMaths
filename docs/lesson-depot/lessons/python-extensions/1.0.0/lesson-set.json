@@ -1,0 +1,1398 @@
+{
+  "format": "quickmaths.lesson-set",
+  "schema_version": "2.0",
+  "mode": "add",
+  "id": "PACK_PYTHON_EXTENSIONS",
+  "name": "Python Extensions: Contracts, Generators and Recursion",
+  "description": "Three new lessons continuing Programming Fundamentals with Python: type hints and dataclasses, iterators and generators, and recursion with trees and memoization. Install Programming Fundamentals with Python first; this extension keeps its 25 lessons and your saved progress intact.",
+  "author": "QuickMaths",
+  "version": "1.0.0",
+  "subject": {
+    "id": "SUBJECT_PROGRAMMING",
+    "name": "Programming",
+    "short_name": "Code",
+    "icon": "⌘",
+    "description": "Learn to design, trace, test, persist, and explain Python programs from first instructions through structured data, reusable modules, objects, algorithms, and complete command-line applications.",
+    "theme": {
+      "paper": "#eef1f7",
+      "paperDeep": "#dce2ee",
+      "paperLight": "#fbfcff",
+      "ink": "#161b2d",
+      "muted": "#667085",
+      "line": "#c7cede",
+      "primary": "#273b8f",
+      "primaryAlt": "#3d57b2",
+      "tint": "#c8d2f5",
+      "highlight": "#f5df93",
+      "accent": "#d95d6f"
+    }
+  },
+  "track": {
+    "id": "TRACK_PYTHON_EXTENSIONS",
+    "name": "Python Extensions: Contracts, Generators and Recursion",
+    "domain": "Programming",
+    "description": "Three new lessons continuing Programming Fundamentals with Python: type hints and dataclasses, iterators and generators, and recursion with trees and memoization. Install Programming Fundamentals with Python first; this extension keeps its 25 lessons and your saved progress intact.",
+    "skills": [
+      "CUSTOM_PROG_026",
+      "CUSTOM_PROG_027",
+      "CUSTOM_PROG_028"
+    ],
+    "entry_skills": [
+      "CUSTOM_PROG_026"
+    ],
+    "exit_skills": [
+      "CUSTOM_PROG_028"
+    ],
+    "schema_version": "2.0"
+  },
+  "skills": [
+    {
+      "id": "CUSTOM_PROG_026",
+      "name": "Type hints, dataclasses, and explicit contracts",
+      "domain": "Programming",
+      "subdomain": "Software Engineering",
+      "description": "Describe function and data contracts with type hints, model records with dataclasses, and validate invariants at clear boundaries.",
+      "prerequisites": [
+        "CUSTOM_PROG_025",
+        {
+          "subject_id": "SUBJECT_MATH",
+          "skill_id": "MATH_FUNC_001"
+        }
+      ],
+      "unlocks": [
+        "CUSTOM_PROG_027"
+      ],
+      "tags": [
+        "python",
+        "type_hints",
+        "dataclasses",
+        "contracts",
+        "validation",
+        "default_factory",
+        "immutability",
+        "static_analysis"
+      ],
+      "mastery": {
+        "passing_score": 0.8,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "maybe",
+        "review_after_days_if_mastered": 10,
+        "review_after_days_if_learning": 3
+      },
+      "theory": "A program becomes easier to understand when its data contracts are visible. A contract describes what a function accepts, what it returns, and which states are valid.\n\nPython type hints document those contracts in code:\n\ndef area(width: float, height: float) -> float:\n    return width * height\n\nThe annotations say that callers should supply two numbers and expect a number back. They help readers, editors, linters, and static type checkers. Ordinary Python does not automatically reject every value that violates an annotation at runtime. Runtime validation is still needed at boundaries where bad data can enter.\n\nCommon annotations:\n- int, float, str, bool, and bytes describe basic values;\n- list[str] means a list whose elements should be strings;\n- dict[str, int] means string keys mapped to integer values;\n- tuple[float, float] describes a two-item coordinate pair;\n- str | None means either a string or None;\n- callable annotations describe functions passed as values.\n\nPrefer specific useful types without making every local variable noisy. Annotate public functions, important data structures, module boundaries, and places where a wrong shape would be confusing.\n\nA dataclass is a concise way to model a record with named fields:\n\nfrom dataclasses import dataclass\n\n@dataclass\nclass Point:\n    x: float\n    y: float\n\nDataclasses normally generate an initializer, readable representation, and value-based equality. Methods can still be added normally.\n\nMutable defaults need special care. A mutable list default is rejected:\n\n@dataclass\nclass Group:\n    members: list[str] = []\n\nPython raises ValueError for this mutable dataclass default, preventing accidental sharing between instances. Use a factory instead:\n\nfrom dataclasses import field\n\n@dataclass\nclass Group:\n    members: list[str] = field(default_factory=list)\n\nEach new Group then receives its own list.\n\nUse frozen=True when instances should behave like immutable values. A frozen dataclass prevents ordinary field reassignment after construction. This can make state transitions clearer because an operation returns a new value instead of silently changing an old one.\n\nInvariants are rules that must remain true. For a Reading record, pages must be positive and pages_read must stay between 0 and pages. __post_init__ is a useful place to validate a dataclass immediately after its generated initializer has assigned fields.\n\nValidation should happen at deliberate boundaries:\n- parse untrusted text before it reaches domain logic;\n- reject impossible constructor values;\n- normalize data once rather than repeatedly;\n- give errors that identify the violated rule.\n\nType hints and validation serve different purposes. Hints communicate and support tooling. Validation protects a running program from invalid values. Tests check that both successful and failing cases behave as designed.\n\nCommon mistake:\nDo not assume an annotation converts a value. A parameter annotated int does not automatically turn \"7\" into 7.\n\nAnother common mistake:\nDo not use one mutable object as a dataclass field default. Use default_factory for lists, dictionaries, sets, or other values that each instance should own.\n\nAnother common mistake:\nDo not expose a dataclass merely to avoid writing a dictionary. Use it when named fields, invariants, equality, or methods make the model clearer.\n",
+      "examples": [
+        {
+          "prompt": "Annotate a formatter",
+          "solution": "def label(name: str, score: int) -> str:",
+          "explanation": "The signature makes both inputs and the returned text explicit."
+        },
+        {
+          "prompt": "Represent an optional lookup result",
+          "solution": "def find_name(user_id: int) -> str | None:",
+          "explanation": "None states clearly that no matching name may exist."
+        },
+        {
+          "prompt": "Give every instance its own list",
+          "solution": "members: list[str] = field(default_factory=list)",
+          "explanation": "The factory runs once for each new instance."
+        },
+        {
+          "prompt": "Validate a percentage field",
+          "solution": "Raise ValueError in __post_init__ unless 0 <= percent <= 100",
+          "explanation": "Invalid objects are rejected at construction rather than leaking into later calculations."
+        }
+      ],
+      "applications": [
+        {
+          "title": "Team codebases",
+          "description": "Visible contracts help callers use functions correctly and make refactoring safer."
+        },
+        {
+          "title": "APIs and file formats",
+          "description": "Typed models and validation turn loosely structured input into dependable domain values."
+        },
+        {
+          "title": "Testing and debugging",
+          "description": "Invariants reduce the number of impossible states that later code must investigate."
+        }
+      ],
+      "question_count": 10,
+      "problems": [
+        {
+          "template_id": "CUSTOM_PROG_026_Q01",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "easy",
+          "prompt": "What does repeat(\"ha\", 3) return?",
+          "expected_answer": "B",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "ha3"
+            },
+            {
+              "id": "B",
+              "label": "hahaha"
+            },
+            {
+              "id": "C",
+              "label": "6"
+            },
+            {
+              "id": "D",
+              "label": "A type error caused by the annotations"
+            }
+          ],
+          "solution_steps": [
+            "String multiplication repeats \"ha\" three times. The annotations describe the intended contract but do not change the operation."
+          ],
+          "mistake_tags": [
+            "type_hint",
+            "string_repetition"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "prompt_blocks": [
+            {
+              "type": "text",
+              "text": "What does repeat(\"ha\", 3) return?"
+            },
+            {
+              "type": "code",
+              "language": "python",
+              "text": "def repeat(text: str, times: int) -> str:\n    return text * times\n\nrepeat(\"ha\", 3)"
+            }
+          ]
+        },
+        {
+          "template_id": "CUSTOM_PROG_026_Q02",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "easy",
+          "prompt": "What does the annotation list[str] communicate?",
+          "expected_answer": "C",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "A single string split into characters"
+            },
+            {
+              "id": "B",
+              "label": "A list that can contain only one item"
+            },
+            {
+              "id": "C",
+              "label": "A list whose elements should be strings"
+            },
+            {
+              "id": "D",
+              "label": "A dictionary with string keys"
+            }
+          ],
+          "solution_steps": [
+            "The outer type is list and the element type is str."
+          ],
+          "mistake_tags": [
+            "collection_annotation",
+            "type_shape"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_026_Q03",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "medium",
+          "prompt": "What does ordinary Python do automatically when a caller passes a string to a parameter annotated int?",
+          "expected_answer": "D",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It always converts the string to an integer"
+            },
+            {
+              "id": "B",
+              "label": "It always terminates before the function body runs"
+            },
+            {
+              "id": "C",
+              "label": "It deletes the annotation"
+            },
+            {
+              "id": "D",
+              "label": "It normally runs the call unless the function or another tool performs a check"
+            }
+          ],
+          "solution_steps": [
+            "Annotations are metadata for readers and tools; they are not automatic runtime enforcement."
+          ],
+          "mistake_tags": [
+            "runtime_validation",
+            "type_hint"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_026_Q04",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "easy",
+          "prompt": "Which return annotation best states that a lookup returns either a user name or no result?",
+          "expected_answer": "A",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "str | None"
+            },
+            {
+              "id": "B",
+              "label": "list[int]"
+            },
+            {
+              "id": "C",
+              "label": "bool | float"
+            },
+            {
+              "id": "D",
+              "label": "dict[str, str]"
+            }
+          ],
+          "solution_steps": [
+            "A union with None makes the missing-result case part of the contract."
+          ],
+          "mistake_tags": [
+            "optional_value",
+            "return_annotation"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_026_Q05",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "easy",
+          "prompt": "What does @dataclass normally generate for a simple record class?",
+          "expected_answer": "B",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "A database and a web server"
+            },
+            {
+              "id": "B",
+              "label": "Methods such as __init__, __repr__, and value-based __eq__"
+            },
+            {
+              "id": "C",
+              "label": "Automatic network validation"
+            },
+            {
+              "id": "D",
+              "label": "A list shared by all instances"
+            }
+          ],
+          "solution_steps": [
+            "The generated methods remove repetitive record boilerplate while leaving the class open to normal methods."
+          ],
+          "mistake_tags": [
+            "dataclass",
+            "generated_methods"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_026_Q06",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "medium",
+          "prompt": "Why should a list field usually use field(default_factory=list) instead of members = []?",
+          "expected_answer": "C",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It sorts the list automatically"
+            },
+            {
+              "id": "B",
+              "label": "It makes the field a tuple"
+            },
+            {
+              "id": "C",
+              "label": "It creates a fresh list for each instance"
+            },
+            {
+              "id": "D",
+              "label": "It prevents all mutations everywhere"
+            }
+          ],
+          "solution_steps": [
+            "A factory avoids accidentally sharing one mutable default across instances."
+          ],
+          "mistake_tags": [
+            "default_factory",
+            "mutable_default"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_026_Q07",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "easy",
+          "prompt": "What is the main effect of @dataclass(frozen=True)?",
+          "expected_answer": "D",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "The class can never be constructed"
+            },
+            {
+              "id": "B",
+              "label": "Every field becomes a string"
+            },
+            {
+              "id": "C",
+              "label": "The object is written to disk automatically"
+            },
+            {
+              "id": "D",
+              "label": "Ordinary reassignment of fields after construction is blocked"
+            }
+          ],
+          "solution_steps": [
+            "Frozen dataclasses support value-style objects whose fields are not normally reassigned."
+          ],
+          "mistake_tags": [
+            "frozen_dataclass",
+            "immutability"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_026_Q08",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "easy",
+          "prompt": "A Point dataclass has x = 3 and y = 4. A method returns x*x + y*y. What value does it return?",
+          "expected_answer": "25",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "Substitute the fields: 3² + 4² = 9 + 16 = 25."
+          ],
+          "mistake_tags": [
+            "dataclass_method",
+            "field_access"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_026_Q09",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "medium",
+          "prompt": "Which dataclass method is designed for validation immediately after the generated initializer assigns fields?",
+          "expected_answer": "A",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "__post_init__"
+            },
+            {
+              "id": "B",
+              "label": "__next__"
+            },
+            {
+              "id": "C",
+              "label": "__enter__"
+            },
+            {
+              "id": "D",
+              "label": "__len__"
+            }
+          ],
+          "solution_steps": [
+            "__post_init__ runs after generated initialization and can reject broken invariants."
+          ],
+          "mistake_tags": [
+            "post_init",
+            "invariant_validation"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_026_Q10",
+          "skill_id": "CUSTOM_PROG_026",
+          "difficulty": "hard",
+          "prompt": "A valid Reading has pages = 120 and pages_read = 45. How many pages remain?",
+          "expected_answer": "75",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "Remaining pages are 120 - 45 = 75."
+          ],
+          "mistake_tags": [
+            "dataclass_design",
+            "invariant",
+            "practical_model"
+          ],
+          "answer_mode": "final_plus_required_work",
+          "work": {
+            "mode": "capture_only",
+            "prompt": "Implement a frozen @dataclass Reading with fields title: str, pages: int, and pages_read: int = 0. Reject a blank title, nonpositive page count, or pages_read outside 0..pages in __post_init__. Add a remaining property and a read(amount: int) method that returns a new Reading rather than mutating the old one. Annotate every public field, property, method parameter, and return value. Include tests for construction, equality, remaining pages, immutable updates, over-reading, negative amounts, a blank title, and independence between instances."
+          },
+          "review_policy": {
+            "work_review": "optional",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        }
+      ],
+      "topic": "Program Design"
+    },
+    {
+      "id": "CUSTOM_PROG_027",
+      "name": "Iterators, generators, and lazy pipelines",
+      "domain": "Programming",
+      "subdomain": "Programming Fundamentals",
+      "description": "Use Python’s iteration protocol, write generator functions, and process streams lazily without materializing every intermediate value.",
+      "prerequisites": [
+        "CUSTOM_PROG_026",
+        {
+          "subject_id": "SUBJECT_MATH",
+          "skill_id": "MATH_SEQ_001"
+        }
+      ],
+      "unlocks": [
+        "CUSTOM_PROG_028"
+      ],
+      "tags": [
+        "python",
+        "iterables",
+        "iterators",
+        "generators",
+        "yield",
+        "lazy_evaluation",
+        "generator_expressions",
+        "pipelines"
+      ],
+      "mastery": {
+        "passing_score": 0.8,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "maybe",
+        "review_after_days_if_mastered": 10,
+        "review_after_days_if_learning": 3
+      },
+      "theory": "Iteration is the process of receiving one value at a time from a source. Python’s for loop works with the iteration protocol rather than only with lists.\n\nAn iterable can produce an iterator. Lists, tuples, strings, dictionaries, sets, ranges, files, and many custom objects are iterable. Calling iter(source) asks for an iterator.\n\nAn iterator remembers its current position. Calling next(iterator) returns the next value. When no values remain, the iterator signals StopIteration. A for loop handles that signal internally.\n\nExample:\n\nvalues = iter([10, 20, 30])\nnext(values)  # 10\nnext(values)  # 20\n\nMost iterators are one-pass objects. Once consumed, they do not restart automatically. Create a new iterator from the original reusable iterable when another pass is needed.\n\nA generator function contains yield. Calling it creates a generator iterator without running the entire body immediately. Each next call resumes execution until the next yield, preserves local state, and pauses again.\n\ndef count_up(limit: int):\n    number = 1\n    while number <= limit:\n        yield number\n        number += 1\n\nGenerators make stateful iteration concise. They are useful for files, large ranges, parsed records, transformed streams, and any pipeline where values can be handled incrementally.\n\nA generator expression resembles a list comprehension but uses parentheses:\n\nsquares = (number * number for number in range(1_000_000))\n\nIt computes values when requested rather than building a million-element list immediately. Laziness can reduce memory use and allow early stopping. It does not automatically make every program faster; generator overhead and repeated computation still matter.\n\nPipelines compose stages:\n1. read or produce values;\n2. filter unwanted values;\n3. transform the remaining values;\n4. aggregate, save, or display results.\n\nBuilt-ins such as sum, any, all, min, max, enumerate, zip, and sorted consume iterables. sorted must materialize all values because it needs to compare the collection globally. sum can consume values incrementally.\n\nyield from delegates to another iterable:\n\ndef flatten_two(left, right):\n    yield from left\n    yield from right\n\nnext(iterator, default) returns the supplied default instead of raising StopIteration when the iterator is exhausted. This is useful only when that default cannot be confused with a real value, or when the distinction is otherwise explicit.\n\nGenerator cleanup matters when an iterator owns a resource. Prefer a context manager around file access and let the generator operate within a clearly controlled lifetime. Do not leave hidden resources open merely because iteration is lazy.\n\nCommon mistake:\nDo not expect len(generator) or generator[0] to work. A general iterator does not promise a known length or random access.\n\nAnother common mistake:\nDo not consume the same generator once for logging and then expect the real calculation to see all values. The first pass may exhaust it.\n\nAnother common mistake:\nDo not replace a clear small list with a generator merely because generators sound advanced. Choose laziness when streaming, memory, early stopping, or composability gives a real benefit.\n",
+      "examples": [
+        {
+          "prompt": "Read one value at a time",
+          "solution": "iterator = iter(values); first = next(iterator)",
+          "explanation": "The iterator retains the position for the next request."
+        },
+        {
+          "prompt": "Yield running totals",
+          "solution": "Update total for each value, then yield total",
+          "explanation": "The generator emits each intermediate state without storing every result first."
+        },
+        {
+          "prompt": "Filter lazily",
+          "solution": "(value for value in readings if value >= 0)",
+          "explanation": "Each nonnegative reading is produced only when a consumer requests it."
+        },
+        {
+          "prompt": "Delegate iteration",
+          "solution": "yield from header; yield from body",
+          "explanation": "yield from forwards every value from each nested iterable in sequence."
+        }
+      ],
+      "applications": [
+        {
+          "title": "Large files",
+          "description": "A program can process one line or record at a time instead of loading the whole file."
+        },
+        {
+          "title": "Data pipelines",
+          "description": "Lazy filter and transformation stages compose without creating many temporary collections."
+        },
+        {
+          "title": "Simulations and event streams",
+          "description": "Generators naturally represent values that arrive over time or continue until a condition is met."
+        }
+      ],
+      "question_count": 10,
+      "problems": [
+        {
+          "template_id": "CUSTOM_PROG_027_Q01",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "easy",
+          "prompt": "Which statement correctly distinguishes an iterable from an iterator?",
+          "expected_answer": "B",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "An iterable must always be a list"
+            },
+            {
+              "id": "B",
+              "label": "An iterable can produce an iterator; an iterator remembers traversal state"
+            },
+            {
+              "id": "C",
+              "label": "An iterator can never be used by a for loop"
+            },
+            {
+              "id": "D",
+              "label": "They are both names for a numeric index"
+            }
+          ],
+          "solution_steps": [
+            "iter asks an iterable for an iterator, and the iterator tracks progress through the sequence."
+          ],
+          "mistake_tags": [
+            "iterable",
+            "iterator_protocol"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_027_Q02",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "easy",
+          "prompt": "What value is assigned to result?",
+          "expected_answer": "20",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "The first next call consumes 10, so the second returns 20."
+          ],
+          "mistake_tags": [
+            "next",
+            "iterator_state"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "prompt_blocks": [
+            {
+              "type": "text",
+              "text": "What value is assigned to result?"
+            },
+            {
+              "type": "code",
+              "language": "python",
+              "text": "values = iter([10, 20, 30])\nnext(values)\nresult = next(values)"
+            }
+          ]
+        },
+        {
+          "template_id": "CUSTOM_PROG_027_Q03",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "easy",
+          "prompt": "What normally happens when next(iterator) is called after the iterator is exhausted?",
+          "expected_answer": "C",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "The first value is returned again"
+            },
+            {
+              "id": "B",
+              "label": "None is always returned"
+            },
+            {
+              "id": "C",
+              "label": "StopIteration is raised"
+            },
+            {
+              "id": "D",
+              "label": "The iterator becomes a list"
+            }
+          ],
+          "solution_steps": [
+            "StopIteration is the protocol signal that no values remain."
+          ],
+          "mistake_tags": [
+            "stop_iteration",
+            "iterator_protocol"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_027_Q04",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "easy",
+          "prompt": "A generator yields each odd number in range(6). What is the sum of all yielded values?",
+          "expected_answer": "9",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "The yielded values are 1, 3, and 5, whose sum is 9."
+          ],
+          "mistake_tags": [
+            "generator",
+            "filtering"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_027_Q05",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "easy",
+          "prompt": "What is sum(number * number for number in range(5))?",
+          "expected_answer": "30",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "The squares are 0, 1, 4, 9, and 16; their sum is 30."
+          ],
+          "mistake_tags": [
+            "generator_expression",
+            "aggregation"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_027_Q06",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "medium",
+          "prompt": "How many items are in second?",
+          "expected_answer": "0",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "The first list call exhausts the one-pass generator, so the second receives no values."
+          ],
+          "mistake_tags": [
+            "generator_exhaustion",
+            "one_pass"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "prompt_blocks": [
+            {
+              "type": "text",
+              "text": "How many items are in second?"
+            },
+            {
+              "type": "code",
+              "language": "python",
+              "text": "stream = (x for x in [1, 2])\nfirst = list(stream)\nsecond = list(stream)"
+            }
+          ]
+        },
+        {
+          "template_id": "CUSTOM_PROG_027_Q07",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "easy",
+          "prompt": "A function executes yield from [2, 4, 6]. How many values does one full iteration produce?",
+          "expected_answer": "3",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "yield from forwards all three list elements."
+          ],
+          "mistake_tags": [
+            "yield_from",
+            "delegation"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_027_Q08",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "medium",
+          "prompt": "When is a generator most clearly preferable to building a list?",
+          "expected_answer": "D",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "When random indexing is required repeatedly"
+            },
+            {
+              "id": "B",
+              "label": "When the exact length must be available before iteration"
+            },
+            {
+              "id": "C",
+              "label": "When the values must be sorted in place"
+            },
+            {
+              "id": "D",
+              "label": "When a large stream can be processed incrementally and may stop early"
+            }
+          ],
+          "solution_steps": [
+            "Lazy production reduces peak memory and avoids computing values that an early-stopping consumer never requests."
+          ],
+          "mistake_tags": [
+            "lazy_evaluation",
+            "memory"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_027_Q09",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "easy",
+          "prompt": "What does next(iterator, \"done\") return when iterator is already exhausted?",
+          "expected_answer": "B",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "StopIteration no matter what"
+            },
+            {
+              "id": "B",
+              "label": "The string \"done\""
+            },
+            {
+              "id": "C",
+              "label": "The iterator object"
+            },
+            {
+              "id": "D",
+              "label": "The first value again"
+            }
+          ],
+          "solution_steps": [
+            "The second argument is the fallback returned at exhaustion."
+          ],
+          "mistake_tags": [
+            "next_default",
+            "exhaustion"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_027_Q10",
+          "skill_id": "CUSTOM_PROG_027",
+          "difficulty": "hard",
+          "prompt": "A running_totals generator receives [3, -1, 4]. What is its final yielded value?",
+          "expected_answer": "6",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "The cumulative totals are 3, 2, and 6."
+          ],
+          "mistake_tags": [
+            "generator_design",
+            "running_total",
+            "practical_generator"
+          ],
+          "answer_mode": "final_plus_required_work",
+          "work": {
+            "mode": "capture_only",
+            "prompt": "Write a typed generator function running_totals(values) that yields the cumulative numeric total after each input. It must accept any iterable rather than requiring a list, keep only the current total in memory, and produce no values for empty input. Also write take_until_totals(values, limit), which consumes running_totals and stops immediately after yielding the first total that is greater than or equal to limit. Include tests for a list, a tuple, a generator input, negative values, empty input, early stopping, and the fact that returned generators are one-pass iterators."
+          },
+          "review_policy": {
+            "work_review": "optional",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        }
+      ],
+      "topic": "Iteration"
+    },
+    {
+      "id": "CUSTOM_PROG_028",
+      "name": "Recursion, trees, and memoization",
+      "domain": "Programming",
+      "subdomain": "Algorithms",
+      "description": "Design terminating recursive functions, traverse tree-shaped data, and use memoization to avoid repeated subproblems.",
+      "prerequisites": [
+        "CUSTOM_PROG_027",
+        {
+          "subject_id": "SUBJECT_MATH",
+          "skill_id": "MATH_EXP_002"
+        }
+      ],
+      "unlocks": [],
+      "tags": [
+        "python",
+        "recursion",
+        "base_case",
+        "call_stack",
+        "trees",
+        "depth_first_search",
+        "memoization",
+        "recursive_data"
+      ],
+      "mastery": {
+        "passing_score": 0.8,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "maybe",
+        "review_after_days_if_mastered": 10,
+        "review_after_days_if_learning": 3
+      },
+      "theory": "Recursion occurs when a function solves a problem by calling itself on a smaller or simpler version of that problem.\n\nEvery correct recursive design needs:\n1. a base case that returns without another recursive call;\n2. a recursive case that reduces the problem;\n3. progress that guarantees the base case will eventually be reached.\n\nExample:\n\ndef factorial(n: int) -> int:\n    if n == 0:\n        return 1\n    return n * factorial(n - 1)\n\nfactorial(4) becomes 4 * factorial(3), which becomes 4 * 3 * factorial(2), and so on until factorial(0) returns 1.\n\nEach active call has a stack frame containing its local variables and return location. Calls build up until a base case returns, then the stack unwinds in reverse order. This explains why code before the recursive call runs on the way down and code after it runs on the way back up.\n\nA recursive function that never reaches a base case eventually raises RecursionError in ordinary Python. Even a logically correct recursive algorithm can exceed the recursion limit on extremely deep input. Iteration is often better for simple long linear processes.\n\nRecursion is especially natural for recursive data. A tree node contains a value and zero or more child trees. The same operation can be applied to every child:\n\ndef tree_size(node) -> int:\n    return 1 + sum(tree_size(child) for child in node[\"children\"])\n\nA leaf is a node with no children. A depth-first traversal explores one branch before moving to the next. Common orders include:\n- preorder: visit the node, then its children;\n- postorder: visit all children, then the node.\n\nTrees are not arbitrary graphs. If data can contain cycles or shared links, a traversal needs an explicit visited policy to avoid infinite repetition and to define whether shared nodes are counted once or once per path.\n\nDivide-and-conquer algorithms split a problem into parts, solve the parts recursively, and combine their results. Binary search and merge sort follow this shape. The recursive structure should match a real reduction in problem size.\n\nSome recursive definitions repeat the same subproblems. A naive Fibonacci implementation calculates fib(k) many times. Memoization stores results by input so each distinct subproblem is solved once:\n\nfrom functools import cache\n\n@cache\ndef fib(n: int) -> int:\n    if n < 2:\n        return n\n    return fib(n - 1) + fib(n - 2)\n\nMemoization trades memory for less repeated work. It is safe only when a function’s result depends entirely on its arguments and cached values will remain valid.\n\nDesign method:\n1. Define exactly what one call returns.\n2. Write the smallest valid input as a base case.\n3. Identify strictly smaller recursive inputs.\n4. Combine their returned results.\n5. Trace a tiny example by hand.\n6. Test empty, minimal, ordinary, and malformed structures.\n7. Compare recursion with an iterative alternative when depth could be large.\n\nCommon mistake:\nDo not modify the input so that it sometimes becomes smaller. Prove that every recursive path makes progress.\n\nAnother common mistake:\nDo not confuse printed order with returned order. Stack unwinding can reverse actions that occur after recursive calls.\n\nAnother common mistake:\nDo not add memoization blindly to a function with changing global state, mutable unhashable arguments, or side effects that are expected to happen on every call.\n",
+      "examples": [
+        {
+          "prompt": "Sum from 1 through n",
+          "solution": "sum_to(0) = 0; sum_to(n) = n + sum_to(n - 1)",
+          "explanation": "Each call reduces n by one and the base case ends the chain."
+        },
+        {
+          "prompt": "Sum nested lists",
+          "solution": "Return an integer directly; recursively sum every nested list element",
+          "explanation": "The data shape and function definition repeat at each list level."
+        },
+        {
+          "prompt": "Traverse a tree in preorder",
+          "solution": "Yield the current label, then yield from each child traversal",
+          "explanation": "The node is visited before any descendants."
+        },
+        {
+          "prompt": "Memoize repeated subproblems",
+          "solution": "Cache results by the complete immutable input key",
+          "explanation": "Later calls reuse the result instead of expanding the same subtree again."
+        }
+      ],
+      "applications": [
+        {
+          "title": "Files and user interfaces",
+          "description": "Directory trees and nested interface components naturally contain smaller structures of the same kind."
+        },
+        {
+          "title": "Parsing and languages",
+          "description": "Expressions, documents, and source code are often represented as recursive syntax trees."
+        },
+        {
+          "title": "Optimization and dynamic programming",
+          "description": "Memoized recursion can transform repeated exponential work into a manageable set of subproblems."
+        }
+      ],
+      "question_count": 10,
+      "problems": [
+        {
+          "template_id": "CUSTOM_PROG_028_Q01",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "easy",
+          "prompt": "What is the purpose of a recursive function’s base case?",
+          "expected_answer": "A",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "Return without another recursive call for the smallest case"
+            },
+            {
+              "id": "B",
+              "label": "Make every argument larger"
+            },
+            {
+              "id": "C",
+              "label": "Delete all local variables"
+            },
+            {
+              "id": "D",
+              "label": "Force the function to call itself forever"
+            }
+          ],
+          "solution_steps": [
+            "The base case terminates one branch of the recursion and anchors the definition."
+          ],
+          "mistake_tags": [
+            "base_case",
+            "termination"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_028_Q02",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "easy",
+          "prompt": "If factorial(0) = 1 and factorial(n) = n * factorial(n - 1), what is factorial(5)?",
+          "expected_answer": "120",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "5 × 4 × 3 × 2 × 1 = 120."
+          ],
+          "mistake_tags": [
+            "factorial",
+            "recursive_trace"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_028_Q03",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "easy",
+          "prompt": "If sum_to(0) = 0 and sum_to(n) = n + sum_to(n - 1), what is sum_to(5)?",
+          "expected_answer": "15",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "5 + 4 + 3 + 2 + 1 + 0 = 15."
+          ],
+          "mistake_tags": [
+            "recursive_sum",
+            "base_case"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_028_Q04",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "medium",
+          "prompt": "What order is printed by countdown(3)?",
+          "expected_answer": "C",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "1, 2, 3"
+            },
+            {
+              "id": "B",
+              "label": "0, 1, 2, 3"
+            },
+            {
+              "id": "C",
+              "label": "3, 2, 1"
+            },
+            {
+              "id": "D",
+              "label": "3, 3, 3"
+            }
+          ],
+          "solution_steps": [
+            "The print occurs before each recursive call, so values appear while descending toward the base case."
+          ],
+          "mistake_tags": [
+            "call_order",
+            "stack_trace"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "prompt_blocks": [
+            {
+              "type": "text",
+              "text": "What order is printed by countdown(3)?"
+            },
+            {
+              "type": "code",
+              "language": "python",
+              "text": "def countdown(n):\n    if n == 0:\n        return\n    print(n)\n    countdown(n - 1)\n\ncountdown(3)"
+            }
+          ]
+        },
+        {
+          "template_id": "CUSTOM_PROG_028_Q05",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "easy",
+          "prompt": "What is the usual result when a recursive Python function keeps calling itself without reaching a base case?",
+          "expected_answer": "B",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "Python silently converts it to a loop"
+            },
+            {
+              "id": "B",
+              "label": "RecursionError after the call stack becomes too deep"
+            },
+            {
+              "id": "C",
+              "label": "The result is always 0"
+            },
+            {
+              "id": "D",
+              "label": "The function becomes a generator"
+            }
+          ],
+          "solution_steps": [
+            "Python limits recursion depth and raises RecursionError rather than allowing an unbounded call stack."
+          ],
+          "mistake_tags": [
+            "recursion_error",
+            "termination"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_028_Q06",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "easy",
+          "prompt": "A recursive nested_sum adds every integer in [1, [2, [3, 4]], 5]. What total should it return?",
+          "expected_answer": "15",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "The integers are 1, 2, 3, 4, and 5; their sum is 15."
+          ],
+          "mistake_tags": [
+            "recursive_data",
+            "nested_list"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_028_Q07",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "medium",
+          "prompt": "A tree has root children A and B, and B has children C and D. Which sequence is preorder traversal from left to right?",
+          "expected_answer": "D",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "A, C, D, B, root"
+            },
+            {
+              "id": "B",
+              "label": "C, D, B, A, root"
+            },
+            {
+              "id": "C",
+              "label": "root, B, D, C, A"
+            },
+            {
+              "id": "D",
+              "label": "root, A, B, C, D"
+            }
+          ],
+          "solution_steps": [
+            "Preorder visits the current node first, then recursively visits each child from left to right."
+          ],
+          "mistake_tags": [
+            "tree_traversal",
+            "preorder"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_028_Q08",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "easy",
+          "prompt": "What is the main purpose of memoization in a pure recursive function?",
+          "expected_answer": "A",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "Store results for repeated inputs so the same subproblem is not solved again"
+            },
+            {
+              "id": "B",
+              "label": "Make every input mutable"
+            },
+            {
+              "id": "C",
+              "label": "Remove all base cases"
+            },
+            {
+              "id": "D",
+              "label": "Print every stack frame"
+            }
+          ],
+          "solution_steps": [
+            "A cache reuses results for argument values that have already been computed."
+          ],
+          "mistake_tags": [
+            "memoization",
+            "dynamic_programming"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_028_Q09",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "hard",
+          "prompt": "Why is naive recursive Fibonacci much slower than an iterative version for larger n?",
+          "expected_answer": "C",
+          "answer_type": "choice",
+          "grading_method": "multiple_choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "Addition is forbidden inside recursive functions"
+            },
+            {
+              "id": "B",
+              "label": "Every call reads a file"
+            },
+            {
+              "id": "C",
+              "label": "It recomputes the same subproblems along many branches"
+            },
+            {
+              "id": "D",
+              "label": "Python sorts the results after every call"
+            }
+          ],
+          "solution_steps": [
+            "The recursion tree contains many duplicate calls, causing roughly exponential growth without memoization."
+          ],
+          "mistake_tags": [
+            "fibonacci",
+            "exponential_work",
+            "repeated_subproblem"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        },
+        {
+          "template_id": "CUSTOM_PROG_028_Q10",
+          "skill_id": "CUSTOM_PROG_028",
+          "difficulty": "hard",
+          "prompt": "A tree contains root, leaf A, node B, and B’s two leaf children C and D. How many nodes should tree_size return?",
+          "expected_answer": "5",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "Count root, A, B, C, and D for a total of 5 nodes."
+          ],
+          "mistake_tags": [
+            "tree_recursion",
+            "practical_algorithm",
+            "base_case"
+          ],
+          "answer_mode": "final_plus_required_work",
+          "work": {
+            "mode": "capture_only",
+            "prompt": "Implement typed recursive functions tree_size(node) and leaf_labels(node) for nodes shaped as {\"label\": str, \"children\": list[node]}. tree_size must count the current node and all descendants. leaf_labels must return leaf labels from left to right without mutating the tree. Validate missing labels, non-list children, and non-dictionary child nodes with clear exceptions. Include tests for one leaf, the sample five-node tree, a deep chain, several sibling leaves, malformed nodes, stable traversal order, and input preservation. Briefly explain the base case, the strictly smaller recursive input, and when an explicit stack would be safer than recursion."
+          },
+          "review_policy": {
+            "work_review": "optional",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          }
+        }
+      ],
+      "topic": "Recursive Algorithms"
+    }
+  ]
+}

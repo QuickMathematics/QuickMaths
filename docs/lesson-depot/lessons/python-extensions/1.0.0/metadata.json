@@ -1,0 +1,20 @@
+{
+  "id": "PACK_PYTHON_EXTENSIONS",
+  "slug": "python-extensions",
+  "version": "1.0.0",
+  "name": "Python Extensions: Contracts, Generators and Recursion",
+  "description": "Three new lessons continuing Programming Fundamentals with Python: type hints and dataclasses, iterators and generators, and recursion with trees and memoization. Install Programming Fundamentals with Python first; this extension keeps its 25 lessons and your saved progress intact.",
+  "author": "QuickMaths",
+  "distribution": "federated",
+  "license": "CC BY 4.0",
+  "tags": [
+    "python",
+    "programming",
+    "dataclasses",
+    "generators",
+    "recursion",
+    "extensions"
+  ],
+  "published_at": "2026-09-06",
+  "updated_at": "2026-09-06"
+}

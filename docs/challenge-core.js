@@ -1,4 +1,4 @@
-import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-optimization-v1";
+import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-lesson-batches-v1";
 import { normalizeLessonAssets, normalizeLessonMedia, validateMediaReferences, mediaBaseUrl } from "./lesson-media.js?v=20260906-media-v1";
 
 export const STORAGE_KEY = "quickmaths.web.v2";

@@ -1,5 +1,5 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260906-media-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-media-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260906-lesson-batches-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-lesson-batches-v1";
 import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260906-media-v1";
 import {
   createGitHubContentsClient,

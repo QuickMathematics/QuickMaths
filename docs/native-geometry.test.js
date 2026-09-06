@@ -15,7 +15,7 @@ const storeFor = (data = curriculum, initial = null) => createQuickMathsStore({
 });
 
 test("all native Geometry illustrations load offline from verified, reproducible source files", async () => {
-  assert.equal(geometry.length, 10);
+  assert.equal(geometry.length, 16);
   const usedPaths = new Set();
   for (const skill of geometry) {
     assert.ok(mediaIn(skill).length, `${skill.id} needs a teaching illustration`);

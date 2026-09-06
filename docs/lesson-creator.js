@@ -1,5 +1,5 @@
 import { normalizeLessonMedia, renderLessonMedia, mediaPath, mediaDigest, encodeMediaData, MEDIA_TYPES, MAX_EMBEDDED_MEDIA_BYTES } from "./lesson-media.js?v=20260906-media-v1";
-import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-optimization-v1";
+import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-lesson-batches-v1";
 const DRAFT_KEY = "quickmaths.lesson-creator.v1";
 
 const DEFAULT_THEME = {
