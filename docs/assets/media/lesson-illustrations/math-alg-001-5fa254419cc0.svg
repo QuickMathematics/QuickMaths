@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 305.5752 322.230857
+L 356.9688 322.230857
+L 331.272 243.236571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 128.781216 236.324571
+L 276.794784 236.324571
+Q 282.962016 236.324571 282.962016 230.4
+L 282.962016 167.204571
+Q 282.962016 161.28 276.794784 161.28
+L 128.781216 161.28
+Q 122.613984 161.28 122.613984 167.204571
+L 122.613984 230.4
+Q 122.613984 236.324571 128.781216 236.324571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 385.749216 236.324571
+L 533.762784 236.324571
+Q 539.930016 236.324571 539.930016 230.4
+L 539.930016 167.204571
+Q 539.930016 161.28 533.762784 161.28
+L 385.749216 161.28
+Q 379.581984 161.28 379.581984 167.204571
+L 379.581984 230.4
+Q 379.581984 236.324571 385.749216 236.324571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 125.6976 243.236571
+L 536.8464 243.236571
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #153f36; stroke-width: 4; stroke-linecap: square"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">Keep both sides balanced</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="202.788" y="204.321036" transform="rotate(-0 202.788 204.321036)">x + 3</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="459.756" y="204.321036" transform="rotate(-0 459.756 204.321036)">7</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="371.632018" transform="rotate(-0 331.272 371.632018)">Subtract 3 from both sides → x = 4</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

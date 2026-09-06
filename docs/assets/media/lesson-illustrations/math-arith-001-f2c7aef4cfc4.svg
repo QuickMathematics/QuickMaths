@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 327.272794 188.928
+Q 262.660185 188.928 200.842662 188.928
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 204.842662 190.928
+L 200.842662 188.928
+L 204.842662 186.928
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 110.27952 248.173714
+L 552.26448 248.173714
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-width: 2; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 125.6976 253.110857
+L 125.6976 243.236571
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-width: 1.5; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 194.2224 253.110857
+L 194.2224 243.236571
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-width: 1.5; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 262.7472 253.110857
+L 262.7472 243.236571
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-width: 1.5; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 331.272 253.110857
+L 331.272 243.236571
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-width: 1.5; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 399.7968 253.110857
+L 399.7968 243.236571
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-width: 1.5; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 468.3216 253.110857
+L 468.3216 243.236571
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-width: 1.5; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 536.8464 253.110857
+L 536.8464 243.236571
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-width: 1.5; stroke-linecap: square"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">Adding a negative moves left</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="125.6976" y="277.550366" transform="rotate(-0 125.6976 277.550366)">-12</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="194.2224" y="277.550366" transform="rotate(-0 194.2224 277.550366)">-10</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="262.7472" y="277.550366" transform="rotate(-0 262.7472 277.550366)">-8</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="277.550366" transform="rotate(-0 331.272 277.550366)">-6</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="399.7968" y="277.550366" transform="rotate(-0 399.7968 277.550366)">-4</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="468.3216" y="277.550366" transform="rotate(-0 468.3216 277.550366)">-2</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="536.8464" y="277.550366" transform="rotate(-0 536.8464 277.550366)">0</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #bc503b" x="262.661544" y="181.27608" transform="rotate(-0 262.661544 181.27608)">−4</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 25px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="131.64358" transform="rotate(-0 331.272 131.64358)">−6 + (−4) = −10</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

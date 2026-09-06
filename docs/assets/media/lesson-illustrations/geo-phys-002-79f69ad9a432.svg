@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 219.345058 262.985143
+Q 177.091139 262.985143 137.632304 262.985143
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 141.632304 264.985143
+L 137.632304 262.985143
+L 141.632304 260.985143
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 294.157502 262.985143
+Q 336.411421 262.985143 375.870256 262.985143
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 371.870256 260.985143
+L 375.870256 262.985143
+L 371.870256 264.985143
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 537.985378 262.985143
+Q 495.731459 262.985143 456.272624 262.985143
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 460.272624 264.985143
+L 456.272624 262.985143
+L 460.272624 260.985143
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 177.0912 272.859429
+C 193.44689 272.859429 209.134896 266.096718 220.700116 254.060705
+C 232.265335 242.024692 238.76352 225.698064 238.76352 208.676571
+C 238.76352 191.655079 232.265335 175.328451 220.700116 163.292438
+C 209.134896 151.256425 193.44689 144.493714 177.0912 144.493714
+C 160.73551 144.493714 145.047504 151.256425 133.482284 163.292438
+C 121.917065 175.328451 115.41888 191.655079 115.41888 208.676571
+C 115.41888 225.698064 121.917065 242.024692 133.482284 254.060705
+C 145.047504 266.096718 160.73551 272.859429 177.0912 272.859429
+L 177.0912 272.859429
+z
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #153f36; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 336.41136 272.859429
+C 352.76705 272.859429 368.455056 266.096718 380.020276 254.060705
+C 391.585495 242.024692 398.08368 225.698064 398.08368 208.676571
+C 398.08368 191.655079 391.585495 175.328451 380.020276 163.292438
+C 368.455056 151.256425 352.76705 144.493714 336.41136 144.493714
+C 320.05567 144.493714 304.367664 151.256425 292.802444 163.292438
+C 281.237225 175.328451 274.73904 191.655079 274.73904 208.676571
+C 274.73904 225.698064 281.237225 242.024692 292.802444 254.060705
+C 304.367664 266.096718 320.05567 272.859429 336.41136 272.859429
+L 336.41136 272.859429
+z
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #153f36; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 495.73152 272.859429
+C 512.08721 272.859429 527.775216 266.096718 539.340436 254.060705
+C 550.905655 242.024692 557.40384 225.698064 557.40384 208.676571
+C 557.40384 191.655079 550.905655 175.328451 539.340436 163.292438
+C 527.775216 151.256425 512.08721 144.493714 495.73152 144.493714
+C 479.37583 144.493714 463.687824 151.256425 452.122604 163.292438
+C 440.557385 175.328451 434.0592 191.655079 434.0592 208.676571
+C 434.0592 225.698064 440.557385 242.024692 452.122604 254.060705
+C 463.687824 266.096718 479.37583 272.859429 495.73152 272.859429
+L 495.73152 272.859429
+z
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #153f36; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">Idealized Northern Hemisphere circulation</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 22px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="177.0912" y="214.747196" transform="rotate(-0 177.0912 214.747196)">Hadley</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="115.41888" y="317.875321" transform="rotate(-0 115.41888 317.875321)">0°</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 22px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="336.41136" y="214.747196" transform="rotate(-0 336.41136 214.747196)">Ferrel</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="274.73904" y="317.875321" transform="rotate(-0 274.73904 317.875321)">30°</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 22px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="495.73152" y="214.747196" transform="rotate(-0 495.73152 214.747196)">Polar</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="434.0592" y="317.875321" transform="rotate(-0 434.0592 317.875321)">60°</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="577.96128" y="317.875321" transform="rotate(-0 577.96128 317.875321)">90°</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="366.970812" transform="rotate(-0 331.272 366.970812)">Surface pressure belts: low · high · low · high</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

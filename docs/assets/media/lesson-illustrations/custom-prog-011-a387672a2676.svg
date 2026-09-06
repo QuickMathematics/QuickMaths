@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 238.993595 208.676571
+Q 249.899242 208.676571 258.009804 208.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 254.009804 206.676571
+L 258.009804 208.676571
+L 254.009804 210.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 401.739995 208.676571
+Q 412.645642 208.676571 420.756204 208.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 416.756204 206.676571
+L 420.756204 208.676571
+L 416.756204 210.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 108.223776 251.136
+L 228.827424 251.136
+Q 234.994656 251.136 234.994656 245.211429
+L 234.994656 162.267429
+Q 234.994656 156.342857 228.827424 156.342857
+L 108.223776 156.342857
+Q 102.056544 156.342857 102.056544 162.267429
+L 102.056544 245.211429
+Q 102.056544 251.136 108.223776 251.136
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 270.970176 251.136
+L 391.573824 251.136
+Q 397.741056 251.136 397.741056 245.211429
+L 397.741056 162.267429
+Q 397.741056 156.342857 391.573824 156.342857
+L 270.970176 156.342857
+Q 264.802944 156.342857 264.802944 162.267429
+L 264.802944 245.211429
+Q 264.802944 251.136 270.970176 251.136
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 433.716576 251.136
+L 554.320224 251.136
+Q 560.487456 251.136 560.487456 245.211429
+L 560.487456 162.267429
+Q 560.487456 156.342857 554.320224 156.342857
+L 433.716576 156.342857
+Q 427.549344 156.342857 427.549344 162.267429
+L 427.549344 245.211429
+Q 427.549344 251.136 433.716576 251.136
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">Transform one collection in stages</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="168.5256" y="208.706304" transform="rotate(-0 168.5256 208.706304)">[−2, 0, 3]</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(282.044812 198.628272)">keep n &gt; 0</text>
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(318.522937 218.784335)">[3]</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(454.798088 198.628272)">square n</text>
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(481.269338 218.784335)">[9]</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(74.531375 314.083223)">Filtering chooses elements; mapping changes each</text>
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(261.945437 336.478848)">chosen value.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

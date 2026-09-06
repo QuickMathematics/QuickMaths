@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 279.8784 341.979429
+C 312.589781 341.979429 343.965792 329.494424 367.096231 307.274093
+C 390.226671 285.053761 403.22304 254.912294 403.22304 223.488
+C 403.22304 192.063706 390.226671 161.922239 367.096231 139.701907
+C 343.965792 117.481576 312.589781 104.996571 279.8784 104.996571
+C 247.167019 104.996571 215.791008 117.481576 192.660569 139.701907
+C 169.530129 161.922239 156.53376 192.063706 156.53376 223.488
+C 156.53376 254.912294 169.530129 285.053761 192.660569 307.274093
+C 215.791008 329.494424 247.167019 341.979429 279.8784 341.979429
+z
+" clip-path="url(#p576bd2a587)" style="fill: #eceddb; stroke: #153f36; stroke-width: 1.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 279.8784 304.950857
+C 302.367474 304.950857 323.938482 296.367417 339.840659 281.090939
+C 355.742836 265.814461 364.67784 245.092202 364.67784 223.488
+C 364.67784 201.883798 355.742836 181.161539 339.840659 165.885061
+C 323.938482 150.608583 302.367474 142.025143 279.8784 142.025143
+C 257.389326 142.025143 235.818318 150.608583 219.916141 165.885061
+C 204.013964 181.161539 195.07896 201.883798 195.07896 223.488
+C 195.07896 245.092202 204.013964 265.814461 219.916141 281.090939
+C 235.818318 296.367417 257.389326 304.950857 279.8784 304.950857
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 279.8784 258.048
+C 289.419219 258.048 298.570556 254.40654 305.316934 247.92561
+C 312.063312 241.44468 315.85392 232.653419 315.85392 223.488
+C 315.85392 214.322581 312.063312 205.53132 305.316934 199.05039
+C 298.570556 192.56946 289.419219 188.928 279.8784 188.928
+C 270.337581 188.928 261.186244 192.56946 254.439866 199.05039
+C 247.693488 205.53132 243.90288 214.322581 243.90288 223.488
+C 243.90288 232.653419 247.693488 241.44468 254.439866 247.92561
+C 261.186244 254.40654 270.337581 258.048 279.8784 258.048
+z
+" clip-path="url(#p576bd2a587)" style="fill: #bfd8e6; stroke: #153f36; stroke-width: 1.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 279.8784 223.488
+L 413.50176 223.488
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #bc503b; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 279.8784 223.488
+L 346.69008 112.32003
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #bc503b; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 279.8784 223.488
+L 213.06672 112.32003
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #bc503b; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 279.8784 223.488
+L 146.25504 223.488
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #bc503b; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 279.8784 223.488
+L 213.06672 334.65597
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #bc503b; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 279.8784 223.488
+L 346.69008 334.65597
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #bc503b; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">Urban accessibility changes across space</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="279.8784" y="229.00675" transform="rotate(-0 279.8784 229.00675)">CBD</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(438.535612 168.437509)">Transport</text>
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(441.223112 190.833134)">corridors</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(440.188737 267.180366)">Land use</text>
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(429.763737 289.575991)">and access</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="376.293223" transform="rotate(-0 331.272 376.293223)">A conceptual model; actual cities are less regular.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

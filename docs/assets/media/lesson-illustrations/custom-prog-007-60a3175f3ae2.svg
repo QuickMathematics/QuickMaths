@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 209.357121 203.739429
+Q 211.783239 203.739429 211.414273 203.739429
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 207.414273 201.739429
+L 211.414273 203.739429
+L 207.414273 205.739429
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 330.132081 203.739429
+Q 332.558199 203.739429 332.189233 203.739429
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 328.189233 201.739429
+L 332.189233 203.739429
+L 328.189233 205.739429
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 450.907041 203.739429
+Q 453.333159 203.739429 452.964193 203.739429
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 448.964193 201.739429
+L 452.964193 203.739429
+L 448.964193 205.739429
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 103.084416 236.324571
+L 199.704384 236.324571
+Q 205.871616 236.324571 205.871616 230.4
+L 205.871616 172.141714
+Q 205.871616 166.217143 199.704384 166.217143
+L 103.084416 166.217143
+Q 96.917184 166.217143 96.917184 172.141714
+L 96.917184 230.4
+Q 96.917184 236.324571 103.084416 236.324571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 223.859376 236.324571
+L 320.479344 236.324571
+Q 326.646576 236.324571 326.646576 230.4
+L 326.646576 172.141714
+Q 326.646576 166.217143 320.479344 166.217143
+L 223.859376 166.217143
+Q 217.692144 166.217143 217.692144 172.141714
+L 217.692144 230.4
+Q 217.692144 236.324571 223.859376 236.324571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 344.634336 236.324571
+L 441.254304 236.324571
+Q 447.421536 236.324571 447.421536 230.4
+L 447.421536 172.141714
+Q 447.421536 166.217143 441.254304 166.217143
+L 344.634336 166.217143
+Q 338.467104 166.217143 338.467104 172.141714
+L 338.467104 230.4
+Q 338.467104 236.324571 344.634336 236.324571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 465.409296 236.324571
+L 562.029264 236.324571
+Q 568.196496 236.324571 568.196496 230.4
+L 568.196496 172.141714
+Q 568.196496 166.217143 562.029264 166.217143
+L 465.409296 166.217143
+Q 459.242064 166.217143 459.242064 172.141714
+L 459.242064 230.4
+Q 459.242064 236.324571 465.409296 236.324571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">Accumulate after each loop iteration</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(123.958462 195.591795)">n = 1</text>
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(107.430337 217.98742)">total = 1</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(244.733422 195.591795)">n = 2</text>
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(228.205297 217.98742)">total = 3</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(365.508382 195.591795)">n = 3</text>
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(348.980257 217.98742)">total = 6</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(486.283343 195.591795)">n = 4</text>
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(463.392718 217.98742)">total = 10</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 21px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(101.499187 311.330699)">total starts at 0; each step adds the current</text>
+    <text style="font-size: 21px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(321.280594 334.846105)">n.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>
