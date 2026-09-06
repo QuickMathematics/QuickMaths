@@ -172,6 +172,100 @@ test("merge choices can keep individual local and remote fields", async () => {
   assert.equal(learnerState.read().subject, "Remote subject");
 });
 
+test("an identical shared checkpoint with a newer SHA does not block the pending agent changes", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ positions: { fractions: { x: 2, y: 3 }, algebra: { x: 4, y: 5 } } });
+  const current = github.files.get(LEARNER_STATE_PATH);
+  await github.writeFile(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: learnerState.serialize(), deviceId: "another-tab" }), { sha: current.sha });
+  agentState.mutate({ note: "New note on Fractions basics" });
+  await agent.pushNow();
+  await assert.rejects(learner.pullNow(), (error) => error.details.channel === "agent");
+  const review = await learner.prepareMerge({ channel: "learner" });
+  assert.equal(review.channel, "agent");
+  assert.ok(review.taskStartedAt);
+  assert.ok(review.rows.some((row) => row.remote === "New note on Fractions basics"));
+  assert.ok(review.rows.some((row) => row.path[0] === "positions"));
+  await learner.applyMerge({ reviewId: review.id });
+  assert.equal(learnerState.read().note, "New note on Fractions basics");
+  assert.equal(learnerState.read().positions.fractions.x, 2);
+});
+
+test("matching canonical content is remembered without a merge, import or extra commit", async () => {
+  const { github, learner, learnerState } = await mergeFixture();
+  learnerState.mutate({ answer: "Already saved by another tab" });
+  const current = github.files.get(LEARNER_STATE_PATH);
+  const saved = await github.writeFile(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: learnerState.serialize(), deviceId: "another-tab" }), { sha: current.sha });
+  const unchanged = learnerState.serialize();
+  const result = await learner.syncLearnerNow();
+  assert.equal(result.matched, true);
+  assert.equal(learner.snapshot().dirty, false);
+  assert.equal(learnerState.serialize(), unchanged);
+  const review = await learner.prepareMerge();
+  assert.equal(review.resolved, true);
+  assert.equal(github.files.get(LEARNER_STATE_PATH).sha, saved.sha);
+});
+
+test("a matching canonical copy cannot roll back a newer locally accepted agent acknowledgement", async () => {
+  const { learner, agent } = await mergeFixture();
+  await agent.pushNow();
+  await learner.pullNow();
+  await learner.pushNow();
+  await agent.beginAgentTask();
+  await agent.pushNow();
+  assert.equal((await learner.pullNow()).updated, true);
+  // The second agent checkpoint has no content changes and has not yet been
+  // acknowledged in the shared learner file. It must not be applied repeatedly.
+  await learner.syncLearnerNow();
+  assert.equal((await learner.pullNow()).updated, false);
+});
+
+test("history-only comparisons settle and continue to the actual agent review", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ activity: [{ at: "a", tool: "read_lesson", message: "Opened lesson" }] });
+  const current = github.files.get(LEARNER_STATE_PATH);
+  const shared = { ...learnerState.read(), activity: [{ at: "b", tool: "read_map", message: "Opened map" }] };
+  await github.writeFile(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: JSON.stringify(shared), deviceId: "another-tab" }), { sha: current.sha });
+  agentState.mutate({ note: "New Fractions basics note" });
+  await agent.pushNow();
+  const agentSha = github.files.get(AGENT_STATE_PATH).sha;
+  const review = await learner.prepareMerge();
+  assert.equal(review.channel, "agent");
+  assert.equal(review.rows.length, 1);
+  assert.equal(review.rows[0].remote, "New Fractions basics note");
+  assert.equal(learnerState.read().activity.length, 2);
+  assert.equal(learnerState.read().note, undefined);
+  assert.notEqual(parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content).appliedAgentSha, agentSha);
+  await learner.applyMerge({ reviewId: review.id });
+  assert.equal(learnerState.read().note, "New Fractions basics note");
+});
+
+test("a history-only agent update settles without asking the user to save zero choices", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ activity: [{ at: "a", tool: "read_lesson" }] });
+  agentState.mutate({ activity: [{ at: "b", tool: "read_map" }] });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  assert.equal(review.resolved, true);
+  assert.equal(learnerState.read().activity.length, 2);
+  assert.equal(parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content).appliedAgentSha, github.files.get(AGENT_STATE_PATH).sha);
+  assert.equal((await learner.pullNow()).updated, false);
+});
+
+test("automatic empty merges keep local work intact if a remote revision changes during the write", async () => {
+  const { github, learner, learnerState } = await mergeFixture();
+  learnerState.mutate({ activity: [{ at: "a", tool: "read_lesson" }] });
+  const original = learnerState.serialize();
+  const write = github.writeFile;
+  github.writeFile = async (...args) => {
+    const latest = github.files.get(LEARNER_STATE_PATH);
+    await write(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: JSON.stringify({ ...learnerState.read(), note: "Concurrent note" }), deviceId: "other-device" }), { sha: latest.sha });
+    return write(...args);
+  };
+  await assert.rejects(learner.prepareMerge(), /changed during review/);
+  assert.equal(learnerState.serialize(), original);
+  assert.equal(parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content).stateJson.includes("Concurrent note"), true);
+});
+
 test("edits on the phone during a merge require a fresh comparison", async () => {
   const { github, learner, learnerState, agent, agentState } = await mergeFixture();
   learnerState.mutate({ score: 9 });

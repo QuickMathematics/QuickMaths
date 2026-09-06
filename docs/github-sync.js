@@ -1,4 +1,4 @@
-import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v2";
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v3";
 
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;
@@ -614,6 +614,18 @@ export function createGitHubSyncController({
     return base !== null && sameWorkspace(serializeState(), base);
   };
 
+  // A different file revision is not necessarily different learner work. Another
+  // tab may already have saved this device's exact content. Remember that copy
+  // without overwriting local state or acknowledging an unreviewed agent task.
+  const rememberMatchingLearner = (remote) => {
+    if (learnerSha !== remote.sha || agentSha === null) agentSha = remote.envelope.appliedAgentSha ?? agentSha;
+    learnerSha = remote.sha;
+    pendingLearnerActor = null;
+    persistMetadata({ revisions: true });
+    update({ phase: "synced", dirty: false, remoteAvailable: true, error: null, conflict: null,
+      lastRemoteUpdatedAt: remote.envelope.updatedAt, lastRemoteActor: remote.envelope.actorLabel });
+  };
+
   const schedulePoll = () => {
     if (stopped || !status.connected) return;
     if (pollTimer) clearTimer(pollTimer);
@@ -762,6 +774,7 @@ export function createGitHubSyncController({
     if (role === "agent" && beginTask && status.dirty) throw new GitHubSyncConflictError("Publish the current agent task before starting another.");
     const channel = role === "learner" ? "agent" : "learner";
     const canonical = role === "learner" ? await readChannel("learner") : null;
+    if (canonical?.exists && sameWorkspace(serializeState(), canonical.envelope.stateJson)) rememberMatchingLearner(canonical);
     if (canonical && canonical.sha !== learnerSha) throw new GitHubSyncConflictError("The shared workspace changed. Review it before the agent update.", { channel: "learner" });
     const remote = await readChannel(channel);
     if (!remote.exists) {
@@ -823,6 +836,10 @@ export function createGitHubSyncController({
     if (!remote.exists) {
       update({ phase: status.dirty ? "idle" : "synced", remoteAvailable: false, error: null });
       return { updated: false, exists: false, channel: "learner" };
+    }
+    if (sameWorkspace(serializeState(), remote.envelope.stateJson)) {
+      rememberMatchingLearner(remote);
+      return { updated: false, exists: true, sha: remote.sha, channel: "learner", matched: true };
     }
     if (remote.sha === learnerSha) {
       update({
@@ -908,22 +925,38 @@ export function createGitHubSyncController({
   const prepareMerge = ({ channel = "learner" } = {}) => runSerial(() => withPhase("checking", async () => {
     if (role !== "learner" || !["learner", "agent"].includes(channel)) throw new GitHubSyncError("Only a learner workspace can review a merge.");
     pauseRemoteActivity();
-    const learner = await readChannel("learner");
-    const agent = await readChannel("agent");
-    // Resolve a newer canonical copy first, then review the pending agent task.
-    if (channel === "agent" && learner.sha !== learnerSha) channel = "learner";
-    const remote = channel === "learner" ? learner : agent;
-    if (!remote.exists) throw new GitHubSyncConflictError("The remote workspace was removed. Reconnect storage to review its current state.", { channel });
-    const baseJson = await readBase(channel === "agent" ? remote.envelope.baseLearnerSha : learnerSha);
-    const localJson = serializeState();
-    const plan = createWorkspaceMerge({ baseJson, localJson, remoteJson: remote.envelope.stateJson, skillNames: getMergeSkillNames() });
-    const id = makeDeviceId();
-    pendingReview = { id, channel, plan, localJson, learner, agent, remote };
-    update({ phase: "reviewing", error: null, conflict: null });
-    return { id, channel, rows: plan.rows, hasBase: plan.hasBase, remoteLabel: remote.envelope.actorLabel, taskStartedAt: remote.envelope.taskStartedAt, remoteUpdatedAt: remote.envelope.updatedAt };
+    // A review may first encounter a harmless canonical checkpoint before the
+    // actual agent response. Settle reviews with no choices and continue, using
+    // the same race checks and conditional writes as a user-selected merge.
+    for (let pass = 0; pass < 3; pass += 1) {
+      const learner = await readChannel("learner");
+      if (learner.exists && sameWorkspace(serializeState(), learner.envelope.stateJson)) rememberMatchingLearner(learner);
+      const agent = await readChannel("agent");
+      if (channel === "agent" && learner.sha !== learnerSha) channel = "learner";
+      if (channel === "learner" && learner.exists && sameWorkspace(serializeState(), learner.envelope.stateJson)) {
+        pendingReview = null;
+        if (agent.exists && agent.sha !== agentSha) { channel = "agent"; continue; }
+        return { resolved: true, rows: [], channel };
+      }
+      const remote = channel === "learner" ? learner : agent;
+      if (!remote.exists) throw new GitHubSyncConflictError("The remote workspace was removed. Reconnect storage to review its current state.", { channel });
+      const baseJson = await readBase(channel === "agent" ? remote.envelope.baseLearnerSha : learnerSha);
+      const localJson = serializeState();
+      const plan = createWorkspaceMerge({ baseJson, localJson, remoteJson: remote.envelope.stateJson, skillNames: getMergeSkillNames() });
+      const id = makeDeviceId();
+      pendingReview = { id, channel, plan, localJson, learner, agent, remote };
+      if (plan.rows.length) {
+        update({ phase: "reviewing", error: null, conflict: null });
+        return { id, channel, rows: plan.rows, hasBase: plan.hasBase, remoteLabel: remote.envelope.actorLabel, taskStartedAt: remote.envelope.taskStartedAt, remoteUpdatedAt: remote.envelope.updatedAt };
+      }
+      await applyPreparedMerge({ reviewId: id });
+      if (channel === "learner" && agent.exists && agent.sha !== agentSha) { channel = "agent"; continue; }
+      return { resolved: true, rows: [], channel };
+    }
+    throw new GitHubSyncConflictError("The workspace changed while comparing. Refresh the comparison.", { channel });
   }));
 
-  const applyMerge = ({ reviewId, choices = {} } = {}) => runSerial(() => withPhase("merging", async () => {
+  const applyPreparedMerge = async ({ reviewId, choices = {} } = {}) => {
     const review = pendingReview;
     if (!review || review.id !== reviewId) throw new GitHubSyncConflictError("This comparison has expired. Refresh the comparison.", { channel: review?.channel ?? "learner" });
     const changed = () => new GitHubSyncConflictError("The workspace changed during review. Refresh the comparison before saving.", { channel: review.channel });
@@ -955,7 +988,9 @@ export function createGitHubSyncController({
     persistMetadata({ revisions: true });
     update({ phase: "synced", dirty: false, localChangedAt, lastPushedAt: localChangedAt, error: null, conflict: null, remoteAvailable: true });
     return { ...result, merged: true, channel: review.channel };
-  }));
+  };
+
+  const applyMerge = (selection) => runSerial(() => withPhase("merging", () => applyPreparedMerge(selection)));
 
   const pauseRemoteActivity = () => {
     stopped = true;

@@ -1,6 +1,6 @@
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-merge-v2";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-merge-v3";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-merge-v2";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-merge-v3";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260905-publisher-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
@@ -17,7 +17,7 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-merge-v2";
+} from "./github-sync.js?v=20260906-merge-v3";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -247,6 +247,14 @@ function openBridgeSourceChoice({ force = false } = {}) {
 async function setBridgeSourceChoice(_remote, kind = "learner") {
   githubSync.stop();
   bridgeChoiceDetails = await githubSync.prepareMerge({ channel: kind === "agent" ? "agent" : "learner" });
+  if (bridgeChoiceDetails.resolved) {
+    bridgeNeedsChoice = false;
+    bridgeChoiceDetails = null;
+    closeBridgeSourceChoice();
+    githubSync.start();
+    showToast("Workspace is up to date. No changes need a choice.");
+    return;
+  }
   bridgeNeedsChoice = true;
   openBridgeSourceChoice({ force: true });
 }
@@ -2322,7 +2330,7 @@ function recoverEstablishedLearnerConflict() {
       }
     }
     await setBridgeSourceChoice(null, channel);
-    showToast("Sync paused. Choose which changes to keep.");
+    if (bridgeNeedsChoice) showToast("Sync paused. Choose which changes to keep.");
   })().catch((error) => {
     showToast(error instanceof Error ? error.message : String(error));
   }).finally(() => { learnerConflictRecovery = null; });
@@ -3378,7 +3386,7 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260906-merge-v2").catch(() => null),
+      fetch("./agent-manifest.json?v=20260906-merge-v3").catch(() => null),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
       fetch("./STUDENT_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
       fetch("./EDUCATOR_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
