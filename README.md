@@ -28,7 +28,7 @@ QuickMaths predates the challenge; the [WebMCP challenge document](WEBMCP_CHALLE
 - Human Lesson Studio for new subjects, new lessons, and reversible native-lesson improvements
 - Federated Lesson Depot that discovers immutable packages from independent GitHub repositories, with optional in-app recommendations, flags, and comments
 - Thirty-one WebMCP tools for visible navigation, tutoring, unified learner/educator guidance, machine-readable product manuals, on-demand lesson-authoring guidance, curriculum design and scoping, mastery-map planning, curriculum inspection, and single or batch human-controlled lesson staging
-- Optional GitHub Bridge for revision-safe mobile/remote-agent checkpoints in a required private writable repository
+- Optional GitHub Bridge with task-start timestamps and selective local/GitHub merging in a required private writable repository
 
 ## Run the web app locally
 
@@ -98,3 +98,7 @@ Settings includes a human-only storage manager. Deleting a profile or clearing t
 Imported curricula start in a fresh assignment profile unless the curriculum's student name matches the selected learner profile name after whitespace and letter-case normalization. Only that explicit match reuses mastery for matching lesson IDs; the import confirmation and in-app tooltip explain the rule before records are attached.
 
 QuickMaths is MIT licensed.
+
+### Reviewing overlapping workspace updates
+
+Start each Agent Bridge prompt with `begin_agent_task`. It records UTC time locally before reading the learner checkpoint. `publish_agent_checkpoint` pushes that original `task_started_at` and `base_learner_sha` with the completed `agent-state.json`; no separate start-time commit is needed. The learner app compares both local work and the current GitHub learner snapshot with that starting revision. Unchanged workspaces accept the update automatically. Overlapping edits open a record-by-record merge window, with explicit choices for conflicts and deletions. Saving rechecks both remote revisions and local content, uses a conditional GitHub write, and acknowledges the accepted agent checkpoint for other devices. Missing Git history falls back to an explicit two-way comparison. Timers and viewport changes alone do not cause a merge.

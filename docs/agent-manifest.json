@@ -130,17 +130,17 @@
     ],
     "deletion_boundary": "Settings lets the human delete one profile or clear the complete workspace after two confirmations. These destructive controls are intentionally not WebMCP tools. Never activate them for the human. Clearing data preserves configured connections and stored tokens; only the separate Disconnect control forgets them. Current GitHub files can be replaced or deleted, but repository history may retain older checkpoint contents.",
     "protocol": [
-      "Call sync_from_learner before inspecting progress or making a recommendation.",
+      "At the start of EVERY new prompt, call begin_agent_task as the first Bridge action, before inspecting or editing. It notes the UTC start time locally and pulls the starting learner revision. No start-time commit is needed yet.",
       "Make changes only through registered QuickMaths tools.",
       "Agent-side changes remain local and dirty until explicitly published; they are never sent by the learner-style debounce.",
-      "Call publish_agent_checkpoint after state-changing work.",
-      "If either agent-side sync tool reports a conflict, pull the learner again and repeat the intended change from current state; never force a stale agent checkpoint.",
+      "Call publish_agent_checkpoint after state-changing work. It pushes task_started_at together with base_learner_sha and the completed app_state in agent-state.json; do not replace the start time with the publish time.",
+      "Publish the current prompt before starting another. Never force over another agent checkpoint. Learner changes during your task do not prevent publication: the learner reviews those overlaps in the app.",
       "Workspace Storage polls the canonical learner checkpoint and the revision-bound agent checkpoint across every app page, not only Settings.",
       "QuickMaths uses a random per-browser identifier plus a friendly browser/platform label; it does not read a hardware device ID. Checkpoints identify their last writer as a device or QuickMaths agent.",
-      "A first-time migration with independent local and GitHub work always requires human A/B approval. Afterward, clean state, same-device updates, agent-authored updates, and dirty different-device updates within ten minutes fast-forward automatically. Dirty different-device histories more than ten minutes apart, or without comparable timestamps, open a global comparison before either complete workspace replaces the other.",
-      "Agent output based on an older learner revision is safely acknowledged and ignored, so the agent must pull current learner state before publishing again."
+      "The app compares the current GitHub learner state and local device work with the revision captured at task start. If unchanged, it applies the agent checkpoint automatically. If either changed, a merge window shows individual records from each version. Session clocks and viewport changes alone do not trigger a merge. Never decide safety from wall-clock timestamps alone.",
+      "The merge window preselects changes made only on one side, requires choices for overlapping edits and deletions, and checks both revisions again before saving. Missing starting history requires explicit choices. Accepted agent updates are acknowledged in the shared learner checkpoint so other devices do not apply them twice."
     ],
-    "bridge_tools": ["get_bridge_sync_status", "sync_from_learner", "publish_agent_checkpoint"]
+    "bridge_tools": ["get_bridge_sync_status", "begin_agent_task", "sync_from_learner", "publish_agent_checkpoint"]
   },
   "github_community": {
     "optional": true,

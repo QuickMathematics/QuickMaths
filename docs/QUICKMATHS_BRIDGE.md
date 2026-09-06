@@ -4,7 +4,7 @@ QuickMaths Bridge turns a free GitHub repository into a small, auditable handoff
 
 The learner page remains local-first. Normal actions save instantly in browser storage, then a short debounce writes a complete workspace checkpoint to `learner-state.json`. That checkpoint includes every learner and educator profile, curriculum, attempt, review, installed pack, map plan, and supplemental educator guidance stored for QuickMaths on this browser origin. It is not scoped to the currently visible profile.
 
-The agent workspace pulls that exact revision, works through QuickMaths WebMCP tools, and publishes `agent-state.json`. The learner accepts it only when it was based on the current learner revision and no local changes are waiting to sync.
+At the start of each prompt, the agent calls `begin_agent_task`. This records the UTC start time locally, then pulls the starting learner revision. After working through QuickMaths tools, the agent publishes `agent-state.json` with that original `task_started_at`, `base_learner_sha`, and the finished `app_state`. The timestamp is pushed with the update; no separate start-time commit is needed.
 
 Agent-side changes are transactional: tool calls mark the workspace dirty but never trigger the learner's automatic debounce. Nothing reaches `agent-state.json` until the agent or human explicitly calls `publish_agent_checkpoint` / **Publish agent checkpoint**.
 
@@ -26,7 +26,7 @@ Complete first-time agent-in-the-loop setup on the computer that will remain onl
 3. Create a token with a sensible expiry. Under repository access, choose **Only select repositories** and select `quickmaths-sync`.
 4. Under repository permissions, set **Contents** to **Read and write**. Leave everything else at its minimum.
 5. In the learner app, open **Settings → Workspace Storage**. Enter the owner, private repository, `main`, and token. QuickMaths verifies privacy and write access before saving the connection. On a personal phone, **Remember token on this device** enables background reconnects. Leave it off on shared devices.
-6. The first connection asks which copy wins only when both the browser and GitHub already contain learner data. Read the labels carefully. Git history keeps the replaced remote version, but a downloaded JSON backup is still the easiest recovery file.
+6. The first connection opens a merge window when both the browser and GitHub already contain independent learner data. Choose which changed items to keep from each side. Git history keeps the replaced remote version, but a downloaded JSON backup is still the easiest recovery file.
 7. On the agent computer, run the following from the QuickMaths source checkout, replacing the repository URL:
 
    ```powershell
@@ -49,10 +49,11 @@ Before leaving the computer on for a phone session:
 
 Keep the Agent Bridge as a top-level browser page and use this starting prompt:
 
-> You are my QuickMaths learning agent. Open the QuickMaths Agent Bridge in the ChatGPT or Codex in-app browser and keep that already-open tab as the top-level page; external browser tabs cannot expose WebMCP tools. First call `get_agent_guide` with `section: "summary"`, then call `sync_from_learner` before inspecting progress, recommending work, or tutoring. Use only the registered QuickMaths tools to read or change learning state. Tutor Socratically, never reveal pre-submission answer keys, and preserve the learner's subject and Hard/Open path choices. After any saved feedback, follow-up problem, preference change, or staged lesson set, call `publish_agent_checkpoint`. If sync reports a conflict, pull the learner again and repeat the intended change from current state; never force stale output over learner work. Recommend a downloadable JSON backup at natural stopping points.
+> You are my QuickMaths learning agent. Open the QuickMaths Agent Bridge in the ChatGPT or Codex in-app browser and keep that already-open tab as the top-level page; external browser tabs cannot expose WebMCP tools. For every new prompt, first call `begin_agent_task` to note the start time locally and pull the starting learner revision, then call `get_agent_guide` with `section: "summary"` before inspecting progress, recommending work, or tutoring. Use only the registered QuickMaths tools to read or change learning state. Tutor Socratically, never reveal pre-submission answer keys, and preserve the learner's subject and Hard/Open path choices. After any saved feedback, follow-up problem, preference change, or staged lesson set, call `publish_agent_checkpoint`. Push the original task start time with your finished work. If the learner kept working, their app will open a merge window. Never force over another agent checkpoint. Recommend a downloadable JSON backup at natural stopping points.
 
-The bridge page exposes the 17 learning tools plus:
+The bridge page exposes the QuickMaths learning and authoring tools plus:
 
+- `begin_agent_task` — first action for each prompt; note the start time locally and load the learner checkpoint.
 - `get_bridge_sync_status` — inspect connection, dirty state, and revision timing.
 - `sync_from_learner` — pull the authoritative learner checkpoint before work.
 - `publish_agent_checkpoint` — publish changes based on that learner revision.
@@ -61,16 +62,16 @@ Codex Remote continues the task that is running on the computer; it does not mak
 
 ## Conflict and recovery rules
 
-- The app never merges arbitrary JSON fields. A complete checkpoint wins only after a verified handoff.
-- A learner device cannot apply agent output while local changes are unsynced.
-- An agent cannot publish if the learner repository revision changed after its last pull.
-- An agent response based on an older learner revision is marked as seen and ignored without changing learner data; the agent must pull the current learner checkpoint and repeat its intended action.
-- A second learner device cannot overwrite a newer GitHub learner file without an explicit choice.
-- After the learner chooses **Load GitHub copy** or **Use this device**, that choice resolves the initial handoff immediately; a narrowly raced GitHub write is retried once only for this explicit human-approved resolution.
-- `learner-state.json` and `agent-state.json` contain learning records, not the GitHub token.
-- Repository history is a recovery trail, not a substitute for the app's **Download JSON backup** button.
-
-If the bridge reports a conflict, stop editing on one side, click **Sync now** on the learner, then call `sync_from_learner` on the agent and repeat the intended agent action.
+- The app compares both the current GitHub learner snapshot and the local device with the task's starting revision. If unchanged, the agent update is applied automatically. Timers and viewport changes alone do not cause a merge.
+- If either contains other changes, the app opens a merge window on the current page. It preserves the original local workspace until the merge is successfully saved.
+- Choose **This device** or **GitHub** for individual profiles, curricula, lesson sets, attempts, reviews, progress records, unfinished tests, plans, and the approval queue. Changes made only on one side are preselected. Overlapping edits and deletions need a choice. Lesson definitions and attempt records stay intact.
+- **Select all from this device** and **Select all from GitHub** only select choices. **Save merged workspace** saves the chosen combination to GitHub and this device. **Not now** leaves synchronization paused; reopen it with **Compare versions** in Settings.
+- Missing starting Git history requires explicit two-way choices for every difference. A timestamp alone never authorizes overwriting learner work.
+- If either remote revision or meaningful local content changes during review, refresh the comparison. Writes use GitHub's expected file SHA and never retry by overwriting an unseen revision. Failed writes leave local work intact.
+- Selecting incompatible dependencies, such as keeping progress but removing its lesson set, is rejected before saving. Keep the related profile, curriculum and lesson set too, or discard that work in the comparison.
+- Accepted agent checkpoints are recorded in `applied_agent_sha` in the canonical learner envelope, so other devices do not reapply them.
+- Agent work can publish even if the learner changed during the prompt. An unpublished task must be published before starting another. Another agent's concurrent checkpoint cannot be overwritten silently.
+- The two checkpoint files contain learning records, not the GitHub token. Repository history remains a recovery trail; downloadable JSON backups are still useful.
 
 ## Security model
 

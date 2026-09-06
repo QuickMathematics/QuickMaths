@@ -23,7 +23,7 @@
         <div>
           <p class="eyebrow">Remote agent workspace</p>
           <h1>The learner’s workspace,<br>without the learning UI.</h1>
-          <p>This top-level page mirrors complete QuickMaths workspace checkpoints from GitHub, exposes the WebMCP toolset for the active profile, and publishes agent changes back only when they are based on the current learner revision. Open it inside the ChatGPT or Codex in-app browser; external browser tabs cannot expose the tools.</p>
+          <p>This top-level page mirrors complete QuickMaths workspace checkpoints from GitHub, exposes the WebMCP toolset for the active profile, and publishes agent changes with the time the task began. If the learner kept working, the app opens a merge window. Open it inside the ChatGPT or Codex in-app browser; external browser tabs cannot expose the tools.</p>
         </div>
         <div class="hero-mark" aria-hidden="true"><span>Q</span><span>M</span><i>↔</i></div>
       </section>
@@ -67,14 +67,14 @@
         <article class="panel protocol-panel">
           <p class="eyebrow">Safe handoff protocol</p>
           <ol>
-            <li><span>1</span><p><strong>Pull first</strong>Load the newest learner checkpoint before inspecting or changing anything.</p></li>
+            <li><span>1</span><p><strong>Start the task</strong>Call begin_agent_task first for each prompt. It notes the start time locally and loads the learner checkpoint.</p></li>
             <li><span>2</span><p><strong>Use site tools</strong>Read progress, tutor visible work, stage lessons, or save feedback through QuickMaths.</p></li>
-            <li><span>3</span><p><strong>Publish once</strong>Send a based agent checkpoint. Stale work is rejected instead of overwriting learning.</p></li>
+            <li><span>3</span><p><strong>Publish once</strong>Push the finished work with its original start time. The learner can merge any overlapping changes in the app.</p></li>
           </ol>
         </article>
       </section>
     </main>
     <div id="toast" class="toast" hidden></div>
-    <script type="module" src="./agent-bridge.js?v=20260905-confused-neutral-v5"></script>
+    <script type="module" src="./agent-bridge.js?v=20260906-merge-v1"></script>
   </body>
 </html>

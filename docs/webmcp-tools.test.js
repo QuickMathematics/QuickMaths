@@ -126,14 +126,14 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /Manage GitHub storage/);
   assert.match(js, /confirmPermanentDeletion/);
   assert.match(js, /function requestAppConfirmation/);
-  assert.match(js, /title: "Use this browser's workspace\?"/);
-  assert.match(js, /confirmLabel: "Replace GitHub copy"/);
+  assert.match(js, /openWorkspaceMerge/);
+  assert.match(js, /githubSync\.applyMerge/);
   assert.doesNotMatch(js, /window\.confirm\("Replace the GitHub learner checkpoint/);
   assert.match(js, /learnerBridgeStartupAction/);
-  assert.match(js, /different device opens the global comparison dialog/);
+  assert.match(js, /opens the global merge window/);
   assert.match(js, /void recoverEstablishedLearnerConflict\(\)/);
-  assert.match(js, /Which workspace should continue\?/);
-  assert.match(js, /data-bridge-choice-remote/);
+  assert.match(js, /githubSync\.prepareMerge/);
+
   assert.match(css, /\.bridge-source-dialog/);
   assert.match(githubSyncSource, /await syncLearnerNow\(\{ quiet: true \}\)/);
   assert.match(js, /Are you absolutely sure/);

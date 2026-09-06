@@ -31,6 +31,7 @@ def envelope(channel: str, *, base_learner_sha: str | None = None, marker: str =
             "schema_version": BRIDGE_SCHEMA_VERSION,
             "channel": channel,
             "updated_at": "2026-09-01T12:00:00Z",
+            "task_started_at": "2026-09-01T11:55:00Z" if channel == "agent" else None,
             "device_id": "test-device",
             "base_learner_sha": base_learner_sha if channel == "agent" else None,
             "app_state": {"version": 10, "marker": marker},
@@ -89,7 +90,9 @@ def test_git_repository_reads_and_transactionally_writes_checkpoints(tmp_path: P
         expected_sha=None,
     )
     assert written["sha"]
-    assert repository.read_file(AGENT_STATE_PATH)["sha"] == written["sha"]
+    published = repository.read_file(AGENT_STATE_PATH)
+    assert published["sha"] == written["sha"]
+    assert json.loads(published["content"])["task_started_at"] == "2026-09-01T11:55:00Z"
     with pytest.raises(LocalBridgeConflict):
         repository.write_file(
             AGENT_STATE_PATH,

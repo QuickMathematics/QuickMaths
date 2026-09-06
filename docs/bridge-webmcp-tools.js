@@ -1,5 +1,6 @@
 export const BRIDGE_TOOL_NAMES = Object.freeze([
   "get_bridge_sync_status",
+  "begin_agent_task",
   "sync_from_learner",
   "publish_agent_checkpoint",
 ]);
@@ -25,6 +26,7 @@ function publicStatus(controller) {
     branch: status.config?.branch ?? null,
     error: status.error,
     conflict: status.conflict,
+    task_started_at: status.taskStartedAt ?? null,
   };
 }
 
@@ -43,8 +45,19 @@ export function buildBridgeToolDefinitions(controller) {
       },
     },
     {
+      name: "begin_agent_task",
+      description: "FIRST action for each new learner prompt: record the current task start time locally, then load the learner workspace. The timestamp is pushed with the finished agent checkpoint. Do this before inspecting or editing; publish unfinished work before starting another task.",
+      inputSchema: emptySchema,
+      annotations: { readOnlyHint: false },
+      execute: async (input = {}) => {
+        noInput("begin_agent_task", input);
+        const result = await controller.beginAgentTask();
+        return { ok: true, ...result, sync: publicStatus(controller) };
+      },
+    },
+    {
       name: "sync_from_learner",
-      description: "Pull and apply the newest learner-owned QuickMaths checkpoint before inspecting progress, recommending work, or tutoring. This never overwrites the GitHub learner file.",
+      description: "Pull the learner-owned checkpoint. Start every new prompt with begin_agent_task first. This starts a timestamped task if none is active, and never writes the learner file. Do not pull over work in progress.",
       inputSchema: emptySchema,
       annotations: { readOnlyHint: false },
       execute: async (input = {}) => {
@@ -55,7 +68,7 @@ export function buildBridgeToolDefinitions(controller) {
     },
     {
       name: "publish_agent_checkpoint",
-      description: "Publish agent-made QuickMaths changes, such as saved tutor feedback or a staged lesson set, to the learner's GitHub bridge. The learner app applies it only if it is based on the current learner checkpoint.",
+      description: "Publish agent-made changes with the task's original start timestamp and learner revision. If the learner changed that workspace in the meantime, their app opens a selective merge window; otherwise it applies the update automatically.",
       inputSchema: emptySchema,
       annotations: { readOnlyHint: false },
       execute: async (input = {}) => {

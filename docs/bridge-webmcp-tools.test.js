@@ -15,6 +15,7 @@ function harness() {
     controller: {
       snapshot: () => ({ ...status }),
       async pullNow() { calls.push("pull"); return { updated: true, channel: "learner", sha: "learner-sha" }; },
+      async beginAgentTask() { calls.push("begin"); return { updated: true, channel: "learner", sha: "learner-sha" }; },
       async pushNow() { calls.push("push"); return { channel: "agent", sha: "agent-sha" }; },
     },
   };
@@ -32,9 +33,10 @@ test("bridge tools expose status without credentials", async () => {
 test("bridge pull and publish tools call the serialized controller operations", async () => {
   const { controller, calls } = harness();
   const tools = Object.fromEntries(buildBridgeToolDefinitions(controller).map((tool) => [tool.name, tool]));
+  await tools.begin_agent_task.execute({});
   const pulled = await tools.sync_from_learner.execute({});
   const pushed = await tools.publish_agent_checkpoint.execute({});
-  assert.deepEqual(calls, ["pull", "push"]);
+  assert.deepEqual(calls, ["begin", "pull", "push"]);
   assert.equal(pulled.updated, true);
   assert.equal(pushed.sha, "agent-sha");
   await assert.rejects(tools.sync_from_learner.execute({ surprise: true }), /unknown input property/i);

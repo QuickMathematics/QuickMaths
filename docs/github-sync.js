@@ -1,3 +1,5 @@
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v1";
+
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;
 const configKey = (role) => roleKey("quickmaths.github-sync.config", role);
@@ -10,7 +12,6 @@ export const BRIDGE_SCHEMA_VERSION = "1.0";
 export const LEARNER_STATE_PATH = "learner-state.json";
 export const AGENT_STATE_PATH = "agent-state.json";
 const MAX_BRIDGE_FILE_BYTES = 10_000_000;
-export const BRIDGE_CONFLICT_WINDOW_MS = 10 * 60 * 1000;
 
 export function learnerBridgeStartupAction({
   remoteExists = false,
@@ -18,23 +19,12 @@ export function learnerBridgeStartupAction({
   establishedConnection = false,
   remoteMatchesKnown = false,
   localDirty = false,
-  sameDevice = false,
-  remoteActorKind = "device",
-  localChangedAt = null,
-  remoteUpdatedAt = null,
-  conflictWindowMs = BRIDGE_CONFLICT_WINDOW_MS,
 } = {}) {
   if (!remoteExists) return localProfileCount > 0 ? "push-local" : "start";
   if (localProfileCount < 1) return "restore-remote";
   if (!establishedConnection) return "choose-migration-source";
   if (remoteMatchesKnown) return "resume-known";
-  if (!localDirty || sameDevice || remoteActorKind === "agent") return "restore-remote";
-  const localTime = Date.parse(String(localChangedAt ?? ""));
-  const remoteTime = Date.parse(String(remoteUpdatedAt ?? ""));
-  const comparable = Number.isFinite(localTime) && Number.isFinite(remoteTime);
-  return comparable && Math.abs(localTime - remoteTime) <= conflictWindowMs
-    ? "restore-remote"
-    : "compare-sources";
+  return localDirty ? "compare-sources" : "restore-remote";
 }
 
 export function summarizeBridgeWorkspace(stateJson) {
@@ -335,7 +325,18 @@ export function createGitHubContentsClient({ fetchImpl = globalThis.fetch, apiBa
     return { deleted: true, commitSha: payload?.commit?.sha ?? null };
   };
 
-  return { verify, readFile, writeFile, deleteFile };
+  const readBlob = async (candidate, sha) => {
+    const config = normalizeGitHubSyncConfig(candidate);
+    if (!/^[a-f0-9]{40,64}$/i.test(String(sha))) throw new GitHubSyncError("Invalid starting revision.", { code: "invalid_revision" });
+    const response = await request(blobUrl(config, sha), { headers: apiHeaders(config.token) }, "loading the starting workspace");
+    const blob = await response.json();
+    if (blob?.encoding !== "base64" || typeof blob.content !== "string" || blob.size > MAX_BRIDGE_FILE_BYTES) throw new GitHubSyncError("The starting workspace is not readable.", { code: "invalid_remote_state" });
+    const content = decodeBase64(blob.content);
+    if (new TextEncoder().encode(content).byteLength > MAX_BRIDGE_FILE_BYTES) throw new GitHubSyncError("The starting workspace is too large.", { code: "invalid_remote_state" });
+    return { sha, content };
+  };
+
+  return { verify, readFile, readBlob, writeFile, deleteFile };
 }
 
 function parseStateJson(stateJson) {
@@ -359,6 +360,8 @@ export function createBridgeEnvelope({
   actorKind = null,
   actorLabel = null,
   baseLearnerSha = null,
+  taskStartedAt = null,
+  appliedAgentSha = null,
   now = () => new Date(),
 }) {
   if (!["learner", "agent"].includes(channel)) throw new GitHubSyncError("Bridge channel is invalid.", { code: "invalid_channel" });
@@ -371,6 +374,7 @@ export function createBridgeEnvelope({
   if (channel === "agent" && (typeof baseLearnerSha !== "string" || !baseLearnerSha.trim() || baseLearnerSha.length > 200)) {
     throw new GitHubSyncError("Pull a learner checkpoint before publishing agent changes.", { code: "missing_learner_base" });
   }
+  if (taskStartedAt !== null && !Number.isFinite(Date.parse(taskStartedAt))) throw new GitHubSyncError("The agent task start time is invalid.", { code: "invalid_task_time" });
   return JSON.stringify({
     format: BRIDGE_FORMAT,
     schema_version: BRIDGE_SCHEMA_VERSION,
@@ -380,6 +384,8 @@ export function createBridgeEnvelope({
     device_label: resolvedDeviceLabel,
     actor: { kind: resolvedActorKind, label: resolvedActorLabel },
     base_learner_sha: channel === "agent" ? baseLearnerSha : null,
+    task_started_at: taskStartedAt,
+    applied_agent_sha: channel === "learner" ? appliedAgentSha : null,
     app_state: parseStateJson(stateJson),
   }, null, 2);
 }
@@ -408,6 +414,8 @@ export function parseBridgeEnvelope(raw, { expectedChannel = null } = {}) {
       ? value.actor.label.slice(0, 80)
       : value.channel === "agent" ? "QuickMaths agent" : (typeof value.device_label === "string" && value.device_label.trim() ? value.device_label.slice(0, 80) : "QuickMaths device"),
     baseLearnerSha: typeof value.base_learner_sha === "string" ? value.base_learner_sha : null,
+    taskStartedAt: typeof value.task_started_at === "string" && Number.isFinite(Date.parse(value.task_started_at)) ? value.task_started_at : null,
+    appliedAgentSha: typeof value.applied_agent_sha === "string" ? value.applied_agent_sha : null,
     stateJson: JSON.stringify(value.app_state),
   };
 }
@@ -427,6 +435,7 @@ export function createGitHubSyncController({
   credentialStore,
   serializeState,
   applyState,
+  validateMergeState = null,
   subscribeToState = null,
   now = () => new Date(),
   deviceId = null,
@@ -456,6 +465,9 @@ export function createGitHubSyncController({
   let operation = Promise.resolve();
   let learnerSha = typeof metadata?.learnerSha === "string" ? metadata.learnerSha : null;
   let agentSha = typeof metadata?.agentSha === "string" ? metadata.agentSha : null;
+  let agentTask = role === "agent" ? metadata?.agentTask ?? null : null;
+  let pendingReview = null;
+  const bases = new Map();
   let unsubscribe = null;
   let consecutiveIdlePolls = 0;
   let localChangedAt = typeof metadata?.localChangedAt === "string" ? metadata.localChangedAt : null;
@@ -477,6 +489,7 @@ export function createGitHubSyncController({
     error: null,
     conflict: null,
     conflictDetails: null,
+    taskStartedAt: agentTask?.startedAt ?? null,
     deviceId: resolvedDeviceId,
     deviceLabel: resolvedDeviceLabel,
     localChangedAt,
@@ -512,6 +525,7 @@ export function createGitHubSyncController({
         dirty: status.dirty,
         localChangedAt,
         pendingActor: clearRevisions ? null : revisions ? pendingLearnerActor : (pendingLearnerActor ?? savedPendingActor),
+        agentTask: clearRevisions ? null : agentTask,
       },
     });
   };
@@ -570,7 +584,33 @@ export function createGitHubSyncController({
     const path = channel === "learner" ? LEARNER_STATE_PATH : AGENT_STATE_PATH;
     const remote = await client.readFile(current, path);
     if (!remote.exists) return { ...remote, envelope: null };
-    return { ...remote, envelope: parseBridgeEnvelope(remote.content, { expectedChannel: channel }) };
+    const envelope = parseBridgeEnvelope(remote.content, { expectedChannel: channel });
+    if (channel === "learner") {
+      bases.set(remote.sha, envelope.stateJson);
+      if (bases.size > 5) bases.delete(bases.keys().next().value);
+    }
+    return { ...remote, envelope };
+  };
+
+  const readBase = async (sha) => {
+    if (!sha) return null;
+    if (bases.has(sha)) return bases.get(sha);
+    if (!client.readBlob) return null;
+    try {
+      const blob = await client.readBlob(requireConfig(), sha);
+      const state = parseBridgeEnvelope(blob.content, { expectedChannel: "learner" }).stateJson;
+      bases.set(sha, state);
+      return state;
+    } catch (error) {
+      // Missing history requires an explicit two-way review, never a blind restore.
+      if (error.status === 404 || error.code === "invalid_revision") return null;
+      throw error;
+    }
+  };
+
+  const localMatchesBase = async (sha) => {
+    const base = await readBase(sha);
+    return base !== null && sameWorkspace(serializeState(), base);
   };
 
   const schedulePoll = () => {
@@ -584,7 +624,7 @@ export function createGitHubSyncController({
         // written by devices, and the revision-bound response written by an
         // agent. Check both from every route; the page shell decides whether a
         // dirty cross-device mismatch can be resolved automatically or needs a
-        // global A/B comparison.
+        // selective merge window.
         if (role === "learner") await syncLearnerNow({ quiet: true });
         await pullNow({ quiet: true });
       } catch { /* Status already records the failure. */ }
@@ -604,6 +644,7 @@ export function createGitHubSyncController({
     // Agent work is deliberately transactional: tools may make several related
     // state changes before publish_agent_checkpoint commits one coherent result.
     if (role === "agent") return;
+    if (pendingReview || status.phase === "conflict") return;
     if (!status.connected || stopped) return;
     // Keep the first pending checkpoint timer. A session heartbeat updates the
     // store every second, so resetting this timer on every notification would
@@ -623,6 +664,9 @@ export function createGitHubSyncController({
     if (previousRepository !== repositoryKey(config)) {
       learnerSha = null;
       agentSha = null;
+      agentTask = null;
+      pendingReview = null;
+      bases.clear();
       status.dirty = false;
     }
     status.config = config;
@@ -646,19 +690,14 @@ export function createGitHubSyncController({
   }));
 
   const pushNow = ({ force = false } = {}) => runSerial(() => withPhase("pushing", async () => {
+    if (pendingReview) throw new GitHubSyncConflictError("Finish reviewing the workspace merge before syncing.", { channel: pendingReview.channel });
     const current = requireConfig();
     const channel = role;
     const path = channel === "learner" ? LEARNER_STATE_PATH : AGENT_STATE_PATH;
     if (role === "agent") {
-      if (!learnerSha) throw new GitHubSyncConflictError("Pull the learner checkpoint before publishing agent changes.");
+      if (!learnerSha || !agentTask?.startedAt) throw new GitHubSyncConflictError("Start the agent task and pull the learner checkpoint before publishing agent changes.");
       const latestLearner = await readChannel("learner");
       if (!latestLearner.exists) throw new GitHubSyncConflictError("The learner checkpoint no longer exists. Pull it again before publishing.");
-      if (latestLearner.sha !== learnerSha) {
-        throw new GitHubSyncConflictError("The learner changed after this agent workspace pulled. Pull the learner again before publishing.", {
-          knownLearnerSha: learnerSha,
-          remoteLearnerSha: latestLearner.sha,
-        });
-      }
     }
     const latest = await readChannel(channel);
     const knownSha = channel === "learner" ? learnerSha : agentSha;
@@ -668,14 +707,17 @@ export function createGitHubSyncController({
     const publishedActorLabel = role === "agent"
       ? resolvedDeviceLabel
       : pendingLearnerActor?.label || resolvedDeviceLabel;
+    const publishedState = serializeState();
     const envelope = createBridgeEnvelope({
       channel,
-      stateJson: serializeState(),
+      stateJson: publishedState,
       deviceId: resolvedDeviceId,
       deviceLabel: resolvedDeviceLabel,
       actorKind: role === "agent" ? "agent" : pendingLearnerActor?.kind,
       actorLabel: role === "agent" ? resolvedDeviceLabel : pendingLearnerActor?.label,
-      baseLearnerSha: channel === "agent" ? learnerSha : null,
+      baseLearnerSha: channel === "agent" ? agentTask.baseLearnerSha : null,
+      taskStartedAt: channel === "agent" ? agentTask.startedAt : null,
+      appliedAgentSha: channel === "learner" ? agentSha : null,
       now,
     });
     let result;
@@ -685,21 +727,21 @@ export function createGitHubSyncController({
         message: `QuickMaths Bridge: ${channel} checkpoint`,
       });
     } catch (error) {
-      if (!force || role !== "learner" || !(error instanceof GitHubSyncConflictError)) throw error;
-      const refreshed = await readChannel(channel);
-      result = await client.writeFile(current, path, envelope, {
-        sha: refreshed.sha,
-        message: `QuickMaths Bridge: resolve ${channel} checkpoint conflict`,
-      });
+      if (error instanceof GitHubSyncConflictError) throw new GitHubSyncConflictError("GitHub changed during the write. Review the current versions before syncing.", { channel, knownSha });
+      throw error;
     }
+    const changedDuringPush = !sameWorkspace(serializeState(), publishedState);
     if (channel === "learner") learnerSha = result.sha;
     else agentSha = result.sha;
-    if (channel === "learner") pendingLearnerActor = null;
+    if (channel === "learner") {
+      bases.set(result.sha, publishedState);
+      if (!changedDuringPush) pendingLearnerActor = null;
+    } else agentTask.completed = !changedDuringPush;
     persistMetadata({ revisions: true });
     const pushedAt = now().toISOString();
     update({
       phase: "synced",
-      dirty: false,
+      dirty: changedDuringPush,
       lastPushedAt: pushedAt,
       lastRemoteUpdatedAt: pushedAt,
       lastRemoteActor: publishedActorLabel,
@@ -710,8 +752,16 @@ export function createGitHubSyncController({
     return { ...result, channel };
   }));
 
-  const pullNow = ({ quiet = false } = {}) => runSerial(() => withPhase(quiet ? status.phase : "pulling", async () => {
+  const pullNow = ({ quiet = false, beginTask = false } = {}) => runSerial(() => withPhase(quiet ? status.phase : "pulling", async () => {
+    if (pendingReview) throw new GitHubSyncConflictError("Review the pending workspace merge first.", { channel: pendingReview.channel });
+    // A prompt's timestamp is captured before its first read, retained locally,
+    // and committed with the finished checkpoint. Polling cannot reset it.
+    const startedAt = now().toISOString();
+    if (role === "agent" && quiet && agentTask && !agentTask.completed) return { updated: false, taskInProgress: true };
+    if (role === "agent" && beginTask && status.dirty) throw new GitHubSyncConflictError("Publish the current agent task before starting another.");
     const channel = role === "learner" ? "agent" : "learner";
+    const canonical = role === "learner" ? await readChannel("learner") : null;
+    if (canonical && canonical.sha !== learnerSha) throw new GitHubSyncConflictError("The shared workspace changed. Review it before the agent update.", { channel: "learner" });
     const remote = await readChannel(channel);
     if (!remote.exists) {
       consecutiveIdlePolls += 1;
@@ -719,35 +769,32 @@ export function createGitHubSyncController({
       return { updated: false, exists: false, channel };
     }
     const knownSha = channel === "learner" ? learnerSha : agentSha;
-    if (remote.sha === knownSha) {
+    if (role === "agent" && (beginTask || !agentTask || agentTask.completed) && !quiet) {
+      if (status.dirty) throw new GitHubSyncConflictError("Publish the current agent task before starting another.");
+      const published = await readChannel("agent");
+      agentSha = published.sha;
+      agentTask = { startedAt, baseLearnerSha: remote.sha, completed: false };
+      update({ taskStartedAt: startedAt });
+      persistMetadata({ revisions: true });
+    }
+    if (remote.sha === knownSha && !beginTask) {
       consecutiveIdlePolls += 1;
       update({ phase: status.dirty ? "idle" : "synced", remoteAvailable: true, error: null, lastRemoteActor: remote.envelope.actorLabel });
       return { updated: false, exists: true, sha: remote.sha, channel };
     }
-    if (status.dirty) {
-      throw new GitHubSyncConflictError(role === "learner"
-        ? "This device has learner changes that are not checkpointed yet. Sync them before applying agent changes."
-        : "This agent workspace has unpublished changes. Publish or discard them before pulling a newer learner checkpoint.");
+    if (role === "agent" && status.dirty) throw new GitHubSyncConflictError("This agent workspace has unpublished changes. Publish them before pulling a newer learner checkpoint.");
+    if (role === "learner") {
+      const base = await readBase(remote.envelope.baseLearnerSha);
+      // Compare both the current repo and the phone with the task's starting
+      // snapshot. Revision/content checks also cover equal or skewed clocks.
+      const alreadyMatches = canonical?.exists && sameWorkspace(canonical.envelope.stateJson, remote.envelope.stateJson) && sameWorkspace(serializeState(), remote.envelope.stateJson);
+      if (!alreadyMatches && (!base || !canonical?.exists || !sameWorkspace(canonical.envelope.stateJson, base) || !sameWorkspace(serializeState(), base))) {
+        throw new GitHubSyncConflictError("Your workspace changed while the agent was working. Choose what to keep from each version.", {
+          channel: "agent", taskStartedAt: remote.envelope.taskStartedAt, remoteSha: remote.sha,
+        });
+      }
     }
-    if (role === "learner" && (!learnerSha || remote.envelope.baseLearnerSha !== learnerSha)) {
-      agentSha = remote.sha;
-      persistMetadata({ revisions: true });
-      consecutiveIdlePolls = 0;
-      update({
-        phase: status.dirty ? "idle" : "synced",
-        remoteAvailable: true,
-        lastPulledAt: now().toISOString(),
-        lastRemoteUpdatedAt: remote.envelope.updatedAt,
-        lastRemoteActor: remote.envelope.actorLabel,
-        error: null,
-        conflict: null,
-      });
-      return {
-        updated: false, exists: true, ignored: true, stale: true,
-        sha: remote.sha, channel, updatedAt: remote.envelope.updatedAt,
-      };
-    }
-    await applyRemote(remote.envelope.stateJson);
+    await applyRemote(role === "learner" ? preserveDeviceState(remote.envelope.stateJson, serializeState()) : remote.envelope.stateJson);
     localChangedAt = remote.envelope.updatedAt ?? now().toISOString();
     if (channel === "learner") learnerSha = remote.sha;
     else agentSha = remote.sha;
@@ -769,6 +816,7 @@ export function createGitHubSyncController({
   }));
 
   const syncLearnerNow = ({ quiet = false } = {}) => runSerial(() => withPhase(quiet ? status.phase : "pulling", async () => {
+    if (pendingReview) throw new GitHubSyncConflictError("Review the pending workspace merge first.", { channel: pendingReview.channel });
     if (role !== "learner") throw new GitHubSyncError("Only a learner browser can follow the canonical learner checkpoint.", { code: "wrong_role" });
     const remote = await readChannel("learner");
     if (!remote.exists) {
@@ -785,7 +833,7 @@ export function createGitHubSyncController({
       });
       return { updated: false, exists: true, sha: remote.sha, channel: "learner" };
     }
-    if (status.dirty) {
+    if ((status.dirty || learnerSha) && !await localMatchesBase(learnerSha)) {
       throw new GitHubSyncConflictError("Another device or agent has a newer QuickMaths workspace while this device has unsynced work.", {
         channel: "learner",
         knownSha: learnerSha,
@@ -797,10 +845,11 @@ export function createGitHubSyncController({
         remoteActorLabel: remote.envelope.actorLabel,
       });
     }
-    await applyRemote(remote.envelope.stateJson);
+    await applyRemote(preserveDeviceState(remote.envelope.stateJson, serializeState()));
     localChangedAt = remote.envelope.updatedAt ?? now().toISOString();
     pendingLearnerActor = null;
     learnerSha = remote.sha;
+    agentSha = remote.envelope.appliedAgentSha ?? agentSha;
     persistMetadata({ revisions: true });
     consecutiveIdlePolls = 0;
     update({
@@ -833,6 +882,7 @@ export function createGitHubSyncController({
     localChangedAt = remote.envelope.updatedAt ?? now().toISOString();
     pendingLearnerActor = null;
     learnerSha = remote.sha;
+    agentSha = remote.envelope.appliedAgentSha ?? agentSha;
     persistMetadata({ revisions: true });
     update({
       phase: "synced", dirty: false, remoteAvailable: true,
@@ -852,6 +902,58 @@ export function createGitHubSyncController({
     }
     update({ phase: "idle", remoteAvailable: learner.exists, error: null });
     return { learner, agent: null };
+  }));
+
+  const prepareMerge = ({ channel = "learner" } = {}) => runSerial(() => withPhase("checking", async () => {
+    if (role !== "learner" || !["learner", "agent"].includes(channel)) throw new GitHubSyncError("Only a learner workspace can review a merge.");
+    pauseRemoteActivity();
+    const learner = await readChannel("learner");
+    const agent = await readChannel("agent");
+    // Resolve a newer canonical copy first, then review the pending agent task.
+    if (channel === "agent" && learner.sha !== learnerSha) channel = "learner";
+    const remote = channel === "learner" ? learner : agent;
+    if (!remote.exists) throw new GitHubSyncConflictError("The remote workspace was removed. Reconnect storage to review its current state.", { channel });
+    const baseJson = await readBase(channel === "agent" ? remote.envelope.baseLearnerSha : learnerSha);
+    const localJson = serializeState();
+    const plan = createWorkspaceMerge({ baseJson, localJson, remoteJson: remote.envelope.stateJson });
+    const id = makeDeviceId();
+    pendingReview = { id, channel, plan, localJson, learner, agent, remote };
+    update({ phase: "reviewing", error: null, conflict: null });
+    return { id, channel, rows: plan.rows, hasBase: plan.hasBase, remoteLabel: remote.envelope.actorLabel, taskStartedAt: remote.envelope.taskStartedAt, remoteUpdatedAt: remote.envelope.updatedAt };
+  }));
+
+  const applyMerge = ({ reviewId, choices = {} } = {}) => runSerial(() => withPhase("merging", async () => {
+    const review = pendingReview;
+    if (!review || review.id !== reviewId) throw new GitHubSyncConflictError("This comparison has expired. Refresh the comparison.", { channel: review?.channel ?? "learner" });
+    const changed = () => new GitHubSyncConflictError("The workspace changed during review. Refresh the comparison before saving.", { channel: review.channel });
+    const learner = await readChannel("learner");
+    const agent = await readChannel("agent");
+    if (learner.sha !== review.learner.sha || agent.sha !== review.agent.sha || !sameWorkspace(serializeState(), review.localJson)) throw changed();
+    const merged = preserveDeviceState(review.plan.resolve(choices), serializeState(), review.remote.envelope.stateJson);
+    if (validateMergeState) await validateMergeState(merged);
+    if (!sameWorkspace(serializeState(), review.localJson)) throw changed();
+    const acknowledged = review.channel === "agent" ? agent.sha : learner.envelope?.appliedAgentSha ?? agentSha;
+    const envelope = createBridgeEnvelope({ channel: "learner", stateJson: merged, deviceId: resolvedDeviceId, deviceLabel: resolvedDeviceLabel, appliedAgentSha: acknowledged, now });
+    let result;
+    try {
+      result = await client.writeFile(requireConfig(), LEARNER_STATE_PATH, envelope, { sha: learner.sha, message: "QuickMaths Bridge: merge reviewed workspace changes" });
+    } catch (error) {
+      if (error instanceof GitHubSyncConflictError) throw changed();
+      throw error;
+    }
+    bases.set(result.sha, merged);
+    // Edits during the network write remain local. The saved merge becomes a
+    // new remote version to compare; it must never overwrite those edits.
+    if (!sameWorkspace(serializeState(), review.localJson)) throw changed();
+    await applyRemote(preserveDeviceState(merged, serializeState(), review.remote.envelope.stateJson));
+    learnerSha = result.sha;
+    agentSha = acknowledged;
+    pendingReview = null;
+    pendingLearnerActor = null;
+    localChangedAt = now().toISOString();
+    persistMetadata({ revisions: true });
+    update({ phase: "synced", dirty: false, localChangedAt, lastPushedAt: localChangedAt, error: null, conflict: null, remoteAvailable: true });
+    return { ...result, merged: true, channel: review.channel };
   }));
 
   const pauseRemoteActivity = () => {
@@ -900,6 +1002,8 @@ export function createGitHubSyncController({
     }
     learnerSha = null;
     agentSha = null;
+    pendingReview = null;
+    bases.clear();
     persistMetadata({ clearRevisions: true });
     update({ phase: "cleared", dirty: false, remoteAvailable: false, error: null, conflict: null });
     return { deletedPaths };
@@ -921,6 +1025,9 @@ export function createGitHubSyncController({
     config = null;
     learnerSha = null;
     agentSha = null;
+    agentTask = null;
+    pendingReview = null;
+    bases.clear();
     update({
       phase: "disconnected", connected: false, dirty: false, remoteAvailable: false,
       error: null, conflict: null, config: null, repository: null,
@@ -937,6 +1044,7 @@ export function createGitHubSyncController({
 
   const start = () => {
     if (!status.connected) throw new GitHubSyncError("Connect a GitHub repository first.", { code: "not_connected" });
+    if (pendingReview) return;
     stopped = false;
     schedulePoll();
   };
@@ -952,6 +1060,12 @@ export function createGitHubSyncController({
     dispose() { stop(); unsubscribe?.(); listeners.clear(); },
     pushNow,
     pullNow,
+    beginAgentTask: () => {
+      if (role !== "agent") throw new GitHubSyncError("Only the agent workspace can start an agent task.");
+      return pullNow({ beginTask: true });
+    },
+    prepareMerge,
+    applyMerge,
     restoreLearner,
     inspectRemote,
     syncLearnerNow,

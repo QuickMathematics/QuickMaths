@@ -17,13 +17,13 @@ import {
   parseBridgeEnvelope,
 } from "./github-sync.js";
 
-test("learner startup reserves A/B choice for a first device migration", () => {
+test("learner startup never uses writer identity or nearby clocks to discard dirty work", () => {
   assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2 }), "choose-migration-source");
   assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true }), "restore-remote");
   assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, remoteMatchesKnown: true }), "resume-known");
-  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, sameDevice: true }), "restore-remote");
-  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, remoteActorKind: "agent" }), "restore-remote");
-  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, localChangedAt: "2026-09-03T12:08:00Z", remoteUpdatedAt: "2026-09-03T12:00:00Z" }), "restore-remote");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, sameDevice: true }), "compare-sources");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, remoteActorKind: "agent" }), "compare-sources");
+  assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, localChangedAt: "2026-09-03T12:08:00Z", remoteUpdatedAt: "2026-09-03T12:00:00Z" }), "compare-sources");
   assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true, localChangedAt: "2026-09-03T12:11:00Z", remoteUpdatedAt: "2026-09-03T12:00:00Z" }), "compare-sources");
   assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2, establishedConnection: true, localDirty: true }), "compare-sources");
   assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 0 }), "restore-remote");
@@ -52,9 +52,11 @@ function connection(role = "learner") {
 
 function fakeGitHub() {
   const files = new Map();
+  const blobs = new Map();
   let revision = 0;
   return {
     files,
+    async readBlob(_config, sha) { return { sha, content: blobs.get(sha) }; },
     async verify(config) { return { owner: config.owner, repo: config.repo, private: true, defaultBranch: config.branch, permissions: { push: true } }; },
     async readFile(_config, path) {
       const file = files.get(path);
@@ -66,6 +68,7 @@ function fakeGitHub() {
       revision += 1;
       const next = { sha: `sha-${revision}`, content };
       files.set(path, next);
+      blobs.set(next.sha, content);
       return { sha: next.sha, commitSha: `commit-${revision}` };
     },
     async deleteFile(_config, path, { sha } = {}) {
@@ -105,6 +108,150 @@ function controller({ role, client, harness, credentialStore = credentials(), da
     clearTimer: () => {},
   });
 }
+
+async function mergeFixture() {
+  const github = fakeGitHub();
+  const learnerState = stateHarness("Learner");
+  const agentState = stateHarness("Agent");
+  const learner = controller({ role: "learner", client: github, harness: learnerState });
+  const agent = controller({ role: "agent", client: github, harness: agentState, date: "2026-09-01T12:02:00.000Z" });
+  await learner.connect(connection(), { startPolling: false });
+  await learner.pushNow();
+  await agent.connect(connection("agent"), { startPolling: false });
+  await agent.beginAgentTask();
+  return { github, learnerState, agentState, learner, agent };
+}
+
+test("a prompt timestamp is local until publish and survives subsequent reads", async () => {
+  const { github, agent, agentState } = await mergeFixture();
+  assert.equal(github.files.has(AGENT_STATE_PATH), false);
+  const start = agent.snapshot().taskStartedAt;
+  await agent.pullNow({ quiet: true });
+  agentState.mutate({ note: "ready" });
+  await assert.rejects(agent.beginAgentTask(), /Publish/);
+  await agent.pushNow();
+  assert.equal(parseBridgeEnvelope(github.files.get(AGENT_STATE_PATH).content).taskStartedAt, start);
+});
+
+test("the timestamp is taken before the initial read and not at publish time", async () => {
+  const github = fakeGitHub();
+  await github.writeFile(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: stateHarness("Learner").serialize(), deviceId: "phone" }));
+  let clock = "2026-09-06T09:00:00.000Z";
+  const agent = createGitHubSyncController({ role: "agent", credentialStore: credentials(),
+    client: { ...github, async readFile(...args) { clock = "2026-09-06T09:01:00.000Z"; return github.readFile(...args); } },
+    serializeState: stateHarness("Agent").serialize, applyState: () => {}, now: () => new Date(clock), setTimer: () => 1, clearTimer: () => {},
+  });
+  await agent.connect(connection("agent"), { startPolling: false });
+  await agent.beginAgentTask();
+  await agent.pushNow();
+  const checkpoint = parseBridgeEnvelope(github.files.get(AGENT_STATE_PATH).content);
+  assert.equal(checkpoint.taskStartedAt, "2026-09-06T09:00:00.000Z");
+  assert.equal(checkpoint.updatedAt, "2026-09-06T09:01:00.000Z");
+});
+
+test("an unchanged phone accepts the task despite harmless timer-only repository commits", async () => {
+  const { learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ session: { heartbeatAt: 1000 }, syncedAt: "later" });
+  await learner.pushNow();
+  agentState.mutate({ note: "new lesson" });
+  await agent.pushNow();
+  assert.equal((await learner.pullNow()).updated, true);
+  assert.equal(learnerState.read().note, "new lesson");
+});
+
+test("merge choices can keep individual local and remote fields", async () => {
+  const { learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ score: 9, subject: "Local subject" });
+  agentState.mutate({ score: 8, subject: "Remote subject" });
+  await agent.pushNow();
+  await assert.rejects(learner.pullNow(), /changed while/);
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const choices = Object.fromEntries(review.rows.map((row) => [row.id, row.path[0] === "score" ? "local" : "remote"]));
+  await learner.applyMerge({ reviewId: review.id, choices });
+  assert.equal(learnerState.read().score, 9);
+  assert.equal(learnerState.read().subject, "Remote subject");
+});
+
+test("edits on the phone during a merge require a fresh comparison", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ score: 9 });
+  agentState.mutate({ score: 8 });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const before = github.files.get(LEARNER_STATE_PATH).sha;
+  learnerState.mutate({ answer: "typed during review" });
+  await assert.rejects(learner.applyMerge({ reviewId: review.id, choices: { 0: "remote" } }), /changed during review/);
+  assert.equal(github.files.get(LEARNER_STATE_PATH).sha, before);
+  assert.equal(learnerState.read().answer, "typed during review");
+  await assert.rejects(learner.pushNow(), /reviewing/);
+});
+
+test("a different GitHub revision during review cannot be overwritten", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ score: 9 });
+  agentState.mutate({ score: 8 });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const current = github.files.get(LEARNER_STATE_PATH);
+  await github.writeFile(connection(), LEARNER_STATE_PATH, current.content, { sha: current.sha });
+  await assert.rejects(learner.applyMerge({ reviewId: review.id, choices: { 0: "remote" } }), /changed during review/);
+  assert.equal(learnerState.read().score, 9);
+});
+
+test("accepted agent checkpoints are acknowledged for other devices", async () => {
+  const { github, learner, agent, agentState } = await mergeFixture();
+  agentState.mutate({ lesson: "accepted" });
+  await agent.pushNow();
+  await learner.pullNow();
+  await learner.pushNow();
+  const secondState = stateHarness("Empty");
+  const second = controller({ role: "learner", client: github, harness: secondState });
+  await second.connect(connection(), { startPolling: false });
+  await second.restoreLearner();
+  assert.equal((await second.pullNow()).updated, false);
+  assert.equal(secondState.read().lesson, "accepted");
+});
+
+test("missing starting history requires explicit two-way choices", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  // Advance enough revisions to evict the in-memory starting checkpoint.
+  for (let n = 0; n < 7; n++) { learnerState.mutate({ n }); await learner.pushNow(); }
+  github.readBlob = async () => { throw Object.assign(new Error("Missing history"), { status: 404 }); };
+  agentState.mutate({ lesson: "new" });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  assert.equal(review.hasBase, false);
+  assert.ok(review.rows.every((r) => r.suggested === null));
+  await assert.rejects(learner.applyMerge({ reviewId: review.id }), /Choose/);
+});
+
+test("a failed merge write leaves the complete local workspace unchanged", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ answer: "local" });
+  agentState.mutate({ lesson: "remote" });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const local = learnerState.serialize();
+  github.writeFile = async () => { throw new Error("Offline"); };
+  await assert.rejects(learner.applyMerge({ reviewId: review.id }), /Offline/);
+  assert.equal(learnerState.serialize(), local);
+});
+
+test("edits during a merge write survive and the saved remote result can be reviewed again", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ answer: "before" });
+  agentState.mutate({ lesson: "remote" });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const write = github.writeFile;
+  github.writeFile = async (...args) => { const result = await write(...args); learnerState.mutate({ answer: "during write" }); return result; };
+  await assert.rejects(learner.applyMerge({ reviewId: review.id }), /changed during review/);
+  assert.equal(learnerState.read().answer, "during write");
+  assert.equal(learnerState.read().lesson, undefined);
+  const refreshed = await learner.prepareMerge({ channel: "agent" });
+  assert.equal(refreshed.channel, "learner");
+  assert.ok(refreshed.rows.some((row) => row.local === "during write"));
+});
 
 test("Bridge hands staged lesson batches to the learner for individual approval", async () => {
   const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
@@ -492,7 +639,7 @@ test("agent changes stay dirty until an explicit checkpoint is published", async
   assert.equal(JSON.parse(parseBridgeEnvelope(github.files.get(AGENT_STATE_PATH).content).stateJson).tutorNote, "Work through the next example.");
 });
 
-test("stale agent output is rejected before it can overwrite newer learner work", async () => {
+test("overlapping agent output publishes with its original task time and opens a merge", async () => {
   const github = fakeGitHub();
   const learnerState = stateHarness("Learner");
   const agentState = stateHarness("Agent");
@@ -506,12 +653,15 @@ test("stale agent output is rejected before it can overwrite newer learner work"
   learnerState.mutate({ score: 10 });
   await learner.pushNow();
   agentState.mutate({ staleTutorNote: true });
-  await assert.rejects(agent.pushNow(), /learner changed/i);
-  assert.equal(agent.snapshot().phase, "conflict");
+  await agent.pushNow();
+  const envelope = parseBridgeEnvelope(github.files.get(AGENT_STATE_PATH).content);
+  assert.equal(envelope.taskStartedAt, "2026-09-01T12:00:00.000Z");
+  await assert.rejects(learner.pullNow(), /changed while the agent/i);
+  assert.equal(learner.snapshot().conflictDetails.channel, "agent");
   assert.equal(learnerState.read().staleTutorNote, undefined);
 });
 
-test("learner safely acknowledges an agent response made stale by newer learner work", async () => {
+test("learner retains both sides of an overlapping task until the merge is saved", async () => {
   const github = fakeGitHub();
   const learnerState = stateHarness("Learner");
   const agentState = stateHarness("Agent");
@@ -526,19 +676,19 @@ test("learner safely acknowledges an agent response made stale by newer learner 
 
   learnerState.mutate({ newerLearnerWork: true });
   await learner.pushNow();
-  const ignored = await learner.pullNow();
-  assert.equal(ignored.stale, true);
-  assert.equal(ignored.ignored, true);
+  await assert.rejects(learner.pullNow(), /changed while the agent/i);
   assert.equal(learnerState.read().staleTutorNote, undefined);
-  assert.equal(learner.snapshot().phase, "synced");
-  assert.equal(learner.snapshot().conflict, null);
-
-  const alreadyAcknowledged = await learner.pullNow();
-  assert.equal(alreadyAcknowledged.updated, false);
-  assert.equal(alreadyAcknowledged.stale, undefined);
+  const review = await learner.prepareMerge({ channel: "agent" });
+  assert.equal(review.hasBase, true);
+  await learner.applyMerge({ reviewId: review.id });
+  assert.equal(learnerState.read().newerLearnerWork, true);
+  assert.equal(learnerState.read().staleTutorNote, "This must never be applied.");
+  const checkpoint = parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content);
+  assert.equal(checkpoint.appliedAgentSha, github.files.get(AGENT_STATE_PATH).sha);
+  assert.equal((await learner.pullNow()).updated, false);
 });
 
-test("explicit learner conflict resolution retries one raced remote write", async () => {
+test("even explicit force never retries by overwriting an unseen raced version", async () => {
   const github = fakeGitHub();
   const firstState = stateHarness("First");
   const secondState = stateHarness("Second");
@@ -563,10 +713,10 @@ test("explicit learner conflict resolution retries one raced remote write", asyn
   };
   const second = controller({ role: "learner", client: racingClient, harness: secondState });
   await second.connect(connection(), { startPolling: false });
-  await second.pushNow({ force: true });
+  await assert.rejects(second.pushNow({ force: true }), GitHubSyncConflictError);
   const resolved = parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content);
-  assert.equal(JSON.parse(resolved.stateJson).profiles[0].displayName, "Second");
-  assert.equal(second.snapshot().phase, "synced");
+  assert.equal(JSON.parse(resolved.stateJson).raced, true);
+  assert.equal(second.snapshot().phase, "conflict");
 });
 
 test("a stale open tab cannot erase the revision persisted by a successful push", async () => {
@@ -628,7 +778,7 @@ test("uncheckpointed learner changes reject an otherwise current agent response"
   await agent.pushNow();
 
   learnerState.mutate({ localAnswer: "still typing" });
-  await assert.rejects(learner.pullNow(), /not checkpointed yet/i);
+  await assert.rejects(learner.pullNow(), /changed while the agent/i);
   assert.equal(learnerState.read().tutorNote, undefined);
 });
 

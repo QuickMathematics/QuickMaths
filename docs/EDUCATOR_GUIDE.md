@@ -506,7 +506,7 @@ The token is entered privately in the app. It is never included in backups, agen
 
 Bridge status distinguishes local browser state and device label, last workspace push, the last remote writer, credential storage, and source choices. **Sync now** pushes the complete workspace checkpoint. **Check agent updates** pulls a revision-bound agent checkpoint. Sync polling runs throughout the educator app, including Overview, Curriculum Designer, Depot, Lesson Studio, and Settings.
 
-QuickMaths creates a random privacy-safe ID for each browser installation and adds a friendly label such as **OpenAI in-app browser on Windows**; it does not inspect hardware identifiers. Each checkpoint also marks the last writer as a device or **QuickMaths agent**. A first-time migration with independent local and GitHub work always requires A/B approval. Afterward, clean state, same-device changes, agent-authored work, and different-device changes within ten minutes fast-forward automatically. A dirty different-device history more than ten minutes apart—or without comparable timestamps—opens a global diff with source labels, times, and compact counts for profiles, progress, attempts, reviews, curricula, lesson packs, and plans.
+Each agent prompt starts by noting its UTC start time locally with **begin_agent_task**. The agent pushes that original timestamp together with the finished checkpoint and its starting learner revision. If neither your device nor the GitHub learner workspace changed from that starting copy, QuickMaths applies the update automatically. If you kept working, sync pauses and a merge window shows the changed profiles, curricula, lesson sets, progress records, attempts, reviews, drafts, and plans. Changes made only on one side are preselected; choose **This device** or **GitHub** for items edited on both sides, then **Save merged workspace**. You can keep different items from each version. Session clocks and viewport changes alone do not cause a merge. The window works on every app page.
 
 **Open Agent Bridge** launches the remote-session companion. **Setup guide** opens human instructions. **Disconnect** removes the active connection on this device.
 
@@ -662,7 +662,7 @@ Use **Jump to skill** to focus any enabled lesson on the combined map. If the le
 
 ### GitHub sync reports a conflict
 
-Most updates fast-forward automatically on every page. A comparison appears only for a first-time migration with independent work or for dirty histories from different devices that are more than ten minutes apart (or cannot be dated). Review the device/agent labels, timestamps, and workspace counts; download a backup if both copies matter, then choose the complete workspace that continues. The repository history remains a recovery aid.
+A comparison appears when local and remote work overlap, or when an existing workspace first connects to an independent GitHub copy. Review the changed fields and choose a version for each item. **Select all from this device** and **Select all from GitHub** only select choices; **Save merged workspace** applies and syncs them. **Not now** leaves sync paused. If either copy changes during review, use **Refresh comparison** before saving. If the starting copy is unavailable, every difference needs an explicit choice. GitHub history remains a recovery aid.
 
 ### A proof has the correct conclusion but no mastery
 

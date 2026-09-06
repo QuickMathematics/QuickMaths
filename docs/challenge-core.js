@@ -4435,6 +4435,45 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     };
   };
 
+  const validateSyncMerge = (raw) => {
+    const { candidate, imported } = parseBackup(raw);
+    const fail = () => { throw new Error("These choices would remove related saved work. Keep its profile, curriculum and lesson set too, or remove that work in the comparison."); };
+    const checkPlan = (plan, next) => {
+      if (!plan) return;
+      for (const [layout, positions] of Object.entries(plan.layouts ?? {})) {
+        if (Object.keys(positions).some((id) => !next?.layouts?.[layout]?.[id])) fail();
+      }
+      for (const key of ["paths", "annotations"]) for (const item of plan[key] ?? []) {
+        const kept = next?.[key]?.find((p) => p.id === item.id);
+        if (!kept || (item.skillIds ?? []).some((id) => !kept.skillIds.includes(id))) fail();
+      }
+      if ((plan.hiddenSkillIds ?? []).some((id) => !next?.hiddenSkillIds?.includes(id))) fail();
+    };
+    for (const [key, id] of Object.entries({ profiles: "id", curricula: "id", lessonPacks: "id", attempts: "attemptId", reviews: "reviewId" })) {
+      const retained = new Set(imported[key].map((item) => item[id]));
+      if ((candidate[key] ?? []).some((item) => !retained.has(item[id]))) fail();
+    }
+    for (const key of ["progress", "drafts", "mapPlans"]) {
+      for (const [profileId, records] of Object.entries(candidate[key] ?? {})) {
+        if (!imported[key][profileId]) fail();
+        if (key !== "mapPlans" && Object.keys(records).some((id) => !Object.hasOwn(imported[key][profileId], id))) fail();
+        if (key === "mapPlans") checkPlan(records, imported.mapPlans[profileId]);
+      }
+    }
+    for (const profile of candidate.profiles ?? []) {
+      const next = imported.profiles.find((p) => p.id === profile.id);
+      if ((profile.curriculumId && next.curriculumId !== profile.curriculumId) || (profile.activeCurriculumId && next.activeCurriculumId !== profile.activeCurriculumId)) fail();
+    }
+    for (const item of candidate.curricula ?? []) {
+      const next = imported.curricula.find((c) => c.id === item.id);
+      if ((item.ownerProfileId && next.ownerProfileId !== item.ownerProfileId) || (item.enabledPackIds ?? []).some((id) => !next.enabledPackIds.includes(id))) fail();
+      checkPlan(item.mapPlan, next.mapPlan);
+    }
+    const attempts = new Set(imported.attempts.map((item) => item.attemptId));
+    if (imported.reviews.some((review) => !attempts.has(review.attemptId))) fail();
+    return { ok: true };
+  };
+
   const exportTutorSummary = (attemptId = state.ui.activeAttemptId) => {
     const attempt = getAttempt(attemptId);
     if (!attempt) throw new Error("Open a saved attempt before exporting a tutor summary.");
@@ -4604,6 +4643,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       return { ok: true, count: migrationLessonPacks.length };
     },
     importSyncState,
+    validateSyncMerge,
     exportCsv,
     heartbeat,
     replaceFromStorage,

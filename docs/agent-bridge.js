@@ -1,17 +1,17 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260905-state-fixes-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260906-merge-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-final-handoff-v1";
 import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260905-confused-neutral-v5";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260903-device-aware-sync-v1";
-import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js";
+} from "./github-sync.js?v=20260906-merge-v1";
+import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js?v=20260906-merge-v1";
 import {
   createLocalBridgeCredentialStore,
   createLocalGitContentsClient,
   resolveLocalBridgeCapability,
-} from "./local-git-client.js";
+} from "./local-git-client.js?v=20260906-merge-v1";
 
 const elements = {
   liveStatus: document.querySelector("#live-status"),
@@ -87,9 +87,9 @@ function renderSync(status) {
   elements.pull.disabled = !status.connected || working;
   elements.push.disabled = !status.connected || working || !store.snapshot().activeProfile;
   elements.stateNote.textContent = status.conflict
-    ? `${status.conflict} Pull the learner again before publishing.`
+    ? status.conflict
     : status.connected
-      ? `Last learner pull: ${formatDate(status.lastPulledAt)}. Last agent publish: ${formatDate(status.lastPushedAt)}.${status.dirty ? " Agent changes are waiting to publish." : ""}`
+      ? `Task started: ${formatDate(status.taskStartedAt)}. Last learner pull: ${formatDate(status.lastPulledAt)}. Last agent publish: ${formatDate(status.lastPushedAt)}.${status.dirty ? " Agent changes are waiting to publish." : ""}`
       : localMode
         ? "Start the local Bridge command again if this host connection stops. GitHub credentials never enter this page."
         : "Connect the same repository used by the learner’s QuickMaths Settings page.";
@@ -120,7 +120,7 @@ async function boot() {
   const [curriculumResponse, geographyResponse, manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
     fetch("./curriculum-data.json?v=20260902-native-math-expansion"),
     fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260902-geography-depot"),
-    fetch("./agent-manifest.json?v=20260903-final-handoff-v1").catch(() => null),
+    fetch("./agent-manifest.json?v=20260906-merge-v1").catch(() => null),
     fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
     fetch("./STUDENT_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
     fetch("./EDUCATOR_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),

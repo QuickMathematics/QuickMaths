@@ -63,6 +63,20 @@ function harness(seed = {}) {
   };
 }
 
+test("merge validation catches removed lesson dependencies before importing any state", () => {
+  const { store } = harness();
+  store.createProfile("Merge learner");
+  const before = store.exportSyncState();
+  assert.equal(store.validateSyncMerge(before).ok, true);
+  const candidate = JSON.parse(before);
+  candidate.progress[candidate.profiles[0].id] = { REMOVED_LESSON: { status: "learning" } };
+  assert.throws(() => store.validateSyncMerge(JSON.stringify(candidate)), /related saved work/);
+  assert.deepEqual(JSON.parse(store.exportSyncState()), JSON.parse(before));
+  delete candidate.progress[candidate.profiles[0].id].REMOVED_LESSON;
+  candidate.mapPlans[candidate.profiles[0].id] = { layouts: { "all-subjects": { REMOVED_LESSON: { x: 1, y: 1 } } }, paths: [], annotations: [], hiddenSkillIds: [] };
+  assert.throws(() => store.validateSyncMerge(JSON.stringify(candidate)), /related saved work/);
+});
+
 function biologyLessonSet() {
   const pack = JSON.parse(lessonSetExample);
   pack.id = "PACK_CELL_BIOLOGY";
