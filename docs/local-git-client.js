@@ -85,7 +85,7 @@ export function createLocalGitContentsClient({
     return {
       owner: value.owner,
       repo: value.repo,
-      private: true,
+      private: value.private === true,
       defaultBranch: value.branch,
       branch: value.branch,
       transport: "local-git",

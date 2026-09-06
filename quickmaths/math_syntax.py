@@ -7,12 +7,12 @@ from sympy import E, Eq, FiniteSet, Ge, Gt, Interval, Le, Lt, N, S, Symbol, Unio
 from sympy.parsing.sympy_parser import (
     convert_xor,
     implicit_multiplication_application,
-    parse_expr,
     standard_transformations,
 )
 from sympy.solvers.inequalities import solve_univariate_inequality
 
 from quickmaths.utils import normalize_spaces
+from quickmaths.safe_math import parse_school_expression
 
 TRANSFORMATIONS = standard_transformations + (implicit_multiplication_application, convert_xor)
 LOCAL_DICT = {
@@ -82,6 +82,8 @@ def display_math(text: str) -> str:
 
 
 def parse_expression(text: str, variables: list[str] | None = None):
+    if not isinstance(text, str) or len(text) > 2_000:
+        raise MathSyntaxError("Math expressions must contain at most 2,000 characters.")
     local_dict = dict(LOCAL_DICT)
     normalized = normalize_math_text(text)
     symbol_names = set(variables or [])
@@ -95,7 +97,7 @@ def parse_expression(text: str, variables: list[str] | None = None):
     for variable in symbol_names:
         local_dict[variable] = Symbol(variable, real=True)
     try:
-        return parse_expr(normalized, transformations=TRANSFORMATIONS, local_dict=local_dict)
+        return parse_school_expression(normalized, local_dict, TRANSFORMATIONS)
     except Exception as exc:
         raise MathSyntaxError(f"Could not parse math expression '{text}'") from exc
 
@@ -408,6 +410,8 @@ def _split_top_level(source: str, separator: str) -> list[str]:
 
 
 def _parse_expression_unevaluated(text: str, variables: list[str] | None = None):
+    if not isinstance(text, str) or len(text) > 2_000:
+        raise MathSyntaxError("Math expressions must contain at most 2,000 characters.")
     local_dict = dict(LOCAL_DICT)
     normalized = normalize_math_text(text)
     symbol_names = set(variables or [])
@@ -417,12 +421,7 @@ def _parse_expression_unevaluated(text: str, variables: list[str] | None = None)
     for variable in symbol_names:
         local_dict[variable] = Symbol(variable, real=True)
     try:
-        return parse_expr(
-            normalized,
-            transformations=TRANSFORMATIONS,
-            local_dict=local_dict,
-            evaluate=False,
-        )
+        return parse_school_expression(normalized, local_dict, TRANSFORMATIONS, evaluate=False)
     except Exception as exc:
         raise MathSyntaxError(f"Could not parse math expression '{text}'") from exc
 

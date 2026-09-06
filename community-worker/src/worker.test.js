@@ -19,6 +19,42 @@ function request(path, body, requestOrigin = origin) {
   });
 }
 
+test("broker stops reading an oversized stream even without Content-Length", async () => {
+  let pulled = 0;
+  let cancelled = false;
+  const body = new ReadableStream({
+    pull(controller) { pulled += 1; controller.enqueue(new Uint8Array(4_000)); },
+    cancel() { cancelled = true; },
+  });
+  const input = new Request("https://auth.example.test/exchange", { method: "POST", headers: { origin }, body, duplex: "half" });
+  let upstream = false;
+  const handler = createCommunityAuthHandler({ fetchImpl: async () => { upstream = true; return new Response(); } });
+  assert.equal((await handler(input, env)).status, 400);
+  assert.equal(cancelled, true);
+  assert.ok(pulled <= 5);
+  assert.equal(upstream, false);
+});
+
+test("broker enforces UTF-8 byte size rather than character count", async () => {
+  let calls = 0;
+  const handler = createCommunityAuthHandler({ fetchImpl: async () => { calls += 1; return Response.json({ access_token: "synthetic" }); } });
+  const response = await handler(request("/exchange", { code: "abcdefgh", code_verifier: "abcdefgh", redirect_uri: env.ALLOWED_CALLBACKS, padding: "€".repeat(4_000) }), env);
+  assert.equal(response.status, 400);
+  assert.equal(calls, 0);
+});
+
+test("exchange ignores caller-supplied grant type and unvalidated refresh fields", async () => {
+  const handler = createCommunityAuthHandler({ fetchImpl: async (_url, options) => {
+    const form = new URLSearchParams(options.body);
+    assert.equal(form.has("grant_type"), false);
+    assert.equal(form.has("refresh_token"), false);
+    assert.equal(form.get("code"), "abcdefgh");
+    return Response.json({ access_token: "synthetic" });
+  } });
+  const response = await handler(request("/exchange", { code: "abcdefgh", code_verifier: "abcdefgh", redirect_uri: env.ALLOWED_CALLBACKS, grant_type: "refresh_token", refresh_token: { invalid: true } }), env);
+  assert.equal(response.status, 200);
+});
+
 test("health endpoint is public but never reveals configuration", async () => {
   const response = await createCommunityAuthHandler()(new Request("https://auth.example.test/health"), env);
   assert.equal(response.status, 200);

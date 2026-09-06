@@ -11,7 +11,7 @@ import {
   createLocalBridgeCredentialStore,
   createLocalGitContentsClient,
   resolveLocalBridgeCapability,
-} from "./local-git-client.js?v=20260906-optimization-v1";
+} from "./local-git-client.js?v=20260906-security-v1";
 
 const elements = {
   liveStatus: document.querySelector("#live-status"),

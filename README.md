@@ -53,6 +53,8 @@ python -m quickmaths.cli agent-bridge --repo https://github.com/YOUR-NAME/quickm
 
 Open the printed `127.0.0.1` URL in the ChatGPT or Codex in-app browser; an external browser cannot expose its WebMCP tools. The loopback server uses the computer's existing Git credentials and exposes only `learner-state.json` and `agent-state.json` from the selected data repository.
 
+The local Bridge verifies repository privacy through GitHub when connecting and before each checkpoint write, using the existing host Git credential without sending it to the browser. Public repositories and unverifiable privacy checks stop writes. Checkpoint files must be regular Git files; symlinks and directories are rejected. After updating the Python package, restart any running local Bridge to apply these checks. See the [security review](docs/SECURITY_REVIEW.md) for the audit scope and regression coverage.
+
 ## Curriculum development
 
 The native Mathematics curriculum is authored in YAML under `content/math/algebra_foundations/`. The deterministic Geography source in `scripts/build_geography_web_curriculum.mjs` emits both the native Mathematics coordinate/geodesy bridge and the reproducible `PACK_GEOGRAPHY` fixture. Geography and Programming are published through the independent [`QuickMathematics/QM_Dev_Depot`](https://github.com/QuickMathematics/QM_Dev_Depot) registry so the production app dogfoods the same federated discovery path as community publishers.

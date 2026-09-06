@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import hmac
 import json
 import os
 import re
 import secrets
+import stat
 import subprocess
 import tempfile
 import threading
@@ -16,6 +18,8 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urlparse
+from urllib.error import HTTPError, URLError
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 
 BRIDGE_FORMAT = "quickmaths.github-bridge"
@@ -40,6 +44,11 @@ class LocalBridgeError(RuntimeError):
 class LocalBridgeConflict(LocalBridgeError):
     def __init__(self, message: str = "The GitHub checkpoint changed before this write completed.") -> None:
         super().__init__(message, status=409, code="conflict")
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 @dataclass(frozen=True)
@@ -125,9 +134,11 @@ class GitBridgeRepository:
         cwd: Path | None = None,
         timeout: int = 60,
         check: bool = True,
+        input_text: str | None = None,
     ) -> subprocess.CompletedProcess[str]:
         environment = os.environ.copy()
         environment["GIT_TERMINAL_PROMPT"] = "0"
+        environment["GCM_INTERACTIVE"] = "never"
         result = subprocess.run(
             ["git", "-c", "credential.interactive=never", *args],
             cwd=str(cwd) if cwd else None,
@@ -140,11 +151,40 @@ class GitBridgeRepository:
             shell=False,
             creationflags=_creation_flags(),
             check=False,
+            input=input_text,
         )
         if check and result.returncode:
             detail = (result.stderr or result.stdout or "Git command failed.").strip().splitlines()[-1]
             raise LocalBridgeError(detail[:500], status=502, code="git_error")
         return result
+
+    def _require_private_repository(self) -> None:
+        # Reuse the host's existing Git credential only for GitHub's fixed API.
+        # Never return it to the browser, put it in an argument, or log it.
+        filled = self._git(
+            ["credential", "fill"],
+            input_text=f"url={self.identity.url}\n\n",
+            check=False,
+        )
+        credential = dict(line.split("=", 1) for line in filled.stdout.splitlines() if "=" in line)
+        username, password = credential.get("username"), credential.get("password")
+        if filled.returncode or not username or not password:
+            raise LocalBridgeError("Sign in through your Git credential manager to verify private storage.", status=403, code="privacy_unverified")
+        authorization = base64.b64encode(f"{username}:{password}".encode()).decode("ascii")
+        request = Request(
+            f"https://api.github.com/repos/{self.identity.owner}/{self.identity.repo}",
+            headers={"Authorization": f"Basic {authorization}", "Accept": "application/vnd.github+json", "User-Agent": "QuickMaths-Bridge", "Cache-Control": "no-store"},
+        )
+        try:
+            with build_opener(_NoRedirect()).open(request, timeout=15) as response:
+                body = response.read(100_001)
+                if len(body) > 100_000:
+                    raise ValueError("Oversized repository response")
+                info = json.loads(body)
+        except (HTTPError, URLError, OSError, ValueError) as error:
+            raise LocalBridgeError("Could not verify that GitHub storage is private. No checkpoint was written.", status=502, code="privacy_unverified") from error
+        if not isinstance(info, dict) or info.get("private") is not True:
+            raise LocalBridgeError("Workspace Storage requires a private GitHub repository. Public repositories cannot store learner work.", status=403, code="public_repository_forbidden")
 
     def _clone(self, destination: Path) -> None:
         self._git([
@@ -169,13 +209,16 @@ class GitBridgeRepository:
         self._git(["pull", "--quiet", "--ff-only", "origin", self.identity.branch], cwd=self.reader_checkout, timeout=120)
 
     def _blob_sha(self, checkout: Path, path: str) -> str | None:
-        result = self._git(["rev-parse", f"HEAD:{path}"], cwd=checkout, check=False)
-        if result.returncode:
+        result = self._git(["ls-tree", "-z", "HEAD", "--", path], cwd=checkout)
+        if not result.stdout:
             return None
-        value = result.stdout.strip()
-        return value if re.fullmatch(r"[0-9a-f]{40,64}", value) else None
+        match = re.fullmatch(r"(100644|100755) blob ([0-9a-f]{40,64})\t" + re.escape(path) + "\x00", result.stdout)
+        if not match:
+            raise LocalBridgeError("Bridge checkpoint must be a regular Git file, not a symlink or directory.", status=422, code="invalid_remote_state")
+        return match.group(2)
 
     def info(self) -> dict[str, Any]:
+        self._require_private_repository()
         self.ensure_checkout()
         revision = self._git(["rev-parse", "HEAD"], cwd=self.reader_checkout).stdout.strip()
         return {
@@ -185,6 +228,7 @@ class GitBridgeRepository:
             "branch": self.identity.branch,
             "repository": f"{self.identity.owner}/{self.identity.repo}",
             "revision": revision,
+            "private": True,
         }
 
     def read_file(self, path: str) -> dict[str, Any]:
@@ -194,8 +238,8 @@ class GitBridgeRepository:
             sha = self._blob_sha(self.reader_checkout, path)
             if not sha:
                 return {"exists": False, "sha": None, "content": None}
-            file_path = (self.reader_checkout / path).resolve()
-            if file_path.parent != self.reader_checkout.resolve() or not file_path.is_file():
+            file_path = self.reader_checkout / path
+            if not stat.S_ISREG(file_path.lstat().st_mode):
                 raise LocalBridgeError("Bridge checkpoint is not a regular file.", status=422, code="invalid_remote_state")
             if file_path.stat().st_size > MAX_STATE_BYTES:
                 raise LocalBridgeError("Bridge checkpoint is too large.", status=422, code="invalid_remote_state")
@@ -207,6 +251,7 @@ class GitBridgeRepository:
         if expected_sha is not None and not re.fullmatch(r"[0-9a-f]{40,64}", expected_sha):
             raise LocalBridgeError("Checkpoint revision is invalid.", status=400, code="invalid_sha")
         with self._lock:
+            self._require_private_repository()
             self.checkout_root.mkdir(parents=True, exist_ok=True)
             self.write_root.mkdir(parents=True, exist_ok=True)
             with tempfile.TemporaryDirectory(prefix="write-", dir=self.write_root) as raw_checkout:
@@ -215,7 +260,11 @@ class GitBridgeRepository:
                 current_sha = self._blob_sha(checkout, path)
                 if current_sha != expected_sha:
                     raise LocalBridgeConflict("The GitHub checkpoint changed before this write began.")
-                (checkout / path).write_text(content, encoding="utf-8", newline="\n")
+                # Replace the directory entry instead of following a checkout
+                # symlink or modifying a hard-linked file outside this clone.
+                with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", newline="\n", dir=checkout, delete=False) as staged:
+                    staged.write(content)
+                os.replace(staged.name, checkout / path)
                 self._git(["config", "user.name", "QuickMaths Bridge"], cwd=checkout)
                 self._git(["config", "user.email", "quickmaths-bridge@users.noreply.github.com"], cwd=checkout)
                 self._git(["add", "--", path], cwd=checkout)

@@ -46,12 +46,29 @@ function validRedirect(value, env) {
 async function requestBody(request) {
   const length = Number(request.headers.get("content-length") ?? 0);
   if (length > MAX_BODY_BYTES) return null;
+  const reader = request.body?.getReader();
+  if (!reader) return null;
   try {
-    const text = await request.text();
-    if (text.length > MAX_BODY_BYTES) return null;
+    const chunks = [];
+    let bytes = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > MAX_BODY_BYTES) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+    const payload = new Uint8Array(bytes);
+    let offset = 0;
+    for (const chunk of chunks) { payload.set(chunk, offset); offset += chunk.byteLength; }
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(payload);
     const body = JSON.parse(text);
     return body && typeof body === "object" && !Array.isArray(body) ? body : null;
   } catch { return null; }
+  finally { reader.releaseLock(); }
 }
 
 async function exchangeWithGitHub(body, env, fetchImpl) {
@@ -121,7 +138,10 @@ export function createCommunityAuthHandler({ fetchImpl = fetch } = {}) {
       return json({ error: "Refresh request is invalid." }, 400, origin, env);
     }
     try {
-      const result = await exchangeWithGitHub(url.pathname === "/refresh" ? { grant_type: "refresh_token", refresh_token: body.refresh_token } : body, env, fetchImpl);
+      const grant = url.pathname === "/refresh"
+        ? { grant_type: "refresh_token", refresh_token: body.refresh_token }
+        : { code: body.code, code_verifier: body.code_verifier, redirect_uri: body.redirect_uri };
+      const result = await exchangeWithGitHub(grant, env, fetchImpl);
       return json(result.ok ? result.payload : { error: result.error }, result.status, origin, env);
     } catch {
       return json({ error: "GitHub sign-in is temporarily unavailable." }, 502, origin, env);

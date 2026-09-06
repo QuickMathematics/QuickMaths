@@ -76,10 +76,11 @@ def test_repository_and_branch_validation_is_narrow() -> None:
         validate_branch("bad branch")
 
 
-def test_git_repository_reads_and_transactionally_writes_checkpoints(tmp_path: Path) -> None:
+def test_git_repository_reads_and_transactionally_writes_checkpoints(tmp_path: Path, monkeypatch) -> None:
     remote = seed_remote(tmp_path)
     identity = RepositoryIdentity(owner="local", repo="sync", branch="main", url=str(remote))
     repository = GitBridgeRepository(identity, tmp_path / "bridge")
+    monkeypatch.setattr(repository, "_require_private_repository", lambda: None)
     learner = repository.read_file("learner-state.json")
     assert learner["exists"] is True
     assert json.loads(learner["content"])["channel"] == "learner"
@@ -101,6 +102,26 @@ def test_git_repository_reads_and_transactionally_writes_checkpoints(tmp_path: P
         )
     with pytest.raises(LocalBridgeError, match="Only QuickMaths"):
         repository.read_file("../secret")
+
+
+def test_git_checkpoint_symlink_cannot_read_or_overwrite_an_external_file(tmp_path: Path, monkeypatch) -> None:
+    remote = seed_remote(tmp_path)
+    seed = tmp_path / "seed"
+    target = tmp_path / "unrelated.txt"
+    target.write_text("keep this file", encoding="utf-8")
+    link_text = tmp_path / "link-target.txt"
+    link_text.write_text(target.as_posix(), encoding="utf-8")
+    link_sha = run_git("hash-object", "-w", str(link_text), cwd=seed)
+    run_git("update-index", "--add", "--cacheinfo", f"120000,{link_sha},learner-state.json", cwd=seed)
+    run_git("commit", "-m", "checkpoint symlink fixture", cwd=seed)
+    run_git("push", "origin", "main", cwd=seed)
+    repo = GitBridgeRepository(RepositoryIdentity("local", "sync", "main", str(remote)), tmp_path / "bridge")
+    monkeypatch.setattr(repo, "_require_private_repository", lambda: None)
+    with pytest.raises(LocalBridgeError, match="regular Git file"):
+        repo.read_file("learner-state.json")
+    with pytest.raises(LocalBridgeError, match="regular Git file"):
+        repo.write_file("learner-state.json", envelope("learner"), expected_sha=link_sha)
+    assert target.read_text(encoding="utf-8") == "keep this file"
 
 
 class FakeRepository:

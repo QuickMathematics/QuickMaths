@@ -34,7 +34,7 @@ test("local capability moves from the URL fragment into session-only storage", (
 test("local client mirrors the GitHub Contents contract without forwarding credentials", async () => {
   const calls = [];
   const responses = [
-    new Response(JSON.stringify({ transport: "local-git", owner: "octo", repo: "sync", branch: "main", revision: "commit" })),
+    new Response(JSON.stringify({ transport: "local-git", owner: "octo", repo: "sync", branch: "main", private: true, revision: "commit" })),
     new Response(JSON.stringify({ exists: true, sha: "blob-one", content: "checkpoint" })),
     new Response(JSON.stringify({ sha: "blob-two", commitSha: "commit-two" })),
   ];
@@ -44,12 +44,20 @@ test("local client mirrors the GitHub Contents contract without forwarding crede
   });
   const repository = await client.verify({ token: "must-not-forward" });
   assert.equal(repository.transport, "local-git");
+  assert.equal(repository.private, true);
   assert.equal((await client.readFile({}, "learner-state.json")).sha, "blob-one");
   assert.deepEqual(await client.writeFile({}, "agent-state.json", "next", { sha: "blob-one" }), { sha: "blob-two", commitSha: "commit-two" });
   assert.ok(calls.every((call) => call.options.headers["X-QuickMaths-Bridge"] === capability));
   assert.equal(JSON.stringify(calls).includes("must-not-forward"), false);
   assert.deepEqual(JSON.parse(calls[2].options.body), { content: "next", sha: "blob-one" });
   await assert.rejects(client.readFile({}, "../../secret"), /path is invalid/i);
+});
+
+test("local client never invents a private status for an unverified repository", async () => {
+  for (const privateValue of [undefined, false, "true"]) {
+    const client = createLocalGitContentsClient({ capability, fetchImpl: async () => Response.json({ transport: "local-git", owner: "octo", repo: "sync", branch: "main", private: privateValue }) });
+    assert.equal((await client.verify()).private, false);
+  }
 });
 
 test("local client maps optimistic conflicts and keeps metadata separate", async () => {
