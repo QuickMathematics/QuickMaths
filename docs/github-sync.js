@@ -1,4 +1,4 @@
-import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v1";
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v2";
 
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;
@@ -436,6 +436,7 @@ export function createGitHubSyncController({
   serializeState,
   applyState,
   validateMergeState = null,
+  getMergeSkillNames = () => ({}),
   subscribeToState = null,
   now = () => new Date(),
   deviceId = null,
@@ -915,7 +916,7 @@ export function createGitHubSyncController({
     if (!remote.exists) throw new GitHubSyncConflictError("The remote workspace was removed. Reconnect storage to review its current state.", { channel });
     const baseJson = await readBase(channel === "agent" ? remote.envelope.baseLearnerSha : learnerSha);
     const localJson = serializeState();
-    const plan = createWorkspaceMerge({ baseJson, localJson, remoteJson: remote.envelope.stateJson });
+    const plan = createWorkspaceMerge({ baseJson, localJson, remoteJson: remote.envelope.stateJson, skillNames: getMergeSkillNames() });
     const id = makeDeviceId();
     pendingReview = { id, channel, plan, localJson, learner, agent, remote };
     update({ phase: "reviewing", error: null, conflict: null });

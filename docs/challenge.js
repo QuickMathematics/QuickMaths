@@ -1,6 +1,6 @@
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-merge-v1";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-merge-v2";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-merge-v1";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-merge-v2";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260905-publisher-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
@@ -17,7 +17,7 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-merge-v1";
+} from "./github-sync.js?v=20260906-merge-v2";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -3378,7 +3378,7 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260906-merge-v1").catch(() => null),
+      fetch("./agent-manifest.json?v=20260906-merge-v2").catch(() => null),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
       fetch("./STUDENT_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
       fetch("./EDUCATOR_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
@@ -3421,6 +3421,7 @@ async function boot() {
     serializeState: () => store.exportSyncState(),
     applyState: (raw) => store.importSyncState(raw),
     validateMergeState: (raw) => store.validateSyncMerge(raw),
+    getMergeSkillNames: () => Object.fromEntries(Object.values(store.skillsById).map((skill) => [skill.id, skill.name])),
     subscribeToState: (listener) => store.subscribe(listener),
     deviceLabel: bridgeDeviceLabel(),
   });

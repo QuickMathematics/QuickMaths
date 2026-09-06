@@ -1571,27 +1571,35 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:ha
 .bridge-diff-head span, .bridge-diff-head strong { color: var(--ink); font-size: 10px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
 .bridge-choice-note { margin-top: 14px !important; padding-left: 12px; border-left: 3px solid var(--pine-2); font-size: 11px !important; }
 .bridge-source-actions { grid-template-columns: .8fr 1fr 1fr; }
-.workspace-merge-dialog { width: min(1060px,100%); }
-.merge-bulk { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.workspace-merge-dialog { width: min(900px,100%); }
+.merge-bulk, .merge-overview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.merge-overview > span { padding: 10px 14px; border-radius: 10px; background: var(--mint); font-size: 13px; }
 .merge-start-time { font-weight: 700; color: var(--pine); }
-.merge-item { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 12px 0; }
-.merge-item summary { cursor: pointer; font-weight: 800; overflow-wrap: anywhere; }
-.merge-item summary small { display: block; margin-top: 5px; color: var(--muted); font-weight: 500; }
-.merge-version-choices { border: 0; padding: 10px 0; display: flex; flex-wrap: wrap; gap: 12px; }
-.merge-version-choices legend { font-size: 12px; padding-top: 15px; }
-.merge-version-choices label { display: flex; gap: 8px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
-.merge-version-choices label:has(input:checked) { background: var(--mint); border-color: var(--pine); }
-.merge-values { overflow-x: auto; }
-.merge-value-head, .merge-value-row { display: grid; grid-template-columns: minmax(100px,.65fr) minmax(0,1fr) minmax(0,1fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
-.merge-value-row pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; max-height: 220px; overflow: auto; margin: 0; }
-.merge-value-row > span { text-transform: capitalize; color: var(--muted); overflow-wrap: anywhere; }
+.merge-options { margin: 12px 0; font-size: 12px; }
+.merge-options > summary { cursor: pointer; color: var(--pine); padding: 6px 0; }
+.merge-history-note { font-size: 12px !important; margin-top: 14px !important; }
+.merge-item { min-width: 0; border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 12px 0; }
+.merge-item legend { font-size: 12px; font-weight: 800; padding: 0 6px; }
+.merge-change + .merge-change { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 14px; }
+.merge-change-choice, .merge-keep-base { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; padding: 6px 0; }
+.merge-change-choice > span { display: grid; gap: 5px; min-width: 0; overflow-wrap: anywhere; }
+.merge-change-choice strong { font-size: 15px; }
+.merge-change-choice small { color: var(--muted); font-size: 12px; }
+.merge-change-choice .merge-source { color: var(--pine); font-weight: 800; }
+.merge-item input { flex-shrink: 0; width: 20px; height: 20px; margin: 3px 0; accent-color: var(--pine); }
+.merge-change-details { margin: 6px 0 0 32px; font-size: 12px; overflow-wrap: anywhere; }
+.merge-change-details summary { cursor: pointer; padding: 6px 0; color: var(--pine); }
+.merge-change-details dl { margin: 0; }
+.merge-change-details dl > div { padding: 6px 0; }
+.merge-change-details dt { font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+.merge-change-details dd { margin: 0; white-space: pre-wrap; max-height: 220px; overflow: auto; }
+.merge-before { color: var(--muted); }
+.merge-keep-base { font-size: 12px; align-items: center; margin-top: 10px; }
 .merge-error { color: var(--coral); font-weight: 700; }
 .merge-footer { position: sticky; bottom: -1px; background: var(--paper-light); padding: 16px 0 4px; }
 @media (max-width: 600px) {
-  .merge-value-head { grid-template-columns: 1fr 1fr; }
-  .merge-value-head > span { display: none; }
-  .merge-value-row { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
-  .merge-value-row > span { grid-column: 1 / -1; font-weight: 700; }
+  .merge-item { padding: 10px; }
+  .merge-change-details { margin-left: 0; }
   .merge-footer { position: static; }
 }
 .button-danger { border-color: #a94a3c; background: #a94a3c; color: #fff; }
