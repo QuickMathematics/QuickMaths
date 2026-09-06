@@ -117,6 +117,8 @@ Lesson packs support images, video and audio in explanations, examples, applicat
 
 Native Mathematics includes **Triangle area: base and perpendicular height**, with eight worked examples and 21 assessment scenarios. All ten Geometry lessons now include Matplotlib illustrations, covering triangle heights, coordinates, slope, lines, bearings, arcs and spherical coordinates. These figures are embedded for offline use; run `python scripts/build_geometry_figures.py` followed by `python scripts/export_web_curriculum.py` to rebuild them.
 
+Native Geometry mastery tests also include diagrams: coordinate and line graphs follow each randomized question's givens, with additional illustrations for bearings, arcs and spherical coordinates. Restored drafts and saved results retain the original question's picture. The app draws these test diagrams locally; authored Matplotlib attachments remain available through the same lesson-media support.
+
 ```sh
 pip install -e ".[media]"
 quickmaths build-lesson docs/examples/geometry-media/lesson-set.yaml --output built-lesson

@@ -1,4 +1,5 @@
 import { parseLessonManifest, readLessonFolder } from "./lesson-folder.js?v=20260906-media-v1";
+import { renderQuestionDiagram } from "./question-diagrams.js?v=20260906-test-diagrams-v1";
 import { renderLessonMedia } from "./lesson-media.js?v=20260906-media-v1";
 import { createLessonMediaRenderer } from "./lesson-media-renderer.js?v=20260906-media-v1";
 import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-optimization-v1";
@@ -1484,7 +1485,7 @@ function renderLesson(snapshot) {
     ${skill.applications?.length ? `<section class="application-grid"><div class="section-title"><p class="eyebrow">Why this matters</p><h2>${escapeHtml(snapshot.activeSubject.shortName)} that travels</h2></div>${skill.applications.map((item) => `<article><strong>${escapeHtml(item.title ?? item.subject ?? "Application")}</strong><p>${escapeHtml(item.description)}</p>${renderLessonMedia(item.media, skill.packId)}</article>`).join("")}</section>` : ""}
     <section class="examples-section">
       <div class="section-title"><p class="eyebrow">Worked examples</p><h2>Watch the method</h2></div>
-      <div class="example-list">${skill.examples.map((example, index) => `<details ${index === 0 ? "open" : ""}><summary><span>${String(index + 1).padStart(2, "0")}</span>${escapeHtml(example.prompt)}</summary><div><p class="example-solution">${escapeHtml(example.solution)}</p><p>${escapeHtml(example.explanation)}</p>${renderLessonMedia(example.media, skill.packId)}</div></details>`).join("")}</div>
+      <div class="example-list">${skill.examples.map((example, index) => `<details ${index === 0 || example.media?.length ? "open" : ""}><summary><span>${String(index + 1).padStart(2, "0")}</span>${escapeHtml(example.prompt)}</summary><div><p class="example-solution">${escapeHtml(example.solution)}</p><p>${escapeHtml(example.explanation)}</p>${renderLessonMedia(example.media, skill.packId)}</div></details>`).join("")}</div>
     </section>
   `;
 }
@@ -1520,7 +1521,8 @@ function renderFormattedCode(source, language = "text", caption = "Code") {
 }
 
 function renderProblemPrompt(problem) {
-  const media = renderLessonMedia(problem.media, store.skillsById[problem.skill_id]?.packId);
+  const packId = store.skillsById[problem.skill_id]?.packId;
+  const media = renderLessonMedia(problem.media, packId) + renderQuestionDiagram(problem);
   if (!problem.prompt_blocks?.length) return `<h2>${escapeHtml(problem.prompt)}</h2>${media}`;
   return `<div class="question-prompt-blocks" aria-label="Question prompt">${problem.prompt_blocks.map((block) => block.type === "code"
     ? renderFormattedCode(block.text, block.language, "Question code")
@@ -1630,6 +1632,7 @@ function renderTest(snapshot) {
   const skill = snapshot.selectedSkill;
   const row = rowForSkill(snapshot, skill.id);
   const draft = snapshot.activeTest;
+  const hasIllustrations = [skill, ...(skill.examples ?? [])].some(item => item.media?.length);
   if (!draft) {
     elements.view.innerHTML = `
       <header class="page-head"><div><p class="eyebrow">Mastery test</p><h1>Choose what to prove.</h1><p>Tests use real questions generated from the original QuickMaths curriculum.</p></div><div class="page-actions"><label class="compact-select">Skill<select id="test-skill-select">${skillOptions(snapshot, skill.id)}</select></label></div></header>
@@ -1643,7 +1646,7 @@ function renderTest(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head">
       <div><p class="eyebrow">Mastery test · autosaved</p><h1>${escapeHtml(skill.name)}</h1><p>All ${draft.problems.length} authored scenarios are included. Retakes rotate available variants; shown work stays available for tutor or self review.</p></div>
-      <div class="test-progress"><span>${answered} / ${draft.problems.length} scenarios answered</span><i><b style="width:${draft.problems.length ? answered / draft.problems.length * 100 : 0}%"></b></i></div>
+      <div><div class="test-progress"><span>${answered} / ${draft.problems.length} scenarios answered</span><i><b style="width:${draft.problems.length ? answered / draft.problems.length * 100 : 0}%"></b></i></div>${hasIllustrations ? `<button class="button button-outline" type="button" data-route="lesson" data-skill-id="${escapeHtml(skill.id)}">View illustrated lesson</button>` : ""}</div>
     </header>
     ${latestReview ? `<aside class="inline-feedback"><span aria-hidden="true">✦</span><div><p class="eyebrow">Latest tutor note</p><strong>${escapeHtml(latestReview.feedback)}</strong><p>${escapeHtml(latestReview.nextStep)}</p></div></aside>` : ""}
     <form id="test-form" class="test-form">
@@ -1690,10 +1693,10 @@ function resultStructuredDetails(result) {
   return `<div class="shown-work"><strong>Structured work</strong><pre>${escapeHtml(JSON.stringify(structured, null, 2))}</pre></div>`;
 }
 
-function resultDetails(results, packId = "") {
+function resultDetails(results, packId = "", skillId = "") {
   return results.map((result, index) => `<details class="result-question" ${!result.correct || result.reviewRequired ? "open" : ""}>
     <summary><span class="result-icon ${result.correct ? "correct" : "incorrect"}">${result.correct ? "✓" : "×"}</span><span><strong>Question ${index + 1}</strong><small>${escapeHtml(result.prompt)}</small></span><b>${result.reviewRequired ? "Review required" : result.correct ? "Correct" : "Needs work"}</b></summary>
-    <div class="result-body">${renderLessonMedia(result.media, packId)}<dl><div><dt>Your answer</dt><dd>${result.gradingMethod === "python_program" ? `<pre class="result-code"><code>${escapeHtml(result.finalAnswer || "No code submitted")}</code></pre>` : escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${resultStructuredDetails(result)}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
+    <div class="result-body">${renderLessonMedia(result.media, packId)}${renderQuestionDiagram(result, skillId)}<dl><div><dt>Your answer</dt><dd>${result.gradingMethod === "python_program" ? `<pre class="result-code"><code>${escapeHtml(result.finalAnswer || "No code submitted")}</code></pre>` : escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${resultStructuredDetails(result)}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
   </details>`).join("");
 }
 
@@ -1737,7 +1740,7 @@ function renderResults(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head"><div><p class="eyebrow">${pending ? "Unsaved reflection" : "Saved attempt"}</p><h1>${escapeHtml(skill?.name ?? result.skillName)}</h1><p>${pending ? "Review the outcome, then save your reflection to update the mastery map." : `Completed ${formatDate(attempt.completedAt)} · ${escapeHtml(attempt.masteryUpdate?.status ?? "saved")}`}</p>${pending ? "" : `<div class="page-actions"><button class="button button-outline" data-action="download-tutor-summary">Tutor summary ↓</button><button class="button button-outline" data-action="download-review-packet">Review packet ↓</button></div>`}</div><div class="result-score"><strong>${score}%</strong><span>${result.rawScore} / ${result.scoreTotal} correct</span></div></header>
     <section class="results-layout">
-      <div class="result-questions">${resultDetails(result.results ?? [], skill?.packId ?? "")}</div>
+      <div class="result-questions">${resultDetails(result.results ?? [], skill?.packId ?? "", result.skillId)}</div>
       <aside class="reflection-card">
         ${pending ? `<p class="eyebrow">Reflection</p><h2>How did that feel?</h2><p>Mastery is accumulated. Confidence, hints, guessing, and difficulty shape the update.</p>
           <form id="reflection-form">
@@ -3461,7 +3464,7 @@ function initClock() {
 async function loadAgentGuides() {
   const read = async (path, type, fallback) => {
     try {
-      const response = await fetch(`./${path}?v=20260906-native-geometry-v1`);
+      const response = await fetch(`./${path}?v=20260906-test-diagrams-v1`);
       return response.ok ? await response[type]() : fallback;
     } catch { return fallback; }
   };
@@ -3502,7 +3505,7 @@ async function boot() {
   const communityConfigPromise = fetch("./github-community-config.json", { cache: "no-store" })
     .then(response => response.ok ? response.json() : { enabled: false })
     .catch(() => ({ enabled: false }));
-  const response = await fetch("./curriculum-data.json?v=20260906-native-geometry-v1");
+  const response = await fetch("./curriculum-data.json?v=20260906-test-diagrams-v1");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];

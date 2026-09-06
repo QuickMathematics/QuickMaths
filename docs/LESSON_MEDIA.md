@@ -6,6 +6,8 @@ Try the [ready-to-import geometry example](lesson-media-example.json), or inspec
 
 The native Mathematics → Geometry branch includes **Triangle area: base and perpendicular height** (`MATH_GEOM_004`), with eight worked examples and 21 assessment scenarios. It unlocks after multiplying/dividing fractions and decimals/percents/conversions. No import is needed. All ten native Geometry lessons include Matplotlib illustrations, embedded in the curriculum for offline use.
 
+Native coordinate and line mastery tests also draw a graph for each question. Relevant bearing, arc and spherical-coordinate questions include diagrams too. These app-drawn figures use the question's displayed givens, including the original values in restored drafts and saved results. They need no plotting download or Python runtime. Illustrated worked examples open automatically; **View illustrated lesson** on a test returns to the lesson without discarding the test draft. Custom questions use their authored `media` attachments.
+
 To rebuild the native figures and their embedded assets from the repository root:
 
 ```sh

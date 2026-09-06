@@ -442,7 +442,7 @@
     "media": {
       "guide": "https://quickmathematics.github.io/QuickMaths/LESSON_MEDIA.md",
       "example": "https://quickmathematics.github.io/QuickMaths/lesson-media-example.json",
-      "native_example": "Mathematics / Geometry / MATH_GEOM_004: Triangle area: base and perpendicular height. Eight worked examples, 21 assessment scenarios; prerequisites MATH_ARITH_004 and MATH_ARITH_005. All ten native Geometry lessons include embedded Matplotlib illustrations and need no pack import.",
+      "native_example": "Mathematics / Geometry / MATH_GEOM_004: Triangle area: base and perpendicular height. Eight worked examples, 21 assessment scenarios; prerequisites MATH_ARITH_004 and MATH_ARITH_005. All ten native Geometry lessons include embedded Matplotlib illustrations and need no pack import. Native coordinate/line tests draw diagrams from each displayed question; selected bearing, arc and sphere questions are illustrated too. Restored drafts and results keep their original diagram values. Illustrated examples open by default.",
       "schema": "https://github.com/QuickMathematics/QuickMaths/blob/main/schemas/lesson-media.schema.json",
       "sections": [
         "skill",
