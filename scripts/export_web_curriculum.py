@@ -30,6 +30,14 @@ def build_payload() -> dict:
     track, skills, warnings = load_curriculum()
     skill_rows = []
     assets = {}
+    def collect_media(rows, folder):
+        media_pack, _ = prepare_lesson_media({"skills": rows}, folder, portable=True)
+        for asset in media_pack.get("assets", []):
+            if asset["path"] in assets and assets[asset["path"]]["sha256"] != asset["sha256"]:
+                raise ValueError(f"Native media path collision: {asset['path']}")
+            assets[asset["path"]] = asset
+        if sum(asset["bytes"] for asset in assets.values()) > 1_000_000:
+            raise ValueError("Native embedded media exceeds 1 MB; move larger media to a lesson pack.")
     for skill_id in track.skills:
         skill = skills[skill_id]
         question_count = len(skill.test.questions)
@@ -97,13 +105,7 @@ def build_payload() -> dict:
                 "problems": problems,
             }
         )
-        media_pack, _ = prepare_lesson_media({"skills": [skill_rows[-1]]}, Path(skill.source_path).parent, portable=True)
-        for asset in media_pack.get("assets", []):
-            if asset["path"] in assets and assets[asset["path"]]["sha256"] != asset["sha256"]:
-                raise ValueError(f"Native media path collision: {asset['path']}")
-            assets[asset["path"]] = asset
-        if sum(asset["bytes"] for asset in assets.values()) > 1_000_000:
-            raise ValueError("Native embedded media exceeds 1 MB; move larger media to a lesson pack.")
+        collect_media([skill_rows[-1]], Path(skill.source_path).parent)
     track_row = asdict(track)
     subjects = []
     generated_from = ["content/math/algebra_foundations"]
@@ -121,6 +123,7 @@ def build_payload() -> dict:
         track_row["entry_skills"].extend(skill_id for skill_id in extension_track.get("entry_skills", []) if skill_id in native_skill_ids)
         track_row["exit_skills"].extend(skill_id for skill_id in extension_track.get("exit_skills", []) if skill_id in native_skill_ids)
         skill_rows.extend(native_skills)
+        collect_media(native_skills, FIRST_PARTY_EXPANSION_PATH.parent)
         generated_from.append(str(FIRST_PARTY_EXPANSION_PATH.relative_to(PROJECT_ROOT)).replace("\\", "/"))
     return {
         "schema_version": "2.0",

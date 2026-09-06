@@ -4,6 +4,17 @@ Attach files in **Lesson Studio**, or place them beside a `lesson-set.yaml`, `le
 
 Try the [ready-to-import geometry example](lesson-media-example.json), or inspect its [YAML source](examples/geometry-media/lesson-set.yaml) and [built folder manifest](examples/geometry-media/lesson-set.json).
 
+The native Mathematics → Geometry branch includes **Triangle area: base and perpendicular height** (`MATH_GEOM_004`), with eight worked examples and 21 assessment scenarios. It unlocks after multiplying/dividing fractions and decimals/percents/conversions. No import is needed. All ten native Geometry lessons include Matplotlib illustrations, embedded in the curriculum for offline use.
+
+To rebuild the native figures and their embedded assets from the repository root:
+
+```sh
+python scripts/build_geometry_figures.py
+python scripts/export_web_curriculum.py
+```
+
+The figure builder also accepts `--preview-dir tmp/geometry-previews` to save PNG previews. Diagrams in generated assessments use fixed dimensions so the image and question always agree.
+
 ## Folder layout and references
 
 ```text

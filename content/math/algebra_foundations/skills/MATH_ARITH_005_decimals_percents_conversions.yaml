@@ -16,6 +16,7 @@ tags:
   - place_value
   - percent_of
 unlocks:
+  - MATH_GEOM_004
   - MATH_EXP_002
 mastery:
   passing_score: 0.8

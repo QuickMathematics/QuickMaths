@@ -51,18 +51,25 @@ theory: |
   Common mistake:
   Do not switch the order halfway through. If you do y2 - y1 on top, you must do x2 - x1 on bottom.
 examples:
-  - prompt: "Find the slope through (1, 4) and (5, 12)."
-    solution: "2"
-    explanation: "Change in y is 8 and change in x is 4, so slope = 8/4 = 2."
-  - prompt: "Find the slope through (-2, 7) and (4, 1)."
-    solution: "-1"
-    explanation: "Change in y is -6 and change in x is 6, so slope = -6/6 = -1."
-  - prompt: "Find the slope through (3, 5) and (9, 5)."
-    solution: "0"
-    explanation: "The y-value does not change, so the slope is 0."
-  - prompt: "Classify the slope through (2, -3) and (2, 8)."
-    solution: "Undefined"
-    explanation: "The x-value does not change, so the run is 0. Division by 0 is undefined."
+- prompt: Find the slope through (1, 4) and (5, 12).
+  solution: '2'
+  explanation: Change in y is 8 and change in x is 4, so slope = 8/4 = 2.
+  media:
+  - src: media/coordinate-geometry/slope-two-points.svg
+    alt: A line passes through (1, 4) and (5, 12). A horizontal arrow moves right 4 units, followed by a vertical
+      arrow up 8 units.
+    caption: 'Keep the order consistent: from (1, 4) to (5, 12), slope = rise/run = 8/4 = 2.'
+    width: 720
+    height: 640
+- prompt: Find the slope through (-2, 7) and (4, 1).
+  solution: '-1'
+  explanation: Change in y is -6 and change in x is 6, so slope = -6/6 = -1.
+- prompt: Find the slope through (3, 5) and (9, 5).
+  solution: '0'
+  explanation: The y-value does not change, so the slope is 0.
+- prompt: Classify the slope through (2, -3) and (2, 8).
+  solution: Undefined
+  explanation: The x-value does not change, so the run is 0. Division by 0 is undefined.
 applications:
   - title: "Graphing lines"
     description: "Slope from two points helps draw the line that passes through both points."

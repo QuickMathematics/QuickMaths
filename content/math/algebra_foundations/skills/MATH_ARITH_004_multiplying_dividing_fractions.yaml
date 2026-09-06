@@ -15,7 +15,8 @@ tags:
   - reciprocals
   - signed_numbers
   - zero
-unlocks: []
+unlocks:
+  - MATH_GEOM_004
 mastery:
   passing_score: 0.8
   minimum_confidence: 3

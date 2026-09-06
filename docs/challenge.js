@@ -3461,7 +3461,7 @@ function initClock() {
 async function loadAgentGuides() {
   const read = async (path, type, fallback) => {
     try {
-      const response = await fetch(`./${path}?v=20260906-optimization-v1`);
+      const response = await fetch(`./${path}?v=20260906-native-geometry-v1`);
       return response.ok ? await response[type]() : fallback;
     } catch { return fallback; }
   };
@@ -3502,7 +3502,7 @@ async function boot() {
   const communityConfigPromise = fetch("./github-community-config.json", { cache: "no-store" })
     .then(response => response.ok ? response.json() : { enabled: false })
     .catch(() => ({ enabled: false }));
-  const response = await fetch("./curriculum-data.json?v=20260906-optimization-v1");
+  const response = await fetch("./curriculum-data.json?v=20260906-native-geometry-v1");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];

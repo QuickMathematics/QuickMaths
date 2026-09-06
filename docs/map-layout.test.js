@@ -10,13 +10,13 @@ const read = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), "
 const curriculum = read("./curriculum-data.json");
 const packages = ["estimation-lab/1.0.0", "geography/1.0.0", "programming-fundamentals-python/1.2.0"].map((path) => read(`./lesson-depot/lessons/${path}/lesson-set.json`));
 
-test("all 94 shipped lessons use the shared broad-branch standard", () => {
+test("all 95 shipped lessons use the shared broad-branch standard", () => {
   assert.deepEqual(FIELD_TAXONOMY, read("./learning-taxonomy.json"));
   const entries = [
     ...curriculum.skills.map((skill) => ["SUBJECT_MATH", skill]),
     ...packages.flatMap((pack) => pack.skills.map((skill) => [pack.subject.id, skill])),
   ];
-  assert.equal(entries.length, 94);
+  assert.equal(entries.length, 95);
   for (const [fieldId, skill] of entries) {
     assert.ok(standardBranches(fieldId).includes(skill.subdomain), `${skill.id}: ${skill.subdomain}`);
     assert.equal(normalizeLessonTaxonomy(skill, fieldId).subdomain, skill.subdomain);
@@ -31,7 +31,7 @@ test("canonical nodes sit in non-overlapping field/branch bands and prerequisite
   const subjects = [DEFAULT_SUBJECT, ...packs.filter((pack) => pack.subject.id !== DEFAULT_SUBJECT.id).map((pack) => pack.subject)];
   const skills = [...curriculum.skills.map((skill) => ({ ...skill, subjectId: "SUBJECT_MATH" })), ...packs.flatMap((pack) => pack.skills)];
   const layout = fieldBranchMapLayout(skills, { subjects });
-  assert.equal(Object.keys(layout.positions).length, 94);
+  assert.equal(Object.keys(layout.positions).length, 95);
   assert.equal(layout.lanes.length, 3);
   assert.equal(layout.lanes.flatMap((lane) => lane.branches).length, 12);
   let end = 0;

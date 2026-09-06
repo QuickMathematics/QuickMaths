@@ -1,0 +1,818 @@
+id: MATH_GEOM_004
+schema_version: 0.2
+name: 'Triangle area: base and perpendicular height'
+domain: Math
+subdomain: Geometry
+topic: Plane Geometry
+description: Choose a matching base and perpendicular height, calculate triangle area, and reason about units, missing lengths, and scale.
+prerequisites:
+  - MATH_ARITH_004
+  - MATH_ARITH_005
+tags:
+  - geometry
+  - triangles
+  - area
+  - perpendicular_height
+  - unit_conversion
+  - scale
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Area measures the surface a shape covers. Perimeter measures the distance around its boundary. A triangle's area depends on a base and its matching perpendicular height, not on adding its three side lengths.
+
+  The central idea:
+  A = b × h ÷ 2
+  Here A is area, b is the chosen base, and h is the perpendicular distance from the opposite vertex to the line containing that base. The small square in a diagram marks a right angle (90°).
+
+  Why divide by two?
+  A diagonal divides a rectangle into two congruent right triangles. The rectangle has area b × h, so each triangle covers half of that area. More generally, two congruent copies of any triangle can form a parallelogram with the same base and perpendicular height. The same factor of one half applies.
+
+  What counts as the height?
+  1. Choose one side as the base. It does not have to be the bottom side or the longest side.
+  2. Find the opposite vertex.
+  3. Measure from that vertex to the line through the base at a right angle. This distance is the matching height.
+  4. If the perpendicular meets the base outside the triangle, extend the base line. An outside height works in exactly the same formula.
+
+  In a right triangle, the two sides that meet at the right angle can be the base and height. The sloping side opposite the right angle is the hypotenuse; it is not the matching height for either of those bases. For example, perpendicular sides of 6 cm and 8 cm give 6 × 8 ÷ 2 = 24 cm². Multiplying by the 10 cm hypotenuse would use the wrong pair.
+
+  Turning the page does not change the area. A base may be vertical or slanted. Any side can be chosen as a base, but changing the base means using the height perpendicular to that new base. All correctly matched pairs give the same area.
+
+  A reliable method:
+  1. Identify a base and the height perpendicular to its line.
+  2. Put both lengths in the same unit.
+  3. Multiply the two lengths, then halve the product.
+  4. Give the answer in square units: cm × cm gives cm², and m × m gives m².
+  5. Check that the answer is half of b × h. A nondegenerate triangle has positive area.
+
+  Fractions and decimals work in the same formula. A base of 2.5 cm and height of 4 cm give 5 cm². An odd product can give a half-square-unit answer; do not round it to a whole number unless the question asks you to.
+
+  Units before arithmetic:
+  There are 10 mm in 1 cm and 100 cm in 1 m. For a base of 8 cm and height of 30 mm, first convert 30 mm to 3 cm; the area is 12 cm². Do not multiply 8 by 30 and label the result cm². If converting an area afterward, remember that 1 m² = 10,000 cm² because both lengths are converted.
+
+  Working backward:
+  From A = b × h ÷ 2, doubling the area gives 2A = b × h. To find a missing height, use h = 2A ÷ b; to find a missing base, use b = 2A ÷ h. Check by putting the length back into the original formula. Area 24 cm² and base 8 cm give height 2 × 24 ÷ 8 = 6 cm.
+
+  Compare and combine:
+  Triangles with the same base length and perpendicular height have the same area, even if their side lengths or shapes differ. If only the height is multiplied by k, with the base unchanged, area is multiplied by k. If both lengths are multiplied by k, area is multiplied by k². Doubling both lengths quadruples area.
+
+  For a composite shape, calculate each piece in the same square unit. A rectangle with a triangular corner removed has remaining area = rectangle area − triangle area. The triangle must fit inside the original rectangle, and its two perpendicular dimensions must be identified.
+
+  Common mistakes to catch:
+  - Forgetting to divide by two gives the area of the matching rectangle or parallelogram.
+  - Using a sloping side as height without a right-angle relationship uses the wrong length.
+  - Treating an outside height as invalid confuses the base segment with its extended line.
+  - Using cm instead of cm² confuses length with area.
+  - A sketch may not be to scale. Use stated lengths and right-angle information, not measurements from the screen. Two arbitrary side lengths alone are not enough to apply the base-height formula.
+media:
+  - src: media/triangle-area/half-rectangle.svg
+    alt: "A rectangle is split diagonally into two matching right triangles. The shaded triangle has base 4 cm and perpendicular height 3 cm. A square marks their right angle."
+    caption: 'The rectangle covers 4 × 3 = 12 cm². Each matching triangle covers half: 6 cm². Dashed lines complete the rectangle.'
+    width: 720
+    height: 480
+examples:
+  - prompt: "Find the area of the triangle with base 8 cm and the marked perpendicular height of 5 cm. Its other sides are slanted."
+    solution: "20 cm²"
+    explanation: "The dashed height meets the base at a right angle. Use that 5 cm distance, not a sloping side. A = 8 × 5 ÷ 2 = 20 cm². The matching base-height rectangle would cover 40 cm²."
+    media:
+      - src: media/triangle-area/inside-height.svg
+        alt: "An acute triangle has a horizontal base of 8 cm and an interior dashed perpendicular height of 5 cm, marked with a right-angle square at the base."
+        caption: "The height is a perpendicular distance. It need not be one of the triangle's sides."
+        width: 720
+        height: 480
+  - prompt: "The base is 6 cm and its perpendicular height is 4 cm, but the height lands beyond the left end of the base. Is the formula still valid?"
+    solution: "Yes. The area is 12 cm²."
+    explanation: "Extend the line through the base until it meets the perpendicular from the opposite vertex. The dashed extension is not extra base length. Use the actual 6 cm base and the 4 cm height, so A = 6 × 4 ÷ 2 = 12 cm²."
+    media:
+      - src: media/triangle-area/outside-height.svg
+        alt: "An obtuse triangle has base 6 cm. The opposite vertex lies left of the base, with a dashed vertical height of 4 cm meeting the extended base line at a right angle outside the triangle."
+        caption: "Extend the base line to locate the height; keep the base length at 6 cm."
+        width: 720
+        height: 480
+  - prompt: "A triangle is drawn with a vertical base of 6 cm. Its matching horizontal height is 4 cm. Find its area."
+    solution: "12 cm²"
+    explanation: "Base and height describe a perpendicular pair, not directions on the page. Multiply 6 × 4 and divide by 2. Rotation changes the drawing's orientation, not its area."
+    media:
+      - src: media/triangle-area/rotated-triangle.svg
+        alt: "A right triangle has a vertical base of 6 cm and a horizontal perpendicular height of 4 cm along its top side. Their right angle is marked at the top left."
+        caption: "A base can be vertical. Match the height to the chosen base."
+        width: 720
+        height: 480
+  - prompt: "Find the area when the base is 3/2 m and the perpendicular height is 5 m."
+    solution: "15/4 m², or 3.75 m²"
+    explanation: "A = (3/2) × 5 ÷ 2 = 15/4. Dividing by 2 is the same as multiplying by 1/2. Keep the exact fraction or an equivalent decimal; there is no reason to round to a whole number."
+  - prompt: "A triangular sign has base 1.2 m and perpendicular height 50 cm. Find the area in m²."
+    solution: "0.3 m²"
+    explanation: "Convert 50 cm to 0.5 m before multiplying. Then A = 1.2 × 0.5 ÷ 2 = 0.3 m². As a check in centimetres, 120 × 50 ÷ 2 = 3,000 cm², which is 0.3 m²."
+  - prompt: "A triangle has area 35 cm² and base 10 cm. Find the perpendicular height."
+    solution: "7 cm"
+    explanation: "Double the area to undo the halving, then divide by the known base. h = 2 × 35 ÷ 10 = 7 cm. Check the answer in the original formula: 10 × 7 ÷ 2 = 35 cm². The missing height is a length, so its unit is cm."
+  - prompt: "A triangle's base and height are both tripled. What happens to its area? What if only its height is tripled?"
+    solution: "Both lengths tripled give 9 times the area. Only the height tripled gives 3 times the area."
+    explanation: "The area formula multiplies base by height. Scaling both contributes 3 × 3 = 9; scaling just one contributes one factor of 3. The division by 2 is unchanged in both comparisons."
+  - prompt: "A 12 cm by 9 cm rectangle has a triangular corner cut out. The cutout's perpendicular sides are 4 cm and 3 cm. Find the area left."
+    solution: "102 cm²"
+    explanation: "The rectangle has area 12 × 9 = 108 cm². The removed triangle has area 4 × 3 ÷ 2 = 6 cm². Subtract the cutout once: 108 − 6 = 102 cm². Adding the triangle or forgetting to halve it would give the wrong remaining area."
+applications:
+  - title: Gardens and floor plans
+    description: Estimate the turf, paving, or flooring for a triangular space. Measure its perpendicular height; the length of a sloping boundary may be different.
+  - title: Signs, sails, and fabric
+    description: Calculate a triangular surface area, then multiply by a price per square metre to estimate material cost. Allow separately for any hems or waste specified by the task.
+  - title: Design at a different scale
+    description: A design doubled in both length and width uses four times the material area. Distinguish the scale factor for lengths from the factor for area.
+test:
+  question_count: 21
+  randomize_order: true
+  questions:
+    - id: TRIANGLE_PERPENDICULAR_PAIR
+      type: fixed
+      prompt_template: Which two labeled lengths form a valid base-height pair for the area formula?
+      answer_mode: final_only
+      options:
+      - id: A
+        label: 8 cm and 6 cm
+      - id: B
+        label: 8 cm and 10 cm
+      - id: C
+        label: 6 cm and 10 cm
+      - id: D
+        label: All three lengths must be added
+      answer:
+        type: multiple_choice
+        value: A
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: The 8 cm and 6 cm sides meet at the marked right angle. The 10 cm side is the hypotenuse,
+        not the perpendicular height for either of those bases.
+      mistake_tags:
+      - perpendicular_height
+      - hypotenuse_as_height
+      difficulty: easy
+      media:
+      - src: media/triangle-area/assessment-right.svg
+        alt: A right triangle has sides labeled 8 cm, 6 cm and 10 cm. A square marks the right angle where the
+          8 cm and 6 cm sides meet.
+        width: 720
+        height: 480
+    - id: TRIANGLE_RIGHT_DIAGRAM
+      type: fixed
+      prompt_template: Find the area of the triangle in the diagram, in cm². Enter only the number.
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: '24'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: 'Use the perpendicular sides: A = 8 × 6 ÷ 2 = 24 cm². The 10 cm hypotenuse is not needed.'
+      mistake_tags:
+      - perpendicular_height
+      - missing_half
+      difficulty: easy
+      media:
+      - src: media/triangle-area/assessment-right.svg
+        alt: A right triangle has sides labeled 8 cm, 6 cm and 10 cm. A square marks the right angle where the
+          8 cm and 6 cm sides meet.
+        width: 720
+        height: 480
+    - id: TRIANGLE_ROTATED_DIAGRAM
+      type: fixed
+      prompt_template: The chosen base is vertical. Find the triangle's area in cm². Enter only the number.
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: '12'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: The vertical base and horizontal height meet at a right angle. A = 6 × 4 ÷ 2 = 12 cm²;
+        orientation does not change the formula.
+      mistake_tags:
+      - orientation
+      - perpendicular_height
+      difficulty: medium
+      media:
+      - src: media/triangle-area/rotated-triangle.svg
+        alt: A right triangle has a vertical base of 6 cm and a horizontal perpendicular height of 4 cm, meeting
+          at the top-left right angle.
+        width: 720
+        height: 480
+    - id: TRIANGLE_OUTSIDE_DIAGRAM
+      type: fixed
+      prompt_template: Use the labeled base and perpendicular height to find the triangle's area in cm². Enter
+        only the number.
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: '30'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: The outside height is the perpendicular distance to the extended base line. The actual
+        base stays 10 cm. A = 10 × 6 ÷ 2 = 30 cm².
+      mistake_tags:
+      - outside_height
+      - extended_base_error
+      difficulty: medium
+      media:
+      - src: media/triangle-area/assessment-outside.svg
+        alt: An obtuse triangle has base 10 cm and perpendicular height 6 cm outside the triangle. The right angle
+          lies on the dashed extension of the base, beyond its left endpoint.
+        width: 720
+        height: 480
+    - id: TRIANGLE_WHOLE_LENGTHS
+      type: generated
+      prompt_template: A triangle has base {b} cm and perpendicular height {h} cm. Find its area in cm²; enter
+        only the number.
+      answer_mode: final_only
+      variables:
+        b:
+          type: int
+          min: 4
+          max: 20
+        h:
+          type: int
+          min: 3
+          max: 12
+      derived:
+        area: b*h/2
+      answer:
+        type: numeric
+        value: '{area}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: A = b × h ÷ 2 = {b} × {h} ÷ 2 = {area} cm².
+      mistake_tags:
+      - missing_half
+      - area_formula
+      difficulty: easy
+    - id: TRIANGLE_ODD_PRODUCT
+      type: generated
+      prompt_template: 'Both lengths are odd: base {b} m and perpendicular height {h} m. Give the exact triangle
+        area in m², without rounding. Enter a number or fraction.'
+      answer_mode: final_only
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 7
+        q:
+          type: int
+          min: 1
+          max: 6
+      derived:
+        b: 2*p+1
+        h: 2*q+1
+        product: b*h
+        area: product/2
+      answer:
+        type: numeric
+        value: '{area}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: The product is {product}. Half of this odd product is {area}, so the exact area is
+        {area} m². A half-square-unit answer is valid.
+      mistake_tags:
+      - unnecessary_rounding
+      - missing_half
+      difficulty: medium
+    - id: TRIANGLE_DECIMAL_LENGTH
+      type: generated
+      prompt_template: A triangle has base {b} cm and perpendicular height {h} cm. Find its area in cm². Enter
+        only the number.
+      answer_mode: final_only
+      variables:
+        tenths:
+          type: int
+          min: 11
+          max: 49
+        k:
+          type: int
+          min: 2
+          max: 7
+      derived:
+        b: tenths/10
+        h: 2*k
+        area: tenths*k/10
+      answer:
+        type: numeric
+        value: '{area}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: A = {b} × {h} ÷ 2 = {area} cm². Decimal lengths use the same base-height formula.
+      mistake_tags:
+      - decimal_multiplication
+      - area_formula
+      difficulty: medium
+    - id: TRIANGLE_FRACTION_LENGTH
+      type: generated
+      prompt_template: A triangle has base {numerator}/2 m and perpendicular height {h} m. Find its area in m².
+        Enter an exact fraction or equivalent decimal.
+      answer_mode: final_only
+      variables:
+        p:
+          type: int
+          min: 1
+          max: 6
+        q:
+          type: int
+          min: 2
+          max: 7
+      derived:
+        numerator: 2*p+1
+        h: 2*q
+        answer_numerator: numerator*q
+      answer:
+        type: numeric
+        value: '{answer_numerator}/2'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: A = ({numerator}/2) × {h} ÷ 2 = {answer_numerator}/2 m². The whole-number height is
+        {h}, and the final division by 2 still applies.
+      mistake_tags:
+      - fraction_multiplication
+      - missing_half
+      difficulty: medium
+    - id: TRIANGLE_MISSING_HEIGHT
+      type: generated
+      prompt_template: A triangle's area is {area} cm² and its base is {b} cm. Find the matching perpendicular
+        height in cm. Enter only the number.
+      answer_mode: final_only
+      variables:
+        b:
+          type: int
+          min: 3
+          max: 15
+        h:
+          type: int
+          min: 2
+          max: 12
+      derived:
+        area: b*h/2
+      answer:
+        type: numeric
+        value: '{h}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: 'Undo the halving first: h = 2A ÷ b = 2 × {area} ÷ {b} = {h} cm. Check: {b} × {h} ÷
+        2 = {area} cm².'
+      mistake_tags:
+      - inverse_area_formula
+      - missing_factor_two
+      difficulty: medium
+    - id: TRIANGLE_MISSING_BASE
+      type: generated
+      prompt_template: A triangle has area {area} m² and perpendicular height {h} m. Find the matching base in
+        m. Enter only the number.
+      answer_mode: final_only
+      variables:
+        b:
+          type: int
+          min: 3
+          max: 16
+        h:
+          type: int
+          min: 2
+          max: 11
+      derived:
+        area: b*h/2
+      answer:
+        type: numeric
+        value: '{b}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: 'Double the area and divide by the known height: b = 2 × {area} ÷ {h} = {b} m. Substitution
+        into b × h ÷ 2 confirms the area.'
+      mistake_tags:
+      - inverse_area_formula
+      - length_vs_area_units
+      difficulty: medium
+    - id: TRIANGLE_MILLIMETRE_CONVERSION
+      type: generated
+      prompt_template: A triangle has base {b} cm and perpendicular height {mm} mm. Use 10 mm = 1 cm. Find the
+        area in cm²; enter only the number.
+      answer_mode: final_plus_required_work
+      variables:
+        b:
+          type: int
+          min: 4
+          max: 14
+        h:
+          type: int
+          min: 2
+          max: 9
+      derived:
+        mm: h*10
+        area: b*h/2
+      answer:
+        type: numeric
+        value: '{area}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: capture_only
+        prompt: Show the calculation, including any unit conversion, and state why your base and height match.
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: 'Convert the height first: {mm} mm = {h} cm. Then A = {b} × {h} ÷ 2 = {area} cm². Mixing
+        cm and mm without conversion would give the wrong unit.'
+      mistake_tags:
+      - mixed_units
+      - area_formula
+      difficulty: medium
+    - id: TRIANGLE_METRE_CONVERSION
+      type: generated
+      prompt_template: A triangular panel has base {b} m and perpendicular height {cm} cm. Use 100 cm = 1 m. Find
+        its area in m²; enter only the number.
+      answer_mode: final_plus_required_work
+      variables:
+        b:
+          type: int
+          min: 2
+          max: 8
+        k:
+          type: int
+          min: 1
+          max: 9
+      derived:
+        cm: 50*k
+        h: k/2
+        area: b*k/4
+      answer:
+        type: numeric
+        value: '{area}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: capture_only
+        prompt: Show the calculation, including any unit conversion, and state why your base and height match.
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: The height is {cm}/100 = {h} m. A = {b} × {h} ÷ 2 = {area} m². Convert lengths before
+        calculating the area.
+      mistake_tags:
+      - mixed_units
+      - decimal_multiplication
+      difficulty: medium
+    - id: TRIANGLE_SQUARE_UNITS
+      type: fixed
+      prompt_template: A triangle's base and perpendicular height are both measured in centimetres. Which unit
+        belongs on its area?
+      answer_mode: final_only
+      options:
+      - id: A
+        label: cm
+      - id: B
+        label: cm³
+      - id: C
+        label: cm²
+      - id: D
+        label: degrees
+      answer:
+        type: multiple_choice
+        value: C
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: Area multiplies two lengths, so cm × cm = cm². The unit cm measures a length and cm³
+        measures a volume.
+      mistake_tags:
+      - length_vs_area_units
+      difficulty: easy
+    - id: TRIANGLE_FORGOTTEN_HALF
+      type: generated
+      prompt_template: A learner uses base {b} cm and perpendicular height {h} cm, then reports {product} cm² as
+        the triangle's area. Which correction is needed?
+      answer_mode: final_only
+      variables:
+        b:
+          type: int
+          min: 4
+          max: 15
+        h:
+          type: int
+          min: 3
+          max: 12
+      derived:
+        product: b*h
+        area: product/2
+      options:
+      - id: A
+        label: Add the two lengths instead
+      - id: B
+        label: Divide the reported area by 2
+      - id: C
+        label: Multiply the reported area by 2
+      - id: D
+        label: No correction is needed
+      answer:
+        type: multiple_choice
+        value: B
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: The product {product} is b × h. A triangle covers half of its matching parallelogram,
+        so divide by 2 to get {area} cm².
+      mistake_tags:
+      - missing_half
+      - area_vs_perimeter
+      difficulty: medium
+    - id: TRIANGLE_SAME_BASE_HEIGHT
+      type: fixed
+      prompt_template: Two triangles have the same base length and the same perpendicular height. Their opposite
+        vertices lie at different positions along a line parallel to the base. How do their areas compare?
+      answer_mode: final_only
+      options:
+      - id: A
+        label: The more tilted triangle always has less area
+      - id: B
+        label: The triangle with the longer sloping side always has more area
+      - id: C
+        label: The areas cannot be compared without the side lengths
+      - id: D
+        label: The areas are equal
+      answer:
+        type: multiple_choice
+        value: D
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: Both areas equal b × h ÷ 2 with the same b and h. Moving the vertex along that parallel
+        line changes the side lengths but not the perpendicular height.
+      mistake_tags:
+      - same_base_height
+      - shape_vs_area
+      difficulty: medium
+    - id: TRIANGLE_ONE_LENGTH_SCALE
+      type: generated
+      prompt_template: A triangle's perpendicular height is multiplied by {k} while its base stays unchanged. By
+        what factor does its area change? Enter only the factor.
+      answer_mode: final_only
+      variables:
+        k:
+          type: int
+          min: 2
+          max: 5
+      answer:
+        type: numeric
+        value: '{k}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: A = b × h ÷ 2. Replacing h by {k}h multiplies the area by {k}; the base and division
+        by 2 stay unchanged.
+      mistake_tags:
+      - area_scale_factor
+      difficulty: medium
+    - id: TRIANGLE_BOTH_LENGTHS_SCALE
+      type: generated
+      prompt_template: A similar triangle is made by multiplying both the base and perpendicular height by {k}.
+        By what factor does its area change? Enter only the factor.
+      answer_mode: final_only
+      variables:
+        k:
+          type: int
+          min: 2
+          max: 5
+      derived:
+        factor: k*k
+      answer:
+        type: numeric
+        value: '{factor}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: Both factors in b × h change. The new area is {k} × {k} = {factor} times the old area,
+        not just {k} times.
+      mistake_tags:
+      - length_vs_area_scale
+      difficulty: medium
+    - id: TRIANGLE_COMPOSITE_CUTOUT
+      type: generated
+      prompt_template: A rectangle is {w} cm by {height} cm. A right-triangular corner with perpendicular sides
+        {b} cm and {h} cm is removed. Find the remaining area in cm²; enter only the number.
+      answer_mode: final_plus_required_work
+      variables:
+        b:
+          type: int
+          min: 2
+          max: 7
+        h:
+          type: int
+          min: 2
+          max: 6
+      derived:
+        w: 2*b+4
+        height: 2*h+3
+        rectangle: w*height
+        triangle: b*h/2
+        remaining: rectangle-triangle
+      answer:
+        type: numeric
+        value: '{remaining}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: capture_only
+        prompt: Show the calculation, including any unit conversion, and state why your base and height match.
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: Rectangle area = {w} × {height} = {rectangle} cm². Cutout area = {b} × {h} ÷ 2 = {triangle}
+        cm². Remaining area = {rectangle} − {triangle} = {remaining} cm².
+      mistake_tags:
+      - composite_area
+      - missing_half
+      - subtract_cutout
+      difficulty: hard
+    - id: TRIANGLE_MATERIAL_COST
+      type: generated
+      prompt_template: A triangular banner has base {b} m and perpendicular height {h} m. Fabric costs €{rate}
+        per m². Ignoring waste and hems, find the total fabric cost in euros; enter only the number.
+      answer_mode: final_plus_required_work
+      variables:
+        k:
+          type: int
+          min: 2
+          max: 5
+        h:
+          type: int
+          min: 2
+          max: 7
+        rate:
+          type: int
+          min: 3
+          max: 9
+      derived:
+        b: 2*k
+        area: k*h
+        cost: area*rate
+      answer:
+        type: numeric
+        value: '{cost}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: capture_only
+        prompt: Show the calculation, including any unit conversion, and state why your base and height match.
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: 'First find area: {b} × {h} ÷ 2 = {area} m². Then multiply by the price per square
+        metre: {area} × {rate} = €{cost}.'
+      mistake_tags:
+      - area_before_cost
+      - area_units
+      difficulty: hard
+    - id: TRIANGLE_AREA_UNIT_CONVERSION
+      type: generated
+      prompt_template: A triangle has area {area} m². Convert this area to cm². Remember that 1 m = 100 cm. Enter
+        only the number.
+      answer_mode: final_only
+      variables:
+        quarters:
+          type: int
+          min: 1
+          max: 20
+      derived:
+        area: quarters/4
+        cm2: quarters*2500
+      answer:
+        type: numeric
+        value: '{cm2}'
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: An area unit has two length factors. 1 m² = 100 cm × 100 cm = 10,000 cm². Therefore
+        {area} m² = {cm2} cm².
+      mistake_tags:
+      - square_unit_conversion
+      difficulty: hard
+    - id: TRIANGLE_INSUFFICIENT_INFORMATION
+      type: fixed
+      prompt_template: A sketch labels two sides of a triangle as 5 cm and 7 cm. No angle, right-angle mark, or
+        perpendicular height is given. Can you conclude that its area is 17.5 cm²?
+      answer_mode: final_only
+      options:
+      - id: A
+        label: Yes; any two sides can be multiplied and halved
+      - id: B
+        label: No; a matching perpendicular height or sufficient angle information is missing
+      - id: C
+        label: No; the area must be 35 cm²
+      - id: D
+        label: Yes; the longer side is always the height
+      answer:
+        type: multiple_choice
+        value: B
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+        allow_self_review: true
+      explanation_template: The calculation 5 × 7 ÷ 2 is valid only if the two lengths form a perpendicular base-height
+        pair. With no angle or perpendicular height stated, these two side lengths alone do not determine the area.
+      mistake_tags:
+      - insufficient_information
+      - perpendicular_height
+      difficulty: medium

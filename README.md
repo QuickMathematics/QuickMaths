@@ -109,11 +109,13 @@ Start each Agent Bridge prompt with `begin_agent_task`. It records UTC time loca
 
 QuickMaths now exposes Field → Branch → Lesson browsing and Studio branch suggestions while retaining compatible subject/subdomain file keys. The profile-adjacent status shows GitHub connection/save progress and time since the last successful save. Settings offers manual change review (default) or selective automatic merging with agent priority at conflicts; independent work survives from both copies. Missing history or invalid dependencies falls back to review. See the updated student, educator, authoring and Bridge guides.
 
-The native curriculum and bundled packages now classify 94 lessons into 12 broad branches across Mathematics, Geography, and Programming. Canonical maps render nested field/branch bands. Older categories migrate to the optional lesson topic, while saved learning and plan data are preserved. See [the complete field/branch reference](docs/FIELDS_AND_BRANCHES.md).
+The native curriculum and bundled packages now classify 95 lessons into 12 broad branches across Mathematics, Geography, and Programming. Canonical maps render nested field/branch bands. Older categories migrate to the optional lesson topic, while saved learning and plan data are preserved. See [the complete field/branch reference](docs/FIELDS_AND_BRANCHES.md).
 
 ## Lesson media and Matplotlib
 
 Lesson packs support images, video and audio in explanations, examples, applications and test questions. Studio attaches small files; folder publishing uploads larger media separately. Author in YAML/JSON, generate Matplotlib figures as PNG/SVG, and keep paths relative to the manifest. See the [media guide](docs/LESSON_MEDIA.md) and [geometry example](docs/examples/geometry-media/lesson-set.yaml).
+
+Native Mathematics includes **Triangle area: base and perpendicular height**, with eight worked examples and 21 assessment scenarios. All ten Geometry lessons now include Matplotlib illustrations, covering triangle heights, coordinates, slope, lines, bearings, arcs and spherical coordinates. These figures are embedded for offline use; run `python scripts/build_geometry_figures.py` followed by `python scripts/export_web_curriculum.py` to rebuild them.
 
 ```sh
 pip install -e ".[media]"

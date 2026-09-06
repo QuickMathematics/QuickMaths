@@ -42,18 +42,26 @@ theory: |
   Common mistake:
   Do not use the slope as the starting point. The y-intercept is where the graph begins on the y-axis. The slope tells the movement from point to point.
 examples:
-  - prompt: "For y = 3x + 4, what is the y-intercept?"
-    solution: "4"
-    explanation: "In y = mx + b, the y-intercept is b."
-  - prompt: "For y = 2x - 5, what is y when x = 1?"
-    solution: "-3"
-    explanation: "Substitute x = 1: y = 2(1) - 5 = -3."
-  - prompt: "A line has y-intercept 6 and slope -2. Starting at x = 0, what is y when x = 1?"
-    solution: "4"
-    explanation: "Moving right 1 changes y by -2, so 6 - 2 = 4."
-  - prompt: "A line has y-intercept -1 and slope 3/2. Starting at x = 0, what is y when x = 2?"
-    solution: "2"
-    explanation: "Slope 3/2 means right 2, up 3. Starting from -1 gives y = 2."
+- prompt: For y = 3x + 4, what is the y-intercept?
+  solution: '4'
+  explanation: In y = mx + b, the y-intercept is b.
+- prompt: For y = 2x - 5, what is y when x = 1?
+  solution: '-3'
+  explanation: 'Substitute x = 1: y = 2(1) - 5 = -3.'
+- prompt: A line has y-intercept 6 and slope -2. Starting at x = 0, what is y when x = 1?
+  solution: '4'
+  explanation: Moving right 1 changes y by -2, so 6 - 2 = 4.
+- prompt: A line has y-intercept -1 and slope 3/2. Starting at x = 0, what is y when x = 2?
+  solution: '2'
+  explanation: Slope 3/2 means right 2, up 3. Starting from -1 gives y = 2.
+  media:
+  - src: media/coordinate-geometry/graphing-line.svg
+    alt: A line passes through the y-intercept (0, minus 1) and (2, 2). The marked step is right 2 units and
+      up 3 units.
+    caption: 'Plot (0, −1), then use slope 3/2: right 2, up 3. The second point is (2, 2), and the line is
+      y = (3/2)x − 1.'
+    width: 720
+    height: 640
 applications:
   - title: "Systems of equations"
     description: "Graphing lines lets learners estimate where two equations have the same solution."

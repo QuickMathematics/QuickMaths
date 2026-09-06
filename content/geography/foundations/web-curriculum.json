@@ -38,7 +38,16 @@
         {
           "prompt": "Convert the bearing 225° into a compass direction.",
           "solution": "Southwest",
-          "explanation": "225° lies halfway between south at 180° and west at 270°."
+          "explanation": "225° lies halfway between south at 180° and west at 270°.",
+          "media": [
+            {
+              "src": "media/native-geometry/bearing-clockwise.svg",
+              "alt": "A compass has north at the top. An arrow rotates clockwise from north through east and south to a southwest ray. This clockwise turn is labeled 225 degrees.",
+              "caption": "A bearing starts at north and turns clockwise. A 225° bearing points southwest, halfway between south and west.",
+              "width": 720,
+              "height": 640
+            }
+          ]
         },
         {
           "prompt": "Find the reciprocal bearing of 070°.",
@@ -48,7 +57,16 @@
         {
           "prompt": "Find the smaller separation between 350° and 025°.",
           "solution": "35°",
-          "explanation": "The direct difference is 325°; the smaller wrap-around angle is 360° − 325° = 35°."
+          "explanation": "The direct difference is 325°; the smaller wrap-around angle is 360° − 325° = 35°.",
+          "media": [
+            {
+              "src": "media/native-geometry/bearing-wrap.svg",
+              "alt": "Two compass rays lie at bearings 350 degrees and 025 degrees, on opposite sides of north. The smaller angle crossing north is marked 35 degrees.",
+              "caption": "The shorter rotation crosses 000°: 10° to reach north, then another 25°, for 35° total.",
+              "width": 720,
+              "height": 640
+            }
+          ]
         },
         {
           "prompt": "Convert 18° 45′ to decimal degrees.",
@@ -513,7 +531,16 @@
         {
           "prompt": "Find the length of a 90° arc on a circle of radius 8.",
           "solution": "4π",
-          "explanation": "A 90° arc is one quarter of the circumference: (90/360)·2π·8 = 4π."
+          "explanation": "A 90° arc is one quarter of the circumference: (90/360)·2π·8 = 4π.",
+          "media": [
+            {
+              "src": "media/native-geometry/circle-arc.svg",
+              "alt": "A circle has radius 8. Two perpendicular radii bound a 90-degree central angle. The intercepted quarter-circle arc is highlighted.",
+              "caption": "A 90° central angle selects one quarter of the circumference: (1/4) × 2π × 8 = 4π. Arc length is measured along the curve.",
+              "width": 720,
+              "height": 640
+            }
+          ]
         },
         {
           "prompt": "Convert 72° to radians.",
@@ -1471,7 +1498,16 @@
           "work_required": true
         }
       ],
-      "topic": "Coordinate Geometry"
+      "topic": "Coordinate Geometry",
+      "media": [
+        {
+          "src": "media/native-geometry/sphere-coordinates.svg",
+          "alt": "A wireframe sphere shows the north and south poles, an equatorial great circle, a smaller parallel at 30 degrees north, and a meridian running from pole to pole.",
+          "caption": "The equator shares the sphere’s centre. The 30°N parallel is smaller; a meridian is half of a great circle. This schematic shows the curves in three dimensions.",
+          "width": 720,
+          "height": 640
+        }
+      ]
     }
   ]
 }

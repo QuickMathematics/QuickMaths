@@ -1,6 +1,6 @@
 # Fields and branches
 
-The shipped library contains 94 lessons. Field IDs and lesson IDs are unchanged. `subdomain` stores the broad branch; optional `topic` preserves the previous focused category.
+The shipped library contains 95 lessons. Field IDs and lesson IDs are unchanged. `subdomain` stores the broad branch; optional `topic` preserves the previous focused category.
 
 Canonical maps group lessons inside branch bands within each field. Existing saved coordinates remain in Plan view; **Plan mode → Plan details → Group by field & branch** adopts the canonical positions while retaining notes and paths.
 
@@ -61,7 +61,7 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Quadratic modeling and optimization | Quadratic Functions | `MATH_QUAD_005` |
 | Systems of equations | Systems of Equations | `MATH_SYS_001` |
 
-### Geometry (9 lessons)
+### Geometry (10 lessons)
 
 | Lesson | Topic | Stable lesson ID |
 | --- | --- | --- |
@@ -74,6 +74,7 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Angles, bearings, and degree measure | Coordinate Geometry | `MATH_GEOM_001` |
 | Circles, arcs, and angular distance | Coordinate Geometry | `MATH_GEOM_002` |
 | Spherical coordinates and great-circle models | Coordinate Geometry | `MATH_GEOM_003` |
+| Triangle area: base and perpendicular height | Plane Geometry | `MATH_GEOM_004` |
 
 ## Geography
 

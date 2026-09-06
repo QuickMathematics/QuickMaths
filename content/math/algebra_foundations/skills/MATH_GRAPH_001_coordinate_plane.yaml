@@ -71,6 +71,14 @@ theory: 'The coordinate plane is a flat grid used to locate points.
   x.
 
   '
+media:
+- src: media/coordinate-geometry/coordinate-plane.svg
+  alt: A coordinate grid from minus 6 to 6 on both axes. The origin is marked. Points (4, minus 3) and (minus
+    3, 4) lie in quadrants IV and II respectively. Dashed guides connect (4, minus 3) to the axes.
+  caption: Read x first, then y. The point (4, −3) is four units right and three units down; its dashed guides
+    show the two coordinates.
+  width: 720
+  height: 640
 examples:
 - prompt: For the point (5, -2), what is the x-coordinate?
   solution: '5'

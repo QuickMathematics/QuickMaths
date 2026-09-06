@@ -47,18 +47,26 @@ theory: |
   Common mistake:
   Do not confuse the slope with the y-intercept. In y = -4x + 7, the slope is -4 and the y-intercept is 7.
 examples:
-  - prompt: "Identify the slope in y = 2x + 9"
-    solution: "2"
-    explanation: "In y = mx + b, the coefficient of x is the slope."
-  - prompt: "Identify the y-intercept in y = -5x + 8"
-    solution: "8"
-    explanation: "In y = mx + b, the constant term is the y-intercept."
-  - prompt: "Write the right-hand side of y = mx + b when the slope is 4 and the y-intercept is -3."
-    solution: "4x - 3"
-    explanation: "Substitute m = 4 and b = -3 into mx + b."
-  - prompt: "Rewrite y - 6 = 3x in slope-intercept form."
-    solution: "3x + 6"
-    explanation: "Add 6 to both sides to get y = 3x + 6."
+- prompt: Identify the slope in y = 2x + 9
+  solution: '2'
+  explanation: In y = mx + b, the coefficient of x is the slope.
+  media:
+  - src: media/coordinate-geometry/slope-intercept.svg
+    alt: The line y = 2x + 9 crosses the y-axis at (0, 9). A step from that point goes right 1 unit and up
+      2 units to (1, 11).
+    caption: 'In y = 2x + 9, the intercept gives the starting point (0, 9), while the slope gives the step:
+      right 1, up 2.'
+    width: 720
+    height: 640
+- prompt: Identify the y-intercept in y = -5x + 8
+  solution: '8'
+  explanation: In y = mx + b, the constant term is the y-intercept.
+- prompt: Write the right-hand side of y = mx + b when the slope is 4 and the y-intercept is -3.
+  solution: 4x - 3
+  explanation: Substitute m = 4 and b = -3 into mx + b.
+- prompt: Rewrite y - 6 = 3x in slope-intercept form.
+  solution: 3x + 6
+  explanation: Add 6 to both sides to get y = 3x + 6.
 applications:
   - title: "Graphing lines"
     description: "Slope-intercept form lets learners graph a line quickly from its slope and y-intercept."

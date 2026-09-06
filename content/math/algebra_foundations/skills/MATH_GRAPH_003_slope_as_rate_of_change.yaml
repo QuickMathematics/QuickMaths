@@ -50,18 +50,26 @@ theory: |
   Common mistake:
   Do not divide in the wrong order. If distance depends on time, the rate is change in distance divided by change in time.
 examples:
-  - prompt: "A car travels 180 miles in 3 hours. What is the rate of change?"
-    solution: "60"
-    explanation: "Divide distance by time: 180 / 3 = 60 miles per hour."
-  - prompt: "A tank has 12 gallons at minute 0 and 32 gallons at minute 5. What is the rate of change?"
-    solution: "4"
-    explanation: "The amount increases by 20 gallons over 5 minutes, so the rate is 20/5 = 4 gallons per minute."
-  - prompt: "A line passes through (2, 10) and (6, 22). What is its rate of change?"
-    solution: "3"
-    explanation: "The change in y is 12 and the change in x is 4, so the rate is 12/4 = 3."
-  - prompt: "A value changes from 50 to 35 over 5 seconds. What is the rate of change?"
-    solution: "-3"
-    explanation: "The output change is -15 over 5 seconds, so the rate is -15/5 = -3 per second."
+- prompt: A car travels 180 miles in 3 hours. What is the rate of change?
+  solution: '60'
+  explanation: 'Divide distance by time: 180 / 3 = 60 miles per hour.'
+- prompt: A tank has 12 gallons at minute 0 and 32 gallons at minute 5. What is the rate of change?
+  solution: '4'
+  explanation: The amount increases by 20 gallons over 5 minutes, so the rate is 20/5 = 4 gallons per minute.
+  media:
+  - src: media/coordinate-geometry/slope-rate.svg
+    alt: A water-volume graph has time in minutes on the horizontal axis and gallons on the vertical axis.
+      A straight line joins (0, 12) to (5, 32). Arrows show 5 minutes and a gain of 20 gallons.
+    caption: 'The starting 12 gallons is not the rate. Use the change: 20 gallons ÷ 5 minutes = 4 gallons per
+      minute.'
+    width: 720
+    height: 640
+- prompt: A line passes through (2, 10) and (6, 22). What is its rate of change?
+  solution: '3'
+  explanation: The change in y is 12 and the change in x is 4, so the rate is 12/4 = 3.
+- prompt: A value changes from 50 to 35 over 5 seconds. What is the rate of change?
+  solution: '-3'
+  explanation: The output change is -15 over 5 seconds, so the rate is -15/5 = -3 per second.
 applications:
   - title: "Speed"
     description: "Speed is a rate of change comparing distance to time."
