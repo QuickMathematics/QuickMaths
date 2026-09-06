@@ -1,11 +1,11 @@
-import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-app-audit-v1";
-import { learningFields, branchName } from "./learning-fields.js?v=20260906-app-audit-v1";
-import { storageStatus } from "./storage-status.js?v=20260906-app-audit-v1";
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-app-audit-v1";
+import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-app-audit-v2";
+import { learningFields, branchName } from "./learning-fields.js?v=20260906-app-audit-v2";
+import { storageStatus } from "./storage-status.js?v=20260906-app-audit-v2";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-app-audit-v2";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-app-audit-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-app-audit-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260906-app-audit-v1";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-app-audit-v2";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-app-audit-v2";
+import { createLessonStudio } from "./lesson-creator.js?v=20260906-app-audit-v2";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -20,7 +20,7 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-app-audit-v1";
+} from "./github-sync.js?v=20260906-app-audit-v2";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -3410,7 +3410,7 @@ function initClock() {
 }
 
 async function boot() {
-  const response = await fetch("./curriculum-data.json?v=20260906-app-audit-v1");
+  const response = await fetch("./curriculum-data.json?v=20260906-app-audit-v2");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];
@@ -3422,7 +3422,7 @@ async function boot() {
     // The store's normal malformed-state recovery remains authoritative.
   }
   if (needsLegacyGeography) {
-    const geography = await fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-app-audit-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+    const geography = await fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-app-audit-v2", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
     bundledLessonPacks = [geography.text];
   }
   let agentManifest = {};
@@ -3431,10 +3431,10 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260906-app-audit-v1").catch(() => null),
-      fetch("./CUSTOM_LESSON_SETS.md?v=20260906-app-audit-v1").catch(() => null),
-      fetch("./STUDENT_GUIDE.md?v=20260906-app-audit-v1").catch(() => null),
-      fetch("./EDUCATOR_GUIDE.md?v=20260906-app-audit-v1").catch(() => null),
+      fetch("./agent-manifest.json?v=20260906-app-audit-v2").catch(() => null),
+      fetch("./CUSTOM_LESSON_SETS.md?v=20260906-app-audit-v2").catch(() => null),
+      fetch("./STUDENT_GUIDE.md?v=20260906-app-audit-v2").catch(() => null),
+      fetch("./EDUCATOR_GUIDE.md?v=20260906-app-audit-v2").catch(() => null),
     ]);
     if (manifestResponse?.ok) agentManifest = await manifestResponse.json();
     if (authoringGuideResponse?.ok) authoringGuideMarkdown = await authoringGuideResponse.text();
@@ -3560,7 +3560,7 @@ async function ensureLegacyGeographyMigration(raw) {
   let version = APP_VERSION;
   try { version = Number(JSON.parse(raw)?.version ?? APP_VERSION); } catch { return; }
   if (version >= APP_VERSION) return;
-  legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-app-audit-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+  legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-app-audit-v2", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
   const result = await legacyGeographyMigrationPromise;
   store.registerBundledLessonPacks([result.text]);
 }

@@ -349,3 +349,99 @@ test("editing a native equation lesson preserves a target variable other than x"
   assert.equal(gradeProblem(question, "n=11").correct, true);
   assert.equal(gradeProblem(question, "x=11").correct, false);
 });
+
+test("renaming draft lessons keeps prerequisites attached through temporary ID collisions and reload", (t) => {
+  const values = new Map();
+  const previousStorage = globalThis.localStorage;
+  const previousConfirm = globalThis.confirm;
+  globalThis.localStorage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+  globalThis.confirm = () => true;
+  t.after(() => { globalThis.localStorage = previousStorage; globalThis.confirm = previousConfirm; });
+  let { studio } = studioHarness();
+  const act = (action, index = 0) => studio.handleAction({ dataset: { creatorAction: action, index: String(index) } });
+  const rename = value => studio.handleInput({ value, dataset: { creatorField: "skill.id" }, matches: () => false });
+  act("add-skill");
+  studio.handleInput({ matches: () => true, selectedOptions: [{ value: "CUSTOM_NEW_LESSON_001" }] });
+  act("select-skill", 0);
+  rename("CUSTOM_NEW_LESSON_002"); // A temporary duplicate while typing must not move the second lesson's links.
+  rename("renamed lesson");
+  ({ studio } = studioHarness());
+  assert.deepEqual(studio.buildPack().skills[1].prerequisites, ["CUSTOM_RENAMED_LESSON"]);
+  act("add-skill");
+  assert.equal(new Set(studio.buildPack().skills.map(skill => skill.id)).size, 3);
+  act("select-skill", 0); act("remove-skill");
+  assert.deepEqual(studio.buildPack().skills[0].prerequisites, []);
+});
+
+test("opening a lesson preserves structured prerequisites and mastery rules", () => {
+  const { studio } = studioHarness();
+  const source = studio.buildPack();
+  source.skills[0].prerequisites = [{ skill_id: "CUSTOM_EXTERNAL", subject_id: "SUBJECT_EXTERNAL" }];
+  source.skills[0].mastery.max_guessing_allowed = "no";
+  studio.loadRaw(JSON.stringify(source));
+  assert.deepEqual(studio.buildPack().skills[0].prerequisites, source.skills[0].prerequisites);
+  assert.deepEqual(studio.buildPack().skills[0].mastery, source.skills[0].mastery);
+  source.skills[0].prerequisites = ["CUSTOM_EXTERNAL"];
+  source.skills[0].prerequisiteRefs = [{ skillId: "CUSTOM_EXTERNAL", subjectId: "SUBJECT_EXTERNAL" }];
+  studio.loadRaw(JSON.stringify(source));
+  assert.deepEqual(studio.buildPack().skills[0].prerequisites, [{ skill_id: "CUSTOM_EXTERNAL", subject_id: "SUBJECT_EXTERNAL" }]);
+});
+
+test("trace authoring round trips strings, separators, and strict comparison rules", () => {
+  const { studio } = studioHarness();
+  changeWorkMode(studio, "code_trace_steps");
+  const source = studio.buildPack();
+  const trace = source.skills[0].problems[0].work.trace_spec;
+  trace.columns = ["step", "output"];
+  trace.expected_rows = [
+    { step: 1, output: "001" }, { step: 2, output: "false" }, { step: 3, output: ' left | "right"\nnext ' },
+    { step: 4, output: false }, { step: 5, output: null },
+  ];
+  trace.comparison = { trim_strings: false, numeric_equivalence: false, blank_equals_null: false };
+  studio.loadRaw(JSON.stringify(source));
+  assert.deepEqual(studio.buildPack().skills[0].problems[0].work.trace_spec, trace);
+  changeProblemField(studio, "traceRows", '1 | "a|b"\n2 | " padded "');
+  assert.deepEqual(studio.buildPack().skills[0].problems[0].work.trace_spec.expected_rows, [{ step: 1, output: "a|b" }, { step: 2, output: " padded " }]);
+  changeProblemField(studio, "traceRows", "1 | extra | discarded");
+  assert.throws(() => studio.buildPack(), /cells|columns/i);
+});
+
+test("Python test authoring preserves pipes and escaped quotes inside JSON strings", () => {
+  const { studio } = studioHarness();
+  studio.handleAction({ dataset: { creatorAction: "apply-python-example", index: "0" } });
+  const source = studio.buildPack();
+  const program = source.skills[0].problems[0].program_spec;
+  program.tests = [{ visibility: "example", id: "pipes", args: ['a|b', { text: 'a\\"|b' }], expected_return: " left | right " }];
+  program.limits.memory_mb = 64;
+  studio.loadRaw(JSON.stringify(source));
+  assert.deepEqual(studio.buildPack().skills[0].problems[0].program_spec, program);
+});
+
+test("editing lesson text preserves prompt blocks, proof obligations and weighted rubric identities", () => {
+  const { studio } = studioHarness();
+  changeWorkMode(studio, "proof_obligations");
+  const source = studio.buildPack();
+  const problem = source.skills[0].problems[0];
+  problem.prompt_blocks = [{ type: "text", text: problem.prompt }, { type: "code", language: "python", text: "x = 1" }, { type: "text", text: "Then consider this variation." }, { type: "code", language: "python", text: "x = 2" }];
+  problem.work.proof_policy.obligations = [{ id: "main_claim", description: "State the claim", required: true }, { id: "extension", description: "Discuss an extension", required: false }];
+  problem.work.require_final_answer_match = false;
+  problem.work.target_variable = "n";
+  studio.loadRaw(JSON.stringify(source));
+  changeProblemField(studio, "prompt", "Updated question");
+  changeProblemField(studio, "promptCode", "x = 3");
+  const saved = studio.buildPack().skills[0].problems[0];
+  assert.deepEqual(saved.work.proof_policy, problem.work.proof_policy);
+  assert.equal(saved.work.require_final_answer_match, false);
+  assert.equal(saved.work.target_variable, "n");
+  assert.deepEqual(saved.prompt_blocks, [{ type: "text", text: "Updated question" }, { type: "code", language: "python", text: "x = 3" }, ...problem.prompt_blocks.slice(2)]);
+  changeWorkMode(studio, "rubric_check");
+  const rubricPack = studio.buildPack();
+  const criteria = [{ id: "reason", description: "Explains the reason", weight: 4 }, { id: "detail", description: "Includes detail", weight: 1 }];
+  rubricPack.skills[0].problems[0].work.rubric.criteria = criteria;
+  studio.loadRaw(JSON.stringify(rubricPack));
+  assert.deepEqual(studio.buildPack().skills[0].problems[0].work.rubric.criteria, criteria);
+  changeProblemField(studio, "rubricCriteria", "Includes detail\nExplains the reason\nAdds an example");
+  const editedCriteria = studio.buildPack().skills[0].problems[0].work.rubric.criteria;
+  assert.deepEqual(editedCriteria.slice(0, 2), [criteria[1], criteria[0]]);
+  assert.equal(new Set(editedCriteria.map(item => item.id)).size, 3);
+});

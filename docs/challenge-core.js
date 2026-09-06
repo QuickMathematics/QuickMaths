@@ -1,4 +1,4 @@
-import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-app-audit-v1";
+import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-app-audit-v2";
 
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
@@ -2479,12 +2479,20 @@ function updateMastery(current, scorePercent, reflection) {
   return Math.max(0, Math.min(100, Math.round(mastery * 100) / 100));
 }
 
-function reviewDate(status, score, confidence, date) {
+function passesMasteryRules(skill, score, reflection) {
+  return score >= Number(skill.mastery.passing_score ?? 0.8)
+    && reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
+    && (skill.mastery.max_guessing_allowed === "no" ? reflection.guessed === "no" : reflection.guessed !== "yes");
+}
+
+function reviewDate(status, score, confidence, date, mastery = {}) {
   let days = 3;
   if (score < 0.7 || confidence <= 2) days = 1;
   else if (status === "learning") days = 2;
   else if (status === "mastered") days = 21;
   else if (status === "proven") days = 7;
+  const configuredDays = PROVEN.has(status) ? mastery.review_after_days_if_mastered : mastery.review_after_days_if_learning;
+  if (Number.isFinite(Number(configuredDays)) && Number(configuredDays) >= 1) days = Math.min(365, Math.round(Number(configuredDays)));
   const next = new Date(date);
   next.setUTCDate(next.getUTCDate() + days);
   return next.toISOString();
@@ -3877,10 +3885,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     });
     const prerequisitesMet = effectiveProgressionMode() === "soft" || skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status));
     const mastery = hasPendingReview ? previous.masteryScore : updateMastery(previous.masteryScore, pending.percentScore, reflection);
-    const passed = prerequisitesMet
-      && pending.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
-      && reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
-      && reflection.guessed !== "yes";
+    const passed = prerequisitesMet && passesMasteryRules(skill, pending.percentScore, reflection);
     const status = hasPendingReview ? "learning" : passed ? (PROVEN.has(previous.status) ? "mastered" : "proven") : "learning";
     const completedAt = isoNow();
     const mistakeTags = [...new Set(pending.results.flatMap((result) => result.mistakeTags))].slice(0, 12);
@@ -3892,7 +3897,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       bestTestScore: Math.max(previous.bestTestScore ?? 0, pending.percentScore),
       attemptCount: (previous.attemptCount ?? 0) + 1,
       lastAttemptAt: completedAt,
-      nextReviewAt: reviewDate(status, pending.percentScore, reflection.confidenceRating, now()),
+      nextReviewAt: reviewDate(status, pending.percentScore, reflection.confidenceRating, now(), skill.mastery),
       mistakeTags,
       notes: reflection.notes,
       updatedAt: completedAt,
@@ -4003,14 +4008,11 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     record.masteryScore = Math.max(0, Math.min(100, record.masteryScore - Number(attempt.reviewMasteryDeltaApplied ?? 0) + desiredDelta));
     const skill = skillsById[attempt.skillId];
     const prerequisitesMet = effectiveProgressionMode() === "soft" || skill.prerequisites.every((id) => PROVEN.has(activeProgress()[id]?.status));
-    const passed = verdict === "pass" && prerequisitesMet
-      && attempt.percentScore >= Number(skill.mastery.passing_score ?? 0.8)
-      && attempt.reflection.confidenceRating >= Number(skill.mastery.minimum_confidence ?? 3)
-      && attempt.reflection.guessed !== "yes";
+    const passed = verdict === "pass" && prerequisitesMet && passesMasteryRules(skill, attempt.percentScore, attempt.reflection);
     // Revisions to one review must not count as additional passing attempts.
     const previouslyProven = PROVEN.has(attempt.previousMasteryStatus) || record.status === "mastered";
     record.status = passed ? (previouslyProven ? "mastered" : "proven") : "learning";
-    record.nextReviewAt = reviewDate(record.status, attempt.percentScore, attempt.reflection.confidenceRating, now());
+    record.nextReviewAt = reviewDate(record.status, attempt.percentScore, attempt.reflection.confidenceRating, now(), skill.mastery);
     record.updatedAt = isoNow();
     attempt.masteryUpdate = { status: record.status, masteryScore: record.masteryScore };
     attempt.reviewStatus = verdict === "pass" ? "review_passed" : verdict;
@@ -4229,11 +4231,26 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   const previewLessonPack = (raw) => lessonPackPreview(parseLessonPack(raw));
 
+  const protectUnfinishedReviews = (targets) => {
+    if (state.ui.pendingResults && targets.has(state.ui.pendingResults.skillId)) {
+      throw new Error("Save the current reflection before replacing this lesson so its answers and review requirements are preserved.");
+    }
+    for (const profile of state.profiles) {
+      for (const skillId of targets) {
+        const draft = state.drafts[profile.id]?.[skillId];
+        if (draft && state.reviews.some(review => review.profileId === profile.id && review.draftId === draft.draftId && !review.attemptId)) {
+          throw new Error(`Finish and save ${profile.displayName}'s ${skillsById[skillId].name} test before replacing this lesson so its tutor feedback is preserved.`);
+        }
+      }
+    }
+  };
+
   const importLessonPack = (raw) => {
     const pack = parseLessonPack(raw);
     let restartedDraftCount = 0;
     if (pack.mode === "override") {
       const targets = new Set(pack.skills.map((skill) => skill.id));
+      protectUnfinishedReviews(targets);
       for (const profileDrafts of Object.values(state.drafts)) {
         for (const skillId of targets) {
           if (!profileDrafts?.[skillId]) continue;
@@ -4318,6 +4335,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (pack.mode !== "override") throw new Error("Only a native lesson improvement can be restored this way.");
     let restartedDraftCount = 0;
     const targets = new Set(pack.skills.map((skill) => skill.id));
+    protectUnfinishedReviews(targets);
     for (const profileDrafts of Object.values(state.drafts)) {
       for (const skillId of targets) {
         if (!profileDrafts?.[skillId]) continue;

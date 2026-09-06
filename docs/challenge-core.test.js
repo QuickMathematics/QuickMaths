@@ -255,13 +255,57 @@ test("passing retakes preserve mastery and its review interval", () => {
     assert.equal(attempt.masteryUpdate.status, expectedStatus);
     const progress = store.snapshot().progressRows.find((row) => row.id === "MATH_ARITH_001");
     assert.equal(progress.status, expectedStatus);
-    assert.equal(Date.parse(progress.nextReviewAt) - Date.parse(attempt.completedAt), (expectedStatus === "mastered" ? 21 : 7) * 86_400_000);
+    assert.equal(Date.parse(progress.nextReviewAt) - Date.parse(attempt.completedAt), store.skillsById["MATH_ARITH_001"].mastery.review_after_days_if_mastered * 86_400_000);
     advance(22 * 86_400);
   }
   store.startTest("MATH_ARITH_001", { force: true });
   answerActiveTestCorrectly(store);
   store.submitTest();
   assert.equal(store.saveReflection({ confidenceRating: 1, guessed: "yes" }).masteryUpdate.status, "learning");
+});
+
+test("authored mastery rules control guessing and review dates for learning, proven and mastered results", () => {
+  const { store } = harness();
+  store.createProfile("Configured mastery");
+  store.setLearningPreferences({ progressionMode: "soft" });
+  const pack = biologyLessonSet();
+  const skill = pack.skills[0];
+  skill.mastery = { ...skill.mastery, max_guessing_allowed: "no", review_after_days_if_mastered: 13, review_after_days_if_learning: 5 };
+  store.importLessonPack(pack);
+  for (const [guessed, status, days] of [["maybe", "learning", 5], ["no", "proven", 13], ["no", "mastered", 13], ["yes", "learning", 5]]) {
+    store.startTest(skill.id, { force: true });
+    answerActiveTestCorrectly(store);
+    assert.equal(store.submitTest().ok, true);
+    const attempt = store.saveReflection({ confidenceRating: 4, guessed });
+    const progress = store.snapshot().progressRows.find(row => row.id === skill.id);
+    assert.equal(progress.status, status);
+    assert.equal(Date.parse(progress.nextReviewAt) - Date.parse(attempt.completedAt), days * 86_400_000);
+  }
+});
+
+test("tutor review respects the same authored guessing and review rules", () => {
+  const { store } = harness();
+  store.createProfile("Reviewed mastery");
+  store.setLearningPreferences({ progressionMode: "soft" });
+  const pack = biologyLessonSet();
+  const skill = pack.skills[0];
+  skill.mastery = { ...skill.mastery, max_guessing_allowed: "no", review_after_days_if_mastered: 13, review_after_days_if_learning: 5 };
+  const problem = skill.problems[0];
+  problem.answer_mode = "final_plus_required_work";
+  problem.work = { mode: "rubric_check", prompt: "Explain your reasoning.", rubric: { criteria: [{ id: "reason", description: "Justifies the claim", weight: 1 }] } };
+  problem.review_policy = { work_review: "tutor_required", mastery_requires_review_pass: true, allow_self_review: false };
+  store.importLessonPack(pack);
+  for (const [guessed, status, days] of [["maybe", "learning", 5], ["no", "proven", 13]]) {
+    const draft = store.startTest(skill.id, { force: true });
+    for (const item of draft.problems) store.updateResponse(item.template_id, { finalAnswer: String(item.expected_answer), work: item.work.mode === "rubric_check" ? "The evidence supports the claim because each step follows from the definitions." : item.work_required ? workFor(item) : "" });
+    assert.equal(store.submitTest().ok, true);
+    const attempt = store.saveReflection({ confidenceRating: 4, guessed });
+    store.recordTutorFeedback({ questionId: problem.template_id, reviewerType: "human_tutor", feedback: "The reasoning is complete.", nextStep: "Continue practising.", rubricResults: [{ id: "reason", awardedPoints: 1, note: "Complete" }] });
+    const progress = store.snapshot().progressRows.find(row => row.id === skill.id);
+    assert.equal(store.getAttempt(attempt.attemptId).reviewStatus, "review_passed");
+    assert.equal(progress.status, status);
+    assert.equal(Date.parse(progress.nextReviewAt) - Date.parse(attempt.completedAt), days * 86_400_000);
+  }
 });
 
 test("staged review queues survive reloads, backups, and Bridge checkpoints without installing", () => {
@@ -1126,6 +1170,37 @@ test("native lesson improvements replace content reversibly without moving IDs o
   assert.equal(original.attemptCount, before.attemptCount);
   assert.equal(original.masteryScore, before.masteryScore);
   assert.equal(state.activeTest, null);
+});
+
+test("replacing native lessons protects pending reflections and feedback on unfinished tests", () => {
+  for (const restoring of [false, true]) {
+    const { store } = harness();
+    const profile = store.createProfile("Learner with saved work");
+    if (restoring) store.importLessonPack(nativeImprovement());
+    const replace = () => restoring ? store.restoreNativeLessons("PACK_IMPROVE_MATH_ARITH_001") : store.importLessonPack(nativeImprovement());
+    store.startTest("MATH_ARITH_001");
+    const draft = answerActiveTestCorrectly(store);
+    store.submitTest();
+    const beforeReflection = store.exportSyncState();
+    assert.throws(replace, /reflection/i);
+    assert.equal(store.exportSyncState(), beforeReflection);
+    store.saveReflection({ confidenceRating: 4, guessed: "no" });
+    store.startTest("MATH_ARITH_001");
+    const question = store.snapshot().activeTest.problems[0];
+    store.updateResponse(question.template_id, { finalAnswer: "1", work: "My working" });
+    store.recordTutorFeedback({ questionId: question.template_id, feedback: "Check the sign.", nextStep: "Try the addition again." });
+    store.createProfile("Another learner");
+    const beforeFeedback = store.exportSyncState();
+    assert.throws(replace, /Learner with saved work.*feedback/i);
+    assert.equal(store.exportSyncState(), beforeFeedback);
+    store.selectProfile(profile.id);
+    store.startTest(draft.skillId);
+    answerActiveTestCorrectly(store);
+    store.submitTest(); store.saveReflection({ confidenceRating: 4, guessed: "no" });
+    assert.doesNotThrow(replace);
+    assert.equal(store.validateSyncMerge(store.exportSyncState()).ok, true);
+    assert.equal(store.snapshot().reviews.length, 1);
+  }
 });
 
 test("native improvements enforce the built-in identity and round-trip through full backups", () => {

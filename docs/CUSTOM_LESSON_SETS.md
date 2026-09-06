@@ -78,7 +78,7 @@ Limits: 2 MB per set, 10 installed sets, 50 skills per set, 100 fixed questions 
 
 ## Improving a native QuickMaths lesson
 
-Schema 2.0 also supports a reversible `override` mode for improving a built-in lesson. This is not a new map node: it temporarily replaces the native lesson content under the **same lesson ID**, so completed attempts, mastery, and reviews stay attached. Any unfinished test for an affected lesson restarts at installation or restoration; this prevents answers from one question-bank version crossing into another.
+Schema 2.0 also supports a reversible `override` mode for improving a built-in lesson. This is not a new map node: it temporarily replaces the native lesson content under the **same lesson ID**, so completed attempts, mastery, and reviews stay attached. Unfinished tests for affected lessons restart at installation or restoration; this prevents answers from one question-bank version crossing into another. Save pending reflections and finish tests with tutor feedback first. The app protects these records across all profiles until their answers and feedback belong to saved attempts.
 
 In Lesson Studio, choose **Edit a native lesson**, select the lesson, and click **Open editable copy**. The Studio locks the lesson ID, copies every authoring field, validates the result, and labels the install as a native improvement. In Settings, **Restore original** removes the improvement while preserving completed learner progress.
 
@@ -192,6 +192,10 @@ Each skill supports:
 ```
 
 `question_count` is the number of questions in one mastery attempt. It must be a whole number from 1 through the number of entries in `problems`; when omitted, QuickMaths uses the complete bank. Supplying a larger bank than `question_count` gives comprehensive retakes fresh variants without making one attempt endless. The Lesson Studio uses the complete bank for new lessons and preserves the original assessment length when improving a native lesson.
+
+Mastery uses the lesson's passing score, minimum confidence, and guessing rule. With `max_guessing_allowed: "no"`, the learner must report no guessing; `"maybe"` accepts either no guessing or uncertainty, but never a definite guess. Review dates use `review_after_days_if_mastered` for proven and mastered results and `review_after_days_if_learning` for learning results, including results resolved by a tutor review.
+
+When editing an existing file, Studio preserves structured prerequisite bridges, extra prompt blocks, rubric weights and IDs, optional proof obligations, trace comparison rules, and Python memory limits. Text cells in authored trace tables use JSON double quotes when their exact type or spacing matters, for example `"001"` or `"a|b"`. Pipes inside JSON strings also remain intact in Python test arguments and expected results.
 
 `unlocks` is optional and may contain only skills from the same pack. QuickMaths also derives unlock relationships from prerequisites, including cross-field links.
 

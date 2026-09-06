@@ -1,4 +1,4 @@
-import { learningFields } from "./learning-fields.js?v=20260906-app-audit-v1";
+import { learningFields } from "./learning-fields.js?v=20260906-app-audit-v2";
 export const TOOL_NAMES = Object.freeze([
   "get_agent_guide",
   "get_quickmaths_manual",

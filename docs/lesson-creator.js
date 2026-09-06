@@ -1,4 +1,4 @@
-import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-app-audit-v1";
+import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-app-audit-v2";
 const DRAFT_KEY = "quickmaths.lesson-creator.v1";
 
 const DEFAULT_THEME = {
@@ -87,6 +87,19 @@ function lines(value) {
   return String(value ?? "").split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
 }
 
+const prerequisiteId = (reference) => typeof reference === "string" ? reference : reference.skill_id;
+// Draft links keep a stable identity while the author edits the exported lesson ID.
+const lessonReferenceId = (skill) => skill.referenceId ?? cleanId(skill.id, "CUSTOM_");
+
+function studioPrerequisites(skill) {
+  const serialized = (skill.prerequisiteRefs ?? []).map(ref => {
+    const subjectId = ref.subjectId ?? ref.subject_id;
+    return { skill_id: ref.skillId ?? ref.skill_id, ...(subjectId ? { subject_id: subjectId } : {}) };
+  });
+  const refs = skill.prerequisites?.length ? skill.prerequisites : serialized;
+  return structuredClone(refs.map(ref => serialized.find(item => item.skill_id === prerequisiteId(ref)) ?? ref));
+}
+
 function blankProblem(skillId, index = 0) {
   return {
     templateId: `${skillId}_Q${String(index + 1).padStart(2, "0")}`,
@@ -111,9 +124,9 @@ function blankProblem(skillId, index = 0) {
 function blankSkill(index = 0) {
   const id = `CUSTOM_NEW_LESSON_${String(index + 1).padStart(3, "0")}`;
   return {
-    id, name: "New lesson", description: "A short description of what learners will master.", subdomain: "Foundations", topic: "",
+    id, referenceId: id, name: "New lesson", description: "A short description of what learners will master.", subdomain: "Foundations", topic: "",
     theory: "Explain the core idea here.\n\n- Add a useful rule\n- Point out a common mistake", tags: "foundation",
-    prerequisites: [], passingScore: 0.8, minimumConfidence: 3, reviewMasteredDays: 7, reviewLearningDays: 2,
+    prerequisites: [], passingScore: 0.8, minimumConfidence: 3, maxGuessingAllowed: "maybe", reviewMasteredDays: 7, reviewLearningDays: 2,
     examples: [{ prompt: "A worked example", solution: "Show the result", explanation: "Explain why each step works." }],
     applications: [{ title: "Why it matters", description: "Connect this lesson to a real problem or another subject." }],
     activeProblem: 0, problems: [blankProblem(id, 0)],
@@ -136,7 +149,7 @@ function blankDraft(snapshot) {
 function restoreDraft(snapshot) {
   try {
     const parsed = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "null");
-    if (parsed && Array.isArray(parsed.skills) && parsed.skills.length) return { mode: "add", nativeSkillId: "", ...parsed, skills: parsed.skills.map((skill) => normalizeLessonTaxonomy(skill, parsed.subjectId)) };
+    if (parsed && Array.isArray(parsed.skills) && parsed.skills.length) return { mode: "add", nativeSkillId: "", ...parsed, skills: parsed.skills.map((skill) => normalizeLessonTaxonomy({ ...skill, referenceId: skill.referenceId ?? (parsed.mode === "override" ? skill.id : lessonReferenceId(skill)) }, parsed.subjectId)) };
   } catch { /* Start from a clean author draft. */ }
   return blankDraft(snapshot);
 }
@@ -273,9 +286,9 @@ function renderAdvancedWork(problem, index) {
     ${problem.workMode === "procedural_steps" ? `<div class="studio-two">${indexed(field("Minimum lines", "problem.minimumSteps", problem.minimumSteps, { type:"number", min:1, max:10, hint:"The app blocks submission until this many non-empty lines are present." }))}${indexed(select("Allowed line format", "problem.lineType", problem.lineType, [["expression","Equivalent expressions"],["equation","Equivalent equations (=)"],["inequality","Equivalent inequalities (<, ≤, >, ≥)"],["mixed","Maths or explanatory text"],["text","Text only"]], "Choose Equations for = on every line. Choose Inequalities when every line must preserve the same one-variable solution set, including reversing the sign after multiplying or dividing by a negative."))}</div><button class="studio-example-button" type="button" data-creator-action="apply-procedural-example" data-index="${index}">Use a clear step-by-step instruction</button>` : ""}
     ${problem.workMode === "rational_equation_steps" ? `<aside class="studio-syntax-note"><strong>The learner sees a form, not JSON.</strong><p>Restrictions, algebra lines, candidate values, classifications, and substitution checks are stored together. The app compares the submitted restriction set and candidate ledger with the trusted model below.</p></aside><div class="studio-three">${indexed(field("Target variable", "problem.targetVariable", problem.targetVariable, { hint:"Usually x." }))}<label class="studio-check"><input type="checkbox" data-index="${index}" data-creator-field="problem.requireRestrictions" ${problem.requireRestrictions ? "checked" : ""}> Require original restrictions</label><label class="studio-check"><input type="checkbox" data-index="${index}" data-creator-field="problem.requireOriginalEquationCheck" ${problem.requireOriginalEquationCheck ? "checked" : ""}> Require substitution checks</label></div><div class="studio-two">${indexed(field("Original equation", "problem.originalEquation", problem.originalEquation || problem.prompt.replace(/^.*?:\s*/, ""), { hint:"The equation used to classify valid and extraneous candidates." }))}${indexed(area("Expected restrictions — one value per line", "problem.expectedRestrictions", problem.expectedRestrictions, { rows:3, hint:"Every original denominator zero, including values from factors that later cancel." }))}</div>` : ""}
     ${problem.workMode === "sign_chart_steps" ? `<aside class="studio-syntax-note"><strong>Author the trusted chart model.</strong><p>Critical point syntax is <code>value | kind | multiplicity | factor</code>, one point per line. Kind is <code>zero</code>, <code>undefined</code>, or <code>hole</code>. The learner receives a guided chart editor.</p></aside><div class="studio-three">${indexed(select("Expression kind", "problem.signExpressionKind", problem.signExpressionKind, [["polynomial","Polynomial"],["rational","Rational"]]))}${indexed(select("Relation", "problem.signRelation", problem.signRelation, [[">","> 0"],[">=","≥ 0"],["<","< 0"],["<=","≤ 0"]]))}${indexed(field("Target variable", "problem.targetVariable", problem.targetVariable))}</div>${indexed(field("Expression", "problem.signExpression", problem.signExpression, { hint:"Example: (x - 2)/(x + 1)." }))}<div class="studio-two">${indexed(field("Expected factorization", "problem.expectedFactorization", problem.expectedFactorization, { hint:"Equivalent factored form used when factorization is required." }))}${indexed(field("Reduced expression", "problem.reducedExpression", problem.reducedExpression, { hint:"Optional; use after canceled factors when holes must remain critical." }))}</div>${indexed(area("Critical points — value | kind | multiplicity | factor", "problem.criticalPoints", problem.criticalPoints, { rows:5, hint:"Example: 2 | zero | 1 | x - 2\n-1 | undefined | 1 | x + 1" }))}<div class="studio-checks"><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireFactorization" ${problem.requireFactorization ? "checked" : ""}> Require factorization</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireTestValues" ${problem.requireTestValues ? "checked" : ""}> Require test values</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireIntervalSigns" ${problem.requireIntervalSigns ? "checked" : ""}> Require interval signs</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireEndpointDecisions" ${problem.requireEndpointDecisions ? "checked" : ""}> Require endpoint decisions</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.requireFinalAnswerMatch" ${problem.requireFinalAnswerMatch ? "checked" : ""}> Match final interval set</label></div>` : ""}
-    ${problem.workMode === "code_trace_steps" ? `<aside class="studio-syntax-note"><strong>The table is authored; lesson code is never executed.</strong><p>List one column name per line, starting with <code>step</code>. Then enter one expected row per line using <code>|</code> between cells in exactly that order. Empty cells mean no value or output yet. The learner sees ordinary inputs in a scrollable table.</p></aside>${indexed(area("Formatted Python to trace", "problem.traceDisplayCode", problem.traceDisplayCode || problem.promptCode, { rows:8, hint:"Indentation and line breaks are preserved exactly." }))}<div class="studio-two">${indexed(area("Table columns — one per line", "problem.traceColumns", problem.traceColumns, { rows:5, hint:"Example: step, x, total, output. The first column must be step." }))}${indexed(area("Expected rows — pipe-separated cells", "problem.traceRows", problem.traceRows, { rows:7, hint:"For columns step / x / output: 1 | 2 |\n2 | 5 |\n3 | 5 | 5" }))}</div>` : ""}
+    ${problem.workMode === "code_trace_steps" ? `<aside class="studio-syntax-note"><strong>The table is authored; lesson code is never executed.</strong><p>List one column name per line, starting with <code>step</code>. Then enter one expected row per line using <code>|</code> between cells in exactly that order. Empty cells mean no value or output yet. Use JSON double quotes for text, such as &quot;001&quot; or &quot;a|b&quot;, to preserve its exact value. The learner sees ordinary inputs in a scrollable table.</p></aside>${indexed(area("Formatted Python to trace", "problem.traceDisplayCode", problem.traceDisplayCode || problem.promptCode, { rows:8, hint:"Indentation and line breaks are preserved exactly." }))}<div class="studio-two">${indexed(area("Table columns — one per line", "problem.traceColumns", problem.traceColumns, { rows:5, hint:"Example: step, x, total, output. The first column must be step." }))}${indexed(area("Expected rows — pipe-separated cells", "problem.traceRows", problem.traceRows, { rows:7, hint:"For columns step / x / output: 1 | 2 |\n2 | 5 |\n3 | 5 | 5" }))}</div>` : ""}
     ${problem.workMode === "proof_obligations" ? `${renderProofAnatomy(problem)}<aside class="studio-syntax-note"><strong>Author a proof skeleton, not a secret answer.</strong><p>Each line below becomes one visible requirement for the learner and the Results/WebMCP reviewer. Use concrete logical milestones. Accepted approaches are suggestions, never exact phrases the learner must type.</p></aside>${indexed(area("Proof obligations — one logical milestone per line", "problem.proofObligations", problem.proofObligations, { rows:6, hint:"Example: “Derives p² = 2q²” or “Explains why both p and q being even contradicts lowest terms.”" }))}${indexed(area("Accepted proof approaches — one per line", "problem.proofStrategies", problem.proofStrategies, { rows:3, hint:"Name legitimate routes such as direct proof, contradiction, induction, or a field-specific argument." }))}<button class="studio-example-button" type="button" data-creator-action="apply-proof-example" data-index="${index}">Load the complete editable √2 contradiction-proof example</button>` : ""}
-    ${problem.workMode === "rubric_check" ? `<aside class="studio-syntax-note"><strong>Describe observable qualities.</strong><p>Each line becomes one visible review criterion with equal weight. The learner can structure the response however the prompt asks.</p></aside>${indexed(area("Review criteria — one per line", "problem.rubricCriteria", problem.rubricCriteria, { rows:5, hint:"Use specific criteria such as “Uses two relevant sources” rather than “Good answer.”" }))}<button class="studio-example-button" type="button" data-creator-action="apply-rubric-example" data-index="${index}">Fill with an editable rubric example</button>` : ""}
+    ${problem.workMode === "rubric_check" ? `<aside class="studio-syntax-note"><strong>Describe observable qualities.</strong><p>Each line becomes one visible review criterion. Imported criteria keep their IDs and weights; new criteria have equal weight. The learner can structure the response however the prompt asks.</p></aside>${indexed(area("Review criteria — one per line", "problem.rubricCriteria", problem.rubricCriteria, { rows:5, hint:"Use specific criteria such as “Uses two relevant sources” rather than “Good answer.”" }))}<button class="studio-example-button" type="button" data-creator-action="apply-rubric-example" data-index="${index}">Fill with an editable rubric example</button>` : ""}
     ${reviewIsRequired ? `<div class="studio-review-lock"><span aria-hidden="true">✓</span><div><strong>Mastery waits for a passed review</strong><p>${problem.workReview === "self_review" ? "The learner can review this response on the Results page." : "A human tutor or connected agent reviews the saved response on the Results page."}</p></div></div>` : `<div class="studio-checks"><label><input type="checkbox" data-index="${index}" data-creator-field="problem.masteryRequiresReview" ${problem.masteryRequiresReview ? "checked" : ""}> Review must pass before mastery</label><label><input type="checkbox" data-index="${index}" data-creator-field="problem.allowSelfReview" ${problem.allowSelfReview ? "checked" : ""}> Allow self review</label></div>`}
     ${renderStudentPreview(problem)}
   </details>`;
@@ -329,10 +342,27 @@ function traceValue(value) {
 }
 
 function parseTraceRows(value, columns) {
-  return lines(value).map((line) => {
-    const cells = line.split("|").map((item) => item.trim());
+  return lines(value).map((line, index) => {
+    const cells = splitAuthoringCells(line);
+    if (cells.length !== columns.length) throw new Error(`Trace row ${index + 1} needs ${columns.length} cells, one for each column. Put text containing | inside JSON double quotes.`);
     return Object.fromEntries(columns.map((column, index) => [column, traceValue(cells[index])]));
   });
+}
+
+// Separators inside JSON strings are data, including escaped quotes and backslashes.
+function splitAuthoringCells(line) {
+  const cells = [];
+  let start = 0, quoted = false, escaped = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index];
+    if (escaped) { escaped = false; continue; }
+    if (quoted && character === "\\") { escaped = true; continue; }
+    if (character === '"') quoted = !quoted;
+    else if (character === "|" && !quoted) { cells.push(line.slice(start, index).trim()); start = index + 1; }
+  }
+  if (quoted) throw new Error("Close every JSON double-quoted string in the authored row.");
+  cells.push(line.slice(start).trim());
+  return cells;
 }
 
 function parsePythonParameters(value) {
@@ -343,23 +373,67 @@ function parsePythonParameters(value) {
 }
 
 function parsePythonTests(value) {
-  return lines(value).map((line) => {
-    const [visibility, id, argsSource, ...expectedParts] = line.split("|").map((item) => item.trim());
-    return { visibility, id, args: JSON.parse(argsSource), expected_return: JSON.parse(expectedParts.join("|")) };
+  return lines(value).map((line, index) => {
+    const cells = splitAuthoringCells(line);
+    if (cells.length !== 4) throw new Error(`Python test ${index + 1} needs visibility | id | arguments JSON | expected JSON.`);
+    const [visibility, id, argsSource, expectedSource] = cells;
+    return { visibility, id, args: JSON.parse(argsSource), expected_return: JSON.parse(expectedSource) };
   });
+}
+
+function editedReviewItems(value, source = [], { rubric = false } = {}) {
+  const descriptions = lines(value);
+  const descriptionOf = item => typeof item === "string" ? item : item.description ?? item.label ?? item.id;
+  const reserved = new Set();
+  const matches = descriptions.map(description => {
+    const index = source.findIndex((item, index) => !reserved.has(index) && descriptionOf(item) === description);
+    if (index >= 0) reserved.add(index);
+    return index;
+  });
+  const ids = new Set(source.map(item => item?.id).filter(Boolean));
+  return descriptions.map((description, index) => {
+    const sourceIndex = matches[index] >= 0 ? matches[index] : descriptions.length === source.length && !reserved.has(index) ? index : -1;
+    const original = source[sourceIndex];
+    if (original && typeof original === "object") return { ...original, description };
+    if (!rubric) return description;
+    let suffix = index + 1;
+    while (ids.has(`criterion_${suffix}`)) suffix += 1;
+    const id = `criterion_${suffix}`; ids.add(id);
+    return { id, description, weight: 1 };
+  });
+}
+
+function buildPromptBlocks(problem) {
+  const blocks = structuredClone(problem.promptBlocks ?? []);
+  if (!blocks.length && !problem.promptCode.trim()) return undefined;
+  if (!blocks.length) blocks.push({ type: "text", text: problem.prompt });
+  else if (problem.prompt !== problem.originalPrompt) {
+    const mirrored = blocks.filter(block => block.type === "text" && block.text === problem.originalPrompt);
+    if (mirrored.length) for (const block of mirrored) block.text = problem.prompt;
+    else blocks.unshift({ type: "text", text: problem.prompt });
+  }
+  const codeIndex = blocks.findIndex(block => block.type === "code");
+  const code = { type: "code", language: problem.promptCodeLanguage || "python", text: problem.promptCode };
+  if (codeIndex >= 0) blocks.splice(codeIndex, 1, ...(problem.promptCode.trim() ? [code] : []));
+  else if (problem.promptCode.trim()) blocks.push(code);
+  return blocks;
 }
 
 function buildPack(draft) {
   const subjectId = draft.subjectMode === "extend" ? draft.subjectId : cleanId(draft.subjectId, "SUBJECT_");
   const skillIds = draft.skills.map((skill) => draft.mode === "override" ? skill.id : cleanId(skill.id, "CUSTOM_"));
+  const references = new Map(draft.skills.map((skill, index) => [lessonReferenceId(skill), skillIds[index]]));
   const skills = draft.skills.map((skill, skillIndex) => {
     const skillId = skillIds[skillIndex];
     const classification = lessonClassification(skill, subjectId);
     return {
       id: skillId, name: skill.name, domain: draft.subjectName, subdomain: classification.branch, ...(classification.topic ? { topic: classification.topic } : {}), description: skill.description,
-      prerequisites: skill.prerequisites, unlocks: [], tags: lines(skill.tags),
+      prerequisites: skill.prerequisites.map(reference => {
+        const id = references.get(prerequisiteId(reference)) ?? prerequisiteId(reference);
+        return typeof reference === "string" ? id : { ...reference, skill_id: id, ...(reference.subject_id && references.has(prerequisiteId(reference)) ? { subject_id: subjectId } : {}) };
+      }), unlocks: [], tags: lines(skill.tags),
       mastery: {
-        passing_score: Number(skill.passingScore), minimum_confidence: Number(skill.minimumConfidence), max_guessing_allowed: "maybe",
+        passing_score: Number(skill.passingScore), minimum_confidence: Number(skill.minimumConfidence), max_guessing_allowed: skill.maxGuessingAllowed ?? "maybe",
         review_after_days_if_mastered: Number(skill.reviewMasteredDays), review_after_days_if_learning: Number(skill.reviewLearningDays),
       },
       theory: skill.theory,
@@ -371,10 +445,11 @@ function buildPack(draft) {
           : ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "code_trace_steps"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
         const work = {
           mode: problem.workMode, prompt: problem.workPrompt, minimum_steps: Number(problem.minimumSteps), line_type: problem.lineType,
-          require_final_answer_match: true,
+          require_final_answer_match: problem.workRequireFinalAnswerMatch !== false,
+          ...(problem.hasTargetVariable && problem.targetVariable ? { target_variable: problem.targetVariable } : {}),
         };
-        if (problem.workMode === "proof_obligations") work.proof_policy = { obligations: lines(problem.proofObligations), accepted_strategies: lines(problem.proofStrategies) };
-        if (problem.workMode === "rubric_check") work.rubric = { criteria: lines(problem.rubricCriteria).map((description, index) => ({ id: `criterion_${index + 1}`, description, weight: 1 })) };
+        if (problem.workMode === "proof_obligations") work.proof_policy = { obligations: editedReviewItems(problem.proofObligations, problem.sourceProofObligations), accepted_strategies: lines(problem.proofStrategies) };
+        if (problem.workMode === "rubric_check") work.rubric = { criteria: editedReviewItems(problem.rubricCriteria, problem.sourceRubricCriteria, { rubric: true }) };
         if (problem.workMode === "rational_equation_steps") {
           work.target_variable = problem.targetVariable || "x";
           work.original_equation = problem.originalEquation || problem.prompt.replace(/^.*?:\s*/, "");
@@ -405,7 +480,7 @@ function buildPack(draft) {
             display_code: problem.traceDisplayCode || problem.promptCode,
             columns,
             expected_rows: parseTraceRows(problem.traceRows, columns),
-            comparison: { trim_strings: true, numeric_equivalence: true, blank_equals_null: true },
+            comparison: { trim_strings: true, numeric_equivalence: true, blank_equals_null: true, ...problem.traceComparison },
           };
         }
         const templateId = draft.mode === "override" ? problem.templateId : cleanId(problem.templateId || `${skillId}_Q${problemIndex + 1}`, "QUESTION_");
@@ -421,7 +496,8 @@ function buildPack(draft) {
             allow_self_review: ["proof_obligations", "rubric_check"].includes(problem.workMode) ? problem.workReview === "self_review" : Boolean(problem.allowSelfReview),
           },
         };
-        if (problem.promptCode.trim()) output.prompt_blocks = [{ type: "text", text: problem.prompt }, { type: "code", language: problem.promptCodeLanguage || "python", text: problem.promptCode }];
+        const promptBlocks = buildPromptBlocks(problem);
+        if (promptBlocks) output.prompt_blocks = promptBlocks;
         if (problem.gradingMethod === "numeric_with_tolerance") output.tolerance = Number(problem.tolerance);
         if (problem.gradingMethod === "finite_set") output.answer_metadata = { type: "finite_set", variable: problem.answerVariable || "x", values: lines(problem.answerValues) };
         if (problem.gradingMethod === "rational_expression") {
@@ -439,7 +515,7 @@ function buildPack(draft) {
             runtime: "python_subset_v1",
             entrypoint: { kind: "function", name: problem.pythonEntrypoint, parameters: parsePythonParameters(problem.pythonParameters), return_type: problem.pythonReturnType },
             tests: parsePythonTests(problem.pythonTests),
-            limits: { wall_time_ms: Number(problem.pythonWallTime), step_limit: Number(problem.pythonStepLimit), memory_mb: 32, stdout_chars: Number(problem.pythonStdoutChars) },
+            limits: { wall_time_ms: Number(problem.pythonWallTime), step_limit: Number(problem.pythonStepLimit), memory_mb: Number(problem.pythonMemoryMb ?? 32), stdout_chars: Number(problem.pythonStdoutChars) },
             policy: { allowed_builtins: lines(problem.pythonBuiltins), imports: [], network: false, storage: false, clock: false, randomness: false },
           };
         }
@@ -474,14 +550,15 @@ function draftFromPack(pack, snapshot) {
     base.subjectMode = snapshot.subjects.some((subject) => subject.id === base.subjectId) ? "extend" : "create";
   }
   base.skills = (pack.skills ?? []).map((skill, skillIndex) => ({
-    ...blankSkill(skillIndex), activeProblem: 0, id: skill.id, name: skill.name, description: skill.description, subdomain: skill.subdomain ?? "Foundations", topic: skill.topic,
-    theory: skill.theory, tags: (skill.tags ?? []).join("\n"), prerequisites: (skill.prerequisites ?? []).map((ref) => typeof ref === "string" ? ref : ref.skill_id),
-    passingScore: skill.mastery?.passing_score ?? .8, minimumConfidence: skill.mastery?.minimum_confidence ?? 3,
+    ...blankSkill(skillIndex), activeProblem: 0, id: skill.id, referenceId: skill.id, name: skill.name, description: skill.description, subdomain: skill.subdomain ?? "Foundations", topic: skill.topic,
+    theory: skill.theory, tags: (skill.tags ?? []).join("\n"), prerequisites: studioPrerequisites(skill),
+    passingScore: skill.mastery?.passing_score ?? .8, minimumConfidence: skill.mastery?.minimum_confidence ?? 3, maxGuessingAllowed: skill.mastery?.max_guessing_allowed ?? "maybe",
     reviewMasteredDays: skill.mastery?.review_after_days_if_mastered ?? 7, reviewLearningDays: skill.mastery?.review_after_days_if_learning ?? 2,
     questionCount: skill.question_count ?? skill.problems?.length ?? 1,
     examples: skill.examples?.length ? skill.examples : [], applications: skill.applications?.length ? skill.applications : [],
     problems: (skill.problems ?? []).map((problem, problemIndex) => ({
       ...blankProblem(skill.id, problemIndex), templateId: problem.template_id, sourceTemplateId: problem.source_template_id ?? problem.template_id, prompt: problem.prompt,
+      originalPrompt: problem.prompt, promptBlocks: structuredClone(problem.prompt_blocks ?? []),
       promptCode: problem.prompt_blocks?.find((block) => block.type === "code")?.text ?? "", promptCodeLanguage: problem.prompt_blocks?.find((block) => block.type === "code")?.language ?? "python",
       expectedAnswer: String(problem.expected_answer ?? ""),
       answerType: problem.answer_type ?? "text", gradingMethod: problem.grading_method, variable: problem.variable ?? null, difficulty: problem.difficulty ?? "medium",
@@ -489,6 +566,8 @@ function draftFromPack(pack, snapshot) {
       acceptedForms: (problem.accepted_forms ?? []).join("\n"), solutionSteps: (problem.solution_steps ?? []).join("\n"), mistakeTags: (problem.mistake_tags ?? []).join("\n"),
       answerMode: problem.answer_mode ?? "final_only", workMode: problem.work?.mode ?? "none", workPrompt: problem.work?.prompt ?? "",
       minimumSteps: problem.work?.minimum_steps ?? 2, lineType: problem.work?.line_type ?? "expression",
+      workRequireFinalAnswerMatch: problem.work?.require_final_answer_match !== false, hasTargetVariable: Boolean(problem.work?.target_variable),
+      sourceProofObligations: structuredClone(problem.work?.proof_policy?.obligations ?? []), sourceRubricCriteria: structuredClone(problem.work?.rubric?.criteria ?? []),
       proofObligations: (problem.work?.proof_policy?.obligations ?? []).map((item) => typeof item === "string" ? item : item.description ?? item.label ?? item.id).join("\n"), proofStrategies: (problem.work?.proof_policy?.accepted_strategies ?? []).map((item) => typeof item === "string" ? item : item.name ?? item.id).join("\n"),
       rubricCriteria: (problem.work?.rubric?.criteria ?? []).map((criterion) => criterion.description).join("\n"),
       workReview: problem.review_policy?.work_review ?? "none", masteryRequiresReview: Boolean(problem.review_policy?.mastery_requires_review_pass),
@@ -504,12 +583,14 @@ function draftFromPack(pack, snapshot) {
       requireTestValues: problem.work?.sign_chart?.require_test_values !== false, requireIntervalSigns: problem.work?.sign_chart?.require_interval_signs !== false,
       requireEndpointDecisions: problem.work?.sign_chart?.require_endpoint_decisions !== false, requireFinalAnswerMatch: problem.work?.sign_chart?.require_final_answer_match !== false,
       traceDisplayCode: problem.work?.trace_spec?.display_code ?? "", traceColumns: (problem.work?.trace_spec?.columns ?? ["step", "x", "output"]).join("\n"),
-      traceRows: (problem.work?.trace_spec?.expected_rows ?? []).map((row) => (problem.work?.trace_spec?.columns ?? []).map((column) => row[column] == null ? "" : typeof row[column] === "string" ? row[column] : JSON.stringify(row[column])).join(" | ")).join("\n"),
+      traceRows: (problem.work?.trace_spec?.expected_rows ?? []).map((row) => (problem.work?.trace_spec?.columns ?? []).map((column) => row[column] == null ? "" : JSON.stringify(row[column])).join(" | ")).join("\n"),
+      traceComparison: structuredClone(problem.work?.trace_spec?.comparison ?? {}),
       pythonEntrypoint: problem.program_spec?.entrypoint?.name ?? "solve",
       pythonParameters: (problem.program_spec?.entrypoint?.parameters ?? [{ name: "value", type: "int" }]).map((parameter) => `${parameter.name} | ${parameter.type}`).join("\n"),
       pythonReturnType: problem.program_spec?.entrypoint?.return_type ?? "json",
       pythonTests: (problem.program_spec?.tests ?? []).map((test) => `${test.visibility} | ${test.id} | ${JSON.stringify(test.args)} | ${JSON.stringify(test.expected_return)}`).join("\n"),
       pythonBuiltins: (problem.program_spec?.policy?.allowed_builtins ?? []).join("\n"), pythonWallTime: problem.program_spec?.limits?.wall_time_ms ?? 1500,
+      pythonMemoryMb: problem.program_spec?.limits?.memory_mb ?? 32,
       pythonStepLimit: problem.program_spec?.limits?.step_limit ?? 20000, pythonStdoutChars: problem.program_spec?.limits?.stdout_chars ?? 1000,
     })),
   }));
@@ -632,9 +713,9 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     if (!draft.nativeSkillId || !nativeSkills.some((item) => item.id === draft.nativeSkillId)) draft.nativeSkillId = snapshot.selectedSkill?.custom ? (nativeSkills[0]?.id ?? "") : (snapshot.selectedSkill?.id ?? nativeSkills[0]?.id ?? "");
     const currentDraftSkillId = draft.mode === "override" ? skill.id : cleanId(skill.id, "CUSTOM_");
     const allSkills = [
-      ...snapshot.curriculum.allSkills.map((item) => ({ id: item.id, name: item.name, subjectId: item.subjectId, subdomain: item.subdomain })),
-      ...draft.skills.map((item) => ({ id: cleanId(item.id, "CUSTOM_"), name: item.name, subjectId: draft.subjectId, subdomain: item.subdomain })),
-    ].filter((item, index, rows) => rows.findIndex((candidate) => candidate.id === item.id) === index && item.id !== currentDraftSkillId);
+      ...draft.skills.map((item) => ({ id: draft.mode === "override" ? item.id : cleanId(item.id, "CUSTOM_"), referenceId: lessonReferenceId(item), name: item.name, subjectId: draft.subjectId, subdomain: item.subdomain })),
+      ...snapshot.curriculum.allSkills.map((item) => ({ id: item.id, referenceId: item.id, name: item.name, subjectId: item.subjectId, subdomain: item.subdomain })),
+    ].filter((item, index, rows) => rows.findIndex((candidate) => candidate.id === item.id || candidate.referenceId === item.referenceId) === index && item.id !== currentDraftSkillId);
     const validation = draft.lastValidation;
     const subjectOptions = snapshot.subjects.map((subject) => [subject.id, `${subject.icon} ${subject.name} · ${subject.skillIds.length} lessons`]);
     const branches = learningFields([{ id: draft.subjectId }], [...snapshot.curriculum.allSkills, ...draft.skills.map((item) => ({ ...item, subjectId: draft.subjectId }))])[0].branches;
@@ -669,7 +750,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
             ${area("Tags, one per line", "skill.tags", skill.tags, { rows: 2 })}
             ${area("What will learners master?", "skill.description", skill.description, { rows: 3 })}
             ${area("Lesson theory", "skill.theory", skill.theory, { rows: 9, help: "Plain text only. Blank lines make paragraphs; lines beginning with - make lists." })}
-            <label class="studio-field"><span>Prerequisite bridges ${helpButton("Choose lessons from any installed field or from this draft. In Hard path they lock this test; in Open path they are guidance.")}</span><select data-creator-prerequisites multiple size="${Math.min(8, Math.max(4, allSkills.length))}">${allSkills.map((item) => `<option value="${esc(item.id)}" ${skill.prerequisites.includes(item.id) ? "selected" : ""}>${esc(snapshot.subjects.find((subject) => subject.id === item.subjectId)?.name ?? "This set")} › ${esc(item.subdomain || "Foundations")} › ${esc(item.name)}</option>`).join("")}</select><small>Ctrl/Cmd-click to choose more than one.</small></label>
+            <label class="studio-field"><span>Prerequisite bridges ${helpButton("Choose lessons from any installed field or from this draft. In Hard path they lock this test; in Open path they are guidance.")}</span><select data-creator-prerequisites multiple size="${Math.min(8, Math.max(4, allSkills.length))}">${allSkills.map((item) => `<option value="${esc(item.referenceId)}" ${skill.prerequisites.some(reference => prerequisiteId(reference) === item.referenceId) ? "selected" : ""}>${esc(snapshot.subjects.find((subject) => subject.id === item.subjectId)?.name ?? "This set")} › ${esc(item.subdomain || "Foundations")} › ${esc(item.name)}</option>`).join("")}</select><small>Ctrl/Cmd-click to choose more than one.</small></label>
             <details class="studio-advanced"><summary>Mastery and review timing</summary><div class="studio-four">${field("Passing score", "skill.passingScore", skill.passingScore, { type: "number", min: .5, max: 1, step: .05 })}${field("Minimum confidence", "skill.minimumConfidence", skill.minimumConfidence, { type: "number", min: 1, max: 5 })}${field("Review if mastered", "skill.reviewMasteredDays", skill.reviewMasteredDays, { type: "number", min: 1, max: 365 })}${field("Review if learning", "skill.reviewLearningDays", skill.reviewLearningDays, { type: "number", min: 1, max: 365 })}</div></details>
           </section>
           <section class="studio-card">
@@ -708,7 +789,8 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
 
   const handleInput = (target) => {
     if (target.matches("[data-creator-prerequisites]")) {
-      currentSkill().prerequisites = [...target.selectedOptions].map((option) => option.value); draft.lastValidation = null; save(); return false;
+      const previous = currentSkill().prerequisites;
+      currentSkill().prerequisites = [...target.selectedOptions].map((option) => previous.find(reference => prerequisiteId(reference) === option.value) ?? option.value); draft.lastValidation = null; save(); return false;
     }
     const path = target.dataset.creatorField;
     if (!path) return false;
@@ -731,13 +813,13 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     if (action === "open-tutorial") draft.tutorialOpen = true;
     if (action === "select-skill") draft.activeSkill = index;
     if (action === "add-skill") {
-      const ids = new Set([...draft.skills.map((item) => cleanId(item.id, "CUSTOM_")), ...getSnapshot().curriculum.allSkills.map((item) => item.id)]);
+      const ids = new Set([...draft.skills.flatMap((item) => [cleanId(item.id, "CUSTOM_"), lessonReferenceId(item)]), ...getSnapshot().curriculum.allSkills.map((item) => item.id)]);
       draft.skills.push({ ...unusedItem(blankSkill, ids, draft.skills.length), subdomain: currentSkill().subdomain }); draft.activeSkill = draft.skills.length - 1;
     }
     if (action === "remove-skill" && draft.skills.length > 1 && confirm("Remove this lesson and its prerequisite links from the studio draft?")) {
-      const removedId = cleanId(skill.id, "CUSTOM_");
+      const removedId = lessonReferenceId(skill);
       draft.skills.splice(draft.activeSkill, 1);
-      for (const item of draft.skills) item.prerequisites = item.prerequisites.filter((id) => id !== removedId);
+      for (const item of draft.skills) item.prerequisites = item.prerequisites.filter((reference) => prerequisiteId(reference) !== removedId);
       draft.activeSkill = Math.max(0, draft.activeSkill - 1);
     }
     if (action === "select-problem") skill.activeProblem = index;
