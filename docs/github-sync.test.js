@@ -252,7 +252,7 @@ test("a history-only agent update settles without asking the user to save zero c
   assert.equal((await learner.pullNow()).updated, false);
 });
 
-test("automatic empty merges keep local work intact if a remote revision changes during the write", async () => {
+test("a raced automatic empty merge opens a fresh review of the concurrent changes", async () => {
   const { github, learner, learnerState } = await mergeFixture();
   learnerState.mutate({ activity: [{ at: "a", tool: "read_lesson" }] });
   const original = learnerState.serialize();
@@ -262,9 +262,47 @@ test("automatic empty merges keep local work intact if a remote revision changes
     await write(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: JSON.stringify({ ...learnerState.read(), note: "Concurrent note" }), deviceId: "other-device" }), { sha: latest.sha });
     return write(...args);
   };
-  await assert.rejects(learner.prepareMerge(), /changed during review/);
+  const review = await learner.prepareMerge();
+  assert.equal(review.resolved, undefined);
+  assert.ok(review.rows.some((row) => row.remote === "Concurrent note"));
   assert.equal(learnerState.serialize(), original);
   assert.equal(parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content).stateJson.includes("Concurrent note"), true);
+});
+
+test("repeated races while preparing an empty merge stop after bounded retries", async () => {
+  const { github, learner, learnerState } = await mergeFixture();
+  learnerState.mutate({ activity: [{ at: "a", tool: "read_lesson" }] });
+  const original = learnerState.serialize();
+  const write = github.writeFile;
+  let races = 0;
+  github.writeFile = async (...args) => {
+    races += 1;
+    const latest = github.files.get(LEARNER_STATE_PATH);
+    const changedHistory = { ...learnerState.read(), activity: [{ at: String(races), tool: "read_map" }] };
+    await write(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: JSON.stringify(changedHistory), deviceId: `other-${races}` }), { sha: latest.sha });
+    return write(...args);
+  };
+  await assert.rejects(learner.prepareMerge(), (error) => error.details?.reason === "stale_review");
+  assert.equal(races, 3);
+  assert.equal(learnerState.serialize(), original);
+});
+
+test("branch revision reads bypass HTTP caches after a checkpoint write", async () => {
+  const old = { type: "file", sha: "old", encoding: "base64", content: Buffer.from("old checkpoint").toString("base64") };
+  let current = old;
+  const client = createGitHubContentsClient({ fetchImpl: async (_url, options) => {
+    if (options.method === "PUT") {
+      current = { ...old, sha: "new", content: JSON.parse(options.body).content };
+      return new Response(JSON.stringify({ content: { sha: current.sha } }));
+    }
+    // A cacheable branch GET can outlive the PUT, whose URL has no ref query.
+    return new Response(JSON.stringify(options.cache === "no-store" ? current : old));
+  } });
+  const before = await client.readFile(connection(), LEARNER_STATE_PATH);
+  await client.writeFile(connection(), LEARNER_STATE_PATH, "new checkpoint", { sha: before.sha });
+  const after = await client.readFile(connection(), LEARNER_STATE_PATH);
+  assert.equal(after.sha, "new");
+  assert.equal(after.content, "new checkpoint");
 });
 
 test("edits on the phone during a merge require a fresh comparison", async () => {

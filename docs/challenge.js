@@ -1,6 +1,6 @@
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-merge-v5";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-merge-v6";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-merge-v5";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-merge-v6";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260905-publisher-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
@@ -17,7 +17,7 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-merge-v5";
+} from "./github-sync.js?v=20260906-merge-v6";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -95,7 +95,9 @@ let githubSync;
 let githubCredentials;
 let githubSyncSnapshot = { phase: "disconnected", connected: false, dirty: false, remoteAvailable: false, config: null, error: null, conflict: null };
 let bridgeNeedsChoice = false;
-let learnerConflictRecovery = null;
+let bridgeReviewPromise = null;
+let bridgeReviewChannel = "learner";
+let bridgeReviewError = null;
 let bridgeChoiceDetails = null;
 let activeBridgeDecision = null;
 let bridgeFormDraft = null;
@@ -230,33 +232,72 @@ function closeBridgeSourceChoice() {
 }
 
 function openBridgeSourceChoice({ force = false } = {}) {
-  if (!bridgeNeedsChoice || !bridgeChoiceDetails) return;
-  if (activeBridgeDecision && !force) return;
-  closeBridgeSourceChoice();
+  if (!bridgeNeedsChoice) return;
+  if (activeBridgeDecision) {
+    if (force) activeBridgeDecision.backdrop.querySelector('[role="dialog"]').focus({ preventScroll: true });
+    return activeBridgeDecision;
+  }
   activeAppConfirmation?.cancel();
-  const review = bridgeChoiceDetails;
   const dialog = openWorkspaceMerge({
-    review,
+    review: bridgeChoiceDetails,
     onApply: resolveBridgeSourceChoice,
-    onRefresh: () => setBridgeSourceChoice(null, review.channel),
+    onRefresh: () => setBridgeSourceChoice(null, bridgeReviewChannel),
     onClose: () => { if (activeBridgeDecision === dialog) activeBridgeDecision = null; },
   });
   activeBridgeDecision = dialog;
+  if (bridgeReviewError) dialog.showError(bridgeReviewError);
+  return dialog;
 }
 
-async function setBridgeSourceChoice(_remote, kind = "learner") {
-  githubSync.stop();
-  bridgeChoiceDetails = await githubSync.prepareMerge({ channel: kind === "agent" ? "agent" : "learner" });
-  if (bridgeChoiceDetails.resolved) {
-    bridgeNeedsChoice = false;
-    bridgeChoiceDetails = null;
-    closeBridgeSourceChoice();
-    githubSync.start();
-    showToast("Workspace is up to date. No changes need a choice.");
-    return;
+function setBridgeSourceChoice(_remote, kind = "learner", { recover = false } = {}) {
+  if (bridgeReviewPromise) {
+    openBridgeSourceChoice({ force: true });
+    return bridgeReviewPromise;
   }
+  githubSync.stop();
+  bridgeReviewChannel = kind === "agent" ? "agent" : "learner";
+  bridgeChoiceDetails = null;
+  bridgeReviewError = null;
   bridgeNeedsChoice = true;
-  openBridgeSourceChoice({ force: true });
+  // Open before any reads or automatic history merge. Failures and retries stay
+  // in this same window; closing it leaves Compare versions available.
+  openBridgeSourceChoice({ force: true }).showLoading();
+  const renderBridge = () => { if (store.snapshot().ui.route === "settings") renderSettings(store.snapshot()); };
+  renderBridge();
+  bridgeReviewPromise = (async () => {
+    let review;
+    if (recover && bridgeReviewChannel === "learner") {
+      try {
+        await githubSync.syncLearnerNow();
+        await githubSync.pullNow();
+        review = { resolved: true };
+      } catch (error) {
+        if (error.code !== "conflict") throw error;
+        bridgeReviewChannel = error.details?.channel === "agent" ? "agent" : "learner";
+      }
+    }
+    review ??= await githubSync.prepareMerge({ channel: bridgeReviewChannel });
+    if (!githubSync.snapshot().connected) return;
+    if (review.resolved) {
+      bridgeNeedsChoice = false;
+      closeBridgeSourceChoice();
+      githubSync.start();
+      showToast("Workspace is up to date. No changes need a choice.");
+    } else {
+      bridgeChoiceDetails = review;
+      bridgeReviewChannel = review.channel;
+      // Respect Not now while loading; the ready review can be reopened later.
+      activeBridgeDecision?.setReview(review);
+    }
+  })().catch((error) => {
+    bridgeReviewError = error;
+    activeBridgeDecision?.showError(error);
+    if (!activeBridgeDecision) showToast(error instanceof Error ? error.message : String(error));
+  }).finally(() => {
+    bridgeReviewPromise = null;
+    renderBridge();
+  });
+  return bridgeReviewPromise;
 }
 
 function agentHandoffMarkup(snapshot, { compact = false } = {}) {
@@ -1835,7 +1876,7 @@ function renderGitHubBridge(snapshot) {
     <section class="content-card github-bridge-card" id="github-bridge">
       <div class="bridge-card-heading"><div><p class="eyebrow">Workspace Storage · experimental</p><h2>${escapeHtml(repository)}</h2><p>The complete browser workspace is checkpointed after a short pause. Agent updates include when work began. If you made changes too, review and merge the versions before syncing.</p></div><span class="sync-phase ${phaseClass}"><i></i>${escapeHtml(bridgePhaseLabel(status))}</span></div>
       ${status.error ? `<aside class="bridge-warning"><strong>${status.phase === "conflict" ? "Sync conflict" : "Bridge paused"}</strong><p>${escapeHtml(status.error)}</p></aside>` : ""}
-      ${bridgeNeedsChoice ? `<aside class="bridge-choice"><div><strong>A workspace decision is waiting.</strong><p>${choice?.kind === "migration" ? "This is a first-time migration between independent browser and GitHub work." : "This device has unsynced work that needs a quick comparison with GitHub."}${choice ? ` Last GitHub writer: ${escapeHtml(choice.remoteLabel)}.` : ""}</p></div><button class="button button-primary" data-action="bridge-review-choice">Compare versions</button></aside>` : ""}
+      ${bridgeNeedsChoice || status.conflict ? `<aside class="bridge-choice"><div><strong>A workspace decision is waiting.</strong><p>${bridgeReviewPromise ? "Loading the latest copies for comparison." : bridgeReviewError ? "The comparison could not finish. Open it to retry." : "Review the changes from this device and GitHub."}${choice ? ` Last GitHub writer: ${escapeHtml(choice.remoteLabel)}.` : ""}</p></div><button class="button button-primary" data-action="bridge-review-choice">Compare versions</button></aside>` : ""}
       <div class="bridge-status-grid">
         <article><span>Local state</span><strong>${status.dirty ? "Pending checkpoint" : "Checkpointed"}</strong><small>${escapeHtml(status.deviceLabel ?? bridgeDeviceLabel())}</small></article>
         <article><span>Last workspace push</span><strong>${status.lastPushedAt ? escapeHtml(formatDate(status.lastPushedAt)) : "This session: not yet"}</strong><small>${escapeHtml(status.config.branch)}</small></article>
@@ -2308,33 +2349,9 @@ async function prepareLearnerBridge({ resumed = false } = {}) {
 }
 
 function recoverEstablishedLearnerConflict() {
-  if (learnerConflictRecovery || bridgeNeedsChoice || !githubSyncSnapshot.connected) return learnerConflictRecovery;
+  if (bridgeReviewPromise || bridgeNeedsChoice || !githubSyncSnapshot.connected) return bridgeReviewPromise;
   const channel = githubSyncSnapshot.conflictDetails?.channel ?? "learner";
-  githubSync.stop();
-  learnerConflictRecovery = (async () => {
-    // A clean canonical update can still be accepted without a merge. The
-    // controller rechecks local edits after the network read before applying it.
-    if (channel === "learner") {
-      try {
-        await githubSync.syncLearnerNow();
-        try { await githubSync.pullNow(); }
-        catch (error) {
-          if (error.code !== "conflict") throw error;
-          await setBridgeSourceChoice(null, error.details?.channel);
-          return;
-        }
-        githubSync.start();
-        return;
-      } catch (error) {
-        if (error.code !== "conflict") throw error;
-      }
-    }
-    await setBridgeSourceChoice(null, channel);
-    if (bridgeNeedsChoice) showToast("Sync paused. Choose which changes to keep.");
-  })().catch((error) => {
-    showToast(error instanceof Error ? error.message : String(error));
-  }).finally(() => { learnerConflictRecovery = null; });
-  return learnerConflictRecovery;
+  return setBridgeSourceChoice(null, channel, { recover: true });
 }
 
 async function resolveBridgeSourceChoice(selection) {
@@ -2402,7 +2419,10 @@ async function bridgeAction(action) {
       const result = await githubSync.pullNow();
       showToast(result.updated ? "Agent changes applied." : "No new agent changes.");
     }
-    if (action === "bridge-review-choice") openBridgeSourceChoice({ force: true });
+    if (action === "bridge-review-choice") {
+      if (bridgeNeedsChoice) openBridgeSourceChoice({ force: true });
+      else await setBridgeSourceChoice(null, githubSync.snapshot().conflictDetails?.channel);
+    }
     if (["bridge-load-remote", "bridge-replace-remote"].includes(action)) await setBridgeSourceChoice(null, "learner");
     if (action === "bridge-disconnect") {
       githubSync.disconnect();
@@ -3392,7 +3412,7 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260906-merge-v5").catch(() => null),
+      fetch("./agent-manifest.json?v=20260906-merge-v6").catch(() => null),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
       fetch("./STUDENT_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
       fetch("./EDUCATOR_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),

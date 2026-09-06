@@ -1,4 +1,4 @@
-import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v5";
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v6";
 
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;
@@ -244,7 +244,10 @@ export function createGitHubContentsClient({ fetchImpl = globalThis.fetch, apiBa
     const config = normalizeGitHubSyncConfig(candidate);
     const url = `${contentsUrl(config, path)}?ref=${encodeURIComponent(config.branch)}`;
     let response;
-    try { response = await fetchImpl(url, { headers: apiHeaders(config.token) }); }
+    // This URL follows a moving branch. A cached GET can still contain the old
+    // SHA after a successful PUT (which uses a different URL without ?ref=).
+    // Immutable blobs remain cacheable, but revision checks must reach GitHub.
+    try { response = await fetchImpl(url, { headers: apiHeaders(config.token), cache: "no-store" }); }
     catch (error) {
       throw new GitHubSyncError("Could not reach GitHub while loading bridge state.", { code: "network_error", details: String(error) });
     }
@@ -943,7 +946,8 @@ export function createGitHubSyncController({
     // A review may first encounter a harmless canonical checkpoint before the
     // actual agent response. Settle reviews with no choices and continue, using
     // the same race checks and conditional writes as a user-selected merge.
-    for (let pass = 0; pass < 3; pass += 1) {
+    let staleRetries = 0;
+    for (let pass = 0; pass < 6; pass += 1) {
       const learner = await readChannel("learner");
       if (learner.exists && sameWorkspace(serializeState(), learner.envelope.stateJson)) rememberMatchingLearner(learner);
       const agent = await readChannel("agent");
@@ -964,7 +968,13 @@ export function createGitHubSyncController({
         update({ phase: "reviewing", error: null, conflict: null });
         return { id, channel, rows: plan.rows, hasBase: plan.hasBase, remoteLabel: remote.envelope.actorLabel, taskStartedAt: remote.envelope.taskStartedAt, remoteUpdatedAt: remote.envelope.updatedAt };
       }
-      await applyPreparedMerge({ reviewId: id });
+      try { await applyPreparedMerge({ reviewId: id }); }
+      catch (error) {
+        // No choices have been shown yet. Rebuild from fresh revisions if an
+        // automatic history-only merge raced with another write or local edit.
+        if (error.details?.reason === "stale_review" && staleRetries++ < 2) continue;
+        throw error;
+      }
       if (channel === "learner" && agent.exists && agent.sha !== agentSha) { channel = "agent"; continue; }
       return { resolved: true, rows: [], channel };
     }
@@ -974,7 +984,7 @@ export function createGitHubSyncController({
   const applyPreparedMerge = async ({ reviewId, choices = {} } = {}) => {
     const review = pendingReview;
     if (!review || review.id !== reviewId) throw new GitHubSyncConflictError("This comparison has expired. Refresh the comparison.", { channel: review?.channel ?? "learner" });
-    const changed = () => new GitHubSyncConflictError("The workspace changed during review. Refresh the comparison before saving.", { channel: review.channel });
+    const changed = () => new GitHubSyncConflictError("The workspace changed during review. Refresh the comparison before saving.", { channel: review.channel, reason: "stale_review" });
     const learner = await readChannel("learner");
     const agent = await readChannel("agent");
     if (learner.sha !== review.learner.sha || agent.sha !== review.agent.sha || !sameWorkspace(serializeState(), review.localJson)) throw changed();
