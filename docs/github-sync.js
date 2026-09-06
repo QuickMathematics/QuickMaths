@@ -1,4 +1,4 @@
-import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v3";
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v4";
 
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;
@@ -964,7 +964,13 @@ export function createGitHubSyncController({
     const agent = await readChannel("agent");
     if (learner.sha !== review.learner.sha || agent.sha !== review.agent.sha || !sameWorkspace(serializeState(), review.localJson)) throw changed();
     const merged = preserveDeviceState(review.plan.resolve(choices), serializeState(), review.remote.envelope.stateJson);
-    if (validateMergeState) await validateMergeState(merged);
+    if (validateMergeState) {
+      try { await validateMergeState(merged); }
+      catch (error) {
+        if (error.code === "merge_dependency") throw new GitHubSyncConflictError(error.message, { channel: review.channel, reason: "dependencies" });
+        throw error;
+      }
+    }
     if (!sameWorkspace(serializeState(), review.localJson)) throw changed();
     const acknowledged = review.channel === "agent" ? agent.sha : learner.envelope?.appliedAgentSha ?? agentSha;
     const envelope = createBridgeEnvelope({ channel: "learner", stateJson: merged, deviceId: resolvedDeviceId, deviceLabel: resolvedDeviceLabel, appliedAgentSha: acknowledged, now });

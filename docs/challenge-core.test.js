@@ -77,6 +77,61 @@ test("merge validation catches removed lesson dependencies before importing any 
   assert.throws(() => store.validateSyncMerge(JSON.stringify(candidate)), /related saved work/);
 });
 
+test("merge validation preserves feedback on unfinished tests, including another profile's draft", () => {
+  const { store } = harness();
+  store.createProfile("Draft learner");
+  store.startTest("MATH_ARITH_001");
+  const question = store.snapshot().activeTest.problems[0];
+  store.updateResponse(question.template_id, { finalAnswer: "1", work: "My working so far" });
+  store.recordTutorFeedback({ questionId: question.template_id, verdict: "partial", feedback: "Check this step.", nextStep: "Try the calculation again." });
+  store.createProfile("Map learner");
+  const before = store.exportSyncState();
+  const candidate = JSON.parse(before);
+  assert.equal(candidate.reviews[0].attemptId, null);
+  assert.ok(candidate.reviews[0].draftId);
+  assert.equal(store.validateSyncMerge(before).ok, true);
+  assert.equal(store.exportSyncState(), before);
+
+  delete candidate.drafts[candidate.reviews[0].profileId];
+  assert.throws(() => store.validateSyncMerge(JSON.stringify(candidate)), (error) => error.code === "merge_dependency" && /Draft learner.*unfinished test/.test(error.message));
+  assert.equal(store.exportSyncState(), before);
+});
+
+test("completed feedback requires its saved attempt and no longer requires the original draft", () => {
+  const { store } = harness();
+  store.createProfile("Reviewed learner");
+  store.startTest("MATH_ARITH_001");
+  const draft = store.snapshot().activeTest;
+  for (const question of draft.problems) store.updateResponse(question.template_id, { finalAnswer: String(question.expected_answer), work: "Checked each step." });
+  store.recordTutorFeedback({ questionId: draft.problems[0].template_id, verdict: "pass", feedback: "The reasoning is sound.", nextStep: "Continue practising." });
+  assert.equal(store.submitTest().ok, true);
+  const attempt = store.saveReflection({ confidenceRating: 4, guessed: "no" });
+  const candidate = JSON.parse(store.exportSyncState());
+  assert.equal(candidate.reviews[0].attemptId, attempt.attemptId);
+  assert.ok(candidate.reviews[0].draftId);
+  assert.deepEqual(candidate.drafts[candidate.profiles[0].id], {});
+  assert.equal(store.validateSyncMerge(JSON.stringify(candidate)).ok, true);
+  candidate.attempts = [];
+  // The historical draft ID must not make feedback pass after its actual saved
+  // attempt was removed, even if an unrelated draft happens to use that ID.
+  candidate.drafts[candidate.profiles[0].id].MATH_ARITH_001 = draft;
+  assert.throws(() => store.validateSyncMerge(JSON.stringify(candidate)), /Reviewed learner.*saved test attempt/);
+});
+
+test("feedback cannot borrow another profile's draft to satisfy a missing dependency", () => {
+  const { store } = harness();
+  store.createProfile("First learner");
+  store.startTest("MATH_ARITH_001");
+  store.recordTutorFeedback({ questionId: store.snapshot().activeTest.problems[0].template_id, feedback: "Check this step.", nextStep: "Try again." });
+  store.createProfile("Second learner");
+  const candidate = JSON.parse(store.exportSyncState());
+  const review = candidate.reviews[0];
+  const other = candidate.profiles.find((profile) => profile.id !== review.profileId);
+  candidate.drafts[other.id] = candidate.drafts[review.profileId];
+  delete candidate.drafts[review.profileId];
+  assert.throws(() => store.validateSyncMerge(JSON.stringify(candidate)), /First learner.*unfinished test/);
+});
+
 function biologyLessonSet() {
   const pack = JSON.parse(lessonSetExample);
   pack.id = "PACK_CELL_BIOLOGY";

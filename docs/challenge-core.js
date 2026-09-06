@@ -4437,7 +4437,11 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   const validateSyncMerge = (raw) => {
     const { candidate, imported } = parseBackup(raw);
-    const fail = () => { throw new Error("These choices would remove related saved work. Keep its profile, curriculum and lesson set too, or remove that work in the comparison."); };
+    const fail = (detail = "Keep its profile, curriculum and lesson set too, or remove that work in the comparison.") => {
+      const error = new Error(`These choices would remove related saved work. ${detail}`);
+      error.code = "merge_dependency";
+      throw error;
+    };
     const checkPlan = (plan, next) => {
       if (!plan) return;
       for (const [layout, positions] of Object.entries(plan.layouts ?? {})) {
@@ -4469,8 +4473,19 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       if ((item.ownerProfileId && next.ownerProfileId !== item.ownerProfileId) || (item.enabledPackIds ?? []).some((id) => !next.enabledPackIds.includes(id))) fail();
       checkPlan(item.mapPlan, next.mapPlan);
     }
-    const attempts = new Set(imported.attempts.map((item) => item.attemptId));
-    if (imported.reviews.some((review) => !attempts.has(review.attemptId))) fail();
+    for (const review of imported.reviews) {
+      // Feedback can be saved while a test is still in progress. saveReflection
+      // attaches it to a completed attempt later, retaining the original draftId.
+      // Check the current target, not both references or a mandatory attemptId.
+      const retained = review.attemptId
+        ? imported.attempts.some((attempt) => attempt.attemptId === review.attemptId && attempt.profileId === review.profileId)
+        : review.draftId && Object.values(imported.drafts[review.profileId] ?? {}).some((draft) => draft.draftId === review.draftId);
+      if (!retained) {
+        const profile = imported.profiles.find((item) => item.id === review.profileId);
+        const target = review.attemptId ? "saved test attempt" : "unfinished test";
+        fail(`Feedback for “${profile?.displayName || "this learner"}” needs its ${target}. Keep that test too, or uncheck the feedback in the comparison.`);
+      }
+    }
     return { ok: true };
   };
 

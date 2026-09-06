@@ -93,13 +93,14 @@ function stateHarness(name) {
   };
 }
 
-function controller({ role, client, harness, credentialStore = credentials(), date = "2026-09-01T12:00:00.000Z", deviceId = `${role}-device`, deviceLabel = null }) {
+function controller({ role, client, harness, credentialStore = credentials(), date = "2026-09-01T12:00:00.000Z", deviceId = `${role}-device`, deviceLabel = null, validateMergeState = null }) {
   return createGitHubSyncController({
     role,
     client,
     credentialStore,
     serializeState: harness.serialize,
     applyState: harness.apply,
+    validateMergeState,
     subscribeToState: harness.subscribe,
     now: () => new Date(date),
     deviceId,
@@ -329,6 +330,25 @@ test("a failed merge write leaves the complete local workspace unchanged", async
   github.writeFile = async () => { throw new Error("Offline"); };
   await assert.rejects(learner.applyMerge({ reviewId: review.id }), /Offline/);
   assert.equal(learnerState.serialize(), local);
+});
+
+test("invalid dependency choices stay reviewable and are not reported as a connection failure", async () => {
+  const { github, learnerState, agent, agentState } = await mergeFixture();
+  agentState.mutate({ note: "New note" });
+  await agent.pushNow();
+  const learner = controller({ role: "learner", client: github, harness: learnerState,
+    validateMergeState: () => { throw Object.assign(new Error("Feedback needs its unfinished test."), { code: "merge_dependency" }); },
+  });
+  await learner.connect(connection(), { startPolling: false });
+  const before = learnerState.serialize();
+  const sha = github.files.get(LEARNER_STATE_PATH).sha;
+  const review = await learner.prepareMerge({ channel: "agent" });
+  await assert.rejects(learner.applyMerge({ reviewId: review.id }), /unfinished test/);
+  assert.equal(learner.snapshot().phase, "conflict");
+  assert.equal(learner.snapshot().conflictDetails.reason, "dependencies");
+  assert.equal(learnerState.serialize(), before);
+  assert.equal(github.files.get(LEARNER_STATE_PATH).sha, sha);
+  assert.equal((await learner.prepareMerge({ channel: "agent" })).rows.length, review.rows.length);
 });
 
 test("edits during a merge write survive and the saved remote result can be reviewed again", async () => {

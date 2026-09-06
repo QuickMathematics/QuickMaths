@@ -1,4 +1,4 @@
-import { GitHubSyncConflictError, GitHubSyncError } from "./github-sync.js?v=20260906-merge-v3";
+import { GitHubSyncConflictError, GitHubSyncError } from "./github-sync.js?v=20260906-merge-v4";
 
 const API_BASE = "/__quickmaths_bridge__";
 const CAPABILITY_KEY = "quickmaths.local-git.capability.v1";
