@@ -4,9 +4,9 @@ Attach files in **Lesson Studio**, or place them beside a `lesson-set.yaml`, `le
 
 Try the [ready-to-import geometry example](lesson-media-example.json), or inspect its [YAML source](examples/geometry-media/lesson-set.yaml) and [built folder manifest](examples/geometry-media/lesson-set.json).
 
-The native Mathematics → Geometry branch includes **Triangle area: base and perpendicular height** (`MATH_GEOM_004`), with eight worked examples and 21 assessment scenarios. It unlocks after multiplying/dividing fractions and decimals/percents/conversions. No import is needed. All ten native Geometry lessons include Matplotlib illustrations, embedded in the curriculum for offline use.
+The native Mathematics → Geometry branch includes **Triangle area: base and perpendicular height** (`MATH_GEOM_004`), with eight worked examples and 21 assessment scenarios. It unlocks after multiplying/dividing fractions and decimals/percents/conversions. No import is needed. All sixteen native Geometry lessons include Matplotlib illustrations, embedded in the curriculum for offline use.
 
-Native coordinate and line mastery tests also draw a graph for each question. Relevant bearing, arc and spherical-coordinate questions include diagrams too. These app-drawn figures use the question's displayed givens, including the original values in restored drafts and saved results. They need no plotting download or Python runtime. Illustrated worked examples open automatically; **View illustrated lesson** on a test returns to the lesson without discarding the test draft. Custom questions use their authored `media` attachments.
+Native coordinate and line mastery tests also draw a graph for each question. Relevant bearing, arc, spherical-coordinate, triangle-area and trigonometry questions include diagrams too. These app-drawn figures use the question's displayed givens, including the original values in restored drafts and saved results. They need no plotting download or Python runtime. Illustrated worked examples open automatically; **View illustrated lesson** on a test returns to the lesson without discarding the test draft. Custom questions use their authored `media` attachments.
 
 To rebuild the native figures and their embedded assets from the repository root:
 
@@ -16,6 +16,10 @@ python scripts/export_web_curriculum.py
 ```
 
 The figure builder also accepts `--preview-dir tmp/geometry-previews` to save PNG previews. Diagrams in generated assessments use fixed dimensions so the image and question always agree.
+
+All 107 shipped lesson pages have teaching figures. The app also supplies a library of 109 Matplotlib SVGs for known Math, Programming, Geography and Estimation lessons, matching their ID and teaching content. This adds illustrations to already installed packs without rewriting them or changing learner progress. Native overrides keep their own media. These additional figures load from the published site as they approach the viewport; they require their hosting files to remain available and are not guaranteed offline.
+
+Studio copies of matching lessons include the figures as ordinary hosted assets. Existing embedded media remains embedded, another publisher's media base is preserved, and figures already present are not duplicated. Normal section and pack limits still apply. Maintainers can rebuild the library with `python -m scripts.build_lesson_illustrations` and review the [coverage report](ILLUSTRATION_AUDIT.md).
 
 ## Folder layout and references
 

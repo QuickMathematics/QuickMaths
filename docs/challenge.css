@@ -467,6 +467,9 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .question-diagram .diagram-sphere-line { stroke: var(--muted); stroke-width: 1.6; }
 .question-diagram .diagram-axis, .question-diagram .diagram-circle { stroke: var(--muted); stroke-width: 1.8; fill: none; }
 .question-diagram .diagram-line { stroke: var(--pine); stroke-width: 3; }
+.question-diagram .diagram-guide { stroke: var(--coral); stroke-width: 3; stroke-dasharray: 8 5; fill: none; }
+.question-diagram .diagram-shape { stroke: var(--pine); stroke-width: 3; fill: #d8ebe3; }
+.question-diagram .diagram-cutout { stroke: var(--coral); stroke-width: 2; fill: #f4d8ce; }
 .question-diagram .diagram-point { fill: var(--pine); }
 .question-diagram .diagram-accent { stroke: var(--coral); stroke-width: 3; fill: none; }
 .question-diagram .diagram-leader { stroke: var(--muted); stroke-width: 1.3; stroke-dasharray: 4 5; }
@@ -1740,6 +1743,9 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:ha
 
 
 .lesson-media { width: 100%; margin: 1.25rem auto; }
+.lesson-illustrations { margin: 2rem 0; }
+.lesson-illustration-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr)); gap: 1.25rem; }
+.lesson-illustration-grid .lesson-media { align-self: start; max-width: 860px; margin: 0 auto; }
 .lesson-media-content { width: 100%; overflow: hidden; border-radius: 12px; background: var(--paper-light, #fffdf8); }
 .lesson-media-content > img, .lesson-media-content > video { display: block; max-width: 100%; height: auto; margin: auto; }
 .lesson-media-content[style] > img, .lesson-media-content[style] > video { width: 100%; height: 100%; }

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { createQuickMathsStore, gradeProblem, STORAGE_KEY } from "./challenge-core.js";
 import { createLessonStudio } from "./lesson-creator.js";
 import { loadLessonAsset } from "./lesson-media.js";
+import { lessonIllustrations } from "./lesson-illustrations.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url)));
 const geometry = curriculum.skills.filter(skill => skill.subdomain === "Geometry");
@@ -80,7 +81,8 @@ test("native geometry improvements retain exactly their media through Studio, in
   for (const skill of geometry) {
     studio.loadNativeLesson(skill.id, { announce: false });
     const pack = studio.buildPack();
-    assert.deepEqual(new Set(pack.assets.map(asset => asset.path)), new Set(mediaIn(skill).map(item => item.src)));
+    const expected = [...mediaIn(skill), ...(lessonIllustrations(skill)?.media ?? [])];
+    assert.deepEqual(new Set(pack.assets.map(asset => asset.path)), new Set(expected.map(item => item.src)));
     assert.equal(store.previewLessonPack(pack).mode, "override");
     store.importLessonPack(pack);
     const restored = storeFor();

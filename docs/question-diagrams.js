@@ -1,6 +1,7 @@
 // Native assessment illustrations are reconstructed from the displayed givens.
 // Never read answer keys or hidden generator values: the same saved prompt must
 // produce the same picture, including for drafts created before this feature.
+import { extendedQuestionDiagram, renderExtendedDrawing } from "./trigonometry-diagrams.js?v=20260906-illustrations-v1";
 const NUMBER = "-?\\d+(?:\\.\\d+)?";
 const esc = value => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const n = value => Math.abs(value) < 1e-9 ? "0" : String(Number(value.toPrecision(6)));
@@ -98,6 +99,8 @@ function geometryQuestion(skillId, id, text) {
 }
 
 export function questionDiagram(problem, skillId = problem?.skill_id) {
+  const extended = extendedQuestionDiagram(problem, skillId);
+  if (extended) return extended;
   if (problem?.media?.length || !/^MATH_(?:GRAPH_00[1-6]|GEOM_00[1-3])$/.test(skillId ?? "")) return null;
   const id = String(problem.source_template_id ?? problem.template_id ?? problem.questionId ?? "").split("__")[0];
   const prefixes = {
@@ -233,7 +236,9 @@ function plotSphere(spec) {
 export function renderQuestionDiagram(problem, skillId) {
   const spec = questionDiagram(problem, skillId);
   if (!spec) return "";
-  const drawing = { graph: plotGraph, compass: plotCompass, arc: plotArc, sphere: plotSphere }[spec.kind](spec);
+  const renderer = { graph: plotGraph, compass: plotCompass, arc: plotArc, sphere: plotSphere }[spec.kind];
+  const drawing = renderer ? renderer(spec) : renderExtendedDrawing(spec);
+  if (!drawing) return "";
   const description = spec.kind === "graph" && spec.points.length ? `Marked points: ${spec.points.map(pair).join(" and ")}. ${spec.caption}` : spec.caption;
   return `<figure class="question-diagram${spec.equalAxes ? " question-diagram-square" : ""}" data-question-diagram="${spec.kind}"><svg viewBox="${spec.equalAxes ? "110 0 500 480" : "0 0 720 480"}" role="img" aria-label="${esc(description)}"><title>${esc(description)}</title>${drawing}</svg><figcaption>${esc(spec.caption)}</figcaption></figure>`;
 }

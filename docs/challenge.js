@@ -1,6 +1,7 @@
 import { parseLessonManifest, readLessonFolder } from "./lesson-folder.js?v=20260906-media-v1";
-import { renderQuestionDiagram } from "./question-diagrams.js?v=20260906-test-diagrams-v1";
+import { renderQuestionDiagram } from "./question-diagrams.js?v=20260906-illustrations-v1";
 import { renderLessonMedia } from "./lesson-media.js?v=20260906-media-v1";
+import { lessonIllustrations, illustrationAssets } from "./lesson-illustrations.js?v=20260906-illustrations-v1";
 import { createLessonMediaRenderer } from "./lesson-media-renderer.js?v=20260906-media-v1";
 import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-lesson-batches-v1";
 import { learningFields, branchName } from "./learning-fields.js?v=20260906-lesson-batches-v1";
@@ -9,7 +10,7 @@ import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-optimizat
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
 import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-lesson-batches-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-lesson-batches-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260906-lesson-batches-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260906-illustrations-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -1459,10 +1460,11 @@ function formatTheory(value) {
   }).join("");
 }
 
-const mediaRenderer = createLessonMediaRenderer({ getPack: id => id === "__studio__" ? lessonStudio.getMediaAssets() : store.getLessonMediaAssets(id) });
+const mediaRenderer = createLessonMediaRenderer({ getPack: id => id === "__studio__" ? lessonStudio.getMediaAssets() : illustrationAssets(id) ?? store.getLessonMediaAssets(id) });
 
 function renderLesson(snapshot) {
   const skill = snapshot.selectedSkill;
+  const illustrations = lessonIllustrations(skill);
   const row = rowForSkill(snapshot, skill.id);
   elements.view.innerHTML = `
     <header class="page-head">
@@ -1483,6 +1485,7 @@ function renderLesson(snapshot) {
       </article>
     </section>
     ${skill.applications?.length ? `<section class="application-grid"><div class="section-title"><p class="eyebrow">Why this matters</p><h2>${escapeHtml(snapshot.activeSubject.shortName)} that travels</h2></div>${skill.applications.map((item) => `<article><strong>${escapeHtml(item.title ?? item.subject ?? "Application")}</strong><p>${escapeHtml(item.description)}</p>${renderLessonMedia(item.media, skill.packId)}</article>`).join("")}</section>` : ""}
+    ${illustrations ? `<section class="lesson-illustrations"><div class="section-title"><p class="eyebrow">Visual explanation</p><h2>See the idea</h2></div><div class="lesson-illustration-grid">${renderLessonMedia(illustrations.media, illustrations.packId)}</div></section>` : ""}
     <section class="examples-section">
       <div class="section-title"><p class="eyebrow">Worked examples</p><h2>Watch the method</h2></div>
       <div class="example-list">${skill.examples.map((example, index) => `<details ${index === 0 || example.media?.length ? "open" : ""}><summary><span>${String(index + 1).padStart(2, "0")}</span>${escapeHtml(example.prompt)}</summary><div><p class="example-solution">${escapeHtml(example.solution)}</p><p>${escapeHtml(example.explanation)}</p>${renderLessonMedia(example.media, skill.packId)}</div></details>`).join("")}</div>
@@ -1632,7 +1635,7 @@ function renderTest(snapshot) {
   const skill = snapshot.selectedSkill;
   const row = rowForSkill(snapshot, skill.id);
   const draft = snapshot.activeTest;
-  const hasIllustrations = [skill, ...(skill.examples ?? [])].some(item => item.media?.length);
+  const hasIllustrations = [skill, ...(skill.examples ?? [])].some(item => item.media?.length) || Boolean(lessonIllustrations(skill));
   if (!draft) {
     elements.view.innerHTML = `
       <header class="page-head"><div><p class="eyebrow">Mastery test</p><h1>Choose what to prove.</h1><p>Tests use real questions generated from the original QuickMaths curriculum.</p></div><div class="page-actions"><label class="compact-select">Skill<select id="test-skill-select">${skillOptions(snapshot, skill.id)}</select></label></div></header>
@@ -3464,7 +3467,7 @@ function initClock() {
 async function loadAgentGuides() {
   const read = async (path, type, fallback) => {
     try {
-      const response = await fetch(`./${path}?v=20260906-test-diagrams-v1`);
+      const response = await fetch(`./${path}?v=20260906-illustrations-v1`);
       return response.ok ? await response[type]() : fallback;
     } catch { return fallback; }
   };
