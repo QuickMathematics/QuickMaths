@@ -1,4 +1,4 @@
-import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-branch-migration-v1";
+import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-app-audit-v1";
 
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
@@ -1246,7 +1246,7 @@ function sanitizeMapPlans(candidate, profileIds, skillIds, subjectIds) {
       };
     }).filter(Boolean).slice(0, MAX_MAP_PLAN_ANNOTATIONS) : [];
     const hiddenSkillIds = Array.isArray(rawPlan.hiddenSkillIds ?? rawPlan.hidden_skill_ids)
-      ? [...new Set((rawPlan.hiddenSkillIds ?? rawPlan.hidden_skill_ids).filter((id) => skillIds.has(id)))].slice(0, 80)
+      ? [...new Set((rawPlan.hiddenSkillIds ?? rawPlan.hidden_skill_ids).filter((id) => skillIds.has(id)))]
       : [];
     output[profileId] = { layouts, paths, annotations, hiddenSkillIds };
   }
@@ -1788,15 +1788,16 @@ function normalizeAnswer(value) {
 }
 
 function numericValue(value) {
+  const mixed = normalizeMathNotation(value).trim().replace(/^[a-z][a-z0-9_]*\s*=\s*/i, "").match(/^([+-]?)(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+  if (mixed) {
+    const [, sign, whole, numerator, denominator] = mixed;
+    return Number(denominator) ? (sign === "-" ? -1 : 1) * (Number(whole) + Number(numerator) / Number(denominator)) : Number.NaN;
+  }
   const clean = normalizeAnswer(value).replace(/^[a-z][a-z0-9_]*=/, "");
+  if (!clean) return Number.NaN;
   if (/^-?\d+(\.\d+)?\/-?\d+(\.\d+)?$/.test(clean)) {
     const [numerator, denominator] = clean.split("/").map(Number);
     return denominator ? numerator / denominator : Number.NaN;
-  }
-  if (/^-?\d+\s+-?\d+\/\d+$/.test(String(value).trim())) {
-    const [whole, fraction] = String(value).trim().split(/\s+/);
-    const [numerator, denominator] = fraction.split("/").map(Number);
-    return Number(whole) + Math.sign(Number(whole) || 1) * numerator / denominator;
   }
   const direct = Number(clean);
   if (Number.isFinite(direct)) return direct;
@@ -1811,7 +1812,9 @@ function numericValue(value) {
 }
 
 function expressionTokens(value) {
-  const source = normalizeMathNotation(value).replace(/\s+/g, "");
+  const normalized = normalizeMathNotation(value).trim();
+  const mixed = normalized.match(/^([+-]?)(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+  const source = (mixed ? `${mixed[1]}(${mixed[2]}+${mixed[3]}/${mixed[4]})` : normalized).replace(/\s+/g, "");
   if (!source || source.length > 300) return null;
   const raw = [];
   for (let index = 0; index < source.length;) {
@@ -2044,7 +2047,7 @@ function extractSolutionValue(value, variable = "x") {
   const [left, right] = parts.map((part) => part.trim());
   if (left.toLowerCase() === variable.toLowerCase()) return right;
   if (right.toLowerCase() === variable.toLowerCase()) return left;
-  return right;
+  return source;
 }
 
 function parseFiniteSetValues(value, variable = "x") {
@@ -2209,6 +2212,7 @@ function signChartBoundaryMatches(actual, expected, side) {
 
 export function gradeProblem(problem, answer, structuredWork = null) {
   const expected = String(problem.expected_answer ?? "");
+  if (!String(answer ?? "").trim()) return { correct: false, expected, method: problem.grading_method };
   const acceptedForms = [expected, ...(problem.accepted_forms ?? [])].map(String);
   const method = problem.grading_method;
   const normalizedExpected = normalizeAnswer(expected);
@@ -3243,7 +3247,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       if (hidden) hiddenIds.add(skillId);
       else hiddenIds.delete(skillId);
     }
-    plan.hiddenSkillIds = [...hiddenIds].filter((id) => skillsById[id]).slice(0, 80);
+    plan.hiddenSkillIds = [...hiddenIds].filter((id) => skillsById[id]);
     if (hidden) state.ui.mapPlanSelection = state.ui.mapPlanSelection.filter((id) => !hiddenIds.has(id));
     if (!plan.hiddenSkillIds.length) state.ui.mapPlanShowHidden = false;
     touchActiveCurriculum();

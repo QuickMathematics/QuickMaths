@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createLessonStudio } from "./lesson-creator.js";
+import { gradeProblem } from "./challenge-core.js";
 
 function snapshot() {
   const activeSubject = {
@@ -286,4 +287,65 @@ test("Studio field choices persist across renders and update only the untouched 
   assert.equal(studio.buildPack().subject.id, "SUBJECT_MATH");
   assert.equal(studio.buildPack().skills[0].subdomain, "My custom branch");
   assert.equal(studio.buildPack().skills[0].topic, "My topic");
+});
+
+
+test("deleting then adding lessons and questions keeps IDs unique and removes deleted prerequisites", (t) => {
+  const previousConfirm = globalThis.confirm;
+  globalThis.confirm = () => true;
+  t.after(() => { if (previousConfirm) globalThis.confirm = previousConfirm; else delete globalThis.confirm; });
+  const { studio } = studioHarness();
+  const act = (creatorAction, index = 0) => studio.handleAction({ dataset: { creatorAction, index: String(index) } });
+  act("add-skill"); act("add-skill");
+  studio.handleInput({ matches: () => true, selectedOptions: [{ value: "CUSTOM_NEW_LESSON_002" }] });
+  act("select-skill", 1); act("remove-skill"); act("add-skill");
+  const pack = studio.buildPack();
+  assert.equal(new Set(pack.skills.map(skill => skill.id)).size, 3);
+  assert.deepEqual(pack.skills[1].prerequisites, []);
+  act("add-problem"); act("add-problem"); act("remove-problem", 1); act("add-problem");
+  const problems = studio.buildPack().skills.flatMap(skill => skill.problems);
+  assert.equal(new Set(problems.map(problem => problem.template_id)).size, problems.length);
+});
+
+test("opening an existing add-on preserves long IDs and prerequisite references", () => {
+  const { studio } = studioHarness();
+  const pack = studio.buildPack();
+  pack.id = "PACK_" + "A".repeat(50);
+  pack.subject.id = "SUBJECT_" + "B".repeat(46);
+  pack.skills[0].id = "CUSTOM_" + "C".repeat(48);
+  pack.skills[0].problems[0].template_id = "QUESTION_" + "D".repeat(95);
+  pack.skills[0].problems[0].source_template_id = pack.skills[0].problems[0].template_id;
+  const second = structuredClone(pack.skills[0]);
+  second.id = "CUSTOM_OTHER_LESSON";
+  second.problems[0].template_id = "ORIGINAL_QUESTION_ID";
+  second.prerequisites = [pack.skills[0].id];
+  pack.skills.push(second);
+  assert.equal(studio.loadRaw(JSON.stringify(pack)), true);
+  const saved = studio.buildPack();
+  assert.equal(saved.id, pack.id);
+  assert.equal(saved.subject.id, pack.subject.id);
+  assert.deepEqual(saved.skills.map(skill => skill.id), pack.skills.map(skill => skill.id));
+  assert.deepEqual(saved.skills.map(skill => skill.problems[0].template_id), pack.skills.map(skill => skill.problems[0].template_id));
+  assert.deepEqual(saved.skills[1].prerequisites, [saved.skills[0].id]);
+});
+
+test("a lesson imported without questions receives an editable starter question", () => {
+  const { studio, state } = studioHarness();
+  const pack = studio.buildPack(); pack.skills[0].problems = [];
+  assert.equal(studio.loadRaw(JSON.stringify(pack)), true);
+  assert.doesNotThrow(() => studio.render(state));
+  changeProblemField(studio, "prompt", "New prompt");
+  assert.equal(studio.buildPack().skills[0].problems[0].prompt, "New prompt");
+});
+
+
+test("editing a native equation lesson preserves a target variable other than x", () => {
+  const { studio, state } = studioHarness();
+  const source = state.curriculum.allSkills[0].problems[0];
+  source.variable = "n"; source.grading_method = "equation_solution"; source.expected_answer = "11";
+  studio.loadNativeLesson(state.selectedSkill.id);
+  const question = studio.buildPack().skills[0].problems[0];
+  assert.equal(question.variable, "n");
+  assert.equal(gradeProblem(question, "n=11").correct, true);
+  assert.equal(gradeProblem(question, "x=11").correct, false);
 });

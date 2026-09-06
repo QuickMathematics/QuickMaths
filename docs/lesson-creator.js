@@ -1,4 +1,4 @@
-import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-branch-migration-v1";
+import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-app-audit-v1";
 const DRAFT_KEY = "quickmaths.lesson-creator.v1";
 
 const DEFAULT_THEME = {
@@ -67,9 +67,20 @@ const REVIEW_OPTIONS = [
 ];
 
 function cleanId(value, prefix) {
+  const original = String(value ?? "").trim();
+  if (prefix === "QUESTION_" && /^[A-Z][A-Z0-9_]{2,119}$/.test(original)) return original;
+  if (["PACK_", "CUSTOM_", "SUBJECT_"].includes(prefix) && original.startsWith(prefix) && /^[A-Z][A-Z0-9_]{2,58}$/.test(original)) return original;
+  if (prefix === "CUSTOM_" && /^GEO_[A-Z0-9_]{3,52}$/.test(original)) return original;
   const body = String(value ?? "").toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 42);
   if (body.startsWith(prefix)) return body;
   return `${prefix}${body || "UNTITLED"}`;
+}
+
+function unusedItem(make, ids, start = 0) {
+  let index = start;
+  let item = make(index);
+  while (ids.has(item.id ?? item.templateId)) item = make(++index);
+  return item;
 }
 
 function lines(value) {
@@ -81,7 +92,7 @@ function blankProblem(skillId, index = 0) {
     templateId: `${skillId}_Q${String(index + 1).padStart(2, "0")}`,
     sourceTemplateId: "",
     prompt: "What should the learner solve?", promptCode: "", promptCodeLanguage: "python", expectedAnswer: "", answerType: "text",
-    gradingMethod: "exact_text", difficulty: "medium", tolerance: "0.001", options: "A | First choice\nB | Second choice",
+    gradingMethod: "exact_text", variable: null, difficulty: "medium", tolerance: "0.001", options: "A | First choice\nB | Second choice",
     acceptedForms: "", solutionSteps: "Explain the key idea.\nComplete the calculation or reasoning.", mistakeTags: "concept_error",
     answerMode: "final_only", workMode: "none", workPrompt: "", minimumSteps: 2,
     lineType: "expression", proofObligations: "State the claim clearly\nName the facts or definitions you use\nJustify how they lead to the conclusion", proofStrategies: "Direct proof\nProof by contradiction\nProof by contrapositive",
@@ -402,6 +413,7 @@ function buildPack(draft) {
           template_id: templateId, source_template_id: problem.sourceTemplateId || templateId, skill_id: skillId,
           difficulty: problem.difficulty, prompt: problem.prompt, expected_answer: problem.gradingMethod === "finite_set" ? `{${lines(problem.answerValues).join(", ")}}` : problem.expectedAnswer,
           answer_type: problem.answerType, grading_method: problem.gradingMethod, solution_steps: lines(problem.solutionSteps),
+          ...(problem.variable ? { variable: problem.variable } : {}),
           mistake_tags: lines(problem.mistakeTags), answer_mode: answerMode, work,
           review_policy: {
             work_review: ["proof_obligations", "rubric_check"].includes(problem.workMode) ? (problem.workReview === "self_review" ? "self_review" : "tutor_required") : problem.workReview,
@@ -472,7 +484,7 @@ function draftFromPack(pack, snapshot) {
       ...blankProblem(skill.id, problemIndex), templateId: problem.template_id, sourceTemplateId: problem.source_template_id ?? problem.template_id, prompt: problem.prompt,
       promptCode: problem.prompt_blocks?.find((block) => block.type === "code")?.text ?? "", promptCodeLanguage: problem.prompt_blocks?.find((block) => block.type === "code")?.language ?? "python",
       expectedAnswer: String(problem.expected_answer ?? ""),
-      answerType: problem.answer_type ?? "text", gradingMethod: problem.grading_method, difficulty: problem.difficulty ?? "medium",
+      answerType: problem.answer_type ?? "text", gradingMethod: problem.grading_method, variable: problem.variable ?? null, difficulty: problem.difficulty ?? "medium",
       tolerance: String(problem.tolerance ?? .001), options: (problem.options ?? []).map((option) => `${option.id} | ${option.label}`).join("\n"),
       acceptedForms: (problem.accepted_forms ?? []).join("\n"), solutionSteps: (problem.solution_steps ?? []).join("\n"), mistakeTags: (problem.mistake_tags ?? []).join("\n"),
       answerMode: problem.answer_mode ?? "final_only", workMode: problem.work?.mode ?? "none", workPrompt: problem.work?.prompt ?? "",
@@ -502,7 +514,7 @@ function draftFromPack(pack, snapshot) {
     })),
   }));
   if (!base.skills.length) base.skills = [blankSkill(0)];
-  base.skills = base.skills.map((skill) => normalizeLessonTaxonomy(skill, base.subjectId));
+  base.skills = base.skills.map((skill) => normalizeLessonTaxonomy({ ...skill, problems: skill.problems.length ? skill.problems : [blankProblem(skill.id)] }, base.subjectId));
   return base;
 }
 
@@ -653,8 +665,8 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
           <section class="studio-card">
             <div class="studio-section-title"><div><p class="eyebrow">2 · Lesson ${draft.activeSkill + 1}</p><h2>${esc(skill.name)}</h2></div>${draft.skills.length > 1 ? `<button class="danger-link" data-creator-action="remove-skill">Remove lesson</button>` : ""}</div>
             <div class="studio-two">${field("Lesson name", "skill.name", skill.name)}${field("Lesson ID", "skill.id", skill.id, { readonly: draft.mode === "override", help: draft.mode === "override" ? "Locked so existing learner progress remains attached to this native lesson." : "Stable and globally unique. The studio enforces the CUSTOM_ prefix." })}</div>
-            <div class="studio-two"><label class="studio-field"><span>Branch ${helpButton("A topic within this field: for example Geometry within Mathematics. Choose an existing branch or type a new name.")}</span><input data-creator-field="skill.subdomain" list="studio-branches" value="${esc(skill.subdomain)}" placeholder="e.g. Geometry"><datalist id="studio-branches">${branches.map((branch) => `<option value="${esc(branch.name)}"></option>`).join("")}</datalist></label>${field("Topic (optional)", "skill.topic", skill.topic ?? "", { help: "A focused subject within the broad branch, such as Quadratic Equations within Algebra. Existing category detail is preserved here." })}</div>
-            ${field("Tags, one per line", "skill.tags", skill.tags)}
+            <div class="studio-two"><label class="studio-field"><span>Branch ${helpButton("A broad division of this field, such as Geometry within Mathematics. Choose an existing branch or type a new name.")}</span><input data-creator-field="skill.subdomain" list="studio-branches" value="${esc(skill.subdomain)}" placeholder="e.g. Geometry"><datalist id="studio-branches">${branches.map((branch) => `<option value="${esc(branch.name)}"></option>`).join("")}</datalist></label>${field("Topic (optional)", "skill.topic", skill.topic ?? "", { help: "A focused subject within the broad branch, such as Quadratic Equations within Algebra. Existing category detail is preserved here." })}</div>
+            ${area("Tags, one per line", "skill.tags", skill.tags, { rows: 2 })}
             ${area("What will learners master?", "skill.description", skill.description, { rows: 3 })}
             ${area("Lesson theory", "skill.theory", skill.theory, { rows: 9, help: "Plain text only. Blank lines make paragraphs; lines beginning with - make lists." })}
             <label class="studio-field"><span>Prerequisite bridges ${helpButton("Choose lessons from any installed field or from this draft. In Hard path they lock this test; in Open path they are guidance.")}</span><select data-creator-prerequisites multiple size="${Math.min(8, Math.max(4, allSkills.length))}">${allSkills.map((item) => `<option value="${esc(item.id)}" ${skill.prerequisites.includes(item.id) ? "selected" : ""}>${esc(snapshot.subjects.find((subject) => subject.id === item.subjectId)?.name ?? "This set")} › ${esc(item.subdomain || "Foundations")} › ${esc(item.name)}</option>`).join("")}</select><small>Ctrl/Cmd-click to choose more than one.</small></label>
@@ -718,8 +730,16 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     if (action === "close-tutorial") draft.tutorialOpen = false;
     if (action === "open-tutorial") draft.tutorialOpen = true;
     if (action === "select-skill") draft.activeSkill = index;
-    if (action === "add-skill") { draft.skills.push({ ...blankSkill(draft.skills.length), subdomain: currentSkill().subdomain }); draft.activeSkill = draft.skills.length - 1; }
-    if (action === "remove-skill" && draft.skills.length > 1 && confirm("Remove this lesson from the studio draft?")) { draft.skills.splice(draft.activeSkill, 1); draft.activeSkill = Math.max(0, draft.activeSkill - 1); }
+    if (action === "add-skill") {
+      const ids = new Set([...draft.skills.map((item) => cleanId(item.id, "CUSTOM_")), ...getSnapshot().curriculum.allSkills.map((item) => item.id)]);
+      draft.skills.push({ ...unusedItem(blankSkill, ids, draft.skills.length), subdomain: currentSkill().subdomain }); draft.activeSkill = draft.skills.length - 1;
+    }
+    if (action === "remove-skill" && draft.skills.length > 1 && confirm("Remove this lesson and its prerequisite links from the studio draft?")) {
+      const removedId = cleanId(skill.id, "CUSTOM_");
+      draft.skills.splice(draft.activeSkill, 1);
+      for (const item of draft.skills) item.prerequisites = item.prerequisites.filter((id) => id !== removedId);
+      draft.activeSkill = Math.max(0, draft.activeSkill - 1);
+    }
     if (action === "select-problem") skill.activeProblem = index;
     if (action === "reroll-native-preview") draft.nativePreviewVariation = Number(draft.nativePreviewVariation ?? 0) + 1;
     if (action === "download-native-preview") {
@@ -728,7 +748,10 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
       download(`${skill.id.toLowerCase()}-native-author-preview.md`, markdown, "text/markdown");
       showToast("Native author preview downloaded.");
     }
-    if (action === "add-problem") { skill.problems.push(blankProblem(cleanId(skill.id, "CUSTOM_"), skill.problems.length)); skill.activeProblem = skill.problems.length - 1; }
+    if (action === "add-problem") {
+      const ids = new Set(draft.skills.flatMap((item) => item.problems.map((problem) => cleanId(problem.templateId, "QUESTION_"))));
+      skill.problems.push(unusedItem((index) => blankProblem(cleanId(skill.id, "CUSTOM_"), index), ids, skill.problems.length)); skill.activeProblem = skill.problems.length - 1;
+    }
     if (action === "remove-problem" && skill.problems.length > 1) { skill.problems.splice(index, 1); skill.activeProblem = Math.max(0, Math.min(skill.activeProblem, skill.problems.length - 1)); }
     if (action === "apply-procedural-example") {
       const problem = skill.problems[index];

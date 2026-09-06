@@ -1,4 +1,4 @@
-import { FIELD_TAXONOMY } from "./learning-taxonomy.js?v=20260906-branch-migration-v1";
+import { FIELD_TAXONOMY } from "./learning-taxonomy.js?v=20260906-app-audit-v1";
 
 export const standardBranches = (fieldId) => Object.keys(FIELD_TAXONOMY.fields.find((field) => field.id === fieldId)?.branches ?? {});
 export function lessonClassification(skill, fieldId = skill.fieldId ?? skill.subjectId) {

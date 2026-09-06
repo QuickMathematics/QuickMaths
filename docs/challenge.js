@@ -1,11 +1,11 @@
-import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-branch-migration-v1";
-import { learningFields, branchName } from "./learning-fields.js?v=20260906-branch-migration-v1";
-import { storageStatus } from "./storage-status.js?v=20260906-branch-migration-v1";
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-branch-migration-v1";
+import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-app-audit-v1";
+import { learningFields, branchName } from "./learning-fields.js?v=20260906-app-audit-v1";
+import { storageStatus } from "./storage-status.js?v=20260906-app-audit-v1";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-app-audit-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-branch-migration-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-branch-migration-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260906-branch-migration-v1";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-app-audit-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-app-audit-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260906-app-audit-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -20,7 +20,7 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-branch-migration-v1";
+} from "./github-sync.js?v=20260906-app-audit-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -2672,8 +2672,24 @@ elements.creatorFile.addEventListener("change", async () => {
   if (!file) return;
   try {
     if (lessonStudio.loadRaw(await readFileTextLimited(file, MAX_LESSON_FILE_BYTES, { label: "Lesson Studio file" }))) render(store.snapshot());
+  } catch (error) {
+    showToast(error instanceof Error ? error.message : String(error));
   } finally { elements.creatorFile.value = ""; }
 });
+
+function positionStudioHelp(button) {
+  if (!button) return;
+  const bounds = button.getBoundingClientRect();
+  const style = window.getComputedStyle(button, "::after");
+  if (style.position === "fixed") return;
+  const width = parseFloat(style.width) + (style.boxSizing === "border-box" ? 0 : parseFloat(style.paddingLeft) + parseFloat(style.paddingRight));
+  if (!Number.isFinite(width)) return;
+  const left = Math.max(12, Math.min(bounds.left - 8, document.documentElement.clientWidth - width - 12));
+  button.style.setProperty("--studio-tooltip-offset", `${left - bounds.left}px`);
+}
+
+for (const name of ["pointerover", "focusin"]) document.addEventListener(name, (event) => positionStudioHelp(event.target.closest?.("[data-studio-help]")));
+window.addEventListener("resize", () => document.querySelectorAll('[data-studio-help]:hover, [data-studio-help]:focus, [data-studio-help][aria-expanded="true"]').forEach(positionStudioHelp));
 
 document.addEventListener("click", async (event) => {
   const structuredAction = event.target.closest?.('[data-action="add-rational-candidate"], [data-action="remove-structured-row"]');
@@ -2703,6 +2719,7 @@ document.addEventListener("click", async (event) => {
   if (studioHelp) {
     event.preventDefault();
     studioHelp.setAttribute("aria-expanded", studioHelp.getAttribute("aria-expanded") === "true" ? "false" : "true");
+    positionStudioHelp(studioHelp);
     return;
   }
   const tutorialStep = event.target.closest?.("[data-tutorial-step]");
@@ -3109,8 +3126,9 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (currentSnapshot?.ui.route === "creator" && (event.target.matches?.("[data-creator-field]") || event.target.matches?.("[data-creator-prerequisites]"))) {
-    lessonStudio.handleInput(event.target);
-    render(store.snapshot());
+    // Text edits are already saved on input. Replacing the form during blur
+    // removes the button the user is clicking before its click can arrive.
+    if (lessonStudio.handleInput(event.target)) render(store.snapshot());
     return;
   }
   if (event.target.id === "lesson-select") store.navigate("lesson", event.target.value);
@@ -3392,7 +3410,7 @@ function initClock() {
 }
 
 async function boot() {
-  const response = await fetch("./curriculum-data.json?v=20260906-branch-migration-v1");
+  const response = await fetch("./curriculum-data.json?v=20260906-app-audit-v1");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];
@@ -3404,7 +3422,7 @@ async function boot() {
     // The store's normal malformed-state recovery remains authoritative.
   }
   if (needsLegacyGeography) {
-    const geography = await fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-branch-migration-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+    const geography = await fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-app-audit-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
     bundledLessonPacks = [geography.text];
   }
   let agentManifest = {};
@@ -3413,10 +3431,10 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260906-branch-migration-v1").catch(() => null),
-      fetch("./CUSTOM_LESSON_SETS.md?v=20260906-branch-migration-v1").catch(() => null),
-      fetch("./STUDENT_GUIDE.md?v=20260906-branch-migration-v1").catch(() => null),
-      fetch("./EDUCATOR_GUIDE.md?v=20260906-branch-migration-v1").catch(() => null),
+      fetch("./agent-manifest.json?v=20260906-app-audit-v1").catch(() => null),
+      fetch("./CUSTOM_LESSON_SETS.md?v=20260906-app-audit-v1").catch(() => null),
+      fetch("./STUDENT_GUIDE.md?v=20260906-app-audit-v1").catch(() => null),
+      fetch("./EDUCATOR_GUIDE.md?v=20260906-app-audit-v1").catch(() => null),
     ]);
     if (manifestResponse?.ok) agentManifest = await manifestResponse.json();
     if (authoringGuideResponse?.ok) authoringGuideMarkdown = await authoringGuideResponse.text();
@@ -3520,6 +3538,9 @@ async function boot() {
   document.addEventListener("visibilitychange", () => { if (document.hidden) store.heartbeat(true); });
   window.addEventListener("pagehide", () => store.heartbeat(true));
   window.addEventListener("pagehide", () => githubSync.stop());
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted && githubSync.snapshot().connected && !bridgeNeedsChoice) githubSync.start();
+  });
   window.addEventListener("pagehide", cancelActivePythonGraders);
   window.addEventListener("storage", (event) => { if (event.key === "quickmaths.web.v2") store.replaceFromStorage(); });
   window.addEventListener("popstate", applyLocationRoute);
@@ -3539,7 +3560,7 @@ async function ensureLegacyGeographyMigration(raw) {
   let version = APP_VERSION;
   try { version = Number(JSON.parse(raw)?.version ?? APP_VERSION); } catch { return; }
   if (version >= APP_VERSION) return;
-  legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-branch-migration-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
+  legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-app-audit-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
   const result = await legacyGeographyMigrationPromise;
   store.registerBundledLessonPacks([result.text]);
 }

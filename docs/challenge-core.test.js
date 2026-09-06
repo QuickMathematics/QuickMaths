@@ -1737,3 +1737,32 @@ test("rich tutor exports preserve post-attempt answers, work, reflection, and re
   assert.match(packet, /QuickMaths Tutor Review Packet/);
   assert.match(packet, /Requested Return Format/);
 });
+
+
+test("blank or punctuation-only responses never earn credit for zero or an empty solution set", () => {
+  for (const grading_method of ["exact_numeric", "numeric_with_tolerance", "finite_set", "interval_set"]) {
+    const problem = { grading_method, expected_answer: grading_method.includes("set") ? "{}" : "0" };
+    for (const answer of ["", "  ", null, undefined]) assert.equal(gradeProblem(problem, answer).correct, false, grading_method);
+  }
+  for (const answer of [".", "...", "x="]) assert.equal(gradeProblem({ grading_method: "exact_numeric", expected_answer: "0" }, answer).correct, false);
+  assert.equal(gradeProblem({ grading_method: "exact_numeric", expected_answer: "0" }, 0).correct, true);
+  assert.equal(gradeProblem({ grading_method: "finite_set", expected_answer: "{}" }, "no solutions").correct, true);
+});
+
+test("mixed-number answers retain their whole part and sign", () => {
+  for (const [answer, expected] of [["1 1/2", "1.5"], ["-1 1/2", "-1.5"], ["+2 3 / 4", "2.75"], ["-0 1/2", "-0.5"], ["x = 1 1/2", "1.5"]]) {
+    for (const grading_method of ["exact_numeric", "numeric_with_tolerance"]) assert.equal(gradeProblem({ grading_method, expected_answer: expected }, answer).correct, true, answer);
+  }
+  assert.equal(gradeProblem({ grading_method: "exact_numeric", expected_answer: "5.5" }, "1 1/2").correct, false);
+  assert.equal(gradeProblem({ grading_method: "exact_numeric", expected_answer: "1" }, "1 1/0").correct, false);
+  assert.equal(gradeProblem({ grading_method: "equation_solution", expected_answer: "-1.5" }, "x=-1 1/2").correct, true);
+  assert.equal(gradeProblem({ grading_method: "finite_set", expected_answer: "{1.5, -2.75}" }, "{1 1/2, -2 3/4}").correct, true);
+});
+
+test("equation and finite-set answers cannot discard a wrong left-hand side", () => {
+  for (const grading_method of ["equation_solution", "finite_set"]) {
+    const problem = { grading_method, expected_answer: "2", variable: "x" };
+    for (const answer of ["y=2", "x+1=2", "2x=2", "1=2"]) assert.equal(gradeProblem(problem, answer).correct, false, `${grading_method}: ${answer}`);
+    for (const answer of ["2", "x=2", "2=x"]) assert.equal(gradeProblem(problem, answer).correct, true, answer);
+  }
+});

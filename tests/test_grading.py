@@ -86,3 +86,26 @@ def test_interval_set_grading_accepts_equivalent_notation_and_rejects_boundary_c
     problem = _problem("(-inf, -2] U (5, inf)", "interval_set", variable="x")
     assert grade_answer(problem, "x <= -2 or x > 5").is_correct
     assert not grade_answer(problem, "x < -2 or x > 5").is_correct
+
+
+def test_blank_final_answers_cannot_pass_empty_solution_sets():
+    for method, expected in [("exact_numeric", "0"), ("finite_set", "{}"), ("interval_set", "{}")]:
+        for answer in ["", "   "]:
+            assert not grade_answer(_problem(expected, method), answer).is_correct
+    assert grade_answer(_problem("{}", "finite_set"), "no solutions").is_correct
+
+
+def test_mixed_numbers_keep_the_whole_part_and_sign():
+    for answer, expected in [("1 1/2", "1.5"), ("-1 1/2", "-1.5"), ("+2 3 / 4", "2.75"), ("-0 1/2", "-0.5")]:
+        for method in ["exact_numeric", "numeric_with_tolerance"]:
+            assert grade_answer(_problem(expected, method), answer).is_correct
+    assert not grade_answer(_problem("5.5", "exact_numeric"), "1 1/2").is_correct
+
+
+def test_wrong_left_hand_side_cannot_pass_as_an_equation_solution():
+    for method in ["equation_solution", "finite_set"]:
+        problem = _problem("2", method, variable="x", answer_metadata={"values": ["2"]})
+        for answer in ["y=2", "x+1=2", "2x=2", "1=2"]:
+            assert not grade_answer(problem, answer).is_correct
+        for answer in ["2", "x=2", "2=x"]:
+            assert grade_answer(problem, answer).is_correct

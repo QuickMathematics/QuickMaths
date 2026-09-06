@@ -80,3 +80,23 @@ test("loading a legacy workspace migrates branches without changing mastery, tes
   const repeated = createQuickMathsStore({ storage: { getItem: () => migrated.exportSyncState(), setItem() {} }, curriculum, now });
   assert.deepEqual(repeated.snapshot().fields, migrated.snapshot().fields);
 });
+
+
+test("hiding more than 80 lessons survives reload and sync export", () => {
+  const values = new Map();
+  const storage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+  const store = createQuickMathsStore({ storage, curriculum });
+  store.createProfile("Large map");
+  packages.forEach(pack => store.importLessonPack(JSON.stringify(pack)));
+  const ids = store.snapshot().curriculum.allSkills.map(skill => skill.id);
+  store.setMapPlanNodesHidden(ids.slice(0, 80));
+  store.setMapPlanNodesHidden(ids.slice(80));
+  assert.deepEqual(store.snapshot().mapPlan.hiddenSkillIds, ids);
+  const reloaded = createQuickMathsStore({ storage, curriculum });
+  assert.deepEqual(reloaded.snapshot().mapPlan.hiddenSkillIds, ids);
+  const imported = createQuickMathsStore({ curriculum, storage: { getItem: () => null, setItem() {} } });
+  imported.importSyncState(reloaded.exportSyncState());
+  assert.deepEqual(imported.snapshot().mapPlan.hiddenSkillIds, ids);
+  imported.setMapPlanNodesHidden(ids.slice(80), false);
+  assert.deepEqual(imported.snapshot().mapPlan.hiddenSkillIds, ids.slice(0, 80));
+});

@@ -33,7 +33,9 @@ def grade_answer(instance: ProblemInstance, user_answer: str | UserResponse) -> 
     work_check = check_work(instance, response)
     work_status = _legacy_work_review_status(work_check.status)
     try:
-        if method == "exact_text":
+        if not user.strip():
+            correct = False
+        elif method == "exact_text":
             correct = _normalize_text(expected) == _normalize_text(user)
         elif method == "exact_numeric":
             correct = numeric_equal(expected, user)

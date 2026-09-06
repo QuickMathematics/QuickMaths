@@ -54,6 +54,10 @@ def normalize_math_text(text: str) -> str:
     for old, new in replacements.items():
         value = value.replace(old, new)
     value = value.replace("\u2264", "<=").replace("\u2265", ">=")
+    mixed = re.fullmatch(r"([+-]?)(\d+)\s+(\d+)\s*/\s*(\d+)", value)
+    if mixed:
+        sign, whole, numerator, denominator = mixed.groups()
+        value = f"{sign}({int(whole)}+{int(numerator)}/{int(denominator)})"
     return value
 
 
@@ -432,7 +436,7 @@ def extract_solution_value(value: str, variable: str) -> str:
         return right
     if right == variable:
         return left
-    return right
+    return normalized
 
 
 def accepted_text_match(user: str, accepted_forms: list[str]) -> bool:

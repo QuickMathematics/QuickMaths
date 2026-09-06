@@ -1,17 +1,17 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260906-branch-migration-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-branch-migration-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260906-app-audit-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-app-audit-v1";
 import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260905-confused-neutral-v5";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260906-branch-migration-v1";
-import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js?v=20260906-branch-migration-v1";
+} from "./github-sync.js?v=20260906-app-audit-v1";
+import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js?v=20260906-app-audit-v1";
 import {
   createLocalBridgeCredentialStore,
   createLocalGitContentsClient,
   resolveLocalBridgeCapability,
-} from "./local-git-client.js?v=20260906-branch-migration-v1";
+} from "./local-git-client.js?v=20260906-app-audit-v1";
 
 const elements = {
   liveStatus: document.querySelector("#live-status"),
@@ -118,12 +118,12 @@ async function connectFromForm(event) {
 
 async function boot() {
   const [curriculumResponse, geographyResponse, manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-    fetch("./curriculum-data.json?v=20260906-branch-migration-v1"),
-    fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-branch-migration-v1"),
-    fetch("./agent-manifest.json?v=20260906-branch-migration-v1").catch(() => null),
-    fetch("./CUSTOM_LESSON_SETS.md?v=20260906-branch-migration-v1").catch(() => null),
-    fetch("./STUDENT_GUIDE.md?v=20260906-branch-migration-v1").catch(() => null),
-    fetch("./EDUCATOR_GUIDE.md?v=20260906-branch-migration-v1").catch(() => null),
+    fetch("./curriculum-data.json?v=20260906-app-audit-v1"),
+    fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-app-audit-v1"),
+    fetch("./agent-manifest.json?v=20260906-app-audit-v1").catch(() => null),
+    fetch("./CUSTOM_LESSON_SETS.md?v=20260906-app-audit-v1").catch(() => null),
+    fetch("./STUDENT_GUIDE.md?v=20260906-app-audit-v1").catch(() => null),
+    fetch("./EDUCATOR_GUIDE.md?v=20260906-app-audit-v1").catch(() => null),
   ]);
   if (!curriculumResponse.ok || !geographyResponse.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await curriculumResponse.json();
@@ -205,6 +205,9 @@ async function boot() {
   });
   if (!localMode) elements.disconnect.addEventListener("click", () => { sync.disconnect(); toast("GitHub Bridge disconnected on this device."); });
   window.addEventListener("pagehide", () => sync.stop());
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted && sync.snapshot().connected) sync.start();
+  });
 
   if (localMode) {
     try {
