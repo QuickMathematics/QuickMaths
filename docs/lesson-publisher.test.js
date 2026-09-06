@@ -9,8 +9,43 @@ import { registryUrlFromBody, validateFederatedNamespace, validateFederatedRelea
 const curriculum = JSON.parse(await readFile(new URL("./curriculum-data.json", import.meta.url)));
 const fixture = JSON.parse(await readFile(new URL("./lesson-depot/lessons/estimation-lab/1.0.0/lesson-set.json", import.meta.url)));
 const hash = (text) => createHash("sha256").update(text).digest("hex");
-const githubSha = (text) => createHash("sha1").update(text).digest("hex");
+const githubSha = (text) => createHash("sha1").update(`blob ${Buffer.byteLength(text)}\0`).update(text).digest("hex");
 const pack = () => structuredClone(fixture);
+
+test("media uploads precede the pinned lesson and retries reuse verified files", async () => {
+  const { state, client, connect } = harness();
+  const input = pack(); input.schema_version = "2.1";
+  const data = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><circle r="4"/></svg>');
+  input.assets = [{ path: "media/diagram.svg", mime_type: "image/svg+xml", bytes: data.length, sha256: hash(data) }];
+  input.skills[0].media = [{ src: "media/diagram.svg", alt: "A circle" }];
+  const supplied = new Uint8Array(data);
+  await connect();
+  const plan = await client.prepare({ pack: input, repo: "quickmaths-lessons", license: "CC BY 4.0", attachments: new Map([["media/diagram.svg", supplied]]) });
+  supplied.fill(0);
+  assert.equal(state.mutations.length, 0);
+  let loseResponse = true;
+  state.failure = call => { if (loseResponse && call.method === "PUT" && call.url.endsWith("lesson-set.json")) { loseResponse = false; return true; } return false; };
+  await assert.rejects(client.publish(plan, { consent: true }), /could not be reached/);
+  const result = await client.publish(plan, { consent: true });
+  const mediaWrites = state.mutations.filter(call => call.url.endsWith("media/diagram.svg"));
+  assert.equal(mediaWrites.length, 1);
+  assert.deepEqual(Buffer.from(mediaWrites[0].body.content, "base64"), data);
+  const parts = new URL(result.lessonUrl).pathname.split("/");
+  const publishedFiles = state.history.get(parts[3]);
+  assert.deepEqual(publishedFiles.get(parts.slice(4, -1).join("/") + "/media/diagram.svg"), data);
+  const manifest = JSON.parse(publishedFiles.get(parts.slice(4).join("/")));
+  assert.equal(manifest.assets[0].data_base64, undefined);
+  assert.equal(manifest.asset_base_url, undefined);
+});
+
+test("publication refuses missing or altered attachments before any writes", async () => {
+  const input = pack(); input.schema_version = "2.1";
+  input.assets = [{ path: "x.png", bytes: 3, sha256: hash("abc") }];
+  input.skills[0].media = [{ src: "x.png", alt: "Diagram" }];
+  const options = { namespace: "ALICE", curriculum, author: "alice" };
+  await assert.rejects(preparePublicLesson(input, options), /Missing attachment/);
+  await assert.rejects(preparePublicLesson(input, { ...options, attachments: new Map([["x.png", new TextEncoder().encode("xyz")]]) }), /changed|digest/i);
+});
 
 function harness({ exists = false, privateRepo = false } = {}) {
   const state = { calls: [], mutations: [], exists, privateRepo, files: new Map(), history: new Map(), sha: null, discussions: [], failure: null, federation: { registries: [] }, statusComments: [] };
@@ -68,7 +103,8 @@ function harness({ exists = false, privateRepo = false } = {}) {
         state.mutations.push(call);
         const current = state.files.get(filePath);
         if ((body.sha ?? null) !== (current == null ? null : githubSha(current))) return Response.json({}, { status: 409 });
-        const text = Buffer.from(body.content, "base64").toString("utf8");
+        const buffer = Buffer.from(body.content, "base64");
+        const text = filePath.endsWith(".json") ? buffer.toString("utf8") : buffer;
         state.files.set(filePath, text);
         return Response.json({ commit: { sha: commit() } }, { status: 201 });
       }

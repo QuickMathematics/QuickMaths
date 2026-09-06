@@ -13,6 +13,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from quickmaths.content_loader import load_curriculum
 from quickmaths.problem_generator import generate_test
+from quickmaths.lesson_media import prepare_lesson_media
 
 
 OUTPUT_PATH = PROJECT_ROOT / "docs" / "curriculum-data.json"
@@ -28,6 +29,7 @@ def stable_seed(skill_id: str) -> int:
 def build_payload() -> dict:
     track, skills, warnings = load_curriculum()
     skill_rows = []
+    assets = {}
     for skill_id in track.skills:
         skill = skills[skill_id]
         question_count = len(skill.test.questions)
@@ -47,6 +49,8 @@ def build_payload() -> dict:
                     continue
                 signatures.add(signature)
                 row = asdict(instance)
+                if not row.get("media"):
+                    row.pop("media", None)
                 row["source_template_id"] = instance.template_id
                 row["template_id"] = f"{instance.template_id}__{len(problems) + 1:02d}"
                 row["work_required"] = instance.answer_mode in {
@@ -84,14 +88,22 @@ def build_payload() -> dict:
                 "tags": skill.tags,
                 "mastery": asdict(skill.mastery),
                 "theory": skill.theory,
-                "examples": [asdict(example) for example in skill.examples],
+                "examples": [{key: value for key, value in asdict(example).items() if key != "media" or value} for example in skill.examples],
+                **({"media": skill.media} if skill.media else {}),
                 "applications": skill.applications,
                 "question_count": question_count,
                 "native_randomize_order": skill.test.randomize_order,
-                "native_templates": [asdict(template) for template in skill.test.questions],
+                "native_templates": [{key: value for key, value in asdict(template).items() if key != "media" or value} for template in skill.test.questions],
                 "problems": problems,
             }
         )
+        media_pack, _ = prepare_lesson_media({"skills": [skill_rows[-1]]}, Path(skill.source_path).parent, portable=True)
+        for asset in media_pack.get("assets", []):
+            if asset["path"] in assets and assets[asset["path"]]["sha256"] != asset["sha256"]:
+                raise ValueError(f"Native media path collision: {asset['path']}")
+            assets[asset["path"]] = asset
+        if sum(asset["bytes"] for asset in assets.values()) > 1_000_000:
+            raise ValueError("Native embedded media exceeds 1 MB; move larger media to a lesson pack.")
     track_row = asdict(track)
     subjects = []
     generated_from = ["content/math/algebra_foundations"]
@@ -117,6 +129,7 @@ def build_payload() -> dict:
         "track": track_row,
         "warnings": warnings,
         "skills": skill_rows,
+        **({"assets": list(assets.values())} if assets else {}),
     }
 
 

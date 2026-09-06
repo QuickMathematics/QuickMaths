@@ -59,7 +59,7 @@ function optionalString(input, key, maxLength) {
 }
 
 const GUIDE_SECTIONS = Object.freeze(["summary", "tutoring", "navigation", "planning", "educator", "bridge", "custom_content", "backup", "all"]);
-const AUTHORING_GUIDE_SECTIONS = Object.freeze(["summary", "envelope", "native_improvements", "curriculum_graph", "questions", "grading_and_work", "studio", "webmcp", "publishing", "all"]);
+const AUTHORING_GUIDE_SECTIONS = Object.freeze(["summary", "envelope", "native_improvements", "curriculum_graph", "questions", "grading_and_work", "media", "studio", "webmcp", "publishing", "all"]);
 const PRODUCT_MANUAL_SECTIONS = Object.freeze(["summary", "all", ...Array.from({ length: 18 }, (_, index) => String(index + 1))]);
 
 function productManualSection(markdown, audience, section) {
@@ -107,6 +107,7 @@ function authoringGuideSection(markdown, section) {
     curriculum_graph: "Track and skills",
     questions: "Fixed mastery questions",
     grading_and_work: "Answer and shown-work modes",
+    media: "Lesson media and Matplotlib",
     studio: "Human Lesson Creator",
     webmcp: "WebMCP workflow",
     publishing: "Publishing to the Lesson Depot",

@@ -1,3 +1,4 @@
+import { normalizeLessonMedia, renderLessonMedia, mediaPath, mediaDigest, encodeMediaData, MEDIA_TYPES, MAX_EMBEDDED_MEDIA_BYTES } from "./lesson-media.js?v=20260906-media-v1";
 import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260906-optimization-v1";
 const DRAFT_KEY = "quickmaths.lesson-creator.v1";
 
@@ -294,7 +295,27 @@ function renderAdvancedWork(problem, index) {
   </details>`;
 }
 
-function renderProblemEditor(skill, problem, index) {
+function renderMediaEditor(items = [], scope, sectionIndex, assets = []) {
+  const context = `data-media-scope="${scope}" data-section-index="${sectionIndex}"`;
+  return `<section class="studio-media-editor"><h3>Images, diagrams and media</h3>
+    ${(items ?? []).map((item, index) => {
+      const indexed = markup => markup.replaceAll("data-creator-field", `${context} data-media-index="${index}" data-creator-field`);
+      let preview = "";
+      try { if (assets.some(asset => asset.path === item.src)) preview = renderLessonMedia(normalizeLessonMedia([item]), "__studio__"); } catch { /* Incomplete fields stay editable. */ }
+      return `<article class="studio-card"><div class="studio-repeat-head"><strong>Media ${index + 1}</strong><button type="button" data-creator-action="remove-media" ${context} data-media-index="${index}">Remove</button></div>
+        ${indexed(field("File path in the lesson folder", "media.src", item.src, { placeholder: "media/triangle.png" }))}
+        ${indexed(area("Alternative text", "media.alt", item.alt ?? "", { rows: 2, hint: "Describe the diagram, labels or information needed to solve the question." }))}
+        ${indexed(field("Caption", "media.caption", item.caption ?? ""))}
+        <div class="studio-three">${indexed(field("Width (pixels)", "media.width", item.width ?? "", { type: "number", min: 1, max: 4096 }))}${indexed(field("Height (pixels, optional)", "media.height", item.height ?? "", { type: "number", min: 1, max: 4096 }))}${indexed(select("Fit", "media.fit", item.fit ?? "contain", [["contain", "Show the whole image"], ["cover", "Fill and crop"]]))}</div>
+        ${item.type === "video" || /\.(webm|mp4|m4v|ogv)$/i.test(item.src ?? "") ? indexed(area("Fallback video paths (optional, one per line)", "media.sources", (item.sources ?? []).join("\n"), { rows: 2, hint: "For example, offer MP4 alongside WebM for wider playback support." })) : ""}
+        ${preview}</article>`;
+    }).join("")}
+    <div class="publisher-actions"><button type="button" class="button button-outline" data-creator-action="attach-media" ${context}>Attach a file</button><button type="button" class="quiet-button" data-creator-action="add-media" ${context}>Reference a folder file</button></div>
+    <small>Small files travel inside your lesson and workspace backups. For larger files, publish a folder containing the manifest and attachments. <a href="./LESSON_MEDIA.md" target="_blank" rel="noopener">Media and Matplotlib guide ↗</a></small>
+  </section>`;
+}
+
+function renderProblemEditor(skill, problem, index, assets) {
   const indexed = (markup) => markup.replaceAll("data-creator-field", `data-index="${index}" data-creator-field`);
   const isProof = problem.workMode === "proof_obligations";
   const graderHelp = isProof ? "This grades only the short conclusion. It never decides whether the proof is valid; that happens through the obligation review below." : "This checks only the final-answer field. Proofs and long responses are handled separately under How the learner answers.";
@@ -320,6 +341,7 @@ function renderProblemEditor(skill, problem, index) {
       ${["theorem_conclusion", "symbolic_expression", "equation_solution", "inequality_solution"].includes(problem.gradingMethod) ? indexed(area(isProof ? "Other accepted conclusions — one per line" : "Other accepted final answers — one per line", "problem.acceptedForms", problem.acceptedForms, { rows: 3, hint: "These apply only to the short final answer, not the proof text." })) : ""}
       ${indexed(area("Private solution outline — one step per line", "problem.solutionSteps", problem.solutionSteps, { rows: 4, hint: "Shown after submission; keep answer-key reasoning out of the learner prompt." }))}
       ${indexed(area("Mistake tags — one per line", "problem.mistakeTags", problem.mistakeTags, { rows: 2, hint: "Short labels such as sign_error or missing_evidence help the tutor target follow-up work." }))}
+      ${renderMediaEditor(problem.media, "problem", index, assets)}
       ${renderAdvancedWork(problem, index)}
     </div>
   </details>`;
@@ -437,8 +459,9 @@ function buildPack(draft) {
         review_after_days_if_mastered: Number(skill.reviewMasteredDays), review_after_days_if_learning: Number(skill.reviewLearningDays),
       },
       theory: skill.theory,
-      examples: skill.examples.map((example) => ({ prompt: example.prompt, solution: example.solution, explanation: example.explanation })),
-      applications: skill.applications.map((application) => ({ title: application.title, description: application.description })),
+      ...(skill.media?.length ? { media: normalizeLessonMedia(skill.media) } : {}),
+      examples: skill.examples.map((example) => ({ prompt: example.prompt, solution: example.solution, explanation: example.explanation, ...(example.media?.length ? { media: normalizeLessonMedia(example.media) } : {}) })),
+      applications: skill.applications.map((application) => ({ title: application.title, description: application.description, ...(application.media?.length ? { media: normalizeLessonMedia(application.media) } : {}) })),
       question_count: draft.mode === "override" ? Math.min(Number(skill.questionCount ?? skill.problems.length), skill.problems.length) : skill.problems.length,
       problems: skill.problems.map((problem, problemIndex) => {
         const answerMode = problem.workMode === "none" ? "final_only"
@@ -498,6 +521,7 @@ function buildPack(draft) {
         };
         const promptBlocks = buildPromptBlocks(problem);
         if (promptBlocks) output.prompt_blocks = promptBlocks;
+        if (problem.media?.length) output.media = normalizeLessonMedia(problem.media);
         if (problem.gradingMethod === "numeric_with_tolerance") output.tolerance = Number(problem.tolerance);
         if (problem.gradingMethod === "finite_set") output.answer_metadata = { type: "finite_set", variable: problem.answerVariable || "x", values: lines(problem.answerValues) };
         if (problem.gradingMethod === "rational_expression") {
@@ -524,8 +548,10 @@ function buildPack(draft) {
       }),
     };
   });
+  const paths = new Set(skills.flatMap(skill => [skill, ...skill.examples, ...skill.applications, ...skill.problems]).flatMap(section => (section.media ?? []).flatMap(item => [item.src, ...(item.sources ?? []), item.poster])));
+  const assets = (draft.assets ?? []).filter(asset => paths.has(asset.path));
   return {
-    format: "quickmaths.lesson-set", schema_version: "2.0", mode: draft.mode === "override" ? "override" : "add", id: cleanId(draft.id, "PACK_"), name: draft.name,
+    format: "quickmaths.lesson-set", schema_version: "2.1", ...(assets.length ? { assets: structuredClone(assets) } : {}), ...(draft.assetBaseUrl ? { asset_base_url: draft.assetBaseUrl } : {}), mode: draft.mode === "override" ? "override" : "add", id: cleanId(draft.id, "PACK_"), name: draft.name,
     description: draft.description, author: draft.author || "QuickMaths Lesson Studio", version: draft.version,
     subject: {
       id: subjectId, name: draft.subjectName, short_name: draft.subjectShortName, icon: draft.subjectIcon,
@@ -538,6 +564,7 @@ function buildPack(draft) {
 
 function draftFromPack(pack, snapshot) {
   const base = blankDraft(snapshot);
+  base.assets = structuredClone(pack.assets ?? []); base.assetBaseUrl = pack.asset_base_url ?? "";
   base.mode = pack.mode === "override" ? "override" : "add";
   base.nativeSkillId = base.mode === "override" ? (pack.skills?.[0]?.id ?? "") : "";
   base.id = pack.id ?? base.id; base.name = pack.name ?? base.name; base.description = pack.description ?? base.description;
@@ -551,14 +578,14 @@ function draftFromPack(pack, snapshot) {
   }
   base.skills = (pack.skills ?? []).map((skill, skillIndex) => ({
     ...blankSkill(skillIndex), activeProblem: 0, id: skill.id, referenceId: skill.id, name: skill.name, description: skill.description, subdomain: skill.subdomain ?? "Foundations", topic: skill.topic,
-    theory: skill.theory, tags: (skill.tags ?? []).join("\n"), prerequisites: studioPrerequisites(skill),
+    theory: skill.theory, media: structuredClone(skill.media ?? []), tags: (skill.tags ?? []).join("\n"), prerequisites: studioPrerequisites(skill),
     passingScore: skill.mastery?.passing_score ?? .8, minimumConfidence: skill.mastery?.minimum_confidence ?? 3, maxGuessingAllowed: skill.mastery?.max_guessing_allowed ?? "maybe",
     reviewMasteredDays: skill.mastery?.review_after_days_if_mastered ?? 7, reviewLearningDays: skill.mastery?.review_after_days_if_learning ?? 2,
     questionCount: skill.question_count ?? skill.problems?.length ?? 1,
     examples: skill.examples?.length ? skill.examples : [], applications: skill.applications?.length ? skill.applications : [],
     problems: (skill.problems ?? []).map((problem, problemIndex) => ({
       ...blankProblem(skill.id, problemIndex), templateId: problem.template_id, sourceTemplateId: problem.source_template_id ?? problem.template_id, prompt: problem.prompt,
-      originalPrompt: problem.prompt, promptBlocks: structuredClone(problem.prompt_blocks ?? []),
+      media: structuredClone(problem.media ?? []), originalPrompt: problem.prompt, promptBlocks: structuredClone(problem.prompt_blocks ?? []),
       promptCode: problem.prompt_blocks?.find((block) => block.type === "code")?.text ?? "", promptCodeLanguage: problem.prompt_blocks?.find((block) => block.type === "code")?.language ?? "python",
       expectedAnswer: String(problem.expected_answer ?? ""),
       answerType: problem.answer_type ?? "text", gradingMethod: problem.grading_method, variable: problem.variable ?? null, difficulty: problem.difficulty ?? "medium",
@@ -599,8 +626,9 @@ function draftFromPack(pack, snapshot) {
   return base;
 }
 
-export function createLessonStudio({ store, download, showToast, getSnapshot, openFilePicker, publishToDepot = () => {} }) {
+export function createLessonStudio({ store, download, showToast, getSnapshot, openFilePicker, openFolderPicker = () => {}, openAssetPicker = () => {}, publishToDepot = () => {} }) {
   let draft = restoreDraft(getSnapshot());
+  let pendingAttachment = null;
 
   const save = () => persist(draft);
   const isUntouchedStarter = () => draft.mode === "add"
@@ -641,7 +669,8 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     const subject = snapshot.subjects.find((item) => item.id === source.subjectId);
     if (!subject) throw new Error("The native lesson field is unavailable.");
     draft = draftFromPack({
-      format: "quickmaths.lesson-set", schema_version: "2.0", mode: "override",
+      format: "quickmaths.lesson-set", schema_version: "2.1", mode: "override",
+      ...store.getLessonMediaAssets?.(),
       id: cleanId(`IMPROVE_${source.id}`, "PACK_"),
       name: `Improvement · ${source.name}`,
       description: `A reversible improvement to the native QuickMaths lesson ${source.name}.`,
@@ -661,7 +690,17 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
   const setField = (path, value, target) => {
     const skill = currentSkill();
     const previousFieldId = draft.subjectId;
-    if (path.startsWith("draft.")) draft[path.slice(6)] = value;
+    if (path.startsWith("media.")) {
+      const scope = target.dataset.mediaScope;
+      const owner = scope === "skill" ? skill : skill[`${scope}s`]?.[Number(target.dataset.sectionIndex)];
+      const item = owner?.media?.[Number(target.dataset.mediaIndex)];
+      if (!item) return;
+      const name = path.slice(6);
+      if (["width", "height"].includes(name)) { if (value === "") delete item[name]; else item[name] = Number(value); }
+      else if (name === "sources") item.sources = lines(value);
+      else { item[name] = value; if (name === "src") delete item.type; }
+    }
+    else if (path.startsWith("draft.")) draft[path.slice(6)] = value;
     else if (path.startsWith("theme.")) draft.theme[path.slice(6)] = value;
     else if (path.startsWith("skill.")) skill[path.slice(6)] = value;
     else if (path.startsWith("problem.")) skill.problems[Number(target.dataset.index)][path.slice(8)] = target.type === "checkbox" ? target.checked : value;
@@ -721,7 +760,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     const branches = learningFields([{ id: draft.subjectId }], [...snapshot.curriculum.allSkills, ...draft.skills.map((item) => ({ ...item, subjectId: draft.subjectId }))])[0].branches;
     for (const name of standardBranches(draft.subjectId)) if (!branches.some((branch) => branch.name === name)) branches.push({ name });
     return `
-      <header class="page-head studio-head"><div><p class="eyebrow">Human Lesson Creator</p><h1>Create something new—or improve what ships with QuickMaths.</h1><p>These friendly forms produce the same validated add-on and native-improvement formats an agent can author directly.</p></div><div class="page-actions"><button class="button button-outline" data-creator-action="import">Open JSON</button><button class="button button-primary" data-creator-action="download">Download lesson set</button></div></header>
+      <header class="page-head studio-head"><div><p class="eyebrow">Human Lesson Creator</p><h1>Create something new—or improve what ships with QuickMaths.</h1><p>These friendly forms produce the same validated add-on and native-improvement formats an agent can author directly.</p></div><div class="page-actions"><button class="button button-outline" data-creator-action="import">Open YAML / JSON</button><button class="button button-outline" data-creator-action="import-folder">Open folder</button><button class="button button-primary" data-creator-action="download">Download lesson set</button></div></header>
       <section class="studio-native-picker"><div><p class="eyebrow">Improve our work</p><h2>Edit a native lesson</h2><p>Open any built-in lesson as a reversible override. Its ID and completed learner progress stay intact; unfinished tests restart on install, and restoring the original later does not erase mastery.</p></div><label><span>Native lesson</span><select data-creator-field="draft.nativeSkillId">${nativeSkills.map((item) => `<option value="${esc(item.id)}" ${item.id === draft.nativeSkillId ? "selected" : ""}>${esc(snapshot.subjects.find((subject) => subject.id === item.subjectId)?.name ?? "QuickMaths")} › ${esc(item.subdomain || "Foundations")} › ${esc(item.name)}</option>`).join("")}</select></label><button class="button button-secondary" data-creator-action="load-native">Open editable copy</button></section>
       ${draft.tutorialOpen ? `<section class="studio-tutorial"><div><p class="eyebrow">Two-minute tour</p><p>Pick a field and branch, write one or more lessons, add mastery questions, then validate and install. Tap or hover any <i aria-hidden="true">?</i> for a plain-English explanation.</p></div><ol><li><b>1</b><span>Field & branch<small>Extend Maths or start Biology, Physics, anything.</small></span></li><li><b>2</b><span>Lessons<small>Theory, examples, applications, and bridge prerequisites.</small></span></li><li><b>3</b><span>Questions<small>Answers, graders, shown work, proof, and review rules.</small></span></li><li><b>4</b><span>Publish<small>Validate, download, and install into the same save pipeline.</small></span></li></ol><button class="quiet-button" data-creator-action="close-tutorial">Got it — hide the tour</button></section>` : `<button class="quiet-button studio-tour-open" data-creator-action="open-tutorial">Show the two-minute tour</button>`}
       <section class="studio-grid">
@@ -750,13 +789,14 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
             ${area("Tags, one per line", "skill.tags", skill.tags, { rows: 2 })}
             ${area("What will learners master?", "skill.description", skill.description, { rows: 3 })}
             ${area("Lesson theory", "skill.theory", skill.theory, { rows: 9, help: "Plain text only. Blank lines make paragraphs; lines beginning with - make lists." })}
+            ${renderMediaEditor(skill.media, "skill", 0, draft.assets)}
             <label class="studio-field"><span>Prerequisite bridges ${helpButton("Choose lessons from any installed field or from this draft. In Hard path they lock this test; in Open path they are guidance.")}</span><select data-creator-prerequisites multiple size="${Math.min(8, Math.max(4, allSkills.length))}">${allSkills.map((item) => `<option value="${esc(item.referenceId)}" ${skill.prerequisites.some(reference => prerequisiteId(reference) === item.referenceId) ? "selected" : ""}>${esc(snapshot.subjects.find((subject) => subject.id === item.subjectId)?.name ?? "This set")} › ${esc(item.subdomain || "Foundations")} › ${esc(item.name)}</option>`).join("")}</select><small>Ctrl/Cmd-click to choose more than one.</small></label>
             <details class="studio-advanced"><summary>Mastery and review timing</summary><div class="studio-four">${field("Passing score", "skill.passingScore", skill.passingScore, { type: "number", min: .5, max: 1, step: .05 })}${field("Minimum confidence", "skill.minimumConfidence", skill.minimumConfidence, { type: "number", min: 1, max: 5 })}${field("Review if mastered", "skill.reviewMasteredDays", skill.reviewMasteredDays, { type: "number", min: 1, max: 365 })}${field("Review if learning", "skill.reviewLearningDays", skill.reviewLearningDays, { type: "number", min: 1, max: 365 })}</div></details>
           </section>
           <section class="studio-card">
             <div class="studio-section-title"><div><p class="eyebrow">Worked teaching material</p><h2>Examples and applications</h2></div></div>
-            <div class="studio-repeat"><h3>Worked examples</h3>${skill.examples.map((example, index) => `<article><div class="studio-repeat-head"><b>Example ${index + 1}</b><button data-creator-action="remove-example" data-index="${index}">Remove</button></div>${field("Prompt", "example.prompt", example.prompt).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${field("Solution", "example.solution", example.solution).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Explanation", "example.explanation", example.explanation, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}</article>`).join("")}<button class="button button-outline" data-creator-action="add-example">＋ Add worked example</button></div>
-            <div class="studio-repeat"><h3>Real-world / cross-field applications</h3>${skill.applications.map((application, index) => `<article><div class="studio-repeat-head"><b>Application ${index + 1}</b><button data-creator-action="remove-application" data-index="${index}">Remove</button></div>${field("Title", "application.title", application.title).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Description", "application.description", application.description, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}</article>`).join("")}<button class="button button-outline" data-creator-action="add-application">＋ Add application</button></div>
+            <div class="studio-repeat"><h3>Worked examples</h3>${skill.examples.map((example, index) => `<article><div class="studio-repeat-head"><b>Example ${index + 1}</b><button data-creator-action="remove-example" data-index="${index}">Remove</button></div>${field("Prompt", "example.prompt", example.prompt).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${field("Solution", "example.solution", example.solution).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Explanation", "example.explanation", example.explanation, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${renderMediaEditor(example.media, "example", index, draft.assets)}</article>`).join("")}<button class="button button-outline" data-creator-action="add-example">＋ Add worked example</button></div>
+            <div class="studio-repeat"><h3>Real-world / cross-field applications</h3>${skill.applications.map((application, index) => `<article><div class="studio-repeat-head"><b>Application ${index + 1}</b><button data-creator-action="remove-application" data-index="${index}">Remove</button></div>${field("Title", "application.title", application.title).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Description", "application.description", application.description, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${renderMediaEditor(application.media, "application", index, draft.assets)}</article>`).join("")}<button class="button button-outline" data-creator-action="add-application">＋ Add application</button></div>
           </section>
           <section class="studio-card">
             <div class="studio-section-title"><div><p class="eyebrow">3 · Mastery questions</p><h2>What proves this lesson?</h2><p>Build the short answer, any required reasoning, and the sign-off rule as three separate pieces.</p></div><button class="button button-secondary" data-creator-action="add-problem">＋ Add question</button></div>
@@ -764,7 +804,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
             <div class="studio-question-roadmap"><article><span>1</span><div><strong>Final answer</strong><p>The local grader checks a number, choice, expression, or conclusion.</p></div></article><i>→</i><article><span>2</span><div><strong>Shown work</strong><p>Optional explanation, checked maths steps, a proof, or a rubric response.</p></div></article><i>→</i><article><span>3</span><div><strong>Review</strong><p>Proofs and rubric responses wait for a self, tutor, or agent verdict.</p></div></article></div>
             <nav class="studio-question-tabs" aria-label="Mastery question bank">${skill.problems.map((problem, index) => `<button type="button" data-creator-action="select-problem" data-index="${index}" aria-current="${index === skill.activeProblem ? "true" : "false"}"><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(problem.prompt || "Untitled question")}</b><small>${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</small></button>`).join("")}</nav>
             <p class="studio-question-count">Editing question ${skill.activeProblem + 1} of ${skill.problems.length}. ${draft.mode === "override" ? `The original comprehensive test length (${Math.min(Number(skill.questionCount ?? skill.problems.length), skill.problems.length)}) is preserved while the bank contains enough questions.` : "Every question in this bank becomes part of the mastery test."} Only the selected editor is rendered, so large native question banks stay fast.</p>
-            <div class="studio-problems">${renderProblemEditor(skill, activeProblem, skill.activeProblem)}</div>
+            <div class="studio-problems">${renderProblemEditor(skill, activeProblem, skill.activeProblem, draft.assets)}</div>
           </section>
           <section class="studio-card studio-publish">
             <div><p class="eyebrow">4 · Validate and publish</p><h2>Ready for the map?</h2><p>Validation uses the exact same safety and graph checks as file upload and WebMCP staging.</p></div>
@@ -900,7 +940,22 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
       if (preview) publishToDepot(buildPack(draft));
     }
     if (action === "import") openFilePicker();
+    if (action === "import-folder") openFolderPicker();
+    if (["add-media", "remove-media", "attach-media"].includes(action)) {
+      const scope = target.dataset.mediaScope;
+      const owner = scope === "skill" ? skill : skill[`${scope}s`]?.[Number(target.dataset.sectionIndex)];
+      if (owner) {
+        owner.media ??= [];
+        if (action === "add-media") owner.media.push({ src: draft.assets?.[0]?.path ?? "media/diagram.png", alt: "", caption: "", width: 800, fit: "contain" });
+        if (action === "remove-media") owner.media.splice(Number(target.dataset.mediaIndex), 1);
+        if (action === "attach-media") { pendingAttachment = { draft, owner }; openAssetPicker(); }
+      }
+    }
     if (action === "reset" && confirm("Reset the Human Lesson Creator draft? Download it first if you want to keep it.")) draft = blankDraft(getSnapshot());
+    if (action.startsWith("remove-")) {
+      const paths = new Set(draft.skills.flatMap(skill => [skill, ...skill.examples, ...skill.applications, ...skill.problems]).flatMap(section => (section.media ?? []).flatMap(item => [item.src, ...(item.sources ?? []), item.poster])));
+      draft.assets = (draft.assets ?? []).filter(asset => paths.has(asset.path));
+    }
     draft.lastValidation = ["validate", "download", "install", "publish-depot"].includes(action) ? draft.lastValidation : null;
     save(); return true;
   };
@@ -913,10 +968,30 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     } catch (error) { showToast(error instanceof Error ? error.message : String(error)); return false; }
   };
 
+  const attachFile = async file => {
+    const destination = pendingAttachment;
+    if (!destination || destination.draft !== draft) throw new Error("Choose the lesson section before attaching a file.");
+    if (!file?.size || file.size > MAX_EMBEDDED_MEDIA_BYTES) throw new Error("Studio embeds attachments up to 1 MB total. Publish a lesson folder for larger files.");
+    const data = new Uint8Array(await file.arrayBuffer());
+    const sha256 = await mediaDigest(data);
+    if (destination.draft !== draft) throw new Error("The Studio draft changed while reading the attachment.");
+    const filename = file.name.replace(/[^A-Za-z0-9_. -]/g, "_");
+    const path = mediaPath(`media/${sha256.slice(0, 12)}-${filename}`);
+    if (!draft.skills.flatMap(skill => [skill, ...skill.examples, ...skill.applications, ...skill.problems]).includes(destination.owner)) throw new Error("The lesson section was removed. Choose another section for this attachment.");
+    if ((destination.owner.media?.length ?? 0) >= 12) throw new Error("Each lesson section supports at most 12 media items.");
+    const existingBytes = (draft.assets ?? []).filter(asset => asset.path !== path).reduce((total, asset) => total + (asset.data_base64 ? asset.bytes : 0), 0);
+    if (existingBytes + file.size > MAX_EMBEDDED_MEDIA_BYTES) throw new Error("Portable attachments must total at most 1 MB. Use a folder publication for larger media.");
+    draft.assets ??= [];
+    if (!draft.assets.some(asset => asset.path === path)) draft.assets.push({ path, mime_type: MEDIA_TYPES[path.split(".").at(-1).toLowerCase()], sha256, bytes: data.length, data_base64: encodeMediaData(data) });
+    destination.owner.media ??= [];
+    destination.owner.media.push({ src: path, alt: filename.replace(/\.[^.]+$/, ""), caption: "", width: 800, fit: "contain" });
+    draft.lastValidation = null; save(); showToast("Media attached. Add a description of what the learner should notice.");
+  };
+
   const clearDraft = () => {
     draft = blankDraft(getSnapshot());
     try { localStorage.removeItem(DRAFT_KEY); } catch { /* Workspace clearing remains best effort if browser storage is unavailable. */ }
   };
 
-  return { render, handleInput, handleAction, loadRaw, loadNativeLesson, clearDraft, buildPack: () => buildPack(draft) };
+  return { render, handleInput, handleAction, attachFile, getMediaAssets: () => ({ assets: structuredClone(draft.assets ?? []), asset_base_url: draft.assetBaseUrl ?? "" }), loadRaw, loadNativeLesson, clearDraft, buildPack: () => buildPack(draft) };
 }

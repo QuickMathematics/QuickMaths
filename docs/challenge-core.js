@@ -1,10 +1,12 @@
 import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-optimization-v1";
+import { normalizeLessonAssets, normalizeLessonMedia, validateMediaReferences, mediaBaseUrl } from "./lesson-media.js?v=20260906-media-v1";
 
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 16;
+export const APP_VERSION = 17;
+export const BUNDLED_LESSON_MIGRATION_VERSION = 16;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
-export const LESSON_SET_SCHEMA_VERSION = "2.0";
+export const LESSON_SET_SCHEMA_VERSION = "2.1";
 export const CURRICULUM_FORMAT = "quickmaths.curriculum";
 export const CURRICULUM_SCHEMA_VERSION = "1.0";
 export const DEFAULT_SUBJECT_ID = "SUBJECT_MATH";
@@ -274,6 +276,7 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
         difficulty: template.difficulty ?? "medium",
         values: Object.fromEntries(Object.entries(values).map(([key, value]) => [key, stringifyTemplateValue(value)])),
         prompt: renderNativeTemplate(template.prompt_template, values),
+        ...(template.media?.length ? { media: normalizeLessonMedia(template.media) } : {}),
         expected_answer: expectedAnswer,
         answer_type: answer.type ?? "text",
         grading_method: template.grading?.method ?? "exact_text",
@@ -703,6 +706,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
     values: {},
     prompt: requiredText(candidate.prompt, `${templateId} prompt`, 2000),
     prompt_blocks: normalizePromptBlocks(candidate.prompt_blocks, templateId),
+    ...(candidate.media != null ? { media: normalizeLessonMedia(candidate.media) } : {}),
     expected_answer: expectedAnswer,
     answer_type: optionalText(candidate.answer_type, `${templateId} answer_type`, 60) || "text",
     grading_method: gradingMethod,
@@ -759,10 +763,12 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error("Lesson set must be a JSON object.");
   if (candidate.format !== LESSON_SET_FORMAT) throw new Error(`Lesson set format must be ${LESSON_SET_FORMAT}.`);
   const schemaVersion = candidate.schema_version;
-  if (!["1.0", LESSON_SET_SCHEMA_VERSION].includes(schemaVersion)) throw new Error(`Unsupported lesson set schema_version ${schemaVersion ?? "missing"}.`);
+  if (!["1.0", "2.0", LESSON_SET_SCHEMA_VERSION].includes(schemaVersion)) throw new Error(`Unsupported lesson set schema_version ${schemaVersion ?? "missing"}.`);
   const mode = candidate.mode == null || candidate.mode === "add" ? "add" : candidate.mode === "override" ? "override" : null;
   if (!mode) throw new Error("Lesson set mode must be add or override.");
-  if (mode === "override" && schemaVersion !== LESSON_SET_SCHEMA_VERSION) throw new Error("Native lesson improvements require schema_version 2.0.");
+  if (mode === "override" && schemaVersion === "1.0") throw new Error("Native lesson improvements require schema_version 2.0 or 2.1.");
+  const assets = normalizeLessonAssets(candidate.assets);
+  const assetBaseUrl = mediaBaseUrl(candidate.asset_base_url);
   const id = requiredText(candidate.id, "Lesson set ID", 60);
   if (!LESSON_SET_ID.test(id)) throw new Error("Lesson set ID must start with PACK_ and use uppercase letters, numbers, and underscores.");
   const subject = normalizeSubject(candidate.subject, schemaVersion);
@@ -820,10 +826,12 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
       prompt: requiredText(example?.prompt, `${skillId} example ${index + 1} prompt`, 1000),
       solution: requiredText(String(example?.solution ?? ""), `${skillId} example ${index + 1} solution`, 1000),
       explanation: requiredText(example?.explanation, `${skillId} example ${index + 1} explanation`, 2000),
+      ...(example?.media != null ? { media: normalizeLessonMedia(example.media) } : {}),
     })) : [];
     const applications = Array.isArray(skillCandidate.applications) ? skillCandidate.applications.slice(0, 20).map((application, index) => ({
       title: requiredText(application?.title, `${skillId} application ${index + 1} title`, 160),
       description: requiredText(application?.description, `${skillId} application ${index + 1} description`, 1000),
+      ...(application?.media != null ? { media: normalizeLessonMedia(application.media) } : {}),
     })) : [];
     return {
       id: skillId,
@@ -851,12 +859,14 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
         review_after_days_if_learning: Math.round(cleanNumber(Number(mastery.review_after_days_if_learning), 2, 1, 365)),
       },
       theory: requiredText(skillCandidate.theory, `${skillId} theory`, 15_000),
+      ...(skillCandidate.media != null ? { media: normalizeLessonMedia(skillCandidate.media) } : {}),
       examples,
       applications,
       question_count: questionCount,
       problems: skillCandidate.problems.map((problem) => normalizeProblem(problem, skillId, questionIds)),
     };
   });
+  validateMediaReferences(skills, assets);
   const skillById = Object.fromEntries(skills.map((skill) => [skill.id, skill]));
   const visiting = new Set();
   const visited = new Set();
@@ -885,6 +895,8 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
     author: optionalText(candidate.author, "Lesson set author", 160) || "Unknown author",
     version: optionalText(candidate.version, "Lesson set version", 40) || "1.0.0",
     importedAt: cleanText(candidate.importedAt, 40) || new Date().toISOString(),
+    ...(assets.length ? { assets } : {}),
+    ...(assetBaseUrl ? { asset_base_url: assetBaseUrl } : {}),
     subject,
     track: {
       id: optionalText(trackCandidate.id, "Track ID", 120) || `TRACK_${id}`,
@@ -1421,6 +1433,7 @@ function sanitizeResult(candidate) {
   return {
     questionId,
     prompt: cleanText(candidate.prompt, 2000),
+    ...(candidate.media?.length ? { media: normalizeLessonMedia(candidate.media) } : {}),
     finalAnswer: cleanText(candidate.finalAnswer, (candidate.gradingMethod ?? candidate.grading_method) === "python_program" ? 12_000 : 300),
     work: cleanText(candidate.work, MAX_LONG_WORK_CHARS),
     structuredWorkJson: sanitizeStructuredWork(candidate.structuredWorkJson),
@@ -1705,7 +1718,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
 
 function migrateBundledLessonPacks(candidate, bundledLessonPacks = []) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return candidate;
-  if (Number(candidate.version) >= APP_VERSION || !Array.isArray(candidate.profiles) || !candidate.profiles.length) return candidate;
+  if (Number(candidate.version) >= BUNDLED_LESSON_MIGRATION_VERSION || !Array.isArray(candidate.profiles) || !candidate.profiles.length) return candidate;
   if (!Array.isArray(bundledLessonPacks) || !bundledLessonPacks.length) return candidate;
   const migrated = clone(candidate);
   migrated.lessonPacks = Array.isArray(migrated.lessonPacks) ? [...migrated.lessonPacks] : [];
@@ -3836,6 +3849,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       return {
         questionId: problem.template_id,
         prompt: problem.prompt,
+        ...(problem.media?.length ? { media: clone(problem.media) } : {}),
         finalAnswer: response.finalAnswer,
         work: response.work,
         structuredWorkJson: clone(response.structuredWorkJson),
@@ -4128,6 +4142,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       ok: true,
       route: state.ui.route,
       skill: { id: skill.id, pack_id: skill.packId ?? null, custom: Boolean(skill.custom), name: skill.name, description: skill.description, status: row.status },
+      lesson_media: { items: clone(skill.media ?? []), ...(() => { const pack = skill.packId ? state.lessonPacks.find(item => item.id === skill.packId) : curriculum; return { assets: (pack?.assets ?? []).map(({ data_base64, ...asset }) => asset), asset_base_url: pack?.asset_base_url ?? "" }; })() },
       active_test: draft ? {
         question_count: draft.problems.length,
         answered_count: Object.values(draft.responses).filter((response) => response.finalAnswer).length,
@@ -4135,6 +4150,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
           question_id: problem.template_id,
           prompt: problem.prompt,
           prompt_blocks: clone(problem.prompt_blocks ?? []),
+          ...(problem.media?.length ? { media: clone(problem.media) } : {}),
           difficulty: problem.difficulty,
           answer_mode: problem.answer_mode,
           work_mode: problem.work?.mode ?? "none",
@@ -4160,7 +4176,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         percent_score: attempt.percentScore,
         review_status: attempt.reviewStatus,
         pending_review: attempt.hasPendingReview,
-        questions: attempt.results.map((result) => ({ question_id: result.questionId, prompt: result.prompt, final_answer_status: result.correct ? "correct" : "incorrect", work_mode: result.workMode, review_required: result.reviewRequired })),
+        questions: attempt.results.map((result) => ({ question_id: result.questionId, prompt: result.prompt, ...(result.media?.length ? { media: clone(result.media) } : {}), final_answer_status: result.correct ? "correct" : "incorrect", work_mode: result.workMode, review_required: result.reviewRequired })),
       } : null,
       progress: { mastery_score: row.masteryScore, attempt_count: row.attemptCount, mistake_tags: row.mistakeTags },
       recent_attempts: includeHistory ? profileAttempts().slice(-5).map((attempt) => ({ skill_id: attempt.skillId, percent_score: attempt.percentScore, completed_at: attempt.completedAt })) : [],
@@ -4680,6 +4696,10 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     restoreNativeLessons,
     importLessonPack,
     exportLessonPack,
+    getLessonMediaAssets(packId) {
+      const pack = packId ? state.lessonPacks.find(item => item.id === packId) : curriculum;
+      return { assets: clone(pack?.assets ?? []), asset_base_url: pack?.asset_base_url ?? "" };
+    },
     previewNativeAssessment,
     exportBackup,
     exportSyncState,

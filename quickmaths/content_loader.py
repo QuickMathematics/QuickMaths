@@ -159,6 +159,7 @@ def _skill_from_dict(data: dict[str, Any], path: Path, content_hash: str) -> Ski
                 answer_mode=item.get("answer_mode", "final_only"),
                 work=dict(item.get("work", {})),
                 review_policy=dict(item.get("review_policy", {})),
+                media=list(item.get("media", [])),
             )
             for item in data["test"].get("questions", [])
         ]
@@ -172,6 +173,7 @@ def _skill_from_dict(data: dict[str, Any], path: Path, content_hash: str) -> Ski
             prerequisites=list(data.get("prerequisites", [])),
             mastery=MasteryRules(**data.get("mastery", {})),
             theory=data.get("theory", ""),
+            media=list(data.get("media", [])),
             examples=[Example(**item) for item in data.get("examples", [])],
             test=SkillTest(
                 question_count=int(data["test"].get("question_count", len(questions))),

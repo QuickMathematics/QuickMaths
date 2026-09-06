@@ -310,7 +310,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 28);
+  assert.equal(summary.guide.app_version, 29);
   assert.match(summary.guide.browser_boundary, /ChatGPT or Codex in-app browser/);
   assert.match(summary.guide.browser_boundary, /already-open in-app QuickMaths tab/);
   assert.match(summary.guide.mobile_boundary, /First-time agent-in-the-loop setup must be completed on a computer/);

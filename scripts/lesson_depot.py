@@ -65,8 +65,8 @@ def _read_json(path: Path) -> dict[str, Any]:
 def _validate_lesson(value: dict[str, Any], path: Path) -> None:
     if value.get("format") != "quickmaths.lesson-set":
         raise DepotError(f"{path.name}: format must be quickmaths.lesson-set")
-    if value.get("schema_version") != "2.0":
-        raise DepotError(f"{path.name}: schema_version must be '2.0'")
+    if value.get("schema_version") not in {"2.0", "2.1"}:
+        raise DepotError(f"{path.name}: schema_version must be '2.0' or '2.1'")
     if not isinstance(value.get("id"), str) or not _PACK_ID.fullmatch(value["id"]):
         raise DepotError(f"{path.name}: id must be a valid PACK_* ID")
     if not isinstance(value.get("skills"), list) or not value["skills"]:

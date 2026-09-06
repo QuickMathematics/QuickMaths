@@ -1,0 +1,105 @@
+{
+  "format": "quickmaths.lesson-set",
+  "schema_version": "2.1",
+  "id": "PACK_GEOMETRY_MEDIA",
+  "name": "Geometry in pictures",
+  "description": "A right triangle, drawn with Matplotlib and used in a lesson and assessment.",
+  "author": "QuickMaths",
+  "version": "1.0.0",
+  "subject": {
+    "id": "SUBJECT_MATH",
+    "name": "Mathematics",
+    "short_name": "Maths",
+    "icon": "∑"
+  },
+  "track": {
+    "id": "TRACK_GEOMETRY_MEDIA",
+    "name": "Geometry in pictures",
+    "skills": [
+      "CUSTOM_GEOMETRY_MEDIA"
+    ]
+  },
+  "skills": [
+    {
+      "id": "CUSTOM_GEOMETRY_MEDIA",
+      "name": "Area of a right triangle",
+      "domain": "Math",
+      "subdomain": "Geometry",
+      "description": "Read a geometric diagram and calculate a triangle's area.",
+      "prerequisites": [],
+      "theory": "A right triangle is half of a rectangle with the same base and height.\nIts area is base × perpendicular height ÷ 2.\nThe vertical and horizontal sides below meet at a right angle.\n",
+      "media": [
+        {
+          "src": "media/right-triangle.svg",
+          "alt": "A right triangle with horizontal base 4 units and perpendicular height 3 units. The right angle is marked at the bottom left.",
+          "caption": "A 4-by-3 rectangle would contain two copies of this triangle.",
+          "width": 800,
+          "height": 500
+        }
+      ],
+      "examples": [
+        {
+          "prompt": "What is the area when the base is 4 units and the height is 3 units?",
+          "solution": "6 square units",
+          "explanation": "Multiply 4 by 3, then divide by 2.",
+          "media": [
+            {
+              "src": "media/right-triangle.png",
+              "alt": "A triangle with base 4 and perpendicular height 3.",
+              "width": 640
+            }
+          ]
+        }
+      ],
+      "applications": [
+        {
+          "title": "A triangular garden",
+          "description": "A garden with perpendicular sides of 4 m and 3 m needs 6 square metres of turf."
+        }
+      ],
+      "problems": [
+        {
+          "template_id": "CUSTOM_GEOMETRY_MEDIA_Q1",
+          "skill_id": "CUSTOM_GEOMETRY_MEDIA",
+          "difficulty": "easy",
+          "prompt": "Use the diagram. What is the area in square units? Enter just the number.",
+          "media": [
+            {
+              "src": "media/right-triangle.svg",
+              "alt": "A right triangle with base 4 units and perpendicular height 3 units.",
+              "width": 640,
+              "height": 400
+            }
+          ],
+          "expected_answer": "6",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "Area = 4 × 3 ÷ 2 = 6 square units."
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none"
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "path": "media/right-triangle.png",
+      "mime_type": "image/png",
+      "bytes": 12374,
+      "sha256": "b1debee6361b2d5cac927b33d2ff273be373961eb6092364e431931a9c46f32d"
+    },
+    {
+      "path": "media/right-triangle.svg",
+      "mime_type": "image/svg+xml",
+      "bytes": 2909,
+      "sha256": "ca7ba939fa6cbfd19f419ba8d257c77238c7501f8c6ab495293c6fae8e978a71"
+    }
+  ]
+}

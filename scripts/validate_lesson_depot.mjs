@@ -1,7 +1,8 @@
-import { readFile } from "node:fs/promises";
+import { readFile, lstat, realpath } from "node:fs/promises";
 import { dirname, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { normalizeLessonPackCollection } from "../docs/challenge-core.js";
+import { normalizeLessonAssets, decodeMediaData, mediaDigest } from "../docs/lesson-media.js";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const root = resolve(process.argv[2] || "docs/lesson-depot");
@@ -21,6 +22,20 @@ for (const entry of catalog.packages) {
   const raw = await readFile(lessonPath, "utf8");
   const parsed = JSON.parse(raw);
   if (parsed.id !== entry.id || parsed.version !== entry.version) throw new Error(`${entry.slug} metadata does not match its lesson-set identity.`);
+  for (const asset of normalizeLessonAssets(parsed.assets)) {
+    let data;
+    if (asset.data_base64) data = decodeMediaData(asset.data_base64);
+    else {
+      const folder = await realpath(dirname(lessonPath));
+      const path = resolve(folder, asset.path);
+      const resolved = await realpath(path);
+      if (!resolved.startsWith(folder + sep) || (await lstat(path)).isSymbolicLink()) throw new Error(`Unsafe lesson attachment: ${asset.path}`);
+      const info = await lstat(resolved);
+      if (!info.isFile() || info.size !== asset.bytes) throw new Error(`Attachment size mismatch: ${asset.path}`);
+      data = await readFile(resolved);
+    }
+    if (data.length !== asset.bytes || await mediaDigest(data) !== asset.sha256) throw new Error(`Attachment digest mismatch: ${asset.path}`);
+  }
   rawPackages.push(raw);
 }
 

@@ -13,7 +13,7 @@
     "prerequisites": { "type": "array", "items": { "type": "string" } },
     "tags": { "type": "array", "items": { "type": "string" } },
     "unlocks": { "type": "array", "items": { "type": "string" } },
-    "applications": { "type": "array" },
+    "applications": { "type": "array", "items": { "type": "object", "properties": { "media": { "$ref": "#/$defs/media" } } } },
     "mastery": {
       "type": "object",
       "required": ["passing_score", "minimum_confidence"],
@@ -26,7 +26,8 @@
       }
     },
     "theory": { "type": "string" },
-    "examples": { "type": "array" },
+    "media": { "$ref": "#/$defs/media" },
+    "examples": { "type": "array", "items": { "type": "object", "properties": { "media": { "$ref": "#/$defs/media" } } } },
     "test": {
       "type": "object",
       "required": ["question_count", "questions"],
@@ -43,6 +44,7 @@
               "id": { "type": "string" },
               "type": { "type": "string", "enum": ["generated", "fixed"] },
               "prompt": { "type": "string" },
+              "media": { "$ref": "#/$defs/media" },
               "prompt_template": { "type": "string" },
               "variables": { "type": "object" },
               "derived": { "type": "object" },
@@ -91,6 +93,7 @@
                     "enum": ["none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"]
                   },
                   "prompt": { "type": "string" },
+              "media": { "$ref": "#/$defs/media" },
                   "line_type": { "type": "string", "enum": ["expression", "equation", "inequality"] },
                   "target_variable": { "type": "string" },
                   "minimum_steps": { "type": "integer", "minimum": 0 },
@@ -154,5 +157,6 @@
         }
       }
     }
-  }
+  },
+  "$defs": {"media":{"type":"array","maxItems":12,"items":{"type":"object","required":["src","alt"],"properties":{"src":{"type":"string","maxLength":240},"type":{"enum":["image","video","audio"]},"alt":{"type":"string","minLength":1,"maxLength":500},"caption":{"type":"string","maxLength":1000},"width":{"type":"integer","minimum":1,"maximum":4096},"height":{"type":"integer","minimum":1,"maximum":4096},"fit":{"enum":["contain","cover"]},"sources":{"type":"array","maxItems":3,"items":{"type":"string","maxLength":240}},"poster":{"type":"string","maxLength":240}}}}}
 }

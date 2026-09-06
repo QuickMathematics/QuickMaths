@@ -2,7 +2,7 @@
 
 This is the machine-oriented guide for creating portable QuickMaths fields and lesson sets. Human authors can use **Lesson studio** inside the app instead: it provides forms, tooltips, a short tutorial, live validation, color pickers, and buttons for every browser-supported feature.
 
-Lesson sets are declarative JSON. QuickMaths never executes uploaded code, HTML, CSS, URLs, generators, or scripts. The browser validates the entire prerequisite graph before installing anything, and an agent may only **stage** a set: a human must click **Install**.
+Lesson sets are declarative JSON, with YAML supported for folder authoring and Studio imports. Matplotlib figures are generated during authoring and packaged as images. Media references are validated and their bytes verified before display. Imported plotting scripts, HTML and CSS never run. The browser validates the entire prerequisite graph before installing anything, and an agent may only **stage** a set: a human must click **Install**.
 
 Start with [`lesson-set-example.json`](lesson-set-example.json), or ask an agent to call `get_agent_guide` and `validate_lesson_set`.
 
@@ -30,12 +30,12 @@ Existing lesson files and backups remain compatible: the saved `subject` object 
 
 ## Envelope and field
 
-Schema 2.0 adds fields, themes, and cross-field prerequisite bridges:
+Schema 2.1 adds media attachments to the fields, themes and prerequisite bridges introduced in 2.0. Existing 1.0 and 2.0 packs remain importable. Use 2.1 for new media packs:
 
 ```json
 {
   "format": "quickmaths.lesson-set",
-  "schema_version": "2.0",
+  "schema_version": "2.1",
   "id": "PACK_CELL_BIOLOGY",
   "name": "Cell Biology",
   "description": "A first biology curriculum.",
@@ -588,6 +588,25 @@ The repository’s trusted built-in Mathematics YAML is exported as browser-safe
 | Deprecated/replacement skills | Publish a new stable skill ID and keep the old source file for backup compatibility. Browser packs do not silently redirect progress. |
 
 The security boundary is intentional: variables, derived expressions, constraints, and arbitrary generator/grader code are trusted-author build features, not uploaded runtime features. An agent should generate explicit fixed questions or use the repository’s validated Python export pipeline.
+
+## Lesson media and Matplotlib
+
+Use schema `'2.1'` with a `media` array on any skill, example, application or problem. Each item has a folder-relative `src`, required descriptive `alt`, and optional `caption`, pixel `width` / `height` (1–4096), and `fit: contain` or `cover`. Images, video and audio are inferred from the extension; video/audio support up to three fallback `sources`, and video supports an image `poster`. Keep dimensions and descriptions consistent with the question's values. Media appears in lessons, questions and saved results.
+
+```yaml
+media:
+  - src: media/triangle.svg
+    alt: A right triangle with base 4 units and perpendicular height 3 units.
+    caption: Identify the two perpendicular sides.
+    width: 800
+    height: 500
+```
+
+Put attachments in the lesson folder, beside `lesson-set.yaml` or `lesson-set.json`. Studio **Open folder** creates a portable pack; **Attach a file** embeds a small file directly. **Publish → Open lesson folder** uploads larger attachments separately before pinning the manifest to their GitHub revision. Only referenced files are collected. Built JSON contains an `assets` entry for each file: `path`, `mime_type`, `bytes`, `sha256`; portable assets add `data_base64`. Installed hosted packs retain `asset_base_url`, derived from the manifest URL. Preserve these fields in backups and edits. Never send private storage credentials with a media request.
+
+Limits are 1 MB total for portable embedded attachments, 25 MB per hosted file, 100 MB per folder, 60 files per pack, 12 items per section, and 2 MB for the JSON manifest. Hosted media requires its public repository to remain available; it is not copied into every workspace checkpoint. Supported extensions: png/apng/jpg/jpeg/gif/webp/avif/svg/bmp, webm/mp4/m4v/ogv, and mp3/wav/ogg/oga/m4a/flac/opus. Codec support depends on the browser; provide fallback video formats when needed.
+
+Matplotlib runs in the author's environment. Save PNG/SVG with `fig.savefig(...)`, or add declarative `matplotlib_figures` to YAML and run `quickmaths build-lesson lesson-set.yaml --output built-lesson` after `pip install -e ".[media]"`. Add `--portable` to embed small attachments. Import or publish the built output. Arbitrary plotting Python is never run when importing or viewing a lesson. The [complete media reference](LESSON_MEDIA.md) documents drawing layers, format options, safety checks and folder workflows. Start from the [geometry YAML](examples/geometry-media/lesson-set.yaml) or [portable example](lesson-media-example.json). Agents can request this section with `get_lesson_authoring_guide({"section":"media"})`.
 
 ## Human Lesson Creator
 

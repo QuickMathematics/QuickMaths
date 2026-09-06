@@ -107,6 +107,20 @@ test("controller previews before explicit install", async () => {
   assert.equal(result.installed, true);
 });
 
+test("media references use the verified manifest folder when staging and installing", async () => {
+  const source = JSON.stringify({ format: "quickmaths.lesson-set", id: "PACK_BIO", version: "1.1.0", assets: [{ path: "media/x.png" }], asset_base_url: "https://untrusted.example/" });
+  const received = [];
+  const store = {
+    snapshot: () => ({ lessonPacks: [] }),
+    previewLessonPack: raw => { received.push(JSON.parse(raw)); return { id: "PACK_BIO", version: "1.1.0", name: "Biology" }; },
+    importLessonPack: raw => { received.push(JSON.parse(raw)); return { id: "PACK_BIO", name: "Biology" }; },
+  };
+  const depot = createLessonDepot({ store, catalogUrl: "https://quickmathematics.github.io/QuickMaths/catalog.json", fetchImpl: async url => new Response(url.endsWith("catalog.json") ? JSON.stringify(catalog) : source), confirmInstall: () => true });
+  await depot.load(); await depot.previewPack("PACK_BIO", "1.1.0"); await depot.installPack("PACK_BIO", "1.1.0");
+  assert.ok(received.length >= 2);
+  assert.ok(received.every(pack => pack.asset_base_url === "https://quickmathematics.github.io/QuickMaths/lessons/"));
+});
+
 test("controller refuses to fetch or stage metadata-only concept previews", async () => {
   const previewCatalog = {
     ...catalog,

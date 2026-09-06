@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QuickMaths lesson media fields",
+  "description": "Media fields used by lesson-set schema 2.1. Runtime validation additionally enforces path containment, supported MIME/extension pairs, references, aggregate limits and file digests.",
+  "type": "object",
+  "properties": {
+    "media": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": [
+          "src",
+          "alt"
+        ],
+        "properties": {
+          "src": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "type": {
+            "enum": [
+              "image",
+              "video",
+              "audio"
+            ]
+          },
+          "alt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "caption": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "fit": {
+            "enum": [
+              "contain",
+              "cover"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "string",
+              "maxLength": 240
+            }
+          },
+          "poster": {
+            "type": "string",
+            "maxLength": 240
+          }
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "maxItems": 60,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "mime_type": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25000000
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{64}$"
+          },
+          "data_base64": {
+            "type": "string",
+            "maxLength": 1333336
+          }
+        }
+      }
+    },
+    "asset_base_url": {
+      "type": "string",
+      "format": "uri"
+    }
+  }
+}

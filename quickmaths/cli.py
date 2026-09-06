@@ -7,6 +7,7 @@ from pathlib import Path
 from quickmaths.config import DEFAULT_TRACK_DIR
 from quickmaths.local_bridge import LocalBridgeError, add_agent_bridge_parser, run_agent_bridge_from_args
 from quickmaths.validation import validate_curriculum
+from quickmaths.lesson_media import add_media_parser, build_lesson_folder
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -18,8 +19,17 @@ def main(argv: list[str] | None = None) -> int:
     validate_parser.add_argument("--strict-warnings", action="store_true", help="Return a failing exit code for warnings.")
     validate_parser.add_argument("--include-drafts", action="store_true", help="Validate draft skills and track-local drafts directory.")
     add_agent_bridge_parser(subparsers)
+    add_media_parser(subparsers)
     args = parser.parse_args(argv)
 
+    if args.command == "build-lesson":
+        try:
+            result = build_lesson_folder(args.manifest, args.output, portable=args.portable)
+            print(f"Built {result['manifest']} with {result['assets']} media files ({result['media_bytes']} bytes).")
+            return 0
+        except (ValueError, OSError) as error:
+            print(f"Could not build lesson: {error}", file=sys.stderr)
+            return 1
     if args.command == "validate-content":
         report = validate_curriculum(args.track_dir, dry_run_generated=not args.no_dry_run, include_drafts=args.include_drafts)
         for line in report.lines():

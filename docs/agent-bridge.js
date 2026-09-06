@@ -1,17 +1,17 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260906-optimization-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-optimization-v1";
-import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260906-optimization-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260906-media-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-media-v1";
+import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260906-media-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
-} from "./github-sync.js?v=20260906-optimization-v1";
-import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js?v=20260906-optimization-v1";
+} from "./github-sync.js?v=20260906-media-v1";
+import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js?v=20260906-media-v1";
 import {
   createLocalBridgeCredentialStore,
   createLocalGitContentsClient,
   resolveLocalBridgeCapability,
-} from "./local-git-client.js?v=20260906-security-v1";
+} from "./local-git-client.js?v=20260906-media-v1";
 
 const elements = {
   liveStatus: document.querySelector("#live-status"),

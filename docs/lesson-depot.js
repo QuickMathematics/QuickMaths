@@ -500,6 +500,11 @@ export function createLessonDepot({
     }
     const payload = JSON.parse(raw);
     if (payload?.id !== pack.id || payload?.version !== pack.version) throw new Error("Lesson file identity does not match its Depot listing.");
+    // Keep attachments beside the exact reviewed manifest.
+    if (payload.assets?.length) {
+      payload.asset_base_url = new URL(".", new URL(pack.lessonUrl, globalThis.location?.href ?? "https://example.invalid/")).href;
+      return JSON.stringify(payload);
+    }
     return raw;
   };
 

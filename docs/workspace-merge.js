@@ -62,7 +62,7 @@ export function preserveDeviceState(raw, localRaw, otherRaw = null) {
 const words = (value) => String(value).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
 const fieldNames = { displayName: "Name", status: "Mastery level", masteryScore: "Mastery score", body: "Note", skillIds: "Linked lessons", hiddenSkillIds: "Hidden lessons", enabledPackIds: "Enabled lesson sets", theory: "Lesson text", progressionMode: "Learning path", activeSubjectId: "Selected field", subject: "Field", subjectId: "Field", subdomain: "Branch", mapScope: "Map scope", nextReviewAt: "Next review", pendingResults: "Pending test result" };
 const fieldName = (key) => get(fieldNames, key) ?? words(key);
-const recordId = (item) => item?.id ?? item?.attemptId ?? item?.reviewId ?? item?.template_id ?? item?.pack?.id;
+const recordId = (item) => item?.id ?? item?.attemptId ?? item?.reviewId ?? item?.template_id ?? item?.pack?.id ?? item?.path;
 function valueAt(state, path) {
   return path.reduce((value, key) => Array.isArray(value) ? value.find((item) => recordId(item) === key) : get(value, key), state);
 }
@@ -99,7 +99,7 @@ export function createWorkspaceMerge({ baseJson = null, localJson, remoteJson, s
       return Array.from({ length: Math.max(before?.length ?? 0, after?.length ?? 0) }, (_, i) => details(before?.[i], after?.[i], `${prefix} · Item ${i + 1}`)).flat();
     }
     if ((object(before) || object(after)) && [before, after].every((v) => v === undefined || object(v))) {
-      return [...new Set([...Object.keys(before ?? {}), ...Object.keys(after ?? {})])].filter((key) => !["id", "createdAt", "updatedAt", "targetType"].includes(key)).flatMap((key) => details(get(before, key), get(after, key), [prefix, fieldName(key)].filter(Boolean).join(" · ")));
+      return [...new Set([...Object.keys(before ?? {}), ...Object.keys(after ?? {})])].filter((key) => !["id", "createdAt", "updatedAt", "targetType", "data_base64"].includes(key)).flatMap((key) => details(get(before, key), get(after, key), [prefix, fieldName(key)].filter(Boolean).join(" · ")));
     }
     return [{ label: prefix || "Value", before: textValue(before), after: textValue(after) }];
   }
@@ -132,6 +132,7 @@ export function createWorkspaceMerge({ baseJson = null, localJson, remoteJson, s
         subject = `Lesson · ${name(path[3])}${path.length > 4 ? ` · ${path.slice(4).map(fieldName).join(" · ")}` : ""}`;
         if (["problems", "native_templates"].includes(path.at(-2))) subject = `Question in ${name(path[3])} · ${record?.prompt || record?.name || name(path.at(-1))}`;
       }
+      else if (path[0] === "lessonPacks" && path[2] === "assets") subject = `Media file · ${path[3]}`;
       else if (["attempts", "reviews"].includes(path[0]) && path.length === 2) {
         const attempt = path[0] === "attempts" ? record : [...(local.attempts ?? []), ...(remote.attempts ?? [])].find((a) => a.attemptId === record?.attemptId);
         subject = `${path[0] === "attempts" ? "Test attempt" : "Feedback"} · ${attempt?.skillName || name(attempt?.skillId || "lesson")}${record?.completedAt || record?.createdAt ? ` · ${record.completedAt || record.createdAt}` : ""}`;
@@ -171,7 +172,7 @@ export function createWorkspaceMerge({ baseJson = null, localJson, remoteJson, s
     if (container && b === undefined && [l, r].every((v) => v === undefined || object(v)) && [l, r].some(object) && (!object(l) || !object(r))) {
       return { omitEmpty: true, children: [...new Set([...Object.keys(l ?? {}), ...Object.keys(r ?? {})])].map((key) => [key, walk(undefined, get(l, key), get(r, key), [...path, key])]) };
     }
-    const keyField = path.length === 1 ? get(keyedArrays, section) : pp?.length === 1 && ["annotations", "paths"].includes(last) ? "id" : section === "lessonPacks" && last === "skills" ? "id" : section === "lessonPacks" && ["problems", "native_templates"].includes(last) ? (last === "problems" ? "template_id" : "id") : null;
+    const keyField = path.length === 1 ? get(keyedArrays, section) : pp?.length === 1 && ["annotations", "paths"].includes(last) ? "id" : section === "lessonPacks" && last === "skills" ? "id" : section === "lessonPacks" && last === "assets" ? "path" : section === "lessonPacks" && ["problems", "native_templates"].includes(last) ? (last === "problems" ? "template_id" : "id") : null;
     const id = keyField ? (item) => get(item, keyField) : section === "stagedLessonPacks" && path.length === 1 ? (item) => item?.pack?.id : null;
     if (id && [l, r, b ?? []].every((items) => uniqueRecords(items, id))) {
       const ids = [...new Set([...l, ...r, ...(b ?? [])].map(id))];
@@ -183,7 +184,7 @@ export function createWorkspaceMerge({ baseJson = null, localJson, remoteJson, s
     if ((pp?.length === 1 && last === "hiddenSkillIds" || section === "curricula" && last === "enabledPackIds") && [l, r, b ?? []].every((items) => Array.isArray(items) && items.every((item) => typeof item === "string"))) {
       return { members: [...new Set([...l, ...r, ...(b ?? [])])].map((key) => [key, walk(b?.includes(key) ?? false, l.includes(key), r.includes(key), [...path, key])]) };
     }
-    const intact = (["attempts", "reviews", "stagedLessonPacks"].includes(section) && path.length === 2) || (section === "drafts" && path.length === 3) || (pp?.[0] === "layouts" && pp.length === 3) || (pp?.[0] === "annotations" && pp[2] === "positions" && pp.length === 4) || (section === "lessonPacks" && ["problems", "native_templates"].includes(path.at(-2)));
+    const intact = (["attempts", "reviews", "stagedLessonPacks"].includes(section) && path.length === 2) || (section === "drafts" && path.length === 3) || (pp?.[0] === "layouts" && pp.length === 3) || (pp?.[0] === "annotations" && pp[2] === "positions" && pp.length === 4) || (section === "lessonPacks" && ["problems", "native_templates", "assets"].includes(path.at(-2)));
     if (!intact && object(l) && object(r) && (b === undefined || object(b))) {
       // An added/deleted record is one choice. Existing records are compared by
       // field; this preserves delete-versus-edit conflicts and required IDs.

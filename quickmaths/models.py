@@ -21,6 +21,7 @@ class Example:
     prompt: str
     solution: str
     explanation: str = ""
+    media: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -42,6 +43,7 @@ class ProblemTemplate:
     answer_mode: str = "final_only"
     work: dict[str, Any] = field(default_factory=dict)
     review_policy: dict[str, Any] = field(default_factory=dict)
+    media: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -74,6 +76,7 @@ class Skill:
     deprecated: bool = False
     replacement_skill_id: str = ""
     topic: str = ""
+    media: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -110,6 +113,7 @@ class ProblemInstance:
     accepted_forms: list[str] = field(default_factory=list)
     answer_metadata: dict[str, Any] = field(default_factory=dict)
     grading_metadata: dict[str, Any] = field(default_factory=dict)
+    media: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

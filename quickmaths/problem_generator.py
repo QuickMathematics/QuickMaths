@@ -121,6 +121,7 @@ def _build_instance(skill_id: str, template: ProblemTemplate, seed: int, values:
         accepted_forms=list(answer.get("accepted_forms", template.grading.get("accepted_forms", []))),
         answer_metadata=deepcopy(answer),
         grading_metadata=deepcopy(template.grading),
+        media=deepcopy(template.media),
     )
 
 
@@ -148,6 +149,7 @@ def _fixed_problem(skill_id: str, template: ProblemTemplate, seed: int) -> Probl
         accepted_forms=list(answer.get("accepted_forms", template.grading.get("accepted_forms", []))),
         answer_metadata=deepcopy(answer),
         grading_metadata=deepcopy(template.grading),
+        media=deepcopy(template.media),
     )
 
 

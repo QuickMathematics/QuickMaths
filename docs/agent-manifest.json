@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Unified Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 28,
+  "app_version": 29,
   "description": "The single operating guide for routing fresh visitors, tutoring learners, and helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -357,7 +357,7 @@
   },
   "custom_lesson_sets": {
     "format": "quickmaths.lesson-set",
-    "schema_version": "2.0",
+    "schema_version": "2.1",
     "authoring_guide": "https://quickmathematics.github.io/QuickMaths/CUSTOM_LESSON_SETS.md",
     "example": "https://quickmathematics.github.io/QuickMaths/lesson-set-example.json",
     "install_route": "settings",
@@ -367,7 +367,12 @@
       "file_bytes": 2000000,
       "sets": 10,
       "skills_per_set": 50,
-      "problems_per_skill": 100
+      "problems_per_skill": 100,
+      "media_file_bytes": 25000000,
+      "media_total_bytes": 100000000,
+      "embedded_media_bytes": 1000000,
+      "assets_per_pack": 60,
+      "media_per_section": 12
     },
     "id_rules": {
       "pack_prefix": "PACK_",
@@ -377,7 +382,7 @@
     },
     "native_improvements": {
       "mode": "override",
-      "schema_version": "2.0",
+      "schema_version": "2.1",
       "scope": "built-in native lessons only; the field and lesson ID cannot change",
       "behavior": "Replaces lesson content while installed, without adding a map node or changing the total lesson count. Completed attempts, mastery, and reviews remain attached to the same ID; affected unfinished tests restart so answers cannot cross between question-bank versions. Built-in Mathematics uses trusted runtime templates for fresh retake values; custom and community overrides remain fixed validated question banks and never execute uploaded generator code.",
       "agent_pipeline": "Use open_lesson_creator with skill_id for a visible editable copy, or validate_lesson_set then stage_custom_lesson_set for authored JSON. A human must install it.",
@@ -433,6 +438,41 @@
       },
       "theme_safety": "Only fixed six-digit color tokens are accepted; CSS, HTML, scripts, and URLs are rejected."
     },
-    "backup_integration": "Installed lesson-set content and all related learner records are embedded in full JSON backups."
+    "backup_integration": "Installed lesson-set content and all related learner records are embedded in full JSON backups.",
+    "media": {
+      "guide": "https://quickmathematics.github.io/QuickMaths/LESSON_MEDIA.md",
+      "example": "https://quickmathematics.github.io/QuickMaths/lesson-media-example.json",
+      "schema": "https://github.com/QuickMathematics/QuickMaths/blob/main/schemas/lesson-media.schema.json",
+      "sections": [
+        "skill",
+        "example",
+        "application",
+        "problem"
+      ],
+      "authoring": "Read get_lesson_authoring_guide section media. Use YAML/JSON folder manifests and relative media paths. Generate Matplotlib PNG/SVG during authoring using savefig or quickmaths build-lesson; importing or viewing lessons never executes plotting Python. Studio can attach small files and import folders. Publish folder attachments before pinning the lesson revision.",
+      "storage": "Keep assets metadata and asset_base_url when editing installed hosted packs. Embedded data_base64 travels in backups; hosted bytes remain in the public lesson repository. Media must have descriptive alt text, valid dimensions and verified SHA-256 digests.",
+      "formats": [
+        "png",
+        "apng",
+        "jpg",
+        "jpeg",
+        "gif",
+        "webp",
+        "avif",
+        "svg",
+        "bmp",
+        "webm",
+        "mp4",
+        "m4v",
+        "ogv",
+        "mp3",
+        "wav",
+        "ogg",
+        "oga",
+        "m4a",
+        "flac",
+        "opus"
+      ]
+    }
   }
 }

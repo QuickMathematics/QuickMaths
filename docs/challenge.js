@@ -1,12 +1,15 @@
+import { parseLessonManifest, readLessonFolder } from "./lesson-folder.js?v=20260906-media-v1";
+import { renderLessonMedia } from "./lesson-media.js?v=20260906-media-v1";
+import { createLessonMediaRenderer } from "./lesson-media-renderer.js?v=20260906-media-v1";
 import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-optimization-v1";
 import { learningFields, branchName } from "./learning-fields.js?v=20260906-optimization-v1";
 import { storageStatus } from "./storage-status.js?v=20260906-optimization-v1";
 import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-optimization-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-optimization-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-optimization-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260906-optimization-v1";
-import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
+import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-media-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-media-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260906-media-v1";
+import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
 import {
   buildDepotSubmissionPrompt,
   createLessonDepot,
@@ -14,13 +17,13 @@ import {
   DEPOT_DISCUSSIONS_URL,
   DEPOT_REPOSITORY_URL,
   filterDepotPackages,
-} from "./lesson-depot.js?v=20260906-optimization-v1";
+} from "./lesson-depot.js?v=20260906-media-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-optimization-v1";
+} from "./github-sync.js?v=20260906-media-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -76,6 +79,8 @@ const elements = {
   backupFile: document.querySelector("#backup-file"),
   lessonSetFile: document.querySelector("#lesson-set-file"),
   creatorFile: document.querySelector("#creator-file"),
+  creatorFolder: document.querySelector("#creator-folder"),
+  creatorMedia: document.querySelector("#creator-media"),
   curriculumFile: document.querySelector("#curriculum-file"),
   toast: document.querySelector("#toast"),
   educatorWelcome: document.querySelector("#educator-welcome-root"),
@@ -1453,6 +1458,8 @@ function formatTheory(value) {
   }).join("");
 }
 
+const mediaRenderer = createLessonMediaRenderer({ getPack: id => id === "__studio__" ? lessonStudio.getMediaAssets() : store.getLessonMediaAssets(id) });
+
 function renderLesson(snapshot) {
   const skill = snapshot.selectedSkill;
   const row = rowForSkill(snapshot, skill.id);
@@ -1471,13 +1478,13 @@ function renderLesson(snapshot) {
       </div>
       <article class="theory-card">
         <p class="eyebrow">Core idea</p>
-        <div class="theory-copy">${formatTheory(skill.theory)}</div>
+        <div class="theory-copy">${formatTheory(skill.theory)}</div>${renderLessonMedia(skill.media, skill.packId)}
       </article>
     </section>
-    ${skill.applications?.length ? `<section class="application-grid"><div class="section-title"><p class="eyebrow">Why this matters</p><h2>${escapeHtml(snapshot.activeSubject.shortName)} that travels</h2></div>${skill.applications.map((item) => `<article><strong>${escapeHtml(item.title ?? item.subject ?? "Application")}</strong><p>${escapeHtml(item.description)}</p></article>`).join("")}</section>` : ""}
+    ${skill.applications?.length ? `<section class="application-grid"><div class="section-title"><p class="eyebrow">Why this matters</p><h2>${escapeHtml(snapshot.activeSubject.shortName)} that travels</h2></div>${skill.applications.map((item) => `<article><strong>${escapeHtml(item.title ?? item.subject ?? "Application")}</strong><p>${escapeHtml(item.description)}</p>${renderLessonMedia(item.media, skill.packId)}</article>`).join("")}</section>` : ""}
     <section class="examples-section">
       <div class="section-title"><p class="eyebrow">Worked examples</p><h2>Watch the method</h2></div>
-      <div class="example-list">${skill.examples.map((example, index) => `<details ${index === 0 ? "open" : ""}><summary><span>${String(index + 1).padStart(2, "0")}</span>${escapeHtml(example.prompt)}</summary><div><p class="example-solution">${escapeHtml(example.solution)}</p><p>${escapeHtml(example.explanation)}</p></div></details>`).join("")}</div>
+      <div class="example-list">${skill.examples.map((example, index) => `<details ${index === 0 ? "open" : ""}><summary><span>${String(index + 1).padStart(2, "0")}</span>${escapeHtml(example.prompt)}</summary><div><p class="example-solution">${escapeHtml(example.solution)}</p><p>${escapeHtml(example.explanation)}</p>${renderLessonMedia(example.media, skill.packId)}</div></details>`).join("")}</div>
     </section>
   `;
 }
@@ -1513,10 +1520,11 @@ function renderFormattedCode(source, language = "text", caption = "Code") {
 }
 
 function renderProblemPrompt(problem) {
-  if (!problem.prompt_blocks?.length) return `<h2>${escapeHtml(problem.prompt)}</h2>`;
+  const media = renderLessonMedia(problem.media, store.skillsById[problem.skill_id]?.packId);
+  if (!problem.prompt_blocks?.length) return `<h2>${escapeHtml(problem.prompt)}</h2>${media}`;
   return `<div class="question-prompt-blocks" aria-label="Question prompt">${problem.prompt_blocks.map((block) => block.type === "code"
     ? renderFormattedCode(block.text, block.language, "Question code")
-    : `<p>${escapeHtml(block.text)}</p>`).join("")}</div>`;
+    : `<p>${escapeHtml(block.text)}</p>`).join("")}</div>${media}`;
 }
 
 function pythonGradePanel(problem, response, { submitted = false } = {}) {
@@ -1682,10 +1690,10 @@ function resultStructuredDetails(result) {
   return `<div class="shown-work"><strong>Structured work</strong><pre>${escapeHtml(JSON.stringify(structured, null, 2))}</pre></div>`;
 }
 
-function resultDetails(results) {
+function resultDetails(results, packId = "") {
   return results.map((result, index) => `<details class="result-question" ${!result.correct || result.reviewRequired ? "open" : ""}>
     <summary><span class="result-icon ${result.correct ? "correct" : "incorrect"}">${result.correct ? "✓" : "×"}</span><span><strong>Question ${index + 1}</strong><small>${escapeHtml(result.prompt)}</small></span><b>${result.reviewRequired ? "Review required" : result.correct ? "Correct" : "Needs work"}</b></summary>
-    <div class="result-body"><dl><div><dt>Your answer</dt><dd>${result.gradingMethod === "python_program" ? `<pre class="result-code"><code>${escapeHtml(result.finalAnswer || "No code submitted")}</code></pre>` : escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${resultStructuredDetails(result)}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
+    <div class="result-body">${renderLessonMedia(result.media, packId)}<dl><div><dt>Your answer</dt><dd>${result.gradingMethod === "python_program" ? `<pre class="result-code"><code>${escapeHtml(result.finalAnswer || "No code submitted")}</code></pre>` : escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${resultStructuredDetails(result)}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
   </details>`).join("");
 }
 
@@ -1729,7 +1737,7 @@ function renderResults(snapshot) {
   elements.view.innerHTML = `
     <header class="page-head"><div><p class="eyebrow">${pending ? "Unsaved reflection" : "Saved attempt"}</p><h1>${escapeHtml(skill?.name ?? result.skillName)}</h1><p>${pending ? "Review the outcome, then save your reflection to update the mastery map." : `Completed ${formatDate(attempt.completedAt)} · ${escapeHtml(attempt.masteryUpdate?.status ?? "saved")}`}</p>${pending ? "" : `<div class="page-actions"><button class="button button-outline" data-action="download-tutor-summary">Tutor summary ↓</button><button class="button button-outline" data-action="download-review-packet">Review packet ↓</button></div>`}</div><div class="result-score"><strong>${score}%</strong><span>${result.rawScore} / ${result.scoreTotal} correct</span></div></header>
     <section class="results-layout">
-      <div class="result-questions">${resultDetails(result.results ?? [])}</div>
+      <div class="result-questions">${resultDetails(result.results ?? [], skill?.packId ?? "")}</div>
       <aside class="reflection-card">
         ${pending ? `<p class="eyebrow">Reflection</p><h2>How did that feel?</h2><p>Mastery is accumulated. Confidence, hints, guessing, and difficulty shape the update.</p>
           <form id="reflection-form">
@@ -2211,6 +2219,7 @@ function render(snapshot) {
   renderEducatorWelcome(snapshot);
   renderWelcomeSummary(snapshot);
   if (!signedIn) {
+    mediaRenderer.dispose();
     renderProfiles(snapshot);
     renderWelcomeStorageRestore(snapshot);
     if (location.hash !== "#/welcome") history.replaceState(null, "", "#/welcome");
@@ -2254,6 +2263,7 @@ function render(snapshot) {
     else history.replaceState(null, "", nextHash);
   }
   routeHistoryReady = true;
+  mediaRenderer.hydrate(elements.view);
 }
 
 function applyLocationRoute() {
@@ -2471,6 +2481,7 @@ async function clearAllWorkspaceData() {
   if (!confirmPermanentDeletion(first, "Are you absolutely sure you want to permanently clear all QuickMaths data?")) return;
   if (connected) await githubSync.clearRemoteWorkspace();
   cancelActivePythonGraders();
+  mediaRenderer.dispose();
   lessonStudio?.clearDraft?.();
   lessonPublisher?.clearDraft?.();
   store.clearAllData();
@@ -2671,10 +2682,27 @@ elements.creatorFile.addEventListener("change", async () => {
   const file = elements.creatorFile.files?.[0];
   if (!file) return;
   try {
-    if (lessonStudio.loadRaw(await readFileTextLimited(file, MAX_LESSON_FILE_BYTES, { label: "Lesson Studio file" }))) render(store.snapshot());
+    const pack = await parseLessonManifest(await readFileTextLimited(file, MAX_LESSON_FILE_BYTES, { label: "Lesson Studio file" }), file.name);
+    if (lessonStudio.loadRaw(JSON.stringify(pack))) render(store.snapshot());
   } catch (error) {
     showToast(error instanceof Error ? error.message : String(error));
   } finally { elements.creatorFile.value = ""; }
+});
+
+elements.creatorFolder.addEventListener("change", async () => {
+  try {
+    if (!elements.creatorFolder.files?.length) return;
+    const { pack } = await readLessonFolder(elements.creatorFolder.files, { portable: true });
+    if (lessonStudio.loadRaw(JSON.stringify(pack))) render(store.snapshot());
+  } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+  finally { elements.creatorFolder.value = ""; }
+});
+elements.creatorMedia.addEventListener("change", async () => {
+  try {
+    const file = elements.creatorMedia.files?.[0];
+    if (file) { await lessonStudio.attachFile(file); render(store.snapshot()); }
+  } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+  finally { elements.creatorMedia.value = ""; }
 });
 
 function positionStudioHelp(button) {
@@ -3481,7 +3509,7 @@ async function boot() {
   let needsLegacyGeography = false;
   try {
     const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "null");
-    needsLegacyGeography = Boolean(saved && Number(saved.version) < APP_VERSION);
+    needsLegacyGeography = Boolean(saved && Number(saved.version) < BUNDLED_LESSON_MIGRATION_VERSION);
   } catch {
     // The store's normal malformed-state recovery remains authoritative.
   }
@@ -3537,6 +3565,8 @@ async function boot() {
     showToast,
     getSnapshot: () => store.snapshot(),
     openFilePicker: () => elements.creatorFile.click(),
+    openFolderPicker: () => elements.creatorFolder.click(),
+    openAssetPicker: () => elements.creatorMedia.click(),
     publishToDepot: (pack) => lessonPublisher.open(pack),
   });
   lessonDepot.load();
@@ -3591,7 +3621,7 @@ async function boot() {
 async function ensureLegacyGeographyMigration(raw) {
   let version = APP_VERSION;
   try { version = Number(JSON.parse(raw)?.version ?? APP_VERSION); } catch { return; }
-  if (version >= APP_VERSION) return;
+  if (version >= BUNDLED_LESSON_MIGRATION_VERSION) return;
   legacyGeographyMigrationPromise ??= fetchTextLimited(fetch, "./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-optimization-v1", { maximumBytes: MAX_LESSON_FILE_BYTES, label: "Geography migration pack" });
   const result = await legacyGeographyMigrationPromise;
   store.registerBundledLessonPacks([result.text]);

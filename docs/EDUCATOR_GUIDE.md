@@ -737,4 +737,8 @@ Use the app's Agent handoff. Download a full backup or configure private Workspa
 - Bridge guide: https://quickmathematics.github.io/QuickMaths/bridge-guide.html
 - Source and Lesson Depot: https://github.com/QuickMathematics/QuickMaths
 
-QuickMaths educator documentation - app version 28 - September 2026.
+QuickMaths educator documentation - app version 29 - September 2026.
+
+## Adding diagrams, video and audio
+
+In Lesson Studio, use **Attach a file** in a lesson, example, application or question, then set its description, caption and dimensions. Small attachments (up to 1 MB total) are saved inside your draft and exported JSON. For larger media, place files beside a YAML/JSON manifest and use **Publish → Open lesson folder**. Files may be up to 25 MB each and 100 MB total. Matplotlib figures are generated during authoring as PNG/SVG, so learners need no plotting runtime. The media guide includes folder and plotting examples: https://quickmathematics.github.io/QuickMaths/LESSON_MEDIA.md . Try the portable geometry lesson: https://quickmathematics.github.io/QuickMaths/lesson-media-example.json . Public hosted attachments stay in the publication repository; backup files preserve their verified references.

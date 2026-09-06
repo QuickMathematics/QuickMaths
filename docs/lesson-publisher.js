@@ -1,3 +1,4 @@
+import { loadLessonAsset, mediaDigest, encodeMediaData } from "./lesson-media.js?v=20260906-media-v1";
 import { normalizeLessonPack } from "./challenge-core.js";
 import { compareVersions, DEFAULT_DEPOT_FEDERATION, normalizeDepotCatalog } from "./lesson-depot.js";
 import { registryUrlFromBody, validateFederatedNamespace, validateFederatedReleases } from "./depot-validation.js";
@@ -41,7 +42,7 @@ function catalogWithRelease(catalog, review, pack, namespace, lessonUrl, date) {
 
 // Serialize only the validated lesson schema, never a workspace, installed-at
 // metadata, authoring draft state, or arbitrary keys from an imported JSON file.
-export async function preparePublicLesson(input, { namespace, curriculum, author, publishedSkills = [], cryptoImpl = globalThis.crypto } = {}) {
+export async function preparePublicLesson(input, { namespace, curriculum, author, publishedSkills = [], attachments = new Map(), fetchImpl = globalThis.fetch, cryptoImpl = globalThis.crypto } = {}) {
   const source = typeof input === "string" ? JSON.parse(input) : structuredClone(input);
   if (bytes(json(source)).length > MAX_PACK_BYTES) throw new Error("Lesson package is larger than 2 MB.");
   const validated = normalizeLessonPack(source, { nativeSkills: curriculum.skills, allowMissingReferences: true });
@@ -55,6 +56,18 @@ export async function preparePublicLesson(input, { namespace, curriculum, author
     return proposed.length <= limit ? proposed : `${proposed.slice(0, limit - 9)}_${(await sha256(id, cryptoImpl)).slice(0, 8).toUpperCase()}`;
   };
   const pack = validated;
+  const mediaFiles = [];
+  let mediaBytes = 0;
+  for (const asset of pack.assets ?? []) {
+    mediaBytes += asset.bytes;
+    if (mediaBytes > 100_000_000) throw new Error("A publication supports at most 100 MB of attachments.");
+    const supplied = attachments.get(asset.path);
+    const data = supplied ? new Uint8Array(supplied) : await loadLessonAsset(asset, pack.asset_base_url, { fetchImpl, cryptoImpl });
+    if (data.length !== asset.bytes || await mediaDigest(data, cryptoImpl) !== asset.sha256) throw new Error(`${asset.path} changed before publication. Review the folder again.`);
+    mediaFiles.push({ ...asset, data });
+    delete asset.data_base64;
+  }
+  delete pack.asset_base_url;
   delete pack.importedAt;
   pack.id = await namespaced(pack.id, "PACK");
   if (!source.author?.trim() || pack.author === "Unknown author") pack.author = author;
@@ -89,7 +102,7 @@ export async function preparePublicLesson(input, { namespace, curriculum, author
   for (const key of ["skills", "entry_skills", "exit_skills"]) pack.track[key] = pack.track[key].map(remap);
   const text = json(pack);
   if (bytes(text).length > MAX_PACK_BYTES) throw new Error("Published lesson package is larger than 2 MB.");
-  return { pack, text, sha256: await sha256(text, cryptoImpl) };
+  return { pack, text, mediaFiles, sha256: await sha256(text, cryptoImpl) };
 }
 
 export function createLessonPublisher({ curriculum, fetchImpl = globalThis.fetch?.bind(globalThis), cryptoImpl = globalThis.crypto, now = () => new Date() } = {}) {
@@ -199,7 +212,7 @@ export function createLessonPublisher({ curriculum, fetchImpl = globalThis.fetch
     return found;
   };
 
-  const prepare = async ({ pack: input, repo: name, license }) => {
+  const prepare = async ({ pack: input, repo: name, license, attachments = new Map() }) => {
     if (!viewer || !community) throw new Error("Connect GitHub before reviewing a publication.");
     if (busy) throw new Error("Publishing is already in progress.");
     if (!PUBLISH_LICENSES.includes(license)) throw new Error("Choose a publication license.");
@@ -234,7 +247,7 @@ export function createLessonPublisher({ curriculum, fetchImpl = globalThis.fetch
       }
     }
     const publishedSkills = releases.flatMap(({ raw }) => raw.skills.map((skill) => ({ id: skill.id, subjectId: raw.subject.id })));
-    const prepared = await preparePublicLesson(input, { namespace, curriculum, author: viewer, publishedSkills, cryptoImpl });
+    const prepared = await preparePublicLesson(input, { namespace, curriculum, author: viewer, publishedSkills, cryptoImpl, attachments, fetchImpl });
     const same = catalog?.packages.find((item) => item.id === prepared.pack.id && item.version === prepared.pack.version);
     if (same && (same.sha256 !== prepared.sha256 || same.license !== license)) throw new Error("This version is already published with different content or a different license. Increase the lesson version before publishing changes.");
     if (!same && releases.some(({ pack }) => pack.id === prepared.pack.id && compareVersions(pack.version, prepared.pack.version) >= 0)) throw new Error("Choose a version newer than this package’s latest published release.");
@@ -248,7 +261,7 @@ export function createLessonPublisher({ curriculum, fetchImpl = globalThis.fetch
       if (existing !== null && await sha256(existing, cryptoImpl) !== prepared.sha256) throw new Error("This release path already contains different content. Increase the version; published lesson files are never overwritten.");
     }
     if (generation !== session) throw new Error("The connected GitHub account changed. Review the publication again.");
-    const review = Object.freeze({ repository, createRepository: !repo, name: prepared.pack.name, id: prepared.pack.id, version: prepared.pack.version, license, author: prepared.pack.author, subject: prepared.pack.subject.name, skills: prepared.pack.skills.length, problems: prepared.pack.skills.reduce((sum, skill) => sum + skill.problems.length, 0), mode: prepared.pack.mode, packagePath, catalogPath, text: prepared.text, sha256: prepared.sha256 });
+    const review = Object.freeze({ repository, createRepository: !repo, name: prepared.pack.name, id: prepared.pack.id, version: prepared.pack.version, license, author: prepared.pack.author, subject: prepared.pack.subject.name, skills: prepared.pack.skills.length, problems: prepared.pack.skills.reduce((sum, skill) => sum + skill.problems.length, 0), mode: prepared.pack.mode, mediaFiles: prepared.mediaFiles.map(({ path, bytes, mime_type }) => ({ path, bytes, mime_type })), packagePath, catalogPath, text: prepared.text, sha256: prepared.sha256 });
     if (!same) {
       const proposed = catalogWithRelease(catalog, review, prepared.pack, namespace, rawUrl(repository, "0".repeat(40), packagePath), now().toISOString().slice(0, 10));
       if (bytes(json(proposed)).length > MAX_CATALOG_BYTES) throw new Error("The registry would exceed 500 KB. Choose a separate public repository for further lessons.");
@@ -277,6 +290,20 @@ export function createLessonPublisher({ curriculum, fetchImpl = globalThis.fetch
       let revision = await head(repository, repo);
       const currentCatalog = revision ? await contents(repository, review.catalogPath, revision, { maximumBytes: 750_000 }) : null;
       if ((currentCatalog?.sha ?? null) !== (plan.catalogFile?.sha ?? null)) throw new Error("The registry changed since your review. Review again so another publication is preserved.");
+      if (!plan.same) for (const asset of plan.mediaFiles) {
+        onProgress(`Uploading attachment ${asset.path}…`);
+        const assetPath = review.packagePath.slice(0, review.packagePath.lastIndexOf("/") + 1) + asset.path;
+        const existingAsset = revision ? await contents(repository, assetPath, revision) : null;
+        const header = bytes(`blob ${asset.data.length}\0`);
+        const blobData = new Uint8Array(header.length + asset.data.length); blobData.set(header); blobData.set(asset.data, header.length);
+        const gitSha = [...new Uint8Array(await cryptoImpl.subtle.digest("SHA-1", blobData))].map(value => value.toString(16).padStart(2, "0")).join("");
+        if (existingAsset && (existingAsset.type !== "file" || existingAsset.sha !== gitSha)) throw new Error(`${asset.path} already contains different data. Increase the release version.`);
+        if (!existingAsset) {
+          const saved = await request(`/repos/${repository}/contents/${encodedPath(assetPath)}`, { method: "PUT", body: { message: `Publish ${review.id} attachment ${asset.path}`, content: encodeMediaData(asset.data), ...(revision ? { branch: repo.default_branch } : {}) } });
+          if (!isSha(saved?.commit?.sha)) throw new Error("GitHub did not confirm the attachment revision.");
+          revision = saved.commit.sha;
+        }
+      }
       onProgress("Uploading the lesson release…");
       let lessonUrl = plan.same?.lesson_url || plan.same?.lesson_path;
       if (!plan.same) {

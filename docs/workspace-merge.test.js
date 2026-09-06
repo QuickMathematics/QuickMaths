@@ -2,6 +2,20 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createWorkspaceMerge, sameWorkspace } from "./workspace-merge.js";
 const json = JSON.stringify;
+
+test("independent lesson attachments merge by path and each digest stays with its bytes", () => {
+  const base = { lessonPacks: [{ id: "pack", assets: [] }] };
+  const local = structuredClone(base), remote = structuredClone(base);
+  local.lessonPacks[0].assets.push({ path: "a.png", bytes: 2, sha256: "a", data_base64: "aaa=" });
+  remote.lessonPacks[0].assets.push({ path: "b.webm", bytes: 3, sha256: "b" });
+  const plan = createWorkspaceMerge({ baseJson: json(base), localJson: json(local), remoteJson: json(remote) });
+  assert.equal(plan.rows.length, 2);
+  assert.ok(plan.rows.every(row => !row.conflict && row.label.includes("Media file")));
+  assert.equal(JSON.parse(plan.resolve()).lessonPacks[0].assets.length, 2);
+  const changed = structuredClone(local); changed.lessonPacks[0].assets[0].bytes = 4; changed.lessonPacks[0].assets[0].sha256 = "changed";
+  const overlap = createWorkspaceMerge({ baseJson: json(base), localJson: json(local), remoteJson: json(changed) });
+  assert.equal(overlap.rows.length, 1); assert.equal(overlap.rows[0].conflict, true);
+});
 const state = () => ({ version: 8, profiles: [{ id: "p1", displayName: "Ada", totalLoggedSeconds: 10 }], attempts: [], progress: { p1: {} }, lessonPacks: [], mapPlans: { p1: {} } });
 
 test("merge keeps independent records from both sides and requires choices for overlapping edits", () => {

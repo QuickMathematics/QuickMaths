@@ -669,3 +669,7 @@ Use Agent Studio's handoff. Download a full backup or configure private Workspac
 App and source: https://quickmathematics.github.io/QuickMaths/ and https://github.com/QuickMathematics/QuickMaths
 
 Technical guides: https://quickmathematics.github.io/QuickMaths/CUSTOM_LESSON_SETS.md and https://quickmathematics.github.io/QuickMaths/bridge-guide.html
+
+## Lesson diagrams and media
+
+Lessons and questions can include diagrams, images, video and audio. Figures resize for your screen; video and audio have playback controls. Captions and descriptions explain the teaching content. Hosted files load from the lesson repository after their integrity is checked, so they require a connection. Small embedded attachments travel with your backup. If a file cannot load, QuickMaths shows an explanation beside that item.

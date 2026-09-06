@@ -18,6 +18,15 @@ import {
 } from "./challenge-core.js";
 
 const curriculum = JSON.parse(readFileSync(new URL("./curriculum-data.json", import.meta.url), "utf8"));
+
+test("media version upgrade does not reinstall previously removed bundled geography", () => {
+  const store = createQuickMathsStore({ curriculum, storage: memoryStorage() });
+  store.createProfile("Returning learner");
+  const saved = JSON.parse(store.exportSyncState()); saved.version = 16;
+  const storage = memoryStorage({ [STORAGE_KEY]: JSON.stringify(saved) });
+  const upgraded = createQuickMathsStore({ curriculum, storage, bundledLessonPacks: [geographyLessonSet] });
+  assert.equal(upgraded.snapshot().lessonPacks.length, 0);
+});
 const lessonSetExample = readFileSync(new URL("./lesson-set-example.json", import.meta.url), "utf8");
 const geographyLessonSet = readFileSync(new URL("./lesson-depot/lessons/geography/1.0.0/lesson-set.json", import.meta.url), "utf8");
 const programmingLessonSet = readFileSync(new URL("./lesson-depot/lessons/programming-fundamentals-python/1.2.0/lesson-set.json", import.meta.url), "utf8");
