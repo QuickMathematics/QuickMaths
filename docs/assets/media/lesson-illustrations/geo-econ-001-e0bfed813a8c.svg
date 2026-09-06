@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 202.164652 208.676571
+Q 210.498752 208.676571 216.037767 208.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 212.037767 206.676571
+L 216.037767 208.676571
+L 212.037767 210.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 322.939612 208.676571
+Q 331.273712 208.676571 336.812727 208.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 332.812727 206.676571
+L 336.812727 208.676571
+L 332.812727 210.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 443.714572 208.676571
+Q 452.048672 208.676571 457.587687 208.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 453.587687 206.676571
+L 457.587687 208.676571
+L 453.587687 210.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 108.223776 251.136
+L 191.995344 251.136
+Q 198.162576 251.136 198.162576 245.211429
+L 198.162576 162.267429
+Q 198.162576 156.342857 191.995344 156.342857
+L 108.223776 156.342857
+Q 102.056544 156.342857 102.056544 162.267429
+L 102.056544 245.211429
+Q 102.056544 251.136 108.223776 251.136
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 228.998736 251.136
+L 312.770304 251.136
+Q 318.937536 251.136 318.937536 245.211429
+L 318.937536 162.267429
+Q 318.937536 156.342857 312.770304 156.342857
+L 228.998736 156.342857
+Q 222.831504 156.342857 222.831504 162.267429
+L 222.831504 245.211429
+Q 222.831504 251.136 228.998736 251.136
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 349.773696 251.136
+L 433.545264 251.136
+Q 439.712496 251.136 439.712496 245.211429
+L 439.712496 162.267429
+Q 439.712496 156.342857 433.545264 156.342857
+L 349.773696 156.342857
+Q 343.606464 156.342857 343.606464 162.267429
+L 343.606464 245.211429
+Q 343.606464 251.136 349.773696 251.136
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 470.548656 251.136
+L 554.320224 251.136
+Q 560.487456 251.136 560.487456 245.211429
+L 560.487456 162.267429
+Q 560.487456 156.342857 554.320224 156.342857
+L 470.548656 156.342857
+Q 464.381424 156.342857 464.381424 162.267429
+L 464.381424 245.211429
+Q 464.381424 251.136 470.548656 251.136
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(111.602625 63.621696)">Production networks connect distant</text>
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(292.73325 90.496446)">places</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(132.234326 198.912225)">Raw</text>
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(110.204716 217.948507)">materials</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="270.88452" y="208.430366" transform="rotate(-0 270.88452 208.430366)">Components</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="391.65948" y="208.430366" transform="rotate(-0 391.65948 208.430366)">Assembly</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="512.43444" y="208.430366" transform="rotate(-0 512.43444 208.430366)">Markets</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(97.545437 314.083223)">Value, jobs, transport costs and environmental</text>
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(212.47825 336.478848)">impacts differ by stage.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

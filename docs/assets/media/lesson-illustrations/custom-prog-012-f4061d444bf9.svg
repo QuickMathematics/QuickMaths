@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 289.018142 149.430857
+Q 331.272061 149.430857 370.730896 149.430857
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 366.730896 147.430857
+L 370.730896 149.430857
+L 366.730896 151.430857
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 289.018142 238.299429
+Q 331.272061 238.299429 370.730896 238.299429
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 366.730896 236.299429
+L 370.730896 238.299429
+L 366.730896 240.299429
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 128.781216 177.078857
+L 276.794784 177.078857
+Q 282.962016 177.078857 282.962016 171.154286
+L 282.962016 127.707429
+Q 282.962016 121.782857 276.794784 121.782857
+L 128.781216 121.782857
+Q 122.613984 121.782857 122.613984 127.707429
+L 122.613984 171.154286
+Q 122.613984 177.078857 128.781216 177.078857
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 385.749216 177.078857
+L 482.369184 177.078857
+Q 488.536416 177.078857 488.536416 171.154286
+L 488.536416 127.707429
+Q 488.536416 121.782857 482.369184 121.782857
+L 385.749216 121.782857
+Q 379.581984 121.782857 379.581984 127.707429
+L 379.581984 171.154286
+Q 379.581984 177.078857 385.749216 177.078857
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 128.781216 265.947429
+L 276.794784 265.947429
+Q 282.962016 265.947429 282.962016 260.022857
+L 282.962016 216.576
+Q 282.962016 210.651429 276.794784 210.651429
+L 128.781216 210.651429
+Q 122.613984 210.651429 122.613984 216.576
+L 122.613984 260.022857
+Q 122.613984 265.947429 128.781216 265.947429
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 385.749216 265.947429
+L 482.369184 265.947429
+Q 488.536416 265.947429 488.536416 260.022857
+L 488.536416 216.576
+Q 488.536416 210.651429 482.369184 210.651429
+L 385.749216 210.651429
+Q 379.581984 210.651429 379.581984 216.576
+L 379.581984 260.022857
+Q 379.581984 265.947429 385.749216 265.947429
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">A dictionary maps keys to values</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="202.788" y="154.949607" transform="rotate(-0 202.788 154.949607)">"red"</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="434.0592" y="154.949607" transform="rotate(-0 434.0592 154.949607)">3</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="202.788" y="243.818179" transform="rotate(-0 202.788 243.818179)">"blue"</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="434.0592" y="243.818179" transform="rotate(-0 434.0592 243.818179)">1</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 23px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="353.263134" transform="rotate(-0 331.272 353.263134)">counts["red"] accesses 3 directly.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

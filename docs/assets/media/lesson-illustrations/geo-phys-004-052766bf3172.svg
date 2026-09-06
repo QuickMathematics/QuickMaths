@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 109.142855 356.790857
+Q 333.841898 356.790857 555.745855 356.790857
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 551.745855 354.790857
+L 555.745855 356.790857
+L 551.745855 358.790857
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 100.0008 318.232085
+Q 100.0008 223.488849 100.0008 131.540698
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 98.0008 135.540698
+L 100.0008 131.540698
+L 102.0008 135.540698
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 128.781216 325.193143
+L 245.958624 325.193143
+Q 252.125856 325.193143 252.125856 319.268571
+L 252.125856 251.136
+Q 252.125856 245.211429 245.958624 245.211429
+L 128.781216 245.211429
+Q 122.613984 245.211429 122.613984 251.136
+L 122.613984 319.268571
+Q 122.613984 325.193143 128.781216 325.193143
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 282.962016 325.193143
+L 400.139424 325.193143
+Q 406.306656 325.193143 406.306656 319.268571
+L 406.306656 251.136
+Q 406.306656 245.211429 400.139424 245.211429
+L 282.962016 245.211429
+Q 276.794784 245.211429 276.794784 251.136
+L 276.794784 319.268571
+Q 276.794784 325.193143 282.962016 325.193143
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 437.142816 325.193143
+L 554.320224 325.193143
+Q 560.487456 325.193143 560.487456 319.268571
+L 560.487456 251.136
+Q 560.487456 245.211429 554.320224 245.211429
+L 437.142816 245.211429
+Q 430.975584 245.211429 430.975584 251.136
+L 430.975584 319.268571
+Q 430.975584 325.193143 437.142816 325.193143
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 282.962016 211.638857
+L 400.139424 211.638857
+Q 406.306656 211.638857 406.306656 205.714286
+L 406.306656 137.581714
+Q 406.306656 131.657143 400.139424 131.657143
+L 282.962016 131.657143
+Q 276.794784 131.657143 276.794784 137.581714
+L 276.794784 205.714286
+Q 276.794784 211.638857 282.962016 211.638857
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 437.142816 211.638857
+L 554.320224 211.638857
+Q 560.487456 211.638857 560.487456 205.714286
+L 560.487456 137.581714
+Q 560.487456 131.657143 554.320224 131.657143
+L 437.142816 131.657143
+Q 430.975584 131.657143 430.975584 137.581714
+L 430.975584 205.714286
+Q 430.975584 211.638857 437.142816 211.638857
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">Climate constrains broad biome patterns</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(167.364607 280.091129)">Cold</text>
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(156.897889 300.247192)">Tundra</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(293.746657 280.091129)">Temperate</text>
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(296.552126 300.247192)">Grassland</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(456.43527 280.091129)">Hot / dry</text>
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(465.809332 300.247192)">Desert</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(293.746657 166.536844)">Temperate</text>
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(313.941814 186.692906)">Forest</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(454.749176 166.536844)">Hot / wet</text>
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(450.03402 186.692906)">Rainforest</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #bc503b" x="333.84168" y="349.138937" transform="rotate(-0 333.84168 349.138937)">Warmer →</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="130.83696" y="95.427955" transform="rotate(-0 130.83696 95.427955)">Wetter ↑</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

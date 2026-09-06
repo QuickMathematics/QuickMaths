@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 222.171643 154.912219
+Q 290.160514 164.242751 355.380255 173.193259
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 351.689322 170.667984
+L 355.380255 173.193259
+L 351.145475 174.63084
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 222.127728 227.617855
+Q 290.159294 213.613267 355.45318 200.172242
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 351.132077 199.019823
+L 355.45318 200.172242
+L 351.938583 202.937673
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 222.206776 337.042286
+Q 290.15723 337.042286 355.312599 337.042286
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 351.312599 335.042286
+L 355.312599 337.042286
+L 351.312599 339.042286
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 113.363136 182.016
+L 209.983104 182.016
+Q 216.150336 182.016 216.150336 176.091429
+L 216.150336 132.644571
+Q 216.150336 126.72 209.983104 126.72
+L 113.363136 126.72
+Q 107.195904 126.72 107.195904 132.644571
+L 107.195904 176.091429
+Q 107.195904 182.016 113.363136 182.016
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 113.363136 256.073143
+L 209.983104 256.073143
+Q 216.150336 256.073143 216.150336 250.148571
+L 216.150336 206.701714
+Q 216.150336 200.777143 209.983104 200.777143
+L 113.363136 200.777143
+Q 107.195904 200.777143 107.195904 206.701714
+L 107.195904 250.148571
+Q 107.195904 256.073143 113.363136 256.073143
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 370.331136 221.513143
+L 538.902144 221.513143
+Q 545.069376 221.513143 545.069376 215.588571
+L 545.069376 152.393143
+Q 545.069376 146.468571 538.902144 146.468571
+L 370.331136 146.468571
+Q 364.163904 146.468571 364.163904 152.393143
+L 364.163904 215.588571
+Q 364.163904 221.513143 370.331136 221.513143
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 113.363136 364.690286
+L 209.983104 364.690286
+Q 216.150336 364.690286 216.150336 358.765714
+L 216.150336 315.318857
+Q 216.150336 309.394286 209.983104 309.394286
+L 113.363136 309.394286
+Q 107.195904 309.394286 107.195904 315.318857
+L 107.195904 358.765714
+Q 107.195904 364.690286 113.363136 364.690286
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 370.331136 374.564571
+L 538.902144 374.564571
+Q 545.069376 374.564571 545.069376 368.64
+L 545.069376 305.444571
+Q 545.069376 299.52 538.902144 299.52
+L 370.331136 299.52
+Q 364.163904 299.52 364.163904 305.444571
+L 364.163904 368.64
+Q 364.163904 374.564571 370.331136 374.564571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">An alias shares the same list</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="161.67312" y="159.88675" transform="rotate(-0 161.67312 159.88675)">items</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="161.67312" y="233.943893" transform="rotate(-0 161.67312 233.943893)">alias</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="454.61664" y="189.509607" transform="rotate(-0 454.61664 189.509607)">[1, 2, 3]</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="161.67312" y="342.561036" transform="rotate(-0 161.67312 342.561036)">copy</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="454.61664" y="342.561036" transform="rotate(-0 454.61664 342.561036)">[1, 2]</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="454.61664" y="275.357732" transform="rotate(-0 454.61664 275.357732)">alias.append(3)</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

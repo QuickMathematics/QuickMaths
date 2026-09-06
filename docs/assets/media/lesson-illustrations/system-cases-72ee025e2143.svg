@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="line2d_1">
+    <path d="M 105.14016 282.733714
+L 238.76352 282.733714
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 112.8492 287.670857
+L 112.8492 154.368
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 120.55824 267.922286
+L 228.4848 179.053714
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #153f36; stroke-width: 3; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 120.55824 179.053714
+L 228.4848 267.922286
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 269.59968 282.733714
+L 403.22304 282.733714
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 277.30872 287.670857
+L 277.30872 154.368
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 285.01776 267.922286
+L 392.94432 179.053714
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #153f36; stroke-width: 3; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 285.01776 240.768
+L 392.94432 151.899429
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 434.0592 282.733714
+L 567.68256 282.733714
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 441.76824 287.670857
+L 441.76824 154.368
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #728c80; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 449.47728 267.922286
+L 557.40384 179.053714
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke: #153f36; stroke-width: 3; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_12">
+    <path d="M 449.47728 267.922286
+L 557.40384 179.053714
+" clip-path="url(#p576bd2a587)" style="fill: none; stroke-dasharray: 9.25,4; stroke-dashoffset: 0; stroke: #bc503b; stroke-width: 2.5"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(90.3195 63.621696)">Systems can have one, zero or infinitely</text>
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(239.938875 90.496446)">many solutions</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="174.52152" y="330.218179" transform="rotate(-0 174.52152 330.218179)">One point</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="338.98104" y="330.218179" transform="rotate(-0 338.98104 330.218179)">No points</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="503.44056" y="330.218179" transform="rotate(-0 503.44056 330.218179)">Every point</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="372.183893" transform="rotate(-0 331.272 372.183893)">Intersecting · parallel and distinct · coincident</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

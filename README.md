@@ -123,7 +123,9 @@ Lesson packs support images, video and audio in explanations, examples, applicat
 
 Native Mathematics includes **Triangle area: base and perpendicular height**, with eight worked examples and 21 assessment scenarios. All sixteen Geometry lessons now include Matplotlib illustrations, covering triangle heights, coordinates, slope, lines, bearings, arcs, spherical coordinates, and trigonometry. These figures are embedded for offline use; run `python scripts/build_geometry_figures.py` and `python scripts/build_trigonometry_figures.py`, followed by `python scripts/export_web_curriculum.py` to rebuild them.
 
-Native Geometry mastery tests also include diagrams: coordinate and line graphs follow each randomized question's givens, with additional illustrations for bearings, arcs and spherical coordinates. Restored drafts and saved results retain the original question's picture. The app draws these test diagrams locally; authored Matplotlib attachments remain available through the same lesson-media support.
+All 107 shipped lesson pages now have illustrations, including the 28 Programming lessons and optional Geography/Estimation packs. A content-matched library adds 109 hosted Matplotlib SVGs without reinstalling existing packs or changing saved progress. Figures load as they approach the viewport; hosted media is not guaranteed offline. Rebuild with `python -m scripts.build_lesson_illustrations`. See the [coverage report](docs/ILLUSTRATION_AUDIT.md).
+
+Native Geometry mastery tests also include diagrams: coordinate and line graphs follow each randomized question's givens, with additional illustrations for bearings, arcs, spherical coordinates, triangle area and 73 spatial trigonometry scenarios. Restored drafts and saved results retain the original question's picture. The app draws these test diagrams locally; authored Matplotlib attachments remain available through the same lesson-media support.
 
 ```sh
 pip install -e ".[media]"

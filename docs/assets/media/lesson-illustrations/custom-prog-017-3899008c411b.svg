@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 328.045 132.038307
+Q 267.031523 176.584031 208.275497 219.481598
+" style="fill: none; stroke: #728c80; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 212.685421 218.738249
+L 208.275497 219.481598
+L 210.326771 215.507649
+" style="fill: none; stroke: #728c80; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 334.353295 132.238698
+Q 387.806668 176.58656 439.108912 219.149727
+" style="fill: none; stroke: #728c80; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 437.30749 215.056455
+L 439.108912 219.149727
+L 434.753441 218.134902
+" style="fill: none; stroke: #728c80; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 441.968369 226.712782
+Q 413.501483 265.454091 386.689649 301.942999
+" style="fill: none; stroke: #728c80; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 390.669851 299.903883
+L 386.689649 301.942999
+L 387.446478 297.535368
+" style="fill: none; stroke: #728c80; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 446.827454 226.61545
+Q 477.743032 265.452799 506.917836 302.103322
+" style="fill: none; stroke: #728c80; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 505.99141 297.728195
+L 506.917836 302.103322
+L 502.861879 300.219386
+" style="fill: none; stroke: #728c80; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 303.519456 152.393143
+L 359.024544 152.393143
+Q 365.191776 152.393143 365.191776 146.468571
+L 365.191776 112.896
+Q 365.191776 106.971429 359.024544 106.971429
+L 303.519456 106.971429
+Q 297.352224 106.971429 297.352224 112.896
+L 297.352224 146.468571
+Q 297.352224 152.393143 303.519456 152.393143
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 175.035456 246.198857
+L 230.540544 246.198857
+Q 236.707776 246.198857 236.707776 240.274286
+L 236.707776 206.701714
+Q 236.707776 200.777143 230.540544 200.777143
+L 175.035456 200.777143
+Q 168.868224 200.777143 168.868224 206.701714
+L 168.868224 240.274286
+Q 168.868224 246.198857 175.035456 246.198857
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 416.585376 246.198857
+L 472.090464 246.198857
+Q 478.257696 246.198857 478.257696 240.274286
+L 478.257696 206.701714
+Q 478.257696 200.777143 472.090464 200.777143
+L 416.585376 200.777143
+Q 410.418144 200.777143 410.418144 206.701714
+L 410.418144 240.274286
+Q 410.418144 246.198857 416.585376 246.198857
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 354.913056 330.130286
+L 410.418144 330.130286
+Q 416.585376 330.130286 416.585376 324.205714
+L 416.585376 290.633143
+Q 416.585376 284.708571 410.418144 284.708571
+L 354.913056 284.708571
+Q 348.745824 284.708571 348.745824 290.633143
+L 348.745824 324.205714
+Q 348.745824 330.130286 354.913056 330.130286
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 483.397056 330.130286
+L 538.902144 330.130286
+Q 545.069376 330.130286 545.069376 324.205714
+L 545.069376 290.633143
+Q 545.069376 284.708571 538.902144 284.708571
+L 483.397056 284.708571
+Q 477.229824 284.708571 477.229824 290.633143
+L 477.229824 324.205714
+Q 477.229824 330.130286 483.397056 330.130286
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">Nested records form a data structure</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="134.925098" transform="rotate(-0 331.272 134.925098)">user</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="202.788" y="228.730813" transform="rotate(-0 202.788 228.730813)">name</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="444.33792" y="228.730813" transform="rotate(-0 444.33792 228.730813)">scores</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="382.6656" y="312.662241" transform="rotate(-0 382.6656 312.662241)">72</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="511.1496" y="312.662241" transform="rotate(-0 511.1496 312.662241)">91</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="371.632018" transform="rotate(-0 331.272 371.632018)">user["scores"][1] follows the right branch to 91.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>
