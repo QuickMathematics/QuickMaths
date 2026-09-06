@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 196.510603 208.676571
+Q 207.928184 208.676571 216.55068 208.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 212.55068 206.676571
+L 216.55068 208.676571
+L 212.55068 210.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 319.855243 208.676571
+Q 331.272824 208.676571 339.89532 208.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 335.89532 206.676571
+L 339.89532 208.676571
+L 335.89532 210.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 443.199883 208.676571
+Q 454.617464 208.676571 463.23996 208.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+    <path d="M 459.23996 206.676571
+L 463.23996 208.676571
+L 459.23996 210.676571
+" style="fill: none; stroke: #bc503b; stroke-width: 2.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 103.084416 241.261714
+L 189.425664 241.261714
+Q 195.592896 241.261714 195.592896 235.337143
+L 195.592896 186.953143
+Q 195.592896 181.028571 189.425664 181.028571
+L 103.084416 181.028571
+Q 96.917184 181.028571 96.917184 186.953143
+L 96.917184 235.337143
+Q 96.917184 241.261714 103.084416 241.261714
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 226.429056 241.261714
+L 312.770304 241.261714
+Q 318.937536 241.261714 318.937536 235.337143
+L 318.937536 186.953143
+Q 318.937536 181.028571 312.770304 181.028571
+L 226.429056 181.028571
+Q 220.261824 181.028571 220.261824 186.953143
+L 220.261824 235.337143
+Q 220.261824 241.261714 226.429056 241.261714
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 349.773696 241.261714
+L 436.114944 241.261714
+Q 442.282176 241.261714 442.282176 235.337143
+L 442.282176 186.953143
+Q 442.282176 181.028571 436.114944 181.028571
+L 349.773696 181.028571
+Q 343.606464 181.028571 343.606464 186.953143
+L 343.606464 235.337143
+Q 343.606464 241.261714 349.773696 241.261714
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 473.118336 241.261714
+L 559.459584 241.261714
+Q 565.626816 241.261714 565.626816 235.337143
+L 565.626816 186.953143
+Q 565.626816 181.028571 559.459584 181.028571
+L 473.118336 181.028571
+Q 466.951104 181.028571 466.951104 186.953143
+L 466.951104 235.337143
+Q 466.951104 241.261714 473.118336 241.261714
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="77.059071" transform="rotate(-0 331.272 77.059071)">Equal log steps represent multiplication</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="146.25504" y="216.663893" transform="rotate(-0 146.25504 216.663893)">1</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 22px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="146.25504" y="283.867196" transform="rotate(-0 146.25504 283.867196)">0</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #bc503b" x="207.92736" y="201.024652" transform="rotate(-0 207.92736 201.024652)">×10</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="269.59968" y="216.663893" transform="rotate(-0 269.59968 216.663893)">10</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 22px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="269.59968" y="283.867196" transform="rotate(-0 269.59968 283.867196)">1</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #bc503b" x="331.272" y="201.024652" transform="rotate(-0 331.272 201.024652)">×10</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="392.94432" y="216.663893" transform="rotate(-0 392.94432 216.663893)">100</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 22px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="392.94432" y="283.867196" transform="rotate(-0 392.94432 283.867196)">2</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #bc503b" x="454.61664" y="201.024652" transform="rotate(-0 454.61664 201.024652)">×10</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="516.28896" y="216.663893" transform="rotate(-0 516.28896 216.663893)">1000</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 22px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="516.28896" y="283.867196" transform="rotate(-0 516.28896 283.867196)">3</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="343.664786" transform="rotate(-0 331.272 343.664786)">log₁₀(x): 0 → 1 → 2 → 3</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>
