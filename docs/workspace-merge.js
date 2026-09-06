@@ -19,7 +19,7 @@ const equal = (a, b) => JSON.stringify(canonical(a)) === JSON.stringify(canonica
 export function comparableWorkspace(raw) {
   const state = typeof raw === "string" ? JSON.parse(raw) : clone(raw);
   for (const key of ["syncedAt", "exportedAt", "session", "backup", "activeProfileId", "app", "transport"]) delete state[key];
-  if (state.ui) state.ui = { pendingResults: state.ui.pendingResults ?? null };
+  state.ui = { pendingResults: state.ui?.pendingResults ?? null };
   for (const profile of state.profiles ?? []) {
     delete profile.totalLoggedSeconds;
     delete profile.agentActivityAt;

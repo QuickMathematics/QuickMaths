@@ -319,7 +319,7 @@ test("edits on the phone during a merge require a fresh comparison", async () =>
   await assert.rejects(learner.pushNow(), /reviewing/);
 });
 
-test("a different GitHub revision during review cannot be overwritten", async () => {
+test("an identical GitHub checkpoint with a different revision keeps the review valid", async () => {
   const { github, learner, learnerState, agent, agentState } = await mergeFixture();
   learnerState.mutate({ score: 9 });
   agentState.mutate({ score: 8 });
@@ -327,8 +327,118 @@ test("a different GitHub revision during review cannot be overwritten", async ()
   const review = await learner.prepareMerge({ channel: "agent" });
   const current = github.files.get(LEARNER_STATE_PATH);
   await github.writeFile(connection(), LEARNER_STATE_PATH, current.content, { sha: current.sha });
-  await assert.rejects(learner.applyMerge({ reviewId: review.id, choices: { 0: "remote" } }), /changed during review/);
+  await learner.applyMerge({ reviewId: review.id, choices: { 0: "remote" } });
+  assert.equal(learnerState.read().score, 8);
+});
+
+test("clocks, touch timestamps and audit entries can advance without resetting merge choices", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ score: 9 });
+  agentState.mutate({ score: 8, note: "Optional agent note" });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const choices = Object.fromEntries(review.rows.map(row => [row.id, row.path[0] === "score" ? "local" : "base"]));
+  const touch = (state, source) => ({ ...state,
+    profiles: state.profiles.map(profile => ({ ...profile, totalLoggedSeconds: 180, agentActivityAt: "later", updatedAt: "2026-09-06T12:00:00Z" })),
+    activity: [{ at: source, tool: "read_map", message: source }],
+    session: { heartbeatAt: 180000 }, syncedAt: "later", ui: { route: "settings" },
+  });
+  learnerState.mutate(touch(learnerState.read(), "local"));
+  for (const channel of ["learner", "agent"]) {
+    const path = channel === "learner" ? LEARNER_STATE_PATH : AGENT_STATE_PATH;
+    const current = github.files.get(path), envelope = JSON.parse(current.content);
+    envelope.updated_at = "2026-09-06T12:00:00Z";
+    envelope.app_state = touch(envelope.app_state, channel);
+    await github.writeFile(connection(), path, JSON.stringify(envelope), { sha: current.sha });
+  }
+  await learner.applyMerge({ reviewId: review.id, choices });
   assert.equal(learnerState.read().score, 9);
+  assert.equal(learnerState.read().note, undefined);
+  assert.equal(learnerState.read().profiles[0].totalLoggedSeconds, 180);
+  assert.equal(learnerState.read().session.heartbeatAt, 180000);
+  assert.deepEqual(new Set(learnerState.read().activity.map(item => item.message)), new Set(["local", "learner", "agent"]));
+  assert.equal(parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content).resolvedAgentSha, github.files.get(AGENT_STATE_PATH).sha);
+});
+
+test("real changes to either remote copy, its task base or its resolution still invalidate review", async () => {
+  for (const change of ["learner", "agent", "base", "resolution", "deletion"]) {
+    const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+    learnerState.mutate({ score: 9 });
+    agentState.mutate({ score: 8 });
+    await agent.pushNow();
+    const review = await learner.prepareMerge({ channel: "agent" });
+    const path = ["learner", "resolution"].includes(change) ? LEARNER_STATE_PATH : AGENT_STATE_PATH;
+    const current = github.files.get(path), envelope = JSON.parse(current.content);
+    if (change === "deletion") github.files.delete(path);
+    else {
+      if (change === "base") envelope.base_learner_sha = "a-new-task-base";
+      else if (change === "resolution") envelope.applied_agent_sha = envelope.resolved_agent_sha = github.files.get(AGENT_STATE_PATH).sha;
+      else envelope.app_state.score = 99;
+      await github.writeFile(connection(), path, JSON.stringify(envelope), { sha: current.sha });
+    }
+    const shared = github.files.get(LEARNER_STATE_PATH).sha;
+    await assert.rejects(learner.applyMerge({ reviewId: review.id, choices: { 0: "remote" } }), /changed during review/);
+    assert.equal(github.files.get(LEARNER_STATE_PATH).sha, shared);
+    assert.equal(learnerState.read().score, 9);
+  }
+});
+
+test("a harmless checkpoint racing the merge write is rechecked without losing choices", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ score: 9 });
+  agentState.mutate({ score: 8 });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const write = github.writeFile;
+  let calls = 0;
+  github.writeFile = async (...args) => {
+    if (++calls === 1) {
+      const latest = github.files.get(LEARNER_STATE_PATH);
+      await write(connection(), LEARNER_STATE_PATH, latest.content, { sha: latest.sha });
+    }
+    return write(...args);
+  };
+  await learner.applyMerge({ reviewId: review.id, choices: { 0: "remote" } });
+  assert.equal(calls, 2);
+  assert.equal(learnerState.read().score, 8);
+});
+
+test("a real edit racing the merge write is not overwritten by retry", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ score: 9 });
+  agentState.mutate({ score: 8 });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const write = github.writeFile;
+  github.writeFile = async (...args) => {
+    const latest = github.files.get(LEARNER_STATE_PATH), envelope = JSON.parse(latest.content);
+    envelope.app_state.score = 99;
+    await write(connection(), LEARNER_STATE_PATH, JSON.stringify(envelope), { sha: latest.sha });
+    return write(...args);
+  };
+  await assert.rejects(learner.applyMerge({ reviewId: review.id, choices: { 0: "remote" } }), /shared workspace/);
+  assert.equal(JSON.parse(github.files.get(LEARNER_STATE_PATH).content).app_state.score, 99);
+  assert.equal(learnerState.read().score, 9);
+});
+
+test("activity arriving during a saved merge is retained and checkpointed when sync resumes", async () => {
+  const { github, learner, learnerState, agent, agentState } = await mergeFixture();
+  agentState.mutate({ lesson: "remote" });
+  await agent.pushNow();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const write = github.writeFile;
+  github.writeFile = async (...args) => {
+    const result = await write(...args);
+    learnerState.mutate({ activity: [{ at: "later", tool: "read_lesson", message: "Read while saving" }] });
+    return result;
+  };
+  await learner.applyMerge({ reviewId: review.id });
+  assert.equal(learnerState.read().lesson, "remote");
+  assert.equal(learnerState.read().activity[0].message, "Read while saving");
+  assert.equal(learner.snapshot().dirty, true);
+  learner.start();
+  await learner.pushNow();
+  assert.equal(JSON.parse(github.files.get(LEARNER_STATE_PATH).content).app_state.activity[0].message, "Read while saving");
 });
 
 test("accepted agent checkpoints are acknowledged for other devices", async () => {

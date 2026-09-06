@@ -1,4 +1,4 @@
-import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v6";
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v7";
 
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;
@@ -981,44 +981,87 @@ export function createGitHubSyncController({
     throw new GitHubSyncConflictError("The workspace changed while comparing. Refresh the comparison.", { channel });
   }));
 
+  // The review is about selectable changes, not audit entries, session clocks,
+  // touch timestamps or a new Git blob containing the same learning content.
+  const sameReviewContent = (before, after) => sameWorkspace(before, after)
+    || createWorkspaceMerge({ baseJson: before, localJson: before, remoteJson: after }).rows.length === 0;
+
+  const preserveReviewUpdates = (merged, before, after) => {
+    if (sameWorkspace(before, after)) return preserveDeviceState(merged, merged, after);
+    const additions = createWorkspaceMerge({ baseJson: before, localJson: merged, remoteJson: after });
+    // All selectable values are already chosen. Only automatic bookkeeping
+    // (such as combined activity history) may be refreshed from these copies.
+    return additions.resolve(Object.fromEntries(additions.rows.map((row) => [row.id, "local"])));
+  };
+
+  const sameReviewRemote = (before, after) => {
+    if (before.exists !== after.exists) return false;
+    if (!before.exists) return true;
+    // A different task base or another device's explicit resolution changes
+    // what this review means, even if the resulting content happens to match.
+    if (before.envelope.baseLearnerSha !== after.envelope.baseLearnerSha
+      || before.envelope.resolvedAgentSha !== after.envelope.resolvedAgentSha) return false;
+    return sameReviewContent(before.envelope.stateJson, after.envelope.stateJson);
+  };
+
   const applyPreparedMerge = async ({ reviewId, choices = {} } = {}) => {
     const review = pendingReview;
     if (!review || review.id !== reviewId) throw new GitHubSyncConflictError("This comparison has expired. Refresh the comparison.", { channel: review?.channel ?? "learner" });
-    const changed = () => new GitHubSyncConflictError("The workspace changed during review. Refresh the comparison before saving.", { channel: review.channel, reason: "stale_review" });
-    const learner = await readChannel("learner");
-    const agent = await readChannel("agent");
-    if (learner.sha !== review.learner.sha || agent.sha !== review.agent.sha || !sameWorkspace(serializeState(), review.localJson)) throw changed();
-    const merged = preserveDeviceState(review.plan.resolve(choices), serializeState(), review.remote.envelope.stateJson);
-    if (validateMergeState) {
-      try { await validateMergeState(merged); }
-      catch (error) {
-        if (error.code === "merge_dependency") throw new GitHubSyncConflictError(error.message, { channel: review.channel, reason: "dependencies" });
+    const changed = (source = "GitHub") => new GitHubSyncConflictError(`The workspace changed during review (${source}). Refresh the comparison before saving.`, { channel: review.channel, reason: "stale_review", source });
+    const selected = review.plan.resolve(choices);
+    // A conditional-write race gets a fresh content check, never a force write.
+    // Empty reviews have their bounded retry loop in prepareMerge instead.
+    const attempts = review.plan.rows.length ? 3 : 1;
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      const learner = await readChannel("learner");
+      const agent = await readChannel("agent");
+      if (!sameReviewRemote(review.learner, learner)) throw changed("shared workspace");
+      if (!sameReviewRemote(review.agent, agent)) throw changed("agent update");
+      const local = serializeState();
+      if (!sameReviewContent(review.localJson, local)) throw changed("this device");
+      let merged = preserveReviewUpdates(selected, review.localJson, local);
+      for (const [before, after] of [[review.learner, learner], [review.agent, agent]]) {
+        if (before.exists) merged = preserveReviewUpdates(merged, before.envelope.stateJson, after.envelope.stateJson);
+      }
+      merged = preserveDeviceState(merged, local);
+      if (validateMergeState) {
+        try { await validateMergeState(merged); }
+        catch (error) {
+          if (error.code === "merge_dependency") throw new GitHubSyncConflictError(error.message, { channel: review.channel, reason: "dependencies" });
+          throw error;
+        }
+      }
+      if (!sameReviewContent(review.localJson, serializeState())) throw changed("this device");
+      const acknowledged = review.channel === "agent" ? agent.sha : learner.envelope?.resolvedAgentSha ?? agentSha;
+      const envelope = createBridgeEnvelope({ channel: "learner", stateJson: merged, deviceId: resolvedDeviceId, deviceLabel: resolvedDeviceLabel, appliedAgentSha: acknowledged, resolvedAgentSha: acknowledged, now });
+      let result;
+      try {
+        result = await client.writeFile(requireConfig(), LEARNER_STATE_PATH, envelope, { sha: learner.sha, message: "QuickMaths Bridge: merge reviewed workspace changes" });
+      } catch (error) {
+        if (error instanceof GitHubSyncConflictError) {
+          if (attempt + 1 < attempts) continue;
+          throw changed();
+        }
         throw error;
       }
+      bases.set(result.sha, merged);
+      const published = merged;
+      // Real edits during the write stay local. Bookkeeping can advance while
+      // the learner only reads the dialog and must not turn a saved merge into
+      // an error. Retain that latest history and elapsed time on this device.
+      const afterWrite = serializeState();
+      if (!sameReviewContent(review.localJson, afterWrite)) throw changed("this device");
+      merged = preserveReviewUpdates(merged, local, afterWrite);
+      await applyRemote(preserveDeviceState(merged, afterWrite));
+      learnerSha = result.sha;
+      agentSha = acknowledged;
+      pendingReview = null;
+      pendingLearnerActor = null;
+      localChangedAt = now().toISOString();
+      persistMetadata({ revisions: true });
+      update({ phase: "synced", dirty: !sameWorkspace(published, merged), localChangedAt, lastPushedAt: localChangedAt, error: null, conflict: null, remoteAvailable: true });
+      return { ...result, merged: true, channel: review.channel };
     }
-    if (!sameWorkspace(serializeState(), review.localJson)) throw changed();
-    const acknowledged = review.channel === "agent" ? agent.sha : learner.envelope?.resolvedAgentSha ?? agentSha;
-    const envelope = createBridgeEnvelope({ channel: "learner", stateJson: merged, deviceId: resolvedDeviceId, deviceLabel: resolvedDeviceLabel, appliedAgentSha: acknowledged, resolvedAgentSha: acknowledged, now });
-    let result;
-    try {
-      result = await client.writeFile(requireConfig(), LEARNER_STATE_PATH, envelope, { sha: learner.sha, message: "QuickMaths Bridge: merge reviewed workspace changes" });
-    } catch (error) {
-      if (error instanceof GitHubSyncConflictError) throw changed();
-      throw error;
-    }
-    bases.set(result.sha, merged);
-    // Edits during the network write remain local. The saved merge becomes a
-    // new remote version to compare; it must never overwrite those edits.
-    if (!sameWorkspace(serializeState(), review.localJson)) throw changed();
-    await applyRemote(preserveDeviceState(merged, serializeState(), review.remote.envelope.stateJson));
-    learnerSha = result.sha;
-    agentSha = acknowledged;
-    pendingReview = null;
-    pendingLearnerActor = null;
-    localChangedAt = now().toISOString();
-    persistMetadata({ revisions: true });
-    update({ phase: "synced", dirty: false, localChangedAt, lastPushedAt: localChangedAt, error: null, conflict: null, remoteAvailable: true });
-    return { ...result, merged: true, channel: review.channel };
   };
 
   const applyMerge = (selection) => runSerial(() => withPhase("merging", () => applyPreparedMerge(selection)));
@@ -1114,6 +1157,9 @@ export function createGitHubSyncController({
     if (pendingReview) return;
     stopped = false;
     schedulePoll();
+    // A little history may arrive while a merge is being written. Finish that
+    // pending checkpoint when sync resumes, preserving its recorded actor.
+    if (role === "learner" && status.dirty) schedulePush({ actorKind: pendingLearnerActor?.kind, actorLabel: pendingLearnerActor?.label, changedAt: localChangedAt });
   };
 
   if (typeof subscribeToState === "function") unsubscribe = subscribeToState(() => schedulePush());
