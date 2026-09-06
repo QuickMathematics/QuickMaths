@@ -1,6 +1,6 @@
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-merge-v4";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-merge-v5";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-merge-v4";
+import { APP_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-merge-v5";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260903-federation-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260905-publisher-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260905-publisher-v1";
@@ -17,7 +17,7 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-merge-v4";
+} from "./github-sync.js?v=20260906-merge-v5";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -2393,8 +2393,10 @@ async function bridgeAction(action) {
   if (!githubSync) return;
   try {
     if (action === "bridge-push") {
+      await githubSync.syncLearnerNow();
+      await githubSync.pullNow();
       await githubSync.pushNow();
-      showToast("Learner checkpoint pushed to GitHub.");
+      showToast("Workspace synced. Agent updates checked.");
     }
     if (action === "bridge-pull-agent") {
       const result = await githubSync.pullNow();
@@ -2410,7 +2412,11 @@ async function bridgeAction(action) {
       showToast("QuickMaths Bridge disconnected on this device.");
     }
   } catch (error) {
-    showToast(error instanceof Error ? error.message : String(error));
+    if (error.code === "conflict") {
+      await recoverEstablishedLearnerConflict();
+      if (bridgeNeedsChoice) openBridgeSourceChoice({ force: true });
+      else if (githubSync.snapshot().conflict) showToast(githubSync.snapshot().error);
+    } else showToast(error instanceof Error ? error.message : String(error));
   }
 }
 
@@ -3386,7 +3392,7 @@ async function boot() {
   let communityConfig = { enabled: false };
   try {
     const [manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-      fetch("./agent-manifest.json?v=20260906-merge-v4").catch(() => null),
+      fetch("./agent-manifest.json?v=20260906-merge-v5").catch(() => null),
       fetch("./CUSTOM_LESSON_SETS.md?v=20260902-python-v1").catch(() => null),
       fetch("./STUDENT_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),
       fetch("./EDUCATOR_GUIDE.md?v=20260903-final-handoff-v1").catch(() => null),

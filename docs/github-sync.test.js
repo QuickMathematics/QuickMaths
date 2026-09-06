@@ -789,7 +789,7 @@ test("learner retains both sides of an overlapping task until the merge is saved
   await agent.pushNow();
 
   learnerState.mutate({ newerLearnerWork: true });
-  await learner.pushNow();
+  await assert.rejects(learner.pushNow(), /agent update is waiting/i);
   await assert.rejects(learner.pullNow(), /changed while the agent/i);
   assert.equal(learnerState.read().staleTutorNote, undefined);
   const review = await learner.prepareMerge({ channel: "agent" });
@@ -799,6 +799,7 @@ test("learner retains both sides of an overlapping task until the merge is saved
   assert.equal(learnerState.read().staleTutorNote, "This must never be applied.");
   const checkpoint = parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content);
   assert.equal(checkpoint.appliedAgentSha, github.files.get(AGENT_STATE_PATH).sha);
+  assert.equal(checkpoint.resolvedAgentSha, checkpoint.appliedAgentSha);
   assert.equal((await learner.pullNow()).updated, false);
 });
 
@@ -912,4 +913,68 @@ test("remote file changes cause optimistic push conflicts", async () => {
   firstState.mutate({ score: 8 });
   await assert.rejects(first.pushNow(), /newer copy/i);
   assert.equal(first.snapshot().conflictDetails.channel, "learner");
+});
+
+
+async function legacySeenAgentFixture() {
+  const { github, learnerState, agent, agentState } = await mergeFixture();
+  learnerState.mutate({ positions: { fractions: { x: 2, y: 3 }, algebra: { x: 4, y: 5 } } });
+  agentState.mutate({ note: "New Fractions basics note" });
+  await agent.pushNow();
+  const agentSha = github.files.get(AGENT_STATE_PATH).sha;
+  const latest = github.files.get(LEARNER_STATE_PATH);
+  const canonical = await github.writeFile(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: learnerState.serialize(), deviceId: "phone", appliedAgentSha: agentSha }), { sha: latest.sha });
+  const credentialStore = credentials();
+  credentialStore.save(connection());
+  credentialStore.saveMetadata({ role: "learner", metadata: { repositoryKey: "octo-user/quickmaths-sync@main", learnerSha: canonical.sha, agentSha, dirty: false } });
+  const learner = controller({ role: "learner", client: github, harness: learnerState, credentialStore });
+  await learner.resume({ startPolling: false });
+  return { github, learnerState, learner, agentSha, credentialStore };
+}
+
+test("legacy seen-only acknowledgements cannot hide a pending note or be promoted by Sync now", async () => {
+  const { github, learnerState, learner, agentSha } = await legacySeenAgentFixture();
+  const canonical = github.files.get(LEARNER_STATE_PATH).sha;
+  await learner.syncLearnerNow();
+  await assert.rejects(learner.pushNow(), /agent update is waiting/i);
+  await assert.rejects(learner.pushNow({ force: true }), /agent update is waiting/i);
+  assert.equal(github.files.get(LEARNER_STATE_PATH).sha, canonical);
+  await assert.rejects(learner.pullNow(), (error) => error.details.channel === "agent");
+  const review = await learner.prepareMerge({ channel: "learner" });
+  assert.equal(review.channel, "agent");
+  assert.ok(review.rows.some((row) => row.remote === "New Fractions basics note"));
+  await learner.applyMerge({ reviewId: review.id });
+  assert.equal(learnerState.read().note, "New Fractions basics note");
+  assert.equal(learnerState.read().positions.fractions.x, 2);
+  const checkpoint = parseBridgeEnvelope(github.files.get(LEARNER_STATE_PATH).content);
+  assert.equal(checkpoint.resolvedAgentSha, agentSha);
+  await learner.pushNow();
+  assert.equal((await learner.pullNow()).updated, false);
+});
+
+test("a new explicit choice to skip a note remains resolved after reload and on other devices", async () => {
+  const { github, learnerState, learner, credentialStore } = await legacySeenAgentFixture();
+  const review = await learner.prepareMerge({ channel: "agent" });
+  const note = review.rows.find((row) => row.path[0] === "note");
+  await learner.applyMerge({ reviewId: review.id, choices: { [note.id]: "base" } });
+  assert.equal(learnerState.read().note, undefined);
+  const reloaded = controller({ role: "learner", client: github, harness: learnerState, credentialStore });
+  await reloaded.resume({ startPolling: false });
+  assert.equal((await reloaded.pullNow()).updated, false);
+  const secondState = stateHarness("Second device");
+  const second = controller({ role: "learner", client: github, harness: secondState });
+  await second.connect(connection(), { startPolling: false });
+  await second.restoreLearner();
+  assert.equal((await second.pullNow()).updated, false);
+  assert.equal(secondState.read().note, undefined);
+});
+
+test("legacy acceptance needs review even when the shared content happens to equal the task base", async () => {
+  const { github, learner, agent, agentState, learnerState } = await mergeFixture();
+  agentState.mutate({ note: "Review this previously skipped update" });
+  await agent.pushNow();
+  const latest = github.files.get(LEARNER_STATE_PATH);
+  await github.writeFile(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: learnerState.serialize(), deviceId: "phone", appliedAgentSha: github.files.get(AGENT_STATE_PATH).sha }), { sha: latest.sha });
+  await assert.rejects(learner.pullNow(), (error) => error.details.channel === "agent");
+  assert.equal(learnerState.read().note, undefined);
 });

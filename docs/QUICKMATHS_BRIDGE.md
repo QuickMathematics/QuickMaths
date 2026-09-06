@@ -69,7 +69,8 @@ Codex Remote continues the task that is running on the computer; it does not mak
 - Missing starting Git history requires explicit two-way choices for every difference. A timestamp alone never authorizes overwriting learner work.
 - If either remote revision or meaningful local content changes during review, refresh the comparison. Writes use GitHub's expected file SHA and never retry by overwriting an unseen revision. Failed writes leave local work intact.
 - Selecting incompatible dependencies, such as keeping progress but removing its lesson set, is rejected before saving. Keep the related profile, curriculum and lesson set too, or discard that work in the comparison.
-- Accepted agent checkpoints are recorded in `applied_agent_sha` in the canonical learner envelope, so other devices do not reapply them.
+- Resolved agent checkpoints record the same revision in `applied_agent_sha` and `resolved_agent_sha` in the canonical learner envelope. This includes an explicit choice to skip a change, so other devices respect that choice. Older clients sometimes recorded a merely seen revision as applied; without the matching resolution marker, differing agent content must be checked again.
+- **Sync now** checks both the shared learner workspace and agent updates before pushing. A pending agent update blocks a learner push until it is applied or reviewed; pushing cannot dismiss the comparison.
 - Agent work can publish even if the learner changed during the prompt. An unpublished task must be published before starting another. Another agent's concurrent checkpoint cannot be overwritten silently.
 - The two checkpoint files contain learning records, not the GitHub token. Repository history remains a recovery trail; downloadable JSON backups are still useful.
 

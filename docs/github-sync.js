@@ -1,4 +1,4 @@
-import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v4";
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-merge-v5";
 
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;
@@ -352,6 +352,10 @@ function parseStateJson(stateJson) {
   }
 }
 
+// Older clients used agentSha for both "seen" and "applied" updates. Require a
+// matching resolution marker before treating that historical value as accepted.
+const confirmedAgentSha = (sha, resolvedSha) => typeof sha === "string" && sha.length > 0 && sha === resolvedSha ? sha : null;
+
 export function createBridgeEnvelope({
   channel,
   stateJson,
@@ -362,6 +366,7 @@ export function createBridgeEnvelope({
   baseLearnerSha = null,
   taskStartedAt = null,
   appliedAgentSha = null,
+  resolvedAgentSha = null,
   now = () => new Date(),
 }) {
   if (!["learner", "agent"].includes(channel)) throw new GitHubSyncError("Bridge channel is invalid.", { code: "invalid_channel" });
@@ -386,6 +391,7 @@ export function createBridgeEnvelope({
     base_learner_sha: channel === "agent" ? baseLearnerSha : null,
     task_started_at: taskStartedAt,
     applied_agent_sha: channel === "learner" ? appliedAgentSha : null,
+    resolved_agent_sha: channel === "learner" ? confirmedAgentSha(appliedAgentSha, resolvedAgentSha) : null,
     app_state: parseStateJson(stateJson),
   }, null, 2);
 }
@@ -416,6 +422,7 @@ export function parseBridgeEnvelope(raw, { expectedChannel = null } = {}) {
     baseLearnerSha: typeof value.base_learner_sha === "string" ? value.base_learner_sha : null,
     taskStartedAt: typeof value.task_started_at === "string" && Number.isFinite(Date.parse(value.task_started_at)) ? value.task_started_at : null,
     appliedAgentSha: typeof value.applied_agent_sha === "string" ? value.applied_agent_sha : null,
+    resolvedAgentSha: confirmedAgentSha(value.applied_agent_sha, value.resolved_agent_sha),
     stateJson: JSON.stringify(value.app_state),
   };
 }
@@ -465,7 +472,7 @@ export function createGitHubSyncController({
   let suppressStateChange = false;
   let operation = Promise.resolve();
   let learnerSha = typeof metadata?.learnerSha === "string" ? metadata.learnerSha : null;
-  let agentSha = typeof metadata?.agentSha === "string" ? metadata.agentSha : null;
+  let agentSha = role === "learner" ? confirmedAgentSha(metadata?.agentSha, metadata?.resolvedAgentSha) : typeof metadata?.agentSha === "string" ? metadata.agentSha : null;
   let agentTask = role === "agent" ? metadata?.agentTask ?? null : null;
   let pendingReview = null;
   const bases = new Map();
@@ -509,7 +516,8 @@ export function createGitHubSyncController({
     const saved = credentialStore.loadMetadata?.({ role }) ?? null;
     const sameRepository = saved?.repositoryKey === currentRepositoryKey;
     const savedLearnerSha = sameRepository && typeof saved?.learnerSha === "string" ? saved.learnerSha : null;
-    const savedAgentSha = sameRepository && typeof saved?.agentSha === "string" ? saved.agentSha : null;
+    const savedAgentSha = !sameRepository ? null : role === "learner" ? confirmedAgentSha(saved?.agentSha, saved?.resolvedAgentSha) : typeof saved?.agentSha === "string" ? saved.agentSha : null;
+    const nextAgentSha = clearRevisions ? null : revisions ? agentSha : (savedAgentSha ?? agentSha);
     const savedPendingActor = sameRepository && ["agent", "device"].includes(saved?.pendingActor?.kind) ? saved.pendingActor : null;
     credentialStore.saveMetadata?.({
       role,
@@ -522,7 +530,8 @@ export function createGitHubSyncController({
         // that just pushed or pulled. Only revision-changing operations replace
         // these fields; clearing storage explicitly removes both.
         learnerSha: clearRevisions ? null : revisions ? learnerSha : (savedLearnerSha ?? learnerSha),
-        agentSha: clearRevisions ? null : revisions ? agentSha : (savedAgentSha ?? agentSha),
+        agentSha: nextAgentSha,
+        resolvedAgentSha: role === "learner" ? nextAgentSha : null,
         dirty: status.dirty,
         localChangedAt,
         pendingActor: clearRevisions ? null : revisions ? pendingLearnerActor : (pendingLearnerActor ?? savedPendingActor),
@@ -618,7 +627,7 @@ export function createGitHubSyncController({
   // tab may already have saved this device's exact content. Remember that copy
   // without overwriting local state or acknowledging an unreviewed agent task.
   const rememberMatchingLearner = (remote) => {
-    if (learnerSha !== remote.sha || agentSha === null) agentSha = remote.envelope.appliedAgentSha ?? agentSha;
+    if (learnerSha !== remote.sha || agentSha === null) agentSha = remote.envelope.resolvedAgentSha ?? agentSha;
     learnerSha = remote.sha;
     pendingLearnerActor = null;
     persistMetadata({ revisions: true });
@@ -717,6 +726,10 @@ export function createGitHubSyncController({
     if (!force && latest.exists && latest.sha !== knownSha) {
       throw new GitHubSyncConflictError("GitHub has a newer copy. Pull it before pushing.", { channel, knownSha, remoteSha: latest.sha });
     }
+    if (role === "learner") {
+      const agent = await readChannel("agent");
+      if (agent.exists && agent.sha !== agentSha) throw new GitHubSyncConflictError("An agent update is waiting. Review it before finishing sync.", { channel: "agent", remoteSha: agent.sha, taskStartedAt: agent.envelope.taskStartedAt });
+    }
     const publishedActorLabel = role === "agent"
       ? resolvedDeviceLabel
       : pendingLearnerActor?.label || resolvedDeviceLabel;
@@ -731,6 +744,7 @@ export function createGitHubSyncController({
       baseLearnerSha: channel === "agent" ? agentTask.baseLearnerSha : null,
       taskStartedAt: channel === "agent" ? agentTask.startedAt : null,
       appliedAgentSha: channel === "learner" ? agentSha : null,
+      resolvedAgentSha: channel === "learner" ? agentSha : null,
       now,
     });
     let result;
@@ -802,7 +816,8 @@ export function createGitHubSyncController({
       // Compare both the current repo and the phone with the task's starting
       // snapshot. Revision/content checks also cover equal or skewed clocks.
       const alreadyMatches = canonical?.exists && sameWorkspace(canonical.envelope.stateJson, remote.envelope.stateJson) && sameWorkspace(serializeState(), remote.envelope.stateJson);
-      if (!alreadyMatches && (!base || !canonical?.exists || !sameWorkspace(canonical.envelope.stateJson, base) || !sameWorkspace(serializeState(), base))) {
+      const unverifiedEarlierAcceptance = canonical?.envelope?.appliedAgentSha === remote.sha && !canonical.envelope.resolvedAgentSha;
+      if (!alreadyMatches && (unverifiedEarlierAcceptance || !base || !canonical?.exists || !sameWorkspace(canonical.envelope.stateJson, base) || !sameWorkspace(serializeState(), base))) {
         throw new GitHubSyncConflictError("Your workspace changed while the agent was working. Choose what to keep from each version.", {
           channel: "agent", taskStartedAt: remote.envelope.taskStartedAt, remoteSha: remote.sha,
         });
@@ -867,7 +882,7 @@ export function createGitHubSyncController({
     localChangedAt = remote.envelope.updatedAt ?? now().toISOString();
     pendingLearnerActor = null;
     learnerSha = remote.sha;
-    agentSha = remote.envelope.appliedAgentSha ?? agentSha;
+    agentSha = remote.envelope.resolvedAgentSha;
     persistMetadata({ revisions: true });
     consecutiveIdlePolls = 0;
     update({
@@ -900,7 +915,7 @@ export function createGitHubSyncController({
     localChangedAt = remote.envelope.updatedAt ?? now().toISOString();
     pendingLearnerActor = null;
     learnerSha = remote.sha;
-    agentSha = remote.envelope.appliedAgentSha ?? agentSha;
+    agentSha = remote.envelope.resolvedAgentSha;
     persistMetadata({ revisions: true });
     update({
       phase: "synced", dirty: false, remoteAvailable: true,
@@ -972,8 +987,8 @@ export function createGitHubSyncController({
       }
     }
     if (!sameWorkspace(serializeState(), review.localJson)) throw changed();
-    const acknowledged = review.channel === "agent" ? agent.sha : learner.envelope?.appliedAgentSha ?? agentSha;
-    const envelope = createBridgeEnvelope({ channel: "learner", stateJson: merged, deviceId: resolvedDeviceId, deviceLabel: resolvedDeviceLabel, appliedAgentSha: acknowledged, now });
+    const acknowledged = review.channel === "agent" ? agent.sha : learner.envelope?.resolvedAgentSha ?? agentSha;
+    const envelope = createBridgeEnvelope({ channel: "learner", stateJson: merged, deviceId: resolvedDeviceId, deviceLabel: resolvedDeviceLabel, appliedAgentSha: acknowledged, resolvedAgentSha: acknowledged, now });
     let result;
     try {
       result = await client.writeFile(requireConfig(), LEARNER_STATE_PATH, envelope, { sha: learner.sha, message: "QuickMaths Bridge: merge reviewed workspace changes" });
