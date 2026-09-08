@@ -4,7 +4,7 @@ import argparse,hashlib,json
 import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
-from scripts import illustration_math,illustration_programming,illustration_geography,illustration_trigonometry,illustration_concepts
+from scripts import illustration_math,illustration_programming,illustration_geography,illustration_trigonometry,illustration_concepts,illustration_statistics
 from scripts.illustration_drawing import PAPER
 from scripts.illustration_captions import CAPTIONS
 
@@ -37,7 +37,7 @@ def build(preview=None):
             if not kinds:continue
             record={"name":skill["name"],"fingerprint":fingerprint(skill),"media":[],"assets":[]}
             for kind in kinds:
-                module=illustration_concepts if kind in illustration_concepts.KINDS else illustration_trigonometry if kind!=skill["id"] else illustration_programming if kind.startswith("CUSTOM_PROG") else illustration_geography if kind.startswith("GEO_") else illustration_math
+                module=illustration_concepts if kind in illustration_concepts.KINDS else illustration_trigonometry if kind!=skill["id"] else illustration_programming if kind.startswith("CUSTOM_PROG") else illustration_geography if kind.startswith("GEO_") else illustration_statistics if kind.startswith(("MATH_STAT_", "MATH_PROB_")) else illustration_math
                 fig=Figure(figsize=(8.6,6.4),dpi=100,facecolor=PAPER);FigureCanvasAgg(fig)
                 ax=fig.add_axes((.12,.14,.83,.75),facecolor=PAPER)
                 module.draw(ax,kind)

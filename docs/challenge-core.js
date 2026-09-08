@@ -1,5 +1,6 @@
-import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260906-lesson-batches-v1";
+import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260908-statistics-v1";
 import { normalizeLessonAssets, normalizeLessonMedia, validateMediaReferences, mediaBaseUrl } from "./lesson-media.js?v=20260906-media-v1";
+import { chi_square_cdf, chi_square_sf, f_sf, inverse_normal_cdf, normal_cdf, t_cdf } from "./distributions.js?v=20260908-statistics-v1";
 
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
@@ -16,7 +17,7 @@ export const DEFAULT_SUBJECT = Object.freeze({
   name: "Mathematics",
   shortName: "Maths",
   icon: "∑",
-  description: "The built-in Mathematics curriculum, from algebra foundations through coordinate geometry.",
+  description: "The built-in Mathematics curriculum, from algebra foundations through probability, statistical inference, and coordinate geometry.",
   builtIn: true,
   theme: Object.freeze({
     paper: "#f3eee3", paperDeep: "#e8dfce", paperLight: "#fffdf8", ink: "#16211d",
@@ -71,6 +72,8 @@ const WORK_MODES = new Set([
 const PYTHON_BUILTINS = new Set(["abs", "all", "any", "bool", "dict", "enumerate", "float", "int", "len", "list", "max", "min", "range", "round", "set", "sorted", "str", "sum", "tuple", "zip"]);
 const PYTHON_VALUE_TYPES = new Set(["json", "int", "float", "str", "bool", "list", "dict"]);
 const EXPRESSION_FUNCTIONS = new Set(["sqrt"]);
+const NATIVE_TEMPLATE_FUNCTIONS = Object.freeze({ normal_cdf, inverse_normal_cdf, t_cdf, chi_square_cdf, chi_square_sf, f_sf });
+const NATIVE_TEMPLATE_BUILTINS = Object.freeze({ abs: Math.abs, min: Math.min, max: Math.max, round: Math.round });
 const EXPRESSION_CONSTANTS = Object.freeze({ pi: Math.PI, e: Math.E });
 const SUPERSCRIPT_DIGITS = Object.freeze({ "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-" });
 
@@ -156,7 +159,7 @@ function safeTemplateEval(expression, variables) {
     if (token.type !== "identifier") throw new Error("Expected a value.");
     if (["true", "false"].includes(token.value)) return token.value === "true";
     if (peek("(")) {
-      if (!["abs", "min", "max", "round"].includes(token.value)) throw new Error("Unsupported template function.");
+      if (!Object.hasOwn(NATIVE_TEMPLATE_FUNCTIONS, token.value) && !Object.hasOwn(NATIVE_TEMPLATE_BUILTINS, token.value)) throw new Error("Unsupported template function.");
       take();
       const args = [];
       if (!peek(")")) {
@@ -164,7 +167,8 @@ function safeTemplateEval(expression, variables) {
       }
       if (!peek(")")) throw new Error("Missing function parenthesis.");
       take();
-      return { abs: Math.abs, min: Math.min, max: Math.max, round: Math.round }[token.value](...args);
+      if (Object.hasOwn(NATIVE_TEMPLATE_BUILTINS, token.value)) return NATIVE_TEMPLATE_BUILTINS[token.value](...args);
+      return NATIVE_TEMPLATE_FUNCTIONS[token.value](...args);
     }
     if (!(token.value in variables)) throw new Error(`Unknown template name ${token.value}.`);
     return variables[token.value];

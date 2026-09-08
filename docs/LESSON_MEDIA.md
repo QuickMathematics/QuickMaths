@@ -17,7 +17,9 @@ python scripts/export_web_curriculum.py
 
 The figure builder also accepts `--preview-dir tmp/geometry-previews` to save PNG previews. Diagrams in generated assessments use fixed dimensions so the image and question always agree.
 
-All 107 shipped lesson pages have teaching figures. The app also supplies a library of 109 Matplotlib SVGs for known Math, Programming, Geography and Estimation lessons, matching their ID and teaching content. This adds illustrations to already installed packs without rewriting them or changing learner progress. Native overrides keep their own media. These additional figures load from the published site as they approach the viewport; they require their hosting files to remain available and are not guaranteed offline.
+All 128 shipped lesson pages have teaching figures. The app also supplies a library of 130 Matplotlib SVGs across 118 known Math, Programming, Geography and Estimation lessons, matching their ID and teaching content. This adds illustrations to already installed packs without rewriting them or changing learner progress. Native overrides keep their own media. These additional figures load from the published site as they approach the viewport; they require their hosting files to remain available and are not guaranteed offline.
+
+The native Statistics and Probability assessments also include nine embedded SVG figures reused across 18 fixed questions: dot plots, five-number and comparison box plots, histograms, scatter patterns, an additional-point comparison, and residual diagnostics. Rebuild them with `python scripts/build_statistics_assessment_media.py`; use `--preview-dir tmp/statistics-assessment-previews` for a visual review. Fixed diagrams must retain the exact values described by their question.
 
 Studio copies of matching lessons include the figures as ordinary hosted assets. Existing embedded media remains embedded, another publisher's media base is preserved, and figures already present are not duplicated. Normal section and pack limits still apply. Maintainers can rebuild the library with `python -m scripts.build_lesson_illustrations` and review the [coverage report](ILLUSTRATION_AUDIT.md).
 

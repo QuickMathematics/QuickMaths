@@ -10,7 +10,7 @@ def test_loads_valid_default_skills():
     assert track.id == "TRACK_MATH_ALGEBRA_FOUNDATIONS"
     assert track.schema_version == "0.2"
     assert "MATH_ALG_001" in skills
-    assert len(track.skills) == 60
+    assert len(track.skills) == 81
     assert skills["MATH_ALG_001"].test.question_count >= 1
     assert len(skills["MATH_ALG_001"].test.questions) >= skills["MATH_ALG_001"].test.question_count
     assert warnings == []

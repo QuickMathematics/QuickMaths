@@ -1,0 +1,458 @@
+id: MATH_STAT_012
+schema_version: 0.2
+name: Chi-square tests for two-way tables
+domain: Math
+subdomain: Statistics
+topic: Chi-Square Inference
+description: Test independence/homogeneity in contingency tables using expected counts, cell contributions and right-tail
+  p-values.
+prerequisites:
+- MATH_STAT_011
+tags:
+- statistics
+unlocks:
+- MATH_STAT_013
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Chi-square tests for two-way tables compare observed cells with independence-model expected counts E=(row
+  total)(column total)/grand total. Independence and homogeneity use the same calculation but differ in sampling design
+  and conclusion. df=(r-1)(c-1). Use the right-tail `chi_square_sf`; inspect cell contributions and standardized residuals.
+  Check independent observations and expected counts, and do not convert association into a causal claim without design
+  support.
+examples:
+  - prompt: 'A table cell has row total 40, column total 30, and grand total 100. Find its expected count under independence.'
+    solution: 'In a 2x2 table with row total 40, column total 30, and grand total 100, expected cell count=(40)(30)/100=12.'
+    explanation: 'Expected counts represent independence while preserving the margins.'
+  - prompt: 'A two-way chi-square statistic is 9.6 with one degree of freedom. How should association be assessed?'
+    solution: 'For chi-square=9.6 with df=1, the right-tail p-value is approximately 0.00195. Since .00195<.05, reject independence and conclude evidence of association.'
+    explanation: 'A two-way chi-square test evaluates association, not causation.'
+applications:
+  - title: 'Outcome-by-group association'
+    description: 'Two-way chi-square tests investigate associations such as treatment by outcome or preference by demographic group.'
+  - title: 'Expected cell analysis'
+    description: 'Expected counts and residuals identify which cells drive an association while avoiding causal claims.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: CHI_TABLE_DESIGN
+    type: fixed
+    prompt_template: One random sample classified by two categorical variables asks association. Procedure?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Chi-square independence
+    - id: B
+      label: Goodness of fit
+    - id: C
+      label: One-sample t
+    - id: D
+      label: ANOVA
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Independence fits one sample/two variables.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_TABLE_HOMOGENEITY
+    type: fixed
+    prompt_template: Separate samples from several populations compare category distributions. Procedure?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Homogeneity
+    - id: B
+      label: Independence only
+    - id: C
+      label: z for mean
+    - id: D
+      label: Correlation
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Homogeneity matches separately sampled populations.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_TABLE_EXPECTED
+    type: generated
+    prompt_template: Row total={r}, column total={c}, grand total={N}. Find expected cell count.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      r:
+        type: int
+        min: 10
+        max: 50
+      c:
+        type: int
+        min: 10
+        max: 50
+      N:
+        type: choice
+        values:
+        - 50
+        - 100
+        - 200
+    derived:
+      e: round(r*c/N*1000)/1000
+    answer:
+      type: numeric
+      value: '{e}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.0011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Expected=row*column/grand total.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - r<N
+    - c<N
+  - id: CHI_TABLE_DF
+    type: generated
+    prompt_template: Table is {r} by {c}. Find df.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 6
+      c:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      df: (r-1)*(c-1)
+    answer:
+      type: numeric
+      value: '{df}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: df=(r-1)(c-1).
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CHI_TABLE_CONTRIB
+    type: generated
+    prompt_template: Observed={o}, expected={e}. Contribution?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      e:
+        type: choice
+        values:
+        - 5
+        - 8
+        - 10
+        - 12
+        - 16
+        - 20
+      d:
+        type: choice
+        values:
+        - -4
+        - -3
+        - -2
+        - 2
+        - 3
+        - 4
+    derived:
+      o: e+d
+      c: round(d*d/e*10000)/10000
+    answer:
+      type: numeric
+      value: '{c}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: (O-E)^2/E.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - o>=0
+  - id: CHI_TABLE_PVALUE
+    type: generated
+    prompt_template: Chi-square={chi}, df={df}. Find p.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      chi:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 8
+        - 10
+        - 12
+        - 15
+      df:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 8
+        - 10
+    derived:
+      p: round(chi_square_sf(chi,df)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Right-tail survival probability.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CHI_TABLE_DECISION
+    type: fixed
+    prompt_template: Independence test p=.004 alpha=.05. Conclusion?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Evidence of association
+    - id: B
+      label: Variables proven causal
+    - id: C
+      label: Every cell differs
+    - id: D
+      label: Independence proven
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Reject independence, not causation.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_TABLE_EXPECTED_CONDITION
+    type: fixed
+    prompt_template: Several expected counts below2. Best?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Exact/simulation method or defensible category combination
+    - id: B
+      label: Ignore
+    - id: C
+      label: Replace with5
+    - id: D
+      label: Increase alpha
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Small expected counts weaken approximation.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_TABLE_CELL_DRIVER
+    type: fixed
+    prompt_template: Which cells drive chi-square?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Those with largest (O-E)^2/E contributions
+    - id: B
+      label: Largest raw counts always
+    - id: C
+      label: Only diagonal
+    - id: D
+      label: Only positive residuals
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Contributions quantify discrepancy.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_TABLE_RESIDUAL_SIGN
+    type: fixed
+    prompt_template: Positive standardized residual means?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: More observed than expected under null
+    - id: B
+      label: Less observed
+    - id: C
+      label: No association
+    - id: D
+      label: Cell invalid
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Residual sign retains direction.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_TABLE_CAUSATION
+    type: fixed
+    prompt_template: Significant association in observational survey proves?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Association, not causation
+    - id: B
+      label: Causation
+    - id: C
+      label: Random assignment
+    - id: D
+      label: No confounding
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Design determines causal scope.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_TABLE_2PROP_LINK
+    type: fixed
+    prompt_template: For 2x2 equal-proportion test without continuity correction, chi-square relates to pooled z how?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: chi-square=z^2
+    - id: B
+      label: chi-square=z
+    - id: C
+      label: chi-square=|z|/2
+    - id: D
+      label: No relation
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The statistics encode same evidence.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_TABLE_HYPOTHESES
+    type: fixed
+    prompt_template: Independence null states?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Variables independent in population
+    - id: B
+      label: Sample cells equal
+    - id: C
+      label: Every expected count 5
+    - id: D
+      label: Variables causal
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Null is population independence.
+    mistake_tags:
+    - concept_error
+    difficulty: medium

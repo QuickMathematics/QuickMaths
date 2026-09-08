@@ -1,0 +1,651 @@
+id: MATH_STAT_001
+schema_version: 0.2
+name: Center, spread, and outliers
+domain: Math
+subdomain: Statistics
+topic: Descriptive Statistics
+description: Summarize one-variable data with mean, median, mode, range, quartiles, IQR, weighted means, and resistant
+  measures.
+prerequisites:
+- MATH_ARITH_005
+- MATH_PREALG_001
+tags:
+- statistics
+- descriptive_statistics
+- mean
+- median
+- quartiles
+- iqr
+- outliers
+- weighted_mean
+unlocks:
+- MATH_STAT_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |-
+  Statistics turns a collection of observations into a description that can be compared and questioned.
+
+  A distribution has three broad features: center, spread, and shape/unusual values. The mean is the total divided by the number of observations and is sensitive to outliers. The median is the middle ordered value and is resistant. The mode is the most frequent value. Range is maximum minus minimum. Quartiles split ordered data and IQR = Q3-Q1. Potential outliers lie below Q1-1.5*IQR or above Q3+1.5*IQR. Weighted mean = sum(value*weight)/sum(weights). Use mean and standard deviation for roughly symmetric distributions without strong outliers; use median and IQR for skewed data or data with outliers. Adding a constant shifts center without changing range or IQR; multiplying by a positive factor scales both center and spread.
+examples:
+- prompt: Find the mean of 4, 7, 9, 10, 10.
+  solution: '8'
+  explanation: The total is 40 and there are 5 values, so 40/5 = 8.
+- prompt: Find the median of 2, 5, 9, 12, 20, 21.
+  solution: '10.5'
+  explanation: The ordered middle values are 9 and 12, so the median is (9 + 12)/2.
+- prompt: Find the IQR of 1, 3, 4, 6, 8, 10, 12, 17.
+  solution: '7.5'
+  explanation: Q1 = 3.5 and Q3 = 11, so IQR = 7.5.
+- prompt: A dataset has Q1 = 20 and Q3 = 28. Find the upper outlier fence.
+  solution: '40'
+  explanation: IQR = 8, so upper fence = 28 + 1.5(8) = 40.
+- prompt: A score of 70 has weight 2 and a score of 90 has weight 3. Find the weighted mean.
+  solution: '82'
+  explanation: (70*2 + 90*3)/(2 + 3) = 410/5 = 82.
+applications:
+- title: Education
+  description: Compare test results without allowing a few extreme scores to hide the typical result.
+- title: Medicine
+  description: Summarize waiting times and measurements while checking unusual observations.
+- title: Business
+  description: Weighted means combine prices, ratings, or performance with unequal frequencies.
+test:
+  question_count: 15
+  randomize_order: true
+  questions:
+  - id: STAT_CENTER_MEAN_BALANCED_001
+    type: generated
+    prompt_template: Find the mean of {v1}, {v2}, {center}, {v4}, and {v5}.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      center:
+        type: int
+        min: 6
+        max: 30
+      a:
+        type: int
+        min: 3
+        max: 8
+      b:
+        type: int
+        min: 1
+        max: 2
+    derived:
+      v1: center - a
+      v2: center - b
+      v4: center + b
+      v5: center + a
+    answer:
+      type: numeric
+      value: '{center}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The deviations from {center} cancel in pairs: -{a}, -{b}, 0, +{b}, +{a}.
+      The sum is 5 * {center}, so the mean is {center}.
+    mistake_tags:
+    - mean_error
+    - sum_error
+    - division_error
+    difficulty: easy
+  - id: STAT_CENTER_MISSING_FROM_MEAN_001
+    type: generated
+    prompt_template: The mean of {a}, {b}, {c}, {d}, and x is {mean}. Find x.
+    answer_mode: final_plus_required_work
+    max_attempts: 500
+    variables:
+      mean:
+        type: int
+        min: 8
+        max: 22
+      a:
+        type: int
+        min: 2
+        max: 25
+      b:
+        type: int
+        min: 2
+        max: 25
+      c:
+        type: int
+        min: 2
+        max: 25
+      d:
+        type: int
+        min: 2
+        max: 25
+    derived:
+      missing: 5 * mean - a - b - c - d
+    constraints:
+    - missing >= 0
+    - missing <= 35
+    answer:
+      type: equation_solution
+      variable: x
+      value: '{missing}'
+    grading:
+      method: equation_solution
+    work:
+      mode: procedural_steps
+      prompt: Write a mean equation containing x, then solve it one equivalent equation per line.
+      line_type: equation
+      target_variable: x
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      A mean of {mean} for five values requires a total of {5 * mean}.
+      The four known values total {a + b + c + d}.
+      So x = {5 * mean} - {a + b + c + d} = {missing}.
+    mistake_tags:
+    - mean_error
+    - missing_value_error
+    - equation_error
+    difficulty: medium
+  - id: STAT_CENTER_MEDIAN_ODD_001
+    type: generated
+    prompt_template: 'The values are already ordered: {v1}, {v2}, {v3}, {v4}, {v5}. What is the median?'
+    answer_mode: final_only
+    max_attempts: 200
+    variables:
+      start:
+        type: int
+        min: -5
+        max: 15
+      g1:
+        type: int
+        min: 1
+        max: 4
+      g2:
+        type: int
+        min: 1
+        max: 4
+      g3:
+        type: int
+        min: 1
+        max: 4
+      g4:
+        type: int
+        min: 1
+        max: 4
+    derived:
+      v1: start
+      v2: v1 + g1
+      v3: v2 + g2
+      v4: v3 + g3
+      v5: v4 + g4
+    answer:
+      type: numeric
+      value: '{v3}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      There are five ordered values, so the median is the third value.
+      The third value is {v3}.
+    mistake_tags:
+    - median_error
+    - ordering_error
+    difficulty: easy
+  - id: STAT_CENTER_MEDIAN_EVEN_001
+    type: generated
+    prompt_template: 'The values are already ordered: {v1}, {v2}, {v3}, {v4}, {v5}, {v6}. What is the median?'
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      start:
+        type: int
+        min: 0
+        max: 12
+      g1:
+        type: int
+        min: 1
+        max: 3
+      g2:
+        type: int
+        min: 1
+        max: 3
+      gap:
+        type: choice
+        values:
+        - 2
+        - 4
+        - 6
+      g4:
+        type: int
+        min: 1
+        max: 3
+      g5:
+        type: int
+        min: 1
+        max: 3
+    derived:
+      v1: start
+      v2: v1 + g1
+      v3: v2 + g2
+      v4: v3 + gap
+      v5: v4 + g4
+      v6: v5 + g5
+      median: (v3 + v4) / 2
+    answer:
+      type: numeric
+      value: '{median}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      With six ordered values, average the third and fourth.
+      ({v3} + {v4}) / 2 = {median}.
+    mistake_tags:
+    - median_error
+    - middle_values_error
+    - division_error
+    difficulty: medium
+  - id: STAT_CENTER_MODE_001
+    type: generated
+    prompt_template: Find the mode of {low}, {mode}, {high}, {mode}, {far}, {mode}.
+    answer_mode: final_only
+    max_attempts: 200
+    variables:
+      mode:
+        type: int
+        min: 4
+        max: 25
+    derived:
+      low: mode - 3
+      high: mode + 2
+      far: mode + 6
+    answer:
+      type: numeric
+      value: '{mode}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The value {mode} appears three times. Every other value appears once, so the mode is {mode}.
+    mistake_tags:
+    - mode_error
+    - frequency_error
+    difficulty: easy
+  - id: STAT_SPREAD_RANGE_001
+    type: generated
+    prompt_template: Find the range of the dataset {low}, {low_plus}, {middle}, {near_high}, {high}.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      low:
+        type: int
+        min: -10
+        max: 12
+      spread:
+        type: int
+        min: 8
+        max: 30
+    derived:
+      high: low + spread
+      low_plus: low + 2
+      middle: low + spread // 2
+      near_high: high - 3
+    answer:
+      type: numeric
+      value: '{spread}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Range = maximum - minimum.
+      {high} - ({low}) = {spread}.
+    mistake_tags:
+    - range_error
+    - maximum_minimum_error
+    - subtraction_error
+    difficulty: easy
+  - id: STAT_CENTER_WEIGHTED_MEAN_001
+    type: generated
+    prompt_template: A course grade uses score {score1} with weight {weight1} and score {score2} with weight {weight2}.
+      Treat the weights as relative frequencies. What is the weighted mean?
+    answer_mode: final_plus_required_work
+    max_attempts: 400
+    variables:
+      score1:
+        type: int
+        min: 60
+        max: 95
+      score2:
+        type: int
+        min: 60
+        max: 95
+      weight1:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 3
+        - 4
+      weight2:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 3
+        - 4
+    derived:
+      weighted_total: score1 * weight1 + score2 * weight2
+      weight_total: weight1 + weight2
+      weighted_mean: weighted_total / weight_total
+    constraints:
+    - score1 != score2
+    - weighted_total % weight_total == 0
+    answer:
+      type: numeric
+      value: '{weighted_mean}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show the weighted total and divide by the total weight.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      Multiply each score by its weight, add, then divide by the total weight.
+      ({score1}*{weight1} + {score2}*{weight2}) / {weight_total} = {weighted_mean}.
+    mistake_tags:
+    - weighted_mean_error
+    - weight_total_error
+    - division_error
+    difficulty: medium
+  - id: STAT_SPREAD_IQR_FIXED_001
+    type: fixed
+    prompt: Using the median-of-halves convention, find the IQR of the ordered data 2, 4, 5, 7, 9, 11, 13, 18.
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '7.5'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Find Q1 and Q3, then subtract to obtain the IQR.
+      line_type: expression
+      minimum_steps: 3
+      require_final_answer_match: true
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: |-
+      The lower-half median is Q1 = (4 + 5)/2 = 4.5.
+      The upper-half median is Q3 = (11 + 13)/2 = 12.
+      IQR = 12 - 4.5 = 7.5.
+    mistake_tags:
+    - quartile_error
+    - iqr_error
+    - middle_values_error
+    difficulty: medium
+  - id: STAT_SPREAD_OUTLIER_FENCE_001
+    type: fixed
+    prompt: A dataset has Q1 = 10 and Q3 = 18. Which listed value is an outlier under the 1.5*IQR rule?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: '-2'
+    - id: B
+      label: '4'
+    - id: C
+      label: '30'
+    - id: D
+      label: '33'
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: IQR = 18 - 10 = 8. The fences are 10 - 12 = -2 and 18 + 12 = 30. Only 33 lies outside
+      the fences.
+    mistake_tags:
+    - outlier_rule_error
+    - iqr_error
+    - fence_error
+    difficulty: medium
+  - id: STAT_CENTER_DOTPLOT_MEDIAN_ROBUST_001
+    type: fixed
+    prompt: The two dot plots show Dataset A = 2, 3, 4, 5, 6 and Dataset B = 2, 3, 4, 5, 18. Which statistic is
+      4 for both datasets?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Mean
+    - id: B
+      label: Median
+    - id: C
+      label: Range
+    - id: D
+      label: Maximum
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The middle ordered value is 4 in both datasets, so both medians are 4. Dataset B's mean
+      is larger because of 18.
+    mistake_tags:
+    - median_error
+    - mean_median_confusion
+    - outlier_effect_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/center-outlier-dotplots.svg
+      alt: Two dot plots. Dataset A contains 2, 3, 4, 5, 6. Dataset B contains 2, 3, 4, 5, 18. The plots show the listed values, including the separated value 18 in Dataset B.
+      caption: The plots display two datasets with one separated value in the second dataset.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_CENTER_DOTPLOT_OUTLIER_EFFECT_001
+    type: fixed
+    prompt: Compare the two displayed datasets. Which statement best describes the effect of replacing 6 with 18?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Both mean and median decrease
+    - id: B
+      label: The median rises more than the mean
+    - id: C
+      label: The mean rises while the median stays fixed
+    - id: D
+      label: The range becomes smaller
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The median stays 4, but the mean rises from 4 to 6.4. The range also grows. This is why
+      the mean is not resistant to a high outlier.
+    mistake_tags:
+    - outlier_effect_error
+    - mean_error
+    - median_error
+    difficulty: medium
+    media:
+    - type: image
+      src: media/statistics/center-outlier-dotplots.svg
+      alt: Two dot plots. Dataset A contains 2, 3, 4, 5, 6. Dataset B contains 2, 3, 4, 5, 18. The plots show the listed values, including the separated value 18 in Dataset B.
+      caption: The plots display two datasets with one separated value in the second dataset.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_SPREAD_BOXPLOT_IQR_MEDIA_001
+    type: fixed
+    prompt: Use the displayed box plot. What is the interquartile range?
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '7'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The box begins at Q1 = 5 and ends at Q3 = 12. IQR = 12 - 5 = 7.
+    mistake_tags:
+    - boxplot_error
+    - iqr_error
+    - quartile_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/five-number-boxplot.svg
+      alt: A horizontal box plot with minimum 2, first quartile 5, median 8, third quartile 12, and maximum 17.
+      caption: The box extends from Q1 to Q3, with whiskers reaching the minimum and maximum.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_CENTER_ROBUST_SUMMARY_CHOICE_001
+    type: fixed
+    prompt: House prices in a neighborhood are strongly right-skewed because a few mansions are much more expensive
+      than the other homes. Which pair best summarizes a typical price and spread?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Mode and maximum
+    - id: B
+      label: Mean and range
+    - id: C
+      label: Mean and standard deviation
+    - id: D
+      label: Median and IQR
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: For skewed data with high outliers, the median and IQR are resistant summaries. The mean
+      and standard deviation are pulled toward the long tail.
+    mistake_tags:
+    - summary_choice_error
+    - mean_median_confusion
+    - spread_measure_error
+    difficulty: medium
+  - id: STAT_TRANSFORM_ADD_CONSTANT_001
+    type: fixed
+    prompt: Five is added to every value in a dataset. What happens to the mean, median, range, and IQR?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Mean and median increase by 5; range and IQR stay unchanged
+    - id: B
+      label: All four measures increase by 5
+    - id: C
+      label: Mean stays unchanged; the other three increase by 5
+    - id: D
+      label: Mean and median stay unchanged; range and IQR increase by 5
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Adding 5 shifts every location measure by 5. Pairwise distances do not change, so the
+      range and IQR stay the same.
+    mistake_tags:
+    - transformation_error
+    - center_spread_confusion
+    difficulty: hard
+  - id: STAT_TRANSFORM_SCALE_DATA_001
+    type: fixed
+    prompt: Every value in a nonnegative dataset is multiplied by 3. What happens to the mean, median, range, and
+      IQR?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Only the mean is multiplied by 3
+    - id: B
+      label: All four measures are multiplied by 3
+    - id: C
+      label: Mean and median are multiplied by 3, but range and IQR are unchanged
+    - id: D
+      label: All four measures increase by exactly 3
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Multiplying every observation by positive 3 multiplies both location measures and distance-based
+      spread measures by 3.
+    mistake_tags:
+    - transformation_error
+    - scale_factor_error
+    - center_spread_confusion
+    difficulty: hard

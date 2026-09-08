@@ -1,0 +1,401 @@
+id: MATH_PROB_002
+schema_version: 0.2
+name: Compound and conditional probability
+domain: Math
+subdomain: Probability
+topic: Conditional Probability
+description: Combine events with addition/multiplication rules, conditional probability, independence, tables, trees
+  and Bayes rule.
+prerequisites:
+- MATH_PROB_001
+tags:
+- probability
+- conditional_probability
+- independence
+unlocks:
+- MATH_PROB_003
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'Compound probability distinguishes union, intersection, conditional probability, independence, and complements.
+  P(A or B)=P(A)+P(B)-P(A and B). Conditional probability changes the denominator: P(A|B)=P(A and B)/P(B). Multiplication
+  gives P(A and B)=P(A)P(B|A); for independence this becomes P(A)P(B). Tree diagrams multiply along a path and add
+  across qualifying paths. Without replacement changes later probabilities. Bayes reasoning reverses a condition by
+  dividing the relevant joint path by all paths producing the observed event.'
+examples:
+  - prompt: 'A bag has 3 red and 2 blue counters. Find the probability of drawing two red without replacement.'
+    solution: 'A bag has 3 red and 2 blue counters. P(two red)=(3/5)(2/4)=3/10.'
+    explanation: 'Without replacement changes the second denominator.'
+  - prompt: 'Given P(A)=1/2, P(B|A)=2/3, and P(B)=1/3, find P(A and B) and P(A|B).'
+    solution: 'If P(A)=1/2 and P(B|A)=2/3, then P(A and B)=1/3; if P(B)=1/3, P(A|B)=1.'
+    explanation: 'Multiplication finds a joint path and Bayes reasoning reverses the condition.'
+applications:
+  - title: 'Screening decisions'
+    description: 'Conditional probability and Bayes reasoning support medical screening, fraud detection, and diagnostic decisions.'
+  - title: 'Conditional risk'
+    description: 'Tree diagrams and contingency tables clarify dependence and changing denominators.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: PROB_COMPOUND_VENN_INTERSECTION
+    type: fixed
+    prompt_template: Among 30 cases, 6 are in both A and B. Find P(A and B).
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: 1/5
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 6/30=1/5.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: PROB_COMPOUND_VENN_UNION
+    type: fixed
+    prompt_template: Among 30 cases, 12 are A-only, 6 in both, 8 B-only. Find P(A or B).
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: 13/15
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The union contains 26 of 30 cases.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_COMPOUND_DISJOINT_ADDITION
+    type: generated
+    prompt_template: Mutually exclusive A and B have {a} and {b} outcomes, with {n} in neither. Find P(A or B).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 12
+      b:
+        type: int
+        min: 2
+        max: 12
+      n:
+        type: int
+        min: 1
+        max: 10
+    derived:
+      fav: a+b
+      total: a+b+n
+    answer:
+      type: numeric
+      value: '{fav}/{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Disjoint event counts add.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_COMPOUND_GENERAL_ADDITION
+    type: generated
+    prompt_template: A has {at} cases, B has {bt}, overlap {overlap}, total {total}. Find P(A or B).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      aonly:
+        type: int
+        min: 2
+        max: 10
+      bonly:
+        type: int
+        min: 2
+        max: 10
+      overlap:
+        type: int
+        min: 1
+        max: 8
+      neither:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      at: aonly+overlap
+      bt: bonly+overlap
+      union: aonly+bonly+overlap
+      total: union+neither
+    answer:
+      type: numeric
+      value: '{union}/{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Add event totals and subtract overlap once.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_COMPOUND_INDEPENDENT_TREE
+    type: fixed
+    prompt_template: Two fair coins are tossed. Find P(HH).
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: 1/4
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply 1/2 by 1/2.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: PROB_COMPOUND_INDEPENDENT_PRODUCT
+    type: generated
+    prompt_template: Independent A and B have probabilities {a}/{ad} and {b}/{bd}. Find P(A and B).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      ad:
+        type: int
+        min: 3
+        max: 10
+      a:
+        type: int
+        min: 1
+        max: 7
+      bd:
+        type: int
+        min: 3
+        max: 10
+      b:
+        type: int
+        min: 1
+        max: 7
+    derived:
+      num: a*b
+      den: ad*bd
+    answer:
+      type: numeric
+      value: '{num}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Independence allows multiplication.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - a<ad
+    - b<bd
+  - id: PROB_COMPOUND_WITHOUT_REPLACEMENT_TREE
+    type: fixed
+    prompt_template: A bag has 3 red and 2 blue counters. Two are drawn without replacement. Find P(two red).
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: 3/10
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: (3/5)(2/4)=3/10.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_COMPOUND_WITHOUT_REPLACEMENT_GENERATED
+    type: generated
+    prompt_template: A bag has {s} winning and {f} nonwinning tickets. Two are drawn without replacement. Find P(both
+      winning).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      s:
+        type: int
+        min: 2
+        max: 9
+      f:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      total: s+f
+      num: s*(s-1)
+      den: total*(total-1)
+    answer:
+      type: numeric
+      value: '{num}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Probabilities change after the first draw.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_COMPOUND_TABLE_LATE_GIVEN_BUS
+    type: fixed
+    prompt_template: Among 24 bus trips, 6 are late. Find P(late given bus).
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: 1/4
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 6/24=1/4.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_COMPOUND_TABLE_BUS_GIVEN_LATE
+    type: fixed
+    prompt_template: Among 11 late trips, 6 used the bus. Find P(bus given late).
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: 6/11
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Condition on the late column.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_COMPOUND_AT_LEAST_ONE
+    type: generated
+    prompt_template: Each of two independent trials succeeds with probability {s}/{d}. Find P(at least one success).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      d:
+        type: int
+        min: 3
+        max: 10
+      s:
+        type: int
+        min: 1
+        max: 7
+    derived:
+      f: d-s
+      num: d*d-f*f
+      den: d*d
+    answer:
+      type: numeric
+      value: '{num}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use 1-P(two failures).
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - s<d
+  - id: PROB_COMPOUND_BAYES_FACTORY
+    type: fixed
+    prompt_template: Factory A supplies 60% with 2% defect rate; B supplies 40% with 5% defect rate. Given a defect,
+      find P(B).
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: 5/8
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: P(B and D)=.02; P(D)=.032; .02/.032=5/8.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_COMPOUND_EXCLUSIVE_VS_INDEPENDENT
+    type: fixed
+    prompt_template: A and B have positive probability and are mutually exclusive. What must be true?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: They are independent
+    - id: B
+      label: They are dependent because observing one makes the other impossible
+    - id: C
+      label: Their probabilities are equal
+    - id: D
+      label: Their union is certain
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Positive-probability mutually exclusive events are dependent.
+    mistake_tags:
+    - concept_error
+    difficulty: medium

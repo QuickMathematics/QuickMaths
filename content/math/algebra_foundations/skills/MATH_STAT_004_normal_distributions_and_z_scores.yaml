@@ -1,0 +1,379 @@
+id: MATH_STAT_004
+schema_version: 0.2
+name: Normal distributions and z-scores
+domain: Math
+subdomain: Statistics
+topic: Normal Distributions
+description: Interpret normal density curves, z-scores, empirical-rule areas and standardized comparisons.
+prerequisites:
+- MATH_STAT_002
+- MATH_PROB_005
+tags:
+- statistics
+- normal_distribution
+- z_scores
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: A normal distribution is a continuous symmetric bell-shaped model determined by mean μ and standard deviation
+  σ. Probability is area, and an exact point has probability zero. Standardize with z=(x-μ)/σ and reverse with x=μ+zσ.
+  The empirical rule gives about 68%,95%,99.7% within 1,2,3 SD. z-scores compare relative standing across scales.
+  A normal model is questionable for strong skew, multimodality, extreme outliers, or hard boundaries near the center.
+examples:
+  - prompt: 'A battery life is 12.25 hours, with mean 10 and SD 1.5. Find its z-score.'
+    solution: 'A battery life is normal with mean 10 hours and SD 1.5. For 12.25 hours, z=(12.25-10)/1.5=1.5.'
+    explanation: 'The battery lasts 1.5 standard deviations above the mean.'
+  - prompt: 'For a normal model with mean 70 and SD 8, estimate P(62<X<78).'
+    solution: 'For N(70,8), P(62<X<78) is approximately the area between z=-1 and z=1, about 0.68.'
+    explanation: 'Standardize both bounds, then use the empirical rule or a normal calculator.'
+applications:
+  - title: 'Battery-life z-scores'
+    description: 'Standardize exam scores, manufacturing tolerances, or biological measurements to compare observations from different normal populations.'
+  - title: 'Normal percentile cutoffs'
+    description: 'Use normal areas and z-scores to set percentile cutoffs and flag unusually high or low observations.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: NORMAL_TOTAL_AREA
+    type: fixed
+    prompt_template: What is total area under a probability density curve?
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '1'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Total probability is 1.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: NORMAL_Z_SCORE
+    type: generated
+    prompt_template: A normal model has mean {mu}, SD {sigma}, and x={x}. Find z.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      mu:
+        type: int
+        min: -20
+        max: 100
+      sigma:
+        type: int
+        min: 2
+        max: 12
+      z:
+        type: choice
+        values:
+        - -3
+        - -2
+        - -1
+        - 1
+        - 2
+        - 3
+    derived:
+      x: mu+sigma*z
+    answer:
+      type: numeric
+      value: '{z}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: z=(x-mu)/sigma.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: NORMAL_VALUE_FROM_Z
+    type: generated
+    prompt_template: A normal model has mean {mu}, SD {sigma}. Find x when z={z}.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      mu:
+        type: int
+        min: -20
+        max: 100
+      sigma:
+        type: int
+        min: 2
+        max: 12
+      z:
+        type: choice
+        values:
+        - -2
+        - -1.5
+        - -1
+        - -0.5
+        - 0.5
+        - 1
+        - 1.5
+        - 2
+    derived:
+      x: mu+z*sigma
+    answer:
+      type: numeric
+      value: '{x}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: x=mu+z sigma.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: NORMAL_COMPARE_Z_SCORES
+    type: fixed
+    prompt_template: Exam A:82 mean70 sd6; Exam B:91 mean80 sd8. Which is higher relative to its exam?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Exam A, z=2
+    - id: B
+      label: Exam B because raw 91 is larger
+    - id: C
+      label: Tie
+    - id: D
+      label: Impossible
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Compare z-scores.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: NORMAL_EMPIRICAL_ONE_SD
+    type: fixed
+    prompt_template: Approximate proportion within 1 SD for normal data.
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0.68'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.01
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Empirical rule gives about .68.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: NORMAL_EMPIRICAL_TWO_SD
+    type: fixed
+    prompt_template: Approximate proportion within 2 SD.
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0.95'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.01
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Empirical rule gives about .95.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: NORMAL_EMPIRICAL_UPPER_TAIL
+    type: fixed
+    prompt_template: Approximate proportion above mu+2sigma.
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '0.025'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.005
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Five percent lies outside ±2 SD, half in each tail.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: NORMAL_LEFT_OF_ONE
+    type: fixed
+    prompt_template: Find P(Z<1.00) from a standard normal table.
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0.8413'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Standard normal cumulative area is .8413.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: NORMAL_CENTRAL_ONE
+    type: fixed
+    prompt_template: Find P(-1<Z<1).
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0.6827'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Central standard-normal area is .6827.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: NORMAL_RIGHT_OF_196
+    type: fixed
+    prompt_template: Find P(Z>1.96).
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0.025'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Right tail is about .025.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: NORMAL_NINETIETH_PERCENTILE
+    type: generated
+    prompt_template: The 90th percentile z is 1.2816. Mean={mu}, SD={sigma}. Find cutoff.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      mu:
+        type: int
+        min: 30
+        max: 100
+      sigma:
+        type: int
+        min: 4
+        max: 20
+    derived:
+      cut: round((mu+1.2816*sigma)*100)/100
+    answer:
+      type: numeric
+      value: '{cut}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.02
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use x=mu+z sigma.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: NORMAL_MODEL_APPROPRIATENESS
+    type: fixed
+    prompt_template: Which shape is strongest reason not to use a normal model?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Symmetric single peak no severe outliers
+    - id: B
+      label: Strong right skew with long tail and extremes
+    - id: C
+      label: Centered near zero after standardization
+    - id: D
+      label: Measured in cm
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Strong skew and outliers conflict with normal shape.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: NORMAL_LINEAR_TRANSFORMATION
+    type: fixed
+    prompt_template: X mean20 SD4; Y=3X+10. Mean and SD?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: 70 and 12
+    - id: B
+      label: 70 and22
+    - id: C
+      label: 30 and7
+    - id: D
+      label: 60 and12
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Mean transforms linearly; SD scales by |3|.
+    mistake_tags:
+    - concept_error
+    difficulty: hard

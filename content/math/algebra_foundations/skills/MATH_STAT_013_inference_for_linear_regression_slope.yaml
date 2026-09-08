@@ -1,0 +1,483 @@
+id: MATH_STAT_013
+schema_version: 0.2
+name: Inference for a linear regression slope
+domain: Math
+subdomain: Statistics
+topic: Regression Inference
+description: Use Student t procedures to test/estimate population regression slope and diagnose assumptions.
+prerequisites:
+- MATH_STAT_012
+tags:
+- statistics
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Regression inference estimates/tests a population slope β1 using t=(b1-β10)/SE_b1 with df=n-2 in simple linear
+  regression. Use the t-distribution calculator for one/two-sided p-values and b1±t*SE for intervals. Check linearity, independence, roughly
+  normal residuals for small samples, constant variance, and influential cases. A slope association is not automatically
+  causal; study design controls causal and generalization claims. Matching confidence intervals and two-sided tests
+  correspond.
+examples:
+  - prompt: 'A fitted slope is 0.8 with standard error 0.2. Test whether the population slope is zero.'
+    solution: 'For slope b=0.8 and SE(b)=0.2, t=0.8/0.2=4 when testing slope 0.'
+    explanation: 'A large standardized slope is evidence of a nonzero population linear rate.'
+  - prompt: 'Using slope .8, SE .2, and critical value 2.1, construct a 95% slope interval.'
+    solution: 'A 95% slope interval with b=.8 and t*=2.1 is .8 plus or minus 2.1(.2)=(.38,1.22).'
+    explanation: 'Interpret the interval in response units per one predictor unit.'
+applications:
+  - title: 'Regression rate inference'
+    description: 'Regression-slope inference quantifies whether a predictor has a nonzero linear rate in fields such as economics or biology.'
+  - title: 'Slope uncertainty'
+    description: 'Slope intervals communicate both direction and plausible change in response units.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: REGINF_PARAM
+    type: fixed
+    prompt_template: Population regression slope beta1 represents?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Mean change in Y for one-unit x increase under model
+    - id: B
+      label: Sample correlation
+    - id: C
+      label: One residual
+    - id: D
+      label: R-squared
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: beta1 is population slope.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: REGINF_DF
+    type: generated
+    prompt_template: Simple regression uses n={n}. Find slope-inference df.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 8
+        max: 60
+    derived:
+      df: n-2
+    answer:
+      type: numeric
+      value: '{df}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Intercept and slope use two df.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: REGINF_SE
+    type: generated
+    prompt_template: Residual SD s={s}, Sxx={sxx}. Find slope SE=s/sqrt(Sxx).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 8
+      se:
+        type: choice
+        values:
+        - 0.5
+        - 1
+        - 1.5
+        - 2
+    derived:
+      s: se*root
+      sxx: root**2
+    answer:
+      type: numeric
+      value: '{se}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use slope SE formula.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: REGINF_T
+    type: generated
+    prompt_template: Test beta1={b0}; b1={b1}, SE={se}. Find t.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      b0:
+        type: int
+        min: -2
+        max: 2
+      se:
+        type: choice
+        values:
+        - 0.25
+        - 0.5
+        - 1
+        - 1.5
+      t:
+        type: choice
+        values:
+        - -3
+        - -2
+        - -1
+        - 1
+        - 2
+        - 3
+    derived:
+      b1: b0+t*se
+    answer:
+      type: numeric
+      value: '{t}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: t=(b1-b10)/SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: REGINF_RIGHT_P
+    type: generated
+    prompt_template: Right-sided slope test t={t}, df={df}. Find p.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      t:
+        type: choice
+        values:
+        - 1.2
+        - 1.5
+        - 1.8
+        - 2
+        - 2.2
+        - 2.5
+        - 3
+      df:
+        type: choice
+        values:
+        - 8
+        - 10
+        - 12
+        - 15
+        - 20
+        - 30
+    derived:
+      p: round(t_cdf(-t,df)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use symmetric lower tail.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: REGINF_TWO_P
+    type: generated
+    prompt_template: Two-sided slope test t={t}, df={df}. Find p.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      t:
+        type: choice
+        values:
+        - -3
+        - -2.5
+        - -2
+        - -1.8
+        - 1.8
+        - 2
+        - 2.5
+        - 3
+      df:
+        type: choice
+        values:
+        - 8
+        - 10
+        - 12
+        - 15
+        - 20
+        - 30
+    derived:
+      p: round(2*t_cdf(-abs(t),df)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Double lower tail beyond |t|.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: REGINF_MARGIN
+    type: generated
+    prompt_template: Slope SE={se}, t*={tstar}. Find margin.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      se:
+        type: choice
+        values:
+        - 0.2
+        - 0.4
+        - 0.5
+        - 0.8
+        - 1
+      tstar:
+        type: choice
+        values:
+        - 2
+        - 2.1
+        - 2.2
+        - 2.3
+        - 2.5
+    derived:
+      m: round(se*tstar*100)/100
+    answer:
+      type: numeric
+      value: '{m}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Margin=t*SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: REGINF_CI_LOWER
+    type: generated
+    prompt_template: Slope estimate {b1}, SE={se}, t*={tstar}. Find lower endpoint.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      center:
+        type: int
+        min: 1
+        max: 8
+      se:
+        type: choice
+        values:
+        - 0.25
+        - 0.5
+        - 1
+      tstar:
+        type: choice
+        values:
+        - 2
+        - 2.2
+        - 2.4
+    derived:
+      margin: round(se*tstar*100)/100
+      b1: center+margin
+    answer:
+      type: numeric
+      value: '{center}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Lower=b1-margin.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: REGINF_INTERVAL_INTERPRET
+    type: fixed
+    prompt_template: 95% CI for slope [1.2,2.8] points/hour. Best?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Population mean score increases 1.2–2.8 per additional hour under model
+    - id: B
+      label: 95% students each gain that
+    - id: C
+      label: 95% probability sample slope inside
+    - id: D
+      label: Causation proven
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Interpret population slope with units and design caveat.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: REGINF_DECISION
+    type: fixed
+    prompt_template: Slope-test p=.018 alpha=.05.
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Reject zero slope
+    - id: B
+      label: Fail reject
+    - id: C
+      label: Accept null
+    - id: D
+      label: Slope=.018
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: p<alpha.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: REGINF_ZERO_CORRELATION
+    type: fixed
+    prompt_template: Simple regression beta1=0 test equivalent to?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Population correlation rho=0
+    - id: B
+      label: Mean response=0
+    - id: C
+      label: R2=1
+    - id: D
+      label: All residuals=0
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Simple linear slope and correlation zero tests coincide.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: REGINF_RESIDUAL_FAIL
+    type: fixed
+    prompt_template: Residual plot strongly U-shaped.
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Reconsider linear model/transform variables
+    - id: B
+      label: Proceed because t ignores form
+    - id: C
+      label: Delete positives
+    - id: D
+      label: Set slope zero
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Curvature violates linearity.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: REGINF_INFLUENCE
+    type: fixed
+    prompt_template: One high-leverage case changes p=.20 to .01. Best?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Verify and report sensitivity with/without it
+    - id: B
+      label: Report only .01
+    - id: C
+      label: Delete automatically
+    - id: D
+      label: Average p-values
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Influence requires sensitivity analysis.
+    mistake_tags:
+    - concept_error
+    difficulty: hard

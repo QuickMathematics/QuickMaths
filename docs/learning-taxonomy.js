@@ -27,6 +27,16 @@ export const FIELD_TAXONOMY = {
           "Systems of Equations",
           "Logarithms and Exponential Functions"
         ],
+        "Statistics": [
+          "Descriptive Statistics",
+          "Statistical Inference",
+          "Regression and ANOVA"
+        ],
+        "Probability": [
+          "Probability Foundations",
+          "Conditional Probability",
+          "Random Variables and Distributions"
+        ],
         "Geometry": [
           "Coordinate Graphing",
           "Coordinate Geometry",

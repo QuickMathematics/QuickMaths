@@ -1,18 +1,18 @@
 # Lesson illustration coverage
 
-Completed 6 September 2026, following the audit of commit `1566d69`.
+Updated 8 September 2026 for the Statistics and Probability batches, following the illustration release in `0cd757e`.
 
 ## Lesson pages
 
 | Library | Lessons | Illustrated before | Illustrated now |
 | --- | ---: | ---: | ---: |
-| Native Mathematics | 63 | 16 | 63 |
-| Programming | 28 | 0 | 28 |
-| Optional Geography | 15 | 0 | 15 |
-| Optional Estimation Lab | 1 | 0 | 1 |
-| **Total** | **107** | **16** | **107** |
+| Native Mathematics | 84 | 63 | 84 |
+| Programming | 28 | 28 | 28 |
+| Optional Geography | 15 | 15 | 15 |
+| Optional Estimation Lab | 1 | 1 | 1 |
+| **Total** | **128** | **107** | **128** |
 
-The new library contains **109 Matplotlib SVG figures for 97 lessons**: the 91 previously empty lessons and extra views for the six illustrated trigonometry lessons. Original embedded Geometry figures remain available.
+The new library contains **130 Matplotlib SVG figures for 118 lessons**: the prior library plus 21 Statistics and Probability figures. Original embedded Geometry figures remain available.
 
 Coverage includes fraction strips, multiplication and division models, percent grids, substitution and balance diagrams, area models, interval unions, sign charts, sequences, exponential/logarithmic curves and domains, rational holes/asymptotes, quadratic roots/vertices/optimization, function mappings and all three linear-system cases.
 
@@ -22,6 +22,7 @@ The six trigonometry lessons now also include special triangles/elevation, radia
 
 ## Assessments
 
+- Eighteen fixed Statistics scenarios use nine restored diagrams for dot plots, box plots, histograms, scatter plots, and residual diagnostics. They are embedded for offline use; captions and alternative descriptions provide the givens without stating the tested conclusions.
 - Existing coverage remains: 48 coordinate/line scenarios, 18 selected bearing/arc/sphere scenarios, and four authored triangle-area diagrams.
 - **73 of 79 trigonometry scenarios** now have diagrams reconstructed from displayed givens: 12 right-triangle, 12 radian/unit-circle, 13 graph, 7 quadrant/ratio, 13 equation and 16 oblique-triangle scenarios.
 - Six abstract identity questions retain text/choices. A generic picture would either add no useful information or reveal the identity being tested.
@@ -40,4 +41,4 @@ Rebuild with `python -m scripts.build_lesson_illustrations`. For local visual re
 
 ## Verification
 
-Automated checks cover all 107 lessons, source compatibility, asset sizes/digests, imports/exports/backups, duplicate suppression and 100 randomized retakes for every spatial trigonometry scenario. Figures receive a rendered layout review, with browser checks for image loading, narrow widths and assessment labels.
+Automated checks cover all 128 lessons, source compatibility, asset sizes/digests, imports/exports/backups, duplicate suppression and 100 randomized retakes for every spatial trigonometry scenario. Figures receive a rendered layout review, with browser checks for image loading, narrow widths and assessment labels.

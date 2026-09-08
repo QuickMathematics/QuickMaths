@@ -18,7 +18,7 @@ The shipped curriculum uses these broad branches:
 
 | Field | Branches |
 | --- | --- |
-| Mathematics | Arithmetic; Algebra; Geometry |
+| Mathematics | Arithmetic; Algebra; Geometry; Statistics; Probability |
 | Geography | Geographic Methods; Cartography and GIS; Physical Geography; Human Geography; Environmental Geography |
 | Programming | Programming Fundamentals; Data Structures; Algorithms; Software Engineering |
 
@@ -678,6 +678,8 @@ Installed lesson content, field metadata/themes, per-profile field and path choi
 Import is rejected without changing state when a file has an unsupported version, duplicate IDs, missing or mislabelled prerequisite bridges, a cycle anywhere in the combined graph, mismatched question/skill IDs, unsupported grading/work/review modes, malformed choices/rubrics/proof obligations, executable content, or exceeded safety limits.
 
 Built-in Mathematics lessons use trusted runtime templates shipped with QuickMaths, so each retake draws fresh values while still covering every authored scenario. Uploaded, Depot, and Studio-authored lesson sets are deliberately fixed-data packages: they may contain large validated question banks, but they cannot ship or execute generator code. When editing a native Mathematics lesson, Lesson Studio includes a rerollable author preview and downloadable audit of the original runtime generator before you install a fixed reversible override.
+
+The Statistics and Probability native batches add 21 lessons and 280 authored scenarios. Native authoring may use the trusted distribution helpers `normal_cdf`, `inverse_normal_cdf`, `t_cdf`, `chi_square_cdf`, `chi_square_sf`, and `f_sf` with domain-checked arguments. These helpers are limited to first-party native templates; uploaded and community lesson files remain fixed data and cannot execute helper or generator code. Learner teaching prose should explain the statistical idea rather than expose helper-function source strings.
 
 ## Branch reference
 

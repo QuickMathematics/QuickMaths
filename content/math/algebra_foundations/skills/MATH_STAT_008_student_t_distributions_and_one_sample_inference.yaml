@@ -1,0 +1,541 @@
+id: MATH_STAT_008
+schema_version: 0.2
+name: Student’s t distributions and one-sample t inference
+domain: Math
+subdomain: Statistics
+topic: Student t Inference
+description: Use Student t distributions for one-sample mean intervals/tests when sigma is unknown.
+prerequisites:
+- MATH_STAT_007
+tags:
+- statistics
+unlocks:
+- MATH_STAT_009
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: When population standard deviation is unknown, replace sigma with sample s and use Student’s t. One-sample
+  t statistic=(xbar-mu0)/(s/sqrt(n)), df=n-1. t distributions are symmetric with heavier tails at small df and approach
+  normal as df grows. the t-distribution calculator returns lower-tail probability. One-sample t interval=xbar±t*s/sqrt(n). Check
+  randomization/independence and, for small n, roughly normal data without severe outliers.
+examples:
+  - prompt: 'A sample has n=16, mean 52, SD 8. Test a population mean of 48 using a t statistic.'
+    solution: 'With n=16, x-bar=52, s=8, and H0 mean 48, t=(52-48)/(8/sqrt(16))=2 with df=15.'
+    explanation: 'Use the t distribution because the population SD is estimated by s.'
+  - prompt: 'Using mean 52, SE 2, df 15, and t*=2.131, construct a 95% interval.'
+    solution: 'For a 95% interval with df=15 and t*=2.131, mean 52 plus or minus 2.131(2) gives (47.74,56.26).'
+    explanation: 'The t critical value accounts for extra uncertainty in a small sample.'
+applications:
+  - title: 'Small-sample mean inference'
+    description: 'Small-sample studies use t intervals and tests for means when population variability is estimated.'
+  - title: 't-based intervals'
+    description: 'Report degrees of freedom and t-based uncertainty when analyzing laboratory or pilot data.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: T_DIST_METHOD_SELECTION
+    type: fixed
+    prompt_template: A random sample estimates a population mean; sigma unknown, sample s available. Which model?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Student t with df=n-1
+    - id: B
+      label: z without estimated SE
+    - id: C
+      label: binomial
+    - id: D
+      label: uniform
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Unknown sigma leads to Student t.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: T_DIST_DF
+    type: generated
+    prompt_template: One-sample t procedure has n={n}. Find df.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 5
+        max: 80
+    derived:
+      df: n-1
+    answer:
+      type: numeric
+      value: '{df}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: df=n-1.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: T_DIST_SE
+    type: generated
+    prompt_template: Sample SD s={s}, n={n}. Find estimated SE.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+      se:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      n: root**2
+      s: se*root
+    answer:
+      type: numeric
+      value: '{se}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: SE=s/sqrt(n).
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: T_DIST_STAT
+    type: generated
+    prompt_template: xbar={xbar}, mu0={mu0}, s={s}, n={n}. Find t.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      mu0:
+        type: int
+        min: 20
+        max: 80
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      se:
+        type: int
+        min: 1
+        max: 5
+      t:
+        type: choice
+        values:
+        - -3
+        - -2
+        - -1
+        - 1
+        - 2
+        - 3
+    derived:
+      n: root**2
+      s: se*root
+      xbar: mu0+t*se
+    answer:
+      type: numeric
+      value: '{t}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: t=(xbar-mu0)/(s/sqrt(n)).
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: T_DIST_LEFT
+    type: generated
+    prompt_template: T has df={df}. Find P(T<={t}).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      df:
+        type: choice
+        values:
+        - 4
+        - 5
+        - 8
+        - 10
+        - 15
+        - 20
+        - 30
+      t:
+        type: choice
+        values:
+        - -3
+        - -2
+        - -1.5
+        - -1
+        - -0.5
+    derived:
+      p: round(t_cdf(t,df)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use the t-distribution calculator.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: T_DIST_RIGHT
+    type: generated
+    prompt_template: T has df={df}. Find P(T>{t}).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      df:
+        type: choice
+        values:
+        - 4
+        - 5
+        - 8
+        - 10
+        - 15
+        - 20
+        - 30
+      t:
+        type: choice
+        values:
+        - 0.5
+        - 1
+        - 1.5
+        - 2
+        - 2.5
+        - 3
+    derived:
+      p: round((1-t_cdf(t,df))*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use complement.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: T_DIST_CENTRAL
+    type: generated
+    prompt_template: For T df={df}, find P(-{tstar}<T<{tstar}).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      df:
+        type: choice
+        values:
+        - 4
+        - 6
+        - 9
+        - 12
+        - 20
+        - 30
+      tstar:
+        type: choice
+        values:
+        - 1.5
+        - 1.75
+        - 2
+        - 2.25
+        - 2.5
+    derived:
+      p: round((2*t_cdf(tstar,df)-1)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use symmetry.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: T_INTERVAL_MARGIN
+    type: generated
+    prompt_template: t*={tstar}, s={s}, n={n}. Find margin.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      tstar:
+        type: choice
+        values:
+        - 1.8
+        - 2
+        - 2.1
+        - 2.2
+        - 2.3
+        - 2.5
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+      se:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      n: root**2
+      s: se*root
+      margin: round(tstar*se*1000)/1000
+    answer:
+      type: numeric
+      value: '{margin}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.0011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Margin=t*SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: T_INTERVAL_LOWER
+    type: generated
+    prompt_template: xbar={xbar}, t*={tstar}, s={s}, n={n}. Find lower endpoint.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      xbar:
+        type: int
+        min: 20
+        max: 100
+      tstar:
+        type: choice
+        values:
+        - 1.8
+        - 2
+        - 2.2
+        - 2.4
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      se:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      n: root**2
+      s: se*root
+      margin: tstar*se
+      lower: round((xbar-margin)*1000)/1000
+    answer:
+      type: numeric
+      value: '{lower}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.0011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Subtract margin.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: T_INTERVAL_UPPER
+    type: generated
+    prompt_template: xbar={xbar}, t*={tstar}, s={s}, n={n}. Find upper endpoint.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      xbar:
+        type: int
+        min: 20
+        max: 100
+      tstar:
+        type: choice
+        values:
+        - 1.8
+        - 2
+        - 2.2
+        - 2.4
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      se:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      n: root**2
+      s: se*root
+      margin: tstar*se
+      upper: round((xbar+margin)*1000)/1000
+    answer:
+      type: numeric
+      value: '{upper}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.0011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Add margin.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: T_INTERVAL_INTERPRETATION
+    type: fixed
+    prompt_template: 95% t interval for population mean [12.4,15.1]. Best?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: We are 95% confident the population mean lies in this interval under conditions
+    - id: B
+      label: 95% observations lie inside
+    - id: C
+      label: Parameter changes into interval with95% probability
+    - id: D
+      label: Every future xbar inside
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Interval estimates population mean.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: T_TAIL_COMPARISON
+    type: fixed
+    prompt_template: Why are small-df t critical values larger than z?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: t has heavier tails because sigma estimated
+    - id: B
+      label: area>1
+    - id: C
+      label: xbar biased upward
+    - id: D
+      label: SE zero
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Estimating sigma adds uncertainty.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: T_CONDITIONS
+    type: fixed
+    prompt_template: n=8 with severe skew and extreme outlier. Best?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: t exact for any shape
+    - id: B
+      label: Small-sample t is questionable; investigate shape/outlier
+    - id: C
+      label: Set s=0
+    - id: D
+      label: Increase confidence to fix
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Small samples are sensitive to severe nonnormality.
+    mistake_tags:
+    - concept_error
+    difficulty: medium

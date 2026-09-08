@@ -1,0 +1,477 @@
+id: MATH_STAT_010
+schema_version: 0.2
+name: Inference for one and two population proportions
+domain: Math
+subdomain: Statistics
+topic: Proportion Inference
+description: Construct/test one and two population proportions, pooled tests, intervals and conditions.
+prerequisites:
+- MATH_STAT_009
+tags:
+- statistics
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Inference for proportions uses sample counts and normal approximations. One-proportion tests use null p0 in
+  the standard error, while confidence intervals use p-hat. Two-proportion confidence intervals combine unpooled sample
+  variances; tests of p1=p2 use a pooled estimate. A normal-distribution calculator provides tail probabilities
+  and critical values. Check randomization, independence/10%, and success-failure counts; report risk differences
+  and scope, not p-values alone.
+examples:
+  - prompt: 'In 80 trials there are 44 successes. Find the sample proportion and its standard error.'
+    solution: 'In 80 trials with 44 successes, p-hat=44/80=0.55 and SE=sqrt(.55(.45)/80)=0.0557.'
+    explanation: 'The sample proportion estimates the population proportion with sampling uncertainty.'
+  - prompt: 'Using p-hat=.55 and SE=.0557, construct an approximate 95% interval.'
+    solution: 'A 95% interval is .55 plus or minus 1.96(.0557)=(.441,.659).'
+    explanation: 'State the interval in proportion or percentage units and check success-failure conditions.'
+applications:
+  - title: 'Defect-rate estimation'
+    description: 'Proportion intervals support polling, defect-rate monitoring, and success-rate estimation.'
+  - title: 'Polling percentages'
+    description: 'Check counts and independence before reporting a population percentage with uncertainty.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: PROP_ONE_PHAT
+    type: generated
+    prompt_template: A sample has {x} successes among {n}. Find p-hat.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: choice
+        values:
+        - 50
+        - 100
+        - 200
+        - 400
+      x:
+        type: int
+        min: 5
+        max: 45
+    derived: {}
+    answer:
+      type: numeric
+      value: '{x}/{n}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: p-hat=x/n.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROP_CRITICAL_Z
+    type: generated
+    prompt_template: Find positive z* for central {pct}% normal coverage.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      c:
+        type: choice
+        values:
+        - 0.8
+        - 0.9
+        - 0.95
+        - 0.98
+        - 0.99
+    derived:
+      pct: c*100
+      p: (1+c)/2
+      z: round(inverse_normal_cdf(p)*10000)/10000
+    answer:
+      type: numeric
+      value: '{z}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Convert central coverage to upper cumulative probability.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROP_NULL_SE
+    type: generated
+    prompt_template: H0:p={p}/10, n={n}. Find null SE.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      p:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+      n:
+        type: choice
+        values:
+        - 100
+        - 400
+        - 900
+    derived:
+      p0: p/10
+      se: round((p0*(1-p0)/n)**.5*10000)/10000
+    answer:
+      type: numeric
+      value: '{se}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use p0 in test SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROP_ONE_Z
+    type: generated
+    prompt_template: H0:p=1/2, n={n}, successes={x}. Find z.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 10
+        - 12
+        - 16
+        - 20
+      z:
+        type: choice
+        values:
+        - -3
+        - -2
+        - -1
+        - 1
+        - 2
+        - 3
+    derived:
+      n: root**2
+      x: n/2+z*root/2
+    answer:
+      type: numeric
+      value: '{z}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Standardize p-hat using null SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROP_TWO_SIDED_P
+    type: generated
+    prompt_template: One-proportion z={z}. Find two-sided p-value.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      z:
+        type: choice
+        values:
+        - -3
+        - -2.5
+        - -2
+        - -1.5
+        - 1.5
+        - 2
+        - 2.5
+        - 3
+    derived:
+      p: round(2*(1-normal_cdf(abs(z)))*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Double standard normal tail.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: PROP_CI_MARGIN
+    type: generated
+    prompt_template: p-hat=1/2, z*=2, n={n}. Find margin.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 10
+        - 20
+        - 25
+        - 40
+    derived:
+      n: root**2
+    answer:
+      type: numeric
+      value: 1/{root}
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Margin=2*sqrt(.25/n)=1/root.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROP_INTERVAL_TEST_LINK
+    type: fixed
+    prompt_template: 95% CI for p excludes p0. Matching two-sided alpha=.05 test?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Reject H0:p=p0
+    - id: B
+      label: Fail reject
+    - id: C
+      label: Accept H0
+    - id: D
+      label: No relation
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Matching interval/test decisions correspond.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: PROP_DIFF_ESTIMATE
+    type: generated
+    prompt_template: Sample proportions are {x1}/{n1} and {x2}/{n2}. Estimate p1-p2.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n1:
+        type: choice
+        values:
+        - 100
+        - 200
+      n2:
+        type: choice
+        values:
+        - 100
+        - 200
+      x1:
+        type: int
+        min: 20
+        max: 80
+      x2:
+        type: int
+        min: 20
+        max: 80
+    derived:
+      diff: round((x1/n1-x2/n2)*1000)/1000
+    answer:
+      type: numeric
+      value: '{diff}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.0011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Subtract sample proportions consistently.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROP_POOLED
+    type: generated
+    prompt_template: Two samples have {x1}/{n1} and {x2}/{n2} successes. Find pooled p-hat.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n1:
+        type: choice
+        values:
+        - 50
+        - 100
+      n2:
+        type: choice
+        values:
+        - 50
+        - 100
+      x1:
+        type: int
+        min: 10
+        max: 40
+      x2:
+        type: int
+        min: 10
+        max: 40
+    derived:
+      num: x1+x2
+      den: n1+n2
+    answer:
+      type: numeric
+      value: '{num}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Pool successes over total when testing equal proportions.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROP_POOLING_WHEN
+    type: fixed
+    prompt_template: When use pooled proportion?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Null test H0:p1=p2
+    - id: B
+      label: Confidence interval for p1-p2
+    - id: C
+      label: Any descriptive table
+    - id: D
+      label: Never
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Pooling belongs to equal-proportion null SE.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: PROP_COUNT_CONDITIONS
+    type: fixed
+    prompt_template: What do large-count conditions protect?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Normal approximation for sample proportions/test statistics
+    - id: B
+      label: Random sampling itself
+    - id: C
+      label: Causation
+    - id: D
+      label: Measurement validity
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Expected/observed counts support approximation.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: PROP_CAUSATION_GENERALIZATION
+    type: fixed
+    prompt_template: Random sample observational comparison supports?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Population association/generalization if sampled well, not causal effect without design
+    - id: B
+      label: Causation automatically
+    - id: C
+      label: No inference
+    - id: D
+      label: Only individual prediction
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Sampling and assignment provide different scopes.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: PROP_ONE_TWO_DIFFERENCE
+    type: fixed
+    prompt_template: One-proportion interval vs two-proportion interval differs mainly because?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Two-proportion SE combines variability from both samples
+    - id: B
+      label: Two-proportion has no uncertainty
+    - id: C
+      label: One-proportion always pooled
+    - id: D
+      label: Two-proportion requires paired observations
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Independent samples contribute two variance terms.
+    mistake_tags:
+    - concept_error
+    difficulty: medium

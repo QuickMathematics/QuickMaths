@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "functions": {
+    "normal_cdf": [
+      {
+        "args": [
+          -8
+        ],
+        "expected": 6.22096057427174e-16
+      },
+      {
+        "args": [
+          -3
+        ],
+        "expected": 0.0013498980316300933
+      },
+      {
+        "args": [
+          -1.96
+        ],
+        "expected": 0.024997895148220435
+      },
+      {
+        "args": [
+          -1
+        ],
+        "expected": 0.15865525393145707
+      },
+      {
+        "args": [
+          0
+        ],
+        "expected": 0.5
+      },
+      {
+        "args": [
+          1
+        ],
+        "expected": 0.8413447460685429
+      },
+      {
+        "args": [
+          1.96
+        ],
+        "expected": 0.9750021048517795
+      },
+      {
+        "args": [
+          3
+        ],
+        "expected": 0.9986501019683699
+      },
+      {
+        "args": [
+          8
+        ],
+        "expected": 0.9999999999999993
+      }
+    ],
+    "inverse_normal_cdf": [
+      {
+        "args": [
+          1e-06
+        ],
+        "expected": -4.753424308822899
+      },
+      {
+        "args": [
+          0.001
+        ],
+        "expected": -3.090232306167813
+      },
+      {
+        "args": [
+          0.025
+        ],
+        "expected": -1.9599639845400545
+      },
+      {
+        "args": [
+          0.1
+        ],
+        "expected": -1.2815515655446004
+      },
+      {
+        "args": [
+          0.5
+        ],
+        "expected": 0.0
+      },
+      {
+        "args": [
+          0.9
+        ],
+        "expected": 1.2815515655446004
+      },
+      {
+        "args": [
+          0.975
+        ],
+        "expected": 1.959963984540054
+      },
+      {
+        "args": [
+          0.999
+        ],
+        "expected": 3.090232306167813
+      },
+      {
+        "args": [
+          0.999999
+        ],
+        "expected": 4.753424308817087
+      }
+    ],
+    "t_cdf": [
+      {
+        "args": [
+          -3,
+          1
+        ],
+        "expected": 0.10241638234956672
+      },
+      {
+        "args": [
+          -1,
+          1
+        ],
+        "expected": 0.25000000000000006
+      },
+      {
+        "args": [
+          0,
+          1
+        ],
+        "expected": 0.5
+      },
+      {
+        "args": [
+          1,
+          1
+        ],
+        "expected": 0.75
+      },
+      {
+        "args": [
+          3,
+          1
+        ],
+        "expected": 0.8975836176504333
+      },
+      {
+        "args": [
+          -2.228,
+          10
+        ],
+        "expected": 0.02500588590855566
+      },
+      {
+        "args": [
+          1.812,
+          10
+        ],
+        "expected": 0.9499623689670764
+      },
+      {
+        "args": [
+          2.228,
+          10
+        ],
+        "expected": 0.9749941140914443
+      },
+      {
+        "args": [
+          2.131,
+          15
+        ],
+        "expected": 0.9749787476128787
+      },
+      {
+        "args": [
+          1.96,
+          30
+        ],
+        "expected": 0.9703288435519748
+      },
+      {
+        "args": [
+          3,
+          100
+        ],
+        "expected": 0.9982960423283352
+      }
+    ]
+  },
+  "notes": [
+    "Reference values generated with SciPy for reconstruction QA. Implementations should follow the per-batch contract, not depend on SciPy at runtime."
+  ]
+}

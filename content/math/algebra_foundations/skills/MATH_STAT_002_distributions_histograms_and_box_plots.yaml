@@ -1,0 +1,603 @@
+id: MATH_STAT_002
+schema_version: 0.2
+name: Distributions, histograms, and box plots
+domain: Math
+subdomain: Statistics
+topic: Data Distributions
+description: Read and compare distributions using frequency, relative frequency, histograms, box plots, MAD, variance,
+  and standard deviation.
+prerequisites:
+- MATH_STAT_001
+tags:
+- statistics
+- histograms
+- box_plots
+- frequency
+- relative_frequency
+- variance
+- standard_deviation
+- distribution_shape
+unlocks:
+- MATH_STAT_003
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: A graph of a distribution should make shape, center, spread, and unusual features visible. Frequency is
+  a count and relative frequency is a fraction or percent. Histograms group quantitative values into adjacent bins;
+  skew is named for the direction of the long tail. Box plots show minimum, Q1, median, Q3, and maximum. MAD averages
+  absolute distances from the mean. Population variance averages squared deviations from the mean, and population
+  standard deviation is its square root. Adding a constant leaves SD unchanged; multiplying by c multiplies SD by
+  |c|. Compare distributions with center, spread, shape, and outliers together.
+examples:
+- prompt: A class interval contains 8 of 40 observations. Find its relative frequency.
+  solution: 20%
+  explanation: 8/40=0.2=20%.
+- prompt: A histogram’s mass is left and tail extends right.
+  solution: Right-skewed
+  explanation: Skew follows the long tail.
+- prompt: Find population SD of 3,3,7,7.
+  solution: '2'
+  explanation: Mean=5; every value is two units away.
+applications:
+- title: Quality control
+  description: Histograms and standard deviation reveal process stability.
+- title: Public policy
+  description: Comparative box plots summarize differences between regions.
+- title: Science
+  description: Relative-frequency distributions show measurement concentration.
+test:
+  question_count: 16
+  randomize_order: true
+  questions:
+  - id: STAT_HIST_SHAPE_RIGHT_SKEW_001
+    type: fixed
+    prompt: Which description best matches the displayed histogram?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Symmetric
+    - id: B
+      label: Right-skewed
+    - id: C
+      label: Left-skewed
+    - id: D
+      label: Uniform
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Most observations are in the low intervals and the frequencies taper toward larger values.
+      The long tail points right, so the distribution is right-skewed.
+    mistake_tags:
+    - histogram_shape_error
+    - skew_direction_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/right-skew-histogram.svg
+      alt: A histogram with class intervals 0–10, 10–20, 20–30, 30–40, 40–50, and 50–60. Their frequencies are 10,
+        8, 5, 3, 2, and 1. Most values are low and a long tail extends right.
+      caption: The histogram has its longer tail on the side of larger values.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_HIST_READ_FREQUENCY_001
+    type: fixed
+    prompt: In the displayed histogram, how many observations lie in the 20–30 interval?
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '5'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The bar above 20–30 has height 5, so that class contains 5 observations.
+    mistake_tags:
+    - histogram_reading_error
+    - frequency_error
+    - bin_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/right-skew-histogram.svg
+      alt: A histogram with class intervals 0–10, 10–20, 20–30, 30–40, 40–50, and 50–60. Their frequencies are 10,
+        8, 5, 3, 2, and 1. Most values are low and a long tail extends right.
+      caption: The histogram has its longer tail on the side of larger values.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_HIST_RELATIVE_FREQUENCY_MEDIA_001
+    type: fixed
+    prompt: In the displayed histogram, approximately what percentage of observations lie below 20? Enter the percentage
+      number, rounded to the nearest tenth.
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '62.1'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.05
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: There are 18 observations below 20 and 29 total, so 100(18/29)≈62.1%.
+    mistake_tags:
+    - relative_frequency_error
+    - histogram_reading_error
+    - percent_error
+    difficulty: medium
+    media:
+    - type: image
+      src: media/statistics/right-skew-histogram.svg
+      alt: A histogram with class intervals 0–10, 10–20, 20–30, 30–40, 40–50, and 50–60. Their frequencies are 10,
+        8, 5, 3, 2, and 1. Most values are low and a long tail extends right.
+      caption: The histogram has its longer tail on the side of larger values.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_HIST_BIMODAL_MEDIA_001
+    type: fixed
+    prompt: Which feature is most visible in the displayed histogram?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: A single central peak
+    - id: B
+      label: A uniform shape
+    - id: C
+      label: Two separated peaks
+    - id: D
+      label: No variation
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The distribution has two separated peaks.
+    mistake_tags:
+    - histogram_shape_error
+    - modality_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/bimodal-histogram.svg
+      alt: A histogram with class intervals 0–5 through 30–35 and frequencies 2, 7, 3, 1, 3, 7, 2. There are clear
+        peaks in the 5–10 and 25–30 intervals.
+      caption: The histogram shows two separated high-frequency regions.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_HIST_FREQUENCY_TOTAL_001
+    type: generated
+    prompt_template: A frequency table has class counts {a}, {b}, {c}, and {d}. How many observations are represented?
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 15
+      b:
+        type: int
+        min: 2
+        max: 15
+      c:
+        type: int
+        min: 2
+        max: 15
+      d:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      total: a + b + c + d
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: 'Add the frequencies: {total}.'
+    mistake_tags:
+    - frequency_error
+    - total_error
+    difficulty: easy
+  - id: STAT_HIST_RELATIVE_FREQUENCY_001
+    type: generated
+    prompt_template: A category contains {count} of {total} observations. What is its relative frequency as a percent?
+      Enter the percentage number.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      count:
+        type: int
+        min: 3
+        max: 20
+      factor:
+        type: choice
+        values:
+        - 2
+        - 4
+        - 5
+        - 10
+    derived:
+      total: count * factor
+      percent: 100 / factor
+    answer:
+      type: numeric
+      value: '{percent}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: Relative frequency={count}/{total}=1/{factor}={percent}%.
+    mistake_tags:
+    - relative_frequency_error
+    - percent_error
+    difficulty: easy
+  - id: STAT_BOXPLOT_COMPARE_MEDIAN_001
+    type: fixed
+    prompt: Compare the displayed box plots. Which statement about the medians is correct?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: The medians are equal
+    - id: B
+      label: Group A has the larger median
+    - id: C
+      label: Group B has the larger median
+    - id: D
+      label: Neither group has a median
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The median is 6 for both groups.
+    mistake_tags:
+    - boxplot_error
+    - median_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/boxplot-comparison.svg
+      alt: Two horizontal box plots. Group A has minimum 2, Q1 4, median 6, Q3 8, maximum 10. Group B has minimum
+        1, Q1 3, median 6, Q3 11, maximum 17.
+      caption: The plots list the five-number summaries for Groups A and B.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_BOXPLOT_COMPARE_IQR_001
+    type: fixed
+    prompt: Which group has the larger IQR in the displayed box plots?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Group A
+    - id: B
+      label: Group B
+    - id: C
+      label: They are equal
+    - id: D
+      label: The IQR cannot be found
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Group B has the larger IQR.
+    mistake_tags:
+    - boxplot_error
+    - iqr_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/boxplot-comparison.svg
+      alt: Two horizontal box plots. Group A has minimum 2, Q1 4, median 6, Q3 8, maximum 10. Group B has minimum
+        1, Q1 3, median 6, Q3 11, maximum 17.
+      caption: The plots list the five-number summaries for Groups A and B.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_BOXPLOT_COMPARE_RANGE_001
+    type: fixed
+    prompt: How much larger is Group B's range than Group A's range in the displayed box plots?
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '8'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: Group A range=8, Group B range=16, difference=8.
+    mistake_tags:
+    - boxplot_error
+    - range_error
+    difficulty: medium
+    media:
+    - type: image
+      src: media/statistics/boxplot-comparison.svg
+      alt: Two horizontal box plots. Group A has minimum 2, Q1 4, median 6, Q3 8, maximum 10. Group B has minimum
+        1, Q1 3, median 6, Q3 11, maximum 17.
+      caption: The plots list the five-number summaries for Groups A and B.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_VARIABILITY_DOTPLOT_STANDARD_DEVIATION_001
+    type: fixed
+    prompt: Both displayed datasets have mean 5. Which has the larger population standard deviation?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Dataset A
+    - id: B
+      label: Dataset B
+    - id: C
+      label: They are equal
+    - id: D
+      label: It cannot be determined
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Dataset B values lie farther from the mean.
+    mistake_tags:
+    - standard_deviation_error
+    - variability_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/same-mean-different-spread.svg
+      alt: Two dot plots. Dataset A is 4, 5, 5, 6. Dataset B is 1, 5, 5, 9. Both means are 5, but Dataset B's values
+        lie farther from the mean.
+      caption: The dot plots show two datasets with the same listed mean and different spacing.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_VARIABILITY_POPULATION_SD_001
+    type: generated
+    prompt_template: Find the population standard deviation of {low}, {low}, {high}, {high}.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      mean:
+        type: int
+        min: 5
+        max: 25
+      distance:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      low: mean - distance
+      high: mean + distance
+    answer:
+      type: numeric
+      value: '{distance}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: Every value is exactly {distance} units from the mean, so population SD is {distance}.
+    mistake_tags:
+    - standard_deviation_error
+    difficulty: medium
+  - id: STAT_VARIABILITY_POPULATION_VARIANCE_001
+    type: generated
+    prompt_template: Find the population variance of {low}, {low}, {high}, {high}.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      mean:
+        type: int
+        min: 5
+        max: 25
+      distance:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      low: mean - distance
+      high: mean + distance
+      variance: distance ** 2
+    answer:
+      type: numeric
+      value: '{variance}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: Each squared deviation is {variance}, so variance={variance}.
+    mistake_tags:
+    - variance_error
+    difficulty: medium
+  - id: STAT_VARIABILITY_MAD_001
+    type: generated
+    prompt_template: Find the mean absolute deviation of {low}, {mean}, {mean}, {high}.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      mean:
+        type: int
+        min: 5
+        max: 25
+      half_distance:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      distance: 2 * half_distance
+      low: mean - distance
+      high: mean + distance
+      mad: distance / 2
+    answer:
+      type: numeric
+      value: '{mad}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: Absolute deviations are {distance},0,0,{distance}, so MAD={mad}.
+    mistake_tags:
+    - mad_error
+    difficulty: medium
+  - id: STAT_VARIABILITY_ADD_CONSTANT_001
+    type: fixed
+    prompt: A constant 12 is added to every observation. What happens to population standard deviation?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: It increases by 12
+    - id: B
+      label: It is multiplied by 12
+    - id: C
+      label: It stays unchanged
+    - id: D
+      label: It becomes 0
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Standard deviation is unchanged.
+    mistake_tags:
+    - standard_deviation_error
+    difficulty: medium
+  - id: STAT_VARIABILITY_SCALE_CONSTANT_001
+    type: fixed
+    prompt: Every observation is multiplied by 3. What happens to population standard deviation?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: It stays unchanged
+    - id: B
+      label: It increases by exactly 3
+    - id: C
+      label: It is divided by 3
+    - id: D
+      label: It is multiplied by 3
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Standard deviation is multiplied by 3.
+    mistake_tags:
+    - standard_deviation_error
+    difficulty: medium
+  - id: STAT_DISTRIBUTION_SUMMARY_PAIR_001
+    type: fixed
+    prompt: A distribution is approximately symmetric with no outliers. Which summaries usually work best together?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Median and range
+    - id: B
+      label: Mean and standard deviation
+    - id: C
+      label: Mode and IQR
+    - id: D
+      label: Maximum and minimum
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Mean and standard deviation use all observations and fit symmetric distributions well.
+    mistake_tags:
+    - summary_choice_error
+    difficulty: medium

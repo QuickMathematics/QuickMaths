@@ -310,7 +310,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 29);
+  assert.equal(summary.guide.app_version, 30);
   assert.match(summary.guide.browser_boundary, /ChatGPT or Codex in-app browser/);
   assert.match(summary.guide.browser_boundary, /already-open in-app QuickMaths tab/);
   assert.match(summary.guide.mobile_boundary, /First-time agent-in-the-loop setup must be completed on a computer/);
@@ -409,10 +409,10 @@ test("educator WebMCP tools compose curricula and expose learner-visible supplem
   const focused = await tools.set_curriculum_native_lessons_enabled.execute({ enabled: false });
   assert.equal(focused.enabled, false);
   assert.equal(store.snapshot().activeCurriculum.includeNativeLessons, false);
-  assert.ok(store.snapshot().curriculum.allSkills.filter((skill) => skill.subjectId === "SUBJECT_MATH").length < 63);
+  assert.ok(store.snapshot().curriculum.allSkills.filter((skill) => skill.subjectId === "SUBJECT_MATH").length < 84);
   await tools.set_curriculum_native_lessons_enabled.execute({ enabled: true });
   await tools.set_curriculum_pack_enabled.execute({ pack_id: "PACK_GEOGRAPHY", enabled: false });
-  assert.equal(store.snapshot().curriculum.allSkills.length, 63);
+  assert.equal(store.snapshot().curriculum.allSkills.length, 84);
   const updated = await tools.update_curriculum_settings.execute({
     student_name: "Ada",
     agent_enabled: false,
@@ -506,8 +506,8 @@ test("app, curriculum, and progress tools expose the full learner state", async 
   assert.equal(app.view, "tutorial");
   assert.equal(app.map_scope, "all");
   assert.deepEqual(app.learning_plan, { plan_mode: false, plan_view: true, show_hidden_nodes: false, selected_skill_ids: [], layouts: {}, paths: [], annotations: [], hidden_skill_ids: [] });
-  assert.equal(map.skills.length, 63);
-  assert.equal(summary.skills.length, 63);
+  assert.equal(map.skills.length, 84);
+  assert.equal(summary.skills.length, 84);
   assert.equal(summary.suggested_next.skill_id, "MATH_ARITH_001");
 });
 
@@ -579,18 +579,18 @@ test("subject tools describe the combined curriculum and open the no-code creato
   let tools = toolsFor(store);
   const nativeSubjects = await tools.list_subjects.execute({});
   assert.equal(nativeSubjects.active_subject_id, "SUBJECT_MATH");
-  assert.deepEqual(nativeSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [["SUBJECT_MATH", 63]]);
+  assert.deepEqual(nativeSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [["SUBJECT_MATH", 84]]);
   store.importLessonPack(geographyLessonSet);
   tools = toolsFor(store);
   const installedSubjects = await tools.list_subjects.execute({});
   assert.deepEqual(installedSubjects.subjects.map((subject) => [subject.subject_id, subject.skill_count]), [
-    ["SUBJECT_MATH", 63], ["SUBJECT_GEOGRAPHY", 15],
+    ["SUBJECT_MATH", 84], ["SUBJECT_GEOGRAPHY", 15],
   ]);
   const changed = await tools.set_learning_preferences.execute({ progression_mode: "soft" });
   assert.equal(changed.progression_mode, "soft");
   const combinedMap = await tools.get_curriculum_map.execute({});
   assert.equal(combinedMap.scope, "all");
-  assert.equal(combinedMap.skills.length, 78);
+  assert.equal(combinedMap.skills.length, 99);
   assert.deepEqual(new Set(combinedMap.skills.map((skill) => skill.subject_id)), new Set(["SUBJECT_MATH", "SUBJECT_GEOGRAPHY"]));
   await assert.rejects(tools.get_curriculum_map.execute({ subject_id: "SUBJECT_MATH" }), /Unknown input property/);
   await assert.rejects(tools.set_learning_preferences.execute({ map_scope: "subject" }), /Unknown input property/);

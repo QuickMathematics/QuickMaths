@@ -1,0 +1,462 @@
+id: MATH_STAT_009
+schema_version: 0.2
+name: Comparing two means and matched pairs
+domain: Math
+subdomain: Statistics
+topic: Comparing Means
+description: Compare independent population means and paired mean differences with t methods.
+prerequisites:
+- MATH_STAT_008
+tags:
+- statistics
+unlocks:
+- MATH_STAT_010
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Comparing two means depends on design. Independent groups use difference xbar1-xbar2 with SE from both samples
+  and a Welch-type t reference. Matched pairs reduce each pair to one difference and use a one-sample t method on
+  the differences. Confidence intervals and tests use the same parameter and consistent subtraction direction. Check
+  independence, outliers/shape, and distinguish random assignment (causation) from random sampling (generalization).
+examples:
+  - prompt: 'Before-after differences are 2, 4, and 3. Find the mean paired difference.'
+    solution: 'Paired differences before-after are 2,4,3, so mean difference=(2+4+3)/3=3.'
+    explanation: 'Analyze within-person differences when observations are naturally matched.'
+  - prompt: 'Two independent group means differ by 3 with SE 1.2. Find the standardized statistic.'
+    solution: 'Group means 18 and 15 with SE of difference 1.2 give t=3/1.2=2.5.'
+    explanation: 'For independent groups, standardize the difference in means by its standard error.'
+applications:
+  - title: 'Paired intervention data'
+    description: 'Matched-pairs analysis evaluates before-and-after interventions while independent-sample analysis compares separate groups.'
+  - title: 'Independent group comparisons'
+    description: 'Choosing the design correctly prevents baseline differences from being mistaken for treatment effects.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: TWO_MEAN_DESIGN
+    type: fixed
+    prompt_template: Which is naturally paired?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Before/after measurements on same people
+    - id: B
+      label: Two unrelated hospital samples
+    - id: C
+      label: Two independent proportions
+    - id: D
+      label: Coin flips
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Same subjects create pairs.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: TWO_MEAN_DIFF_ESTIMATE
+    type: generated
+    prompt_template: Sample means are {m1} and {m2}. Estimate mu1-mu2.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      m1:
+        type: int
+        min: 20
+        max: 100
+      m2:
+        type: int
+        min: 20
+        max: 100
+    derived:
+      diff: m1-m2
+    answer:
+      type: numeric
+      value: '{diff}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Difference of sample means estimates difference of population means.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: TWO_MEAN_SE
+    type: generated
+    prompt_template: Independent samples have SE components {a} and {b}; find combined SE=sqrt(a^2+b^2).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      k:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      a: 3*k
+      b: 4*k
+      se: 5*k
+    answer:
+      type: numeric
+      value: '{se}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use Pythagorean form of independent variance components.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: TWO_MEAN_T
+    type: generated
+    prompt_template: Difference estimate={diff}, null=0, SE={se}. Find t.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      se:
+        type: choice
+        values:
+        - 0.5
+        - 1
+        - 1.5
+        - 2
+      t:
+        type: choice
+        values:
+        - -3
+        - -2
+        - -1
+        - 1
+        - 2
+        - 3
+    derived:
+      diff: se*t
+    answer:
+      type: numeric
+      value: '{t}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: t=estimate/SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: TWO_MEAN_PVALUE
+    type: generated
+    prompt_template: Two-sided t test t={t}, df={df}. Find p.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      t:
+        type: choice
+        values:
+        - -3
+        - -2.5
+        - -2
+        - -1.5
+        - 1.5
+        - 2
+        - 2.5
+        - 3
+      df:
+        type: choice
+        values:
+        - 8
+        - 10
+        - 15
+        - 20
+        - 30
+    derived:
+      p: round(2*(1-t_cdf(abs(t),df))*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Double one tail.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: TWO_MEAN_MARGIN
+    type: generated
+    prompt_template: t*={tstar}, SE={se}. Find CI margin.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      tstar:
+        type: choice
+        values:
+        - 2
+        - 2.1
+        - 2.2
+        - 2.4
+      se:
+        type: choice
+        values:
+        - 0.5
+        - 1
+        - 1.5
+        - 2
+    derived:
+      m: round(tstar*se*1000)/1000
+    answer:
+      type: numeric
+      value: '{m}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.0011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Margin=t*SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: TWO_MEAN_CI_INTERPRET
+    type: fixed
+    prompt_template: CI for mu1-mu2 is [1.2,4.8].
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Evidence population1 mean exceeds population2 mean
+    - id: B
+      label: 95% individuals differ by 1.2-4.8
+    - id: C
+      label: Means equal
+    - id: D
+      label: Causation proven
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Entire interval is positive.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: PAIRED_DF
+    type: generated
+    prompt_template: Matched-pairs t uses {n} pairs. Find df.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 5
+        max: 60
+    derived:
+      df: n-1
+    answer:
+      type: numeric
+      value: '{df}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Analyze one difference per pair.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PAIRED_T
+    type: generated
+    prompt_template: For {n} pairs, mean difference={dbar}, SD differences={sd}. Find t against 0.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      se:
+        type: int
+        min: 1
+        max: 4
+      t:
+        type: choice
+        values:
+        - -3
+        - -2
+        - -1
+        - 1
+        - 2
+        - 3
+    derived:
+      n: root**2
+      sd: se*root
+      dbar: t*se
+    answer:
+      type: numeric
+      value: '{t}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Treat differences as one sample.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PAIRED_DIRECTION
+    type: fixed
+    prompt_template: d=after-before. Negative mean difference means?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: After values tend lower
+    - id: B
+      label: After higher
+    - id: C
+      label: No pairing
+    - id: D
+      label: SD negative
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Sign follows subtraction direction.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: TWO_MEAN_CONDITIONS
+    type: fixed
+    prompt_template: Key independent two-sample t condition?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Independent samples/units and manageable shapes/outliers
+    - id: B
+      label: Population sigma known
+    - id: C
+      label: Equal sample means
+    - id: D
+      label: All observations paired
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Design and distribution conditions matter.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: MATCHED_CONDITIONS
+    type: fixed
+    prompt_template: For 12 pairs, what is checked?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Pairwise differences are independent across pairs and lack severe outliers
+    - id: B
+      label: Before/after within pair independent
+    - id: C
+      label: Population sigma known
+    - id: D
+      label: Differences identical
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Conditions apply to differences across pairs.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: TWO_MEAN_SCOPE
+    type: fixed
+    prompt_template: Random assignment to two treatments but convenience recruitment supports?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Causal comparison for recruited participants; limited population generalization
+    - id: B
+      label: Automatic generalization to everyone
+    - id: C
+      label: No causal statement
+    - id: D
+      label: Parameter certainty
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Assignment and sampling answer different scope questions.
+    mistake_tags:
+    - concept_error
+    difficulty: medium

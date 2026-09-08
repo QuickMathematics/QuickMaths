@@ -1292,6 +1292,468 @@ export const LESSON_ILLUSTRATIONS = {
       }
     ]
   },
+  "MATH_STAT_001": {
+    "name": "Center, spread, and outliers",
+    "fingerprint": "8bb50607",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-001-12d14740ef01.svg",
+        "alt": "Mean and median mark center while the spread and outlier show how a distribution varies. Diagram labels: Center and spread describe a distribution. outlier",
+        "caption": "Mean and median mark center while the spread and outlier show how a distribution varies.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-001-12d14740ef01.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "12d14740ef01beaf36ba95de34a5034e0b214a4e08f8e86dcdf9aaefc9da49ae",
+        "bytes": 15492
+      }
+    ]
+  },
+  "MATH_STAT_002": {
+    "name": "Distributions, histograms, and box plots",
+    "fingerprint": "cca228b5",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-002-eb25806861c9.svg",
+        "alt": "A histogram groups numerical observations into bins so the distribution shape can be compared. Diagram labels: A histogram groups numerical values. bins turn a list into a shape",
+        "caption": "A histogram groups numerical observations into bins so the distribution shape can be compared.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-002-eb25806861c9.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "eb25806861c9b3e5f973ce1573454ed60dc1d14cc0851cef8e5f5d85626e7f67",
+        "bytes": 13965
+      }
+    ]
+  },
+  "MATH_STAT_003": {
+    "name": "Scatter plots, correlation, and residuals",
+    "fingerprint": "af9bf2c5",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-003-54ce1a0779ab.svg",
+        "alt": "A scatter plot shows paired observations; the fitted line summarizes their linear association. Diagram labels: Association is visible in a scatter plot. ",
+        "caption": "A scatter plot shows paired observations; the fitted line summarizes their linear association.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-003-54ce1a0779ab.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "54ce1a0779abfc3f47647a913f7ca015fdc7f9b941faffadd5fc80415d5679a1",
+        "bytes": 12711
+      }
+    ]
+  },
+  "MATH_STAT_004": {
+    "name": "Normal distributions and z-scores",
+    "fingerprint": "87064763",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-004-39a15bc32b0b.svg",
+        "alt": "The normal curve is symmetric around its mean; the shaded central region illustrates a standard deviation band. Diagram labels: A normal model is centered and symmetric. about 68% within 1 SD",
+        "caption": "The normal curve is symmetric around its mean; the shaded central region illustrates a standard deviation band.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-004-39a15bc32b0b.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "39a15bc32b0b0a182101ed24fcceb8ea2b0b2af542c69908767542a282b34052",
+        "bytes": 19687
+      }
+    ]
+  },
+  "MATH_STAT_005": {
+    "name": "Sampling distributions and standard error",
+    "fingerprint": "b4eab7f6",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-005-1625cc7780ab.svg",
+        "alt": "Repeated sample means cluster around the population mean, with less spread than individual observations. Diagram labels: Sample means vary less than individual values. standard error shrinks as n grows",
+        "caption": "Repeated sample means cluster around the population mean, with less spread than individual observations.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-005-1625cc7780ab.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "1625cc7780ab087a109e47fb4596cb781ea6e4706a1eee687c1cfa91654d3188",
+        "bytes": 15730
+      }
+    ]
+  },
+  "MATH_STAT_006": {
+    "name": "Confidence intervals and margin of error",
+    "fingerprint": "5827ab8f",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-006-2419a1c11a18.svg",
+        "alt": "A confidence interval places a plausible range around a sample estimate of a population value. Diagram labels: An interval estimates a population value; estimate; confidence interval; lower; upper",
+        "caption": "A confidence interval places a plausible range around a sample estimate of a population value.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-006-2419a1c11a18.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "2419a1c11a1848cabba00fbf115e82e747c12e71030c743abb3b4e24925c447b",
+        "bytes": 3237
+      }
+    ]
+  },
+  "MATH_STAT_007": {
+    "name": "Hypothesis tests, p-values, and power",
+    "fingerprint": "fd92cbbe",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-007-070494a4ab84.svg",
+        "alt": "A p-value is the probability of a result at least this extreme under the null model. Diagram labels: A p-value is tail area under the null model. extreme outcomes",
+        "caption": "A p-value is the probability of a result at least this extreme under the null model.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-007-070494a4ab84.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "070494a4ab84ed0589df7ea18b430711d9187f531f7bde30736fcf505c1f219e",
+        "bytes": 21567
+      }
+    ]
+  },
+  "MATH_STAT_008": {
+    "name": "Student’s t distributions and one-sample t inference",
+    "fingerprint": "a25ff68b",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-008-534c385376bc.svg",
+        "alt": "The t distribution keeps heavier tails than the normal distribution when degrees of freedom are limited. Diagram labels: The t distribution has heavier tails. ",
+        "caption": "The t distribution keeps heavier tails than the normal distribution when degrees of freedom are limited.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-008-534c385376bc.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "534c385376bc2039ff26a23925cc51b4aaa046ea065a8c0d0ac8e1582145fb3b",
+        "bytes": 20758
+      }
+    ]
+  },
+  "MATH_STAT_009": {
+    "name": "Comparing two means and matched pairs",
+    "fingerprint": "10852b82",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-009-d21f050230a0.svg",
+        "alt": "Two group means can be compared together with their uncertainty; the gap is the difference of means. Diagram labels: Compare means by looking at their difference. difference of means",
+        "caption": "Two group means can be compared together with their uncertainty; the gap is the difference of means.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-009-d21f050230a0.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "d21f050230a055b73d6c5a76cbedd805c918318eed99844fab47fd9b0279de85",
+        "bytes": 10905
+      }
+    ]
+  },
+  "MATH_STAT_010": {
+    "name": "Inference for one and two population proportions",
+    "fingerprint": "7788d487",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-010-9ace08b0ef5a.svg",
+        "alt": "A sample proportion is the number of successes divided by the number of trials. Diagram labels: A proportion is a count divided by its total; 6 successes / 10 trials = 0.60; sample proportion",
+        "caption": "A sample proportion is the number of successes divided by the number of trials.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-010-9ace08b0ef5a.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "9ace08b0ef5a4088e6fb877bc607fdca5feb6d0b298e929c2669c976a662aa3e",
+        "bytes": 4351
+      }
+    ]
+  },
+  "MATH_STAT_011": {
+    "name": "Chi-square goodness-of-fit tests",
+    "fingerprint": "1e90e7b8",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-011-27f0285d17e3.svg",
+        "alt": "Chi-square goodness of fit compares observed category counts with expected counts. Diagram labels: Chi-square compares observed with expected counts. ",
+        "caption": "Chi-square goodness of fit compares observed category counts with expected counts.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-011-27f0285d17e3.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "27f0285d17e33959b577fdf3f0aadca277fd349de818400d72bec274152ebd0b",
+        "bytes": 13393
+      }
+    ]
+  },
+  "MATH_STAT_012": {
+    "name": "Chi-square tests for two-way tables",
+    "fingerprint": "45c0f965",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-012-cc60c0b562be.svg",
+        "alt": "A two-way table records joint counts, allowing row and column patterns to be compared. Diagram labels: A two-way table compares conditional proportions; 18; 12; 9; 21; outcome 1     outcome 2; group A; group B; within-row percentages: 60% vs 30%",
+        "caption": "A two-way table records joint counts, allowing row and column patterns to be compared.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-012-cc60c0b562be.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "cc60c0b562bed3df1477163c5bffec7366010161328e0e714a624f6c0e3e0145",
+        "bytes": 4166
+      }
+    ]
+  },
+  "MATH_STAT_013": {
+    "name": "Inference for a linear regression slope",
+    "fingerprint": "79c285af",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-013-f0bed91df54e.svg",
+        "alt": "Regression inference asks whether the population slope differs from the null value of zero. Diagram labels: A slope test asks whether a line is flat. slope = 0 is the null claim",
+        "caption": "Regression inference asks whether the population slope differs from the null value of zero.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-013-f0bed91df54e.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "f0bed91df54e49ea83ad258d90c8db6b6b41af71befe8d943fd5564c99ea46e6",
+        "bytes": 12025
+      }
+    ]
+  },
+  "MATH_STAT_014": {
+    "name": "One-way ANOVA and F tests",
+    "fingerprint": "e3b68dc0",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-014-47c13a4a6399.svg",
+        "alt": "ANOVA compares variation among group means with variation within the groups. Diagram labels: ANOVA compares variation between groups. within-group spread vs between-group spread",
+        "caption": "ANOVA compares variation among group means with variation within the groups.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-014-47c13a4a6399.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "47c13a4a63999f6146b060360c29f54cefec19725962d40d6937d25bcc327b34",
+        "bytes": 14246
+      }
+    ]
+  },
+  "MATH_STAT_015": {
+    "name": "Multiple linear regression and partial effects",
+    "fingerprint": "6a9ecc95",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-015-7c67033f782f.svg",
+        "alt": "Multiple regression estimates one predictor’s effect while holding another predictor fixed. Diagram labels: Partial effects hold other predictors fixed. ",
+        "caption": "Multiple regression estimates one predictor’s effect while holding another predictor fixed.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-015-7c67033f782f.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "7c67033f782f2b3cf3fb80544268cf3988b54679070add7a5b36d886411b3b4d",
+        "bytes": 14210
+      }
+    ]
+  },
+  "MATH_STAT_016": {
+    "name": "Bootstrap and randomization-based inference",
+    "fingerprint": "a9355f56",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-stat-016-f124de8c0643.svg",
+        "alt": "Bootstrap and randomization repeat a sampling procedure to build an empirical distribution of a statistic. Diagram labels: Resampling builds an empirical sampling distribution. repeat: sample → statistic",
+        "caption": "Bootstrap and randomization repeat a sampling procedure to build an empirical distribution of a statistic.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-stat-016-f124de8c0643.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "f124de8c0643627bbd96b1fe23fe386c8ecc3019b90498ff31416b8fd0c0ed3f",
+        "bytes": 16214
+      }
+    ]
+  },
+  "MATH_PROB_001": {
+    "name": "Probability models and sample spaces",
+    "fingerprint": "bd9e16e3",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-prob-001-c856d327c3f7.svg",
+        "alt": "A sample space lists every possible outcome; an event is a selected subset of those outcomes. Diagram labels: A sample space lists possible outcomes; H; T; events are subsets of the sample space",
+        "caption": "A sample space lists every possible outcome; an event is a selected subset of those outcomes.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-prob-001-c856d327c3f7.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "c856d327c3f7091faad45d0ded8df8263866e5eb147dd64da737af53ada9a3bd",
+        "bytes": 2906
+      }
+    ]
+  },
+  "MATH_PROB_002": {
+    "name": "Compound and conditional probability",
+    "fingerprint": "d41fa295",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-prob-002-f6f652cee2f2.svg",
+        "alt": "Conditional probability narrows attention to the outcomes in the given event before measuring another event. Diagram labels: Conditional probability narrows the reference group; all outcomes; B; A ∩ B; P(A | B) = P(A ∩ B) / P(B)",
+        "caption": "Conditional probability narrows attention to the outcomes in the given event before measuring another event.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-prob-002-f6f652cee2f2.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "f6f652cee2f23ade055d7b8269a71ad8036e9b9d7b5f752a4c7f46debe56b399",
+        "bytes": 3083
+      }
+    ]
+  },
+  "MATH_PROB_003": {
+    "name": "Discrete random variables and expected value",
+    "fingerprint": "d5fe5ed9",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-prob-003-2ef5ca1dffcd.svg",
+        "alt": "Expected value weights each possible outcome by its probability to find a long-run average. Diagram labels: Expected value is a probability-weighted average. ",
+        "caption": "Expected value weights each possible outcome by its probability to find a long-run average.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-prob-003-2ef5ca1dffcd.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "2ef5ca1dffcd388acc4e25810561d1837b239d3649b8569617b14000ce7dc0c9",
+        "bytes": 11787
+      }
+    ]
+  },
+  "MATH_PROB_004": {
+    "name": "Counting principles, permutations, and combinations",
+    "fingerprint": "d42d48a7",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-prob-004-dc43d2d77c60.svg",
+        "alt": "When stages are independent choices, multiply the number of options at each stage to count outcomes. Diagram labels: Counting choices multiply across stages; 3 shirts; × 2 pants; = 6 outfits; Each first choice pairs with every second choice.",
+        "caption": "When stages are independent choices, multiply the number of options at each stage to count outcomes.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-prob-004-dc43d2d77c60.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "dc43d2d77c601d938c47de487b031c71776094e6660222cac2abd826cd6a1002",
+        "bytes": 4327
+      }
+    ]
+  },
+  "MATH_PROB_005": {
+    "name": "Binomial probability distributions",
+    "fingerprint": "524d7268",
+    "media": [
+      {
+        "type": "image",
+        "src": "media/lesson-illustrations/math-prob-005-73ae8f32e13f.svg",
+        "alt": "A binomial distribution counts successes across a fixed number of independent trials with a common success probability. Diagram labels: A binomial model counts successes in fixed trials. ",
+        "caption": "A binomial distribution counts successes across a fixed number of independent trials with a common success probability.",
+        "width": 860,
+        "height": 640
+      }
+    ],
+    "assets": [
+      {
+        "path": "media/lesson-illustrations/math-prob-005-73ae8f32e13f.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "73ae8f32e13ff3c69b2139549f4a8d2c01ba039fb36537b86f5fef683a7ed2a8",
+        "bytes": 16106
+      }
+    ]
+  },
   "CUSTOM_ESTIMATION_SANITY": {
     "name": "Estimate before calculating",
     "fingerprint": "17f735a2",

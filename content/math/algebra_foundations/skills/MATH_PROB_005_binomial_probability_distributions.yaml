@@ -1,0 +1,448 @@
+id: MATH_PROB_005
+schema_version: 0.2
+name: Binomial probability distributions
+domain: Math
+subdomain: Probability
+topic: Binomial Models
+description: Recognize binomial settings and calculate probabilities, mean and spread.
+prerequisites:
+- MATH_PROB_003
+- MATH_PROB_004
+tags:
+- probability
+- binomial
+unlocks:
+- MATH_STAT_004
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'A binomial random variable counts successes in a fixed number n of independent binary trials with constant
+  success probability p. Check BINS: Binary, Independent, Number fixed, Same p. P(X=k)=nCk p^k(1-p)^(n-k). “At least
+  one” is often a complement. Mean=np, variance=np(1-p), SD=sqrt(np(1-p)). Sampling without replacement is not exactly
+  binomial because p changes.'
+examples:
+  - prompt: 'Five independent trials have success probability .2. Find P(X=2).'
+    solution: 'P(X=2)=C(5,2)(0.2)^2(0.8)^3=10(0.04)(0.512)=0.2048.'
+    explanation: 'Choose the two success positions and multiply the probability of each sequence.'
+  - prompt: 'For n=5 and p=.2, find P(X>=1), the expected number, and the standard deviation.'
+    solution: 'For n=5,p=.2, P(X>=1)=1-.8^5=.67232, mean=np=1, and SD=sqrt(np(1-p))=sqrt(.8)=.8944.'
+    explanation: 'The complement is efficient for at-least-one events, while np and np(1-p) give center and spread.'
+applications:
+  - title: 'Repeated-trial quality control'
+    description: 'Binomial models estimate defect counts, conversion totals, and repeated-trial success rates.'
+  - title: 'Success-rate planning'
+    description: 'Means, standard deviations, and tail probabilities support staffing and risk decisions.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: BINOMIAL_CONDITIONS_VALID
+    type: fixed
+    prompt_template: Which is binomial?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: 30 independent items each defective with probability .02
+    - id: B
+      label: Draw cards until first ace
+    - id: C
+      label: Record bus waiting times
+    - id: D
+      label: Roll until total exceeds 20
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: BINS conditions hold only in A.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: BINOMIAL_WITHOUT_REPLACEMENT
+    type: fixed
+    prompt_template: Why are small draws without replacement not exactly binomial?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: More than two colors
+    - id: B
+      label: n not fixed
+    - id: C
+      label: p changes and trials are dependent
+    - id: D
+      label: A count cannot be random
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Removing items changes p.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: BINOMIAL_EXACTLY_ZERO
+    type: generated
+    prompt_template: X~Bin({n},{p}/10). Find P(X=0).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 3
+        max: 8
+      p:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      q: 10-p
+      num: q**n
+      den: 10**n
+    answer:
+      type: numeric
+      value: '{num}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: All trials fail.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: BINOMIAL_EXACTLY_ALL
+    type: generated
+    prompt_template: X~Bin({n},{p}/10). Find P(X=n).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 3
+        max: 8
+      p:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      num: p**n
+      den: 10**n
+    answer:
+      type: numeric
+      value: '{num}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: All trials succeed.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: BINOMIAL_EXACTLY_ONE
+    type: generated
+    prompt_template: X~Bin({n},{p}/10). Find P(X=1).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 3
+        max: 8
+      p:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      q: 10-p
+      num: n*p*q**(n-1)
+      den: 10**n
+    answer:
+      type: numeric
+      value: '{num}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Choose one success position.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: BINOMIAL_EXACTLY_TWO
+    type: generated
+    prompt_template: X~Bin({n},{p}/10). Find P(X=2).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 3
+        max: 8
+      p:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      q: 10-p
+      coef: n*(n-1)/2
+      num: coef*p**2*q**(n-2)
+      den: 10**n
+    answer:
+      type: numeric
+      value: '{num}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use nC2 p^2 q^(n-2).
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: BINOMIAL_AT_LEAST_ONE
+    type: generated
+    prompt_template: In {n} independent trials p={p}/10. Find P(at least one success).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 3
+        max: 8
+      p:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      q: 10-p
+      den: 10**n
+      none: q**n
+      want: den-none
+    answer:
+      type: numeric
+      value: '{want}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use complement.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: BINOMIAL_AT_MOST_ONE
+    type: generated
+    prompt_template: In {n} independent trials p={p}/10. Find P(at most one success).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 3
+        max: 8
+      p:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      q: 10-p
+      den: 10**n
+      zero: q**n
+      one: n*p*q**(n-1)
+      want: zero+one
+    answer:
+      type: numeric
+      value: '{want}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Add X=0 and X=1.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: BINOMIAL_MEAN
+    type: generated
+    prompt_template: X~Bin({n},{p}/10). Find mean.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: choice
+        values:
+        - 10
+        - 20
+        - 30
+        - 40
+        - 50
+      p:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      num: n*p
+    answer:
+      type: numeric
+      value: '{num}/10'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Mean=np.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: BINOMIAL_VARIANCE
+    type: generated
+    prompt_template: X~Bin({n},{p}/10). Find variance.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: choice
+        values:
+        - 10
+        - 20
+        - 30
+        - 40
+        - 50
+      p:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      q: 10-p
+      num: n*p*q
+    answer:
+      type: numeric
+      value: '{num}/100'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Variance=np(1-p).
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: BINOMIAL_STANDARD_DEVIATION
+    type: fixed
+    prompt_template: For X~Bin(100,.36), find SD.
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '4.8'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: sqrt(100*.36*.64)=4.8.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: BINOMIAL_GRAPH_MODE
+    type: fixed
+    prompt_template: For Bin(6,.4), which success count is most probable?
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '2'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The mode is 2.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: BINOMIAL_RECOVER_P
+    type: generated
+    prompt_template: A binomial count has n={n} and mean {mean}. Find p.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      n:
+        type: choice
+        values:
+        - 10
+        - 20
+        - 30
+        - 40
+        - 50
+      p:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      mean: n*p/10
+    answer:
+      type: numeric
+      value: '{p}/10'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: p=mean/n.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard

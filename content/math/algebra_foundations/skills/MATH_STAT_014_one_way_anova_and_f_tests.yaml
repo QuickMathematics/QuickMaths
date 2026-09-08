@@ -1,0 +1,465 @@
+id: MATH_STAT_014
+schema_version: 0.2
+name: One-way ANOVA and F tests
+domain: Math
+subdomain: Statistics
+topic: Analysis of Variance
+description: Compare three or more independent population means with variance decomposition, F tests and effect sizes.
+prerequisites:
+- MATH_STAT_009
+tags:
+- statistics
+unlocks:
+- MATH_STAT_016
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: One-way ANOVA compares three or more independent population means through variance decomposition. H0 states
+  all means equal; Ha says not all equal. SS_total=SS_between+SS_within, df_between=k-1, df_within=N-k, mean squares
+  divide sums by df, and F=MS_between/MS_within. Use the right-tail F-distribution calculator. Check independence, shape/outliers, and
+  similar spreads; a significant global result does not say every pair differs. Report effect size eta² and use multiplicity-aware
+  follow-up comparisons.
+examples:
+  - prompt: 'Three groups contain 18 observations. SSbetween=60 and SSwithin=90. Find the ANOVA F statistic.'
+    solution: 'dfbetween=3-1=2; dfwithin=18-3=15. MSbetween=60/2=30; MSwithin=90/15=6. F=30/6=5.'
+    explanation: 'The between-group mean square is five times the within-group mean square, so group means vary substantially relative to within-group noise.'
+  - prompt: 'An ANOVA returns p=0.01 at significance 0.05. What can you conclude and what follow-up is needed?'
+    solution: 'If an ANOVA p-value is .01 at alpha .05, reject equal means, then use planned pairwise comparisons to locate differences.'
+    explanation: 'The omnibus test establishes that at least one mean differs; it does not identify which one.'
+applications:
+  - title: 'Comparing production settings'
+    description: 'ANOVA compares means across three or more treatments, schools, or production settings.'
+  - title: 'Follow-up group comparisons'
+    description: 'Follow-up comparisons and effect sizes turn an omnibus result into a practical group decision.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: ANOVA_HYPOTHESES
+    type: fixed
+    prompt_template: 'Four groups: ANOVA hypotheses?'
+    answer_mode: final_only
+    options:
+    - id: A
+      label: H0 all population means equal; Ha not all equal
+    - id: B
+      label: H0 sample means equal; Ha every differs
+    - id: C
+      label: H0 SDs zero
+    - id: D
+      label: H0 response categorical
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: ANOVA is a global population-mean test.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: ANOVA_DF_BETWEEN
+    type: generated
+    prompt_template: ANOVA compares {k} groups. Find numerator df.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      k:
+        type: int
+        min: 3
+        max: 8
+    derived:
+      df: k-1
+    answer:
+      type: numeric
+      value: '{df}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: df=k-1.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: ANOVA_DF_WITHIN
+    type: generated
+    prompt_template: ANOVA has {k} groups with {per} observations each. Find denominator df.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      k:
+        type: int
+        min: 3
+        max: 7
+      per:
+        type: int
+        min: 5
+        max: 16
+    derived:
+      N: k*per
+      df: N-k
+    answer:
+      type: numeric
+      value: '{df}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: df=N-k.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: ANOVA_SUMS_OF_SQUARES
+    type: generated
+    prompt_template: SS_between={b}, SS_within={w}. Find SS_total.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      b:
+        type: int
+        min: 8
+        max: 80
+      w:
+        type: int
+        min: 20
+        max: 180
+    derived:
+      t: b+w
+    answer:
+      type: numeric
+      value: '{t}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: SST=SSB+SSW.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: ANOVA_MEAN_SQUARE
+    type: generated
+    prompt_template: k={k}, SS_between={ss}. Find MS_between.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      k:
+        type: int
+        min: 3
+        max: 7
+      ms:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 8
+        - 10
+        - 12
+    derived:
+      df: k-1
+      ss: df*ms
+    answer:
+      type: numeric
+      value: '{ms}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: MS=SS/df.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: ANOVA_F_STATISTIC
+    type: generated
+    prompt_template: MS_between={a}, MS_within={b}. Find F.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      a:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 6
+        - 8
+        - 10
+        - 12
+      b:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 4
+    derived:
+      f: round(a/b*1000)/1000
+    answer:
+      type: numeric
+      value: '{f}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: F=MSB/MSW.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - a!=b
+  - id: ANOVA_F_P_VALUE
+    type: generated
+    prompt_template: F={f}, df1={d1}, df2={d2}. Find p.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      f:
+        type: decimal
+        min: 0.6
+        max: 9
+        places: 1
+      d1:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      d2:
+        type: choice
+        values:
+        - 12
+        - 18
+        - 24
+        - 30
+        - 40
+    derived:
+      p: round(f_sf(f,d1,d2)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00015
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use the right-tail F-distribution calculator.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - p>.0001
+    - p<.9999
+  - id: ANOVA_DECISION
+    type: fixed
+    prompt_template: ANOVA p=.018 alpha=.05.
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Reject equality of all means
+    - id: B
+      label: Accept all equal
+    - id: C
+      label: Every pair differs
+    - id: D
+      label: Fail reject
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Reject global null, not every pair.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: ANOVA_ETA_SQUARED
+    type: generated
+    prompt_template: SS_between={b}, SS_within={w}. Find eta².
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      b:
+        type: int
+        min: 10
+        max: 80
+      w:
+        type: int
+        min: 20
+        max: 160
+    derived:
+      total: b+w
+      eta: round(b/total*1000)/1000
+    answer:
+      type: numeric
+      value: '{eta}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: eta²=SSB/SST.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: ANOVA_POST_HOC
+    type: fixed
+    prompt_template: After significant 5-group ANOVA, to locate differences?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Declare all pairs differ
+    - id: B
+      label: Use planned contrasts or multiplicity-adjusted follow-ups
+    - id: C
+      label: Run 10 unadjusted tests
+    - id: D
+      label: Replace response with labels
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Global test does not localize differences.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: ANOVA_CONDITIONS
+    type: fixed
+    prompt_template: Most concerning?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Balanced symmetric similar spread
+    - id: B
+      label: Large balanced mild skew
+    - id: C
+      label: Tiny severely skewed group with outliers and huge spread
+    - id: D
+      label: Randomized independent groups
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Severe skew/outliers/unequal variance can harm F approximation.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: ANOVA_TWO_GROUP_EQUIVALENCE
+    type: generated
+    prompt_template: For two-group pooled t={t}, equivalent F?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      t:
+        type: choice
+        values:
+        - -3
+        - -2.5
+        - -2
+        - -1.5
+        - 1.5
+        - 2
+        - 2.5
+        - 3
+    derived:
+      f: t**2
+    answer:
+      type: numeric
+      value: '{f}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: F=t².
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: ANOVA_CAUSAL_SCOPE
+    type: fixed
+    prompt_template: Randomized experiment across three methods, significant ANOVA. Best?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Assignment supports causal differences among at least some means within scope; follow-up needed
+    - id: B
+      label: Everyone improves under largest mean
+    - id: C
+      label: Random assignment guarantees population generalization
+    - id: D
+      label: p=P(equal means)
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Random assignment supports causal scope, not universal generalization.
+    mistake_tags:
+    - concept_error
+    difficulty: hard
