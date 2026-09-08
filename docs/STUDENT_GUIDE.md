@@ -154,7 +154,7 @@ The shipped curriculum uses these broad branches:
 
 A focused category such as **Quadratic Equations** is a topic within **Algebra**, rather than a separate branch. Lesson details and Studio retain that topic. Legacy category names in installed lesson sets, imported curricula, old backups, and Studio drafts are converted automatically. Custom branch names outside the documented aliases are preserved.
 
-The canonical map places lessons inside labeled branch bands within each field. Prerequisite connections remain intact across branch and field boundaries. Saved Plan-view coordinates, notes, paths, hidden-node choices, mastery, and unfinished tests are preserved. Switch off **Plan view** to see the canonical grouping; to adopt it for an existing custom layout, open **Plan mode → Plan details → Group by field & branch**. That action resets moved node positions while retaining notes and paths.
+The canonical map places lessons inside labeled branch bands within each field. Prerequisite connections remain intact across branch and field boundaries. Saved Plan-view coordinates, notes, paths, hidden-node choices, mastery, and unfinished tests are preserved. The saved map is always displayed. **Reset mastery map** asks for confirmation before clearing saved positions, paths, map notes and hidden-node choices, and expanding branches; lesson progress is preserved. For a positions-only regrouping, to adopt it for an existing custom layout, open **Plan mode → Plan details → Group by field & branch**. That action resets moved node positions while retaining notes and paths.
 
 Collapse a branch to show its lessons as one node, twice the width and height of a lesson node. Use its expand control to restore the individual lessons. Connections between collapsed branches combine prerequisite links; hover, focus, or tap a connection to see how many links it represents. Collapse and expand controls are saved separately for each profile on this device: they do not change prerequisites, mastery, or saved lesson positions. Plan mode and Curriculum designer display individual lessons for editing.
 
@@ -259,11 +259,11 @@ The skill selector moves focus to a known lesson and updates the detail card. It
 
 The map opens in **Plan view**. This is the read-only presentation of your saved personal plan: it uses your arranged positions, colored paths, annotations, and hidden-node choices, while clicks still open ordinary lesson detail cards and drag, wheel, and pinch gestures only navigate the map.
 
-Use the **Plan view** toggle to switch it off and inspect the untouched canonical prerequisite map. Turn it back on to return to the saved plan. Use **Plan mode** only when you want to edit that plan.
+The saved map is always shown. Use **Plan mode** to edit it. **Reset mastery map** asks for confirmation before permanently clearing map customizations; lesson progress is preserved.
 
 ## 8. Personal Plan mode
 
-Plan mode is the editor for the private working copy layered over the canonical mastery map. Leaving Plan mode returns to the read-only Plan view without deleting anything; the separate Plan view toggle reveals the canonical map whenever you want to compare them.
+Plan mode is the editor for the private working copy layered over the canonical mastery map. Leaving Plan mode returns to the read-only Plan view without deleting anything; use the confirmed Reset mastery map action to remove map customizations.
 
 ### Enter and leave Plan mode
 

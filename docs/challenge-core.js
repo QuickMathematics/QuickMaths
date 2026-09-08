@@ -3346,6 +3346,24 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return { ok: true, hidden: Boolean(hidden), skillIds: targets, hiddenSkillIds: [...plan.hiddenSkillIds] };
   };
 
+  const resetMasteryMap = () => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    Object.assign(activeMapPlan(), emptyMapPlan());
+    state.ui.mapPlanSelection = [];
+    state.ui.selectedMapPlanPathId = null;
+    state.ui.mapPlanComposer = null;
+    state.ui.mapPlanShowHidden = false;
+    state.ui.mapPlanView = true;
+    state.ui.mapCollapsedBranchIds = [];
+    state.ui.mapCollapsedBranchIdsByProfile ??= {};
+    state.ui.mapCollapsedBranchIdsByProfile[activeProfile().id] = [];
+    state.ui.mapZoom = 1;
+    touchActiveCurriculum();
+    addActivity("reset_mastery_map", "Reset the active mastery map; lesson progress preserved.");
+    notify();
+    return { ok: true };
+  };
+
   const resetMapPlanLayout = (layoutKey, skillIds = null) => {
     if (!activeProfile()) throw new Error("Select a profile first.");
     if (layoutKey !== "all-subjects") throw new Error("The mastery map uses the all-subjects layout.");
@@ -4751,6 +4769,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     setMapPlanSelection,
     updateMapPlanLayout,
     resetMapPlanLayout,
+    resetMasteryMap,
     setMapPlanNodesHidden,
     setProfilePackEnabled,
     setStorageMergePolicy,

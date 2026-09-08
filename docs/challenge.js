@@ -9,7 +9,7 @@ import { learningFields, branchName } from "./learning-fields.js?v=20260908-stat
 import { storageStatus } from "./storage-status.js?v=20260906-optimization-v1";
 import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260908-profile-sync-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260908-profile-sync-v1";
+import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260908-map-reset-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260908-statistics-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260908-statistics-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
@@ -1279,7 +1279,7 @@ function renderMap(snapshot, { designer = false } = {}) {
     return;
   }
   const planMode = designer || Boolean(snapshot.ui.mapPlanMode);
-  const planView = !designer && !planMode && snapshot.ui.mapPlanView !== false;
+  const planView = !designer && !planMode;
   const displayedPlan = planMode || planView
     ? snapshot.mapPlan
     : { layouts: {}, paths: [], annotations: [], hiddenSkillIds: [] };
@@ -1416,7 +1416,7 @@ function renderMap(snapshot, { designer = false } = {}) {
   elements.view.innerHTML = `${designer ? renderCurriculumWorkspace(snapshot) : ""}
     <header class="page-head">
       <div><p class="eyebrow">All fields · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula</p><h1>${designer ? "Canonical curriculum map" : "Mastery map"}</h1><p>${designer ? "Drag this curriculum’s canonical map into shape. Learners receive these positions, custom paths, and annotations when they load the file." : `${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Field lanes contain labeled branch groups. Prerequisite lines connect lessons across branches and fields.`}</p></div>
-      <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><button type="button" class="map-plan-toggle map-plan-view-toggle" data-action="toggle-plan-view" aria-pressed="${planView}" ${planMode ? "disabled" : ""}><span>◎</span><strong>Plan view</strong><small>${planMode ? "Exit editor to view" : planView ? "Showing saved plan" : "Showing canonical map"}</small></button>`}<div class="map-branch-actions" role="group" aria-label="Map branch visibility"><button type="button" class="quiet-button" data-action="map-expand-all" ${planMode ? "disabled" : ""}>Expand all</button><button type="button" class="quiet-button" data-action="map-collapse-all" ${planMode ? "disabled" : ""}>Collapse all</button></div>${mapBrowseMarkup(snapshot, renderedRows.length ? renderedRows : mapRows)}<label class="compact-select">Lesson<select id="map-skill-select">${mapSkillOptions(snapshot, renderedRows.length ? renderedRows : mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
+      <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><button type="button" class="button button-outline" data-action="plan-reset-map">Reset mastery map</button>`}<div class="map-branch-actions" role="group" aria-label="Map branch visibility"><button type="button" class="quiet-button" data-action="map-expand-all" ${planMode ? "disabled" : ""}>Expand all</button><button type="button" class="quiet-button" data-action="map-collapse-all" ${planMode ? "disabled" : ""}>Collapse all</button></div>${mapBrowseMarkup(snapshot, renderedRows.length ? renderedRows : mapRows)}<label class="compact-select">Lesson<select id="map-skill-select">${mapSkillOptions(snapshot, renderedRows.length ? renderedRows : mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${planMode ? `<span class="map-plan-key">Plan mode is autosaving</span>` : planView ? `<span class="map-plan-key">Plan view · read only</span>` : combined ? `<span class="map-subject-key">Node color = field · dot = status</span>` : ""}</div>
     <section class="map-layout ${planMode ? "is-plan-mode" : ""}">
@@ -2957,7 +2957,7 @@ document.addEventListener("click", async (event) => {
     }
     return;
   }
-  if (["map", "curriculum"].includes(currentSnapshot?.ui.route) && (action.dataset.action.startsWith("plan-") || ["toggle-plan-mode", "toggle-plan-view"].includes(action.dataset.action))) {
+  if (["map", "curriculum"].includes(currentSnapshot?.ui.route) && (action.dataset.action.startsWith("plan-") || action.dataset.action === "toggle-plan-mode")) {
     const layoutKey = "all-subjects";
     try {
       if (action.dataset.action === "toggle-plan-mode") {
@@ -2965,9 +2965,13 @@ document.addEventListener("click", async (event) => {
         store.setMapPlanMode(enabled);
         showToast(enabled ? "Plan mode enabled. Your planner autosaves with this profile." : "Plan mode closed. Showing your saved plan in read-only Plan view.");
       }
-      if (action.dataset.action === "toggle-plan-view") {
-        const result = store.setMapPlanView(!currentSnapshot.ui.mapPlanView);
-        showToast(result.enabled ? "Plan view enabled. Node clicks and map navigation remain read-only." : "Showing the untouched canonical mastery map.");
+      if (action.dataset.action === "plan-reset-map") {
+        if (window.confirm("Reset this profile's mastery map?\n\nThis removes saved node positions, custom paths, map notes, and hidden-node choices, and expands all branches. Lesson progress and installed packs are kept.\n\nAre you sure? This can't be undone.")) {
+          store.resetMasteryMap();
+          const scroller = document.querySelector(".map-scroll");
+          if (scroller) { scroller.scrollLeft = 0; scroller.scrollTop = 0; }
+          showToast("Mastery map reset. Lesson progress was preserved.");
+        }
       }
       if (action.dataset.action === "plan-open-annotation") store.setMapPlanComposer("annotation");
       if (action.dataset.action === "plan-open-path") {

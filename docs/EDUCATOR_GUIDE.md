@@ -124,7 +124,7 @@ The shipped curriculum uses these broad branches:
 
 A focused category such as **Quadratic Equations** is a topic within **Algebra**, rather than a separate branch. Lesson details and Studio retain that topic. Legacy category names in installed lesson sets, imported curricula, old backups, and Studio drafts are converted automatically. Custom branch names outside the documented aliases are preserved.
 
-The canonical map places lessons inside labeled branch bands within each field. Prerequisite connections remain intact across branch and field boundaries. Saved Plan-view coordinates, notes, paths, hidden-node choices, mastery, and unfinished tests are preserved. Switch off **Plan view** to see the canonical grouping; to adopt it for an existing custom layout, open **Plan mode → Plan details → Group by field & branch**. That action resets moved node positions while retaining notes and paths.
+The canonical map places lessons inside labeled branch bands within each field. Prerequisite connections remain intact across branch and field boundaries. Saved Plan-view coordinates, notes, paths, hidden-node choices, mastery, and unfinished tests are preserved. The saved map is always displayed. **Reset mastery map** asks for confirmation before clearing saved positions, paths, map notes and hidden-node choices, and expanding branches; lesson progress is preserved. For a positions-only regrouping, to adopt it for an existing custom layout, open **Plan mode → Plan details → Group by field & branch**. That action resets moved node positions while retaining notes and paths.
 
 Collapse a branch to show its lessons as one node, twice the width and height of a lesson node. Use its expand control to restore the individual lessons. Connections between collapsed branches combine prerequisite links; hover, focus, or tap a connection to see how many links it represents. Collapse and expand controls are saved separately for each profile on this device: they do not change prerequisites, mastery, or saved lesson positions. Plan mode and Curriculum designer display individual lessons for editing.
 
@@ -237,7 +237,7 @@ Desktop users can use zoom buttons, the mouse wheel over the map, and click-drag
 
 Each node is one lesson. Color identifies field. Status is learner-specific when viewed by a learner: Locked, Ready, Learning, Proven, Mastered, or Rusty. Selecting a node opens its details without resetting the map's pan position.
 
-Learner maps open in a read-only **Plan view** that shows the saved personalized arrangement while preserving ordinary node selection, detail cards, panning, and zoom. The learner can switch off Plan view to compare it with the untouched canonical prerequisite map, or enter Plan mode to edit their independent copy. Curriculum Designer itself remains the editable canonical-plan surface for the educator.
+Learner maps open in a read-only **Plan view** that shows the saved personalized arrangement while preserving ordinary node selection, detail cards, panning, and zoom. The learner can enter Plan mode to edit their independent copy, or use Reset mastery map to clear it after confirmation. Curriculum Designer itself remains the editable canonical-plan surface for the educator.
 
 ### Desktop selection and arrangement
 
@@ -492,7 +492,7 @@ The dashboard reports mastery status, suggested next work, recent attempts, back
 
 ### Mastery map
 
-The learner map opens in read-only Plan view, initially copied from the educator's plan. Learners can enter Plan mode to rearrange nodes, create personal paths, hide nodes, and add annotations without mutating the educator's source curriculum. Turning Plan view off reveals the untouched prerequisite layout with no planning overlays.
+The learner map opens in read-only Plan view, initially copied from the educator's plan. Learners can enter Plan mode to rearrange nodes, create personal paths, hide nodes, and add annotations without mutating the educator's source curriculum. Reset mastery map restores the prerequisite layout after confirmation, clearing personal map customizations without changing lesson progress.
 
 ### Lesson page
 
