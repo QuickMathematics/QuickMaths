@@ -27,6 +27,8 @@ git -c credential.interactive=never push origin HEAD
 
 Select the intended branch, review the diff, and run relevant checks before the actual push. Fetch and compare the remote revision afterward. The dry run authenticates without uploading a commit.
 
+In Codex, run authenticated Git commands in the approved host execution context. The restricted sandbox can report `Key not valid for use in specified state` when reading the host user's DPAPI store even though login succeeded. Retry the Git operation in the host context; do not replace or expose the stored credential.
+
 If login expires, repeat the device login. If the wrong account is selected, check the repository-local username setting. If GCM reports `wincredman`, verify that these commands are running in the configured checkout. Do not fall back to manually uploading the repository through a browser.
 
 Reference: [GCM credential stores](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/credstores.md).

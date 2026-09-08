@@ -1,4 +1,4 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260908-statistics-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260908-branches-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260908-statistics-v1";
 import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260906-media-v1";
 import {

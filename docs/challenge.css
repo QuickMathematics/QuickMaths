@@ -340,6 +340,24 @@ button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; 
 .map-node text { fill: #fff; font-size: 10px; font-weight: 800; pointer-events: none; }
 .map-node .map-node-meta { fill: rgba(255,255,255,.76); font-size: 7px; font-weight: 650; text-transform: uppercase; }
 .map-node .map-node-subject { fill: rgba(255,255,255,.92); font-size: 11px; font-weight: 900; }
+.map-branch-actions { display: flex; align-items: center; gap: 5px; min-height: 43px; padding: 0 7px; background: var(--paper-light); border: 1px solid var(--line); border-radius: 11px; }
+.map-branch-actions .quiet-button { padding: 10px 8px; min-height: 42px; font-size: 12px; }
+.map-branch-group { filter: drop-shadow(0 7px 10px rgba(30,38,33,.14)); }
+.map-branch-group-body { stroke: rgba(255,255,255,.85); stroke-width: 2; }
+.map-branch-group text { pointer-events: none; }
+.map-branch-group-field { fill: rgba(255,255,255,.9); font-size: 11px; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+.map-branch-group-name { fill: #fff; font-size: 20px; font-weight: 900; }
+.map-branch-group-meta { fill: rgba(255,255,255,.9); font-size: 12px; font-weight: 700; }
+.map-branch-group-toggle { cursor: pointer; }
+.map-branch-group-toggle rect { fill: #dceca9; stroke: rgba(21,63,54,.25); stroke-width: 2; }
+.map-branch-group-toggle text { fill: var(--pine); font-size: 28px; font-weight: 900; }
+.map-branch-group-toggle:hover rect, .map-branch-group-toggle:focus rect { stroke: #fff; stroke-width: 3; }
+.map-branch-heading-toggle { cursor: pointer; }
+.map-branch-heading-toggle rect { fill: var(--paper-light); stroke: var(--pine-2); stroke-width: 1; }
+.map-branch-heading-toggle text { fill: var(--pine); font-size: 18px; font-weight: 900; }
+.map-branch-heading-toggle:hover rect, .map-branch-heading-toggle:focus rect { fill: var(--lime); stroke-width: 2; }
+.map-edge-hit { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; }
+.map-edges path:focus, .map-edge-hit:focus { outline: none; }
 .map-detail { align-self: start; position: sticky; top: 24px; padding: 22px; background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
 .map-detail-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .map-detail code { color: var(--muted); font-size: 7px; }
@@ -1752,3 +1770,6 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:ha
 .lesson-media-content > audio { display: block; width: 100%; }
 .lesson-media figcaption { padding: .65rem .25rem; color: var(--muted, #68716b); font-size: .9rem; text-align: center; }
 .lesson-media-status { padding: 1rem; color: var(--muted, #68716b); overflow-wrap: anywhere; }
+
+.map-subject-lanes .map-branch-heading-toggle { pointer-events: auto; }
+.map-edge-hit:hover, .map-edge-hit:focus { stroke: var(--pine); stroke-opacity: .18; }

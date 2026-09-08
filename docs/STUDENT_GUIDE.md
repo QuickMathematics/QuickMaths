@@ -154,6 +154,8 @@ A focused category such as **Quadratic Equations** is a topic within **Algebra**
 
 The canonical map places lessons inside labeled branch bands within each field. Prerequisite connections remain intact across branch and field boundaries. Saved Plan-view coordinates, notes, paths, hidden-node choices, mastery, and unfinished tests are preserved. Switch off **Plan view** to see the canonical grouping; to adopt it for an existing custom layout, open **Plan mode → Plan details → Group by field & branch**. That action resets moved node positions while retaining notes and paths.
 
+Collapse a branch to show its lessons as one node, twice the width and height of a lesson node. Use its expand control to restore the individual lessons. Connections between collapsed branches combine prerequisite links; hover, focus, or tap a connection to see how many links it represents. Collapse and expand controls change only this device’s map view: they do not change prerequisites, mastery, or saved lesson positions. Plan mode and Curriculum designer display individual lessons for editing.
+
 Existing lesson files and backups remain compatible: the saved `subject` object and `subjectId` / `subject_id` identifiers describe the field; each lesson's `subdomain` is its broad branch and optional `topic` retains finer subject matter. Keep these stable file keys and lesson IDs when editing older files. The agent tools `list_fields` and `list_branches` expose the hierarchy; `list_subjects` remains a compatibility alias.
 
 ### Field theme

@@ -1105,6 +1105,7 @@ function initialState() {
       selectedSkillId: "MATH_ARITH_001",
       selectedMapSkillId: "MATH_ARITH_001",
       mapZoom: 1,
+      mapCollapsedBranchIds: [],
       mapPlanMode: false,
       mapPlanView: true,
       mapPlanShowHidden: false,
@@ -1697,6 +1698,11 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       selectedSkillId,
       selectedMapSkillId: skills.has(ui.selectedMapSkillId) ? ui.selectedMapSkillId : selectedSkillId,
       mapZoom: Math.round(cleanNumber(Number(ui.mapZoom), 1, 0.1, 1.6) * 100) / 100,
+      mapCollapsedBranchIds: Array.isArray(ui.mapCollapsedBranchIds)
+        ? [...new Set(ui.mapCollapsedBranchIds
+          .filter((id) => typeof id === "string" && id.length >= 3 && id.length <= 240 && /^[^/]+\/[^/]+$/.test(id)))]
+          .slice(0, 200)
+        : [],
       mapPlanMode: Boolean(ui.mapPlanMode),
       mapPlanView: ui.mapPlanView !== false,
       mapPlanShowHidden: Boolean(ui.mapPlanShowHidden),
@@ -3186,6 +3192,24 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return state.ui.mapZoom;
   };
 
+  const setMapCollapsedBranches = (branchIds = []) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    if (!Array.isArray(branchIds)) throw new Error("branch_ids must be an array.");
+    state.ui.mapCollapsedBranchIds = [...new Set(branchIds
+      .filter((id) => typeof id === "string" && id.length >= 3 && id.length <= 240 && /^[^/]+\/[^/]+$/.test(id)))]
+      .slice(0, 200);
+    notify();
+    return { ok: true, branch_ids: [...state.ui.mapCollapsedBranchIds] };
+  };
+
+  const toggleMapBranch = (branchId) => {
+    if (!activeProfile()) throw new Error("Select a profile first.");
+    if (typeof branchId !== "string" || branchId.length < 3 || branchId.length > 240 || !/^[^/]+\/[^/]+$/.test(branchId)) throw new Error("Invalid branch_id.");
+    const ids = new Set(state.ui.mapCollapsedBranchIds);
+    if (ids.has(branchId)) ids.delete(branchId); else ids.add(branchId);
+    return setMapCollapsedBranches([...ids]);
+  };
+
   const normalizeMapPlanSelection = (skillIds) => Array.isArray(skillIds)
     ? [...new Set(skillIds.filter((id) => skillsById[id]))].slice(0, 80)
     : [];
@@ -4653,6 +4677,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     completeEducatorWelcome,
     selectMapSkill,
     setMapZoom,
+    setMapCollapsedBranches,
+    toggleMapBranch,
     setMapPlanMode,
     setMapPlanView,
     setMapPlanShowHidden,

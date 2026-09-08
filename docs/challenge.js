@@ -4,11 +4,12 @@ import { renderLessonMedia } from "./lesson-media.js?v=20260906-media-v1";
 import { lessonIllustrations, illustrationAssets } from "./lesson-illustrations.js?v=20260908-statistics-v1";
 import { createLessonMediaRenderer } from "./lesson-media-renderer.js?v=20260906-media-v1";
 import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260908-statistics-v1";
+import { buildGroupedMasteryMap, COLLAPSED_NODE_HEIGHT, COLLAPSED_NODE_WIDTH } from "./map-groups.js?v=20260908-branches-v1";
 import { learningFields, branchName } from "./learning-fields.js?v=20260908-statistics-v1";
 import { storageStatus } from "./storage-status.js?v=20260906-optimization-v1";
 import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-optimization-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260908-statistics-v1";
+import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260908-branches-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260908-statistics-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260908-statistics-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
@@ -696,26 +697,30 @@ function changeMapZoom(delta) {
 }
 
 function mapEdgePath(from, to, kind = "prerequisite") {
+  const fromWidth = Number(from.width ?? 178);
+  const fromHeight = Number(from.height ?? 70);
+  const toWidth = Number(to.width ?? 178);
+  const toHeight = Number(to.height ?? 70);
   if (kind === "plan") {
-    const x1 = from.x + 89;
-    const y1 = from.y + 35;
-    const x2 = to.x + 89;
-    const y2 = to.y + 35;
+    const x1 = from.x + fromWidth / 2;
+    const y1 = from.y + fromHeight / 2;
+    const x2 = to.x + toWidth / 2;
+    const y2 = to.y + toHeight / 2;
     const bend = Math.max(48, Math.abs(x2 - x1) * .42);
     const direction = x2 >= x1 ? 1 : -1;
     return `M ${x1} ${y1} C ${x1 + bend * direction} ${y1}, ${x2 - bend * direction} ${y2}, ${x2} ${y2}`;
   }
-  const x1 = from.x + 178;
-  const y1 = from.y + 35;
+  const x1 = from.x + fromWidth;
+  const y1 = from.y + fromHeight / 2;
   const x2 = to.x;
-  const y2 = to.y + 35;
+  const y2 = to.y + toHeight / 2;
   const bend = Math.max(40, (x2 - x1) * .5);
   return `M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`;
 }
 
 function mapCommentEdgePath(target, comment) {
-  const x1 = target.x + 89;
-  const y1 = target.y + 35;
+  const x1 = target.x + Number(target.width ?? 178) / 2;
+  const y1 = target.y + Number(target.height ?? 70) / 2;
   const x2 = comment.x + 95;
   const y2 = comment.y + 42;
   const bend = Math.max(32, Math.abs(x2 - x1) * .35);
@@ -887,6 +892,7 @@ function setupMapInteractions({ planMode = false, layoutKey = "", positions = {}
   };
 
   scroller.addEventListener("pointerdown", (event) => {
+    if (!planMode && event.target.closest?.("[data-map-branch-toggle], .map-edge-hit")) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     const pointer = pointFrom(event);
     pointers.set(event.pointerId, { ...pointer, pointerType: event.pointerType });
@@ -1279,15 +1285,21 @@ function renderMap(snapshot, { designer = false } = {}) {
     : { layouts: {}, paths: [], annotations: [], hiddenSkillIds: [] };
   const layout = mapLayout(mapSkills, { subjects: snapshot.subjects, combined: true });
   const savedPositions = displayedPlan.layouts?.[viewportKey] ?? {};
-  const positions = Object.fromEntries(Object.entries(layout.positions).map(([id, position]) => [
-    id,
-    savedPositions[id] ? { ...position, ...savedPositions[id] } : { ...position },
-  ]));
   const hiddenIds = new Set(displayedPlan.hiddenSkillIds ?? []);
   const showHiddenNodes = planMode && Boolean(snapshot.ui.mapPlanShowHidden);
   const renderedRows = (planMode || planView) && !showHiddenNodes ? mapRows.filter((row) => !hiddenIds.has(row.id)) : mapRows;
   const renderedSkillIds = new Set(renderedRows.map((row) => row.id));
   if (renderedRows.length && !renderedSkillIds.has(selected.id)) selected = renderedRows[0];
+  const grouped = buildGroupedMasteryMap({
+    layout,
+    savedPositions,
+    skills: mapSkills,
+    visibleIds: renderedSkillIds,
+    collapsedBranchIds: planMode ? [] : snapshot.ui.mapCollapsedBranchIds,
+  });
+  const positions = grouped.positions;
+  const endpointForSkill = skillId => planMode ? skillId : grouped.endpointBySkillId.get(skillId);
+  const positionForEndpoint = (endpoint) => positions[planMode ? `skill:${endpoint}` : endpoint];
   const selectedSkill = store.skillsById[selected.id];
   const selectedSubject = snapshot.subjects.find((subject) => subject.id === selected.subjectId) ?? snapshot.activeSubject;
   const hasPlanContent = Boolean(Object.keys(savedPositions).length || displayedPlan.paths.length || displayedPlan.annotations.length || hiddenIds.size);
@@ -1299,38 +1311,44 @@ function renderMap(snapshot, { designer = false } = {}) {
   });
   const viewMinX = freeCanvas ? Math.min(0, ...planPositionValues.map((position) => position.x), ...commentPositionValues.map((position) => position.x)) - PLAN_CANVAS_MARGIN_X : 0;
   const viewMinY = freeCanvas ? Math.min(0, ...planPositionValues.map((position) => position.y), ...commentPositionValues.map((position) => position.y)) - PLAN_CANVAS_MARGIN_Y : 0;
-  const viewMaxX = freeCanvas ? Math.max(layout.width, ...planPositionValues.map((position) => position.x + 178), ...commentPositionValues.map((position) => position.x + 190)) + PLAN_CANVAS_MARGIN_X : layout.width;
-  const viewMaxY = freeCanvas ? Math.max(layout.height, ...planPositionValues.map((position) => position.y + 70), ...commentPositionValues.map((position) => position.y + 84)) + PLAN_CANVAS_MARGIN_Y : layout.height;
+  const displayHeight = Math.max(620, ...grouped.lanes.map(lane => lane.y + lane.height + 28), grouped.bounds.y + grouped.bounds.height);
+  const viewMaxX = freeCanvas ? Math.max(layout.width, ...planPositionValues.map((position) => position.x + (position.width ?? 178)), ...commentPositionValues.map((position) => position.x + 190)) + PLAN_CANVAS_MARGIN_X : Math.max(layout.width, grouped.bounds.x + grouped.bounds.width);
+  const viewMaxY = freeCanvas ? Math.max(displayHeight, ...planPositionValues.map((position) => position.y + (position.height ?? 70)), ...commentPositionValues.map((position) => position.y + 84)) + PLAN_CANVAS_MARGIN_Y : displayHeight;
   const width = viewMaxX - viewMinX;
   const height = viewMaxY - viewMinY;
-  const { lanes } = layout;
+  const { lanes } = grouped;
   const zoom = Number(snapshot.ui.mapZoom ?? 1);
-  const edges = mapSkills.flatMap((skill) => skill.prerequisites.map((prerequisite) => {
-    if (!renderedSkillIds.has(prerequisite) || !renderedSkillIds.has(skill.id)) return "";
-    const from = positions[prerequisite];
-    const to = positions[skill.id];
+  const edges = grouped.edges.map((edge) => {
+    const from = positions[edge.from];
+    const to = positions[edge.to];
     if (!from || !to) return "";
-    const crossSubject = store.skillsById[prerequisite]?.subjectId !== skill.subjectId;
-    return `<path class="${crossSubject ? "is-cross-subject" : ""}" data-map-edge-from="${escapeHtml(prerequisite)}" data-map-edge-to="${escapeHtml(skill.id)}" data-map-edge-kind="prerequisite" d="${mapEdgePath(from, to)}" />`;
-  })).join("");
+    const fromSkill = store.skillsById[edge.originalPairs[0]?.from];
+    const toSkill = store.skillsById[edge.originalPairs[0]?.to];
+    const crossSubject = fromSkill?.subjectId !== toSkill?.subjectId;
+    const label = `${edge.count} prerequisite connection${edge.count === 1 ? "" : "s"}`;
+    const attrs = `data-map-edge-from="${escapeHtml(planMode ? edge.from.slice(6) : edge.from)}" data-map-edge-to="${escapeHtml(planMode ? edge.to.slice(6) : edge.to)}" data-map-edge-kind="prerequisite" data-map-edge-count="${edge.count}" aria-label="${escapeHtml(label)}"`;
+    return `<path class="${crossSubject ? "is-cross-subject" : ""}" ${attrs} d="${mapEdgePath(from, to)}"><title>${escapeHtml(label)}</title></path><path class="map-edge-hit" ${attrs} d="${mapEdgePath(from, to)}" tabindex="0"><title>${escapeHtml(label)}</title></path>`;
+  }).join("");
   const planConnections = (planMode || displayedPlan.paths.length) ? displayedPlan.paths.flatMap((path) => {
-    const visibleSkillIds = path.skillIds.filter((id) => positions[id] && renderedSkillIds.has(id));
+    const visibleSkillIds = path.skillIds.filter((id) => positionForEndpoint(endpointForSkill(id)) && renderedSkillIds.has(id));
     return visibleSkillIds.slice(1).map((skillId, index) => {
-      const fromId = visibleSkillIds[index];
-      return `<path class="map-plan-connection ${path.id === snapshot.ui.selectedMapPlanPathId ? "is-active" : ""}" style="--plan-color:${escapeHtml(path.color)}" data-map-edge-from="${escapeHtml(fromId)}" data-map-edge-to="${escapeHtml(skillId)}" data-map-edge-kind="plan" d="${mapEdgePath(positions[fromId], positions[skillId], "plan")}" />`;
+      const fromId = endpointForSkill(visibleSkillIds[index]);
+      const toId = endpointForSkill(skillId);
+      if (fromId === toId) return "";
+      return `<path class="map-plan-connection ${path.id === snapshot.ui.selectedMapPlanPathId ? "is-active" : ""}" style="--plan-color:${escapeHtml(path.color)}" data-map-edge-from="${escapeHtml(fromId)}" data-map-edge-to="${escapeHtml(toId)}" data-map-edge-kind="plan" d="${mapEdgePath(positionForEndpoint(fromId), positionForEndpoint(toId), "plan")}" />`;
     });
   }).join("") : "";
   const commentLinks = [];
   const planComments = (planMode || displayedPlan.annotations.length) ? displayedPlan.annotations.map((annotation, index) => {
-    const allTargetSkillIds = annotation.skillIds.filter((id) => positions[id]);
+    const allTargetSkillIds = annotation.skillIds.filter((id) => store.skillsById[id]);
     const targetSkillIds = allTargetSkillIds.filter((id) => renderedSkillIds.has(id));
     const savedPosition = annotation.positions?.[viewportKey] ?? null;
     if (allTargetSkillIds.length && !targetSkillIds.length) return "";
     if (!savedPosition && !targetSkillIds.length) return "";
-    const targets = targetSkillIds.map((id) => positions[id]);
+    const targets = [...new Set(targetSkillIds.map(endpointForSkill))].map(positionForEndpoint);
     const anchor = targets.length ? {
-      x: targets.reduce((sum, position) => sum + position.x + 89, 0) / targets.length,
-      y: targets.reduce((sum, position) => sum + position.y + 35, 0) / targets.length,
+      x: targets.reduce((sum, position) => sum + position.x + (position.width ?? 178) / 2, 0) / targets.length,
+      y: targets.reduce((sum, position) => sum + position.y + (position.height ?? 70) / 2, 0) / targets.length,
     } : { x: viewMinX + width / 2, y: viewMinY + height / 2 };
     const autoX = anchor.x + 130 <= viewMaxX - 190 ? anchor.x + 130 : Math.max(viewMinX, anchor.x - 220);
     const position = savedPosition ? { ...savedPosition } : {
@@ -1338,7 +1356,8 @@ function renderMap(snapshot, { designer = false } = {}) {
       y: Math.max(viewMinY, Math.min(viewMaxY - 84, anchor.y - 42 + (index % 3) * 18)),
     };
     for (const skillId of targetSkillIds) {
-      commentLinks.push(`<path class="map-plan-comment-link" data-plan-comment-link="${escapeHtml(annotation.id)}" data-map-edge-to="${escapeHtml(skillId)}" d="${mapCommentEdgePath(positions[skillId], position)}"></path>`);
+      const endpoint = endpointForSkill(skillId);
+      if (!commentLinks.some((link) => link.includes(`data-plan-comment-link="${escapeHtml(annotation.id)}"`) && link.includes(`data-map-edge-to="${escapeHtml(endpoint)}"`))) commentLinks.push(`<path class="map-plan-comment-link" data-plan-comment-link="${escapeHtml(annotation.id)}" data-map-edge-to="${escapeHtml(endpoint)}" d="${mapCommentEdgePath(positionForEndpoint(endpoint), position)}"></path>`);
     }
     const lines = splitPlanComment(annotation.body);
     return `<g class="map-plan-comment" role="note" tabindex="0" data-plan-comment="${escapeHtml(annotation.id)}" data-plan-x="${position.x}" data-plan-y="${position.y}" transform="translate(${position.x} ${position.y})">
@@ -1351,12 +1370,13 @@ function renderMap(snapshot, { designer = false } = {}) {
   }).join("") : "";
   const subjectLanes = lanes.map(({ subject, y, height: laneHeight, branches }) => `<g class="map-subject-lane">
     <rect x="12" y="${y}" width="${layout.width - 24}" height="${laneHeight}" rx="22" fill="${escapeHtml(subject.theme?.tint ?? "#dceca9")}"></rect>
-    ${branches.map((branch, index) => `<g class="map-branch-lane" data-map-branch="${escapeHtml(branch.id)}" aria-label="${escapeHtml(`${subject.name} → ${branch.name}: ${branch.count} lessons`)}"><rect x="28" y="${branch.y}" width="${layout.width - 56}" height="${branch.height}" rx="14" fill="${index % 2 ? '#ffffff' : escapeHtml(subject.theme?.paperLight ?? '#ffffff')}" stroke="${escapeHtml(subject.theme?.primary ?? '#153f36')}"></rect><text x="42" y="${branch.y + 27}" fill="${escapeHtml(subject.theme?.primary ?? '#153f36')}">${escapeHtml(branch.name)} · ${branch.count} lessons</text></g>`).join("")}
+    ${branches.map((branch, index) => `<g class="map-branch-lane" data-map-branch="${escapeHtml(branch.id)}" aria-label="${escapeHtml(`${subject.name} → ${branch.name}: ${branch.count} lessons`)}"><rect x="28" y="${branch.y}" width="${layout.width - 56}" height="${branch.height}" rx="14" fill="${index % 2 ? '#ffffff' : escapeHtml(subject.theme?.paperLight ?? '#ffffff')}" stroke="${escapeHtml(subject.theme?.primary ?? '#153f36')}"></rect><text x="42" y="${branch.y + 27}" fill="${escapeHtml(subject.theme?.primary ?? '#153f36')}">${escapeHtml(branch.name)} · ${branch.count} lessons</text>${!planMode && !branch.collapsed ? `<g class="map-branch-heading-toggle" data-map-branch-toggle="${escapeHtml(branch.id)}" role="button" tabindex="0" aria-label="Collapse ${escapeHtml(branch.name)} branch" transform="translate(${Math.min(layout.width - 88, 154 + branch.name.length * 9)} ${branch.y + 10})"><rect width="42" height="30" rx="10"></rect><text x="21" y="21" text-anchor="middle">−</text></g>` : ""}</g>`).join("")}
     <line x1="28" y1="${y + 42}" x2="${layout.width - 28}" y2="${y + 42}" stroke="${escapeHtml(subject.theme?.primary ?? "#153f36")}"></line>
     <text x="30" y="${y + 29}" fill="${escapeHtml(subject.theme?.primary ?? "#153f36")}">${escapeHtml(subject.icon)} ${escapeHtml(subject.name)}</text>
   </g>`).join("");
   const nodes = renderedRows.map((row) => {
-    const position = positions[row.id];
+    const position = positions[`skill:${row.id}`];
+    if (!position) return "";
     const lines = splitLabel(row.name);
     const subject = snapshot.subjects.find((item) => item.id === row.subjectId) ?? snapshot.activeSubject;
     const nodeFill = combined ? subject.theme?.primary ?? STATUS_COLORS[row.status] : STATUS_COLORS[row.status] ?? STATUS_COLORS.locked;
@@ -1376,6 +1396,19 @@ function renderMap(snapshot, { designer = false } = {}) {
       ${planMode && hiddenIds.has(row.id) ? `<g class="map-node-hidden-badge" transform="translate(132 8)"><rect width="38" height="14" rx="7"></rect><text x="19" y="10" text-anchor="middle">Hidden</text></g>` : ""}
     </g>`;
   }).join("");
+  const collapsedGroups = grouped.groups.filter((group) => group.collapsed).map((group) => {
+    const position = group.position;
+    const memberRows = renderedRows.filter((row) => group.skillIds.includes(row.id));
+    const mastery = memberRows.length ? Math.round(memberRows.reduce((sum, row) => sum + Number(row.masteryScore || 0), 0) / memberRows.length) : 0;
+    const subject = snapshot.subjects.find((item) => item.id === group.fieldId) ?? snapshot.activeSubject;
+    return `<g class="map-branch-group" data-map-branch-group="${escapeHtml(group.id)}" transform="translate(${position.x} ${position.y})" role="group" aria-label="${escapeHtml(`${subject?.name ?? group.fieldId} → ${group.name}: ${group.skillIds.length} lessons, average mastery ${mastery}/100`)}">
+      <rect class="map-branch-group-body" width="${COLLAPSED_NODE_WIDTH}" height="${COLLAPSED_NODE_HEIGHT}" rx="18" fill="${escapeHtml(subject?.theme?.primary ?? "#153f36")}"></rect>
+      <text class="map-branch-group-field" x="18" y="27">${escapeHtml(subject?.icon ?? "◇")} ${escapeHtml(subject?.name ?? group.fieldId)}</text>
+      <text class="map-branch-group-name" x="18" y="65">${escapeHtml(group.name)}</text>
+      <text class="map-branch-group-meta" x="18" y="91">${group.skillIds.length} lesson${group.skillIds.length === 1 ? "" : "s"} · ${mastery}/100 average mastery</text>
+      <g class="map-branch-group-toggle" data-map-branch-toggle="${escapeHtml(group.id)}" role="button" tabindex="0" aria-label="Expand ${escapeHtml(group.name)} branch"><rect x="286" y="43" width="52" height="52" rx="15" fill="${escapeHtml(subject?.theme?.primaryAlt ?? "#dceca9")}"></rect><text x="312" y="76" text-anchor="middle">+</text></g>
+    </g>`;
+  }).join("");
   const selectedHiddenCount = snapshot.ui.mapPlanSelection.filter((id) => hiddenIds.has(id)).length;
   const selectedVisibleCount = snapshot.ui.mapPlanSelection.filter((id) => !hiddenIds.has(id)).length;
   const hiddenCount = hiddenIds.size;
@@ -1383,7 +1416,7 @@ function renderMap(snapshot, { designer = false } = {}) {
   elements.view.innerHTML = `${designer ? renderCurriculumWorkspace(snapshot) : ""}
     <header class="page-head">
       <div><p class="eyebrow">All fields · ${mapRows.length} connected lessons across ${snapshot.subjects.length} curricula</p><h1>${designer ? "Canonical curriculum map" : "Mastery map"}</h1><p>${designer ? "Drag this curriculum’s canonical map into shape. Learners receive these positions, custom paths, and annotations when they load the file." : `${snapshot.progressionMode === "soft" ? "Open path treats the connections as guidance: every lesson and test is available." : "Hard path unlocks tests when prerequisite lessons are proven."} Field lanes contain labeled branch groups. Prerequisite lines connect lessons across branches and fields.`}</p></div>
-      <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><button type="button" class="map-plan-toggle map-plan-view-toggle" data-action="toggle-plan-view" aria-pressed="${planView}" ${planMode ? "disabled" : ""}><span>◎</span><strong>Plan view</strong><small>${planMode ? "Exit editor to view" : planView ? "Showing saved plan" : "Showing canonical map"}</small></button>`}${mapBrowseMarkup(snapshot, renderedRows.length ? renderedRows : mapRows)}<label class="compact-select">Lesson<select id="map-skill-select">${mapSkillOptions(snapshot, renderedRows.length ? renderedRows : mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
+      <div class="page-actions map-toolbar">${designer ? "" : `<button type="button" class="map-plan-toggle" data-action="toggle-plan-mode" aria-pressed="${planMode}"><span>✦</span><strong>Plan mode</strong><small>${planMode ? "Editing private plan" : "Arrange · connect · annotate"}</small></button><button type="button" class="map-plan-toggle map-plan-view-toggle" data-action="toggle-plan-view" aria-pressed="${planView}" ${planMode ? "disabled" : ""}><span>◎</span><strong>Plan view</strong><small>${planMode ? "Exit editor to view" : planView ? "Showing saved plan" : "Showing canonical map"}</small></button>`}<div class="map-branch-actions" role="group" aria-label="Map branch visibility"><button type="button" class="quiet-button" data-action="map-expand-all" ${planMode ? "disabled" : ""}>Expand all</button><button type="button" class="quiet-button" data-action="map-collapse-all" ${planMode ? "disabled" : ""}>Collapse all</button></div>${mapBrowseMarkup(snapshot, renderedRows.length ? renderedRows : mapRows)}<label class="compact-select">Lesson<select id="map-skill-select">${mapSkillOptions(snapshot, renderedRows.length ? renderedRows : mapRows, selected.id)}</select></label><div class="map-zoom-control" role="group" aria-label="Mastery map zoom"><button type="button" data-action="map-zoom-out" aria-label="Zoom mastery map out" ${zoom <= MAP_ZOOM_MIN ? "disabled" : ""}>−</button><output id="map-zoom-output" aria-live="polite">${Math.round(zoom * 100)}%</output><button type="button" data-action="map-zoom-in" aria-label="Zoom mastery map in" ${zoom >= MAP_ZOOM_MAX ? "disabled" : ""}>+</button></div></div>
     </header>
     <div class="status-legend">${Object.entries(STATUS_COLORS).map(([status, color]) => `<span><i style="background:${color}"></i>${status}</span>`).join("")}${planMode ? `<span class="map-plan-key">Plan mode is autosaving</span>` : planView ? `<span class="map-plan-key">Plan view · read only</span>` : combined ? `<span class="map-subject-key">Node color = field · dot = status</span>` : ""}</div>
     <section class="map-layout ${planMode ? "is-plan-mode" : ""}">
@@ -1403,6 +1436,7 @@ function renderMap(snapshot, { designer = false } = {}) {
           <g class="map-edges">${edges}</g>
           <g class="map-plan-connections">${planConnections}</g>
           <g class="map-plan-comment-links">${commentLinks.join("")}</g>
+          <g class="map-branch-groups">${collapsedGroups}</g>
           <g>${nodes}</g>
           <g class="map-plan-comments">${planComments}</g>
           <rect class="map-selection-marquee" visibility="hidden" x="0" y="0" width="0" height="0"></rect>
@@ -1443,7 +1477,7 @@ function renderMap(snapshot, { designer = false } = {}) {
     nextScroller.scrollLeft = Math.max(0, -viewMinX * zoom);
     nextScroller.scrollTop = Math.max(0, -viewMinY * zoom);
   }
-  const interactivePositions = Object.fromEntries(Object.entries(positions).filter(([id]) => renderedSkillIds.has(id)));
+  const interactivePositions = Object.fromEntries([...renderedSkillIds].map((id) => [id, positions[`skill:${id}`]]).filter(([, position]) => position));
   setupMapInteractions({ planMode, layoutKey: viewportKey, positions: interactivePositions, width, height, viewMinX, viewMinY });
 }
 
@@ -2858,6 +2892,11 @@ document.addEventListener("click", async (event) => {
     showToast(modeButton.dataset.progressionMode === "soft" ? "Open path enabled. Connections are now guidance." : "Hard path enabled. Prerequisites lock tests.");
     return;
   }
+  const branchToggle = event.target.closest?.("[data-map-branch-toggle]");
+  if (branchToggle && !currentSnapshot?.ui.mapPlanMode) {
+    store.toggleMapBranch(branchToggle.dataset.mapBranchToggle);
+    return;
+  }
   const mapNode = event.target.closest?.("[data-map-skill]");
   if (mapNode && !currentSnapshot?.ui.mapPlanMode) store.selectMapSkill(mapNode.dataset.mapSkill);
   const routeButton = event.target.closest("[data-route]");
@@ -3020,6 +3059,11 @@ document.addEventListener("click", async (event) => {
   if (action.dataset.action === "replay-tutorial") store.startTutorial();
   if (action.dataset.action === "map-zoom-out") changeMapZoom(-MAP_ZOOM_STEP);
   if (action.dataset.action === "map-zoom-in") changeMapZoom(MAP_ZOOM_STEP);
+  if (["map-expand-all", "map-collapse-all"].includes(action.dataset.action) && !currentSnapshot?.ui.mapPlanMode) {
+    const branchIds = learningFields(currentSnapshot.subjects, currentSnapshot.allProgressRows).flatMap((field) => field.branches.map((branch) => branch.id));
+    store.setMapCollapsedBranches(action.dataset.action === "map-collapse-all" ? branchIds : []);
+    return;
+  }
   if (action.dataset.action === "install-staged-pack") {
     const staged = store.snapshot().stagedLessonPack;
     const installNote = staged?.mode === "override"
@@ -3168,7 +3212,13 @@ document.addEventListener("change", (event) => {
   if (event.target.id === "lesson-select") store.navigate("lesson", event.target.value);
   if (event.target.id === "map-field-select") { mapBrowseField = event.target.value; mapBrowseBranch = ""; renderMap(store.snapshot()); }
   if (event.target.id === "map-branch-select") { mapBrowseBranch = event.target.value; renderMap(store.snapshot()); }
-  if (event.target.id === "map-skill-select" && event.target.value) store.selectMapSkill(event.target.value);
+  if (event.target.id === "map-skill-select" && event.target.value) {
+    const target = currentSnapshot?.allProgressRows.find((row) => row.id === event.target.value);
+    const field = target ? learningFields(currentSnapshot.subjects, [target]).find((item) => item.id === target.subjectId) : null;
+    const branchId = field?.branches[0]?.id;
+    if (branchId && currentSnapshot.ui.mapCollapsedBranchIds.includes(branchId)) store.toggleMapBranch(branchId);
+    store.selectMapSkill(event.target.value);
+  }
   if (event.target.id === "test-skill-select") store.navigate("test", event.target.value);
 });
 
@@ -3395,6 +3445,12 @@ document.addEventListener("submit", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  const branchToggle = event.target.closest?.("[data-map-branch-toggle]");
+  if (branchToggle && ["Enter", " "].includes(event.key)) {
+    event.preventDefault();
+    if (!currentSnapshot?.ui.mapPlanMode) store.toggleMapBranch(branchToggle.dataset.mapBranchToggle);
+    return;
+  }
   const mapNode = event.target.closest?.("[data-map-skill]");
   if (mapNode && ["Enter", " "].includes(event.key)) {
     event.preventDefault();
@@ -3636,3 +3692,13 @@ async function ensureLegacyGeographyMigration(raw) {
 boot().catch((error) => {
   elements.loading.innerHTML = `<p><strong>QuickMaths could not start.</strong></p><p>${escapeHtml(error instanceof Error ? error.message : String(error))}</p>`;
 });
+
+// Announce bundled edge counts for pointer, keyboard and touchscreen users.
+for (const eventName of ["mouseover", "focusin", "click"]) {
+  document.addEventListener(eventName, event => {
+    const edge = event.target.closest?.(".map-edge-hit[data-map-edge-count]");
+    if (!edge || (eventName === "mouseover" && edge.contains(event.relatedTarget))) return;
+    const count = Number(edge.dataset.mapEdgeCount);
+    showToast(`${count} prerequisite connection${count === 1 ? "" : "s"}`);
+  });
+}
