@@ -57,6 +57,8 @@ The local Bridge verifies repository privacy through GitHub when connecting and 
 
 ## Curriculum development
 
+For authenticated Git pushes from this checkout, see [Direct GitHub publishing](docs/GITHUB_PUBLISHING.md).
+
 The native Mathematics curriculum is authored in YAML under `content/math/algebra_foundations/`. The deterministic Geography source in `scripts/build_geography_web_curriculum.mjs` emits both the native Mathematics coordinate/geodesy bridge and the reproducible `PACK_GEOGRAPHY` fixture. Geography and Programming are published through the independent [`QuickMathematics/QM_Dev_Depot`](https://github.com/QuickMathematics/QM_Dev_Depot) registry so the production app dogfoods the same federated discovery path as community publishers.
 
 Validate native YAML:
