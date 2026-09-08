@@ -18,10 +18,10 @@ const packs = readdirSync(folder).map(name => {
 });
 const storeFor = () => createQuickMathsStore({ curriculum, now: () => new Date("2026-09-06T12:00:00Z"), storage: { getItem: () => null, setItem() {} } });
 
-test("all 107 shipped lessons have teaching figures, including the 91 previously empty lessons", async () => {
+test("all 128 shipped lessons have teaching figures, including the new statistics and probability lessons", async () => {
   const lessons = [...curriculum.skills, ...packs.flatMap(p => p.skills)];
-  assert.equal(lessons.length, 107);
-  assert.equal(Object.keys(LESSON_ILLUSTRATIONS).length, 97);
+  assert.equal(lessons.length, 128);
+  assert.equal(Object.keys(LESSON_ILLUSTRATIONS).length, 118);
   let count = 0;
   for (const skill of lessons) {
     const library = lessonIllustrations(skill);
@@ -48,7 +48,7 @@ test("all 107 shipped lessons have teaching figures, including the 91 previously
       assert.deepEqual(Buffer.from(loaded), bytes);
     }
   }
-  assert.equal(count, 109);
+  assert.equal(count, 130);
 });
 
 test("installed Programming lessons gain matched figures without rewriting packages or saved state", () => {

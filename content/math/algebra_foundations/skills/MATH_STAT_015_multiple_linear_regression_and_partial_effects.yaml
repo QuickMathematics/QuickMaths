@@ -1,0 +1,493 @@
+id: MATH_STAT_015
+schema_version: 0.2
+name: Multiple linear regression and partial effects
+domain: Math
+subdomain: Statistics
+topic: Multiple Regression
+description: Interpret/test partial slopes, indicators, interactions, confounding, multicollinearity and F tests.
+prerequisites:
+- MATH_STAT_013
+tags:
+- statistics
+unlocks:
+- MATH_STAT_016
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Multiple regression models a quantitative response using several predictors. Each partial slope describes
+  fitted mean change for one predictor holding the others fixed. Indicator variables encode categories; interactions
+  let effects depend on another predictor. Confounding and multicollinearity can change coefficients and standard
+  errors. Individual coefficients use t inference with df=n-p-1; overall/nested model questions use F and the F-distribution calculator.
+  R² never decreases with added predictors, while adjusted R² penalizes complexity. Diagnostics, extrapolation, influence,
+  and causal design remain essential.
+examples:
+  - prompt: 'In y=10+2x1-.5x2, interpret the coefficient of x1 while x2 is fixed.'
+    solution: 'In y=10+2x1-.5x2, increasing x1 by 1 changes predicted y by 2 while holding x2 fixed.'
+    explanation: 'A multiple-regression coefficient is a partial effect conditional on the other predictors.'
+  - prompt: 'A regression coefficient is .6 with SE .15. Find its t statistic and interpret the evidence.'
+    solution: 'With n=50 and 3 predictors, df=50-3-1=46 and t=.6/.15=4. Using t*=2.013, the 95% interval is .6±2.013(.15)=(.298,.902), supporting a positive partial association.'
+    explanation: 'Use coefficient units and uncertainty when interpreting a fitted model.'
+applications:
+  - title: 'Adjusted predictor effects'
+    description: 'Multiple regression estimates a predictor effect while holding correlated covariates fixed.'
+  - title: 'Multivariable forecasting'
+    description: 'Partial effects support forecasting and fair comparisons when several explanatory variables matter.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: MLR_PARTIAL_SLOPE
+    type: fixed
+    prompt_template: In yhat=12+2.5x1-.8x2, interpret 2.5.
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Mean response increases 2.5 per x1 unit holding x2 fixed
+    - id: B
+      label: Every individual increases exactly2.5
+    - id: C
+      label: x2 causes -.8
+    - id: D
+      label: Correlation=2.5
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Partial slope is conditional on other predictors.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: MLR_PREDICTION
+    type: generated
+    prompt_template: yhat={b0}+{b1}x1+{b2}x2; x1={x1}, x2={x2}. Predict.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      b0:
+        type: int
+        min: -5
+        max: 12
+      b1:
+        type: int
+        min: -4
+        max: 6
+        exclude:
+        - 0
+      b2:
+        type: int
+        min: -4
+        max: 6
+        exclude:
+        - 0
+      x1:
+        type: int
+        min: -3
+        max: 6
+      x2:
+        type: int
+        min: -3
+        max: 6
+    derived:
+      p: b0+b1*x1+b2*x2
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Substitute all predictors.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: MLR_INDICATOR
+    type: fixed
+    prompt_template: yhat=40+3x-6D; D=0 reference,1 comparison. -6 means?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Comparison fitted mean 6 lower at same x
+    - id: B
+      label: Comparison x slope -6
+    - id: C
+      label: Reference intercept -6
+    - id: D
+      label: Every comparison observation exactly6 below
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Indicator shifts the fitted line.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: MLR_INTERACTION_SLOPE
+    type: generated
+    prompt_template: Model has base x slope {base} and interaction {inter}xD. Find slope for D=1.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      base:
+        type: decimal
+        min: -3
+        max: 5
+        places: 1
+      inter:
+        type: decimal
+        min: -2
+        max: 3
+        places: 1
+    derived:
+      s: round((base+inter)*1000)/1000
+    answer:
+      type: numeric
+      value: '{s}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Add main and interaction slopes.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - inter!=0
+  - id: MLR_CONFOUNDING
+    type: fixed
+    prompt_template: Adding age changes exercise coefficient substantially. Best?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Adjusted coefficient answers different conditional question; age may confound
+    - id: B
+      label: Data entry wrong
+    - id: C
+      label: Causation proven
+    - id: D
+      label: Coefficient must stay same
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Adjustment changes comparison.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: MLR_MULTICOLLINEARITY
+    type: fixed
+    prompt_template: Severe multicollinearity often?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Inflates coefficient SEs and instability
+    - id: B
+      label: Residuals zero
+    - id: C
+      label: R² negative
+    - id: D
+      label: Response categorical
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Overlapping predictors make separate effects imprecise.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: MLR_ADJUSTED_R2
+    type: fixed
+    prompt_template: Why can adjusted R² fall after adding predictor?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: It penalizes model complexity
+    - id: B
+      label: Ignores response
+    - id: C
+      label: R² always1
+    - id: D
+      label: It is p-value
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Adjusted R² includes size penalty.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: MLR_OVERALL_HYPOTHESES
+    type: fixed
+    prompt_template: Overall F null with four slopes?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: All population slopes zero
+    - id: B
+      label: All sample slopes equal
+    - id: C
+      label: Intercept zero/residuals normal
+    - id: D
+      label: At least one slope nonzero
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Global null sets all slopes zero.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: MLR_OVERALL_F_P_VALUE
+    type: generated
+    prompt_template: Overall F={f}, df1={d1}, df2={d2}. Find p.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      f:
+        type: decimal
+        min: 0.6
+        max: 10
+        places: 1
+      d1:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      d2:
+        type: choice
+        values:
+        - 15
+        - 20
+        - 30
+        - 45
+        - 60
+    derived:
+      p: round(f_sf(f,d1,d2)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00015
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use the F-distribution calculator.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - p>.0001
+    - p<.9999
+  - id: MLR_COEFFICIENT_P_VALUE
+    type: generated
+    prompt_template: Coefficient t={t}, df={df}. Find two-sided p.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      t:
+        type: decimal
+        min: -4
+        max: 4
+        places: 1
+        exclude:
+        - 0
+      df:
+        type: choice
+        values:
+        - 10
+        - 15
+        - 20
+        - 30
+        - 50
+        - 80
+    derived:
+      p: round(2*t_cdf(-abs(t),df)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00015
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Double lower tail.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - p>.0001
+    - p<.9999
+  - id: MLR_NESTED_F
+    type: generated
+    prompt_template: Full SSE={sf}, df={df}; reduced SSE={sr}; q={q}. Find nested F.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      df:
+        type: choice
+        values:
+        - 20
+        - 24
+        - 30
+        - 36
+        - 40
+      mse:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+      q:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 3
+      target:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+    derived:
+      sf: df*mse
+      drop: q*mse*target
+      sr: sf+drop
+      f: ((sr-sf)/q)/(sf/df)
+    answer:
+      type: numeric
+      value: '{f}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Compare SSE reduction per added parameter with residual MSE.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: MLR_DIAGNOSTICS
+    type: fixed
+    prompt_template: Residual plot fans outward. Concern?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Nonconstant residual variance
+    - id: B
+      label: Categorical response
+    - id: C
+      label: Perfect multicollinearity
+    - id: D
+      label: Guaranteed causal effect
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Funnel pattern indicates heteroscedasticity.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: MLR_CAUSAL_SCOPE
+    type: fixed
+    prompt_template: Observational multiple regression adjusts for six covariates and finds small p. Best?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Adjusted association is evidence within model; unmeasured confounding/model assumptions still limit causality
+    - id: B
+      label: Causation proven
+    - id: C
+      label: Coefficient applies to every individual
+    - id: D
+      label: Small p guarantees prediction
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Adjustment does not create random assignment.
+    mistake_tags:
+    - concept_error
+    difficulty: hard

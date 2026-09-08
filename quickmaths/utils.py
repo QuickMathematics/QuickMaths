@@ -6,6 +6,15 @@ import re
 from fractions import Fraction
 from typing import Any
 
+from quickmaths.distributions import (
+    chi_square_cdf,
+    chi_square_sf,
+    f_sf,
+    inverse_normal_cdf,
+    normal_cdf,
+    t_cdf,
+)
+
 
 class SafeExpressionError(ValueError):
     pass
@@ -16,6 +25,14 @@ _ALLOWED_FUNCTIONS = {
     "min": min,
     "max": max,
     "round": round,
+    # Trusted native distribution helpers.  Uploaded lesson packages are
+    # validated as fixed data and never gain access to this evaluator.
+    "normal_cdf": normal_cdf,
+    "inverse_normal_cdf": inverse_normal_cdf,
+    "t_cdf": t_cdf,
+    "chi_square_cdf": chi_square_cdf,
+    "chi_square_sf": chi_square_sf,
+    "f_sf": f_sf,
 }
 
 _MAX_EXPRESSION_LENGTH = 1_000
@@ -139,7 +156,10 @@ def _eval_node(node: ast.AST, names: dict[str, Any]) -> Any:
         if node.keywords:
             raise SafeExpressionError("Keyword arguments are not allowed")
         args = [_eval_node(arg, names) for arg in node.args]
-        return _bounded(_ALLOWED_FUNCTIONS[node.func.id](*args))
+        try:
+            return _bounded(_ALLOWED_FUNCTIONS[node.func.id](*args))
+        except (TypeError, ValueError, OverflowError) as error:
+            raise SafeExpressionError(str(error)) from error
     raise SafeExpressionError(f"Unsupported expression: {ast.dump(node)}")
 
 

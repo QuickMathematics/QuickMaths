@@ -1,0 +1,404 @@
+id: MATH_PROB_004
+schema_version: 0.2
+name: Counting principles, permutations, and combinations
+domain: Math
+subdomain: Probability
+topic: Counting and Combinatorics
+description: Count multistage outcomes and distinguish ordered arrangements from unordered selections.
+prerequisites:
+- MATH_PROB_002
+- MATH_ARITH_004
+tags:
+- probability
+- combinatorics
+unlocks:
+- MATH_PROB_005
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Counting begins by defining what one outcome records. The fundamental counting principle multiplies choices
+  across successive stages. If repetition is allowed in k positions with n symbols, there are n^k strings. Factorials
+  count arrangements. Permutations count ordered selections nPr=n!/(n-r)!, while combinations count unordered selections
+  nCr=n!/[r!(n-r)!]. Repeated identical objects require division by repeated factorials. “At least one” events are
+  often easiest by complement counting.
+examples:
+  - prompt: 'How many ordered 3-letter arrangements can be made from 5 distinct letters when letters cannot repeat?'
+    solution: 'The ordered 3-letter arrangements from 5 distinct letters number 5P3=5*4*3=60.'
+    explanation: 'Use permutations when order changes the outcome.'
+  - prompt: 'How many unordered committees of 2 can be chosen from 6 people?'
+    solution: 'Choosing 2 committee members from 6 gives 6C2=6*5/(2*1)=15.'
+    explanation: 'Use combinations when the selected group has no order.'
+applications:
+  - title: 'Schedules and committees'
+    description: 'Counting principles estimate password spaces, schedules, routes, and committee selections.'
+  - title: 'Search-space counting'
+    description: 'Distinguishing order and repetition prevents systematic overcounting.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: COUNT_FUNDAMENTAL_PRINCIPLE
+    type: generated
+    prompt_template: A product has {a} styles, {b} sizes, {c} colors. How many versions?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 6
+      b:
+        type: int
+        min: 2
+        max: 5
+      c:
+        type: int
+        min: 2
+        max: 4
+    derived:
+      total: a*b*c
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply across stages.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: COUNT_REPEATED_CODES
+    type: generated
+    prompt_template: A code has {length} positions and {symbols} symbols per position, repetition allowed. How many
+      codes?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      symbols:
+        type: int
+        min: 3
+        max: 8
+      length:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+    derived:
+      total: symbols**length
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use symbols^length.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: COUNT_PERMUTATION_TWO
+    type: generated
+    prompt_template: From {n} people, how many president-secretary assignments?
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 4
+        max: 10
+    derived:
+      total: n*(n-1)
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Order matters.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: COUNT_PERMUTATION_THREE
+    type: generated
+    prompt_template: How many gold-silver-bronze finishes among {n} finalists?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 4
+        max: 9
+    derived:
+      total: n*(n-1)*(n-2)
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply decreasing choices.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: COUNT_COMBINATION_PAIRS
+    type: generated
+    prompt_template: How many unordered pairs from {n} objects?
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 4
+        max: 15
+    derived:
+      ordered: n*(n-1)
+      total: ordered/2
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Divide ordered pairs by 2.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: COUNT_COMBINATION_TRIPLES
+    type: generated
+    prompt_template: How many 3-person committees from {n} people?
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 5
+        max: 12
+    derived:
+      ordered: n*(n-1)*(n-2)
+      total: ordered/6
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Divide by 3!.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: COUNT_ORDER_DECISION
+    type: fixed
+    prompt_template: Which is a combination?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Assign president, VP, treasurer
+    - id: B
+      label: Select three books to take on a trip
+    - id: C
+      label: Award gold silver bronze
+    - id: D
+      label: Choose first second third speakers
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A set of books has no role order.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: COUNT_FACTORIAL_MEANING
+    type: fixed
+    prompt_template: What does 6! count?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Arrangements of six distinct objects
+    - id: B
+      label: Unordered pairs from six
+    - id: C
+      label: Six-position binary strings
+    - id: D
+      label: Probability of six successes
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Factorial counts all orders.
+    mistake_tags:
+    - concept_error
+    difficulty: easy
+  - id: COUNT_REPEATED_LETTERS
+    type: fixed
+    prompt_template: How many distinct arrangements of LEVEL?
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '30'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 5!/(2!2!)=30.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: COUNT_COMPLEMENT_AT_LEAST_ONE
+    type: generated
+    prompt_template: A {length}-position string uses {symbols} symbols, one a star. How many contain at least one
+      star?
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      symbols:
+        type: int
+        min: 3
+        max: 8
+      length:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+    derived:
+      total: symbols**length
+      without: (symbols-1)**length
+      wanted: total-without
+    answer:
+      type: numeric
+      value: '{wanted}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use all minus no-star strings.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: COUNT_HANDSHAKES
+    type: fixed
+    prompt_template: Eight people each shake hands once. How many handshakes?
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '28'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 8 choose 2=28.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: COUNT_ORDERED_UNORDERED_RATIO
+    type: generated
+    prompt_template: From {n} people, how many times as many president-secretary assignments as 2-person committees?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      n:
+        type: int
+        min: 4
+        max: 15
+    derived:
+      p: n*(n-1)
+      c: p/2
+      ratio: p/c
+    answer:
+      type: numeric
+      value: '{ratio}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Each pair has two office orders.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: COUNT_TREE_MEALS
+    type: fixed
+    prompt_template: A menu has 3 starters, 2 mains and 2 drinks. How many complete meals?
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '12'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 3*2*2=12.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy

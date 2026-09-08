@@ -1,0 +1,448 @@
+id: MATH_STAT_011
+schema_version: 0.2
+name: Chi-square goodness-of-fit tests
+domain: Math
+subdomain: Statistics
+topic: Chi-Square Inference
+description: Compare observed categorical counts with a specified population distribution.
+prerequisites:
+- MATH_STAT_010
+tags:
+- statistics
+unlocks:
+- MATH_STAT_012
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Chi-square goodness-of-fit compares observed categorical counts with expected counts from a specified null
+  distribution. E_i=np_i, statistic Σ(O-E)^2/E, df=k-1 when no parameters are estimated. Tests are right-tailed; use
+  stable `chi_square_sf`. Check independent counts and adequate expected counts. Significant global fit evidence does
+  not identify every differing category or establish causation; inspect standardized residuals and report effect/context.
+examples:
+  - prompt: 'Observed category counts are 18 and 22; expected counts are 20 and 20. Find chi-square.'
+    solution: 'Observed counts 18,22 and expected counts 20,20 give chi-square=(18-20)^2/20+(22-20)^2/20=0.4.'
+    explanation: 'Small discrepancy means the data are close to the proposed categorical distribution.'
+  - prompt: 'A goodness-of-fit test has four categories and no estimated parameters. Find its degrees of freedom.'
+    solution: 'For four categories with no parameters estimated, df=4-1=3.'
+    explanation: 'Degrees of freedom determine the reference chi-square distribution for the goodness-of-fit test.'
+applications:
+  - title: 'Distribution checks'
+    description: 'Goodness-of-fit tests compare observed category counts with a proposed genetic, market, or die-roll distribution.'
+  - title: 'Categorical model fit'
+    description: 'Expected counts and degrees of freedom make categorical model checks reproducible.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: CHI_GOF_EXPECTED
+    type: generated
+    prompt_template: Null probability for category is {p}/10 in sample n={n}. Find expected count.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      p:
+        type: int
+        min: 1
+        max: 9
+      tens:
+        type: int
+        min: 5
+        max: 30
+    derived:
+      n: 10*tens
+      e: p*tens
+    answer:
+      type: numeric
+      value: '{e}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Expected=np.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CHI_GOF_CONTRIB
+    type: generated
+    prompt_template: Observed={o}, expected={e}. Find chi-square contribution.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      e:
+        type: choice
+        values:
+        - 5
+        - 8
+        - 10
+        - 12
+        - 16
+        - 20
+      d:
+        type: choice
+        values:
+        - -4
+        - -3
+        - -2
+        - 2
+        - 3
+        - 4
+    derived:
+      o: e+d
+      c: round(d*d/e*10000)/10000
+    answer:
+      type: numeric
+      value: '{c}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: (O-E)^2/E.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - o>=0
+  - id: CHI_GOF_DF
+    type: generated
+    prompt_template: Goodness-of-fit with {k} categories and no estimated parameters. Find df.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      k:
+        type: int
+        min: 3
+        max: 10
+    derived:
+      df: k-1
+    answer:
+      type: numeric
+      value: '{df}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: df=k-1.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CHI_GOF_PVALUE
+    type: generated
+    prompt_template: Chi-square={chi}, df={df}. Find right-tail p.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      chi:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 8
+        - 10
+        - 12
+        - 15
+      df:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 8
+        - 10
+    derived:
+      p: round(chi_square_sf(chi,df)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00011
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use chi_square_sf.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: CHI_GOF_DECISION
+    type: fixed
+    prompt_template: p=.02 alpha=.05. Decision?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Reject claimed distribution
+    - id: B
+      label: Fail reject
+    - id: C
+      label: Accept exact fit
+    - id: D
+      label: Every category differs
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Small p rejects global fit.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_GOF_COUNTS
+    type: fixed
+    prompt_template: Chi-square tests require?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Categorical counts with independent observations and adequate expected counts
+    - id: B
+      label: Only percentages
+    - id: C
+      label: Quantitative means
+    - id: D
+      label: Known population SD
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Procedure is for counts.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_GOF_SMALL_EXPECTED
+    type: fixed
+    prompt_template: Some expected counts <2. Best?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Use exact/simulation or defensibly combine categories
+    - id: B
+      label: Ignore
+    - id: C
+      label: Replace with5
+    - id: D
+      label: Delete categories
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Approximation can fail with tiny expected counts.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_GOF_RESIDUAL
+    type: fixed
+    prompt_template: Standardized residual (O-E)/sqrt(E) positive means?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Observed count above expected
+    - id: B
+      label: Observed below expected
+    - id: C
+      label: No difference
+    - id: D
+      label: Expected invalid
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Sign shows direction.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_GOF_GLOBAL
+    type: fixed
+    prompt_template: Significant GOF implies?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Distribution differs somewhere from null
+    - id: B
+      label: Every category differs
+    - id: C
+      label: Causation
+    - id: D
+      label: Null probability of being true is p
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Global test does not localize all differences.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_GOF_EXAMPLE
+    type: fixed
+    prompt_template: Observed 18 expected12. Contribution?
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '3'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: (6^2)/12=3.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CHI_GOF_SUM
+    type: generated
+    prompt_template: Contributions {a},{b},{c}. Find chi-square.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      a:
+        type: choice
+        values:
+        - 0.5
+        - 1
+        - 1.5
+        - 2
+      b:
+        type: choice
+        values:
+        - 0.25
+        - 0.75
+        - 1.25
+      c:
+        type: choice
+        values:
+        - 0.5
+        - 1
+        - 2
+    derived:
+      s: round((a+b+c)*100)/100
+    answer:
+      type: numeric
+      value: '{s}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Sum cell contributions.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CHI_GOF_PARAMETER_DF
+    type: fixed
+    prompt_template: If parameters are estimated to create null probabilities, what may happen to df?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: May need further reduction
+    - id: B
+      label: Always increases
+    - id: C
+      label: No change ever
+    - id: D
+      label: Becomes n-1 automatically
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Estimated parameters consume degrees of freedom.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CHI_GOF_SCOPE
+    type: fixed
+    prompt_template: A significant observational category fit test establishes?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Evidence against specified distribution in sampled population under design, not causation
+    - id: B
+      label: Causal mechanism
+    - id: C
+      label: Every subject different
+    - id: D
+      label: P(H0) exactly p
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Statistical fit and causal claims differ.
+    mistake_tags:
+    - concept_error
+    difficulty: medium

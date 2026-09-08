@@ -1,0 +1,379 @@
+id: MATH_PROB_001
+schema_version: 0.2
+name: Probability models and sample spaces
+domain: Math
+subdomain: Probability
+topic: Probability Foundations
+description: Build sample spaces, calculate theoretical and experimental probabilities, use complements, simulation,
+  and area models.
+prerequisites:
+- MATH_ARITH_004
+- MATH_STAT_001
+tags:
+- probability
+- sample_spaces
+- simulation
+unlocks:
+- MATH_PROB_002
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Probability assigns numbers from 0 to 1 to events. Outcomes form a complete sample space, and events are subsets
+  of it. For equally likely outcomes, P(event)=favorable/total. Complements obey P(not A)=1-P(A). Multi-stage sample
+  spaces use organized lists, trees, or tables; independent choice counts multiply. Experimental probability is observed
+  successes divided by trials and approaches model probability in long runs without matching it exactly. Uniform geometric
+  probability is favorable area divided by total area. Always check completeness, equal-likelihood assumptions, and
+  that the result lies from 0 to 1.
+examples:
+  - prompt: 'Two fair dice are rolled. Find the probability that their sum is 7.'
+    solution: 'Two fair dice have 36 ordered outcomes and 6 sum to 7, so P(sum=7)=6/36=1/6.'
+    explanation: 'Count favorable outcomes in the complete equally likely sample space.'
+  - prompt: 'A spinner has 8 equally likely equal-size sectors, 3 favorable. Find the event and complement probabilities.'
+    solution: 'A spinner has 3 favorable sectors out of 8, so P(event)=3/8 and P(not event)=5/8.'
+    explanation: 'Complement probabilities add to 1.'
+applications:
+  - title: 'Game and risk models'
+    description: 'Sample spaces and complements model games, reliability events, and risk estimates.'
+  - title: 'Simulation'
+    description: 'Simulation approximates probabilities when a complete enumeration is impractical.'
+test:
+  question_count: 12
+  randomize_order: true
+  questions:
+  - id: PROB_FOUND_EQUAL_OUTCOMES
+    type: generated
+    prompt_template: An experiment has {total} equally likely outcomes and {favorable} favorable outcomes. Find P(event).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      total:
+        type: int
+        min: 5
+        max: 24
+      favorable:
+        type: int
+        min: 1
+        max: 12
+    derived: {}
+    answer:
+      type: numeric
+      value: '{favorable}/{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Probability=favorable/total.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+    constraints:
+    - favorable < total
+  - id: PROB_FOUND_COMPLEMENT
+    type: generated
+    prompt_template: P(A)={a}/{den}. Find P(not A).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      den:
+        type: int
+        min: 3
+        max: 12
+      a:
+        type: int
+        min: 1
+        max: 10
+    derived:
+      b: den-a
+    answer:
+      type: numeric
+      value: '{b}/{den}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Complement probabilities sum to 1.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+    constraints:
+    - a < den
+  - id: PROB_FOUND_PRODUCT_COUNT
+    type: generated
+    prompt_template: A process has {a} choices followed by {b} choices. How many ordered outcomes?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 9
+      b:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      total: a*b
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply choices across stages.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: PROB_FOUND_SPINNER
+    type: fixed
+    prompt_template: A fair spinner has 8 equal sectors and 3 are favorable. Find the probability.
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: 3/8
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Three of eight equally likely sectors are favorable.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: PROB_FOUND_TWO_DICE_SUM_SEVEN
+    type: fixed
+    prompt_template: Two fair dice are rolled. Find P(sum=7).
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: 1/6
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Six of 36 ordered outcomes sum to 7.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_FOUND_EXPERIMENTAL
+    type: generated
+    prompt_template: An experiment records {successes} successes and {failures} failures. Find the experimental probability.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      successes:
+        type: int
+        min: 3
+        max: 30
+      failures:
+        type: int
+        min: 3
+        max: 30
+    derived:
+      trials: successes+failures
+    answer:
+      type: numeric
+      value: '{successes}/{trials}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Relative frequency is successes divided by trials.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_FOUND_SIMULATION_INTERPRETATION
+    type: fixed
+    prompt_template: Which statement best describes a long simulation of a fair chance process?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Relative frequency may fluctuate but tends to stabilize near the model probability.
+    - id: B
+      label: Every block must match the theoretical probability exactly.
+    - id: C
+      label: The process must compensate immediately after streaks.
+    - id: D
+      label: The first few trials determine the true probability.
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Long-run relative frequency tends to stabilize without requiring short-run balance.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: PROB_FOUND_AREA_MODEL
+    type: fixed
+    prompt_template: A uniformly selected point lies in a favorable area 12 inside total area 32. Find the probability.
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: 3/8
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Uniform geometric probability is favorable area divided by total area.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_FOUND_BAG_EVENT
+    type: generated
+    prompt_template: A bag has {r} red, {b} blue, and {g} green counters. Find P(red or blue).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      r:
+        type: int
+        min: 1
+        max: 9
+      b:
+        type: int
+        min: 1
+        max: 9
+      g:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      fav: r+b
+      total: r+b+g
+    answer:
+      type: numeric
+      value: '{fav}/{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Add favorable counts and divide by total.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_FOUND_CERTAIN_IMPOSSIBLE
+    type: fixed
+    prompt_template: A standard die is rolled. Which event is impossible?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Rolling 1 through 6
+    - id: B
+      label: Rolling an even number
+    - id: C
+      label: Rolling a number greater than 6
+    - id: D
+      label: Rolling less than 6
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The die sample space contains no value greater than 6.
+    mistake_tags:
+    - concept_error
+    difficulty: easy
+  - id: PROB_FOUND_EQUAL_LIKELIHOOD_ASSUMPTION
+    type: fixed
+    prompt_template: When is favorable outcomes divided by total outcomes valid?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Whenever outcomes have labels
+    - id: B
+      label: When the sample space is complete and outcomes are equally likely
+    - id: C
+      label: Only with two outcomes
+    - id: D
+      label: Whenever there is more than one favorable outcome
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Simple counting requires equally likely outcomes.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: PROB_FOUND_COMPLETE_COIN_SPACE
+    type: fixed
+    prompt_template: Which is the ordered sample space for two coin tosses?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: HH, HT, TT
+    - id: B
+      label: two heads, one head, zero heads
+    - id: C
+      label: HH, HT, TH, TT
+    - id: D
+      label: H, T
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: HT and TH are different ordered outcomes.
+    mistake_tags:
+    - concept_error
+    difficulty: medium

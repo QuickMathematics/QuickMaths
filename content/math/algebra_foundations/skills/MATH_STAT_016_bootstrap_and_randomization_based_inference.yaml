@@ -1,0 +1,426 @@
+id: MATH_STAT_016
+schema_version: 0.2
+name: Bootstrap and randomization-based inference
+domain: Math
+subdomain: Statistics
+topic: Resampling Methods
+description: Build bootstrap intervals and randomization tests that match design, dependence and null mechanism.
+prerequisites:
+- MATH_STAT_012
+- MATH_STAT_014
+- MATH_STAT_015
+tags:
+- statistics
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Resampling approximates sampling or null distributions by repeatedly resampling observed data according to
+  a justified mechanism. A nonparametric bootstrap draws n observations with replacement and estimates standard errors
+  or percentile intervals from the bootstrap statistic distribution. Randomization tests recreate a null assignment/exchangeability
+  mechanism; empirical p-values can use (r+1)/(B+1). Resampling must preserve pairs, clusters, blocks, or time dependence.
+  More repetitions reduce Monte Carlo noise but do not add observational information or fix bias. Resampling is not
+  assumption-free.
+examples:
+  - prompt: 'Observed values are 2, 4, 4, 7, 7, and a bootstrap resample is 2, 2, 4, 7, 7. Find the resample mean.'
+    solution: 'The resample mean is (2+2+4+7+7)/5=22/5=4.4; repeat many resamples to form a bootstrap distribution.'
+    explanation: 'Resampling approximates the sampling variability of a statistic.'
+  - prompt: 'Only 3 of 1000 null randomizations are at least as extreme as observed. Estimate the plus-one corrected p-value.'
+    solution: 'The corrected estimate is (3+1)/(1000+1)=4/1001≈0.003996.'
+    explanation: 'Randomization simulates the null and counts tail outcomes.'
+applications:
+  - title: 'Bootstrap uncertainty'
+    description: 'Bootstrap intervals quantify uncertainty for statistics when formulas are difficult or assumptions are doubtful.'
+  - title: 'Randomization tests'
+    description: 'Randomization tests provide a transparent null reference for experiments and observational comparisons.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: RESAMPLE_BOOTSTRAP_MECHANISM
+    type: fixed
+    prompt_template: Ordinary nonparametric bootstrap sample?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Draw n with replacement from original sample
+    - id: B
+      label: Draw n without replacement
+    - id: C
+      label: Generate standard normal values
+    - id: D
+      label: Delete values above mean
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Bootstrap samples with replacement and same size.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_VALID_SAMPLE
+    type: fixed
+    prompt_template: Original [2,5,7,9]. Which could be bootstrap sample?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Only original order
+    - id: B
+      label: '[2,2,7,9]'
+    - id: C
+      label: '[2,5,7]'
+    - id: D
+      label: '[1,4,8,10]'
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Values may repeat/omit but come from sample.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_BOOTSTRAP_SE
+    type: generated
+    prompt_template: SD of {B} bootstrap estimates is {sd}. Estimate SE.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      B:
+        type: choice
+        values:
+        - 500
+        - 1000
+        - 2000
+        - 5000
+      sd:
+        type: choice
+        values:
+        - 0.12
+        - 0.25
+        - 0.4
+        - 0.75
+        - 1.2
+        - 2.5
+    derived: {}
+    answer:
+      type: numeric
+      value: '{sd}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Bootstrap SD estimates SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: RESAMPLE_PERCENTILE_INTERVAL
+    type: fixed
+    prompt_template: Bootstrap 2.5th/97.5th percentiles are 4.2 and7.9. Percentile interval?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: '[4.2,7.9]'
+    - id: B
+      label: '[-4.2,7.9]'
+    - id: C
+      label: '[2.5,97.5]'
+    - id: D
+      label: '[0,1]'
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use empirical percentile endpoints.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_RANDOMIZATION_NULL
+    type: fixed
+    prompt_template: In randomized two-group experiment, shuffling labels simulates?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Assignments possible under no-effect null preserving outcomes/group sizes
+    - id: B
+      label: New normal outcomes
+    - id: C
+      label: Larger population sample
+    - id: D
+      label: P(H0)
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Randomization recreates assignment mechanism.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_P_VALUE_COUNT
+    type: generated
+    prompt_template: B={B} null resamples, {r} at least as extreme. Use (r+1)/(B+1).
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      B:
+        type: choice
+        values:
+        - 99
+        - 199
+        - 499
+        - 999
+        - 1999
+      r:
+        type: int
+        min: 0
+        max: 80
+    derived:
+      p: round((r+1)/(B+1)*10000)/10000
+    answer:
+      type: numeric
+      value: '{p}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.00015
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use plus-one correction.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - r<B
+  - id: RESAMPLE_TWO_SIDED
+    type: fixed
+    prompt_template: For symmetric signed statistic and two-sided Ha, count?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Only greater positives
+    - id: B
+      label: Values with |stat| at least observed |stat|
+    - id: C
+      label: Only negatives
+    - id: D
+      label: Every value
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Two-sided extremeness uses both directions.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_PAIRED_SIGN_FLIP
+    type: fixed
+    prompt_template: Paired before/after no-change randomization?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Shuffle all measurements unrelated
+    - id: B
+      label: Randomly flip signs of within-pair differences
+    - id: C
+      label: Bootstrap labels without replacement
+    - id: D
+      label: Replace differences by mean
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Preserve pair structure.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_REGRESSION
+    type: fixed
+    prompt_template: Pairs vs residual bootstrap?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Pairs resamples rows; residual keeps predictors fixed and resamples suitable residuals
+    - id: B
+      label: Both shuffle only y
+    - id: C
+      label: Residual always valid under heteroscedasticity/dependence
+    - id: D
+      label: Pairs changes n every time
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Schemes represent different assumptions.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_CLUSTERED_DATA
+    type: fixed
+    prompt_template: Why not bootstrap individual students from clustered schools as independent?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Breaks within-school dependence and can understate uncertainty
+    - id: B
+      label: Makes mean zero
+    - id: C
+      label: Response categorical
+    - id: D
+      label: Too many repetitions
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Resample independent units/clusters.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_MORE_REPLICATES
+    type: fixed
+    prompt_template: 'Increase bootstrap repetitions 1k to100k, same original sample:'
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Reduces Monte Carlo noise only
+    - id: B
+      label: Multiplies sample size100
+    - id: C
+      label: Removes bias
+    - id: D
+      label: Guarantees exact coverage
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: More simulation does not create new data.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_BOUNDARY
+    type: fixed
+    prompt_template: Warning for simple percentile bootstrap?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Large smooth symmetric sample
+    - id: B
+      label: Tiny sample near hard boundary with strongly skewed bootstrap distribution
+    - id: C
+      label: Randomized large experiment
+    - id: D
+      label: Symmetric mean no outliers
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Boundary/skew/tiny n can harm percentile intervals.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: RESAMPLE_METHOD_CHOICE
+    type: fixed
+    prompt_template: ANOVA and randomization test agree in well-randomized experiment. Strong report?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Report design,summaries,effect,size both methods and note robustness
+    - id: B
+      label: Only smaller p
+    - id: C
+      label: Randomization assumption-free proof
+    - id: D
+      label: Average p-values
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Transparent method agreement is a robustness check.
+    mistake_tags:
+    - concept_error
+    difficulty: hard

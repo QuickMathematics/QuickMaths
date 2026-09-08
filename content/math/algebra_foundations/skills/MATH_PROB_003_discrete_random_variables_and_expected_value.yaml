@@ -1,0 +1,447 @@
+id: MATH_PROB_003
+schema_version: 0.2
+name: Discrete random variables and expected value
+domain: Math
+subdomain: Probability
+topic: Random Variables and Expectation
+description: Validate discrete probability distributions, calculate expected value, compare risk, and analyze fair
+  games.
+prerequisites:
+- MATH_PROB_002
+- MATH_STAT_002
+tags:
+- probability
+- expected_value
+- random_variables
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: A discrete random variable assigns numerical values to countable outcomes. A valid probability distribution
+  has probabilities from 0 to 1 that sum to 1. Expected value is the probability-weighted average E(X)=ΣxP(X=x), interpreted
+  as a long-run average. Distinguish gross payout from net payoff after cost. A fair game has expected net payoff
+  zero. For n Bernoulli trials with success probability p, expected successes=np. Linearity gives E(aX+b)=aE(X)+b.
+  Equal expected values can hide very different variability and risk.
+examples:
+  - prompt: 'X is 0 with probability .25 and 4 with probability .75. Find E(X).'
+    solution: 'X is 0 with probability .25 and 4 with probability .75: E(X)=0(.25)+4(.75)=3.'
+    explanation: 'Expected value is a weighted long-run average.'
+  - prompt: 'X takes values 1,2,3 with probabilities .2,.5,.3. Find its mean and variance.'
+    solution: 'For X=1,2,3 with probabilities .2,.5,.3, E(X)=.2+1+.9=2.1 and Var(X)=E(X^2)-E(X)^2=4.9-4.41=.49.'
+    explanation: 'Variance measures spread around the expected value.'
+applications:
+  - title: 'Expected payoff'
+    description: 'Expected value and variance describe long-run payoff and risk in insurance, finance, and planning.'
+  - title: 'Discrete risk'
+    description: 'Discrete distributions turn possible outcomes into quantitative forecasts.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: PROB_RV_READ_DISTRIBUTION
+    type: fixed
+    prompt_template: A discrete distribution has P(X=2)=0.4. Enter P(X=2).
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0.4'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Read the probability assigned to X=2.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: PROB_RV_EXPECTATION_FROM_GRAPH
+    type: fixed
+    prompt_template: X takes 0,1,2,3 with probabilities .1,.3,.4,.2. Find E(X).
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '1.7'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the calculation and explain the result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 0(.1)+1(.3)+2(.4)+3(.2)=1.7.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_RV_MISSING_PROBABILITY
+    type: generated
+    prompt_template: Probabilities are {a}/10, {b}/10, {c}/10, and q. Find q.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      b:
+        type: int
+        min: 1
+        max: 5
+      c:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      used: a+b+c
+      missing: 10-used
+    answer:
+      type: numeric
+      value: '{missing}/10'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Probabilities sum to 1.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - used<10
+    - missing>=1
+  - id: PROB_RV_VALID_DISTRIBUTION
+    type: fixed
+    prompt_template: Which list can be a complete probability distribution?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: 0.2, 0.3, 0.5
+    - id: B
+      label: -0.1, 0.4, 0.7
+    - id: C
+      label: 0.4,0.4,0.4
+    - id: D
+      label: 0.1,0.2,0.3
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Probabilities must be nonnegative and sum to 1.
+    mistake_tags:
+    - concept_error
+    difficulty: easy
+  - id: PROB_RV_TWO_OUTCOME_EXPECTATION
+    type: generated
+    prompt_template: X={hi} with probability {p}/{d} and X={lo} otherwise. Find E(X).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      hi:
+        type: int
+        min: 3
+        max: 12
+      lo:
+        type: int
+        min: -6
+        max: 2
+      d:
+        type: choice
+        values:
+        - 4
+        - 5
+        - 10
+      p:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      q: d-p
+      weighted: p*hi+q*lo
+    answer:
+      type: numeric
+      value: '{weighted}/{d}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Weight each value by its probability.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - p<d
+    - lo<hi
+  - id: PROB_RV_FAIR_TICKET_PRICE
+    type: generated
+    prompt_template: A ticket pays {prize} with probability 1/{d}, otherwise 0. Find fair price.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      d:
+        type: int
+        min: 2
+        max: 10
+      unit:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      prize: d*unit
+    answer:
+      type: numeric
+      value: '{unit}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Fair price equals expected gross payout.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_RV_EXPECTED_NET_GAIN
+    type: generated
+    prompt_template: A ticket costs {cost}; expected gross payout is {gross}. Find expected net payoff.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      gross:
+        type: int
+        min: 2
+        max: 15
+      cost:
+        type: int
+        min: 1
+        max: 18
+    derived:
+      net: gross-cost
+    answer:
+      type: numeric
+      value: '{net}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Expected net=gross-cost.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - net != 0
+  - id: PROB_RV_FAIR_GAME_GRAPH
+    type: fixed
+    prompt_template: A game has weighted payoff contributions -1.5 and +1.5. Find expected net payoff.
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The contributions sum to zero.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: PROB_RV_EXPECTED_SUCCESS_COUNT
+    type: generated
+    prompt_template: A process repeats {trials} times with success probability {s}/{d}. Find expected successes.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      d:
+        type: choice
+        values:
+        - 2
+        - 4
+        - 5
+        - 10
+      s:
+        type: int
+        min: 1
+        max: 9
+      groups:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      trials: d*groups
+      expected: groups*s
+    answer:
+      type: numeric
+      value: '{expected}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Expected count=np.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+    constraints:
+    - s<d
+  - id: PROB_RV_LINEARITY
+    type: generated
+    prompt_template: E(X)={mean}. Define Y={scale}X+{shift}. Find E(Y).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      mean:
+        type: int
+        min: -8
+        max: 12
+      scale:
+        type: int
+        min: -4
+        max: 4
+        exclude:
+        - 0
+      shift:
+        type: int
+        min: -10
+        max: 10
+    derived:
+      result: scale*mean+shift
+    answer:
+      type: numeric
+      value: '{result}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: E(aX+b)=aE(X)+b.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: PROB_RV_SAME_MEAN_DIFFERENT_RISK
+    type: fixed
+    prompt_template: Game A pays 4 certainly; Game B pays 0 or 8 with equal probability. Which is correct?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: A has larger expected value
+    - id: B
+      label: B has larger expected value
+    - id: C
+      label: Both have expected value 4, but B is more variable
+    - id: D
+      label: Equal expected value means identical risk
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Both means are 4; B has greater spread.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: PROB_RV_LONG_RUN_INTERPRETATION
+    type: fixed
+    prompt_template: A game has expected net payoff 1.7. Interpret it.
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Every play returns 1.7
+    - id: B
+      label: The next play is 1 or 2
+    - id: C
+      label: Across many comparable plays, average net payoff tends toward 1.7
+    - id: D
+      label: Positive expectation prevents losses
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Expected value is a long-run average.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: PROB_RV_BREAK_EVEN_PROBABILITY
+    type: generated
+    prompt_template: A decision gains {gain} with probability p and loses {loss} otherwise. Find break-even p.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      gain:
+        type: int
+        min: 2
+        max: 15
+      loss:
+        type: int
+        min: 1
+        max: 12
+    derived:
+      total: gain+loss
+    answer:
+      type: numeric
+      value: '{loss}/{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Set expected net payoff to zero and solve.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium

@@ -1,6 +1,6 @@
 # Fields and branches
 
-The shipped library contains 107 lessons. Field IDs and lesson IDs are unchanged. `subdomain` stores the broad branch; optional `topic` preserves the previous focused category.
+The shipped library contains 128 lessons. Field IDs and lesson IDs are unchanged. `subdomain` stores the broad branch; optional `topic` preserves the previous focused category.
 
 Canonical maps group lessons inside branch bands within each field. Existing saved coordinates remain in Plan view; **Plan mode → Plan details → Group by field & branch** adopts the canonical positions while retaining notes and paths.
 
@@ -63,6 +63,37 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Logarithms as inverse exponents | Logarithms and Exponential Functions | `MATH_LOG_001` |
 | Logarithm laws and change of base | Logarithms and Exponential Functions | `MATH_LOG_002` |
 | Solving exponential and logarithmic equations | Logarithms and Exponential Functions | `MATH_LOG_003` |
+
+### Statistics (16 lessons)
+
+| Lesson | Topic | Stable lesson ID |
+| --- | --- | --- |
+| Center, spread, and outliers | Descriptive Statistics | `MATH_STAT_001` |
+| Distributions, histograms, and box plots | Data Distributions | `MATH_STAT_002` |
+| Scatter plots, correlation, and residuals | Bivariate Data | `MATH_STAT_003` |
+| Normal distributions and z-scores | Normal Distributions | `MATH_STAT_004` |
+| Sampling distributions and standard error | Sampling Distributions | `MATH_STAT_005` |
+| Confidence intervals and margin of error | Confidence Intervals | `MATH_STAT_006` |
+| Hypothesis tests, p-values, and power | Statistical Significance | `MATH_STAT_007` |
+| Student’s t distributions and one-sample t inference | Student t Inference | `MATH_STAT_008` |
+| Comparing two means and matched pairs | Comparing Means | `MATH_STAT_009` |
+| Inference for one and two population proportions | Proportion Inference | `MATH_STAT_010` |
+| Chi-square goodness-of-fit tests | Chi-Square Inference | `MATH_STAT_011` |
+| Chi-square tests for two-way tables | Chi-Square Inference | `MATH_STAT_012` |
+| Inference for a linear regression slope | Regression Inference | `MATH_STAT_013` |
+| One-way ANOVA and F tests | Analysis of Variance | `MATH_STAT_014` |
+| Multiple linear regression and partial effects | Multiple Regression | `MATH_STAT_015` |
+| Bootstrap and randomization-based inference | Resampling Methods | `MATH_STAT_016` |
+
+### Probability (5 lessons)
+
+| Lesson | Topic | Stable lesson ID |
+| --- | --- | --- |
+| Probability models and sample spaces | Probability Foundations | `MATH_PROB_001` |
+| Compound and conditional probability | Conditional Probability | `MATH_PROB_002` |
+| Discrete random variables and expected value | Random Variables and Expectation | `MATH_PROB_003` |
+| Counting principles, permutations, and combinations | Counting and Combinatorics | `MATH_PROB_004` |
+| Binomial probability distributions | Binomial Models | `MATH_PROB_005` |
 
 ### Geometry (16 lessons)
 

@@ -1,0 +1,476 @@
+id: MATH_STAT_006
+schema_version: 0.2
+name: Confidence intervals and margin of error
+domain: Math
+subdomain: Statistics
+topic: Confidence Intervals
+description: Construct and interpret confidence intervals, margins, conditions and sample-size plans.
+prerequisites:
+- MATH_STAT_005
+tags:
+- statistics
+unlocks:
+- MATH_STAT_007
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: A confidence interval is estimate ± margin of error, with margin=critical value×standard error. A 95% confidence
+  procedure captures the fixed parameter in about 95% of repeated samples under its conditions. Higher confidence
+  widens intervals; larger n narrows them at a square-root rate. Mean intervals with known σ use x-bar±z*σ/sqrt(n).
+  Introductory proportion intervals use p-hat±z*sqrt[p-hat(1-p-hat)/n]. Check randomization, independence/10%, shape
+  or count conditions, and nonsampling bias separately. Sample-size planning solves the margin formula and rounds
+  upward.
+examples:
+  - prompt: 'A sample mean is 50 with known standard error 1.5. Construct a 95% confidence interval.'
+    solution: 'A sample mean 50 with known SE 1.5 gives a 95% interval 50 plus or minus 1.96(1.5)=(47.06,52.94).'
+    explanation: 'The interval is a plausible range for the population mean produced by the procedure.'
+  - prompt: 'How does quadrupling sample size affect a margin of error? Explain why.'
+    solution: 'To cut a margin of error from 4 to 2, quadruple the sample size because margin varies as 1/sqrt(n).'
+    explanation: 'Precision improves through larger samples, while confidence level also changes width.'
+applications:
+  - title: 'Survey confidence intervals'
+    description: 'Confidence intervals communicate plausible ranges for means in surveys, experiments, and quality-control studies.'
+  - title: 'Planning margin of error'
+    description: 'Margin-of-error calculations help choose a sample size for a target level of precision.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: CI_CENTER_FROM_ENDPOINTS
+    type: generated
+    prompt_template: A confidence interval is {low} to {high}. Find point estimate.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      center:
+        type: int
+        min: 20
+        max: 100
+      margin:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      low: center-margin
+      high: center+margin
+    answer:
+      type: numeric
+      value: '{center}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Midpoint is estimate.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CI_MARGIN_FROM_ENDPOINTS
+    type: generated
+    prompt_template: A confidence interval is {low} to {high}. Find margin.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      center:
+        type: int
+        min: 20
+        max: 100
+      margin:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      low: center-margin
+      high: center+margin
+    answer:
+      type: numeric
+      value: '{margin}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Half-width is margin.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CI_MEAN_MARGIN
+    type: generated
+    prompt_template: x-bar={xbar}, sigma={sigma}, n={n}, z*={zstar}. Find margin.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      xbar:
+        type: int
+        min: 20
+        max: 120
+      root:
+        type: choice
+        values:
+        - 2
+        - 4
+        - 5
+        - 10
+      k:
+        type: int
+        min: 1
+        max: 6
+      zstar:
+        type: choice
+        values:
+        - 1.645
+        - 1.96
+        - 2.576
+    derived:
+      n: root**2
+      sigma: root*k
+      se: k
+      margin: round(zstar*se*1000)/1000
+    answer:
+      type: numeric
+      value: '{margin}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.0005
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Margin=z*SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CI_MEAN_UPPER_ENDPOINT
+    type: generated
+    prompt_template: x-bar={xbar}, sigma={sigma}, n={n}, z*={zstar}. Find upper limit.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      xbar:
+        type: int
+        min: 20
+        max: 120
+      root:
+        type: choice
+        values:
+        - 2
+        - 4
+        - 5
+        - 10
+      k:
+        type: int
+        min: 1
+        max: 5
+      zstar:
+        type: choice
+        values:
+        - 1.645
+        - 1.96
+        - 2.576
+    derived:
+      n: root**2
+      sigma: root*k
+      se: k
+      margin: round(zstar*se*1000)/1000
+      upper: round((xbar+margin)*1000)/1000
+    answer:
+      type: numeric
+      value: '{upper}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.0005
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Upper=estimate+margin.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: CI_SAMPLE_SIZE_EFFECT
+    type: fixed
+    prompt_template: With confidence and variability unchanged, quadrupling n does what to margin?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Halves it
+    - id: B
+      label: Quarters it
+    - id: C
+      label: Doubles
+    - id: D
+      label: No change
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Margin scales as 1/sqrt(n).
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CI_CONFIDENCE_LEVEL_WIDTH
+    type: fixed
+    prompt_template: 'Same data/method: which produces widest interval?'
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Raise confidence 90% to99%
+    - id: B
+      label: Lower95 to90
+    - id: C
+      label: Increase n
+    - id: D
+      label: Reduce SE
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Higher confidence uses larger critical value.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CI_REPEATED_SAMPLING_INTERPRETATION
+    type: fixed
+    prompt_template: What does a 95% confidence procedure mean?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: About 95% of intervals from repeated samples capture the fixed parameter
+    - id: B
+      label: Parameter changes between intervals
+    - id: C
+      label: 95% observations lie in each interval
+    - id: D
+      label: Every estimate has 95% chance correct
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Confidence is long-run method performance.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CI_PARAMETER_PROBABILITY_WORDING
+    type: fixed
+    prompt_template: Best wording after computing a frequentist 95% interval?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: We are 95% confident the interval captures the parameter
+    - id: B
+      label: The fixed parameter changes into interval with 95% probability
+    - id: C
+      label: 95% population values lie inside
+    - id: D
+      label: Sample statistic lies inside in 95% future samples
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The interval is one outcome of a long-run calibrated method.
+    mistake_tags:
+    - concept_error
+    difficulty: hard
+  - id: CI_PROPORTION_MARGIN_HALF
+    type: generated
+    prompt_template: Use p-hat=1/2, z*=2, n={n}. Find margin.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 10
+        - 20
+        - 25
+        - 40
+    derived:
+      n: root**2
+    answer:
+      type: numeric
+      value: 1/{root}
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: SE=1/(2root), margin=1/root.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: CI_PROPORTION_CONDITIONS
+    type: fixed
+    prompt_template: SRS n=200 from N=5000, 18 successes. Conditions?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: 10% and large-count checks pass
+    - id: B
+      label: 10% fails
+    - id: C
+      label: Failure count below10
+    - id: D
+      label: No conditions needed
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: n/N=.04; counts18 and182.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: CI_MEAN_SAMPLE_SIZE
+    type: generated
+    prompt_template: z*=2, sigma={sigma}. Smallest n for margin E={E}.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 4
+        - 6
+        - 8
+        - 10
+        - 12
+        - 14
+        - 16
+      E:
+        type: choice
+        values:
+        - 1
+        - 2
+        - 4
+    derived:
+      sigma: root*E/2
+      n: root**2
+    answer:
+      type: numeric
+      value: '{n}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Solve E=2sigma/sqrt(n).
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: CI_PROPORTION_SAMPLE_SIZE
+    type: generated
+    prompt_template: Use p*=1/2, z*=2. Smallest n for margin E={E}.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 10
+        - 20
+        - 25
+        - 40
+    derived:
+      E: 1/root
+      n: root**2
+    answer:
+      type: numeric
+      value: '{n}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: With conservative p=.5, E=1/sqrt(n).
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: CI_CONTEXTUAL_REPORT
+    type: fixed
+    prompt_template: 95% CI for voter support .52 to .58. Best report?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Method estimates support 52%-58% subject to sampling conditions and possible nonsampling bias
+    - id: B
+      label: Exactly95% voters support
+    - id: C
+      label: No uncertainty since endpoints >.5
+    - id: D
+      label: Interval proves no bias
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: CI quantifies sampling uncertainty but does not erase nonsampling bias.
+    mistake_tags:
+    - concept_error
+    difficulty: hard

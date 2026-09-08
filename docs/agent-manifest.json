@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Unified Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 29,
+  "app_version": 30,
   "description": "The single operating guide for routing fresh visitors, tutoring learners, and helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -140,7 +140,9 @@
         "Mathematics": [
           "Arithmetic",
           "Algebra",
-          "Geometry"
+          "Geometry",
+          "Statistics",
+          "Probability"
         ],
         "Geography": [
           "Geographic Methods",
@@ -452,6 +454,7 @@
       ],
       "authoring": "Read get_lesson_authoring_guide section media. Use YAML/JSON folder manifests and relative media paths. Generate Matplotlib PNG/SVG during authoring using savefig or quickmaths build-lesson; importing or viewing lessons never executes plotting Python. Studio can attach small files and import folders. Publish folder attachments before pinning the lesson revision.",
       "storage": "Keep assets metadata and asset_base_url when editing installed hosted packs. Embedded data_base64 travels in backups; hosted bytes remain in the public lesson repository. Media must have descriptive alt text, valid dimensions and verified SHA-256 digests.",
+      "native_assessment_figures": "The native Statistics and Probability assessments include nine embedded SVG figures reused across 18 fixed questions. Rebuild them with scripts/build_statistics_assessment_media.py; fixed diagrams retain the exact values described by their questions.",
       "formats": [
         "png",
         "apng",
@@ -474,7 +477,8 @@
         "flac",
         "opus"
       ],
-      "illustration_library": "All 107 shipped lesson pages have teaching figures. A content-matched library adds 109 hosted Matplotlib SVGs to known lessons without reinstalling packs or rewriting saved work. Native overrides keep their own media. Studio copies include matching assets under normal media limits. Hosted figures load near the viewport and are not guaranteed offline. Spatial tests include 73 trigonometry scenarios and eleven additional triangle-area scenarios, derived only from displayed givens; six abstract identity scenarios remain text-only."
-    }
+      "illustration_library": "All 128 shipped lesson pages have teaching figures. A content-matched library adds 130 hosted Matplotlib SVGs across 118 library lessons without reinstalling packs or rewriting saved work. Native overrides keep their own media. Studio copies include matching assets under normal media limits. Hosted figures load near the viewport and are not guaranteed offline. Spatial tests include 73 trigonometry scenarios and eleven additional triangle-area scenarios, derived only from displayed givens; six abstract identity scenarios remain text-only."
+    },
+    "native_authoring_function_allowlist": "Trusted native authoring may use normal_cdf(z), inverse_normal_cdf(p), t_cdf(t, df), chi_square_cdf(x, df), chi_square_sf(x, df), and f_sf(x, df1, df2), with finite/domain-checked inputs. These helpers are first-party native functions only; uploaded, Depot, and community lesson packages remain fixed data and cannot execute generator or helper code."
   }
 }

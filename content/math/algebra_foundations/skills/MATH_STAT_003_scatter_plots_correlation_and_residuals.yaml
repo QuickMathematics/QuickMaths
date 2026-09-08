@@ -1,0 +1,607 @@
+id: MATH_STAT_003
+schema_version: 0.2
+name: Scatter plots, correlation, and residuals
+domain: Math
+subdomain: Statistics
+topic: Bivariate Data
+description: Describe bivariate association, use fitted lines, calculate and interpret residuals, and distinguish
+  correlation from causation.
+prerequisites:
+- MATH_STAT_002
+- MATH_GRAPH_003
+- MATH_GRAPH_006
+tags:
+- statistics
+- scatter_plots
+- correlation
+- regression
+- line_of_best_fit
+- residuals
+- interpolation
+- extrapolation
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Bivariate data record two variables for each observational unit. Describe association by direction, form,
+  strength, and unusual features. Correlation r measures linear association from -1 to 1; r near zero can coexist
+  with strong nonlinear association. Correlation does not prove causation. A fitted line y_hat=mx+b predicts the
+  response; interpolation stays within the observed range and extrapolation extends outside it. Residual=observed-predicted.
+  Random residual scatter supports a linear form; curvature signals missing structure. High-leverage points can
+  be influential and should be investigated rather than automatically deleted.
+examples:
+- prompt: Describe the left scatter plot.
+  solution: Strong positive linear association
+  explanation: The points rise and stay close to a line.
+- prompt: Use y_hat=3x+4 at x=6.
+  solution: '22'
+  explanation: 3(6)+4=22.
+- prompt: Observed=25, predicted=22. Residual?
+  solution: '3'
+  explanation: 25-22=3.
+applications:
+- title: Forecasting
+  description: Fitted lines support transparent predictions within a measured range.
+- title: Scientific modeling
+  description: Residual plots reveal patterns a model fails to explain.
+- title: Data ethics
+  description: Separating association from causal claims prevents misleading conclusions.
+test:
+  question_count: 16
+  randomize_order: true
+  questions:
+  - id: STAT_SCATTER_LINEAR_ASSOCIATION_001
+    type: fixed
+    prompt: Describe the association in the left scatter plot.
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Strong positive linear
+    - id: B
+      label: Strong negative linear
+    - id: C
+      label: Weak positive nonlinear
+    - id: D
+      label: No association
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The points rise from left to right and stay close to a straight line.
+    mistake_tags:
+    - scatterplot_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/scatter-patterns.svg
+      alt: Two scatter plots. The left plot has points tightly clustered around an upward straight line. The right
+        plot has points tightly clustered around a U-shaped curve.
+      caption: The paired plots show different point patterns, including upward and curved arrangements.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_SCATTER_NONLINEAR_ASSOCIATION_001
+    type: fixed
+    prompt: What does the right scatter plot demonstrate about correlation?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Every strong association has correlation near 1
+    - id: B
+      label: A curved pattern always has negative correlation
+    - id: C
+      label: Correlation near zero can hide a strong nonlinear relationship
+    - id: D
+      label: Correlation proves causation
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Correlation near zero can hide a strong nonlinear relationship.
+    mistake_tags:
+    - correlation_error
+    difficulty: medium
+    media:
+    - type: image
+      src: media/statistics/scatter-patterns.svg
+      alt: Two scatter plots. The left plot has points tightly clustered around an upward straight line. The right
+        plot has points tightly clustered around a U-shaped curve.
+      caption: The paired plots show different point patterns, including upward and curved arrangements.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_SCATTER_MODEL_CHOICE_001
+    type: fixed
+    prompt: For which displayed dataset is a straight-line model more appropriate?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: The left plot only
+    - id: B
+      label: The right plot only
+    - id: C
+      label: Both equally
+    - id: D
+      label: Neither
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The left plot is approximately linear.
+    mistake_tags:
+    - model_choice_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/scatter-patterns.svg
+      alt: Two scatter plots. The left plot has points tightly clustered around an upward straight line. The right
+        plot has points tightly clustered around a U-shaped curve.
+      caption: The paired plots show different point patterns, including upward and curved arrangements.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_SCATTER_INFLUENTIAL_POINT_001
+    type: fixed
+    prompt: Why is the diamond-shaped point in the displayed scatter plot influential?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: It has the smallest residual
+    - id: B
+      label: It lies at mean x
+    - id: C
+      label: It makes the sample larger by one
+    - id: D
+      label: It is far in x and changes the fitted line substantially
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: It is far in x and changes the fitted line substantially.
+    mistake_tags:
+    - influential_point_error
+    difficulty: medium
+    media:
+    - type: image
+      src: media/statistics/scatter-influential.svg
+      alt: A scatter plot with seven points following a steep positive line and one diamond-shaped point far to
+        the right and low. A dashed fitted line using all points is much flatter than the line fitted to the main
+        cluster.
+      caption: The scatter plot includes a diamond-shaped point separated horizontally from the other points.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_SCATTER_REMOVE_INFLUENTIAL_001
+    type: fixed
+    prompt: According to the displayed fitted lines, what happens to the slope when the influential point is removed?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: The slope becomes more negative
+    - id: B
+      label: The slope increases
+    - id: C
+      label: The slope becomes exactly zero
+    - id: D
+      label: The slope is unchanged
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The slope increases.
+    mistake_tags:
+    - slope_comparison_error
+    difficulty: medium
+    media:
+    - type: image
+      src: media/statistics/scatter-influential.svg
+      alt: A scatter plot with seven points following a steep positive line and one diamond-shaped point far to
+        the right and low. A dashed fitted line using all points is much flatter than the line fitted to the main
+        cluster.
+      caption: The scatter plot includes a diamond-shaped point separated horizontally from the other points.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_REGRESSION_PREDICTION_001
+    type: generated
+    prompt_template: A fitted line is y_hat = {m}x + {b}. Predict y when x = {x}.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      m:
+        type: int
+        min: -6
+        max: 8
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -15
+        max: 20
+      x:
+        type: int
+        min: -5
+        max: 12
+    derived:
+      prediction: m * x + b
+    answer:
+      type: numeric
+      value: '{prediction}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: 'Substitute x={x}: prediction={prediction}.'
+    mistake_tags:
+    - prediction_error
+    difficulty: easy
+  - id: STAT_REGRESSION_RESIDUAL_001
+    type: generated
+    prompt_template: A model predicts {predicted}, but the observed value is {observed}. Find the residual using
+      observed - predicted.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      predicted:
+        type: int
+        min: 10
+        max: 80
+      residual:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+    derived:
+      observed: predicted + residual
+    answer:
+      type: numeric
+      value: '{residual}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: Residual={observed}-{predicted}={residual}.
+    mistake_tags:
+    - residual_error
+    difficulty: easy
+  - id: STAT_REGRESSION_OBSERVED_FROM_RESIDUAL_001
+    type: generated
+    prompt_template: A fitted model predicts {predicted}. The residual is {residual}. What was the observed value?
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      predicted:
+        type: int
+        min: 10
+        max: 80
+      residual:
+        type: int
+        min: -12
+        max: 12
+        exclude:
+        - 0
+    derived:
+      observed: predicted + residual
+    answer:
+      type: numeric
+      value: '{observed}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Show an equivalent numerical expression on each line, ending with the final value.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+    explanation_template: Observed=predicted+residual={observed}.
+    mistake_tags:
+    - residual_error
+    difficulty: medium
+  - id: STAT_REGRESSION_SLOPE_INTERPRETATION_VALUE_001
+    type: generated
+    prompt_template: 'A fitted line predicts cost in dollars from number of items: cost_hat={rate}x+{start}. By
+      how many dollars does predicted cost change per additional item?'
+    answer_mode: final_only
+    max_attempts: 200
+    variables:
+      rate:
+        type: int
+        min: 2
+        max: 25
+      start:
+        type: int
+        min: 5
+        max: 40
+    answer:
+      type: numeric
+      value: '{rate}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: 'The x coefficient is the slope: {rate}.'
+    mistake_tags:
+    - slope_interpretation_error
+    difficulty: easy
+  - id: STAT_REGRESSION_TWO_POINT_PREDICTION_001
+    type: generated
+    prompt_template: A line of best fit passes through ({x1}, {y1}) and ({x2}, {y2}). Predict y at x={target_x}.
+    answer_mode: final_plus_required_work
+    max_attempts: 200
+    variables:
+      x1:
+        type: int
+        min: 0
+        max: 5
+      run:
+        type: int
+        min: 2
+        max: 5
+      m:
+        type: int
+        min: -4
+        max: 7
+        exclude:
+        - 0
+      y1:
+        type: int
+        min: 5
+        max: 30
+      steps:
+        type: int
+        min: 1
+        max: 3
+    derived:
+      x2: x1 + run
+      y2: y1 + m * run
+      target_x: x2 + steps
+      prediction: y2 + m * steps
+    answer:
+      type: numeric
+      value: '{prediction}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Find the slope from the two points, then explain how you extend the fitted line to the target x-value.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Slope={m}; extend {steps} x-units, so prediction={prediction}.
+    mistake_tags:
+    - slope_error
+    - prediction_error
+    difficulty: hard
+  - id: STAT_RESIDUAL_RANDOM_PATTERN_001
+    type: fixed
+    prompt: What does the left residual plot suggest?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: A linear model is plausible
+    - id: B
+      label: The response must be exponential
+    - id: C
+      label: Every prediction is exact
+    - id: D
+      label: The variables have no association
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Random residual scatter makes a linear model plausible.
+    mistake_tags:
+    - residual_plot_error
+    difficulty: easy
+    media:
+    - type: image
+      src: media/statistics/residual-diagnostics.svg
+      alt: 'Two residual plots. The left residuals are randomly scattered above and below zero. The right residuals
+        form a U-shaped pattern: positive at both ends and negative in the middle.'
+      caption: The paired residual plots show one random-looking arrangement and one patterned arrangement.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_RESIDUAL_CURVED_PATTERN_001
+    type: fixed
+    prompt: What does the right residual plot suggest?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: The fitted line is perfect
+    - id: B
+      label: The residuals are random
+    - id: C
+      label: The linear model misses a curved relationship
+    - id: D
+      label: The sample standard deviation is zero
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: The curved residual pattern means a linear model misses structure.
+    mistake_tags:
+    - residual_plot_error
+    difficulty: medium
+    media:
+    - type: image
+      src: media/statistics/residual-diagnostics.svg
+      alt: 'Two residual plots. The left residuals are randomly scattered above and below zero. The right residuals
+        form a U-shaped pattern: positive at both ends and negative in the middle.'
+      caption: The paired residual plots show one random-looking arrangement and one patterned arrangement.
+      width: 720
+      height: 480
+      fit: contain
+  - id: STAT_RESIDUAL_SIGN_INTERPRETATION_001
+    type: fixed
+    prompt: A residual is positive. What does that mean?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Observed is below predicted
+    - id: B
+      label: Observed is above predicted
+    - id: C
+      label: Observed equals predicted
+    - id: D
+      label: The slope must be positive
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Observed is above predicted.
+    mistake_tags:
+    - residual_sign_error
+    difficulty: easy
+  - id: STAT_INTERPOLATION_EXTRAPOLATION_001
+    type: fixed
+    prompt: A fitted model was based on x-values from 10 through 40. Predicting at x=55 is an example of what?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Interpolation
+    - id: B
+      label: Randomization
+    - id: C
+      label: Replication
+    - id: D
+      label: Extrapolation
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: This is extrapolation beyond the observed range.
+    mistake_tags:
+    - extrapolation_error
+    difficulty: easy
+  - id: STAT_CORRELATION_CAUSATION_001
+    type: fixed
+    prompt: A strong positive correlation is observed in an observational study. Which conclusion is justified?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: The first variable definitely causes the second
+    - id: B
+      label: The second definitely causes the first
+    - id: C
+      label: The variables are associated, but causation is not established
+    - id: D
+      label: Correlation must be exactly 1
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Association is observed but causation is not established.
+    mistake_tags:
+    - causation_error
+    difficulty: medium
+  - id: STAT_CORRELATION_STRENGTH_VS_SLOPE_001
+    type: fixed
+    prompt: Two scatter plots can have fitted lines with the same slope but different correlations. Why?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Correlation also depends on how tightly points cluster around a line
+    - id: B
+      label: Correlation is always equal to slope
+    - id: C
+      label: Equal slopes force identical datasets
+    - id: D
+      label: Correlation depends only on y-intercept
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    explanation_template: Correlation also depends on how tightly points cluster around a line.
+    mistake_tags:
+    - correlation_slope_confusion
+    difficulty: hard

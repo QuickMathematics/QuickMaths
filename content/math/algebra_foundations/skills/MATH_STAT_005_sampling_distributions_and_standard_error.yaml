@@ -1,0 +1,464 @@
+id: MATH_STAT_005
+schema_version: 0.2
+name: Sampling distributions and standard error
+domain: Math
+subdomain: Statistics
+topic: Sampling Distributions
+description: Distinguish parameters/statistics, model sampling variability, calculate standard errors and apply CLT
+  conditions.
+prerequisites:
+- MATH_STAT_004
+- MATH_PROB_005
+tags:
+- statistics
+unlocks:
+- MATH_STAT_006
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: Inference starts from sampling variability. A population parameter is fixed but unknown; a sample statistic
+  varies across random samples. Sampling distributions describe this variation. E(x-bar)=μ and E(p-hat)=p. SE(x-bar)=σ/sqrt(n),
+  SE(p-hat)=sqrt[p(1-p)/n]. Quadrupling n halves SE. Check randomization, independence/10% condition, and normal/large-count
+  conditions. The Central Limit Theorem makes the distribution of sample means more nearly normal as n grows. Large
+  n reduces random variation but does not repair selection or measurement bias.
+examples:
+  - prompt: 'A population has SD 12 and samples have size 36. Find the standard error of the sample mean.'
+    solution: 'If population SD is 12 and n=36, SE(x-bar)=12/sqrt(36)=2.'
+    explanation: 'The sampling mean varies less than individual observations.'
+  - prompt: 'Assume a normal population has mean 50 and SD 10. Describe the center and approximate 95% spread of means for n=25.'
+    solution: 'The sampling mean is 50 and SE=10/sqrt(25)=2; about 95% of means lie within 50±2(2), or (46,54).'
+    explanation: 'Center stays at the population mean while standard error controls spread.'
+applications:
+  - title: 'Polling precision'
+    description: 'Sampling distributions and standard errors quantify how poll estimates vary from sample to sample.'
+  - title: 'Sample-size planning'
+    description: 'Use sample-size planning to make estimates precise while distinguishing population spread from sampling spread.'
+test:
+  question_count: 13
+  randomize_order: true
+  questions:
+  - id: SAMPLING_PARAMETER_STATISTIC
+    type: fixed
+    prompt_template: A sample proportion is .57 while p denotes the true population proportion. Which is correct?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: p is a parameter and .57 a statistic
+    - id: B
+      label: Both parameters
+    - id: C
+      label: .57 parameter p statistic
+    - id: D
+      label: Neither
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Parameters describe populations; statistics summarize samples.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: SAMPLING_DISTRIBUTION_DEFINITION
+    type: fixed
+    prompt_template: What is a sampling distribution?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Values in one sample
+    - id: B
+      label: Distribution of a statistic over repeated samples of the same size
+    - id: C
+      label: A population category graph
+    - id: D
+      label: A formula list
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: It describes sample-to-sample variation.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: SAMPLING_MEAN_CENTER
+    type: generated
+    prompt_template: Population mean is {mu}. What is E(x-bar)?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      mu:
+        type: int
+        min: -30
+        max: 120
+      n:
+        type: choice
+        values:
+        - 4
+        - 9
+        - 16
+        - 25
+        - 36
+        - 49
+        - 64
+        - 100
+    derived: {}
+    answer:
+      type: numeric
+      value: '{mu}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Sample mean is unbiased.
+    mistake_tags:
+    - calculation_error
+    difficulty: easy
+  - id: SAMPLING_MEAN_STANDARD_ERROR
+    type: generated
+    prompt_template: Population SD={sigma}, n={n}. Find SE(x-bar).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 8
+        - 10
+      k:
+        type: int
+        min: 1
+        max: 7
+    derived:
+      n: root**2
+      sigma: root*k
+      se: k
+    answer:
+      type: numeric
+      value: '{se}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: SE=sigma/sqrt(n).
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: SAMPLING_MEAN_Z_SCORE
+    type: generated
+    prompt_template: Population mean={mu}, SD={sigma}, n={n}, sample mean={xbar}. Find standardized z.
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      mu:
+        type: int
+        min: -20
+        max: 100
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 8
+        - 10
+      k:
+        type: int
+        min: 1
+        max: 6
+      z:
+        type: choice
+        values:
+        - -3
+        - -2
+        - -1
+        - 1
+        - 2
+        - 3
+    derived:
+      n: root**2
+      sigma: root*k
+      se: k
+      xbar: mu+z*se
+    answer:
+      type: numeric
+      value: '{z}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Standardize using sampling SE.
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: SAMPLING_SE_SAMPLE_SIZE_FACTOR
+    type: generated
+    prompt_template: Sample size is multiplied by {mult}. By what factor is SE divided?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 2
+        - 3
+        - 4
+        - 5
+    derived:
+      mult: root**2
+    answer:
+      type: numeric
+      value: '{root}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: SE scales with 1/sqrt(n).
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: SAMPLING_PROPORTION_CENTER
+    type: generated
+    prompt_template: Population proportion p={p}/10. Find mean of p-hat.
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      p:
+        type: int
+        min: 1
+        max: 9
+    derived: {}
+    answer:
+      type: numeric
+      value: '{p}/10'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Sample proportion is unbiased.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: SAMPLING_PROPORTION_SE_HALF
+    type: generated
+    prompt_template: p=1/2 and n={n}. Find SE(p-hat).
+    answer_mode: final_plus_required_work
+    max_attempts: 300
+    variables:
+      root:
+        type: choice
+        values:
+        - 10
+        - 12
+        - 16
+        - 20
+        - 24
+        - 30
+    derived:
+      n: root**2
+      den: 2*root
+    answer:
+      type: numeric
+      value: 1/{den}
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: Show the formula, substitution, and result.
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: SE=sqrt[p(1-p)/n].
+    mistake_tags:
+    - calculation_error
+    difficulty: hard
+  - id: SAMPLING_LARGE_COUNTS
+    type: fixed
+    prompt_template: For n=100 p=.12, which is true?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: np=12 and n(1-p)=88; both at least 10
+    - id: B
+      label: Only np passes
+    - id: C
+      label: Only failures pass
+    - id: D
+      label: Neither
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Expected success and failure counts are both large.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: SAMPLING_TEN_PERCENT_CONDITION
+    type: generated
+    prompt_template: Population size {N}. Largest sample allowed by 10% condition?
+    answer_mode: final_only
+    max_attempts: 300
+    variables:
+      N:
+        type: choice
+        values:
+        - 500
+        - 800
+        - 1200
+        - 2000
+        - 5000
+        - 8000
+    derived:
+      n: N//10
+    answer:
+      type: numeric
+      value: '{n}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use n≤.10N.
+    mistake_tags:
+    - calculation_error
+    difficulty: medium
+  - id: SAMPLING_CENTRAL_LIMIT_THEOREM
+    type: fixed
+    prompt_template: A population is strongly right-skewed. As n grows, what happens to distribution of x-bar?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: More nearly normal, centered at μ
+    - id: B
+      label: More skewed
+    - id: C
+      label: Center moves to 0
+    - id: D
+      label: SE grows with n
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: CLT concerns sample means.
+    mistake_tags:
+    - concept_error
+    difficulty: medium
+  - id: SAMPLING_BIAS_VARIABILITY
+    type: fixed
+    prompt_template: Estimator A centered at truth but wide; B tight but above truth.
+    answer_mode: final_only
+    options:
+    - id: A
+      label: A unbiased/high variability; B biased/low variability
+    - id: B
+      label: Opposite
+    - id: C
+      label: Both unbiased
+    - id: D
+      label: Bias=variability
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Bias is center; variability is spread.
+    mistake_tags:
+    - concept_error
+    difficulty: hard
+  - id: SAMPLING_THREE_DISTRIBUTIONS
+    type: fixed
+    prompt_template: Correct distinction?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Data distribution has individual observations; sampling distribution has statistic values from repeated
+        samples
+    - id: B
+      label: Must same size
+    - id: C
+      label: Sampling distribution is one sample
+    - id: D
+      label: Data cannot be graphed
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: They contain different observational units.
+    mistake_tags:
+    - concept_error
+    difficulty: medium

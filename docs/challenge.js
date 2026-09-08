@@ -1,16 +1,16 @@
 import { parseLessonManifest, readLessonFolder } from "./lesson-folder.js?v=20260906-media-v1";
 import { renderQuestionDiagram } from "./question-diagrams.js?v=20260906-illustrations-v1";
 import { renderLessonMedia } from "./lesson-media.js?v=20260906-media-v1";
-import { lessonIllustrations, illustrationAssets } from "./lesson-illustrations.js?v=20260906-illustrations-v1";
+import { lessonIllustrations, illustrationAssets } from "./lesson-illustrations.js?v=20260908-statistics-v1";
 import { createLessonMediaRenderer } from "./lesson-media-renderer.js?v=20260906-media-v1";
-import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260906-lesson-batches-v1";
-import { learningFields, branchName } from "./learning-fields.js?v=20260906-lesson-batches-v1";
+import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260908-statistics-v1";
+import { learningFields, branchName } from "./learning-fields.js?v=20260908-statistics-v1";
 import { storageStatus } from "./storage-status.js?v=20260906-optimization-v1";
 import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-optimization-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260906-lesson-batches-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260906-lesson-batches-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260906-illustrations-v1";
+import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260908-statistics-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260908-statistics-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260908-statistics-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -3467,7 +3467,7 @@ function initClock() {
 async function loadAgentGuides() {
   const read = async (path, type, fallback) => {
     try {
-      const response = await fetch(`./${path}?v=20260906-illustrations-v1`);
+      const response = await fetch(`./${path}?v=20260908-statistics-v1`);
       return response.ok ? await response[type]() : fallback;
     } catch { return fallback; }
   };
@@ -3508,7 +3508,7 @@ async function boot() {
   const communityConfigPromise = fetch("./github-community-config.json", { cache: "no-store" })
     .then(response => response.ok ? response.json() : { enabled: false })
     .catch(() => ({ enabled: false }));
-  const response = await fetch("./curriculum-data.json?v=20260906-lesson-batches-v1");
+  const response = await fetch("./curriculum-data.json?v=20260908-statistics-v1");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];

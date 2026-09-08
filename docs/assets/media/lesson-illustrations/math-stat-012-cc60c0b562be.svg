@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="619.2pt" height="460.8pt" viewBox="0 0 619.2 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>QuickMaths</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8
+L 619.2 460.8
+L 619.2 0
+L 0 0
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 177.0912 243.236571
+L 285.01776 243.236571
+L 285.01776 174.116571
+L 177.0912 174.116571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 290.15712 243.236571
+L 398.08368 243.236571
+L 398.08368 174.116571
+L 290.15712 174.116571
+z
+" clip-path="url(#p576bd2a587)" style="fill: #eedcb9; stroke: #153f36; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 177.0912 317.293714
+L 285.01776 317.293714
+L 285.01776 248.173714
+L 177.0912 248.173714
+z
+" clip-path="url(#p576bd2a587)" style="fill: #eedcb9; stroke: #153f36; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 290.15712 317.293714
+L 398.08368 317.293714
+L 398.08368 248.173714
+L 290.15712 248.173714
+z
+" clip-path="url(#p576bd2a587)" style="fill: #d8ebe3; stroke: #153f36; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(101.6595 63.621696)">A two-way table compares conditional</text>
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; fill: #153f36" transform="translate(262.517625 90.496446)">proportions</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="231.05448" y="215.299071" transform="rotate(-0 231.05448 215.299071)">18</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="344.1204" y="215.299071" transform="rotate(-0 344.1204 215.299071)">12</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="231.05448" y="289.356214" transform="rotate(-0 231.05448 289.356214)">9</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="344.1204" y="289.356214" transform="rotate(-0 344.1204 289.356214)">21</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="119.561795" transform="rotate(-0 331.272 119.561795)">outcome 1     outcome 2</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="125.6976" y="213.091571" transform="rotate(-0 125.6976 213.091571)">group A</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="125.6976" y="287.148714" transform="rotate(-0 125.6976 287.148714)">group B</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #153f36" x="331.272" y="351.883446" transform="rotate(-0 331.272 351.883446)">within-row percentages: 60% vs 30%</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p576bd2a587">
+   <rect x="74.304" y="50.688" width="513.936" height="345.6"/>
+  </clipPath>
+ </defs>
+</svg>

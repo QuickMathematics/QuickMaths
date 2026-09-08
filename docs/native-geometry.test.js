@@ -25,7 +25,7 @@ test("all native Geometry illustrations load offline from verified, reproducible
       usedPaths.add(item.src);
     }
   }
-  assert.deepEqual([...usedPaths].sort(), curriculum.assets.map(asset => asset.path).sort());
+  assert.deepEqual([...usedPaths].sort(), curriculum.assets.filter(asset => !asset.path.startsWith("media/statistics/")).map(asset => asset.path).sort());
   assert.ok(curriculum.assets.reduce((sum, asset) => sum + asset.bytes, 0) < 1_000_000);
   for (const asset of curriculum.assets) {
     const bytes = await loadLessonAsset(asset, "", { fetchImpl() { throw new Error("Native media must work offline"); } });

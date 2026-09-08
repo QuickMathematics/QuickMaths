@@ -1,10 +1,11 @@
 id: TRACK_MATH_ALGEBRA_FOUNDATIONS
 schema_version: 0.2
-name: Algebra Foundations
+name: Algebra, Statistics, and Probability Foundations
 domain: Math
 description: A rigorous path through arithmetic, pre-algebra, functions, exponents, sequences, polynomials, radicals, rational
   expressions and equations, rational functions and inequalities, interval notation, polynomial inequalities, quadratics,
-  coordinate graphing, triangle area and measurement, linear equations, systems, logarithms, and trigonometry.
+  coordinate graphing, triangle area and measurement, linear equations, systems, logarithms, trigonometry, descriptive and
+  inferential statistics, and probability.
 entry_skills:
 - MATH_ARITH_001
 exit_skills:
@@ -18,6 +19,8 @@ exit_skills:
 - MATH_LOG_003
 - MATH_TRIG_005
 - MATH_TRIG_006
+- MATH_STAT_016
+- MATH_PROB_005
 skills:
 - MATH_ARITH_001
 - MATH_ARITH_002
@@ -79,3 +82,24 @@ skills:
 - MATH_TRIG_004
 - MATH_TRIG_005
 - MATH_TRIG_006
+- MATH_STAT_001
+- MATH_STAT_002
+- MATH_STAT_003
+- MATH_STAT_004
+- MATH_STAT_005
+- MATH_STAT_006
+- MATH_STAT_007
+- MATH_STAT_008
+- MATH_STAT_009
+- MATH_STAT_010
+- MATH_STAT_011
+- MATH_STAT_012
+- MATH_STAT_013
+- MATH_STAT_014
+- MATH_STAT_015
+- MATH_STAT_016
+- MATH_PROB_001
+- MATH_PROB_002
+- MATH_PROB_003
+- MATH_PROB_004
+- MATH_PROB_005
