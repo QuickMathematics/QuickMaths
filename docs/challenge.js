@@ -7,9 +7,9 @@ import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260908-st
 import { buildGroupedMasteryMap, COLLAPSED_NODE_HEIGHT, COLLAPSED_NODE_WIDTH } from "./map-groups.js?v=20260908-branches-v1";
 import { learningFields, branchName } from "./learning-fields.js?v=20260908-statistics-v1";
 import { storageStatus } from "./storage-status.js?v=20260906-optimization-v1";
-import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260906-optimization-v1";
+import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260908-profile-sync-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260908-branches-v1";
+import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260908-profile-sync-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260908-statistics-v1";
 import { createLessonStudio } from "./lesson-creator.js?v=20260908-statistics-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
@@ -26,7 +26,7 @@ import {
   createGitHubCredentialStore,
   createGitHubSyncController,
   learnerBridgeStartupAction,
-} from "./github-sync.js?v=20260906-media-v1";
+} from "./github-sync.js?v=20260908-profile-sync-v1";
 import {
   createGitHubCommunityClient,
   createGitHubCommunityCredentialStore,
@@ -272,7 +272,7 @@ function setBridgeSourceChoice(_remote, kind = "learner", { recover = false } = 
   bridgeNeedsChoice = true;
   // Open before any reads or automatic history merge. Failures and retries stay
   // in this same window; closing it leaves Compare versions available.
-  const automatic = githubSync.snapshot().config?.mergeMode === "agent-priority";
+  const automatic = (store.snapshot().preferences?.storageMergePolicy ?? githubSync.snapshot().config?.mergeMode) === "agent-priority";
   if (!automatic) openBridgeSourceChoice({ force: true }).showLoading();
   const renderBridge = () => { if (store.snapshot().ui.route === "settings") renderSettings(store.snapshot()); };
   renderBridge();
@@ -289,7 +289,7 @@ function setBridgeSourceChoice(_remote, kind = "learner", { recover = false } = 
       }
     }
     review ??= await (automatic ? githubSync.mergeAutomatically({ channel: bridgeReviewChannel }) : githubSync.prepareMerge({ channel: bridgeReviewChannel }));
-    if (!review.resolved && !automatic && githubSync.snapshot().config?.mergeMode === "agent-priority") review = await githubSync.mergeAutomatically({ channel: review.channel });
+    if (!review.resolved && !automatic && (store.snapshot().preferences?.storageMergePolicy ?? githubSync.snapshot().config?.mergeMode) === "agent-priority") review = await githubSync.mergeAutomatically({ channel: review.channel });
     if (!githubSync.snapshot().connected) return;
     if (review.resolved) {
       bridgeNeedsChoice = false;
@@ -1808,7 +1808,7 @@ function bridgePhaseLabel(status) {
 function renderGlobalStorageStatus() {
   const button = document.querySelector("#global-storage-status");
   if (!button) return;
-  const display = storageStatus(githubSyncSnapshot, { needsReview: bridgeNeedsChoice && (!bridgeReviewPromise || githubSyncSnapshot.config?.mergeMode !== "agent-priority") });
+  const display = storageStatus(githubSyncSnapshot, { needsReview: bridgeNeedsChoice && (!bridgeReviewPromise || (store.snapshot().preferences?.storageMergePolicy ?? githubSyncSnapshot.config?.mergeMode) !== "agent-priority") });
   button.dataset.tone = display.tone;
   button.title = display.title;
   button.setAttribute("aria-label", `${display.label}. ${display.age}. Open storage settings`);
@@ -1817,11 +1817,11 @@ function renderGlobalStorageStatus() {
 }
 
 function renderStorageMergeSetting() {
-  const mode = githubSyncSnapshot.config?.mergeMode ?? "manual";
+  const mode = store?.snapshot?.().preferences?.storageMergePolicy ?? githubSyncSnapshot.config?.mergeMode ?? "manual";
   return `<fieldset class="storage-merge-setting"><legend>Storage management</legend><p>Choose how changes from this device, other devices and your agent are combined.</p>
     <label><input type="radio" name="storage-merge-mode" value="manual" ${mode === "manual" ? "checked" : ""}><span><strong>Manually review storage merges</strong><small>Review detected changes and choose what to keep. Independent changes start checked.</small></span></label>
-    <label><input type="radio" name="storage-merge-mode" value="agent-priority" ${mode === "agent-priority" ? "checked" : ""}><span><strong>Automatically merge · agent priority</strong><small>Keep independent changes from both copies. Agent edits win only where the same content conflicts. Between devices, this device wins conflicts. If a starting version or required related work is missing, review the comparison.</small></span></label>
-    <p class="bridge-form-note">This setting belongs to this device and connection. It does not change lesson-installation approval.</p></fieldset>`;
+    <label><input type="radio" name="storage-merge-mode" value="agent-priority" ${mode === "agent-priority" ? "checked" : ""}><span><strong>Automatically merge · agent priority</strong><small>Keep independent changes from both copies. Agent edits win only where the same content conflicts. Conflicts between learner devices still require review. If a starting version or required related work is missing, review the comparison.</small></span></label>
+    <p class="bridge-form-note">This workspace policy syncs with the checkpoint. Older workspaces fall back to this device’s setting.</p></fieldset>`;
 }
 
 function bridgeFormValues() {
@@ -2015,7 +2015,7 @@ function renderSettings(snapshot) {
       ${renderStagedLessonReview(snapshot)}
       <div class="lesson-pack-guide"><div><strong>Two ways to build</strong><p>Use Lesson Studio to create a lesson pack or open a native lesson as an editable copy—or give the machine-readable guide to an agent. Educator profiles assemble installed packs into portable curricula.</p></div><button class="button button-primary" data-route="creator">Open Lesson Studio</button><a class="button button-outline" href="./CUSTOM_LESSON_SETS.md" target="_blank" rel="noopener">Agent Lesson Authoring Guide</a></div>
       <div class="installed-packs">
-        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.mode === "override" ? `Native improvement · ${pack.overridesNativeSkills.map((id) => escapeHtml(id)).join(", ")} · completed progress preserved` : `${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"}`} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button>${pack.mode === "override" ? `<button class="quiet-button danger-link" data-action="restore-native-lessons" data-pack-id="${escapeHtml(pack.id)}">Restore original</button>` : ""}</div></article>`).join("") : `<div class="empty-state">No lesson sets or improvements installed. Mathematics remains the native curriculum; install Geography and other fields from the Lesson Depot.</div>`}
+        ${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : escapeHtml(snapshot.subjects.find((subject) => subject.id === pack.subjectId)?.icon ?? "＋")}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${pack.mode === "override" ? `Native improvement · ${pack.overridesNativeSkills.map((id) => escapeHtml(id)).join(", ")} · completed progress preserved` : `${escapeHtml(pack.subjectName)} · ${pack.skillCount} lesson${pack.skillCount === 1 ? "" : "s"}`} · ${pack.problemCount} questions · ${escapeHtml(pack.author)} · v${escapeHtml(pack.version)}</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button>${pack.mode === "override" ? `<button class="quiet-button danger-link" data-action="restore-native-lessons" data-pack-id="${escapeHtml(pack.id)}">Restore original</button>` : snapshot.activeCurriculum ? "" : `<button class="quiet-button" data-action="toggle-profile-pack" data-pack-id="${escapeHtml(pack.id)}" data-enabled="${pack.enabledForProfile}">${pack.enabledForProfile ? "Disable for this profile" : "Enable for this profile"}</button>`}</div></article>`).join("") : `<div class="empty-state">No lesson sets or improvements installed. Mathematics remains the native curriculum; install Geography and other fields from the Lesson Depot.</div>`}
       </div>
       <p class="pack-security-note"><strong>Teacher-file warning:</strong> lesson-set JSON contains answer keys and solutions. Don’t paste the raw file into a learner tutoring conversation.</p>
     </section>
@@ -3075,6 +3075,13 @@ document.addEventListener("click", async (event) => {
     }
   }
   if (action.dataset.action === "discard-staged-pack") store.discardStagedLessonPack();
+  if (action.dataset.action === "toggle-profile-pack") {
+    try {
+      const result = store.setProfilePackEnabled(action.dataset.packId, action.dataset.enabled !== "true");
+      showToast(`${result.enabled ? "Enabled" : "Disabled"} lesson set for this profile.`);
+    } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    return;
+  }
   if (action.dataset.action === "restore-native-lessons") {
     const packId = action.dataset.packId;
     const pack = store.snapshot().lessonPacks.find((item) => item.id === packId);
@@ -3605,6 +3612,7 @@ async function boot() {
     serializeState: () => store.exportSyncState(),
     applyState: (raw) => store.importSyncState(raw),
     validateMergeState: (raw) => store.validateSyncMerge(raw),
+    setStorageMergePolicy: (mode) => store.setStorageMergePolicy(mode),
     getMergeSkillNames: () => Object.fromEntries(Object.values(store.skillsById).map((skill) => [skill.id, skill.name])),
     subscribeToState: (listener) => store.subscribe(listener),
     deviceLabel: bridgeDeviceLabel(),

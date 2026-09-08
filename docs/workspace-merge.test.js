@@ -240,3 +240,14 @@ test("deleting a note versus editing it stays explicit, including when history i
   const withoutHistory = createWorkspaceMerge({ localJson: json(local), remoteJson: json(remote) });
   assert.throws(() => withoutHistory.resolve({ 0: "base" }), /Choose/);
 });
+
+test('independent profile pack selections merge per pack without leaking between profiles', () => {
+ const base={profiles:[{id:'a',enabledPackIds:[]},{id:'b',enabledPackIds:[]}]};
+ const local=structuredClone(base), remote=structuredClone(base);
+ local.profiles[0].enabledPackIds=['one'];remote.profiles[0].enabledPackIds=['two'];
+ const plan=createWorkspaceMerge({baseJson:json(base),localJson:json(local),remoteJson:json(remote)});
+ assert.ok(plan.rows.every(row=>!row.conflict));
+ const merged=JSON.parse(plan.resolve());
+ assert.deepEqual(new Set(merged.profiles[0].enabledPackIds),new Set(['one','two']));
+ assert.deepEqual(merged.profiles[1].enabledPackIds,[]);
+});

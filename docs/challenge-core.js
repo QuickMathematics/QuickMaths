@@ -1083,6 +1083,7 @@ function mergeCurriculum(curriculum, lessonPacks) {
 function initialState() {
   return {
     version: APP_VERSION,
+    preferences: { storageMergePolicy: "manual" },
     activeProfileId: null,
     profiles: [],
     progress: {},
@@ -1105,6 +1106,7 @@ function initialState() {
       selectedSkillId: "MATH_ARITH_001",
       selectedMapSkillId: "MATH_ARITH_001",
       mapZoom: 1,
+      mapCollapsedBranchIdsByProfile: {},
       mapCollapsedBranchIds: [],
       mapPlanMode: false,
       mapPlanView: true,
@@ -1320,6 +1322,9 @@ function sanitizeProfile(candidate) {
     activeSubjectId: SUBJECT_ID.test(candidate.activeSubjectId) ? candidate.activeSubjectId : DEFAULT_SUBJECT_ID,
     progressionMode: candidate.progressionMode === "soft" ? "soft" : "hard",
     mapScope: "all",
+    enabledPackIds: Array.isArray(candidate.enabledPackIds ?? candidate.enabled_pack_ids)
+      ? [...new Set(candidate.enabledPackIds ?? candidate.enabled_pack_ids)].filter((id) => typeof id === "string").slice(0, MAX_LESSON_SETS)
+      : null,
     agentActivityAt: cleanText(candidate.agentActivityAt, 40) || null,
     educatorGuideSeenAt: role === "educator"
       ? candidate.educatorGuideSeenAt === null ? null : cleanText(candidate.educatorGuideSeenAt, 40) || null
@@ -1644,7 +1649,24 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   }
   const profileIds = new Set(profiles.map((profile) => profile.id));
   const activeProfileId = profileIds.has(candidate.activeProfileId) ? candidate.activeProfileId : null;
+  const additivePackIds = lessonPacks.filter((pack) => pack.mode !== "override").map((pack) => pack.id);
+  for (const profile of profiles) {
+    const rawProfile = Array.isArray(candidate.profiles) ? candidate.profiles.find((item) => item?.id === profile.id) : null;
+    if (profile.role === "learner" && !profile.curriculumId) {
+      const requested = Array.isArray(rawProfile?.enabledPackIds ?? rawProfile?.enabled_pack_ids)
+        ? rawProfile.enabledPackIds ?? rawProfile.enabled_pack_ids
+        : profile.id === activeProfileId ? additivePackIds : [];
+      profile.enabledPackIds = [...new Set(requested.filter((id) => additivePackIds.includes(id)))].slice(0, MAX_LESSON_SETS);
+    } else profile.enabledPackIds = [];
+  }
   const ui = candidate.ui && typeof candidate.ui === "object" ? candidate.ui : {};
+  const rawMergePolicy = candidate.preferences?.storageMergePolicy ?? candidate.preferences?.storage_merge_policy;
+  const preferences = rawMergePolicy !== undefined
+    ? { storageMergePolicy: rawMergePolicy === "agent-priority" ? "agent-priority" : "manual" }
+    : {};
+  const validCollapsed = (value) => Array.isArray(value) ? [...new Set(value.filter((id) => typeof id === "string" && id.length >= 3 && id.length <= 240 && /^[^/]+\/[^/]+$/.test(id)))].slice(0, 200) : [];
+  const collapsedByProfile = Object.fromEntries(profiles.map((profile) => [profile.id, validCollapsed(ui.mapCollapsedBranchIdsByProfile?.[profile.id])]));
+  if (activeProfileId && !Object.hasOwn(ui, "mapCollapsedBranchIdsByProfile") && validCollapsed(ui.mapCollapsedBranchIds).length) collapsedByProfile[activeProfileId] = validCollapsed(ui.mapCollapsedBranchIds);
   const savedRoute = ROUTES.has(ui.route) ? ui.route : activeProfileId ? "home" : "welcome";
   const route = savedRoute === "data" ? "settings" : savedRoute;
   const selectedSkillId = skills.has(ui.selectedSkillId) ? ui.selectedSkillId : catalog.track.entry_skills[0];
@@ -1676,6 +1698,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   }
   return {
     ...base,
+    preferences,
     activeProfileId,
     profiles,
     curricula,
@@ -1698,11 +1721,8 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       selectedSkillId,
       selectedMapSkillId: skills.has(ui.selectedMapSkillId) ? ui.selectedMapSkillId : selectedSkillId,
       mapZoom: Math.round(cleanNumber(Number(ui.mapZoom), 1, 0.1, 1.6) * 100) / 100,
-      mapCollapsedBranchIds: Array.isArray(ui.mapCollapsedBranchIds)
-        ? [...new Set(ui.mapCollapsedBranchIds
-          .filter((id) => typeof id === "string" && id.length >= 3 && id.length <= 240 && /^[^/]+\/[^/]+$/.test(id)))]
-          .slice(0, 200)
-        : [],
+      mapCollapsedBranchIdsByProfile: collapsedByProfile,
+      mapCollapsedBranchIds: collapsedByProfile[activeProfileId] ?? [],
       mapPlanMode: Boolean(ui.mapPlanMode),
       mapPlanView: ui.mapPlanView !== false,
       mapPlanShowHidden: Boolean(ui.mapPlanShowHidden),
@@ -2620,6 +2640,14 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   };
   const visibleSkillIds = () => {
     const active = activeCurriculum();
+    const profile = activeProfile();
+    if (!active && profile?.role === "learner") {
+      const enabled = new Set(profile.enabledPackIds ?? []);
+      return new Set(skillOrder.filter((id) => {
+        const skill = skillsById[id];
+        return !skill?.packId || skill.native || enabled.has(skill.packId) || lessonPacksById.get(skill.packId)?.mode === "override";
+      }));
+    }
     if (!active) return new Set(skillOrder);
     const cacheKey = `${active.id}\u0000${active.includeNativeLessons !== false}\u0000${active.enabledPackIds.join("\u0000")}`;
     if (visibleSkillCache?.key === cacheKey) return new Set(visibleSkillCache.ids);
@@ -2845,6 +2873,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       ?? null;
     return {
       version: state.version,
+      preferences: clone(state.preferences),
       activeProfile: clone(activeProfile()),
       activeCurriculum: clone(curriculumWorkspace),
       curricula: clone(curriculaForProfile().map((item) => ({
@@ -2897,7 +2926,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         overridesNativeSkills: pack.mode === "override" ? pack.skills.map((skill) => skill.id) : [],
         subjectId: pack.subject.id,
         subjectName: pack.subject.name,
-        enabledForCurriculum: curriculumWorkspace ? pack.mode === "override" || curriculumWorkspace.enabledPackIds.includes(pack.id) : true,
+        enabledForCurriculum: curriculumWorkspace ? pack.mode === "override" || curriculumWorkspace.enabledPackIds.includes(pack.id) : pack.mode === "override" || (activeProfile()?.enabledPackIds ?? []).includes(pack.id),
+        enabledForProfile: pack.mode === "override" || (curriculumWorkspace ? curriculumWorkspace.enabledPackIds.includes(pack.id) : (activeProfile()?.enabledPackIds ?? []).includes(pack.id)),
       })),
       selectedSkill: clone(skillsById[state.ui.selectedSkillId] ?? skillsById[skillOrder[0]]),
       selectedMapSkill: clone(skillsById[state.ui.selectedMapSkillId] ?? skillsById[skillOrder[0]]),
@@ -2906,7 +2936,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       curriculum: {
         track: clone({ ...catalog.track, skills: catalog.track.skills.filter((id) => visible.has(id)), entry_skills: catalog.track.entry_skills.filter((id) => visible.has(id)), exit_skills: catalog.track.exit_skills.filter((id) => visible.has(id)) }),
         subjects: clone(visibleSubjects),
-        lessonPacks: state.lessonPacks.filter((pack) => pack.mode === "override" || !curriculumWorkspace || curriculumWorkspace.enabledPackIds.includes(pack.id)).map((pack) => ({ id: pack.id, name: pack.name, mode: pack.mode, skill_ids: [...pack.track.skills] })),
+        lessonPacks: state.lessonPacks.filter((pack) => pack.mode === "override" || (curriculumWorkspace ? curriculumWorkspace.enabledPackIds.includes(pack.id) : (activeProfile()?.enabledPackIds ?? []).includes(pack.id))).map((pack) => ({ id: pack.id, name: pack.name, mode: pack.mode, skill_ids: [...pack.track.skills] })),
         skills: visibleSkills.filter((skill) => skill.subjectId === subjectId).map((skill) => ({
           id: skill.id,
           packId: skill.packId ?? null,
@@ -2962,12 +2992,15 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     }
     const subjectId = activeProfile()?.activeSubjectId ?? DEFAULT_SUBJECT_ID;
     const firstSkill = skillOrder.find((id) => isSkillVisible(id) && skillsById[id]?.subjectId === subjectId) ?? skillOrder.find((id) => isSkillVisible(id));
-    if (firstSkill && skillsById[state.ui.selectedSkillId]?.subjectId !== subjectId) {
+    if (firstSkill && (!isSkillVisible(state.ui.selectedSkillId) || skillsById[state.ui.selectedSkillId]?.subjectId !== subjectId)) {
       state.ui.selectedSkillId = firstSkill;
       state.ui.selectedMapSkillId = firstSkill;
     }
     state.ui.route = profile?.role === "educator" ? "curriculum" : profile?.tutorialCompletedAt ? "home" : "tutorial";
     state.ui.mapPlanMode = profile?.role === "educator";
+    state.ui.mapCollapsedBranchIds = profile
+      ? [...(state.ui.mapCollapsedBranchIdsByProfile?.[profile.id] ?? [])]
+      : [];
     state.ui.mapPlanView = true;
     state.ui.mapPlanShowHidden = false;
     state.ui.tutorialStep = 0;
@@ -2990,7 +3023,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       id: makeId("profile"), displayName: name, createdAt: isoNow(), totalLoggedSeconds: 0, demo,
       role: safeRole, curriculumId: safeRole === "learner" && state.curricula.some((item) => item.id === curriculumId) ? curriculumId : null,
       activeCurriculumId: null,
-      activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "all", tutorialCompletedAt: safeRole === "educator" ? isoNow() : null, tutorialSkipped: false,
+      activeSubjectId: DEFAULT_SUBJECT_ID, progressionMode: "hard", mapScope: "all", enabledPackIds: [], tutorialCompletedAt: safeRole === "educator" ? isoNow() : null, tutorialSkipped: false,
       agentActivityAt: null,
       educatorGuideSeenAt: null,
     };
@@ -3198,6 +3231,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     state.ui.mapCollapsedBranchIds = [...new Set(branchIds
       .filter((id) => typeof id === "string" && id.length >= 3 && id.length <= 240 && /^[^/]+\/[^/]+$/.test(id)))]
       .slice(0, 200);
+    state.ui.mapCollapsedBranchIdsByProfile ??= {};
+    state.ui.mapCollapsedBranchIdsByProfile[activeProfile().id] = [...state.ui.mapCollapsedBranchIds];
     notify();
     return { ok: true, branch_ids: [...state.ui.mapCollapsedBranchIds] };
   };
@@ -3629,6 +3664,27 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     addActivity("update_curriculum_settings", `Updated learner policy for ${workspace.name}.`);
     notify();
     return clone(workspace.settings);
+  };
+
+  const setProfilePackEnabled = (packId, enabled) => {
+    const profile = activeProfile();
+    if (!profile || profile.role !== "learner" || profile.curriculumId) throw new Error("This profile follows its assigned curriculum.");
+    const pack = state.lessonPacks.find((item) => item.id === packId);
+    if (!pack) throw new Error("Lesson set not found.");
+    if (pack.mode === "override") throw new Error("Native lesson improvements apply to every profile while installed.");
+    const ids = new Set(profile.enabledPackIds ?? []);
+    if (enabled) ids.add(packId); else ids.delete(packId);
+    const workspace = { includeNativeLessons: true, enabledPackIds: [...ids], mapPlan: emptyMapPlan() };
+    validateEnabledCurriculum(workspace, [...ids], { checkPlan: false });
+    profile.enabledPackIds = [...ids].slice(0, MAX_LESSON_SETS);
+    visibleSkillCache = null;
+    if (!isSkillVisible(state.ui.selectedSkillId)) {
+      const firstSkill = skillOrder.find((id) => isSkillVisible(id));
+      if (firstSkill) { state.ui.selectedSkillId = firstSkill; state.ui.selectedMapSkillId = firstSkill; }
+    }
+    addActivity("set_profile_pack", `${enabled ? "Enabled" : "Disabled"} ${pack.name} for ${profile.displayName}.`);
+    notify();
+    return { ok: true, packId, enabled: Boolean(enabled), enabledPackIds: [...profile.enabledPackIds] };
   };
 
   const setCurriculumPackEnabled = (packId, enabled, { removePlanReferences = false } = {}) => {
@@ -4314,6 +4370,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (activeProfile()?.role === "educator" && activeCurriculum() && pack.mode !== "override") {
       activeCurriculum().enabledPackIds = [...new Set([...activeCurriculum().enabledPackIds, pack.id])];
       activeCurriculum().updatedAt = isoNow();
+    } else if (activeProfile()?.role === "learner" && !activeProfile().curriculumId && pack.mode !== "override") {
+      activeProfile().enabledPackIds = [...new Set([...(activeProfile().enabledPackIds ?? []), pack.id])];
     }
     if (activeProfile() && isSkillVisible(pack.track.skills[0])) {
       state.ui.selectedSkillId = pack.track.skills[0];
@@ -4434,6 +4492,13 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       app: "QuickMaths Web",
       transport: "QuickMaths Bridge",
     }, null, 2);
+  };
+
+  const setStorageMergePolicy = (policy) => {
+    if (!["manual", "agent-priority"].includes(policy)) throw new Error("storage_merge_policy must be manual or agent-priority.");
+    state.preferences = { storageMergePolicy: policy };
+    notify();
+    return clone(state.preferences);
   };
 
   const parseBackup = (raw) => {
@@ -4687,6 +4752,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     updateMapPlanLayout,
     resetMapPlanLayout,
     setMapPlanNodesHidden,
+    setProfilePackEnabled,
+    setStorageMergePolicy,
     createMapPlanPath,
     updateMapPlanPath,
     selectMapPlanPath,

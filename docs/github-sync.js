@@ -1,4 +1,4 @@
-import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260906-media-v1";
+import { createWorkspaceMerge, sameWorkspace, preserveDeviceState } from "./workspace-merge.js?v=20260908-profile-sync-v1";
 
 const DEFAULT_API_BASE = "https://api.github.com";
 const roleKey = (prefix, role) => `${prefix}.${role === "agent" ? "agent" : "learner"}.v1`;
@@ -12,6 +12,37 @@ export const BRIDGE_SCHEMA_VERSION = "1.0";
 export const LEARNER_STATE_PATH = "learner-state.json";
 export const AGENT_STATE_PATH = "agent-state.json";
 const MAX_BRIDGE_FILE_BYTES = 10_000_000;
+export const STORAGE_MERGE_POLICIES = ["manual", "agent-priority"];
+
+export function readStorageMergePolicy(raw, fallback = "manual") {
+  let state = raw;
+  if (typeof raw === "string") {
+    try { state = JSON.parse(raw); } catch { state = null; }
+  }
+  const policy = state?.preferences?.storageMergePolicy;
+  if (STORAGE_MERGE_POLICIES.includes(policy)) return policy;
+  return STORAGE_MERGE_POLICIES.includes(fallback) ? fallback : "manual";
+}
+
+export function writeStorageMergePolicy(raw, policy) {
+  if (!STORAGE_MERGE_POLICIES.includes(policy)) throw new GitHubSyncError("Unknown storage merge policy.");
+  let state;
+  try { state = typeof raw === "string" ? JSON.parse(raw) : JSON.parse(JSON.stringify(raw)); }
+  catch { throw new GitHubSyncError("Workspace state is invalid.", { code: "invalid_state" }); }
+  if (!state || typeof state !== "object" || Array.isArray(state)) throw new GitHubSyncError("Workspace state is invalid.", { code: "invalid_state" });
+  state.preferences = { ...(state.preferences && typeof state.preferences === "object" ? state.preferences : {}), storageMergePolicy: policy };
+  return JSON.stringify(state);
+}
+
+function explicitStorageMergePolicy(raw) {
+  let state = raw;
+  if (typeof raw === "string") {
+    try { state = JSON.parse(raw); } catch { return null; }
+  }
+  return STORAGE_MERGE_POLICIES.includes(state?.preferences?.storageMergePolicy)
+    ? state.preferences.storageMergePolicy
+    : null;
+}
 
 export function learnerBridgeStartupAction({
   remoteExists = false,
@@ -448,6 +479,7 @@ export function createGitHubSyncController({
   serializeState,
   applyState,
   validateMergeState = null,
+  setStorageMergePolicy = null,
   getMergeSkillNames = () => ({}),
   subscribeToState = null,
   now = () => new Date(),
@@ -566,6 +598,15 @@ export function createGitHubSyncController({
     return normalizeGitHubSyncConfig({ ...config, role });
   };
 
+  // Workspace policy is authoritative when present in synced content. The
+  // credential setting remains a migration fallback for old checkpoints only.
+  const serializeForSync = () => {
+    const raw = serializeState();
+    if (role === "agent" || explicitStorageMergePolicy(raw) || config?.mergeMode !== "agent-priority") return raw;
+    return writeStorageMergePolicy(raw, "agent-priority");
+  };
+  const currentStorageMergePolicy = () => readStorageMergePolicy(serializeState(), config?.mergeMode ?? "manual");
+
   const requireWritablePrivateRepository = (repository) => {
     if (!repository?.private) {
       throw new GitHubSyncError("QuickMaths workspace storage must use a private repository.", { code: "public_repository_forbidden" });
@@ -593,7 +634,10 @@ export function createGitHubSyncController({
 
   const applyRemote = async (stateJson) => {
     suppressStateChange = true;
-    try { await applyState(stateJson); }
+    try {
+      await applyState(stateJson);
+      if (status.config) status.config = { ...status.config, mergeMode: readStorageMergePolicy(stateJson, status.config.mergeMode) };
+    }
     finally { suppressStateChange = false; }
   };
 
@@ -742,7 +786,7 @@ export function createGitHubSyncController({
     const publishedActorLabel = role === "agent"
       ? resolvedDeviceLabel
       : pendingLearnerActor?.label || resolvedDeviceLabel;
-    const publishedState = serializeState();
+    const publishedState = serializeForSync();
     const envelope = createBridgeEnvelope({
       channel,
       stateJson: publishedState,
@@ -766,7 +810,7 @@ export function createGitHubSyncController({
       if (error instanceof GitHubSyncConflictError) throw new GitHubSyncConflictError("GitHub changed during the write. Review the current versions before syncing.", { channel, knownSha });
       throw error;
     }
-    const changedDuringPush = !sameWorkspace(serializeState(), publishedState);
+    const changedDuringPush = !sameWorkspace(serializeForSync(), publishedState);
     if (channel === "learner") learnerSha = result.sha;
     else agentSha = result.sha;
     if (channel === "learner") {
@@ -966,13 +1010,13 @@ export function createGitHubSyncController({
       const remote = channel === "learner" ? learner : agent;
       if (!remote.exists) throw new GitHubSyncConflictError("The remote workspace was removed. Reconnect storage to review its current state.", { channel });
       const baseJson = await readBase(channel === "agent" ? remote.envelope.baseLearnerSha : learnerSha);
-      const localJson = serializeState();
+      const localJson = serializeForSync();
       const plan = createWorkspaceMerge({ baseJson, localJson, remoteJson: remote.envelope.stateJson, skillNames: getMergeSkillNames() });
       const id = makeDeviceId();
       pendingReview = { id, channel, plan, localJson, learner, agent, remote };
       if (plan.rows.length) {
         update({ phase: "reviewing", error: null, conflict: null });
-        return { id, channel, rows: plan.rows, hasBase: plan.hasBase, remoteIsAgent: channel === "agent" || remote.envelope.actorKind === "agent", remoteLabel: remote.envelope.actorLabel, taskStartedAt: remote.envelope.taskStartedAt, remoteUpdatedAt: remote.envelope.updatedAt };
+        return { id, channel, rows: plan.rows, hasBase: plan.hasBase, remoteIsAgent: channel === "agent" || remote.envelope.actorKind === "agent", remoteStorageMergePolicy: readStorageMergePolicy(remote.envelope.stateJson, currentStorageMergePolicy()), remoteLabel: remote.envelope.actorLabel, taskStartedAt: remote.envelope.taskStartedAt, remoteUpdatedAt: remote.envelope.updatedAt };
       }
       try { await applyPreparedMerge({ reviewId: id }); }
       catch (error) {
@@ -1023,7 +1067,7 @@ export function createGitHubSyncController({
       const agent = await readChannel("agent");
       if (!sameReviewRemote(review.learner, learner)) throw changed("shared workspace");
       if (!sameReviewRemote(review.agent, agent)) throw changed("agent update");
-      const local = serializeState();
+      const local = serializeForSync();
       if (!sameReviewContent(review.localJson, local)) throw changed("this device");
       let merged = preserveReviewUpdates(selected, review.localJson, local);
       for (const [before, after] of [[review.learner, learner], [review.agent, agent]]) {
@@ -1037,7 +1081,7 @@ export function createGitHubSyncController({
           throw error;
         }
       }
-      if (!sameReviewContent(review.localJson, serializeState())) throw changed("this device");
+      if (!sameReviewContent(review.localJson, serializeForSync())) throw changed("this device");
       const acknowledged = review.channel === "agent" ? agent.sha : learner.envelope?.resolvedAgentSha ?? agentSha;
       const envelope = createBridgeEnvelope({ channel: "learner", stateJson: merged, deviceId: resolvedDeviceId, deviceLabel: resolvedDeviceLabel, appliedAgentSha: acknowledged, resolvedAgentSha: acknowledged, now });
       let result;
@@ -1046,7 +1090,11 @@ export function createGitHubSyncController({
         config = { ...config, mergeMode: savedPreference.mergeMode };
         status.config = config;
       }
-      if (automatic && (config?.mergeMode !== "agent-priority" || repositoryKey(savedPreference) !== repositoryKey(config) || savedPreference?.mergeMode !== "agent-priority")) throw new GitHubSyncConflictError("Automatic merging is now off. Review these changes before saving.", { channel: review.channel });
+      const reviewIsAgent = review.channel === "agent" || review.remote.envelope?.actorKind === "agent";
+      const reviewPolicy = explicitStorageMergePolicy(serializeState())
+        ?? explicitStorageMergePolicy(review.remote.envelope?.stateJson)
+        ?? currentStorageMergePolicy();
+      if (automatic && (reviewPolicy !== "agent-priority" && reviewIsAgent || reviewIsAgent === false && review.plan.rows.some((row) => row.conflict) || repositoryKey(savedPreference) !== repositoryKey(config))) throw new GitHubSyncConflictError("Automatic merging is now off. Review these changes before saving.", { channel: review.channel });
       try {
         result = await client.writeFile(requireConfig(), LEARNER_STATE_PATH, envelope, { sha: learner.sha, message: "QuickMaths Bridge: merge reviewed workspace changes" });
       } catch (error) {
@@ -1061,7 +1109,7 @@ export function createGitHubSyncController({
       // Real edits during the write stay local. Bookkeeping can advance while
       // the learner only reads the dialog and must not turn a saved merge into
       // an error. Retain that latest history and elapsed time on this device.
-      const afterWrite = serializeState();
+      const afterWrite = serializeForSync();
       if (!sameReviewContent(review.localJson, afterWrite)) throw changed("this device");
       merged = preserveReviewUpdates(merged, local, afterWrite);
       await applyRemote(preserveDeviceState(merged, afterWrite));
@@ -1083,9 +1131,15 @@ export function createGitHubSyncController({
   const mergeAutomatically = async ({ channel = "learner" } = {}) => {
     for (let pass = 0; pass < 6; pass += 1) {
       const review = await prepareMerge({ channel });
-      if (review.resolved || config?.mergeMode !== "agent-priority" || !review.hasBase) return review;
+      if (review.resolved) return review;
+      const hasConflicts = review.rows.some((row) => row.conflict);
+      const remoteIsAgent = review.remoteIsAgent ?? review.channel === "agent";
+      const effectivePolicy = explicitStorageMergePolicy(serializeState())
+        ?? review.remoteStorageMergePolicy
+        ?? currentStorageMergePolicy();
+      if (!review.hasBase || effectivePolicy !== "agent-priority" || (!remoteIsAgent && hasConflicts)) return review;
       const choices = Object.fromEntries(review.rows.map((row) => [row.id,
-        row.conflict ? (review.remoteIsAgent ? "remote" : "local") : row.suggested]));
+        row.conflict ? (remoteIsAgent ? "remote" : "local") : row.suggested]));
       try { await applyMerge({ reviewId: review.id, choices, automatic: true }); }
       catch (error) {
         if (error.details?.reason === "stale_review") { channel = review.channel; continue; }
@@ -1098,9 +1152,16 @@ export function createGitHubSyncController({
   };
 
   const setMergeMode = (mode) => {
-    if (!["manual", "agent-priority"].includes(mode)) throw new GitHubSyncError("Unknown storage merge mode.");
+    if (!STORAGE_MERGE_POLICIES.includes(mode)) throw new GitHubSyncError("Unknown storage merge mode.");
     config = credentialStore.save({ ...requireConfig(), mergeMode: mode });
     update({ config });
+    const current = serializeState();
+    const next = writeStorageMergePolicy(current, mode);
+    if (next !== current) {
+      suppressStateChange = true;
+      try { setStorageMergePolicy ? setStorageMergePolicy(mode) : applyState(next); } finally { suppressStateChange = false; }
+      schedulePush({ actorKind: "device" });
+    }
     return statusClone(status);
   };
 

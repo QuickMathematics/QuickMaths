@@ -135,6 +135,8 @@ The shell keeps navigation, identity, time, retained lesson theme, and agent sta
 The bottom bar shows Home, Map, Learn, Test, Depot, and Settings. Lesson Studio is available from the Depot tab when it cannot fit as a separate item. The fixed navigation stays reachable while the page scrolls.
 
 
+Installed additive lesson packs stay in a shared library. Each independent learner profile chooses which packs to enable in Settings. Installing a pack enables it for the installing profile; other profiles start with it disabled. Disabling a pack preserves its saved progress and map work. Educator assignments continue to use their curriculum’s pack selections. Native lesson improvement packs remain shared updates to the built-in content.
+
 ### Fields and branches
 
 QuickMaths organizes learning as **Field → Branch → Lesson**. Mathematics is a field; Geometry is a branch within Mathematics. A field owns its theme and can contain many branches. A branch groups lessons in that field; the same branch name in another field is a separate group. Lesson sets can contain several branches.
@@ -154,7 +156,7 @@ A focused category such as **Quadratic Equations** is a topic within **Algebra**
 
 The canonical map places lessons inside labeled branch bands within each field. Prerequisite connections remain intact across branch and field boundaries. Saved Plan-view coordinates, notes, paths, hidden-node choices, mastery, and unfinished tests are preserved. Switch off **Plan view** to see the canonical grouping; to adopt it for an existing custom layout, open **Plan mode → Plan details → Group by field & branch**. That action resets moved node positions while retaining notes and paths.
 
-Collapse a branch to show its lessons as one node, twice the width and height of a lesson node. Use its expand control to restore the individual lessons. Connections between collapsed branches combine prerequisite links; hover, focus, or tap a connection to see how many links it represents. Collapse and expand controls change only this device’s map view: they do not change prerequisites, mastery, or saved lesson positions. Plan mode and Curriculum designer display individual lessons for editing.
+Collapse a branch to show its lessons as one node, twice the width and height of a lesson node. Use its expand control to restore the individual lessons. Connections between collapsed branches combine prerequisite links; hover, focus, or tap a connection to see how many links it represents. Collapse and expand controls are saved separately for each profile on this device: they do not change prerequisites, mastery, or saved lesson positions. Plan mode and Curriculum designer display individual lessons for editing.
 
 Existing lesson files and backups remain compatible: the saved `subject` object and `subjectId` / `subject_id` identifiers describe the field; each lesson's `subdomain` is its broad branch and optional `topic` retains finer subject matter. Keep these stable file keys and lesson IDs when editing older files. The agent tools `list_fields` and `list_branches` expose the hierarchy; `list_subjects` remains a compatibility alias.
 
@@ -559,9 +561,9 @@ The light beside your profile is visible throughout the app, including the mobil
 In **Settings → Workspace Storage → Storage management**, choose:
 
 - **Manually review storage merges** (default): review the detected changes with checkboxes. Independent changes start checked; choose which side to keep when the same content conflicts.
-- **Automatically merge · agent priority**: keep independent changes from both copies. If an agent and a device change the same content, the agent's value wins for that change. Local-only notes, node moves, lessons, mastery, profiles, curricula, tests, and feedback remain. Between device checkpoints, this device wins conflicts. This is a selective merge, not replacement of the complete workspace.
+- **Automatically merge · agent priority**: keep independent changes from both copies. If an agent and a device change the same content, the agent's value wins for that change. Local-only notes, node moves, lessons, mastery, profiles, curricula, tests, and feedback remain. Conflicts between two devices always open the merge screen; independent changes can still merge automatically. This is a selective merge, not replacement of the complete workspace.
 
-The choice belongs to this device and repository connection. It does not bypass human approval to install agent-staged lesson packages. Both modes preserve the existing activity-history combination and device-local settings. Missing starting history or an invalid combination of related saved work opens the comparison for a manual decision. Actual concurrent edits are checked again before saving; clocks, navigation, and bookkeeping alone do not invalidate the review. Agents still record the original task start before editing and publish it with the finished update.
+The choice is saved in the shared workspace and syncs to other devices connected to the same GitHub storage. It does not bypass human approval to install agent-staged lesson packages. Both modes preserve the existing activity-history combination and device-local settings. Missing starting history or an invalid combination of related saved work opens the comparison for a manual decision. Actual concurrent edits are checked again before saving; clocks, navigation, and bookkeeping alone do not invalidate the review. Agents still record the original task start before editing and publish it with the finished update.
 
 ### GitHub Bridge
 

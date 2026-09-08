@@ -15,7 +15,16 @@ import {
   learnerBridgeStartupAction,
   normalizeGitHubSyncConfig,
   parseBridgeEnvelope,
+  readStorageMergePolicy,
+  writeStorageMergePolicy,
 } from "./github-sync.js";
+
+test("storage merge policy is synced content with legacy fallback and no implicit overwrite", () => {
+  assert.equal(readStorageMergePolicy("{}", "agent-priority"), "agent-priority");
+  assert.equal(readStorageMergePolicy(JSON.stringify({ preferences: { storageMergePolicy: "manual" } }), "agent-priority"), "manual");
+  const next = JSON.parse(writeStorageMergePolicy(JSON.stringify({ preferences: { theme: "pine" } }), "agent-priority"));
+  assert.deepEqual(next.preferences, { theme: "pine", storageMergePolicy: "agent-priority" });
+});
 
 test("learner startup never uses writer identity or nearby clocks to discard dirty work", () => {
   assert.equal(learnerBridgeStartupAction({ remoteExists: true, localProfileCount: 2 }), "choose-migration-source");
@@ -1148,7 +1157,7 @@ test("automatic merging preserves local work and gives only conflicting values t
   assert.equal(github.files.get(LEARNER_STATE_PATH).sha, sha, "does not reapply a resolved agent checkpoint");
 });
 
-test("automatic mode preserves independent device edits before applying an agent conflict", async () => {
+test("device conflicts remain reviewable even when agent priority is enabled", async () => {
   const { github, learner, learnerState, agent, agentState } = await mergeFixture();
   learner.setMergeMode("agent-priority");
   learnerState.mutate({ note: "Phone", phoneOnly: 1 });
@@ -1156,8 +1165,9 @@ test("automatic mode preserves independent device edits before applying an agent
   await github.writeFile(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: JSON.stringify(remote), deviceId: "desktop" }), { sha: github.files.get(LEARNER_STATE_PATH).sha });
   agentState.mutate({ note: "Agent", agentOnly: 3 });
   await agent.pushNow();
-  assert.equal((await learner.mergeAutomatically()).resolved, true);
-  assert.deepEqual([learnerState.read().note, learnerState.read().phoneOnly, learnerState.read().desktopOnly, learnerState.read().agentOnly], ["Agent", 1, 2, 3]);
+  const review = await learner.mergeAutomatically();
+  assert.ok(review.rows.some((row) => row.conflict));
+  assert.equal(learnerState.read().note, "Phone");
 });
 
 test("manual mode and missing history require choices without writing content", async () => {
@@ -1177,7 +1187,7 @@ test("manual mode and missing history require choices without writing content", 
   assert.equal(github.files.get(LEARNER_STATE_PATH).sha, before);
 });
 
-test("dependency failures in automatic mode leave the comparison available", async () => {
+test("device conflicts stop before merge validation and leave the comparison available", async () => {
   const github = fakeGitHub(); const state = stateHarness("Learner");
   const learner = controller({ role: "learner", client: github, harness: state, validateMergeState: () => { const error = new Error("Keep the related lesson set"); error.code = "merge_dependency"; throw error; } });
   await learner.connect({ ...connection(), mergeMode: "agent-priority" }, { startPolling: false });
@@ -1188,7 +1198,7 @@ test("dependency failures in automatic mode leave the comparison available", asy
   await github.writeFile(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: JSON.stringify(remote), deviceId: "desktop" }), { sha: before });
   const current = github.files.get(LEARNER_STATE_PATH).sha;
   const review = await learner.mergeAutomatically();
-  assert.equal(review.automaticReviewReason, "Keep the related lesson set");
+  assert.ok(review.rows.some((row) => row.conflict));
   assert.equal(github.files.get(LEARNER_STATE_PATH).sha, current);
   assert.equal(state.read().note, "Phone");
 });
@@ -1210,7 +1220,7 @@ test("merge preference and last successful GitHub save survive reload and reset 
 });
 
 
-test("turning automatic mode off in another tab before the write keeps local work for review", async () => {
+test("changing device credentials does not override the synced workspace policy", async () => {
   const github = fakeGitHub(); const credentialStore = credentials(); const state = stateHarness("Learner");
   const learner = controller({ role: "learner", client: github, credentialStore, harness: state,
     validateMergeState: () => credentialStore.save({ ...connection(), mergeMode: "manual" }) });
@@ -1221,8 +1231,52 @@ test("turning automatic mode off in another tab before the write keeps local wor
   const remote = { ...state.read(), note: "Other" };
   await github.writeFile(connection(), LEARNER_STATE_PATH, createBridgeEnvelope({ channel: "learner", stateJson: JSON.stringify(remote), deviceId: "other" }), { sha: old });
   const current = github.files.get(LEARNER_STATE_PATH).sha;
-  await assert.rejects(learner.mergeAutomatically(), /Automatic merging is now off/);
+  const review = await learner.mergeAutomatically();
+  assert.ok(review.rows.some((row) => row.conflict));
   assert.equal(github.files.get(LEARNER_STATE_PATH).sha, current);
-  assert.equal(learner.snapshot().config.mergeMode, "manual");
+  assert.ok(["manual", "agent-priority"].includes(readStorageMergePolicy(state.serialize(), "manual")));
   assert.equal(state.read().note, "Phone");
+});
+
+test('explicit shared policy reaches a second device without its credential preference overriding it', async () => {
+ const github=fakeGitHub(), firstState=stateHarness('First'), secondState=stateHarness('Second');
+ const first=controller({role:'learner',client:github,harness:firstState,deviceId:'first'});
+ await first.connect(connection(),{startPolling:false});first.setMergeMode('agent-priority');await first.pushNow();
+ const second=controller({role:'learner',client:github,harness:secondState,deviceId:'second'});
+ await second.connect({...connection(),mergeMode:'manual'},{startPolling:false});await second.restoreLearner();
+ assert.equal(readStorageMergePolicy(secondState.serialize()),'agent-priority');
+ assert.equal(second.snapshot().config.mergeMode,'agent-priority');
+ second.setMergeMode('manual');await second.pushNow();await first.syncLearnerNow();
+ assert.equal(readStorageMergePolicy(firstState.serialize()),'manual');
+});
+
+test('independent device edits still auto merge under shared agent priority', async () => {
+ const {github,learner,learnerState}=await mergeFixture();
+ learner.setMergeMode('agent-priority');await learner.pushNow();
+ const remote=learnerState.read();learnerState.mutate({phoneOnly:'keep'});remote.desktopOnly='keep';
+ await github.writeFile(connection(),LEARNER_STATE_PATH,createBridgeEnvelope({channel:'learner',stateJson:JSON.stringify(remote),deviceId:'desktop'}),{sha:github.files.get(LEARNER_STATE_PATH).sha});
+ const result=await learner.mergeAutomatically();assert.equal(result.resolved,true);
+ assert.equal(learnerState.read().phoneOnly,'keep');assert.equal(learnerState.read().desktopOnly,'keep');
+});
+
+test('switching shared policy to manual during agent review prevents an automatic write', async () => {
+ const github=fakeGitHub(), state=stateHarness('Learner'), agentState=stateHarness('Agent');
+ let revoke=false;
+ const learner=controller({role:'learner',client:github,harness:state,validateMergeState:()=>{if(revoke)state.mutate({preferences:{storageMergePolicy:'manual'}});}});
+ await learner.connect(connection(),{startPolling:false});learner.setMergeMode('agent-priority');await learner.pushNow();
+ const agent=controller({role:'agent',client:github,harness:agentState});await agent.connect(connection('agent'),{startPolling:false});await agent.beginAgentTask();
+ state.mutate({note:'Phone'});agentState.mutate({note:'Agent'});await agent.pushNow();revoke=true;
+ const sha=github.files.get(LEARNER_STATE_PATH).sha;
+ const stopped=await learner.mergeAutomatically();assert.notEqual(stopped.resolved,true);
+ assert.equal(readStorageMergePolicy(state.serialize()),'manual');
+ assert.equal(github.files.get(LEARNER_STATE_PATH).sha,sha);assert.equal(state.read().note,'Phone');
+});
+
+test('legacy automatic preference can merge an agent update before the policy is explicitly saved locally', async () => {
+ const github=fakeGitHub(), state=stateHarness('Legacy'), agentState=stateHarness('Agent');
+ const learner=controller({role:'learner',client:github,harness:state});
+ await learner.connect({...connection(),mergeMode:'agent-priority'},{startPolling:false});await learner.pushNow();
+ const agent=controller({role:'agent',client:github,harness:agentState});await agent.connect(connection('agent'),{startPolling:false});await agent.beginAgentTask();
+ state.mutate({note:'Local'});agentState.mutate({note:'Agent'});await agent.pushNow();
+ assert.equal((await learner.mergeAutomatically()).resolved,true);assert.equal(state.read().note,'Agent');
 });

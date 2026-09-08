@@ -181,7 +181,7 @@ export function createWorkspaceMerge({ baseJson = null, localJson, remoteJson, s
       const reordered = base === undefined ? !equal(order(l), order(r)) : !equal(order(b), order(l)) || !equal(order(b), order(r));
       return { array: ids.map((key) => walk(b?.find((item) => id(item) === key), l.find((item) => id(item) === key), r.find((item) => id(item) === key), [...path, key])), ...(reordered ? { order: atomic(order(b), order(l), order(r), [...path, "order"]), id } : {}) };
     }
-    if ((pp?.length === 1 && last === "hiddenSkillIds" || section === "curricula" && last === "enabledPackIds") && [l, r, b ?? []].every((items) => Array.isArray(items) && items.every((item) => typeof item === "string"))) {
+    if ((pp?.length === 1 && last === "hiddenSkillIds" || ["curricula", "profiles"].includes(section) && last === "enabledPackIds") && [l, r, b ?? []].every((items) => Array.isArray(items) && items.every((item) => typeof item === "string"))) {
       return { members: [...new Set([...l, ...r, ...(b ?? [])])].map((key) => [key, walk(b?.includes(key) ?? false, l.includes(key), r.includes(key), [...path, key])]) };
     }
     const intact = (["attempts", "reviews", "stagedLessonPacks"].includes(section) && path.length === 2) || (section === "drafts" && path.length === 3) || (pp?.[0] === "layouts" && pp.length === 3) || (pp?.[0] === "annotations" && pp[2] === "positions" && pp.length === 4) || (section === "lessonPacks" && ["problems", "native_templates", "assets"].includes(path.at(-2)));
