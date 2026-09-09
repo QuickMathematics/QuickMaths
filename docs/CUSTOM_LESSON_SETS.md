@@ -282,6 +282,12 @@ Supported `answer_mode` values are `final_only`, `final_plus_optional_work`, and
 | Structure a proof | `proof_obligations` | Shows obligations and strategies, captures the proof, and waits for review. |
 | Grade open reasoning | `rubric_check` | Shows rubric criteria, captures work, and waits for review. |
 
+### Typed limit arguments
+
+Use `work.mode: limit_steps` with a `work.limit` object: `variable`, `approach`, `direction` (`left`, `right`, `both`), `original_expression`, and `restrictions` (a list). Set an answer mode with required work. Native templates resolve this metadata with their givens; portable questions store resolved text. The learner submits `structuredWorkJson.limit` with the setup, retained restrictions, a `steps` list beginning with the original expression, `result_kind` (`finite`, `positive_infinity`, `negative_infinity`, `no_common_limit`) and a finite `result_value` when applicable.
+
+The original setup is compared modulo whitespace only, before any cancellation. The engine never treats the function value as the limit or conflates signed infinities with no common limit. Setup/form checks do not validate transformations or prove the declared domain sufficient. This mode forces tutor review, gates mastery on review and disables self-review. Use ordinary proof/rubric review for IVT, continuity hypotheses and uniqueness arguments. See [limit authoring examples](CALCULUS_ENGINE.md#reviewed-limit-work).
+
 ### Finite sets, rational expressions, and interval sets
 
 Native YAML uses these answer blocks:
@@ -608,9 +614,17 @@ Limits are 1 MB total for portable embedded attachments, 25 MB per hosted file, 
 
 Matplotlib runs in the author's environment. Save PNG/SVG with `fig.savefig(...)`, or add declarative `matplotlib_figures` to YAML and run `quickmaths build-lesson lesson-set.yaml --output built-lesson` after `pip install -e ".[media]"`. Add `--portable` to embed small attachments. Import or publish the built output. Arbitrary plotting Python is never run when importing or viewing a lesson. The [complete media reference](LESSON_MEDIA.md) documents drawing layers, format options, safety checks and folder workflows. Start from the [geometry YAML](examples/geometry-media/lesson-set.yaml) or [portable example](lesson-media-example.json). Agents can request this section with `get_lesson_authoring_guide({"section":"media"})`.
 
+### Declarative Cartesian diagrams and mathematical blocks
+
+Attach `diagram` to a native template or resolved portable question. Cartesian data supports independently restricted curves, open/closed endpoints, isolated points, secant segments, excluded inputs, asymptotes and labels. Native bindings can use only names stated directly as `{name}` in `prompt_template`; numeric coordinates can use bounded arithmetic from these public givens. No expected-answer or hidden-derived variables may enter a graph, label or description. Curves use a bounded arithmetic parser with x, sqrt and abs, never JavaScript/Python execution. Saved visual drafts retain their original question and diagram after template changes.
+
+Use `math_blocks` on a lesson, example, application or problem for piecewise rules, fractions, directed limits, derivations or notation. Every block requires `alt` and `linear_text`; the latter is exposed as copyable text. Existing text fields remain unchanged. Native explanation line breaks are preserved as separate solution steps. See [Cartesian and limit examples](CALCULUS_ENGINE.md) and [math-block schema/examples](MATH_DISPLAY.md).
+
+The native exporter keeps its default 1,000,000-byte budget and now reports bytes, remaining space and per-branch/source attribution. `--media-report` saves a report; `--previous-media-report` adds batch growth. An explicit `--native-media-budget` affects native builds only, not untrusted imported packs. This is an embedded-media capacity bridge, not hosted chunks or offline prefetch.
+
 ## Human Lesson Creator
 
-Open **Lesson studio** in the left sidebar. It can:
+Open **Lesson studio** in the left sidebar. Its optional **Mathematical displays and function graph** panel validates and previews structured display JSON. Lesson, example, application and question math blocks survive source edits and exports; question graphs use resolved numeric coordinates. The native runtime preview rerolls graphs together with question givens. Select **Limit argument · tutor review** for guided setup fields and a mandatory review gate. It can:
 
 - extend an installed field or create a themed field;
 - create, remove, and switch between multiple lessons;

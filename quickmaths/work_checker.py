@@ -18,6 +18,7 @@ from quickmaths.math_syntax import (
     rational_equation_restrictions,
 )
 from quickmaths.models import ProblemInstance, UserResponse, WorkCheckResult
+from quickmaths.limit_work import validate_limit_work
 
 
 def check_work(instance: ProblemInstance, response: UserResponse) -> WorkCheckResult:
@@ -31,6 +32,14 @@ def check_work(instance: ProblemInstance, response: UserResponse) -> WorkCheckRe
         return WorkCheckResult("not_required", "none", review_policy, score=None)
     if required and not work_text and not structured:
         return WorkCheckResult("incomplete", mode, review_policy, score=0.0, messages=["Required work was not submitted."])
+    if mode == "limit_steps":
+        message = validate_limit_work(instance.work.get("limit"), structured.get("limit"))
+        if message:
+            return WorkCheckResult("incomplete", mode, review_policy, score=0.0, messages=[message])
+        return WorkCheckResult(
+            "pending_review", mode, review_policy, score=None,
+            messages=["Transformations, domain restrictions, and theorem use require tutor review."],
+        )
     if mode == "capture_only":
         status = "pending_review" if review_policy in {"tutor_required", "self_review"} else "not_required"
         return WorkCheckResult(status, mode, review_policy, score=None)
@@ -58,7 +67,7 @@ def work_mode(instance: ProblemInstance) -> str:
 
 def work_required(instance: ProblemInstance) -> bool:
     raw_mode = str(instance.work.get("mode", "none") if instance.work else "none")
-    return raw_mode in {"required", "structured", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"} or instance.answer_mode in {
+    return raw_mode in {"required", "structured", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "limit_steps"} or instance.answer_mode in {
         "final_plus_required_work",
         "structured_steps",
         "proof_required",

@@ -1,0 +1,292 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QuickMaths Cartesian diagram",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "const": "cartesian"
+    },
+    "x_range": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Native-only constant arithmetic with public {name} placeholders; portable resolved coordinates are numeric."
+          }
+        ]
+      }
+    },
+    "y_range": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Native-only constant arithmetic with public {name} placeholders; portable resolved coordinates are numeric."
+          }
+        ]
+      }
+    },
+    "alt": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "curves": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expression": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "interval": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": -1000000,
+                  "maximum": 1000000
+                },
+                {
+                  "type": "string",
+                  "maxLength": 300,
+                  "description": "Native-only constant arithmetic with public {name} placeholders; portable resolved coordinates are numeric."
+                }
+              ]
+            }
+          },
+          "endpoints": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "enum": [
+                "open",
+                "closed",
+                "none"
+              ]
+            }
+          },
+          "exclude": {
+            "type": "array",
+            "maxItems": 24,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": -1000000,
+                  "maximum": 1000000
+                },
+                {
+                  "type": "string",
+                  "maxLength": 300,
+                  "description": "Native-only constant arithmetic with public {name} placeholders; portable resolved coordinates are numeric."
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "expression",
+          "interval"
+        ]
+      }
+    },
+    "points": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "at": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": -1000000,
+                  "maximum": 1000000
+                },
+                {
+                  "type": "string",
+                  "maxLength": 300,
+                  "description": "Native-only constant arithmetic with public {name} placeholders; portable resolved coordinates are numeric."
+                }
+              ]
+            }
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "endpoint": {
+            "enum": [
+              "open",
+              "closed"
+            ]
+          }
+        },
+        "required": [
+          "at"
+        ]
+      }
+    },
+    "segments": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": -1000000,
+                  "maximum": 1000000
+                },
+                {
+                  "type": "string",
+                  "maxLength": 300,
+                  "description": "Native-only constant arithmetic with public {name} placeholders; portable resolved coordinates are numeric."
+                }
+              ]
+            }
+          },
+          "to": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": -1000000,
+                  "maximum": 1000000
+                },
+                {
+                  "type": "string",
+                  "maxLength": 300,
+                  "description": "Native-only constant arithmetic with public {name} placeholders; portable resolved coordinates are numeric."
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      }
+    },
+    "asymptotes": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "axis": {
+            "enum": [
+              "x",
+              "y"
+            ]
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": -1000000,
+                "maximum": 1000000
+              },
+              {
+                "type": "string",
+                "maxLength": 300,
+                "description": "Native-only constant arithmetic with public {name} placeholders; portable resolved coordinates are numeric."
+              }
+            ]
+          }
+        },
+        "required": [
+          "axis",
+          "value"
+        ]
+      }
+    },
+    "labels": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "at": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": -1000000,
+                  "maximum": 1000000
+                },
+                {
+                  "type": "string",
+                  "maxLength": 300,
+                  "description": "Native-only constant arithmetic with public {name} placeholders; portable resolved coordinates are numeric."
+                }
+              ]
+            }
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "at",
+          "text"
+        ]
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "x_range",
+    "y_range",
+    "alt"
+  ]
+}

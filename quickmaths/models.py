@@ -22,6 +22,7 @@ class Example:
     solution: str
     explanation: str = ""
     media: list[dict[str, Any]] = field(default_factory=list)
+    math_blocks: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -44,6 +45,8 @@ class ProblemTemplate:
     work: dict[str, Any] = field(default_factory=dict)
     review_policy: dict[str, Any] = field(default_factory=dict)
     media: list[dict[str, Any]] = field(default_factory=list)
+    diagram: dict[str, Any] | None = None
+    math_blocks: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -77,6 +80,7 @@ class Skill:
     replacement_skill_id: str = ""
     topic: str = ""
     media: list[dict[str, Any]] = field(default_factory=list)
+    math_blocks: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -114,6 +118,8 @@ class ProblemInstance:
     answer_metadata: dict[str, Any] = field(default_factory=dict)
     grading_metadata: dict[str, Any] = field(default_factory=dict)
     media: list[dict[str, Any]] = field(default_factory=list)
+    diagram: dict[str, Any] | None = None
+    math_blocks: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

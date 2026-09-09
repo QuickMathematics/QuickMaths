@@ -1,0 +1,13 @@
+.math-display { margin: 1rem 0; max-width: 100%; min-width: 0; overflow-x: auto; }
+.math-display > div { max-width: 100%; min-width: 0; overflow-x: auto; padding: .75rem; }
+.math-display__piecewise { display: table; min-width: max-content; }
+.math-display__row { display: table-row; }
+.math-display__row > span { display: table-cell; padding: .2rem .8rem; vertical-align: top; }
+.math-display__condition { white-space: nowrap; }
+.math-display__fraction, .math-display__limit { display: flex; align-items: center; gap: 1rem; min-width: max-content; }
+.math-display__fraction { flex-direction: column; gap: 0; }
+.math-display__fraction > span:first-child { border-bottom: 1px solid currentColor; padding: 0 .5rem .2rem; }
+.math-display__fraction > span:last-child { padding: .2rem .5rem 0; }
+.math-display__derivation { white-space: pre-wrap; }
+.math-display__linear { margin-top: .5rem; }
+.math-display__linear pre { white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; }

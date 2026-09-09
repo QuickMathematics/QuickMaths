@@ -1,5 +1,7 @@
+import { renderLimitWork, collectLimitWork } from "./limit-work.js?v=20260909-calculus-v1";
+import { renderMathBlocks } from "./math-display.js?v=20260909-calculus-v1";
 import { parseLessonManifest, readLessonFolder } from "./lesson-folder.js?v=20260906-media-v1";
-import { renderQuestionDiagram } from "./question-diagrams.js?v=20260906-illustrations-v1";
+import { renderQuestionDiagram } from "./question-diagrams.js?v=20260909-calculus-v1";
 import { renderLessonMedia } from "./lesson-media.js?v=20260906-media-v1";
 import { lessonIllustrations, illustrationAssets } from "./lesson-illustrations.js?v=20260908-statistics-v1";
 import { createLessonMediaRenderer } from "./lesson-media-renderer.js?v=20260906-media-v1";
@@ -9,9 +11,9 @@ import { learningFields, branchName } from "./learning-fields.js?v=20260908-stat
 import { storageStatus } from "./storage-status.js?v=20260906-optimization-v1";
 import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260908-profile-sync-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260908-map-reset-v1";
+import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260909-calculus-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260908-statistics-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260908-statistics-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260909-calculus-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -1515,14 +1517,14 @@ function renderLesson(snapshot) {
       </div>
       <article class="theory-card">
         <p class="eyebrow">Core idea</p>
-        <div class="theory-copy">${formatTheory(skill.theory)}</div>${renderLessonMedia(skill.media, skill.packId)}
+        <div class="theory-copy">${formatTheory(skill.theory)}</div>${renderMathBlocks(skill.math_blocks)}${renderLessonMedia(skill.media, skill.packId)}
       </article>
     </section>
-    ${skill.applications?.length ? `<section class="application-grid"><div class="section-title"><p class="eyebrow">Why this matters</p><h2>${escapeHtml(snapshot.activeSubject.shortName)} that travels</h2></div>${skill.applications.map((item) => `<article><strong>${escapeHtml(item.title ?? item.subject ?? "Application")}</strong><p>${escapeHtml(item.description)}</p>${renderLessonMedia(item.media, skill.packId)}</article>`).join("")}</section>` : ""}
+    ${skill.applications?.length ? `<section class="application-grid"><div class="section-title"><p class="eyebrow">Why this matters</p><h2>${escapeHtml(snapshot.activeSubject.shortName)} that travels</h2></div>${skill.applications.map((item) => `<article><strong>${escapeHtml(item.title ?? item.subject ?? "Application")}</strong><p>${escapeHtml(item.description)}</p>${renderMathBlocks(item.math_blocks)}${renderLessonMedia(item.media, skill.packId)}</article>`).join("")}</section>` : ""}
     ${illustrations ? `<section class="lesson-illustrations"><div class="section-title"><p class="eyebrow">Visual explanation</p><h2>See the idea</h2></div><div class="lesson-illustration-grid">${renderLessonMedia(illustrations.media, illustrations.packId)}</div></section>` : ""}
     <section class="examples-section">
       <div class="section-title"><p class="eyebrow">Worked examples</p><h2>Watch the method</h2></div>
-      <div class="example-list">${skill.examples.map((example, index) => `<details ${index === 0 || example.media?.length ? "open" : ""}><summary><span>${String(index + 1).padStart(2, "0")}</span>${escapeHtml(example.prompt)}</summary><div><p class="example-solution">${escapeHtml(example.solution)}</p><p>${escapeHtml(example.explanation)}</p>${renderLessonMedia(example.media, skill.packId)}</div></details>`).join("")}</div>
+      <div class="example-list">${skill.examples.map((example, index) => `<details ${index === 0 || example.media?.length ? "open" : ""}><summary><span>${String(index + 1).padStart(2, "0")}</span>${escapeHtml(example.prompt)}</summary><div><p class="example-solution">${escapeHtml(example.solution)}</p><p>${escapeHtml(example.explanation)}</p>${renderMathBlocks(example.math_blocks)}${renderLessonMedia(example.media, skill.packId)}</div></details>`).join("")}</div>
     </section>
   `;
 }
@@ -1559,7 +1561,7 @@ function renderFormattedCode(source, language = "text", caption = "Code") {
 
 function renderProblemPrompt(problem) {
   const packId = store.skillsById[problem.skill_id]?.packId;
-  const media = renderLessonMedia(problem.media, packId) + renderQuestionDiagram(problem);
+  const media = renderMathBlocks(problem.math_blocks) + renderLessonMedia(problem.media, packId) + renderQuestionDiagram(problem);
   if (!problem.prompt_blocks?.length) return `<h2>${escapeHtml(problem.prompt)}</h2>${media}`;
   return `<div class="question-prompt-blocks" aria-label="Question prompt">${problem.prompt_blocks.map((block) => block.type === "code"
     ? renderFormattedCode(block.text, block.language, "Question code")
@@ -1587,6 +1589,7 @@ function renderPythonResponse(problem, response) {
 }
 
 function renderStructuredWorkEditor(problem, response) {
+  if (problem.work?.mode === "limit_steps") return renderLimitWork(problem.work.limit, response.structuredWorkJson?.limit ?? {});
   const data = response.structuredWorkJson ?? {};
   const pieces = [];
   if (problem.grading_method === "rational_expression") {
@@ -1645,6 +1648,7 @@ function syncSignChartLayout(card) {
 }
 
 function collectStructuredWork(card) {
+  if (card.dataset.workMode === "limit_steps") return { limit: collectLimitWork(card) };
   const output = {};
   const exclusions = card.querySelector('[data-structured-field="excluded-values"]');
   if (exclusions) output.excluded_values = exclusions.value;
@@ -1695,7 +1699,7 @@ function renderTest(snapshot) {
           ${problem.grading_method === "python_program" ? renderPythonResponse(problem, response) : problem.options?.length ? `<fieldset class="answer-options"><legend>Final answer</legend>${problem.options.map((option) => `<label><input type="radio" name="answer-${escapeHtml(problem.template_id)}" value="${escapeHtml(option.id)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" ${response.finalAnswer === String(option.id) ? "checked" : ""}><span><b>${escapeHtml(option.id)}</b>${escapeHtml(option.label ?? option.id)}</span></label>`).join("")}</fieldset>` : `<label class="response-field"><span>Final answer</span><input type="text" value="${escapeHtml(response.finalAnswer)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" autocomplete="off" spellcheck="false" placeholder="Enter your answer"></label>`}
           ${renderWorkGuide(problem)}
           ${renderStructuredWorkEditor(problem, response)}
-          ${problem.work?.mode && problem.work.mode !== "none" && !["rational_equation_steps", "sign_chart_steps", "code_trace_steps"].includes(problem.work.mode) ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="${["proof_obligations", "rubric_check"].includes(problem.work.mode) ? 7 : 4}" maxlength="${MAX_LONG_WORK_CHARS}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="${escapeHtml(workResponsePlaceholder(problem))}">${escapeHtml(response.work)}</textarea><small>${Number(response.work?.length ?? 0).toLocaleString()} / ${MAX_LONG_WORK_CHARS.toLocaleString()} characters · saved without silent truncation</small></label>` : ""}
+          ${problem.work?.mode && problem.work.mode !== "none" && !["rational_equation_steps", "sign_chart_steps", "code_trace_steps", "limit_steps"].includes(problem.work.mode) ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="${["proof_obligations", "rubric_check"].includes(problem.work.mode) ? 7 : 4}" maxlength="${MAX_LONG_WORK_CHARS}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="${escapeHtml(workResponsePlaceholder(problem))}">${escapeHtml(response.work)}</textarea><small>${Number(response.work?.length ?? 0).toLocaleString()} / ${MAX_LONG_WORK_CHARS.toLocaleString()} characters · saved without silent truncation</small></label>` : ""}
         </article>`;
       }).join("")}
       <p id="test-error" class="form-message" role="alert"></p>
@@ -1717,6 +1721,11 @@ function resultReviewGuide(result) {
 function resultStructuredDetails(result) {
   const structured = result.structuredWorkJson;
   if (!structured) return "";
+  if (result.workMode === "limit_steps" && structured.limit) {
+    const data = structured.limit;
+    const kind = {finite:"Finite limit",positive_infinity:"Positive infinity",negative_infinity:"Negative infinity",no_common_limit:"No common limit"}[data.result_kind] ?? "No result selected";
+    return `<section class="shown-work"><strong>Your limit argument · tutor review</strong><p>${escapeHtml(data.variable)} approaches ${escapeHtml(data.approach)} (${escapeHtml(data.direction)}).</p><p>Original expression: ${escapeHtml(data.original_expression)}</p><p>Restrictions: ${escapeHtml((Array.isArray(data.restrictions) ? data.restrictions : []).join("; "))}</p><ol>${(Array.isArray(data.steps) ? data.steps : []).map(step => `<li>${escapeHtml(step)}</li>`).join("")}</ol><p>${escapeHtml(kind)}${data.result_kind === "finite" ? `: ${escapeHtml(data.result_value)}` : ""}</p><small>Algebraic transformations, domain validity and theorem hypotheses require tutor review.</small></section>`;
+  }
   if (result.gradingMethod === "python_program") {
     const grade = structured.python_grade;
     const tests = visiblePythonTests(grade, { submitted: true });
@@ -1733,7 +1742,7 @@ function resultStructuredDetails(result) {
 function resultDetails(results, packId = "", skillId = "") {
   return results.map((result, index) => `<details class="result-question" ${!result.correct || result.reviewRequired ? "open" : ""}>
     <summary><span class="result-icon ${result.correct ? "correct" : "incorrect"}">${result.correct ? "✓" : "×"}</span><span><strong>Question ${index + 1}</strong><small>${escapeHtml(result.prompt)}</small></span><b>${result.reviewRequired ? "Review required" : result.correct ? "Correct" : "Needs work"}</b></summary>
-    <div class="result-body">${renderLessonMedia(result.media, packId)}${renderQuestionDiagram(result, skillId)}<dl><div><dt>Your answer</dt><dd>${result.gradingMethod === "python_program" ? `<pre class="result-code"><code>${escapeHtml(result.finalAnswer || "No code submitted")}</code></pre>` : escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${resultStructuredDetails(result)}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
+    <div class="result-body">${renderMathBlocks(result.math_blocks)}${renderLessonMedia(result.media, packId)}${renderQuestionDiagram(result, skillId)}<dl><div><dt>Your answer</dt><dd>${result.gradingMethod === "python_program" ? `<pre class="result-code"><code>${escapeHtml(result.finalAnswer || "No code submitted")}</code></pre>` : escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${resultStructuredDetails(result)}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
   </details>`).join("");
 }
 
@@ -3319,7 +3328,7 @@ document.addEventListener("input", (event) => {
   }
   const responseInput = event.target.closest?.("[data-question-id][data-response-kind]");
   const card = responseInput?.closest(".question-card") ?? event.target.closest?.(".question-card");
-  if (!card || (!responseInput && !event.target.matches?.("[data-structured-field], [data-candidate-field], [data-critical-field], [data-interval-field], [data-endpoint-field], [data-trace-field]"))) return;
+  if (!card || (!responseInput && !event.target.matches?.("[data-structured-field], [data-candidate-field], [data-critical-field], [data-interval-field], [data-endpoint-field], [data-trace-field], [data-limit-work-field]"))) return;
   if (event.target.matches?.('[data-critical-field="value"]')) syncSignChartLayout(card);
   const questionId = responseInput?.dataset.questionId ?? card.id.replace(/^question-/, "");
   const answerField = card.querySelector('[data-response-kind="answer"]:checked') ?? card.querySelector('[data-response-kind="answer"]');
@@ -3581,7 +3590,7 @@ function initClock() {
 async function loadAgentGuides() {
   const read = async (path, type, fallback) => {
     try {
-      const response = await fetch(`./${path}?v=20260908-statistics-v1`);
+      const response = await fetch(`./${path}?v=20260909-calculus-v1`);
       return response.ok ? await response[type]() : fallback;
     } catch { return fallback; }
   };
@@ -3622,7 +3631,7 @@ async function boot() {
   const communityConfigPromise = fetch("./github-community-config.json", { cache: "no-store" })
     .then(response => response.ok ? response.json() : { enabled: false })
     .catch(() => ({ enabled: false }));
-  const response = await fetch("./curriculum-data.json?v=20260908-statistics-v1");
+  const response = await fetch("./curriculum-data.json?v=20260909-calculus-v1");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];

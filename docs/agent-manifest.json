@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Unified Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 30,
+  "app_version": 31,
   "description": "The single operating guide for routing fresh visitors, tutoring learners, and helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -407,7 +407,9 @@
       "exact_text",
       "theorem_conclusion"
     ],
+    "calculus_authoring": {"guide":"./CALCULUS_ENGINE.md","math_display_guide":"./MATH_DISPLAY.md","diagrams":"Bounded declarative Cartesian diagrams bind only to public prompt givens and persist with resolved questions.","limit_work":"limit_steps captures setup, restrictions and typed results; transformations and theorem applicability always require tutor review. No automatic semantic limit proof grading.","native_media":"Default native embedded budget remains 1000000 bytes; exporter can report batch growth and accept an explicit native-only budget. Hosted chunks and offline prefetch are not implemented."},
     "supported_work_modes": [
+      "limit_steps",
       "none",
       "capture_only",
       "procedural_steps",

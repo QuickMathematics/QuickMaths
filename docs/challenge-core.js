@@ -1,3 +1,6 @@
+import { normalizeLimitSpec, validateLimitWork } from "./limit-work.js?v=20260909-calculus-v1";
+import { normalizeCartesianDiagram, resolveCartesianDiagram, publicDiagramValues } from "./cartesian-diagrams.js?v=20260909-calculus-v1";
+import { normalizeMathBlocks, resolveMathBlocks } from "./math-display.js?v=20260909-calculus-v1";
 import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260908-statistics-v1";
 import { normalizeLessonAssets, normalizeLessonMedia, validateMediaReferences, mediaBaseUrl } from "./lesson-media.js?v=20260906-media-v1";
 import { chi_square_cdf, chi_square_sf, f_sf, inverse_normal_cdf, normal_cdf, t_cdf } from "./distributions.js?v=20260908-statistics-v1";
@@ -66,7 +69,7 @@ const GRADING_METHODS = new Set([
   "finite_set", "rational_expression", "interval_set", "python_program",
 ]);
 const WORK_MODES = new Set([
-  "none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check",
+  "none", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "limit_steps",
   "rational_equation_steps", "sign_chart_steps", "code_trace_steps",
 ]);
 const PYTHON_BUILTINS = new Set(["abs", "all", "any", "bool", "dict", "enumerate", "float", "int", "len", "list", "max", "min", "range", "round", "set", "sorted", "str", "sum", "tuple", "zip"]);
@@ -266,9 +269,11 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
       for (const [name, expression] of Object.entries(template.derived ?? {})) values[name] = safeTemplateEval(expression, values);
       if (!(template.constraints ?? []).every((constraint) => Boolean(safeTemplateEval(constraint, values)))) continue;
       const answer = renderNativeValue(template.answer ?? {}, values);
-      const explanation = template.explanation_template ? renderNativeTemplate(template.explanation_template, values).split(/\r?\n/).map((line) => line.trim()).filter(Boolean) : clone(template.solution_steps ?? []);
-      const answerMode = template.answer_mode ?? "final_only";
+      const explanation = template.explanation_template ? String(template.explanation_template).split(/\r?\n/).map(line => renderNativeTemplate(line, values)).filter(Boolean) : clone(template.solution_steps ?? []);
+      const publicValues = publicDiagramValues(template.prompt_template, values);
+      const answerMode = template.work?.mode === "limit_steps" ? "final_plus_required_work" : template.answer_mode ?? "final_only";
       const work = renderNativeValue(template.work ?? {}, values);
+      if (work.mode === "limit_steps") work.limit = normalizeLimitSpec(work.limit);
       const expectedAnswer = answer.value == null && answer.type === "finite_set"
         ? `{${(answer.values ?? []).join(", ")}}`
         : String(answer.value ?? "");
@@ -281,6 +286,8 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
         values: Object.fromEntries(Object.entries(values).map(([key, value]) => [key, stringifyTemplateValue(value)])),
         prompt: renderNativeTemplate(template.prompt_template, values),
         ...(template.media?.length ? { media: normalizeLessonMedia(template.media) } : {}),
+        ...(template.diagram ? { diagram: resolveCartesianDiagram(template.diagram, publicValues) } : {}),
+        ...(template.math_blocks?.length ? { math_blocks: resolveMathBlocks(template.math_blocks, publicValues) } : {}),
         expected_answer: expectedAnswer,
         answer_type: answer.type ?? "text",
         grading_method: template.grading?.method ?? "exact_text",
@@ -291,11 +298,11 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
         options: (template.options ?? []).map((option) => ({ ...clone(option), label: option.label == null ? option.label : renderNativeTemplate(String(option.label), values) })),
         answer_mode: answerMode,
         work,
-        review_policy: clone(template.review_policy ?? {}),
+        review_policy: work.mode === "limit_steps" ? { work_review:"tutor_required", mastery_requires_review_pass:true, allow_self_review:false } : clone(template.review_policy ?? {}),
         accepted_forms: clone(answer.accepted_forms ?? template.grading?.accepted_forms ?? []),
         answer_metadata: clone(answer),
         grading_metadata: renderNativeValue(template.grading ?? {}, values),
-        work_required: ["final_plus_required_work", "structured_steps", "proof_required"].includes(answerMode) || ["required", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"].includes(work.mode ?? "none"),
+        work_required: ["final_plus_required_work", "structured_steps", "proof_required"].includes(answerMode) || ["required", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "limit_steps"].includes(work.mode ?? "none"),
       };
     } catch {
       // Try a fresh variable draw. Exported native templates are trusted, but every expression still uses the allowlisted parser above.
@@ -655,7 +662,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
   const workCandidate = candidate.work && typeof candidate.work === "object" && !Array.isArray(candidate.work) ? candidate.work : {};
   const workMode = workCandidate.mode ?? "none";
   if (!WORK_MODES.has(workMode)) throw new Error(`${templateId} uses unsupported work mode ${workMode}.`);
-  const answerMode = candidate.answer_mode ?? (workMode === "none" ? "final_only" : "final_plus_required_work");
+  const answerMode = workMode === "limit_steps" ? "final_plus_required_work" : candidate.answer_mode ?? (workMode === "none" ? "final_only" : "final_plus_required_work");
   if (!["final_only", "final_plus_optional_work", "final_plus_required_work"].includes(answerMode)) throw new Error(`${templateId} uses unsupported answer_mode ${answerMode}.`);
   const minimumSteps = Math.floor(cleanNumber(Number(workCandidate.minimum_steps), workMode === "procedural_steps" ? 2 : 1, 1, 10));
   const solutionSteps = Array.isArray(candidate.solution_steps)
@@ -684,7 +691,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
     : [];
   if (workMode === "proof_obligations" && !obligations.length) throw new Error(`${templateId} proof_obligations needs at least one obligation.`);
   const reviewCandidate = candidate.review_policy && typeof candidate.review_policy === "object" && !Array.isArray(candidate.review_policy) ? candidate.review_policy : {};
-  const workReview = reviewCandidate.work_review ?? (["proof_obligations", "rubric_check"].includes(workMode) ? "tutor_required" : ["rational_equation_steps", "sign_chart_steps", "code_trace_steps"].includes(workMode) ? "auto" : "none");
+  const workReview = workMode === "limit_steps" ? "tutor_required" : reviewCandidate.work_review ?? (["proof_obligations", "rubric_check", "limit_steps"].includes(workMode) ? "tutor_required" : ["rational_equation_steps", "sign_chart_steps", "code_trace_steps"].includes(workMode) ? "auto" : "none");
   if (!["none", "optional", "auto", "tutor_required", "self_review"].includes(workReview)) throw new Error(`${templateId} uses unsupported work_review ${workReview}.`);
   const signChart = normalizeSignChart(workCandidate.sign_chart, templateId);
   const traceSpec = workMode === "code_trace_steps" ? normalizeTraceSpec(workCandidate.trace_spec, templateId) : null;
@@ -711,6 +718,8 @@ function normalizeProblem(candidate, skillId, questionIds) {
     prompt: requiredText(candidate.prompt, `${templateId} prompt`, 2000),
     prompt_blocks: normalizePromptBlocks(candidate.prompt_blocks, templateId),
     ...(candidate.media != null ? { media: normalizeLessonMedia(candidate.media) } : {}),
+    ...(candidate.math_blocks?.length ? { math_blocks: normalizeMathBlocks(candidate.math_blocks) } : {}),
+    ...(candidate.diagram ? { diagram: normalizeCartesianDiagram(candidate.diagram) } : {}),
     expected_answer: expectedAnswer,
     answer_type: optionalText(candidate.answer_type, `${templateId} answer_type`, 60) || "text",
     grading_method: gradingMethod,
@@ -722,6 +731,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
     answer_mode: answerMode,
     work: {
       mode: workMode,
+      ...(workMode === "limit_steps" ? { limit: normalizeLimitSpec(workCandidate.limit) } : {}),
       prompt: optionalText(workCandidate.prompt, `${templateId} work prompt`, 2000) || (workMode === "procedural_steps" ? "Show one mathematical step per line." : workMode === "code_trace_steps" ? "Complete the trace table after each labeled step." : workMode === "none" ? "" : "Explain your reasoning clearly."),
       line_type: ["expression", "equation", "inequality", "mixed", "text"].includes(workCandidate.line_type) ? workCandidate.line_type : "expression",
       target_variable: optionalText(workCandidate.target_variable, `${templateId} target_variable`, 40) || null,
@@ -745,8 +755,8 @@ function normalizeProblem(candidate, skillId, questionIds) {
     },
     review_policy: {
       work_review: workReview,
-      mastery_requires_review_pass: reviewCandidate.mastery_requires_review_pass === true || ["proof_obligations", "rubric_check"].includes(workMode),
-      allow_self_review: reviewCandidate.allow_self_review !== false,
+      mastery_requires_review_pass: reviewCandidate.mastery_requires_review_pass === true || ["proof_obligations", "rubric_check", "limit_steps"].includes(workMode),
+      allow_self_review: workMode !== "limit_steps" && reviewCandidate.allow_self_review !== false,
     },
     accepted_forms: Array.isArray(candidate.accepted_forms) ? candidate.accepted_forms.map((form) => requiredText(String(form), `${templateId} accepted form`, 300)).slice(0, 12) : [],
     answer_metadata: normalizeAnswerMetadata(candidate.answer_metadata, templateId),
@@ -754,7 +764,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
       require_reduced_form: candidate.grading_metadata?.require_reduced_form === true,
     },
     program_spec: programSpec,
-    work_required: candidate.work_required === true || answerMode === "final_plus_required_work",
+    work_required: workMode === "limit_steps" || candidate.work_required === true || answerMode === "final_plus_required_work",
   };
 }
 
@@ -831,11 +841,13 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
       solution: requiredText(String(example?.solution ?? ""), `${skillId} example ${index + 1} solution`, 1000),
       explanation: requiredText(example?.explanation, `${skillId} example ${index + 1} explanation`, 2000),
       ...(example?.media != null ? { media: normalizeLessonMedia(example.media) } : {}),
+      ...(example?.math_blocks?.length ? { math_blocks: normalizeMathBlocks(example.math_blocks) } : {}),
     })) : [];
     const applications = Array.isArray(skillCandidate.applications) ? skillCandidate.applications.slice(0, 20).map((application, index) => ({
       title: requiredText(application?.title, `${skillId} application ${index + 1} title`, 160),
       description: requiredText(application?.description, `${skillId} application ${index + 1} description`, 1000),
       ...(application?.media != null ? { media: normalizeLessonMedia(application.media) } : {}),
+      ...(application?.math_blocks?.length ? { math_blocks: normalizeMathBlocks(application.math_blocks) } : {}),
     })) : [];
     return {
       id: skillId,
@@ -864,6 +876,8 @@ export function normalizeLessonPack(input, { knownSkillIds = [], nativeSkills = 
       },
       theory: requiredText(skillCandidate.theory, `${skillId} theory`, 15_000),
       ...(skillCandidate.media != null ? { media: normalizeLessonMedia(skillCandidate.media) } : {}),
+
+      ...(skillCandidate.math_blocks?.length ? { math_blocks: normalizeMathBlocks(skillCandidate.math_blocks) } : {}),
       examples,
       applications,
       question_count: questionCount,
@@ -1444,6 +1458,8 @@ function sanitizeResult(candidate) {
     questionId,
     prompt: cleanText(candidate.prompt, 2000),
     ...(candidate.media?.length ? { media: normalizeLessonMedia(candidate.media) } : {}),
+    ...(candidate.math_blocks?.length ? { math_blocks: normalizeMathBlocks(candidate.math_blocks) } : {}),
+    ...(candidate.diagram ? { diagram: normalizeCartesianDiagram(candidate.diagram) } : {}),
     finalAnswer: cleanText(candidate.finalAnswer, (candidate.gradingMethod ?? candidate.grading_method) === "python_program" ? 12_000 : 300),
     work: cleanText(candidate.work, MAX_LONG_WORK_CHARS),
     structuredWorkJson: sanitizeStructuredWork(candidate.structuredWorkJson),
@@ -1456,6 +1472,7 @@ function sanitizeResult(candidate) {
     reviewRequired: Boolean(candidate.reviewRequired),
     allowSelfReview: candidate.allowSelfReview !== false,
     workMode: cleanText(candidate.workMode, 60) || "none",
+    ...(candidate.limitSpec ? { limitSpec: normalizeLimitSpec(candidate.limitSpec) } : {}),
     proofObligations: Array.isArray(candidate.proofObligations) ? candidate.proofObligations.map(normalizeReviewObligation).slice(0, 12) : [],
     rubricCriteria: Array.isArray(candidate.rubricCriteria) ? candidate.rubricCriteria.map(normalizeReviewCriterion).slice(0, 12) : [],
     reviewPolicy: cleanText(candidate.reviewPolicy, 60) || "none",
@@ -1568,6 +1585,15 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
             if (regenerated) safeProblems.set(id, regenerated);
           } catch { /* Discard malformed or non-reproducible runtime problems. */ }
         }
+      }
+      // Visual questions are immutable resolved snapshots. Never pair an old
+      // response or graph with newly generated givens after a template update.
+      for (const rawProblem of (Array.isArray(rawDraft.problems) ? rawDraft.problems : []).slice(0, MAX_PROBLEMS_PER_SKILL)) {
+        if (!rawProblem?.diagram && !rawProblem?.math_blocks?.length) continue;
+        const id = rawProblem.template_id;
+        if (!safeProblems.has(id) && !nativeTemplateIds.has(rawProblem.source_template_id)) continue;
+        try { safeProblems.set(id, normalizeProblem(rawProblem, skillId, new Set())); }
+        catch { safeProblems.delete(id); } // Invalid saved visual data is never silently regenerated.
       }
       const problemIds = Array.isArray(rawDraft.problems)
         ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => safeProblems.has(id)).slice(0, MAX_PROBLEMS_PER_SKILL)
@@ -2356,6 +2382,7 @@ export function gradeTraceTable(problem, structuredWork = null) {
 }
 
 export function validateProceduralWork(problem, work, structuredWork = null, finalAnswer = "") {
+  if (problem.work?.mode === "limit_steps") return validateLimitWork(problem.work.limit, structuredWork?.limit);
   if (!problem.work_required) return null;
   const lines = String(work ?? "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const minimumSteps = Math.max(1, Number(problem.work?.minimum_steps ?? 1));
@@ -3952,6 +3979,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         questionId: problem.template_id,
         prompt: problem.prompt,
         ...(problem.media?.length ? { media: clone(problem.media) } : {}),
+        ...(problem.diagram ? { diagram: clone(problem.diagram) } : {}),
+        ...(problem.math_blocks?.length ? { math_blocks: clone(problem.math_blocks) } : {}),
         finalAnswer: response.finalAnswer,
         work: response.work,
         structuredWorkJson: clone(response.structuredWorkJson),
@@ -3961,9 +3990,10 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         solutionSteps: clone(problem.solution_steps ?? []),
         mistakeTags: grade.correct ? [] : clone(problem.mistake_tags ?? []),
         workRequired: Boolean(problem.work_required),
-        reviewRequired: ["proof_obligations", "rubric_check"].includes(problem.work?.mode) || problem.review_policy?.mastery_requires_review_pass === true,
-        allowSelfReview: problem.review_policy?.allow_self_review !== false,
+        reviewRequired: ["proof_obligations", "rubric_check", "limit_steps"].includes(problem.work?.mode) || problem.review_policy?.mastery_requires_review_pass === true,
+        allowSelfReview: problem.work?.mode !== "limit_steps" && problem.review_policy?.allow_self_review !== false,
         workMode: problem.work?.mode ?? "none",
+        ...(problem.work?.mode === "limit_steps" ? { limitSpec: clone(problem.work.limit) } : {}),
         proofObligations: clone((problem.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation)),
         rubricCriteria: clone((problem.work?.rubric?.criteria ?? []).map(normalizeReviewCriterion)),
         reviewPolicy: problem.review_policy?.work_review ?? "none",
@@ -4177,6 +4207,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       work_status: response.work || response.structuredWorkJson ? (latest ? latest.verdict : ["rational_equation_steps", "sign_chart_steps"].includes(mode) ? "auto_checked" : "pending_review") : (saved ? item.workRequired : item.work_required) ? "missing" : "not_required",
       review_guide: {
         mode,
+        ...(mode === "limit_steps" ? { limit: clone(saved ? item.limitSpec : item.work.limit), proof_status: "Tutor review required; setup checks do not prove transformations or theorem hypotheses." } : {}),
         proof_obligations: clone(proofObligations),
         rubric_criteria: clone(rubricCriteria),
         review_policy: saved ? item.reviewPolicy : item.review_policy?.work_review ?? "none",
@@ -4244,6 +4275,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       ok: true,
       route: state.ui.route,
       skill: { id: skill.id, pack_id: skill.packId ?? null, custom: Boolean(skill.custom), name: skill.name, description: skill.description, status: row.status },
+      lesson_math_blocks: clone(skill.math_blocks ?? []),
       lesson_media: { items: clone(skill.media ?? []), ...(() => { const pack = skill.packId ? state.lessonPacks.find(item => item.id === skill.packId) : curriculum; return { assets: (pack?.assets ?? []).map(({ data_base64, ...asset }) => asset), asset_base_url: pack?.asset_base_url ?? "" }; })() },
       active_test: draft ? {
         question_count: draft.problems.length,
@@ -4253,6 +4285,8 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
           prompt: problem.prompt,
           prompt_blocks: clone(problem.prompt_blocks ?? []),
           ...(problem.media?.length ? { media: clone(problem.media) } : {}),
+        ...(problem.diagram ? { diagram: clone(problem.diagram) } : {}),
+        ...(problem.math_blocks?.length ? { math_blocks: clone(problem.math_blocks) } : {}),
           difficulty: problem.difficulty,
           answer_mode: problem.answer_mode,
           work_mode: problem.work?.mode ?? "none",

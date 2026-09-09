@@ -1,3 +1,4 @@
+import { renderCartesianDiagram } from "./cartesian-diagrams.js?v=20260909-calculus-v1";
 // Native assessment illustrations are reconstructed from the displayed givens.
 // Never read answer keys or hidden generator values: the same saved prompt must
 // produce the same picture, including for drafts created before this feature.
@@ -234,6 +235,7 @@ function plotSphere(spec) {
 }
 
 export function renderQuestionDiagram(problem, skillId) {
+  if (problem.diagram) return renderCartesianDiagram(problem.diagram);
   const spec = questionDiagram(problem, skillId);
   if (!spec) return "";
   const renderer = { graph: plotGraph, compass: plotCompass, arc: plotArc, sphere: plotSphere }[spec.kind];

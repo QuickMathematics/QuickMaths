@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +10,7 @@ from yaml.constructor import ConstructorError
 from yaml.nodes import MappingNode
 
 from quickmaths.config import DEFAULT_TRACK_DIR, SUPPORTED_GRADING_METHODS
+from quickmaths.lesson_display import LessonDisplayError, normalize_cartesian_diagram, normalize_math_blocks
 from quickmaths.models import Example, MasteryRules, ProblemTemplate, Skill, SkillTest, Track
 
 
@@ -106,12 +108,24 @@ def validate_content(track: Track, skills: dict[str, Skill]) -> list[str]:
             warnings.append(f"{skill.id}: no theory")
         if len(skill.test.questions) < 2:
             warnings.append(f"{skill.id}: fewer than two test question templates")
+        try:
+            normalize_math_blocks(skill.math_blocks)
+            for example in skill.examples:
+                normalize_math_blocks(example.math_blocks)
+        except LessonDisplayError as exc:
+            raise ContentError(f"{skill.source_path}: invalid native math display: {exc}") from exc
         for question in skill.test.questions:
             method = question.grading.get("method")
             if method not in SUPPORTED_GRADING_METHODS:
                 raise ContentError(
                     f"{skill.source_path}: question '{question.id}' uses unsupported grading method '{method}'"
                 )
+            try:
+                normalize_math_blocks(question.math_blocks)
+                if question.diagram is not None:
+                    normalize_cartesian_diagram(question.diagram)
+            except LessonDisplayError as exc:
+                raise ContentError(f"{skill.source_path}: question '{question.id}' has invalid native display: {exc}") from exc
     return warnings
 
 
@@ -160,6 +174,8 @@ def _skill_from_dict(data: dict[str, Any], path: Path, content_hash: str) -> Ski
                 work=dict(item.get("work", {})),
                 review_policy=dict(item.get("review_policy", {})),
                 media=list(item.get("media", [])),
+                diagram=deepcopy(item.get("diagram")) if item.get("diagram") is not None else None,
+                math_blocks=list(item.get("math_blocks", [])),
             )
             for item in data["test"].get("questions", [])
         ]
@@ -190,6 +206,7 @@ def _skill_from_dict(data: dict[str, Any], path: Path, content_hash: str) -> Ski
             draft=bool(data.get("draft", False)),
             deprecated=bool(data.get("deprecated", False)),
             replacement_skill_id=str(data.get("replacement_skill_id", "") or ""),
+            math_blocks=list(data.get("math_blocks", [])),
         )
     except KeyError as exc:
         raise ContentError(f"{path}: question is missing required field '{exc.args[0]}'") from exc

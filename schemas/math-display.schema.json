@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quickmathematics.github.io/QuickMaths/schemas/math-display.schema.json",
+  "title": "Quick Maths declarative math display",
+  "type": "array",
+  "maxItems": 24,
+  "items": {
+    "oneOf": [
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "alt", "linear_text", "rows"],
+        "properties": {
+          "type": { "const": "piecewise" },
+          "alt": { "$ref": "#/$defs/alt" },
+          "linear_text": { "$ref": "#/$defs/linearText" },
+          "rows": { "type": "array", "minItems": 1, "maxItems": 16, "items": { "$ref": "#/$defs/row" } }
+        }
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "alt", "linear_text", "numerator", "denominator"],
+        "properties": {
+          "type": { "const": "fraction" },
+          "alt": { "$ref": "#/$defs/alt" },
+          "linear_text": { "$ref": "#/$defs/linearText" },
+          "numerator": { "$ref": "#/$defs/shortText" },
+          "denominator": { "$ref": "#/$defs/shortText" }
+        }
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "alt", "linear_text", "variable", "to", "direction", "expression"],
+        "properties": {
+          "type": { "const": "limit" },
+          "alt": { "$ref": "#/$defs/alt" },
+          "linear_text": { "$ref": "#/$defs/linearText" },
+          "variable": { "$ref": "#/$defs/shortText" },
+          "to": { "$ref": "#/$defs/shortText" },
+          "direction": { "enum": ["left", "right", "both"] },
+          "expression": { "$ref": "#/$defs/shortText" }
+        }
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "alt", "linear_text", "steps"],
+        "properties": {
+          "type": { "const": "derivation" },
+          "alt": { "$ref": "#/$defs/alt" },
+          "linear_text": { "$ref": "#/$defs/linearText" },
+          "steps": { "type": "array", "minItems": 1, "maxItems": 16, "items": { "$ref": "#/$defs/text" } }
+        }
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "alt", "linear_text", "text"],
+        "properties": {
+          "type": { "const": "notation" },
+          "alt": { "$ref": "#/$defs/alt" },
+          "linear_text": { "$ref": "#/$defs/linearText" },
+          "text": { "$ref": "#/$defs/text" }
+        }
+      }
+    ]
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "shortText": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "alt": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "linearText": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expression", "condition"],
+      "properties": {
+        "expression": { "$ref": "#/$defs/shortText" },
+        "condition": { "$ref": "#/$defs/shortText" }
+      }
+    }
+  }
+}

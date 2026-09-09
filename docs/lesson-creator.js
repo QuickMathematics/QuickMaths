@@ -1,3 +1,6 @@
+import { normalizeLimitSpec } from "./limit-work.js?v=20260909-calculus-v1";
+import { normalizeMathBlocks, renderMathBlocks } from "./math-display.js?v=20260909-calculus-v1";
+import { normalizeCartesianDiagram, renderCartesianDiagram } from "./cartesian-diagrams.js?v=20260909-calculus-v1";
 import { normalizeLessonMedia, renderLessonMedia, mediaPath, mediaDigest, encodeMediaData, MEDIA_TYPES, MAX_EMBEDDED_MEDIA_BYTES } from "./lesson-media.js?v=20260906-media-v1";
 import { includeLessonIllustrations } from "./lesson-illustrations.js?v=20260908-statistics-v1";
 import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260908-statistics-v1";
@@ -10,6 +13,7 @@ const DEFAULT_THEME = {
 };
 
 const WORK_MODE_GUIDES = {
+  limit_steps: {title:"Limit argument · tutor review", summary:"Capture approach, direction, restrictions and algebra steps.", syntax:"Start with the original expression; retain domain restrictions after cancellation.", flow:"Setup is checked; transformations, limit laws and proof completeness need tutor review."},
   none: {
     title: "Final answer only",
     summary: "QuickMaths shows one final-answer field and grades it locally.",
@@ -236,11 +240,12 @@ function renderStudentPreview(problem) {
   const obligations = lines(problem.proofObligations);
   const strategies = lines(problem.proofStrategies);
   const criteria = lines(problem.rubricCriteria);
-  const required = ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "code_trace_steps"].includes(problem.workMode) || problem.answerMode === "final_plus_required_work";
+  const required = ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "code_trace_steps", "limit_steps"].includes(problem.workMode) || problem.answerMode === "final_plus_required_work";
   return `<section class="studio-student-preview" aria-label="Learner view preview">
     <header><div><span>Learner view preview</span><strong>${esc(guide.title)}</strong></div><b>${required ? "Required work" : problem.answerMode === "final_plus_optional_work" ? "Optional work" : "Final answer"}</b></header>
     <article>
       <small>QUESTION</small><h4>${esc(problem.prompt || "Your learner-facing question appears here.")}</h4>
+      ${displayPreview(problem)}
       ${problem.promptCode ? `<figure class="studio-code-preview"><figcaption>${esc(problem.promptCodeLanguage || "python")}</figcaption><pre><code>${esc(problem.promptCode)}</code></pre></figure>` : ""}
       <label><span>${problem.gradingMethod === "python_program" ? "Python solution" : problem.workMode === "proof_obligations" ? "Final conclusion (graded separately)" : "Final answer"}</span><i>${problem.gradingMethod === "python_program" ? `Code editor + Run sandboxed tests for ${esc(problem.pythonEntrypoint)}` : esc(problem.expectedAnswer ? "Learner enters an answer here" : problem.workMode === "proof_obligations" ? "Set the private expected conclusion above" : "Set the private expected answer above")}</i></label>
       ${problem.workMode === "proof_obligations" ? `<div class="studio-preview-guide"><strong>Your proof must cover</strong><ol>${obligations.map((item) => `<li>${esc(item)}</li>`).join("") || "<li>Add at least one proof obligation.</li>"}</ol>${strategies.length ? `<p><b>Accepted approaches:</b> ${strategies.map(esc).join(" · ")}</p>` : ""}</div>` : ""}
@@ -279,7 +284,7 @@ function renderAdvancedWork(problem, index) {
     : problem.workMode === "capture_only" ? [["final_plus_optional_work", "Final answer + optional explanation"], ["final_plus_required_work", "Final answer + required explanation"]]
       : [["final_plus_required_work", "Final answer + required work"]];
   const answerValue = problem.workMode === "none" ? "final_only"
-    : ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "code_trace_steps"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
+    : ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "code_trace_steps", "limit_steps"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
   return `<details class="studio-advanced studio-work-authoring" ${problem.workMode !== "none" ? "open" : ""}>
     <summary><span>How the learner answers</span><b>${esc(guide.title)}</b></summary>
     <div class="studio-mode-guide"><span aria-hidden="true">${problem.workMode === "proof_obligations" ? "∴" : problem.workMode === "rubric_check" ? "☷" : problem.workMode === "procedural_steps" ? "=" : "✎"}</span><div><strong>${esc(guide.summary)}</strong><p>${esc(guide.syntax)}</p></div></div>
@@ -296,9 +301,25 @@ function renderAdvancedWork(problem, index) {
   </details>`;
 }
 
-function renderMediaEditor(items = [], scope, sectionIndex, assets = []) {
+function displayBlocks(owner) {
+  return normalizeMathBlocks(owner.mathBlocksJson == null ? owner.math_blocks ?? [] : JSON.parse(owner.mathBlocksJson || "[]"));
+}
+function displayGraph(owner) {
+  const value = owner.diagramJson == null ? owner.diagram : JSON.parse(owner.diagramJson || "null");
+  return value ? normalizeCartesianDiagram(value) : null;
+}
+function displayPreview(owner) {
+  try { const graph = displayGraph(owner); return renderMathBlocks(displayBlocks(owner)) + (graph ? renderCartesianDiagram(graph) : ""); }
+  catch (error) { return `<p class="studio-field-intro">Display preview: ${esc(error.message)}</p>`; }
+}
+function renderDisplayEditor(owner, scope, index) {
+  const indexed = html => html.replaceAll("data-creator-field", `data-index="${index}" data-creator-field`);
+  return `<details class="studio-advanced"><summary>Mathematical displays${scope === "problem" ? " and function graph" : ""} <small>optional</small></summary><p>Use structured mathematical data for piecewise rules, fractions, limits and derivations. Each block needs a description and copyable linear text. <a href="./CALCULUS_ENGINE.md" target="_blank" rel="noopener">Authoring examples ↗</a></p>${indexed(area("Math display blocks (JSON list)", `${scope}.mathBlocksJson`, owner.mathBlocksJson ?? JSON.stringify(owner.math_blocks ?? [], null, 2), {rows:6}))}${scope === "problem" ? indexed(area("Resolved Cartesian graph (JSON object)", `${scope}.diagramJson`, owner.diagramJson ?? JSON.stringify(owner.diagram ?? null, null, 2), {rows:6, hint:"Coordinates in exported lesson packs are numbers. Randomized parameter binding belongs in native templates."})) : ""}${displayPreview(owner)}</details>`;
+}
+
+function renderMediaEditor(items = [], scope, sectionIndex, assets = [], owner = {}) {
   const context = `data-media-scope="${scope}" data-section-index="${sectionIndex}"`;
-  return `<section class="studio-media-editor"><h3>Images, diagrams and media</h3>
+  return `<section class="studio-media-editor"><h3>Images, diagrams and media</h3>${renderDisplayEditor(owner, scope, sectionIndex)}
     ${(items ?? []).map((item, index) => {
       const indexed = markup => markup.replaceAll("data-creator-field", `${context} data-media-index="${index}" data-creator-field`);
       let preview = "";
@@ -342,7 +363,8 @@ function renderProblemEditor(skill, problem, index, assets) {
       ${["theorem_conclusion", "symbolic_expression", "equation_solution", "inequality_solution"].includes(problem.gradingMethod) ? indexed(area(isProof ? "Other accepted conclusions — one per line" : "Other accepted final answers — one per line", "problem.acceptedForms", problem.acceptedForms, { rows: 3, hint: "These apply only to the short final answer, not the proof text." })) : ""}
       ${indexed(area("Private solution outline — one step per line", "problem.solutionSteps", problem.solutionSteps, { rows: 4, hint: "Shown after submission; keep answer-key reasoning out of the learner prompt." }))}
       ${indexed(area("Mistake tags — one per line", "problem.mistakeTags", problem.mistakeTags, { rows: 2, hint: "Short labels such as sign_error or missing_evidence help the tutor target follow-up work." }))}
-      ${renderMediaEditor(problem.media, "problem", index, assets)}
+      ${problem.workMode === "limit_steps" ? `<section class="studio-card"><h3>Limit setup for review</h3>${indexed(field("Variable", "problem.limitVariable", problem.limitVariable ?? "x"))}${indexed(field("Approaching", "problem.limitApproach", problem.limitApproach ?? "0"))}${indexed(select("Direction", "problem.limitDirection", problem.limitDirection ?? "both", [["both","Both sides"],["left","From the left"],["right","From the right"]]))}${indexed(area("Original expression", "problem.limitOriginal", problem.limitOriginal ?? "", {rows:2}))}${indexed(area("Required original restrictions (one per line)", "problem.limitRestrictions", problem.limitRestrictions ?? "", {rows:3}))}<p>Transformations and limit laws always require tutor review.</p></section>` : ""}
+      ${renderMediaEditor(problem.media, "problem", index, assets, problem)}
       ${renderAdvancedWork(problem, index)}
     </div>
   </details>`;
@@ -460,18 +482,19 @@ function buildPack(draft) {
         review_after_days_if_mastered: Number(skill.reviewMasteredDays), review_after_days_if_learning: Number(skill.reviewLearningDays),
       },
       theory: skill.theory,
-      ...(skill.media?.length ? { media: normalizeLessonMedia(skill.media) } : {}),
-      examples: skill.examples.map((example) => ({ prompt: example.prompt, solution: example.solution, explanation: example.explanation, ...(example.media?.length ? { media: normalizeLessonMedia(example.media) } : {}) })),
-      applications: skill.applications.map((application) => ({ title: application.title, description: application.description, ...(application.media?.length ? { media: normalizeLessonMedia(application.media) } : {}) })),
+      ...(displayBlocks(skill).length ? { math_blocks: displayBlocks(skill) } : {}), ...(skill.media?.length ? { media: normalizeLessonMedia(skill.media) } : {}),
+      examples: skill.examples.map((example) => ({ prompt: example.prompt, solution: example.solution, explanation: example.explanation, ...(displayBlocks(example).length ? { math_blocks: displayBlocks(example) } : {}), ...(example.media?.length ? { media: normalizeLessonMedia(example.media) } : {}) })),
+      applications: skill.applications.map((application) => ({ title: application.title, description: application.description, ...(displayBlocks(application).length ? { math_blocks: displayBlocks(application) } : {}), ...(application.media?.length ? { media: normalizeLessonMedia(application.media) } : {}) })),
       question_count: draft.mode === "override" ? Math.min(Number(skill.questionCount ?? skill.problems.length), skill.problems.length) : skill.problems.length,
       problems: skill.problems.map((problem, problemIndex) => {
         const answerMode = problem.workMode === "none" ? "final_only"
-          : ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "code_trace_steps"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
+          : ["procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "code_trace_steps", "limit_steps"].includes(problem.workMode) ? "final_plus_required_work" : problem.answerMode;
         const work = {
           mode: problem.workMode, prompt: problem.workPrompt, minimum_steps: Number(problem.minimumSteps), line_type: problem.lineType,
           require_final_answer_match: problem.workRequireFinalAnswerMatch !== false,
           ...(problem.hasTargetVariable && problem.targetVariable ? { target_variable: problem.targetVariable } : {}),
         };
+        if (problem.workMode === "limit_steps") work.limit = normalizeLimitSpec({ variable:problem.limitVariable || "x", approach:problem.limitApproach || "0", direction:problem.limitDirection || "both", original_expression:problem.limitOriginal || "", restrictions:lines(problem.limitRestrictions ?? "") });
         if (problem.workMode === "proof_obligations") work.proof_policy = { obligations: editedReviewItems(problem.proofObligations, problem.sourceProofObligations), accepted_strategies: lines(problem.proofStrategies) };
         if (problem.workMode === "rubric_check") work.rubric = { criteria: editedReviewItems(problem.rubricCriteria, problem.sourceRubricCriteria, { rubric: true }) };
         if (problem.workMode === "rational_equation_steps") {
@@ -515,13 +538,15 @@ function buildPack(draft) {
           ...(problem.variable ? { variable: problem.variable } : {}),
           mistake_tags: lines(problem.mistakeTags), answer_mode: answerMode, work,
           review_policy: {
-            work_review: ["proof_obligations", "rubric_check"].includes(problem.workMode) ? (problem.workReview === "self_review" ? "self_review" : "tutor_required") : problem.workReview,
-            mastery_requires_review_pass: ["proof_obligations", "rubric_check"].includes(problem.workMode) || Boolean(problem.masteryRequiresReview),
-            allow_self_review: ["proof_obligations", "rubric_check"].includes(problem.workMode) ? problem.workReview === "self_review" : Boolean(problem.allowSelfReview),
+            work_review: problem.workMode === "limit_steps" ? "tutor_required" : ["proof_obligations", "rubric_check"].includes(problem.workMode) ? (problem.workReview === "self_review" ? "self_review" : "tutor_required") : problem.workReview,
+            mastery_requires_review_pass: problem.workMode === "limit_steps" || ["proof_obligations", "rubric_check"].includes(problem.workMode) || Boolean(problem.masteryRequiresReview),
+            allow_self_review: problem.workMode === "limit_steps" ? false : ["proof_obligations", "rubric_check"].includes(problem.workMode) ? problem.workReview === "self_review" : Boolean(problem.allowSelfReview),
           },
         };
         const promptBlocks = buildPromptBlocks(problem);
         if (promptBlocks) output.prompt_blocks = promptBlocks;
+        if (displayGraph(problem)) output.diagram = displayGraph(problem);
+        if (displayBlocks(problem).length) output.math_blocks = displayBlocks(problem);
         if (problem.media?.length) output.media = normalizeLessonMedia(problem.media);
         if (problem.gradingMethod === "numeric_with_tolerance") output.tolerance = Number(problem.tolerance);
         if (problem.gradingMethod === "finite_set") output.answer_metadata = { type: "finite_set", variable: problem.answerVariable || "x", values: lines(problem.answerValues) };
@@ -580,19 +605,20 @@ function draftFromPack(pack, snapshot) {
   }
   base.skills = (pack.skills ?? []).map((skill, skillIndex) => ({
     ...blankSkill(skillIndex), activeProblem: 0, id: skill.id, referenceId: skill.id, name: skill.name, description: skill.description, subdomain: skill.subdomain ?? "Foundations", topic: skill.topic,
-    theory: skill.theory, media: structuredClone(skill.media ?? []), tags: (skill.tags ?? []).join("\n"), prerequisites: studioPrerequisites(skill),
+    theory: skill.theory, math_blocks: structuredClone(skill.math_blocks ?? []), media: structuredClone(skill.media ?? []), tags: (skill.tags ?? []).join("\n"), prerequisites: studioPrerequisites(skill),
     passingScore: skill.mastery?.passing_score ?? .8, minimumConfidence: skill.mastery?.minimum_confidence ?? 3, maxGuessingAllowed: skill.mastery?.max_guessing_allowed ?? "maybe",
     reviewMasteredDays: skill.mastery?.review_after_days_if_mastered ?? 7, reviewLearningDays: skill.mastery?.review_after_days_if_learning ?? 2,
     questionCount: skill.question_count ?? skill.problems?.length ?? 1,
     examples: skill.examples?.length ? skill.examples : [], applications: skill.applications?.length ? skill.applications : [],
     problems: (skill.problems ?? []).map((problem, problemIndex) => ({
       ...blankProblem(skill.id, problemIndex), templateId: problem.template_id, sourceTemplateId: problem.source_template_id ?? problem.template_id, prompt: problem.prompt,
-      media: structuredClone(problem.media ?? []), originalPrompt: problem.prompt, promptBlocks: structuredClone(problem.prompt_blocks ?? []),
+      math_blocks: structuredClone(problem.math_blocks ?? []), diagram: structuredClone(problem.diagram ?? null), media: structuredClone(problem.media ?? []), originalPrompt: problem.prompt, promptBlocks: structuredClone(problem.prompt_blocks ?? []),
       promptCode: problem.prompt_blocks?.find((block) => block.type === "code")?.text ?? "", promptCodeLanguage: problem.prompt_blocks?.find((block) => block.type === "code")?.language ?? "python",
       expectedAnswer: String(problem.expected_answer ?? ""),
       answerType: problem.answer_type ?? "text", gradingMethod: problem.grading_method, variable: problem.variable ?? null, difficulty: problem.difficulty ?? "medium",
       tolerance: String(problem.tolerance ?? .001), options: (problem.options ?? []).map((option) => `${option.id} | ${option.label}`).join("\n"),
       acceptedForms: (problem.accepted_forms ?? []).join("\n"), solutionSteps: (problem.solution_steps ?? []).join("\n"), mistakeTags: (problem.mistake_tags ?? []).join("\n"),
+      limitVariable:problem.work?.limit?.variable ?? "x", limitApproach:problem.work?.limit?.approach ?? "0", limitDirection:problem.work?.limit?.direction ?? "both", limitOriginal:problem.work?.limit?.original_expression ?? "", limitRestrictions:(problem.work?.limit?.restrictions ?? []).join("\n"),
       answerMode: problem.answer_mode ?? "final_only", workMode: problem.work?.mode ?? "none", workPrompt: problem.work?.prompt ?? "",
       minimumSteps: problem.work?.minimum_steps ?? 2, lineType: problem.work?.line_type ?? "expression",
       workRequireFinalAnswerMatch: problem.work?.require_final_answer_match !== false, hasTargetVariable: Boolean(problem.work?.target_variable),
@@ -791,18 +817,18 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
             ${area("Tags, one per line", "skill.tags", skill.tags, { rows: 2 })}
             ${area("What will learners master?", "skill.description", skill.description, { rows: 3 })}
             ${area("Lesson theory", "skill.theory", skill.theory, { rows: 9, help: "Plain text only. Blank lines make paragraphs; lines beginning with - make lists." })}
-            ${renderMediaEditor(skill.media, "skill", 0, draft.assets)}
+            ${renderMediaEditor(skill.media, "skill", 0, draft.assets, skill)}
             <label class="studio-field"><span>Prerequisite bridges ${helpButton("Choose lessons from any installed field or from this draft. In Hard path they lock this test; in Open path they are guidance.")}</span><select data-creator-prerequisites multiple size="${Math.min(8, Math.max(4, allSkills.length))}">${allSkills.map((item) => `<option value="${esc(item.referenceId)}" ${skill.prerequisites.some(reference => prerequisiteId(reference) === item.referenceId) ? "selected" : ""}>${esc(snapshot.subjects.find((subject) => subject.id === item.subjectId)?.name ?? "This set")} › ${esc(item.subdomain || "Foundations")} › ${esc(item.name)}</option>`).join("")}</select><small>Ctrl/Cmd-click to choose more than one.</small></label>
             <details class="studio-advanced"><summary>Mastery and review timing</summary><div class="studio-four">${field("Passing score", "skill.passingScore", skill.passingScore, { type: "number", min: .5, max: 1, step: .05 })}${field("Minimum confidence", "skill.minimumConfidence", skill.minimumConfidence, { type: "number", min: 1, max: 5 })}${field("Review if mastered", "skill.reviewMasteredDays", skill.reviewMasteredDays, { type: "number", min: 1, max: 365 })}${field("Review if learning", "skill.reviewLearningDays", skill.reviewLearningDays, { type: "number", min: 1, max: 365 })}</div></details>
           </section>
           <section class="studio-card">
             <div class="studio-section-title"><div><p class="eyebrow">Worked teaching material</p><h2>Examples and applications</h2></div></div>
-            <div class="studio-repeat"><h3>Worked examples</h3>${skill.examples.map((example, index) => `<article><div class="studio-repeat-head"><b>Example ${index + 1}</b><button data-creator-action="remove-example" data-index="${index}">Remove</button></div>${field("Prompt", "example.prompt", example.prompt).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${field("Solution", "example.solution", example.solution).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Explanation", "example.explanation", example.explanation, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${renderMediaEditor(example.media, "example", index, draft.assets)}</article>`).join("")}<button class="button button-outline" data-creator-action="add-example">＋ Add worked example</button></div>
-            <div class="studio-repeat"><h3>Real-world / cross-field applications</h3>${skill.applications.map((application, index) => `<article><div class="studio-repeat-head"><b>Application ${index + 1}</b><button data-creator-action="remove-application" data-index="${index}">Remove</button></div>${field("Title", "application.title", application.title).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Description", "application.description", application.description, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${renderMediaEditor(application.media, "application", index, draft.assets)}</article>`).join("")}<button class="button button-outline" data-creator-action="add-application">＋ Add application</button></div>
+            <div class="studio-repeat"><h3>Worked examples</h3>${skill.examples.map((example, index) => `<article><div class="studio-repeat-head"><b>Example ${index + 1}</b><button data-creator-action="remove-example" data-index="${index}">Remove</button></div>${field("Prompt", "example.prompt", example.prompt).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${field("Solution", "example.solution", example.solution).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Explanation", "example.explanation", example.explanation, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${renderMediaEditor(example.media, "example", index, draft.assets, example)}</article>`).join("")}<button class="button button-outline" data-creator-action="add-example">＋ Add worked example</button></div>
+            <div class="studio-repeat"><h3>Real-world / cross-field applications</h3>${skill.applications.map((application, index) => `<article><div class="studio-repeat-head"><b>Application ${index + 1}</b><button data-creator-action="remove-application" data-index="${index}">Remove</button></div>${field("Title", "application.title", application.title).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${area("Description", "application.description", application.description, { rows: 3 }).replaceAll("data-creator-field", `data-index="${index}" data-creator-field`)}${renderMediaEditor(application.media, "application", index, draft.assets, application)}</article>`).join("")}<button class="button button-outline" data-creator-action="add-application">＋ Add application</button></div>
           </section>
           <section class="studio-card">
             <div class="studio-section-title"><div><p class="eyebrow">3 · Mastery questions</p><h2>What proves this lesson?</h2><p>Build the short answer, any required reasoning, and the sign-off rule as three separate pieces.</p></div><button class="button button-secondary" data-creator-action="add-problem">＋ Add question</button></div>
-            ${nativePreviewProblem ? `<aside class="studio-runtime-preview"><header><div><span>Original native runtime generator</span><strong>Variation ${Number(draft.nativePreviewVariation ?? 0) + 1} · ${nativePreview.templateCount} authored scenarios</strong></div><div><button type="button" class="quiet-button" data-creator-action="reroll-native-preview">Reroll values</button><button type="button" class="quiet-button" data-creator-action="download-native-preview">Download full audit</button></div></header><div><small>${esc(nativePreviewProblem.source_template_id)}</small><h3>${esc(nativePreviewProblem.prompt)}</h3><dl><div><dt>Generated values</dt><dd>${esc(Object.entries(nativePreviewProblem.values ?? {}).map(([key, value]) => `${key}=${value}`).join(" · ") || "fixed scenario")}</dd></div><div><dt>Expected answer</dt><dd>${esc(nativePreviewProblem.expected_answer)}</dd></div><div><dt>Self-grades</dt><dd>${esc(nativePreviewProblem.grading_method)}</dd></div></dl></div><footer>This audits the original trusted generator while you edit a fixed, reversible override. Installed custom/community files never execute generators.</footer></aside>` : ""}
+            ${nativePreviewProblem ? `<aside class="studio-runtime-preview"><header><div><span>Original native runtime generator</span><strong>Variation ${Number(draft.nativePreviewVariation ?? 0) + 1} · ${nativePreview.templateCount} authored scenarios</strong></div><div><button type="button" class="quiet-button" data-creator-action="reroll-native-preview">Reroll values</button><button type="button" class="quiet-button" data-creator-action="download-native-preview">Download full audit</button></div></header><div><small>${esc(nativePreviewProblem.source_template_id)}</small><h3>${esc(nativePreviewProblem.prompt)}</h3>${renderMathBlocks(nativePreviewProblem.math_blocks)}${nativePreviewProblem.diagram ? renderCartesianDiagram(nativePreviewProblem.diagram) : ""}<dl><div><dt>Generated values</dt><dd>${esc(Object.entries(nativePreviewProblem.values ?? {}).map(([key, value]) => `${key}=${value}`).join(" · ") || "fixed scenario")}</dd></div><div><dt>Expected answer</dt><dd>${esc(nativePreviewProblem.expected_answer)}</dd></div><div><dt>Self-grades</dt><dd>${esc(nativePreviewProblem.grading_method)}</dd></div></dl></div><footer>This audits the original trusted generator while you edit a fixed, reversible override. Installed custom/community files never execute generators.</footer></aside>` : ""}
             <div class="studio-question-roadmap"><article><span>1</span><div><strong>Final answer</strong><p>The local grader checks a number, choice, expression, or conclusion.</p></div></article><i>→</i><article><span>2</span><div><strong>Shown work</strong><p>Optional explanation, checked maths steps, a proof, or a rubric response.</p></div></article><i>→</i><article><span>3</span><div><strong>Review</strong><p>Proofs and rubric responses wait for a self, tutor, or agent verdict.</p></div></article></div>
             <nav class="studio-question-tabs" aria-label="Mastery question bank">${skill.problems.map((problem, index) => `<button type="button" data-creator-action="select-problem" data-index="${index}" aria-current="${index === skill.activeProblem ? "true" : "false"}"><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(problem.prompt || "Untitled question")}</b><small>${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</small></button>`).join("")}</nav>
             <p class="studio-question-count">Editing question ${skill.activeProblem + 1} of ${skill.problems.length}. ${draft.mode === "override" ? `The original comprehensive test length (${Math.min(Number(skill.questionCount ?? skill.problems.length), skill.problems.length)}) is preserved while the bank contains enough questions.` : "Every question in this bank becomes part of the mastery test."} Only the selected editor is rendered, so large native question banks stay fast.</p>

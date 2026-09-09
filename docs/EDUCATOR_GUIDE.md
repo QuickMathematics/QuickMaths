@@ -741,8 +741,18 @@ Use the app's Agent handoff. Download a full backup or configure private Workspa
 - Bridge guide: https://quickmathematics.github.io/QuickMaths/bridge-guide.html
 - Source and Lesson Depot: https://github.com/QuickMathematics/QuickMaths
 
-QuickMaths educator documentation - app version 29 - September 2026.
+QuickMaths educator documentation - app version 31 - September 2026.
 
 ## Adding diagrams, video and audio
 
 In Lesson Studio, use **Attach a file** in a lesson, example, application or question, then set its description, caption and dimensions. Small attachments (up to 1 MB total) are saved inside your draft and exported JSON. For larger media, place files beside a YAML/JSON manifest and use **Publish → Open lesson folder**. Files may be up to 25 MB each and 100 MB total. Matplotlib figures are generated during authoring as PNG/SVG, so learners need no plotting runtime. The media guide includes folder and plotting examples: https://quickmathematics.github.io/QuickMaths/LESSON_MEDIA.md . Try the portable geometry lesson: https://quickmathematics.github.io/QuickMaths/lesson-media-example.json . Public hosted attachments stay in the publication repository; backup files preserve their verified references.
+
+## Calculus displays and reviewed limit arguments
+
+Lessons support parameter-linked Cartesian diagrams and structured mathematical display blocks. Native authors bind graphs to public prompt givens; portable lesson packs store resolved numeric graph data. Saved visual questions and attempts retain their original display. Use separate open endpoints and isolated filled points when a boundary function value differs from the neighboring curve. Descriptions and labels must not disclose hidden roots, expected answers or proof conclusions.
+
+Studio's optional **Mathematical displays and function graph** panel accepts validated display data, shows a preview, and preserves it through imports, edits and exports. Math blocks can accompany lesson theory, examples, applications and questions. Graphs attach to questions. The original native generator preview also shows its resolved graph when values are rerolled; portable overrides remain fixed questions. Authoring details: https://quickmathematics.github.io/QuickMaths/CALCULUS_ENGINE.md and https://quickmathematics.github.io/QuickMaths/MATH_DISPLAY.md .
+
+Select **Limit argument · tutor review** for structured calculus work. Configure the original expression, approach, direction and required domain restrictions. The engine checks setup and form completeness; a tutor must judge legal transformations, admissible domains, limit-law hypotheses and proof completeness. The mode requires review and disallows self-review. Keep open IVT and uniqueness arguments in proof/rubric review modes. Do not interpret pending review as a proof pass.
+
+Native media builds now report current bytes, remaining budget and optional growth since the previous batch. The default native embedded budget remains 1 MB; imported pack limits remain separate. Hosted native chunks and an explicit offline download workflow are not part of this update.

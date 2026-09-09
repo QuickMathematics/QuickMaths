@@ -1,3 +1,5 @@
+@import url("./math-display.css?v=20260909-calculus-v1");
+
 :root {
   --paper: #f3eee3;
   --paper-deep: #e8dfce;
@@ -1772,6 +1774,10 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:ha
 .lesson-media-status { padding: 1rem; color: var(--muted, #68716b); overflow-wrap: anywhere; }
 
 .map-subject-lanes .map-branch-heading-toggle { pointer-events: auto; }
+.cartesian-endpoint { stroke: var(--pine); stroke-width: 2.5; }
+.cartesian-endpoint.open { fill: var(--paper-light); }
+.cartesian-endpoint.closed { fill: var(--pine); }
+.cartesian-asymptote { stroke: var(--muted); stroke-width: 2; stroke-dasharray: 8 6; }
 .map-edge-hit:hover, .map-edge-hit:focus { stroke: var(--pine); stroke-opacity: .18; }
 
 /* Compact settings workspace; other learning pages retain their own scale. */

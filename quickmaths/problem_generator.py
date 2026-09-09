@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import random
+import re
 from copy import deepcopy
 from fractions import Fraction
 
 from quickmaths.math_syntax import equation_text_from_prompt, rational_equation_restrictions
+from quickmaths.lesson_display import LessonDisplayError, resolve_cartesian_diagram, resolve_math_blocks
+from quickmaths.limit_work import normalize_limit_spec
 from quickmaths.models import ProblemInstance, ProblemTemplate, Skill
 from quickmaths.utils import SafeExpressionError, render_template, safe_eval, stringify_value
 
@@ -96,10 +99,13 @@ def _build_instance(skill_id: str, template: ProblemTemplate, seed: int, values:
     answer = _render_nested(template.answer, values)
     expected = _expected_answer_text(answer)
     prompt = render_template(template.prompt_template, values)
-    work = _enrich_structured_work(_render_nested(template.work, values), prompt)
+    work = _prepare_work(_enrich_structured_work(_render_nested(template.work, values), prompt))
     solution_steps = [render_template(str(step), values) for step in template.solution_steps]
     if template.explanation_template:
-        solution_steps = [line.strip() for line in render_template(template.explanation_template, values).splitlines() if line.strip()]
+        solution_steps = [render_template(line, values) for line in template.explanation_template.splitlines() if line.strip()]
+    public_values = _public_values(template.prompt_template, values)
+    diagram, math_blocks = _resolve_displays(template, public_values)
+    review_policy = _review_policy_for_work(template.review_policy, work)
     return ProblemInstance(
         template_id=template.id,
         skill_id=skill_id,
@@ -117,17 +123,21 @@ def _build_instance(skill_id: str, template: ProblemTemplate, seed: int, values:
         options=_render_options(template.options, values),
         answer_mode=template.answer_mode,
         work=work,
-        review_policy=_render_nested(template.review_policy, values),
+        review_policy=review_policy,
         accepted_forms=list(answer.get("accepted_forms", template.grading.get("accepted_forms", []))),
         answer_metadata=deepcopy(answer),
         grading_metadata=deepcopy(template.grading),
         media=deepcopy(template.media),
+        diagram=diagram,
+        math_blocks=math_blocks,
     )
 
 
 def _fixed_problem(skill_id: str, template: ProblemTemplate, seed: int) -> ProblemInstance:
     answer = _render_nested(template.answer, {})
-    work = _enrich_structured_work(_render_nested(template.work, {}), template.prompt_template)
+    work = _prepare_work(_enrich_structured_work(_render_nested(template.work, {}), template.prompt_template))
+    review_policy = _review_policy_for_work(template.review_policy, work)
+    diagram, math_blocks = _resolve_displays(template, {})
     return ProblemInstance(
         template_id=template.id,
         skill_id=skill_id,
@@ -138,18 +148,20 @@ def _fixed_problem(skill_id: str, template: ProblemTemplate, seed: int) -> Probl
         expected_answer=_expected_answer_text(answer),
         answer_type=answer.get("type", "text"),
         grading_method=template.grading.get("method", "exact_text"),
-        solution_steps=template.solution_steps or ([template.explanation_template] if template.explanation_template else []),
+        solution_steps=([_render_fixed_explanation_line(line) for line in template.explanation_template.splitlines() if line.strip()] if template.explanation_template else list(template.solution_steps)),
         mistake_tags=list(template.mistake_tags),
         variable=answer.get("variable"),
         tolerance=template.grading.get("tolerance"),
         options=deepcopy(template.options),
         answer_mode=template.answer_mode,
         work=work,
-        review_policy=_render_nested(template.review_policy, {}),
+        review_policy=review_policy,
         accepted_forms=list(answer.get("accepted_forms", template.grading.get("accepted_forms", []))),
         answer_metadata=deepcopy(answer),
         grading_metadata=deepcopy(template.grading),
         media=deepcopy(template.media),
+        diagram=diagram,
+        math_blocks=math_blocks,
     )
 
 
@@ -159,6 +171,46 @@ def _render_options(options: list[dict], values: dict[str, object]) -> list[dict
         if "label" in option:
             option["label"] = render_template(str(option["label"]), values)
     return rendered_options
+
+
+_PUBLIC_PLACEHOLDER = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
+
+
+def _public_values(prompt_template: str, values: dict[str, object]) -> dict[str, object]:
+    """Expose only values named by exact placeholders in the learner prompt."""
+    names = {match.group(1) for match in _PUBLIC_PLACEHOLDER.finditer(prompt_template)}
+    return {name: values[name] for name in names if name in values}
+
+
+def _render_fixed_explanation_line(line: str) -> str:
+    # Fixed explanations have no variable draw; braces may be literal set notation.
+    return line.strip()
+
+
+def _resolve_displays(template: ProblemTemplate, public_values: dict[str, object]):
+    try:
+        diagram = resolve_cartesian_diagram(template.diagram, public_values) if template.diagram is not None else None
+        math_blocks = resolve_math_blocks(template.math_blocks, public_values)
+    except LessonDisplayError as exc:
+        raise GenerationError(f"{template.id}: invalid native display: {exc}") from exc
+    return diagram, math_blocks
+
+
+def _prepare_work(work: dict) -> dict:
+    if work.get("mode") != "limit_steps":
+        return work
+    try:
+        work["limit"] = normalize_limit_spec(work.get("limit"))
+    except ValueError as exc:
+        raise GenerationError(f"Invalid limit_steps work: {exc}") from exc
+    return work
+
+
+def _review_policy_for_work(policy: dict, work: dict) -> dict:
+    result = deepcopy(policy)
+    if work.get("mode") == "limit_steps":
+        result.update({"work_review": "tutor_required", "mastery_requires_review_pass": True, "allow_self_review": False})
+    return result
 
 
 def _enrich_structured_work(work: dict, prompt: str) -> dict:

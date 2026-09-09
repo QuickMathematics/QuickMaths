@@ -13,7 +13,7 @@
     "prerequisites": { "type": "array", "items": { "type": "string" } },
     "tags": { "type": "array", "items": { "type": "string" } },
     "unlocks": { "type": "array", "items": { "type": "string" } },
-    "applications": { "type": "array", "items": { "type": "object", "properties": { "media": { "$ref": "#/$defs/media" } } } },
+    "applications": { "type": "array", "items": { "type": "object", "properties": { "math_blocks": { "$ref": "math-display.schema.json" }, "media": { "$ref": "#/$defs/media" } } } },
     "mastery": {
       "type": "object",
       "required": ["passing_score", "minimum_confidence"],
@@ -26,8 +26,8 @@
       }
     },
     "theory": { "type": "string" },
-    "media": { "$ref": "#/$defs/media" },
-    "examples": { "type": "array", "items": { "type": "object", "properties": { "media": { "$ref": "#/$defs/media" } } } },
+    "math_blocks": { "$ref": "math-display.schema.json" }, "media": { "$ref": "#/$defs/media" },
+    "examples": { "type": "array", "items": { "type": "object", "properties": { "math_blocks": { "$ref": "math-display.schema.json" }, "media": { "$ref": "#/$defs/media" } } } },
     "test": {
       "type": "object",
       "required": ["question_count", "questions"],
@@ -44,7 +44,8 @@
               "id": { "type": "string" },
               "type": { "type": "string", "enum": ["generated", "fixed"] },
               "prompt": { "type": "string" },
-              "media": { "$ref": "#/$defs/media" },
+              "math_blocks": { "$ref": "math-display.schema.json" }, "media": { "$ref": "#/$defs/media" },
+              "diagram": { "$ref": "cartesian-diagram.schema.json" },
               "prompt_template": { "type": "string" },
               "variables": { "type": "object" },
               "derived": { "type": "object" },
@@ -90,11 +91,12 @@
                 "properties": {
                   "mode": {
                     "type": "string",
-                    "enum": ["none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"]
+                    "enum": ["none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "limit_steps"]
                   },
                   "prompt": { "type": "string" },
               "media": { "$ref": "#/$defs/media" },
                   "line_type": { "type": "string", "enum": ["expression", "equation", "inequality"] },
+                  "limit": { "$ref": "limit-work.schema.json" },
                   "target_variable": { "type": "string" },
                   "minimum_steps": { "type": "integer", "minimum": 0 },
                   "require_final_answer_match": { "type": "boolean" },

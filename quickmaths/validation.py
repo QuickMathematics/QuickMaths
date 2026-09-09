@@ -12,6 +12,7 @@ from quickmaths.grading import grade_answer
 from quickmaths.graph_engine import GraphError, build_graph
 from quickmaths.models import ProblemTemplate, Skill, UserResponse
 from quickmaths.math_syntax import expressions_equivalent, parse_expression, parse_interval_set
+from quickmaths.limit_work import normalize_limit_spec
 from quickmaths.problem_generator import GenerationError, generate_problem
 
 SUPPORTED_VARIABLE_TYPES = {"int", "decimal", "fraction", "choice"}
@@ -23,7 +24,7 @@ SUPPORTED_ANSWER_MODES = {
     "structured_steps",
     "proof_required",
 }
-SUPPORTED_WORK_MODES = {"none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"}
+SUPPORTED_WORK_MODES = {"none", "optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "limit_steps"}
 SUPPORTED_WORK_GRADING = {"not_graded", "tutor_review", "self_review"}
 SUPPORTED_WORK_REVIEW = {"optional", "none", "auto", "tutor_required", "self_review"}
 SUPPORTED_SCHEMA_VERSIONS = {"0.2"}
@@ -230,6 +231,13 @@ def _validate_work_block(skill: Skill, question: ProblemTemplate, report: Valida
         report.add_error(f"Unsupported work.grading '{grading}'", skill, question)
     if question.answer_mode in {"final_plus_required_work", "structured_steps", "proof_required"} and mode == "none":
         report.add_error("answer_mode requires work, but work.mode is none", skill, question)
+    if mode == "limit_steps":
+        if question.answer_mode not in {"final_plus_required_work", "structured_steps", "proof_required"}:
+            report.add_error("limit_steps requires an answer mode with required work", skill, question)
+        try:
+            normalize_limit_spec(question.work.get("limit"))
+        except (TypeError, ValueError) as exc:
+            report.add_error(f"limit_steps requires a valid work.limit spec: {exc}", skill, question)
     review_policy = question.review_policy or {}
     work_review = review_policy.get("work_review", "optional")
     if work_review not in SUPPORTED_WORK_REVIEW:
@@ -238,7 +246,7 @@ def _validate_work_block(skill: Skill, question: ProblemTemplate, report: Valida
         report.add_error("mastery_requires_review_pass requires tutor_required or self_review", skill, question)
     if work_review == "auto" and mode not in {"procedural_steps", "rational_equation_steps", "sign_chart_steps", "none"}:
         report.add_error(f"review_policy.work_review auto has no checker for work.mode '{mode}'", skill, question)
-    if mode in {"optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps"} and not str(question.work.get("prompt", "")).strip():
+    if mode in {"optional", "required", "structured", "capture_only", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "limit_steps"} and not str(question.work.get("prompt", "")).strip():
         report.add_warning("work.prompt should be set when work is shown to learners", skill, question)
     if mode == "procedural_steps":
         _validate_procedural_work(skill, question, report)

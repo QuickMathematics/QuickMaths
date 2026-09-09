@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Limit setup for tutor review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "variable",
+    "approach",
+    "original_expression",
+    "direction",
+    "restrictions"
+  ],
+  "properties": {
+    "variable": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "approach": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "original_expression": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "direction": {
+      "enum": [
+        "left",
+        "right",
+        "both"
+      ]
+    },
+    "restrictions": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      }
+    }
+  }
+}

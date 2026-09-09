@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+import argparse
+import base64
 import hashlib
 import json
 from pathlib import Path
@@ -19,6 +21,7 @@ from quickmaths.lesson_media import prepare_lesson_media
 OUTPUT_PATH = PROJECT_ROOT / "docs" / "curriculum-data.json"
 FIRST_PARTY_EXPANSION_PATH = PROJECT_ROOT / "content" / "geography" / "foundations" / "web-curriculum.json"
 MAX_VARIANT_SEEDS = 12
+DEFAULT_NATIVE_MEDIA_BUDGET = 1_000_000
 
 
 def stable_seed(skill_id: str) -> int:
@@ -26,18 +29,57 @@ def stable_seed(skill_id: str) -> int:
     return int(digest[:8], 16) % 2_000_000_000 or 1
 
 
-def build_payload() -> dict:
+def _attribution_key(value: object, fallback: str) -> str:
+    return str(value or fallback)
+
+
+def _media_report(*, budget: int, assets: dict, attributions: dict) -> dict:
+    total = sum(asset["bytes"] for asset in assets.values())
+    report = {
+        "budget_bytes": budget,
+        "total_bytes": total,
+        "remaining_bytes": budget - total,
+        "asset_count": len(assets),
+    }
+    for label in ("subdomain", "branch", "source_folder"):
+        report[f"by_{label}"] = {
+            key: {"bytes": value["bytes"], "asset_count": value["asset_count"]}
+            for key, value in sorted(attributions[label].items())
+        }
+    return report
+
+
+def build_payload(*, native_media_budget: int = DEFAULT_NATIVE_MEDIA_BUDGET, media_report_path: Path | None = None, previous_media_report: dict | None = None) -> dict:
+    if type(native_media_budget) is not int or native_media_budget < 0:
+        raise ValueError("Native media budget must be a non-negative integer.")
     track, skills, warnings = load_curriculum()
     skill_rows = []
     assets = {}
-    def collect_media(rows, folder):
-        media_pack, _ = prepare_lesson_media({"skills": rows}, folder, portable=True)
+    attributions = {"subdomain": {}, "branch": {}, "source_folder": {}}
+
+    def collect_media(rows, folder, *, branch):
+        media_pack, files = prepare_lesson_media({"skills": rows}, folder, portable=False)
         for asset in media_pack.get("assets", []):
             if asset["path"] in assets and assets[asset["path"]]["sha256"] != asset["sha256"]:
                 raise ValueError(f"Native media path collision: {asset['path']}")
-            assets[asset["path"]] = asset
-        if sum(asset["bytes"] for asset in assets.values()) > 1_000_000:
-            raise ValueError("Native embedded media exceeds 1 MB; move larger media to a lesson pack.")
+            if asset["path"] not in assets:
+                assets[asset["path"]] = {**asset, "data_base64": base64.b64encode(files[asset["path"]]).decode("ascii")}
+                source_folder = str(folder.relative_to(PROJECT_ROOT)).replace("\\", "/")
+                first_row = rows[0] if rows else {}
+                keys = {
+                    "subdomain": _attribution_key(first_row.get("subdomain"), "unknown"),
+                    "branch": branch,
+                    "source_folder": source_folder,
+                }
+                for label, key in keys.items():
+                    bucket = attributions[label].setdefault(key, {"bytes": 0, "asset_count": 0})
+                    bucket["bytes"] += asset["bytes"]
+                    bucket["asset_count"] += 1
+        total = sum(asset["bytes"] for asset in assets.values())
+        if total > native_media_budget:
+            raise ValueError(
+                f"Native embedded media exceeds the configured budget of {native_media_budget} bytes."
+            )
     for skill_id in track.skills:
         skill = skills[skill_id]
         question_count = len(skill.test.questions)
@@ -57,8 +99,9 @@ def build_payload() -> dict:
                     continue
                 signatures.add(signature)
                 row = asdict(instance)
-                if not row.get("media"):
-                    row.pop("media", None)
+                for optional in ("media", "diagram", "math_blocks"):
+                    if not row.get(optional):
+                        row.pop(optional, None)
                 row["source_template_id"] = instance.template_id
                 row["template_id"] = f"{instance.template_id}__{len(problems) + 1:02d}"
                 row["work_required"] = instance.answer_mode in {
@@ -96,16 +139,17 @@ def build_payload() -> dict:
                 "tags": skill.tags,
                 "mastery": asdict(skill.mastery),
                 "theory": skill.theory,
-                "examples": [{key: value for key, value in asdict(example).items() if key != "media" or value} for example in skill.examples],
+                **({"math_blocks": skill.math_blocks} if skill.math_blocks else {}),
+                "examples": [{key: value for key, value in asdict(example).items() if key not in {"media", "diagram", "math_blocks"} or value} for example in skill.examples],
                 **({"media": skill.media} if skill.media else {}),
                 "applications": skill.applications,
                 "question_count": question_count,
                 "native_randomize_order": skill.test.randomize_order,
-                "native_templates": [{key: value for key, value in asdict(template).items() if key != "media" or value} for template in skill.test.questions],
+                "native_templates": [{key: value for key, value in asdict(template).items() if key not in {"media", "diagram", "math_blocks"} or value} for template in skill.test.questions],
                 "problems": problems,
             }
         )
-        collect_media([skill_rows[-1]], Path(skill.source_path).parent)
+        collect_media([skill_rows[-1]], Path(skill.source_path).parent, branch="core")
     track_row = asdict(track)
     subjects = []
     generated_from = ["content/math/algebra_foundations"]
@@ -123,9 +167,10 @@ def build_payload() -> dict:
         track_row["entry_skills"].extend(skill_id for skill_id in extension_track.get("entry_skills", []) if skill_id in native_skill_ids)
         track_row["exit_skills"].extend(skill_id for skill_id in extension_track.get("exit_skills", []) if skill_id in native_skill_ids)
         skill_rows.extend(native_skills)
-        collect_media(native_skills, FIRST_PARTY_EXPANSION_PATH.parent)
+        for native_skill in native_skills:
+            collect_media([native_skill], FIRST_PARTY_EXPANSION_PATH.parent, branch="math_bridge")
         generated_from.append(str(FIRST_PARTY_EXPANSION_PATH.relative_to(PROJECT_ROOT)).replace("\\", "/"))
-    return {
+    payload = {
         "schema_version": "2.0",
         "generated_from": generated_from,
         "subjects": subjects,
@@ -134,11 +179,30 @@ def build_payload() -> dict:
         "skills": skill_rows,
         **({"assets": list(assets.values())} if assets else {}),
     }
+    report = _media_report(budget=native_media_budget, assets=assets, attributions=attributions)
+    if previous_media_report is not None:
+        previous_total = previous_media_report.get("total_bytes")
+        if type(previous_total) is not int or previous_total < 0:
+            raise ValueError("Previous media report needs a non-negative total_bytes integer.")
+        report["growth_bytes"] = report["total_bytes"] - previous_total
+        report["previous_total_bytes"] = previous_total
+    payload["native_media_report"] = report
+    if media_report_path is not None:
+        media_report_path = Path(media_report_path)
+        media_report_path.parent.mkdir(parents=True, exist_ok=True)
+        media_report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return payload
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Export native web curriculum data.")
+    parser.add_argument("--native-media-budget", type=int, default=DEFAULT_NATIVE_MEDIA_BUDGET)
+    parser.add_argument("--media-report", type=Path, help="Write the deterministic native media budget report to this path.")
+    parser.add_argument("--previous-media-report", type=Path, help="Compare growth with a previous batch report.")
+    args = parser.parse_args()
+    baseline = json.loads(args.previous_media_report.read_text(encoding="utf-8")) if args.previous_media_report else None
     OUTPUT_PATH.write_text(
-        json.dumps(build_payload(), indent=2, ensure_ascii=False) + "\n",
+        json.dumps(build_payload(native_media_budget=args.native_media_budget, media_report_path=args.media_report, previous_media_report=baseline), indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     print(f"Wrote {OUTPUT_PATH}")

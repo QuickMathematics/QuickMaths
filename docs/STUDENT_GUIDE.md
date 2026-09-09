@@ -679,3 +679,11 @@ Technical guides: https://quickmathematics.github.io/QuickMaths/CUSTOM_LESSON_SE
 ## Lesson diagrams and media
 
 Lessons and questions can include diagrams, images, video and audio. Figures resize for your screen; video and audio have playback controls. Captions and descriptions explain the teaching content. Hosted files load from the lesson repository after their integrity is checked, so they require a connection. Small embedded attachments travel with your backup. If a file cannot load, QuickMaths shows an explanation beside that item.
+
+## Calculus diagrams and mathematical displays
+
+A lesson or test can now show a graph whose coordinates match its randomized question. Open circles mean the endpoint is excluded; a filled point can specify a different function value at that input. Dashed lines can mark asymptotes. Read the graph description below the picture, and use the labeled axes rather than measuring the screen. Your saved visual question keeps its original givens and picture when you reopen it, even if the lesson author later updates the template.
+
+Piecewise definitions, stacked fractions, directed limits and multi-line calculations may appear as formatted mathematical blocks. Open **Linear text** to select and copy a plain-text equivalent. On a narrow screen, wide mathematics can scroll horizontally; branch conditions are retained. Keyboard users can focus the mathematical block or its text description.
+
+A **Limit work** question asks for the approaching variable and input, direction, original expression, domain restrictions, steps and result kind. Distinguish a finite limit, positive infinity, negative infinity and no common limit. Start with the original expression and preserve restrictions after cancellation. These arguments always need tutor review; completing the form or getting the short answer correct does not prove the reasoning or immediately award mastery.
