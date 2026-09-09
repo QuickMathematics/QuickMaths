@@ -1924,15 +1924,47 @@ function renderGitHubBridge(snapshot) {
     </section>`;
 }
 
+let settingsSection = "general";
+let storageManagerOpen = false;
+let storageMutationPending = false;
+const storageManagementBusy = () => storageMutationPending || ["connecting", "checking", "pulling", "pushing", "merging", "deleting"].includes(githubSyncSnapshot.phase) || (githubSyncSnapshot.connected && githubSyncSnapshot.dirty && !githubSyncSnapshot.error && !bridgeNeedsChoice);
+
+function selectSettingsSection(section) {
+  settingsSection = section;
+  elements.view.querySelectorAll("[data-settings-panel]").forEach(panel => { panel.hidden = panel.dataset.settingsPanel !== section; });
+  elements.view.querySelectorAll("[data-settings-section]").forEach(button => button.setAttribute("aria-current", button.dataset.settingsSection === section ? "page" : "false"));
+}
+
+function organizeSettings() {
+  const categories = [["general", "General"], ["lessons", "Lessons & curricula"], ["storage", "Storage & sync"], ["backups", "Backups & exports"], ["agent", "Agent support"]];
+  const header = elements.view.querySelector(":scope > header");
+  const cards = [...elements.view.children].filter(node => node !== header);
+  const shell = document.createElement("div"); shell.className = "settings-shell";
+  shell.innerHTML = `<nav class="settings-nav" aria-label="Settings sections">${categories.map(([id,label]) => `<button type="button" data-settings-section="${id}" aria-controls="settings-${id}">${label}</button>`).join("")}</nav><div class="settings-content">${categories.map(([id,label]) => `<section id="settings-${id}" data-settings-panel="${id}" aria-label="${label}"></section>`).join("")}</div>`;
+  for (const card of cards) {
+    const section = card.matches(".github-bridge-card, .workspace-storage-manager, .storage-summary") ? "storage"
+      : card.matches(".lesson-packs-card, .depot-source-manager, .learner-curriculum-card, .curriculum-guidance-card") ? "lessons"
+      : card.matches(".data-grid, .backup-recommendation") ? "backups"
+      : card.matches(".tutor-setup") ? "agent" : "general";
+    shell.querySelector(`[data-settings-panel="${section}"]`).append(card);
+  }
+  elements.view.append(shell);
+  for (const [id] of categories) if (!shell.querySelector(`[data-settings-panel="${id}"]`).children.length) shell.querySelector(`[data-settings-section="${id}"]`).hidden = true;
+  if (!shell.querySelector(`[data-settings-panel="${settingsSection}"]`)?.children.length) settingsSection = categories.find(([id]) => shell.querySelector(`[data-settings-panel="${id}"]`).children.length)?.[0] ?? "general";
+  selectSettingsSection(settingsSection);
+}
+
 function renderWorkspaceStorageManager(snapshot) {
   const connected = githubSyncSnapshot.connected;
   const repository = connected && githubSyncSnapshot.config
     ? `${githubSyncSnapshot.config.owner}/${githubSyncSnapshot.config.repo}`
     : null;
-  const deletionDisabled = bridgeNeedsChoice ? "disabled" : "";
-  return `<details class="content-card workspace-storage-manager" id="workspace-storage-manager">
+  const busy = storageManagementBusy();
+  const deletionDisabled = bridgeNeedsChoice || busy ? "disabled" : "";
+  return `<details class="content-card workspace-storage-manager" id="workspace-storage-manager" ${storageManagerOpen ? "open" : ""}>
     <summary><span><span class="eyebrow">Privacy & deletion</span><strong>${connected ? "Manage GitHub storage" : "Manage browser data"}</strong><small>${connected ? `Current checkpoint: ${escapeHtml(repository)}` : "Connect Workspace Storage above to remove its current GitHub files too."}</small></span><b>Open manager</b></summary>
-    <div class="workspace-storage-manager-body">
+    <div class="workspace-storage-manager-body" aria-busy="${busy}">
+      ${busy ? `<p class="storage-manager-busy" role="status">Saving changes… Management actions will be available when sync finishes.</p>` : ""}
       <div class="storage-manager-notice"><strong>QuickMaths has no undo for deletion.</strong><p>Download a full JSON backup first if you may need this work again. GitHub repository history can retain older checkpoint contents even after current files are replaced or deleted.</p></div>
       <section aria-labelledby="stored-profiles-title"><div class="storage-manager-heading"><div><p class="eyebrow">Stored profiles</p><h2 id="stored-profiles-title">Delete one profile</h2><p>Deletes its progress, attempts, reviews, drafts, map plan, and any curriculum it owns. When GitHub is connected, QuickMaths replaces the current learner checkpoint and discards the stale agent checkpoint.</p></div><span>${snapshot.profiles.length} total</span></div>
         <div class="storage-profile-list">${snapshot.profiles.map((profile) => `<article><span class="storage-profile-avatar" aria-hidden="true">${escapeHtml(profile.displayName.slice(0, 1).toUpperCase())}</span><div><strong>${escapeHtml(profile.displayName)}</strong><small>${profile.role === "educator" ? "Educator" : "Learner"}${profile.id === snapshot.activeProfile.id ? " · current profile" : ""}</small></div><button class="button button-outline danger-button" type="button" data-action="delete-stored-profile" data-profile-id="${escapeHtml(profile.id)}" ${deletionDisabled}>Delete profile</button></article>`).join("")}</div>
@@ -1972,10 +2004,14 @@ function renderEducatorSettings(snapshot) {
     ${backup.recommended ? `<aside class="backup-recommendation"><span aria-hidden="true">↧</span><div><strong>Portable backup recommended</strong><p>${escapeHtml(backup.reason)}</p></div><button class="button button-primary" data-action="save-backup">Download now</button></aside>` : ""}
     <section class="data-grid educator-data-grid"><article class="content-card"><div class="card-heading"><div><h2>Full educator backup</h2><p>Profiles, curricula, installed packs, map plans, policy, and any learner records in this browser.</p></div></div><div class="data-actions"><button class="button button-primary" data-action="save-backup">Download full JSON backup</button><button class="button button-outline" data-action="load-backup">Restore full backup</button></div></article><article class="content-card"><div class="card-heading"><div><h2>Current curriculum exports</h2><p>Public blueprints omit names, email, and supplemental guidance. Private assignments include them with a privacy warning.</p></div></div><p><strong>${escapeHtml(workspace?.name ?? "No curriculum open")}</strong></p><div class="data-actions"><button class="button button-primary" data-action="export-curriculum" ${workspace ? "" : "disabled"}>Download public blueprint</button><button class="button button-outline" data-action="export-private-assignment" ${workspace ? "" : "disabled"}>Download private assignment</button><button class="button button-outline" data-action="import-curriculum">Import curriculum</button></div></article></section>
     <section class="content-card lesson-packs-card"><div class="card-heading"><div><p class="eyebrow">Shared lesson library</p><h2>Installed lesson packs</h2><p>Installed packs are available to Curriculum designer, where each curriculum enables only what it needs.</p></div><button class="button button-primary" data-action="load-lesson-set">Load lesson file</button></div>${renderStagedLessonReview(snapshot)}<div class="installed-packs">${snapshot.lessonPacks.length ? snapshot.lessonPacks.map((pack) => `<article><span class="pack-mark">${pack.mode === "override" ? "↻" : "＋"}</span><div><strong>${escapeHtml(pack.name)}</strong><p>${escapeHtml(pack.description)}</p><small>${escapeHtml(pack.subjectName)} · ${pack.skillCount} lessons · ${pack.problemCount} questions</small></div><div class="pack-actions"><button class="quiet-button" data-action="export-lesson-set" data-pack-id="${escapeHtml(pack.id)}">Download source</button></div></article>`).join("") : `<div class="empty-state">No additional lesson packs installed. Browse the Depot to assemble a library.</div>`}</div></section>`;
+  organizeSettings();
   restoreBridgeFormDraft(document.querySelector("#github-sync-form")?.closest("[data-bridge-form]"));
 }
 
 function renderSettings(snapshot) {
+  const existingManager = document.querySelector("#workspace-storage-manager");
+  if (existingManager) storageManagerOpen = existingManager.open;
+  captureBridgeFormDraft(document.querySelector("[data-bridge-form]"));
   if (snapshot.activeProfile.role === "educator") {
     renderEducatorSettings(snapshot);
     return;
@@ -2021,6 +2057,7 @@ function renderSettings(snapshot) {
     </section>
     <section class="content-card tutor-setup"><div class="card-heading"><div><h2>Agent handoff</h2><p>QuickMaths detects whether this tab can expose WebMCP, keeps migration steps outside the prompt, and starts the agent from the correct manifest.</p></div></div>${agentHandoffMarkup(snapshot, { compact: true })}</section>
   `;
+  organizeSettings();
   restoreBridgeFormDraft(document.querySelector("#github-sync-form")?.closest("[data-bridge-form]"));
 }
 
@@ -2908,6 +2945,8 @@ document.addEventListener("click", async (event) => {
   const action = event.target.closest("[data-action]");
   if (!action) return;
   if (action.dataset.action === "manage-workspace-storage") {
+    selectSettingsSection("storage");
+    storageManagerOpen = true;
     const manager = document.querySelector("#workspace-storage-manager");
     if (manager) {
       manager.open = true;
@@ -2917,15 +2956,22 @@ document.addEventListener("click", async (event) => {
     return;
   }
   if (action.dataset.action === "delete-stored-profile") {
+    if (storageManagementBusy()) return;
     if (bridgeNeedsChoice) { showToast("Resolve the GitHub checkpoint choice before deleting synchronized data."); return; }
+    storageMutationPending = true;
+    storageManagerOpen = true;
     try { await deleteStoredProfile(action.dataset.profileId); }
     catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    finally { storageMutationPending = false; if (store.snapshot().activeProfile && store.snapshot().ui.route === "settings") renderSettings(store.snapshot()); }
     return;
   }
   if (action.dataset.action === "clear-all-workspace-data") {
+    if (storageManagementBusy()) return;
     if (bridgeNeedsChoice) { showToast("Resolve the GitHub checkpoint choice before clearing synchronized data."); return; }
+    storageMutationPending = true;
     try { await clearAllWorkspaceData(); }
     catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    finally { storageMutationPending = false; if (store.snapshot().activeProfile && store.snapshot().ui.route === "settings") renderSettings(store.snapshot()); }
     return;
   }
   if (action.dataset.action === "run-python-tests") {
@@ -3116,6 +3162,7 @@ document.addEventListener("click", async (event) => {
   }
   if (action.dataset.action === "copy-current-agent-prompt") copyAgentPrompt();
   if (action.dataset.action === "open-storage-setup") {
+    settingsSection = "storage";
     store.navigate("settings");
     requestAnimationFrame(() => document.querySelector("#github-bridge")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
@@ -3714,3 +3761,11 @@ for (const eventName of ["mouseover", "focusin", "click"]) {
     showToast(`${count} prerequisite connection${count === 1 ? "" : "s"}`);
   });
 }
+
+document.addEventListener("click", event => {
+  const button = event.target.closest?.("[data-settings-section]");
+  if (button) selectSettingsSection(button.dataset.settingsSection);
+});
+document.addEventListener("toggle", event => {
+  if (event.target.id === "workspace-storage-manager" && event.target.isConnected) storageManagerOpen = event.target.open;
+}, true);

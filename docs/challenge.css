@@ -1773,3 +1773,49 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:ha
 
 .map-subject-lanes .map-branch-heading-toggle { pointer-events: auto; }
 .map-edge-hit:hover, .map-edge-hit:focus { stroke: var(--pine); stroke-opacity: .18; }
+
+/* Compact settings workspace; other learning pages retain their own scale. */
+.settings-shell { display:grid; grid-template-columns:180px minmax(0,1fr); gap:24px; align-items:start; }
+.settings-nav { position:sticky; top:24px; display:flex; flex-direction:column; gap:4px; }
+.settings-nav button { min-height:42px; padding:10px 12px; text-align:left; font:600 13px/1.4 var(--sans); border:0; border-radius:8px; color:var(--muted); background:transparent; cursor:pointer; }
+.settings-nav button[aria-current="page"] { color:var(--pine); background:var(--lime); }
+.settings-nav button:hover { color:var(--pine); background:var(--paper-light); }
+.settings-nav button:focus-visible { outline:2px solid var(--pine); outline-offset:2px; }
+.settings-content, .settings-content > section { min-width:0; }
+.settings-content > section:not([hidden]) { display:grid; gap:16px; }
+.settings-shell [hidden] { display:none !important; }
+.settings-shell .content-card, .settings-shell .settings-control-card { padding:18px; border-radius:12px; margin:0; box-shadow:none; min-width:0; }
+.settings-shell h2 { font:700 19px/1.3 var(--sans); margin:0 0 8px; overflow-wrap:anywhere; }
+.settings-shell h3 { font:700 16px/1.4 var(--sans); }
+.settings-shell p, .settings-shell label, .settings-shell summary { font-size:13px; line-height:1.5; }
+.settings-shell small { font-size:12px; line-height:1.4; }
+.settings-shell .eyebrow { font-size:10px; margin-bottom:6px; }
+.settings-shell .button, .settings-shell .quiet-button { min-height:40px; padding:9px 12px; font-size:12px; border-radius:8px; }
+.settings-shell input:not([type="radio"]):not([type="checkbox"]), .settings-shell select { min-height:40px; padding:9px 10px; font-size:13px; }
+.settings-shell .settings-controls, .settings-shell .data-grid { grid-template-columns:1fr; gap:16px; margin:0; }
+.settings-shell .settings-mode-grid button { padding:12px; }
+.settings-shell .settings-mode-grid strong { font:700 15px/1.4 var(--sans); }
+.settings-shell .card-heading, .settings-shell .bridge-card-heading { gap:12px; margin-bottom:12px; }
+.settings-shell .storage-summary { gap:10px; margin:0; }
+.settings-shell .storage-summary article { padding:12px; }
+.settings-shell .storage-summary strong { font-size:18px; overflow-wrap:anywhere; }
+.settings-shell .bridge-status-grid { gap:10px; }
+.settings-shell .bridge-status-grid article { padding:12px; }
+.settings-shell .bridge-status-grid strong { font-size:15px; overflow-wrap:anywhere; }
+.settings-shell .storage-profile-list article { padding:10px; }
+.settings-shell .storage-profile-list .button { width:auto; grid-column:auto; }
+.settings-shell .storage-profile-list article { grid-template-columns:32px minmax(0,1fr) auto; gap:8px; }
+.settings-shell .storage-profile-avatar { width:32px; height:32px; }
+.settings-shell .storage-clear-zone > .button { flex-shrink:0; white-space:nowrap; }
+.settings-shell button:disabled { opacity:.45; cursor:not-allowed; filter:grayscale(1); }
+.storage-manager-busy { padding:10px 12px; border-radius:8px; background:var(--paper); color:var(--muted); }
+@media(max-width:760px) {
+ .settings-shell { grid-template-columns:minmax(0,1fr); gap:14px; }
+ .settings-nav { position:static; flex-direction:row; overflow-x:auto; padding-bottom:5px; border-bottom:1px solid var(--line); }
+ .settings-nav button { flex:0 0 auto; white-space:nowrap; min-height:42px; }
+ .settings-shell .content-card, .settings-shell .settings-control-card { padding:14px; }
+ .settings-shell .settings-mode-grid { grid-template-columns:1fr; }
+ .settings-shell .card-heading, .settings-shell .bridge-card-heading { flex-wrap:wrap; }
+ .settings-shell .data-actions, .settings-shell .bridge-actions { flex-wrap:wrap; }
+ .settings-shell .storage-profile-list .button { font-size:11px; padding:8px; }
+}

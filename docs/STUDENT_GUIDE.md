@@ -128,6 +128,8 @@ The shell keeps navigation, identity, time, retained lesson theme, and agent sta
 | Lesson Depot | Federated lesson-pack discovery, provenance, preview, installation, upvotes, reactions, and comments |
 | Lesson Studio | Friendly authoring and reversible native-lesson improvements |
 | Settings | Path mode, tutorial, curriculum, backups, storage, exports, and installed content |
+
+Settings uses a compact section menu: General, Lessons & curricula, Storage & sync, Backups & exports, and Agent support. The menu sits beside the content on desktop and scrolls horizontally above it on phones. In Storage & sync, the storage manager stays open after deleting a profile; management actions are temporarily disabled while the save and synchronization finish.
 | Profile badge | Opens Dashboard; the arrow returns to profile selection |
 
 ### Mobile bottom navigation
