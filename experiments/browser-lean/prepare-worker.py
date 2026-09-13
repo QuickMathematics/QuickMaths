@@ -19,6 +19,19 @@ worker=worker.replace('const candidates = isIOS ? [1024, 768, 512] : [2048, 1536
     "const requested = Number(new URLSearchParams(location.search).get('initialMB') || 128); const candidates = [Math.max(64, Math.min(2048, requested))];")
 worker=worker.replace('wasmMemory: p.memory','wasmMemory: (self.probeMemory=p.memory)')
 if args.task_workers is not None:
+    worker=worker.replace('const resObj = Module._lean_wasm_compile(codeObj, fnameObj);',
+                          'const resObj = Module._lean_wasm_compile(codeObj, fnameObj) >>> 0;')
+    # Lean returns IO UInt32: on wasm32 both the IO result and UInt32 payload
+    # are heap constructors. An IO success is not necessarily compiler success.
+    old='return { success: true, elapsed };'
+    if worker.count(old)!=1:raise ValueError('Compiler status hook drifted')
+    worker=worker.replace(old,"""const boxedStatus = Module.getValue(resObj + 8, 'i32') >>> 0;
+    if (!boxedStatus || (boxedStatus & 1)) throw new Error('Unexpected wasm32 UInt32 result ABI');
+    const compilerExitCode = Module.getValue(boxedStatus + 8, 'i32') >>> 0;
+    return { success: compilerExitCode === 0, compilerExitCode, elapsed };""")
+    old="console.error('[COMPILE] threw:', e);\n    return { success: false, error: (e && e.message) || String(e) };"
+    if worker.count(old)!=1:raise ValueError('Compiler exception hook drifted')
+    worker=worker.replace(old,"console.error('[COMPILE] threw:', e);\n    return { success: false, hostException: true, error: (e && e.message) || String(e), stack: String(e?.stack || '').split('\\n').slice(0, 16).join('\\n') };")
     # The main thread hashes the compressed object before handing over its Blob
     # URL. Stream that committed payload into MEMFS rather than holding another
     # full decompressed snapshot on the main thread.

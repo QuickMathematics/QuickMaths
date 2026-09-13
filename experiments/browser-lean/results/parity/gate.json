@@ -1,0 +1,42 @@
+{
+  "positiveCases": 122,
+  "positiveKernelExecutions": 366,
+  "negativeCasesRejected": 71,
+  "negativeStage": "freshly re-executed production preflight; no generated Lean source or browser kernel invocation",
+  "environments": 5,
+  "minimumSameWorkerRounds": 3,
+  "identity": "99c652ea7ca123f51dd96e4888b36e1ef469bd787d3dd620b3f553cf170315d1",
+  "runtime": {
+    "lean.js": {
+      "file": "lean.js-f2b0f1509626023bc24ed9f991553669ae49baf7b171e49ce2e599a2411cd16e.gz",
+      "bytes": 134325,
+      "compressedBytes": 36142,
+      "rawSha256": "0708102aca19f0a897710cc862eea213a564e22289d37867151b437ab27db95c",
+      "sha256": "f2b0f1509626023bc24ed9f991553669ae49baf7b171e49ce2e599a2411cd16e"
+    },
+    "lean.wasm": {
+      "file": "lean.wasm-f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257.gz",
+      "bytes": 104721833,
+      "compressedBytes": 15712659,
+      "rawSha256": "3038cfd8f81cf650b17967881339256e0bb1cbd1a407c1a7b7225fa8e367df8b",
+      "sha256": "f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257"
+    }
+  },
+  "environment": {
+    "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+    "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+    "portSha256": "6829a2a80680ac561a70573edb1ccb3f6763b6b7d2f875b04ab892b450440387",
+    "importPolicy": "production-module-public"
+  },
+  "hostSourceHashes": {
+    "experiments\\browser-lean\\benchmark.py": "3b4e796864066892557c23c90396651ff80912088790b0ba843fdcf0bd8866f3",
+    "experiments\\browser-lean\\curated.js": "63b8f03711c7c1a9c360677dacd78f99e8320c6c68d0e6875d8ad447d3f0d901",
+    "experiments\\browser-lean\\curated.html": "d1be431ed5229e1250128abaf07c227f4b894eb581a664136b6e9b637862037a",
+    "experiments\\browser-lean\\compatibility.js": "6cb5c2f6ad8f0110132205a4fa54c09b739e46b270a431f0f654d72d91f88a59",
+    "docs\\formal-environment-loader.js": "7f4cc65405555f8631da84b842fb08cd9f976d470156c59c64dde9c64225264f",
+    ".bridge-runtime\\curated-formal\\assets-native-eh-tail\\viability-worker.js": "f1c189a82c8eae053465c45478b0dc57e94f626b1b156b25721cc4d8d769cf73"
+  },
+  "resultSha256": "02d4f85efda2a1d01880643e02ad7deb72d401bd1e13b1e79695aba54b21af8d",
+  "assessment_eligible": false,
+  "certificate": null
+}

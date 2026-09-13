@@ -5,6 +5,7 @@ memory; Windows private commit and summed RSS are separately labelled.
 """
 import argparse
 import functools
+import hashlib
 import http.server
 import json
 import os
@@ -17,6 +18,7 @@ import subprocess
 import threading
 import time
 from urllib.parse import urlsplit
+from urllib.parse import quote
 import psutil
 from playwright.sync_api import sync_playwright
 
@@ -32,6 +34,8 @@ parser.add_argument('--timeout',type=int,default=240,help='Overall diagnostic ru
 parser.add_argument('--group',default='',help='One recorded corpus import group per fresh worker')
 parser.add_argument('--suite',choices=['legacy','curated'],default='legacy')
 parser.add_argument('--mode',choices=['modules','snapshot'],default='modules')
+parser.add_argument('--fixture',help='One named canonical fixture for a clearly labelled diagnostic run')
+parser.add_argument('--corpus-rounds',type=int,choices=range(1,6),default=1)
 args=parser.parse_args()
 if args.suite=='curated':BASE=ROOT/'.bridge-runtime/curated-formal'
 if not args.label.replace('-','').isalnum():parser.error('Use a simple alphanumeric result label')
@@ -41,6 +45,10 @@ os.environ['TEMP']=os.environ['TMP']=str(BASE)
 if 'LOCALAPPDATA' in os.environ:
     os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH',str(Path(os.environ['LOCALAPPDATA'])/'ms-playwright'))
 body_bytes=0
+host_paths=[Path(__file__),Path(__file__).with_name('curated.js'),Path(__file__).with_name('curated.html'),
+            Path(__file__).with_name('compatibility.js'),ROOT/'docs/formal-environment-loader.js',asset_root/'viability-worker.js']
+def host_hashes():
+    return {str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest() for path in host_paths if path.exists()}
 class Files(http.server.SimpleHTTPRequestHandler):
     def translate_path(self,path):
         url=urlsplit(path).path
@@ -96,6 +104,7 @@ def measure():
 thread=threading.Thread(target=measure,daemon=True);thread.start()
 profile=BASE/'profiles'/(args.browser+'-'+str(int(time.time())))
 results={'browser':args.browser,'initialMB':args.initial_mb,'baseline':'Actual native QuickMaths mastery map, fresh profile, default curriculum, no verifier',
+         'hostSourceHashes':host_hashes(),
          'memoryMethod':'Sum of per-process USS (private resident pages); sample interval >=0.5 s, plus labelled RSS/private commit; only owned browser descendants',
          'executedAt':datetime.now(timezone.utc).isoformat(),
          'host':{'os':platform.platform(),'logicalCpus':psutil.cpu_count(),'physicalCpus':psutil.cpu_count(logical=False),'physicalMemoryBytes':psutil.virtual_memory().total},
@@ -116,7 +125,7 @@ with sync_playwright() as pw:
     for group,index in cases:
         probe=context.new_page()
         entry='curated.html' if args.suite=='curated' else 'viability.html'
-        probe.goto(origin+'/probe/'+entry+'?initialMB='+str(args.initial_mb)+'&group='+group+'&mode='+args.mode,wait_until='networkidle')
+        probe.goto(origin+'/probe/'+entry+'?initialMB='+str(args.initial_mb)+'&group='+group+'&mode='+args.mode+'&rounds='+str(args.corpus_rounds)+('&fixture='+quote(args.fixture) if args.fixture else ''),wait_until='networkidle')
         probe.wait_for_function('() => typeof window.startProbe === "function"')
         start=time.monotonic();network_start=body_bytes
         probe.evaluate('() => { void window.startProbe(); }')
@@ -159,6 +168,8 @@ with sync_playwright() as pw:
 sampling=False;thread.join(timeout=5);server.shutdown()
 results['profileLogicalFileBytes']=sum(p.stat().st_size for p in profile.rglob('*') if p.is_file())
 results['samples']=samples
+results['finalHostSourceHashes']=host_hashes()
+results['hostSourcesChanged']=results['hostSourceHashes']!=results['finalHostSourceHashes']
 destination=BASE/(args.browser+'-'+args.label+'-'+str(args.initial_mb)+'.json')
 destination.write_text(json.dumps(results,indent=2)+'\n',encoding='utf-8')
 print('Saved',destination,flush=True)

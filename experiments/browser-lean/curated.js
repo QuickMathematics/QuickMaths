@@ -52,7 +52,7 @@ async function createRuntime(profile,format) {
     try {
       const result=await command('compile','compile_result',{code:source,path:'/workspace/request.lean'},[],budget);
       const record={name,...result,...analyze(result,output),sourceHash,output:[...output],assessment_eligible:false,certificate:null};
-      record.fatalRuntimeError=/call stack|out of bounds|unreachable|indirect call|out of memory/i.test(result.error||'');
+      record.fatalRuntimeError=result.hostException===true||/call stack|out of bounds|unreachable|indirect call|out of memory/i.test(result.error||'');
       if(record.fatalRuntimeError)dispose();
       report.proofs.push(record);log('proof',{name,elapsedMs:result.elapsed,success:record.experimentalKernelSuccess});return record;
     } catch(error) {
@@ -124,32 +124,48 @@ window.startProbe=async()=>{
       if(fixture.group!==id)report.matrix.push({name:fixture.name,status:'different_environment_required',environment:fixture.group,assessment_eligible:false,certificate:null});
     }
     for(const negative of config.negatives)report.matrix.push({name:negative.name,status:negative.actual,stage:negative.stage,evidence:'curated-corpus.py production preflight; no kernel invocation',assessment_eligible:false,certificate:null});
-    const selected=config.fixtures.filter(f=>f.group===id);
-    for(const fixture of selected) {
+    const requestedFixture=params.get('fixture');
+    if(requestedFixture&&!config.fixtures.some(f=>f.group===id&&f.name===requestedFixture))throw Error('Unknown diagnostic fixture');
+    report.diagnosticFixture=requestedFixture;
+    const rounds=Number(params.get('rounds')||1);
+    if(!Number.isInteger(rounds)||rounds<1||rounds>5)throw Error('Invalid corpus repetition count');
+    report.corpusRounds=rounds;
+    for(const fixture of config.fixtures.filter(f=>f.group===id&&requestedFixture&&f.name!==requestedFixture))
+      report.matrix.push({name:fixture.name,status:'not_run_diagnostic',assessment_eligible:false,certificate:null});
+    const selected=config.fixtures.filter(f=>f.group===id&&(!requestedFixture||f.name===requestedFixture));
+    corpusLoop: for(let round=0;round<rounds;round++) for(const fixture of selected) {
       try {
         const result=await pool.withEnvironment(id,format,async runtime=>{
           const adapted=sourceForExperiment(fixture.source,config.environment);
           if(headerOf(adapted.source)!==runtime.header)throw Error('Canonical source header mismatch');
           return runtime.prove(fixture.name,adapted.source,fixture.request.policy.max_seconds*1000);
         });
-        report.matrix.push({name:fixture.name,status:result.experimentalKernelSuccess?'kernel_success':'kernel_failure',assessment_eligible:false,certificate:null});
+        result.corpusRound=round;
+        report.matrix.push({name:fixture.name,round,status:result.experimentalKernelSuccess?'kernel_success':'kernel_failure',assessment_eligible:false,certificate:null});
         if(result.fatalRuntimeError)await pool.discard();
       } catch(error) {
-        report.matrix.push({name:fixture.name,status:'runtime_failure',error:String(error),assessment_eligible:false,certificate:null});
+        report.matrix.push({name:fixture.name,round,status:'runtime_failure',error:String(error),assessment_eligible:false,certificate:null});
         log('fixture-failed',{name:fixture.name,error:String(error)});await pool.discard();
         // A failed environment initialization is a shared prerequisite failure,
         // not 100 individually run proofs. Record all remaining cases explicitly.
         if(!report.stages.some(s=>s.stage==='ready-to-verify')) {
           for(const remaining of selected.filter(f=>!report.matrix.some(r=>r.name===f.name)))
             report.matrix.push({name:remaining.name,status:'blocked_environment_initialization',assessment_eligible:false,certificate:null});
-          report.error=String(error);break;
+          report.error=String(error);break corpusLoop;
         }
       }
     }
-    const successful=selected.find(f=>report.matrix.some(row=>row.name===f.name&&row.status==='kernel_success'));
+    const slowest=report.proofs.filter(p=>selected.some(f=>f.name===p.name)&&p.experimentalKernelSuccess)
+      .sort((a,b)=>(b.elapsed||0)-(a.elapsed||0))[0];
+    const successful=selected.find(f=>f.name===slowest?.name);
+    report.warmFixture=successful?.name||null;
+    report.warmSelection='slowest successful canonical proof';
     if(!report.error&&successful)await pool.withEnvironment(id,format,async runtime=>{
-      for(let i=0;i<5;i++)await runtime.prove('warm-repeat-'+i,successful.source,successful.request.policy.max_seconds*1000);
-      report.memory=await runtime.memory();
+      for(let i=0;i<5;i++) {
+        const result=await runtime.prove('warm-repeat-'+i,successful.source,successful.request.policy.max_seconds*1000);
+        if(!result.experimentalKernelSuccess) {report.error='Warm verification failed: '+(result.error||'kernel rejection');break;}
+      }
+      if(!runtime.dead)report.memory=await runtime.memory();
     });
     const keys=await cache.keys(),present=new Set(keys.map(k=>new URL(k.url).pathname.split('/').pop()));
     const unique=[...new Map(report.assets.map(a=>[a.cacheKey,a])).values()];

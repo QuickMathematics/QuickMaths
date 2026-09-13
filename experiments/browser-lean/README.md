@@ -166,8 +166,8 @@ headers. The older reference/private measurements above belong to commit
 original generated sources. Do not compare an old source header against new
 artifacts or overwrite the historical evidence.
 
-For the curated build, apply **`lean-6a10-curated.patch` instead of the old
-patch** to the pinned clean Lean source, then follow the matching 32-bit build
+For the curated JS-EH build, apply **`lean-6a10-curated-full.patch` instead of the old
+patches** to the pinned clean Lean source, then follow the matching 32-bit build
 steps above. It includes the module-aware environment cache and strict explicit
 artifact map. `port-curated.py` and `port-artifact-map.py` document incremental
 transformations already in that patch, not additional clean-build steps.
@@ -175,6 +175,12 @@ transformations already in that patch, not additional clean-build steps.
 snapshot API, which avoids retaining CLI command/task trees.
 `exports.py` now includes runtime/meta initializer phases, which public modules
 need. No kernel source or certificate schema is changed.
+
+Reproducibility correction: `lean-6a10-curated.patch` captured only unstaged
+changes on top of an already-staged port. It is retained as historical evidence,
+but is not a clean-checkout patch. The full patch records staged and unstaged
+changes from the pinned HEAD, with binary/full-index bootstrap patches. The
+native-EH variant uses the separately recorded full `lean-6a10-native-eh.patch`.
 
 `prepare-curated.py` requires the build's source diff to match the reviewed
 patch exactly. It applies `optimize-dlsym.py` to the generated JavaScript:

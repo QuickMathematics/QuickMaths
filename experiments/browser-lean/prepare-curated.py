@@ -60,8 +60,8 @@ if wasm_link.exists() and wasm_link.stat().st_ino != (build / 'build-matched32/s
 if not wasm_link.exists():wasm_link.hardlink_to(build / 'build-matched32/stage1/bin/lean.wasm')
 for name in ['lean.js', 'lean.wasm']:
     runtime[name] = compressed_object((runtime_dir / name).read_bytes(), name)
-patch = subprocess.run(['git', '-C', str(build / 'lean-upstream'), 'diff', '--', '.', ':(exclude)src/emscripten-exports.txt'], capture_output=True, check=True).stdout
-patch_path = Path(__file__).with_name('lean-6a10-curated.patch')
+patch = subprocess.run(['git', '-C', str(build / 'lean-upstream'), 'diff', '--binary', '--full-index', 'HEAD', '--', '.', ':(exclude)src/emscripten-exports.txt'], capture_output=True, check=True).stdout
+patch_path = Path(__file__).with_name('lean-6a10-curated-full.patch')
 if patch != patch_path.read_bytes():
     raise ValueError('Build source does not match the reviewed curated patch')
 search = [build / 'build-native32/lib/lean', build / 'mathlib/.lake/build/lib/lean']

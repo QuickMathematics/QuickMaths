@@ -1,0 +1,1276 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 3e6ae3d6f2d71d0c4dacd09960c95841b835db6a..4cb95642451db4353534eb8ac5327ee96f2fdcdd 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -114,6 +114,15 @@ option(FORCE_GMP "Build against the available GMP even if older than the require
+ option(USE_MIMALLOC "use mimalloc" ON)
+ set(LEAN_MI_SECURE 0 CACHE STRING "Configure mimalloc memory safety mitigations (https://github.com/microsoft/mimalloc/blob/v2.2.7/include/mimalloc/types.h#L56-L60)")
+ 
++# mimalloc's OS layer can't grow memory under Emscripten: mi_malloc_small
++# returns null once its initial reserve is exhausted (even a 24-byte request
++# fails with GBs of wasm heap free), aborting olean import via
++# lean_internal_panic_out_of_memory. Fall back to Emscripten's own allocator,
++# which grows the wasm memory correctly (ALLOW_MEMORY_GROWTH).
++if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
++  set(USE_MIMALLOC OFF)
++endif()
++
+ # development-specific options
+ option(CHECK_OLEAN_VERSION "Only load .olean files compiled with the current version of Lean" OFF)
+ option(USE_LAKE "Use Lake instead of lean.mk for building core libs from language server" ON)
+@@ -169,18 +178,66 @@ if(CHECK_OLEAN_VERSION MATCHES "ON")
+ endif()
+ 
+ if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
++  # Build with Emscripten pthreads. The single-threaded WASM build OOMs during the
++  # `Init` olean import (upstream's async-const realization accumulates unboundedly
++  # with no worker threads to drain it); the pthread build — like the native and the
++  # older 4.28 WASM builds — drains that work on real worker threads. Requires
++  # cross-origin isolation (COOP/COEP) in the browser for SharedArrayBuffer.
++  #
+   # TODO(WN): code size/performance tradeoffs
+   # - we're using -O3; it's /okay/
+   # - -Oz produces quite slow code
+   # - system libraries such as OpenGL are included in the JS but shouldn't be
+-  # - we need EMSCRIPTEN_KEEPALIVE annotations on exports to run meta-dce (-s MAIN_MODULE=2)
++  # - we disable "-flto" because it uses too much memory (we would need more RAM in the CI runner)
+ 
+   # From https://emscripten.org/docs/compiling/WebAssembly.html#backends:
+   # > The simple and safe thing is to pass all -s flags at both compile and link time.
+-  set(EMSCRIPTEN_SETTINGS "-s ALLOW_MEMORY_GROWTH=1 -fwasm-exceptions -pthread -flto")
+-  string(APPEND LEANC_EXTRA_CC_FLAGS " -pthread")
++  # -fwasm-exceptions uses native WASM exception handling instead of the
++  # JS-emulated kind (-sDISABLE_EXCEPTION_CATCHING=0), which routes every
++  # potentially-throwing call through a JS invoke_* trampoline. Lean's
++  # runtime is exception-heavy, so the emulated mode dominated profiles of
++  # olean import loading in the browser.
++  # No -flto: it OOMs the CI runner during the LTO link, so -mtail-call stands in
++  # as the codegen optimization. MAXIMUM_MEMORY=4GB (up from the 2GB default) tests
++  # whether the Init-import allocation is bounded-but-large or truly unbounded;
++  # shared-memory growth doesn't engage here, so the worker reserves it up front.
++  # INCOMING_MODULE_JS_API: emsdk 6 strictly validates Module keys supplied by
++    # the embedder; the playground workers set all of these before load.
++    # Threads: 4.33's import machinery creates IO.Promises during env
++    # realization, and without LEAN_MULTI_THREAD the task manager is a no-op,
++    # so Promise.new panics by design. A single-thread (no COOP/COEP, phone-
++    # sized) build needs a sequential task manager upstream first.
++    # JS-based EH: -fwasm-exceptions still miscompiles this tree on emsdk 6 —
++    # the first compile traps `unreachable` inside readModuleDataPartsOfMod
++    # (exception-heavy part-probing) in 10ms, silently, heap tiny, in both the
++    # pthread and single-thread configs; the native i386 build of the same
++    # sources is fine. Same class of bug 1aa6036d1f dodged on emcc 4.0.22.
++    # EMSCRIPTEN_SETTINGS holds only flags that change CODEGEN and therefore
++    # must reach every compile: -pthread (atomics/TLS) and the EH mode. Flags
++    # that only shape the final JS/wasm output live in EMSCRIPTEN_LINK_SETTINGS
++    # so that link-only experiments keep the ccache'd objects valid.
++    set(EMSCRIPTEN_SETTINGS "-fwasm-exceptions -mtail-call -pthread")
++    set(EMSCRIPTEN_LINK_SETTINGS "-sALLOW_MEMORY_GROWTH=1 -sINCOMING_MODULE_JS_API=print,printErr,setStatus,locateFile,mainScriptUrlOrBlob,INITIAL_MEMORY,wasmMemory,noInitialRun,preRun,onRuntimeInitialized,onAbort,onExit,arguments,ENV")
++
++  # EMSCRIPTEN_DEBUG: Enable readable function names and assertions for debugging
++  # This makes the WASM larger and slower but shows actual function names in stack traces
++  # instead of mangled names like "invoke_III"
++  option(EMSCRIPTEN_DEBUG "Enable debug-friendly WASM build with readable function names" OFF)
++  if(EMSCRIPTEN_DEBUG)
++    message(STATUS "Emscripten debug mode: enabling readable function names and assertions")
++    # --profiling-funcs keeps a name section (accurate, non-folded stack traces)
++    # without the size blow-up of -g3; -sASSERTIONS=1 surfaces real abort/OOM
++    # messages instead of a bare `unreachable`.
++    # ASSERTIONS=1 is broken on emsdk 6 pthread workers: the stack-cookie
++    # checks call growMemViews() before the load message delivers wasmMemory
++    # ("Cannot read properties of undefined (reading 'buffer')" at boot).
++    # Keep the name section for symbolizing traces.
++    string(APPEND EMSCRIPTEN_SETTINGS " --profiling-funcs")
++  endif()
++
++  string(APPEND LEANC_EXTRA_CC_FLAGS " -D LEAN_EMSCRIPTEN ${EMSCRIPTEN_SETTINGS}")
+   string(APPEND LEAN_EXTRA_CXX_FLAGS " -D LEAN_EMSCRIPTEN ${EMSCRIPTEN_SETTINGS}")
+-  string(APPEND LEAN_EXTRA_LINKER_FLAGS " ${EMSCRIPTEN_SETTINGS}")
++  string(APPEND LEAN_EXTRA_LINKER_FLAGS " ${EMSCRIPTEN_SETTINGS} ${EMSCRIPTEN_LINK_SETTINGS}")
+ endif()
+ 
+ # Added for CTest
+@@ -722,7 +779,7 @@ file(WRITE "${CMAKE_BINARY_DIR}/lake-githash" "${LAKE_LEAN_GITHASH}")
+ # Git HASH
+ if(USE_GITHASH)
+   include(GetGitRevisionDescription)
+-  get_git_head_revision(GIT_REFSPEC GIT_SHA1 ALLOW_LOOKING_ABOVE_CMAKE_SOURCE_DIR)
++  execute_process(COMMAND git rev-parse HEAD WORKING_DIRECTORY "${LEAN_SOURCE_DIR}" OUTPUT_VARIABLE GIT_SHA1 OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+   if(GIT_SHA1 MATCHES "GITDIR-NOTFOUND")
+     message(STATUS "Failed to read git_sha1")
+     set(GIT_SHA1 "")
+@@ -904,9 +961,29 @@ if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+   # We set `ERROR_ON_UNDEFINED_SYMBOLS=0` because our build of LibUV does not
+   # define all symbols, see the comment about LibUV on WebAssembly further up
+   # in this file.
++  # MAIN_MODULE=2 keeps dlsym() working (the IR interpreter resolves native
++  # code — mandatorily for body-less @[extern] decls like the IO primitives —
++  # via dlsym(RTLD_DEFAULT), which searches the wasm export table) while
++  # letting wasm-ld GC everything not reachable from the export list.
++  # emscripten-exports.txt pins the symbols dlsym must see: the C runtime API
++  # (lean_*), the l_<mangled>[___boxed] stems of every @[extern] decl in the
++  # shipped libraries, and the entry points the playground workers call. All
++  # other Lean functions stay callable through their IR (shipped as .ir parts),
++  # just interpreted instead of native. This replaces MAIN_MODULE=1 +
++  # LINKABLE=1 + EXPORT_ALL=1, whose ~230k-entry export table dominated the
++  # glue JS and blocked all DCE (WebKit on iPhone dies compiling the result).
++  # PTHREAD_POOL_SIZE pre-spawns worker threads so Lean can create threads without
++  # the main thread blocking (Emscripten can't spawn a worker synchronously); 4
++  # matched the working 4.28 build. STACK_SIZE=16MB covers whatever import work
++  # still runs on the main wasm stack (Emscripten's 64KB default overflows it).
++  # INITIAL_MEMORY must exceed static data + the 16MB stack + per-thread TLS; the
++  # pthread layout needs ~22MB up front (the default 16MB fails to link). Shared
++  # memory does NOT grow here (the browser's SharedArrayBuffer isn't resizable in
++  # this config), so the worker reserves the real size up front; MAXIMUM_MEMORY=4GB
++  # raises the wasm32 ceiling from 2GB so we can test whether the import fits.
+   string(
+     APPEND LEAN_EXE_LINKER_FLAGS
+-    " ${LIB}/temp/libleanshell.a ${TOOLCHAIN_STATIC_LINKER_FLAGS} ${EMSCRIPTEN_SETTINGS} -lnodefs.js -s EXIT_RUNTIME=1 -s MAIN_MODULE=1 -s LINKABLE=1 -s EXPORT_ALL=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0"
++    " ${LIB}/temp/libleanshell.a ${TOOLCHAIN_STATIC_LINKER_FLAGS} ${EMSCRIPTEN_SETTINGS} ${EMSCRIPTEN_LINK_SETTINGS} -lnodefs.js -s EXIT_RUNTIME=1 -s MAIN_MODULE=2 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -sEXPORTED_FUNCTIONS=@${LEAN_SOURCE_DIR}/emscripten-exports.txt -sEXPORTED_RUNTIME_METHODS=ccall,callMain,FS,ENV,getValue,setValue,stringToNewUTF8,UTF8ToString -s STACK_SIZE=16777216 -sINITIAL_MEMORY=67108864 -sMAXIMUM_MEMORY=4294967296 -sPTHREAD_POOL_SIZE=4"
+   )
+ endif()
+ 
+@@ -1036,8 +1113,15 @@ endif()
+ 
+ # use Bash version for building, use Lean version in bin/ for tests & distribution
+ configure_file("${LEAN_SOURCE_DIR}/bin/leanc.in" "${CMAKE_BINARY_DIR}/leanc.sh" @ONLY)
+-if(STAGE GREATER 0 AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
++
++# Copy Leanc.lean source so Lake can build the Leanc library (needed for all
++# platforms, including Emscripten where the stdlib build expects it)
++if(STAGE GREATER 0 AND EXISTS ${LEAN_SOURCE_DIR}/Leanc.lean)
+   configure_file("${LEAN_SOURCE_DIR}/Leanc.lean" "${CMAKE_BINARY_DIR}/leanc/Leanc.lean" @ONLY)
++endif()
++
++# Build the leanc binary (not needed for Emscripten because it uses emcc directly)
++if(STAGE GREATER 0 AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+   add_custom_target(
+     leanc
+     ALL
+@@ -1149,12 +1233,13 @@ string(REPLACE "ROOT" "${CMAKE_BINARY_DIR}" LEANC_INTERNAL_FLAGS "${LEANC_INTERN
+ toml_escape("${LEAN_EXTRA_OPTS}" LEAN_EXTRA_OPTS_TOML)
+ toml_escape("${LEANC_EXTRA_CC_FLAGS}" LEAN_MORE_LEANC_ARGS_TOML)
+ # These are passed as untraced arguments because they include the sysroot path.
+-# However, as they are untraced, Lake will not invalidate build artifacts if the sysroot changes.
+-# As such, care must be taken when changing sysroots. Locally, artifacts can be manually cleaned via
+-# `clean-stdlib` and `lake cache clean`. In CI, this behavior is currently desirable. The portable
+-# release build populates the cache, and non-release builds using the host sysroot consume it.
+-# If this changed or reversed, the setup here would also need changing.
+ toml_escape("${LEANC_INTERNAL_FLAGS}" LEAN_WEAK_LEANC_ARGS_TOML)
++# For Emscripten cross-compilation, Lake needs the extra linker flags too.
++set(LAKE_MORE_LEANC_FLAGS "${LEANC_INTERNAL_FLAGS} ${LEANC_INTERNAL_LINKER_FLAGS}")
++if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
++  string(APPEND LAKE_MORE_LEANC_FLAGS " ${EMSCRIPTEN_SETTINGS}")
++endif()
++toml_escape("${LAKE_MORE_LEANC_FLAGS}" LEAN_MORE_LEANC_LINK_ARGS_TOML)
+ 
+ if(CMAKE_BUILD_TYPE MATCHES "Debug|Release|RelWithDebInfo|MinSizeRel")
+   set(CMAKE_BUILD_TYPE_TOML "${CMAKE_BUILD_TYPE}")
+diff --git a/src/Lean/Elab/Frontend.lean b/src/Lean/Elab/Frontend.lean
+index 965a761b628ebc7b7c780c7a6d12fde6e2e9b339..a75bf98b54117cf79d3123dbdc2214735c19d08a 100644
+--- a/src/Lean/Elab/Frontend.lean
++++ b/src/Lean/Elab/Frontend.lean
+@@ -266,6 +266,22 @@ private def setMainModule (snap : Language.Lean.InitialSnapshot) (m : Name) :
+     result? := some { parsed with
+       processedSnap := .finished none newProcessed } }
+ 
++/--
++Loads a `--incr-header-save` snapshot and returns its post-import command state
++together with the `[init]` module indices `runInitAttrsForModules` must replay.
++For hosts that consume the header environment directly instead of driving the
++language processor — the WASM shell seeds its per-import-set environment cache
++this way, skipping the multi-minute `loadExts` import.
++-/
++unsafe def loadHeaderSnapshotCmdState (fname : System.FilePath) :
++    IO (Command.State × Array Nat) := do
++  let incr ← loadIncrSnapshot fname
++  let some parsed := incr.snap.result?
++    | throw <| IO.userError s!"snapshot {fname} has no parse result"
++  let some hps := parsed.processedSnap.get.result?
++    | throw <| IO.userError s!"snapshot {fname} has no processed header"
++  return (hps.cmdState, incr.initModIdxs)
++
+ def runFrontend
+     (input : String)
+     (opts : Options)
+@@ -283,6 +299,8 @@ def runFrontend
+     (incrLoadFileName? : Option System.FilePath := none)
+     (incrHeaderSaveFileName? : Option System.FilePath := none)
+     : IO (Option Environment) := do
++  IO.println "[DEBUG:L] runFrontend entered"
++  IO.println s!"[DEBUG:L] fileName = {fileName}, mainModuleName = {mainModuleName}"
+   let startTime := (← IO.monoNanosNow).toFloat / 1000000000
+   let inputCtx := Parser.mkInputContext input fileName
+   -- default `cmdlineSnapshots` to true (not done as default value for API back-compat reasons)
+@@ -337,24 +355,37 @@ def runFrontend
+   let snaps := Language.toSnapshotTree snap
+   let severityOverrides := errorOnKinds.foldl (·.insert · .error) {}
+ 
++  IO.println "[DEBUG:N] About to run and report snapshots"
+   -- reporting should be done before any early exit from the function
+   let hasErrors ← snaps.runAndReport opts jsonOutput severityOverrides
++  IO.println s!"[DEBUG:N] Reporting complete, hasErrors = {hasErrors}"
+ 
+   let some cmdState := Language.Lean.waitForFinalCmdState? snap
+-    | return none
++    | IO.println "[DEBUG:N] waitForFinalCmdState? returned none"
++      return none
+   let env := cmdState.env
+   let finalOpts := cmdState.scopes[0]!.opts
+ 
+   -- Saves `snapToSave` wrapped with the init-mod indices used by `runInitAttrsForModules` on load.
+   -- Writes a `<incrFile>.deps` JSON helper alongside: the dep regions grouped per module (see
+   -- `regionsToModuleArtifacts`), needed to map the snapshot back in before we can access `env`.
++  --
++  -- On Emscripten the snapshot is saved SELF-CONTAINED (no dep regions, empty `.deps`): dep
++  -- resolution matches pointers against each region's saved `base_addr` range, which requires
++  -- every dep to sit at its saved address on load (mmap-at-base) and all saved ranges to be
++  -- disjoint. Wasm can never map at base, and the 32-bit address space makes the independently
++  -- built oleans' saved ranges collide, so the region-referencing scheme cannot work there;
++  -- copying everything reachable into the snapshot sidesteps addresses entirely at the cost of
++  -- a larger file.
+   let saveSnap (incrFile : System.FilePath) (snapToSave : Language.Lean.InitialSnapshot) :
+       IO Unit := do
+     let toSave : IncrSnapshot :=
+       { snap := snapToSave, initModIdxs := getRegularInitAttrModIdxs env }
++    let depRegions := if System.Platform.isEmscripten then #[] else env.header.regions
+     let compactor ← (unsafe CompactedRegion.save incrFile `_snap toSave
+-      env.header.regions none (allowClosures := true))
+-    let moduleArts := regionsToModuleArtifacts env.header.regions
++      depRegions none (allowClosures := true))
++    let moduleArts := if System.Platform.isEmscripten then #[] else
++      regionsToModuleArtifacts env.header.regions
+     IO.FS.writeFile (incrFile.addExtension "deps") (toJson moduleArts).compress
+     Runtime.forget compactor
+ 
+diff --git a/src/Lean/Elab/Import.lean b/src/Lean/Elab/Import.lean
+index 1335a89776762c65c6df53f3028fbae9cba85513..5bc9ebc00f16d2dece735770d0c6d32da43c176f 100644
+--- a/src/Lean/Elab/Import.lean
++++ b/src/Lean/Elab/Import.lean
+@@ -11,6 +11,7 @@ meta import Lean.Parser.Module
+ import Lean.Compiler.ModPkgExt
+ public import Lean.DeprecatedModule
+ import Init.Data.String.Modify
++import Init.System.Platform
+ 
+ public section
+ 
+diff --git a/src/Lean/Environment.lean b/src/Lean/Environment.lean
+index 33928512dadcfa2e42a307499e9228596da0341a..3166f86c8a516b26294f4bca8b7705d6d18cfb37 100644
+--- a/src/Lean/Environment.lean
++++ b/src/Lean/Environment.lean
+@@ -22,6 +22,7 @@ public import Lean.PrivateName
+ public import Lean.LoadDynlib
+ public import Lean.CompactedRegion
+ public import Init.Dynamic
++import Init.System.Platform
+ import Init.Data.Slice
+ import Init.Data.String.TakeDrop
+ import Init.Data.Range.Polymorphic.Iterators
+@@ -2177,7 +2178,11 @@ where
+   go (imports : Array Import) (importAll isExported needsData needsIRTrans : Bool) := do
+     for i in imports do
+       -- `B > none`?
+-      let needsData := needsData && (i.isExported || importAll)
++      -- In Emscripten, we ALWAYS need .olean data (no IR fallback), so keep needsData=true
++      let needsData := if System.Platform.isEmscripten then
++        needsData
++      else
++        needsData && (i.isExported || importAll)
+       -- `B ≥ privateAll`?
+       let importAll := globalLevel == .private || importAll && i.importAll
+       -- `B ≥ public`?
+@@ -2187,7 +2192,14 @@ where
+       let needsIRTrans := needsIRTrans || (!loadIRSig && needsData && i.isMeta)
+       -- `loadIRSig` only loads `.ir.sig` for modules whose `.olean` is also loaded
+       -- (i.e., `needsData`), preserving the invariant that IR is never present without its olean.
+-      let needsIR := needsIRTrans || importAll || globalLevel > .exported || (loadIRSig && needsData)
++      -- On Emscripten, load `.ir` wherever data is loaded: codegen phase-splits
++      -- IR, so the `.olean`'s decl map holds `.extern` stubs whose runtime
++      -- bodies live in the `.ir` part. Core stubs resolve through `dlsym` into
++      -- the linked binary, but external packages (Batteries, …) exist only as
++      -- olean trees — without their `.ir` the interpreter cannot run so much as
++      -- their `initialize` blocks. The parts are small (~17% of the oleans).
++      let needsIR := needsIRTrans || importAll || globalLevel > .exported ||
++        (loadIRSig && needsData) || (System.Platform.isEmscripten && needsData)
+       if !needsData && !needsIR then
+         continue
+ 
+@@ -2310,7 +2322,13 @@ def finalizeImport (s : ImportState) (imports : Array Import) (opts : Options) (
+     (loadIRSig := false) :
+     IO Environment := do
+   let modules := s.moduleNames.filterMap (s.moduleNameMap[·]?)
+-  let moduleData ← modules.mapM fun mod => do
++  if System.Platform.isEmscripten then
++    IO.println s!"[DEBUG:PROGRESS] Loading {modules.size} modules..."
++  let moduleData ← modules.mapIdxM fun idx mod => do
++    -- Progress counter for Emscripten (every 50 modules or on error)
++    let i : Nat := idx
++    if System.Platform.isEmscripten && (i % 50 == 0 || i + 1 == modules.size) then
++      IO.println s!"[DEBUG:PROGRESS] {i + 1}/{modules.size}: {mod.module}"
+     let some data := mod.mainModule? |
+       throw <| IO.userError s!"missing data file for module {mod.module}"
+     return data
+diff --git a/src/Lean/Shell.lean b/src/Lean/Shell.lean
+index 3f73f6fe35d11cbccd9b6effe1bafad030fdbdce..289953605f96c2c2314890d02dd486484126436f 100644
+--- a/src/Lean/Shell.lean
++++ b/src/Lean/Shell.lean
+@@ -13,6 +13,7 @@ import Lean.Server.FileWorker
+ import Lean.Compiler.LCNF.EmitC
+ import Init.System.Platform
+ import Lean.Compiler.Options
++import Lean.Compiler.InitAttr  -- for `runInitAttrsForModules` on snapshot load
+ 
+ /-  Lean companion to  `shell.cpp` -/
+ 
+@@ -49,6 +50,208 @@ Before calling this function, the LLVM subsystem must first be successfully init
+ @[extern "lean_emit_llvm"]
+ opaque emitLLVM (env : Environment) (modName : Name) (filepath : FilePath) : IO Unit
+ 
++/-! ## WASM API
++
++These functions provide a WASM-friendly API that caches the environment
++between calls, avoiding the slow re-import of Init modules on each compile.
++-/
++
++/-- Cache of import-set → environment. Each distinct set of header imports gets
++its own cached environment, so `import Std …` (or any imports) is slow only on
++its first compile and fast on every repeat, just like Init-only code. -/
++private initialize wasmEnvCache : IO.Ref (Array ((Array Import × Bool) × Environment)) ← IO.mkRef #[]
++
++/-- Get or create the cached WASM environment for the given header `imports`.
++The first compile with a given import set imports it (slow); later compiles with
++the same set reuse the cached environment (fast). -/
++def getOrCreateWasmEnvFor (imports : Array Import) (isModule : Bool) : IO Environment := do
++  let key := (imports, isModule)
++  for (k, env) in (← wasmEnvCache.get) do
++    if k == key then
++      IO.eprintln "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env"
++      return env
++  IO.eprintln s!"[WASM DEBUG] getOrCreateWasmEnvFor: cache miss, importing {reprStr key}…"
++  -- Mirror the frontend's header import (`processHeaderCore`, Elab/Import.lean):
++  --  * `loadExts := true` loads the environment extensions — parser notation
++  --    (e.g. `+`) and the instance database (e.g. `OfNat`). Without it (the
++  --    default `false`), `#check 2 + 2` fails with "OfNat" / "unexpected '+'".
++  --  * `level := .private` matches non-module generated production requests (complete
++  --    `.olean`); the default `.private` expects absent private/server data.
++  --  * `leakEnv := true` keeps the compacted regions alive. Environments are
++  --    cached and reused across compiles; with the default (regions freed after
++  --    import) a later compile dereferences freed regions and fails. Freeing is
++  --    also unsafe once extensions are loaded (see `withImportModules`).
++  -- `withImporting` (inside `importModules`) clears the initializer-execution
++  -- flag when it returns, and a `loadExts := true` import refuses to run
++  -- without it — so every cache-miss import after the first would throw.
++  -- Re-enable it each time, as `runFrontend` does after `--incr-load`.
++  unsafe enableInitializersExecution
++  -- Curated packs name every public/IR artifact explicitly, as Lake does.
++  -- The strict importer still rejects any required but unprovided part.
++  let setup ← ModuleSetup.load "/lib/lean/qm-setup.json"
++  let env ← importModules imports {} 0 (arts := setup.importArts)
++    (level := if isModule then .exported else .private) (loadExts := true) (leakEnv := true)
++  IO.eprintln "[WASM DEBUG] getOrCreateWasmEnvFor: importModules completed"
++  wasmEnvCache.modify (·.push (key, env))
++  return env
++
++/--
++Compile Lean code using a cached environment.
++
++This is the main WASM entry point. The first call will import Init modules (slow),
++but subsequent calls reuse the cached environment (fast).
++
++The `fileName` parameter is optional - it's only used as a label in error messages,
++not for actual file I/O. The `code` string is processed directly in memory.
++
++Returns 0 on success, 1 on error. Output is written to stdout as JSON.
++-/
++@[export lean_wasm_compile]
++def wasmCompile (code : String) (fileName : String := "<input>") : IO UInt32 := do
++  IO.eprintln s!"[WASM DEBUG] wasmCompile called with code length={code.length}, fileName={fileName}"
++  IO.eprintln "[WASM DEBUG] Creating input context..."
++  let inputCtx := Parser.mkInputContext code fileName
++  -- Parse the file's header (its `import` lines) and import that closure into a
++  -- per-import-set cached environment, then elaborate the body against it. This
++  -- is what lets user code `import Std …` (or any modules) work and stay fast on
++  -- repeat. `headerToImports` includes `Init` implicitly unless the file is
++  -- `prelude`, matching the normal frontend.
++  let (header, parserState, headerMessages) ← Parser.parseHeader inputCtx
++  IO.eprintln "[WASM DEBUG] Getting or creating environment for header imports..."
++  let env ← getOrCreateWasmEnvFor (Elab.headerToImports header) (Elab.HeaderSyntax.isModule header)
++  IO.eprintln "[WASM DEBUG] Environment ready"
++
++  let opts : Options := {}
++  let cmdState := Elab.Command.mkState env headerMessages opts
++
++  -- Elaborate synchronously with `Frontend.processCommands` — a plain loop over
++  -- `Command.elabCommandTopLevel` — rather than `Elab.IO.processCommands`. The
++  -- latter drives elaboration through the language-server snapshot/task
++  -- infrastructure, which spawns elaboration tasks. In the single-threaded WASM
++  -- worker those tasks are never drained, leaving the runtime in a state where
++  -- the *next* `lean_wasm_compile` call fails immediately. The synchronous loop
++  -- creates no tasks, so the cached environment stays reusable across compiles.
++  let frontendCtx : Elab.Frontend.Context := { inputCtx }
++  -- Start parsing commands right after the header, so the header's `import` lines
++  -- are not re-parsed as commands (they aren't commands and would error).
++  let frontendState : Elab.Frontend.State :=
++    { commandState := cmdState, parserState := parserState, cmdPos := parserState.pos }
++  -- `Command.elabCommandTopLevel` resets `commandState.messages` at the start of
++  -- every command, so the final state holds only the last command's messages.
++  -- Collect the log after each command instead of reading the end state; seed it
++  -- with any header (import) parse errors.
++  let collect : Elab.Frontend.FrontendM MessageLog := do
++    let mut acc : MessageLog := headerMessages
++    let mut done := false
++    while !done do
++      done := (← Elab.Frontend.processCommand)
++      acc := acc ++ (← Elab.Frontend.getCommandState).messages
++    return acc
++  let (msgLog, _s) ← StateRefT'.run (ReaderT.run collect frontendCtx) frontendState
++
++  -- Output messages as JSON
++  let messages := msgLog.toList
++  IO.eprintln s!"[WASM DEBUG] Processing {messages.length} messages..."
++  for msg in messages do
++    -- Convert to interactive diagnostic, then to plain diagnostic for JSON
++    let interactiveDiag ← Widget.msgToInteractiveDiagnostic inputCtx.fileMap msg false
++    let diag := interactiveDiag.toDiagnostic
++    -- Add extra fields for WASM consumers
++    let json := Json.mkObj [
++      ("fileName", Json.str msg.fileName),
++      ("pos", Json.mkObj [("line", msg.pos.line), ("column", msg.pos.column)]),
++      ("endPos", match msg.endPos with
++        | some p => Json.mkObj [("line", p.line), ("column", p.column)]
++        | none => Json.null),
++      ("severity", match msg.severity with
++        | .error => "error" | .warning => "warning" | .information => "information"),
++      ("caption", msg.caption),
++      ("data", diag.message),
++      ("isSilent", msg.isSilent),
++      ("keepFullRange", msg.keepFullRange),
++      ("kind", Json.str msg.kind.toString)
++    ]
++    IO.println json.compress
++
++  -- Return success/failure
++  let hasErrors := messages.any (·.severity == .error)
++  IO.eprintln s!"[WASM DEBUG] Done, hasErrors={hasErrors}"
++  return if hasErrors then 1 else 0
++
++/--
++Reset the WASM environment cache.
++Call this if you need to re-import modules (e.g., after changing search paths).
++-/
++@[export lean_wasm_reset]
++def wasmReset : IO Unit := do
++  wasmEnvCache.set #[]
++  IO.println "[WASM] Environment cache cleared"
++
++/--
++Seed the WASM environment cache from a `--incr-header-save` snapshot file,
++so the first compile with that header import set skips the multi-minute
++`loadExts` import entirely.
++
++The snapshot must have been saved by this same binary: its closure relocation
++(the base-0 "wasm-main" pseudo-library) is the identity, which is only correct
++against this build's function table. The cache key is read back out of the
++loaded environment's header, so the file needs no naming convention.
++
++Returns 0 on success, 1 on failure — the next compile then just falls back to
++a regular import.
++-/
++@[export lean_wasm_load_snapshot]
++def wasmLoadSnapshot (path : String) : IO UInt32 := do
++  try
++    IO.eprintln s!"[WASM DEBUG] wasmLoadSnapshot: loading {path}"
++    let (cmdState, initModIdxs) ← unsafe Elab.loadHeaderSnapshotCmdState ⟨path⟩
++    let env := cmdState.env.setMainModule .anonymous
++    -- Replay the `[init]` attributes the imported modules would have run.
++    -- `runInitAttrsForModules` requires initializer execution to be enabled,
++    -- and `withImporting` clears the flag when it returns, so enable on both
++    -- sides (the same restore `runFrontend` performs after `--incr-load`).
++    unsafe enableInitializersExecution
++    withImporting do
++      unsafe runInitAttrsForModules env initModIdxs {}
++    unsafe enableInitializersExecution
++    let key := (env.header.imports, env.header.isModule)
++    wasmEnvCache.modify (·.push (key, env))
++    IO.eprintln s!"[WASM DEBUG] wasmLoadSnapshot: cached env for {reprStr key}"
++    return 0
++  catch e =>
++    IO.eprintln s!"[WASM DEBUG] wasmLoadSnapshot failed: {e}"
++    return 1
++
++-- Versioned curated environment format: no command/task snapshot tree and no proof body.
++@[export lean_wasm_save_environment]
++def wasmSaveEnvironment (code : String) (path : String) : IO UInt32 := do
++  let inputCtx := Parser.mkInputContext code "QuickMathsHeader.lean"
++  let (header, _, messages) ← Parser.parseHeader inputCtx
++  if messages.hasErrors || !Elab.HeaderSyntax.isModule header then
++    throw <| IO.userError "Expected a valid public module header"
++  let env ← getOrCreateWasmEnvFor (Elab.headerToImports header) true
++  IO.eprintln "[WASM ENV] imported; compacting environment"
++  let payload := (env, getRegularInitAttrModIdxs env)
++  let compactor ← unsafe CompactedRegion.save ⟨path⟩ `_qm_environment_v1 payload
++    #[] none (allowClosures := true)
++  Runtime.forget compactor
++  IO.FS.writeFile ⟨path ++ ".deps"⟩ "[]"
++  IO.eprintln "[WASM ENV] saved"
++  return 0
++
++@[export lean_wasm_load_environment]
++def wasmLoadEnvironment (path : String) : IO UInt32 := do
++  let (payload, region) ← unsafe CompactedRegion.read (α := Environment × Array Nat) ⟨path⟩ #[]
++  -- Cache lifetime owns these imported regions until the worker is discarded.
++  Runtime.forget region
++  let (env, initModIdxs) := payload
++  unsafe enableInitializersExecution
++  withImporting do
++    unsafe runInitAttrsForModules env initModIdxs {}
++  unsafe enableInitializersExecution
++  wasmEnvCache.modify (·.push ((env.header.imports, env.header.isModule), env))
++  return 0
++
+ /-- Whether Lean was built with an address sanitizer enabled. -/
+ @[extern "lean_internal_has_address_sanitizer"]
+ opaque Internal.hasAddressSanitizer (_ : Unit) : Bool
+@@ -511,11 +714,14 @@ def shellMain (args : List String) (opts : ShellOptions) : IO UInt32 := do
+       IO.eprintln "Expected exactly one file name"
+       displayHelp (useStderr := true)
+       return 1
++  IO.println s!"[DEBUG:I] fileName = {fileName}"
++  IO.println "[DEBUG:I] Reading file contents"
+   let contents ← decodeLossyUTF8 <$> do
+     if opts.useStdin then
+       (← IO.getStdin).readBinToEnd
+     else
+       IO.FS.readBinFile fileName
++  IO.println s!"[DEBUG:I] contents length = {contents.length}"
+   if opts.onlyDeps then
+     Elab.printImports contents fileName
+     return 0
+@@ -537,7 +743,9 @@ def shellMain (args : List String) (opts : ShellOptions) : IO UInt32 := do
+       pure (contents.sliceFrom endLinePos).copy
+     else
+       pure contents
++  IO.println "[DEBUG:J] Loading module setup"
+   let setup? ← opts.setupFileName?.mapM ModuleSetup.load
++  IO.println s!"[DEBUG:J] setup? = {setup?.isSome}"
+   let mainModuleName ←
+     if let some setup := setup? then
+       pure setup.name
+@@ -549,6 +757,8 @@ def shellMain (args : List String) (opts : ShellOptions) : IO UInt32 := do
+           throw e
+     else
+       pure `_stdin
++  IO.println s!"[DEBUG:J] mainModuleName = {mainModuleName}"
++  IO.println "[DEBUG:K] Calling Elab.runFrontend"
+   let env? ← Elab.runFrontend contents opts.leanOpts fileName mainModuleName
+     opts.trustLevel opts.oleanFileName? opts.ileanFileName? opts.jsonOutput opts.errorOnKinds
+     #[] opts.printStats setup?
+diff --git a/src/include/lean/lean.h b/src/include/lean/lean.h
+index 910ecae72a7d1c149d4ccc8111ee438c8b4551dd..0cc7636702fe22bd6fea306b2a6b2c6b3ffaf566 100644
+--- a/src/include/lean/lean.h
++++ b/src/include/lean/lean.h
+@@ -3358,7 +3358,12 @@ static inline lean_obj_res lean_runtime_hold(b_lean_obj_arg a) {
+     return lean_box(0);
+ }
+ 
+-#ifdef LEAN_EMSCRIPTEN
++// An 8-byte scalar packed into pointer-sized `m_objs` slots: two slots on
++// 32-bit targets, one on 64-bit. Gate on pointer width, not just Emscripten —
++// a native 32-bit build (e.g. the stage0 of the wasm cross-build) must take the
++// two-slot form, or the 64-bit cast truncates the value and leaves the second
++// slot zero, silently corrupting statically-emitted scalars such as Name hashes.
++#if defined(LEAN_EMSCRIPTEN) || UINTPTR_MAX == UINT32_MAX
+ #define LEAN_SCALAR_PTR_LITERAL(b1, b2, b3, b4, b5, b6, b7, b8) (lean_object*)((uint32_t)b1 | ((uint32_t)b2 << 8) | ((uint32_t)b3 << 16) | ((uint32_t)b4 << 24)), (lean_object*)((uint32_t)b5 | ((uint32_t)b6 << 8) | ((uint32_t)b7 << 16) | ((uint32_t)b8 << 24))
+ #else
+ #define LEAN_SCALAR_PTR_LITERAL(b1, b2, b3, b4, b5, b6, b7, b8) (lean_object*)((uint64_t)b1 | ((uint64_t)b2 << 8) | ((uint64_t)b3 << 16) | ((uint64_t)b4 << 24) | ((uint64_t)b5 << 32) | ((uint64_t)b6 << 40) | ((uint64_t)b7 << 48) | ((uint64_t)b8 << 56))
+diff --git a/src/initialize/init.cpp b/src/initialize/init.cpp
+index 6cc1fbb32d08a3e2ba8f6c9abb805d3864691d59..5cb083d29a120cbc9138816ca1b35aa430e2e3fb 100644
+--- a/src/initialize/init.cpp
++++ b/src/initialize/init.cpp
+@@ -14,6 +14,11 @@ Author: Leonardo de Moura
+ #include "library/constructions/init_module.h"
+ #include "library/print.h"
+ #include "initialize/init.h"
++// #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++#include <emscripten.h>
++#endif
++// #endregion
+ 
+ namespace lean {
+ extern "C" object* initialize_Init(uint8_t);
+@@ -32,21 +37,71 @@ extern "C" LEAN_EXPORT void lean_initialize() {
+         return;
+     g_initialized = true;
+     save_stack_info();
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] save_stack_info() done"); });
++#endif
++    // #endregion
+     initialize_util_module();
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] initialize_util_module() done"); });
++#endif
++    // #endregion
+     uint8_t builtin = 1;
+     // Initializing the core libs explicitly is necessary because of references to them other than
+     // via `import`, such as:
+     // * calling exported Lean functions from C++
+     // * calling into native code of the current module from a previous stage when `prefer_native`
+     //   is set
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] About to initialize_Init..."); });
++#endif
++    // #endregion
+     consume_io_result(initialize_Init(builtin));
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] initialize_Init() done"); });
++#endif
++    // #endregion
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] About to initialize_Std..."); });
++#endif
++    // #endregion
+     consume_io_result(initialize_Std(builtin));
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] initialize_Std() done"); });
++#endif
++    // #endregion
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] About to initialize_Lean..."); });
++#endif
++    // #endregion
+     consume_io_result(initialize_Lean(builtin));
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] initialize_Lean() done"); });
++#endif
++    // #endregion
+     initialize_kernel_module();
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] initialize_kernel_module() done"); });
++#endif
++    // #endregion
+     init_default_print_fn();
+     initialize_library_core_module();
+     initialize_library_module();
+     initialize_constructions_module();
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({ console.log("[DEBUG:INIT] lean_initialize() completed successfully"); });
++#endif
++    // #endregion
+ }
+ 
+ void finalize() {
+diff --git a/src/library/ir_interpreter.cpp b/src/library/ir_interpreter.cpp
+index cb954c098e93bf45a17a5d1e66131f37d1158848..b94deb518129508e57044686ae388d5ecdbb02f3 100644
+--- a/src/library/ir_interpreter.cpp
++++ b/src/library/ir_interpreter.cpp
+@@ -1206,7 +1206,7 @@ extern "C" LEAN_EXPORT obj_res lean_run_mod_init_core(b_obj_arg  sym) {
+     }
+ }
+ 
+-extern "C" LEAN_EXPORT object * lean_run_init(object * env, object * opts, object * decl, object * init_decl, object *) {
++extern "C" LEAN_EXPORT object * lean_run_init(object * env, object * opts, object * decl, object * init_decl) {
+     return interpreter::with_interpreter<object *>(TO_REF(elab_environment, env), TO_REF(options, opts), TO_REF(name, decl), [&](interpreter & interp) {
+         return interp.run_init(TO_REF(name, decl), TO_REF(name, init_decl));
+     });
+diff --git a/src/library/module.cpp b/src/library/module.cpp
+index 402e5220e1379d1204beefec0817ce9dda74294a..e86b9f199ada6b8365530f67782c296274358798 100644
+--- a/src/library/module.cpp
++++ b/src/library/module.cpp
+@@ -267,7 +267,7 @@ static std::vector<std::pair<size_t, ptrdiff_t>> read_lib_table_from_buffer(char
+ 
+ extern "C" LEAN_EXPORT object * lean_compacted_region_save(b_obj_arg ofname, b_obj_arg mod, b_obj_arg odata,
+                                                            b_obj_arg odep_regions, obj_arg oprev,
+-                                                           uint8 allow_closures_u8, object *) {
++                                                           uint8 allow_closures_u8) {
+     // `mmap` addresses must be page-aligned. The default (non-huge) page size on x86-64 is 4KB;
+     // `MapViewOfFileEx` addresses must be aligned to the "memory allocation granularity" (64KB).
+     const size_t ALIGN = 1LL<<16;
+@@ -449,7 +449,7 @@ static object * mk_compacted_region(b_obj_arg ofname, object * root,
+ // root to be interpreted as — the C side does no type checking and the caller is responsible for
+ // using a type compatible with what was saved (see `CompactedRegion.read`).
+ // Supports both `v2` and `v3` formats.
+-extern "C" LEAN_EXPORT object * lean_compacted_region_read(b_obj_arg ofname, b_obj_arg odep_regions, object *) {
++extern "C" LEAN_EXPORT object * lean_compacted_region_read(b_obj_arg ofname, b_obj_arg odep_regions) {
+     std::string olean_fn(lean_string_cstr(ofname));
+     try {
+         std::vector<region_view> dep_regions = extract_dep_regions(odep_regions);
+@@ -618,7 +618,7 @@ extern "C" LEAN_EXPORT object * lean_compacted_region_read(b_obj_arg ofname, b_o
+     }
+ }
+ 
+-extern "C" LEAN_EXPORT obj_res lean_compacted_region_free(obj_arg region, object *) {
++extern "C" LEAN_EXPORT obj_res lean_compacted_region_free(obj_arg region) {
+     char * buffer = region_buffer(region);
+     size_t full_sz = region_size(region);
+     bool is_mmap = lean_ctor_get_uint8(region, sizeof(void*) * 5) != 0;
+diff --git a/src/runtime/compact.cpp b/src/runtime/compact.cpp
+index 73c9a4e18798496bc764cdb7e9899021eed3e4b3..a3a79f1a3cd78d6d2fe646238509ddf7b164d13f 100644
+--- a/src/runtime/compact.cpp
++++ b/src/runtime/compact.cpp
+@@ -100,6 +100,15 @@ LEAN_EXPORT std::vector<lib_info> get_loaded_libs() {
+         if (!name) continue;
+         libs.push_back({reinterpret_cast<size_t>(hdr), name});
+     }
++#elif defined(__EMSCRIPTEN__)
++    // Wasm has no shared libraries and no dl_iterate_phdr (see the stub in
++    // debug.cpp); a "function pointer" is an index into the module's function
++    // table, which is stable for a given binary. Present that table as one
++    // pseudo-library at base 0: closures then compact to ("wasm-main", index)
++    // and relocate as the identity when the same binary reloads the region.
++    // A region saved by one build must not be loaded by another — the callers
++    // key snapshot files by the Lean githash.
++    libs.push_back({0, "wasm-main"});
+ #else
+     // Linux: use dl_iterate_phdr
+     dl_iterate_phdr([](struct dl_phdr_info * info, size_t, void * data) -> int {
+diff --git a/src/runtime/debug.cpp b/src/runtime/debug.cpp
+index ecd5da1bfc6c2c9e196e49be5fa31bf53f8069bd..30b786871cf566185911a97233b47da13042da5c 100644
+--- a/src/runtime/debug.cpp
++++ b/src/runtime/debug.cpp
+@@ -51,6 +51,16 @@ void notify_assertion_violation(const char * fileName, int line, const char * co
+     std::cerr << "Line: " << line << "\n";
+     std::cerr << condition << "\n";
+     std::cerr.flush();
++    // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++    EM_ASM({
++        console.log("[DEBUG:ASSERT] ASSERTION VIOLATION:");
++        console.log("[DEBUG:ASSERT] File: " + UTF8ToString($0));
++        console.log("[DEBUG:ASSERT] Line: " + $1);
++        console.log("[DEBUG:ASSERT] Condition: " + UTF8ToString($2));
++    }, fileName, line, condition);
++#endif
++    // #endregion
+ }
+ 
+ void enable_debug(char const * tag) {
+@@ -146,3 +156,14 @@ extern "C" LEAN_EXPORT void lean_notify_assert(const char * fileName, int line,
+     invoke_debugger();
+ }
+ }
++
++#ifdef LEAN_EMSCRIPTEN
++// Under MAIN_MODULE dynamic linking, libunwind references dl_iterate_phdr to
++// walk loaded modules for EH frame data; nothing provides it in the
++// Emscripten link, which leaves a required-but-unresolved GOT entry that
++// emsdk 6's loader crashes on (its undefined-symbol reporter dereferences
++// the missing binding). There are no modules to walk — report none.
++extern "C" LEAN_EXPORT int dl_iterate_phdr(int (*)(void *, unsigned long, void *), void *) {
++    return 0;
++}
++#endif
+diff --git a/src/runtime/interrupt.cpp b/src/runtime/interrupt.cpp
+index 4cc6fac15430cca1177bacd01565eb7b6285efed..19df1f51628816519cbd25ce0eefe0ba31eddabd 100644
+--- a/src/runtime/interrupt.cpp
++++ b/src/runtime/interrupt.cpp
+@@ -17,7 +17,7 @@ namespace lean {
+ LEAN_THREAD_VALUE(size_t, g_max_heartbeat, 0);
+ LEAN_THREAD_VALUE(size_t, g_heartbeat, 0);
+ 
+-extern "C" LEAN_EXPORT obj_res lean_internal_get_default_max_heartbeat() {
++extern "C" LEAN_EXPORT obj_res lean_internal_get_default_max_heartbeat(lean_obj_arg /* unit */) {
+ #ifdef LEAN_DEFAULT_MAX_HEARTBEAT
+     return lean_box(LEAN_DEFAULT_MAX_HEARTBEAT);
+ #else
+diff --git a/src/runtime/io.cpp b/src/runtime/io.cpp
+index 3df6291f8c4a132cfb4fa64d554b10af05f304cf..c55340d30fb52915873701f6930fa65ee40a3219 100644
+--- a/src/runtime/io.cpp
++++ b/src/runtime/io.cpp
+@@ -1258,7 +1258,7 @@ extern "C" LEAN_EXPORT obj_res lean_io_hard_link(b_obj_arg orig, b_obj_arg link)
+ }
+ 
+ /* createTempFile : IO (Handle × FilePath) */
+-extern "C" LEAN_EXPORT obj_res lean_io_create_tempfile(lean_object * /* w */) {
++extern "C" LEAN_EXPORT obj_res lean_io_create_tempfile() {
+     char path[PATH_MAX];
+     size_t base_len = PATH_MAX;
+     int ret = uv_os_tmpdir(path, &base_len);
+@@ -1304,7 +1304,7 @@ extern "C" LEAN_EXPORT obj_res lean_io_create_tempfile(lean_object * /* w */) {
+ }
+ 
+ /* createTempDir : IO FilePath */
+-extern "C" LEAN_EXPORT obj_res lean_io_create_tempdir(lean_object * /* w */) {
++extern "C" LEAN_EXPORT obj_res lean_io_create_tempdir() {
+     char path[PATH_MAX];
+     size_t base_len = PATH_MAX;
+     int ret = uv_os_tmpdir(path, &base_len);
+@@ -1387,18 +1387,26 @@ extern "C" LEAN_EXPORT obj_res lean_io_app_path() {
+ #elif defined(LEAN_EMSCRIPTEN)
+     // See https://emscripten.org/docs/api_reference/emscripten.h.html#c.EM_ASM_INT
+     char* appPath = reinterpret_cast<char*>(EM_ASM_INT({
+-        if ((typeof process === "undefined") || (process.release.name !== "node")) {
+-            return 0;
++        var isNode = (typeof process !== "undefined") &&
++                     (process.release && process.release.name === "node");
++        
++        var path;
++        if (isNode) {
++            // Node.js: use actual filename
++            path = __filename;
++        } else {
++            // Browser: return a virtual path that results in correct sysroot
++            // appDir = appPath.parent = "/bin"
++            // sysroot = appDir.parent = "/"
++            // This makes libraries resolve to "/lib/lean/library"
++            path = "/bin/lean.wasm";
+         }
+ 
+-        var lengthBytes = lengthBytesUTF8(__filename)+1;
++        var lengthBytes = lengthBytesUTF8(path)+1;
+         var pathOnWasmHeap = _malloc(lengthBytes);
+-        stringToUTF8(__filename, pathOnWasmHeap, lengthBytes);
++        stringToUTF8(path, pathOnWasmHeap, lengthBytes);
+         return pathOnWasmHeap;
+     }));
+-    if (appPath == nullptr) {
+-        return io_result_mk_error("no Lean executable file exists in WASM outside of Node.js");
+-    }
+ 
+     object * appPathLean = mk_string(appPath);
+     free(appPath);
+diff --git a/src/runtime/memory.cpp b/src/runtime/memory.cpp
+index 0a723690f3bed9f1bf56229bc9f6238522ea3c59..3bde0c143665c5fafa7bc78cccfbac49465a8c4b 100644
+--- a/src/runtime/memory.cpp
++++ b/src/runtime/memory.cpp
+@@ -114,7 +114,7 @@ namespace lean {
+ static size_t g_max_memory = 0;
+ LEAN_THREAD_VALUE(size_t, g_counter, 0);
+ 
+-extern "C" LEAN_EXPORT lean_obj_res lean_internal_get_default_max_memory() {
++extern "C" LEAN_EXPORT lean_obj_res lean_internal_get_default_max_memory(lean_obj_arg /* unit */) {
+ #ifdef LEAN_DEFAULT_MAX_MEMORY
+     return lean_box(LEAN_DEFAULT_MAX_MEMORY);
+ #else
+diff --git a/src/runtime/thread.cpp b/src/runtime/thread.cpp
+index d4b50d3f723a7f94de8021214e6822e9430330f7..0acdfe4a5809af40510323acc8c5b8b7a885a8ca 100644
+--- a/src/runtime/thread.cpp
++++ b/src/runtime/thread.cpp
+@@ -22,7 +22,10 @@ Author: Leonardo de Moura
+ #include "runtime/sstream.h"
+ 
+ #ifndef LEAN_DEFAULT_THREAD_STACK_SIZE
+-#ifdef LEAN_EMSCRIPTEN
++// Gate on pointer width, not just Emscripten: a 1GB thread stack cannot be
++// reserved in a native 32-bit address space (e.g. the stage0 of the wasm
++// cross-build), making every pthread_create fail.
++#if defined(LEAN_EMSCRIPTEN) || UINTPTR_MAX == UINT32_MAX
+ #define LEAN_DEFAULT_THREAD_STACK_SIZE 8*1024*1024 // 8MB for 32-bit
+ #else
+ #define LEAN_DEFAULT_THREAD_STACK_SIZE 1024*1024*1024 // 1GB for 64-bit
+diff --git a/src/runtime/uv/event_loop.cpp b/src/runtime/uv/event_loop.cpp
+index fa854393154f94cb0cc20db4c0622235ac33f029..18865275d7b75f8aba1e86b254b66331006043ee 100644
+--- a/src/runtime/uv/event_loop.cpp
++++ b/src/runtime/uv/event_loop.cpp
+@@ -139,15 +139,16 @@ void initialize_libuv_loop() {
+ }
+ 
+ #else
++// Emscripten/WASM: Async/Network/IO operations are not supported on WebAssembly.
+ 
+ /* Std.Internal.UV.Loop.configure (options : Loop.Options) : BaseIO Unit */
+ extern "C" LEAN_EXPORT lean_obj_res lean_uv_event_loop_configure(b_obj_arg options) {
+     return io_result_mk_error("lean_uv_event_loop_configure is not supported");
+ }
+ 
+-/* Std.Internal.UV.Loop.alive : BaseIO UInt64 */
+-extern "C" LEAN_EXPORT lean_obj_res lean_uv_event_loop_alive() {
+-    return io_result_mk_error("lean_uv_event_loop_alive is not supported");
++/* Std.Internal.UV.Loop.alive : BaseIO Bool */
++extern "C" LEAN_EXPORT uint8_t lean_uv_event_loop_alive() {
++    return 0;  // No libuv event loop in Emscripten
+ }
+ 
+ #endif
+diff --git a/src/runtime/uv/system.cpp b/src/runtime/uv/system.cpp
+index 3ac95b6f28e921ea3543bab933fb71e2338403e0..a2283fb29ac2830335589e8f4ee0c97fa7c09f3b 100644
+--- a/src/runtime/uv/system.cpp
++++ b/src/runtime/uv/system.cpp
+@@ -634,7 +634,7 @@ extern "C" LEAN_EXPORT lean_obj_res lean_uv_os_get_passwd() {
+ }
+ 
+ // Std.Internal.UV.System.osGetGroup : IO (Option GroupInfo)
+-extern "C" LEAN_EXPORT lean_obj_res lean_uv_os_get_group() {
++extern "C" LEAN_EXPORT lean_obj_res lean_uv_os_get_group(uint64_t gid) {
+     lean_always_assert(
+         false && ("Please build a version of Lean4 with libuv to invoke this.")
+     );
+diff --git a/src/util/io.h b/src/util/io.h
+index c648a52d1a583c6868ebc237460e56499cd1ff7d..ad881171f0468d1efdbb464f13ff9df5403c20bd 100644
+--- a/src/util/io.h
++++ b/src/util/io.h
+@@ -8,6 +8,11 @@ Author: Leonardo de Moura
+ #include "runtime/exception.h"
+ #include "runtime/object.h"
+ #include "runtime/string_ref.h"
++// #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++#include <emscripten.h>
++#endif
++// #endregion
+ 
+ namespace lean {
+ extern "C" object* lean_io_error_to_string(object * err);
+@@ -32,12 +37,19 @@ inline void consume_io_result(object * o) {
+         inc(err_obj);
+         dec(o);
+         string_ref error(lean_io_error_to_string(err_obj));
++        // #region agent log
++#if defined(LEAN_EMSCRIPTEN)
++        EM_ASM({
++            console.log("[DEBUG:IO_ERROR] IO result error: " + UTF8ToString($0));
++        }, error.data());
++#endif
++        // #endregion
+         throw exception(error.to_std_string());
+     }
+     dec(o);
+ }
+ 
+-template<typename T> T get_io_scalar_result(object * o) {
++inline uint32 get_io_uint32_result(object * o) {
+     if (io_result_is_error(o)) {
+         object * err_obj = io_result_get_error(o);
+         inc(err_obj);
+@@ -45,7 +57,7 @@ template<typename T> T get_io_scalar_result(object * o) {
+         string_ref error(lean_io_error_to_string(err_obj));
+         throw exception(error.to_std_string());
+     } else {
+-        T r = unbox(io_result_get_value(o));
++        uint32 r = lean_unbox_uint32(io_result_get_value(o));
+         dec(o);
+         return r;
+     }
+diff --git a/src/util/shell.cpp b/src/util/shell.cpp
+index 29b859887e2ca380b30216242fa02c95f291cb1a..2f1602de0379d9f9c4f31b8692f188e6073703f2 100644
+--- a/src/util/shell.cpp
++++ b/src/util/shell.cpp
+@@ -210,15 +210,49 @@ static char const * g_opt_str =
+ namespace lean {
+ extern "C" obj_res lean_shell_main(obj_arg args, obj_arg shell_opts);
+ int run_shell_main(int argc, char* argv[], object_ref const & shell_opts) {
++    // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:G] run_shell_main entered, building args list"); });
++#endif
++    // #endregion
+     list_ref<string_ref> args;
+     while (argc > 0) {
+         argc--;
+         args = list_ref<string_ref>(string_ref(argv[argc]), args);
+     }
+-    return get_io_scalar_result<uint32>(lean_shell_main(
+-        args.steal(),
+-        shell_opts.to_obj_arg()
+-    ));
++    // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:G] Args list built, preparing arguments..."); });
++#endif
++    // #endregion
++    
++    // Prepare arguments separately to isolate crash
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:G] Calling args.steal()..."); });
++#endif
++    object * args_obj = args.steal();
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:G] args.steal() returned: " + $0); }, (int)(uintptr_t)args_obj);
++#endif
++    
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:G] Calling shell_opts.to_obj_arg()..."); });
++#endif
++    object * opts_obj = shell_opts.to_obj_arg();
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:G] shell_opts.to_obj_arg() returned: " + $0); }, (int)(uintptr_t)opts_obj);
++#endif
++
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:G] Now calling lean_shell_main..."); });
++#endif
++    object * result = lean_shell_main(args_obj, opts_obj);
++    // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:G] lean_shell_main returned, processing result..."); });
++#endif
++    // #endregion
++    return get_io_uint32_result(result);
+ }
+ 
+ extern "C" object* lean_init_search_path();
+@@ -240,7 +274,7 @@ bool process_shell_option(object_ref & shell_opts, int opt, char const * optarg,
+         dec_ref(r);
+         return false;
+     } else {
+-        rc = unbox(io_result_get_error(r));
++        rc = lean_unbox_uint32(io_result_get_error(r));
+         dec_ref(r);
+         return true;
+     }
+@@ -284,22 +318,95 @@ static void report_task_get_blocked_time(std::chrono::nanoseconds d) {
+ 
+ extern "C" LEAN_EXPORT int lean_main(int argc, char ** argv) {
+ #ifdef LEAN_EMSCRIPTEN
+-    // When running in command-line mode under Node.js, we make system directories available in the virtual filesystem.
+-    // This mode is used to compile 32-bit oleans.
+-    EM_ASM(
+-        if ((typeof process === "undefined") || (process.release.name !== "node")) {
+-            throw new Error("The Lean command-line driver can only run under Node.js. For the embeddable WASM library, see lean_wasm.cpp.");
++    // #region agent log
++    EM_ASM({
++        console.log("[DEBUG:A] lean_main entered, argc=" + $0);
++        for (var i = 0; i < $0; i++) {
++            var argPtr = HEAPU32[($1 >> 2) + i];
++            console.log("[DEBUG:A] argv[" + i + "]=" + UTF8ToString(argPtr));
+         }
+-
+-        var lean_path = process.env["LEAN_PATH"];
+-        if (lean_path) {
+-            ENV["LEAN_PATH"] = lean_path;
++    }, argc, argv);
++    // #endregion
++    // Set up the virtual filesystem based on the runtime environment.
++    // Node.js: Use NODEFS to access the real filesystem.
++    // Browser: Use MEMFS (default) with pre-created directories.
++    EM_ASM(
++        var isNode = (typeof process !== "undefined") && 
++                     (process.release && process.release.name === "node");
++        
++        if (isNode) {
++            // Node.js environment: mount real filesystem
++            var lean_path = process.env["LEAN_PATH"];
++            if (lean_path) {
++                ENV["LEAN_PATH"] = lean_path;
++            }
++            // We cannot mount /, see https://github.com/emscripten-core/emscripten/issues/2040
++            FS.mount(NODEFS, { root: "/home" }, "/home");
++            FS.mount(NODEFS, { root: "/tmp" }, "/tmp");
++            // On macOS, /tmp is a symlink to /private/tmp, but process.cwd()
++            // returns the resolved path. Normalize it for the WASM VFS.
++            var cwd = process.cwd();
++            if (cwd.startsWith("/private/tmp/")) {
++                cwd = cwd.replace("/private/tmp/", "/tmp/");
++            } else if (cwd === "/private/tmp") {
++                cwd = "/tmp";
++            }
++            FS.chdir(cwd);
++        } else {
++            // Browser environment: use MEMFS (Emscripten's default in-memory filesystem)
++            // Create necessary directories if they don't exist
++            // Note: /home, /tmp, /dev, /proc are often pre-created by Emscripten
++            function mkdirSafe(path) {
++                try { FS.mkdir(path); }
++                catch (e) {
++                    if (e.errno !== 20) { // 20 = EEXIST, ignore if already exists
++                        console.log("Error creating " + path + ": " + (e.message || e));
++                    }
++                }
++            }
++            
++            mkdirSafe("/home");
++            mkdirSafe("/tmp");
++            mkdirSafe("/workspace");
++            mkdirSafe("/bin");  // For fake app path "/bin/lean.wasm"
++            mkdirSafe("/lib");
++            mkdirSafe("/lib/lean");
++            mkdirSafe("/lib/lean/library");
++            
++            FS.chdir("/workspace");
++            
++            // Set default LEAN_PATH for browser if not already configured
++            // The standard library .olean files should be preloaded at this path
++            if (!ENV["LEAN_PATH"]) {
++                ENV["LEAN_PATH"] = "/lib/lean/library";
++            }
++            
++            console.log("Lean 4 WASM running in browser mode");
++            console.log("LEAN_PATH:", ENV["LEAN_PATH"]);
++            console.log("Working directory:", FS.cwd());
++            // #region agent log
++            // Debug: List files in LEAN_PATH to verify .olean files are present
++            try {
++                var leanPath = ENV["LEAN_PATH"] || "/lib/lean/library";
++                console.log("[DEBUG:B] Checking for .olean files in LEAN_PATH:", leanPath);
++                try {
++                    var files = FS.readdir(leanPath);
++                    console.log("[DEBUG:B] Files in " + leanPath + ":", JSON.stringify(files.slice(0, 10)));
++                } catch(e) {
++                    console.log("[DEBUG:B] ERROR: Cannot read LEAN_PATH directory:", e.message);
++                }
++                // Check for Init.olean specifically
++                try {
++                    var stat = FS.stat(leanPath + "/Init.olean");
++                    console.log("[DEBUG:B] Init.olean exists, size:", stat.size);
++                } catch(e) {
++                    console.log("[DEBUG:B] ERROR: Init.olean not found:", e.message);
++                }
++            } catch(e) {
++                console.log("[DEBUG:B] LEAN_PATH check failed:", e.message);
++            }
++            // #endregion
+         }
+-
+-        // We cannot mount /, see https://github.com/emscripten-core/emscripten/issues/2040
+-        FS.mount(NODEFS, { root: "/home" }, "/home");
+-        FS.mount(NODEFS, { root: "/tmp" }, "/tmp");
+-        FS.chdir(process.cwd());
+     );
+ #elif defined(LEAN_WINDOWS)
+     // "best practice" according to https://docs.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-seterrormode
+@@ -308,14 +415,39 @@ extern "C" LEAN_EXPORT int lean_main(int argc, char ** argv) {
+     // see https://github.com/leanprover/lean4/issues/4291
+     SetConsoleOutputCP(CP_UTF8);
+ #endif
++    // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:C] About to create lean::initializer"); });
++#endif
++    // #endregion
+     auto init_start = std::chrono::steady_clock::now();
+     lean::initializer init;
+     second_duration init_time = std::chrono::steady_clock::now() - init_start;
++    // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:C] lean::initializer completed successfully"); });
++#endif
++    // #endregion
+ 
+     try {
++        // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++        EM_ASM({ console.log("[DEBUG:D] About to call init_search_path()"); });
++#endif
++        // #endregion
+         // Remark: This currently runs under `IO.initializing = true`.
+         init_search_path();
++        // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++        EM_ASM({ console.log("[DEBUG:D] init_search_path() completed successfully"); });
++#endif
++        // #endregion
+     } catch (lean::throwable & ex) {
++        // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++        EM_ASM({ console.log("[DEBUG:D] init_search_path() threw exception"); });
++#endif
++        // #endregion
+         std::cerr << "error: " << ex.what() << std::endl;
+         return 1;
+     }
+@@ -328,9 +460,24 @@ extern "C" LEAN_EXPORT int lean_main(int argc, char ** argv) {
+     int rc;
+     object_ref shell_opts;
+     try {
++        // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++        EM_ASM({ console.log("[DEBUG:E] Creating shell options"); });
++#endif
++        // #endregion
+         shell_opts = mk_shell_options();
++        // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++        EM_ASM({ console.log("[DEBUG:E] Shell options created, processing command line"); });
++#endif
++        // #endregion
+         for (;;) {
+             int c = getopt_long(argc, argv, g_opt_str, g_long_options, NULL);
++            // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++            EM_ASM({ console.log("[DEBUG:E] getopt_long returned: " + $0); }, c);
++#endif
++            // #endregion
+             if (c == -1)
+                 break; // end of command line
+             if (process_shell_option(shell_opts, c, optarg, rc))
+@@ -339,10 +486,20 @@ extern "C" LEAN_EXPORT int lean_main(int argc, char ** argv) {
+                 break; // stop consuming arguments after `--run`
+         }
+     } catch (lean::throwable & ex) {
++        // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++        EM_ASM({ console.log("[DEBUG:E] Exception during option processing"); });
++#endif
++        // #endregion
+         std::cerr << "error: " << ex.what() << std::endl;
+         return 1;
+     }
+ 
++    // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:E] About to call io_mark_end_initialization"); });
++#endif
++    // #endregion
+     lean::io_mark_end_initialization();
+ 
+     if (get_shell_profiler(shell_opts)) {
+@@ -350,7 +507,17 @@ extern "C" LEAN_EXPORT int lean_main(int argc, char ** argv) {
+         report_profiling_time("initialization", init_time);
+     }
+ 
++    // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:E] Creating scoped_task_manager"); });
++#endif
++    // #endregion
+     scoped_task_manager scope_task_man(get_shell_num_threads(shell_opts));
++    // #region agent log
++#ifdef LEAN_EMSCRIPTEN
++    EM_ASM({ console.log("[DEBUG:E] scoped_task_manager created"); });
++#endif
++    // #endregion
+ 
+     int shell_rc = 1;
+     // Do not rely on OS thread stack size, as for Lean executables
+diff --git a/stage0/src/include/lean/lean.h b/stage0/src/include/lean/lean.h
+index 824d6cfa865e4e5bdb29043a6278af9a8e797bac..48680e08bd72f8515af803610bd7679307b6366c 100644
+GIT binary patch
+delta 77
+zcmdnp&2g`rqhSl9{|_^Tl+?7$ywns8A6G}ecvs(G=OE935LZ7<g_;_LP*1;*fRLbg
+bU&jaqTU#*K*a*a%p8b<Cbo=%nj4ZqWBAgma
+
+delta 42
+ycmccD&9S?iqhSl9{}17m)HDSjS4Y2iSKnagAkTmhSHJ0fKN&-}-}=GG!V3UmyAUP-
+
+diff --git a/stage0/src/runtime/thread.cpp b/stage0/src/runtime/thread.cpp
+index d4b50d3f723a7f94de8021214e6822e9430330f7..3b028d54489cc32c2caedf0445966a9fdfe60782 100644
+GIT binary patch
+delta 67
+zcmdmGao1vlDU+E(N@`kWUTTVlkE^3!ysK}pbC731h^wEbLQRcAsHa~@KuA!$uVaLQ
+Rtu2^qYy{$M_F(!X2>|Nm6+Hj|
+
+delta 32
+ncmca>vCCqEDU)zYYMO$NtD|4Mt8cJ#kY_-MtKa5qrcaUpxOoco
+
+diff --git a/stage0/src/util/io.h b/stage0/src/util/io.h
+index c648a52d1a583c6868ebc237460e56499cd1ff7d..377d545814c370c2dae861514673b4c997f1d313 100644
+GIT binary patch
+delta 73
+zcmZqX?&jX`hgmu^FDElERiQL9uf*6$Aw9JuJ~KZa!rQFCBFHEMl_^rNRme$A%!@D0
+OOUkc+s+erU>J9*{92n66
+
+delta 43
+zcmeC?Zsy+bhk0@&qa0gta$-(m(dO4ojEs{dSOvI46p9pV6-x7x@+&60u(|^PI2sLl
+
+diff --git a/stage0/src/util/shell.cpp b/stage0/src/util/shell.cpp
+index 29b859887e2ca380b30216242fa02c95f291cb1a..937c6d564b4727ac78e0ed6c8a195f9853340eab 100644
+GIT binary patch
+delta 49
+zcmeB7>`mNICdFHtnO9<L6kn8DT$)p|xmzldSuiIxF)zL}FDbtw9wNK>rR)MB0NoH1
+AC;$Ke
+
+delta 45
+zcmeB8>`dHHCM8;&oS2hX6kn8DT$)p2Q<|AqVr*o$xmhZbnYA=8DZgU#TiFFd0GP%R
+AjQ{`u
+
