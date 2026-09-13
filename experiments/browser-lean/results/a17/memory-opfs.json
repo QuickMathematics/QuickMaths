@@ -1,0 +1,1511 @@
+{
+  "baseline": "Actual native QuickMaths mastery map, fresh profile, default curriculum, no verifier",
+  "baselineMemory": {
+    "uss": 124424192,
+    "rss": 314904576,
+    "privateCommit": 184672256
+  },
+  "host": {
+    "os": "Windows-10-10.0.26100-SP0",
+    "logicalCpus": 16,
+    "physicalCpus": 8,
+    "physicalMemoryBytes": 34261053440
+  },
+  "executedAt": "2026-09-13T20:22:44.968888+00:00",
+  "hostSourceHashes": {
+    "experiments\\browser-lean\\benchmark.py": "d97855fbcde8b2d6464bb6c6d17364b8415d89f683bf3646b1ab41a3da5737c0",
+    "experiments\\browser-lean\\curated.js": "c0ba27fd580aebe65f08fcb0ce2e76bb7ca362e2ead3400a3892c1c9a2ab76e7",
+    "experiments\\browser-lean\\curated.html": "d1be431ed5229e1250128abaf07c227f4b894eb581a664136b6e9b637862037a",
+    "experiments\\browser-lean\\curated-opfs.js": "61fe1871876600d4954c569099eaad73496567c98d379b570d163dc4f90238ff",
+    "experiments\\browser-lean\\opfs-module-worker.js": "e58162dc0e0f94a29946ec686e73002c169c9d7f5e40052219296b66dab74ed7",
+    "experiments\\browser-lean\\compatibility.js": "6cb5c2f6ad8f0110132205a4fa54c09b739e46b270a431f0f654d72d91f88a59",
+    "docs\\formal-environment-loader.js": "7f4cc65405555f8631da84b842fb08cd9f976d470156c59c64dde9c64225264f",
+    ".bridge-runtime\\curated-formal\\assets-a17-opfs-v1\\viability-worker.js": "6968c7ac20fec4a90cfc505b397d8603dd60f51e9a623d652f3c596397e00acc"
+  },
+  "profileLogicalFileBytes": 1837031520,
+  "sourceFile": "chromium-a17-opfs-parity-128.json",
+  "rawEvidenceSha256": "66f672679f3e291cf86ded79c9fbc774e77b6cb2ce489d64cda791945794b02b",
+  "method": "Private resident USS summed over owned Chromium descendants, normal QuickMaths map baseline. Phase idle holds are labelled. Linear-memory capacity is not live allocator usage. MEMFS bytes are exact logical/capacity counts. Residual memory is not attributed to a specific allocator.",
+  "runs": [
+    {
+      "environment": "qm-formal-v1-ed8d51650a0bb7da",
+      "identity": "c85e57e95fdbc7f94aa05880ca492e72030735f9024e10fc1085a48581d0cc07",
+      "runKind": "cold",
+      "rounds": 3,
+      "positiveExecutions": 9,
+      "releaseStaged": "all",
+      "phases": [
+        {
+          "stage": "memory-phase",
+          "atMs": 4915.335000038147,
+          "phase": "runtime-initialized",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 0,
+          "stagedBytes": 0,
+          "stagedCapacity": 0,
+          "byType": {},
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 883138560,
+            "rss": 1155276800,
+            "privateCommit": 1100128256
+          },
+          "incrementalPrivateResidentBytes": 758714368
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 14965.245000004768,
+          "phase": "closure-staged",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 7366,
+          "stagedBytes": 509747309,
+          "stagedCapacity": 416189,
+          "byType": {
+            "olean": {
+              "files": 2455,
+              "bytes": 317436064,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 2455,
+              "bytes": 191551356,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 2455,
+              "bytes": 343700,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 416189,
+              "capacity": 416189
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 2,
+          "privateMemory": {
+            "uss": 1104693248.0,
+            "rss": 1379377152.0,
+            "privateCommit": 1326299136.0
+          },
+          "incrementalPrivateResidentBytes": 980269056.0
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 18957.544999957085,
+          "phase": "imports-ready",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 678428672,
+          "stagedFiles": 7366,
+          "stagedBytes": 509747309,
+          "stagedCapacity": 416189,
+          "byType": {
+            "olean": {
+              "files": 2455,
+              "bytes": 317436064,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 2455,
+              "bytes": 191551356,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 2455,
+              "bytes": 343700,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 416189,
+              "capacity": 416189
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1759625216,
+            "rss": 2034659328,
+            "privateCommit": 1937190912
+          },
+          "incrementalPrivateResidentBytes": 1635201024
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 21564.884999990463,
+          "phase": "staged-files-released",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 678428672,
+          "stagedFiles": 1,
+          "stagedBytes": 416189,
+          "stagedCapacity": 416189,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 416189,
+              "capacity": 416189
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 2,
+          "privateMemory": {
+            "uss": 1766443008.0,
+            "rss": 2041841664.0,
+            "privateCommit": 1943394304.0
+          },
+          "incrementalPrivateResidentBytes": 1642018816.0
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 24980.319999933243,
+          "phase": "corpus-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 678428672,
+          "stagedFiles": 1,
+          "stagedBytes": 416189,
+          "stagedCapacity": 416189,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 416189,
+              "capacity": 416189
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1785896960,
+            "rss": 2061324288,
+            "privateCommit": 1962336256
+          },
+          "incrementalPrivateResidentBytes": 1661472768
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 27878.294999957085,
+          "phase": "warm-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 678428672,
+          "stagedFiles": 1,
+          "stagedBytes": 416189,
+          "stagedCapacity": 416189,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 416189,
+              "capacity": 416189
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1751330816,
+            "rss": 2028150784,
+            "privateCommit": 1926606848
+          },
+          "incrementalPrivateResidentBytes": 1626906624
+        }
+      ],
+      "readyMsIncludingProfilingHolds": 16364.664999961853,
+      "readyMsExcludingIntentionalHolds": 11364.664999961853,
+      "warmFixture": "guarded_cancellation.json",
+      "warmMs": [
+        74.11500000953674,
+        71.60500001907349,
+        73.34500002861023,
+        73.00999999046326,
+        69.125
+      ],
+      "corpusMedianMs": 86.72500002384186,
+      "corpusMaxMs": 161.11000001430511,
+      "memoryMeasurement": {
+        "uss": {
+          "peak": 1786880000,
+          "steady": 1650102272,
+          "incrementalPeak": 1662455808,
+          "incrementalSteady": 1525678080
+        },
+        "rss": {
+          "peak": 2062319616,
+          "steady": 1927077888,
+          "incrementalPeak": 1747415040,
+          "incrementalSteady": 1612173312
+        },
+        "privateCommit": {
+          "peak": 1963610112,
+          "steady": 1823367168,
+          "incrementalPeak": 1778937856,
+          "incrementalSteady": 1638694912
+        }
+      },
+      "afterWorkerDiscard": {
+        "uss": 4841472,
+        "rss": 10076160,
+        "privateCommit": 5103616
+      },
+      "cache": {
+        "downloads": 65,
+        "downloadedBytes": 204434621,
+        "hits": 0,
+        "writable": true,
+        "bodyBytes": 204434621,
+        "entries": 65,
+        "complete": true,
+        "method": "Verified compressed body lengths; excludes browser metadata"
+      },
+      "originStorage": {
+        "quota": 186818492006,
+        "usage": 728784146,
+        "usageDetails": {
+          "caches": 204478464,
+          "fileSystem": 524305682
+        }
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "environment": "qm-formal-v1-47dfa7faf67fa573",
+      "identity": "c85e57e95fdbc7f94aa05880ca492e72030735f9024e10fc1085a48581d0cc07",
+      "runKind": "new-environment-shared-cache",
+      "rounds": 3,
+      "positiveExecutions": 6,
+      "releaseStaged": "all",
+      "phases": [
+        {
+          "stage": "memory-phase",
+          "atMs": 5040.25,
+          "phase": "runtime-initialized",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 0,
+          "stagedBytes": 0,
+          "stagedCapacity": 0,
+          "byType": {},
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 875319296,
+            "rss": 1150754816,
+            "privateCommit": 1092820992
+          },
+          "incrementalPrivateResidentBytes": 750895104
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 13544.974999904633,
+          "phase": "closure-staged",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 8995,
+          "stagedBytes": 593814245,
+          "stagedCapacity": 522873,
+          "byType": {
+            "olean": {
+              "files": 2998,
+              "bytes": 392755752,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 2998,
+              "bytes": 200115900,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 2998,
+              "bytes": 419720,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 522873,
+              "capacity": 522873
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 2,
+          "privateMemory": {
+            "uss": 948318208.0,
+            "rss": 1224683520.0,
+            "privateCommit": 1163866112.0
+          },
+          "incrementalPrivateResidentBytes": 823894016.0
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 17680.704999923706,
+          "phase": "imports-ready",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 786038784,
+          "stagedFiles": 8995,
+          "stagedBytes": 593814245,
+          "stagedCapacity": 522873,
+          "byType": {
+            "olean": {
+              "files": 2998,
+              "bytes": 392755752,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 2998,
+              "bytes": 200115900,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 2998,
+              "bytes": 419720,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 522873,
+              "capacity": 522873
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1676648448,
+            "rss": 1953771520,
+            "privateCommit": 1853198336
+          },
+          "incrementalPrivateResidentBytes": 1552224256
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 20296.02999997139,
+          "phase": "staged-files-released",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 786038784,
+          "stagedFiles": 1,
+          "stagedBytes": 522873,
+          "stagedCapacity": 522873,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 522873,
+              "capacity": 522873
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1679523840,
+            "rss": 1957056512,
+            "privateCommit": 1856892928
+          },
+          "incrementalPrivateResidentBytes": 1555099648
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 23526.854999899864,
+          "phase": "corpus-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 786038784,
+          "stagedFiles": 1,
+          "stagedBytes": 522873,
+          "stagedCapacity": 522873,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 522873,
+              "capacity": 522873
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1683750912,
+            "rss": 1961340928,
+            "privateCommit": 1860079616
+          },
+          "incrementalPrivateResidentBytes": 1559326720
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 26782.209999918938,
+          "phase": "warm-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 786038784,
+          "stagedFiles": 1,
+          "stagedBytes": 522873,
+          "stagedCapacity": 522873,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 522873,
+              "capacity": 522873
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1610534912,
+            "rss": 1888133120,
+            "privateCommit": 1786277888
+          },
+          "incrementalPrivateResidentBytes": 1486110720
+        }
+      ],
+      "readyMsIncludingProfilingHolds": 15090.004999995232,
+      "readyMsExcludingIntentionalHolds": 10090.004999995232,
+      "warmFixture": "conjugate_identity.json",
+      "warmMs": [
+        146.05000007152557,
+        145.08000004291534,
+        133.54999995231628,
+        142.15499997138977,
+        135.56500005722046
+      ],
+      "corpusMedianMs": 116.9650000333786,
+      "corpusMaxMs": 189.60000002384186,
+      "memoryMeasurement": {
+        "uss": {
+          "peak": 1688182784,
+          "steady": 1611415552,
+          "incrementalPeak": 1563758592,
+          "incrementalSteady": 1486991360
+        },
+        "rss": {
+          "peak": 1965772800,
+          "steady": 1888813056,
+          "incrementalPeak": 1650868224,
+          "incrementalSteady": 1573908480
+        },
+        "privateCommit": {
+          "peak": 1864753152,
+          "steady": 1786957824,
+          "incrementalPeak": 1680080896,
+          "incrementalSteady": 1602285568
+        }
+      },
+      "afterWorkerDiscard": {
+        "uss": -1032192,
+        "rss": 4096000,
+        "privateCommit": -1298432
+      },
+      "cache": {
+        "downloads": 11,
+        "downloadedBytes": 33874962,
+        "hits": 65,
+        "writable": true,
+        "bodyBytes": 238309583,
+        "entries": 76,
+        "complete": true,
+        "method": "Verified compressed body lengths; excludes browser metadata"
+      },
+      "originStorage": {
+        "quota": 186818492006,
+        "usage": 848652504,
+        "usageDetails": {
+          "caches": 238360576,
+          "fileSystem": 610291928
+        }
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "environment": "qm-formal-v1-a8d843f013bdac16",
+      "identity": "c85e57e95fdbc7f94aa05880ca492e72030735f9024e10fc1085a48581d0cc07",
+      "runKind": "new-environment-shared-cache",
+      "rounds": 3,
+      "positiveExecutions": 60,
+      "releaseStaged": "all",
+      "phases": [
+        {
+          "stage": "memory-phase",
+          "atMs": 4798.5199999809265,
+          "phase": "runtime-initialized",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 0,
+          "stagedBytes": 0,
+          "stagedCapacity": 0,
+          "byType": {},
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 2,
+          "privateMemory": {
+            "uss": 871280640.0,
+            "rss": 1147113472.0,
+            "privateCommit": 1086873600.0
+          },
+          "incrementalPrivateResidentBytes": 746856448.0
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 14426.509999990463,
+          "phase": "closure-staged",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 10354,
+          "stagedBytes": 702694725,
+          "stagedCapacity": 613885,
+          "byType": {
+            "olean": {
+              "files": 3451,
+              "bytes": 492074000,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 3451,
+              "bytes": 209523700,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 3451,
+              "bytes": 483140,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 613885,
+              "capacity": 613885
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 2,
+          "privateMemory": {
+            "uss": 978722816.0,
+            "rss": 1255673856.0,
+            "privateCommit": 1195345920.0
+          },
+          "incrementalPrivateResidentBytes": 854298624.0
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 18842.695000052452,
+          "phase": "imports-ready",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 879624192,
+          "stagedFiles": 10354,
+          "stagedBytes": 702694725,
+          "stagedCapacity": 613885,
+          "byType": {
+            "olean": {
+              "files": 3451,
+              "bytes": 492074000,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 3451,
+              "bytes": 209523700,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 3451,
+              "bytes": 483140,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 613885,
+              "capacity": 613885
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 2,
+          "privateMemory": {
+            "uss": 1852301312.0,
+            "rss": 2130126848.0,
+            "privateCommit": 1994426368.0
+          },
+          "incrementalPrivateResidentBytes": 1727877120.0
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 21461.955000042915,
+          "phase": "staged-files-released",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 879624192,
+          "stagedFiles": 1,
+          "stagedBytes": 613885,
+          "stagedCapacity": 613885,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 613885,
+              "capacity": 613885
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1851633664,
+            "rss": 2129616896,
+            "privateCommit": 1992978432
+          },
+          "incrementalPrivateResidentBytes": 1727209472
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 33075.62999999523,
+          "phase": "corpus-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 879624192,
+          "stagedFiles": 1,
+          "stagedBytes": 613885,
+          "stagedCapacity": 613885,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 613885,
+              "capacity": 613885
+            }
+          },
+          "pthreads": {
+            "running": 1,
+            "unused": 1
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1732993024,
+            "rss": 2009939968,
+            "privateCommit": 1866375168
+          },
+          "incrementalPrivateResidentBytes": 1608568832
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 37314.57000005245,
+          "phase": "warm-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 879624192,
+          "stagedFiles": 1,
+          "stagedBytes": 613885,
+          "stagedCapacity": 613885,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 613885,
+              "capacity": 613885
+            }
+          },
+          "pthreads": {
+            "running": 1,
+            "unused": 1
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 2,
+          "privateMemory": {
+            "uss": 1737064448.0,
+            "rss": 2014808064.0,
+            "privateCommit": 1870952448.0
+          },
+          "incrementalPrivateResidentBytes": 1612640256.0
+        }
+      ],
+      "readyMsIncludingProfilingHolds": 16242.125,
+      "readyMsExcludingIntentionalHolds": 11242.125,
+      "warmFixture": "conjugate_limit.json",
+      "warmMs": [
+        344.42000007629395,
+        339.08000004291534,
+        339.36500000953674,
+        340.7000000476837,
+        337.7149999141693
+      ],
+      "corpusMedianMs": 132.74500000476837,
+      "corpusMaxMs": 396.49000000953674,
+      "memoryMeasurement": {
+        "uss": {
+          "peak": 1877487616,
+          "steady": 1731842048,
+          "incrementalPeak": 1753063424,
+          "incrementalSteady": 1607417856
+        },
+        "rss": {
+          "peak": 2154405888,
+          "steady": 2009411584,
+          "incrementalPeak": 1839501312,
+          "incrementalSteady": 1694507008
+        },
+        "privateCommit": {
+          "peak": 2013933568,
+          "steady": 1865166848,
+          "incrementalPeak": 1829261312,
+          "incrementalSteady": 1680494592
+        }
+      },
+      "afterWorkerDiscard": {
+        "uss": -4079616,
+        "rss": 1200128,
+        "privateCommit": -4616192
+      },
+      "cache": {
+        "downloads": 14,
+        "downloadedBytes": 44911026,
+        "hits": 76,
+        "writable": true,
+        "bodyBytes": 283220609,
+        "entries": 90,
+        "complete": true,
+        "method": "Verified compressed body lengths; excludes browser metadata"
+      },
+      "originStorage": {
+        "quota": 186818492006,
+        "usage": 1006822868,
+        "usageDetails": {
+          "caches": 283280896,
+          "fileSystem": 723541972
+        }
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "environment": "qm-formal-v1-d9180291ee776ddb",
+      "identity": "c85e57e95fdbc7f94aa05880ca492e72030735f9024e10fc1085a48581d0cc07",
+      "runKind": "new-environment-shared-cache",
+      "rounds": 3,
+      "positiveExecutions": 48,
+      "releaseStaged": "all",
+      "phases": [
+        {
+          "stage": "memory-phase",
+          "atMs": 4878.935000061989,
+          "phase": "runtime-initialized",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 0,
+          "stagedBytes": 0,
+          "stagedCapacity": 0,
+          "byType": {},
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 870789120,
+            "rss": 1146675200,
+            "privateCommit": 1085456384
+          },
+          "incrementalPrivateResidentBytes": 746364928
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 16764.639999985695,
+          "phase": "closure-staged",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 12193,
+          "stagedBytes": 828653181,
+          "stagedCapacity": 744345,
+          "byType": {
+            "olean": {
+              "files": 4064,
+              "bytes": 598892176,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 4064,
+              "bytes": 228447700,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 4064,
+              "bytes": 568960,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 744345,
+              "capacity": 744345
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1000136704,
+            "rss": 1277632512,
+            "privateCommit": 1216032768
+          },
+          "incrementalPrivateResidentBytes": 875712512
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 21612.09000003338,
+          "phase": "imports-ready",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 1081278464,
+          "stagedFiles": 12193,
+          "stagedBytes": 828653181,
+          "stagedCapacity": 744345,
+          "byType": {
+            "olean": {
+              "files": 4064,
+              "bytes": 598892176,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 4064,
+              "bytes": 228447700,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 4064,
+              "bytes": 568960,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 744345,
+              "capacity": 744345
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 2007322624,
+            "rss": 2285408256,
+            "privateCommit": 2206109696
+          },
+          "incrementalPrivateResidentBytes": 1882898432
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 24263.37000000477,
+          "phase": "staged-files-released",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 1081278464,
+          "stagedFiles": 1,
+          "stagedBytes": 744345,
+          "stagedCapacity": 744345,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 744345,
+              "capacity": 744345
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 2,
+          "privateMemory": {
+            "uss": 1996326912.0,
+            "rss": 2274859008.0,
+            "privateCommit": 2192455680.0
+          },
+          "incrementalPrivateResidentBytes": 1871902720.0
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 35713.35000002384,
+          "phase": "corpus-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 1081278464,
+          "stagedFiles": 1,
+          "stagedBytes": 744345,
+          "stagedCapacity": 744345,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 744345,
+              "capacity": 744345
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1850081280,
+            "rss": 2127101952,
+            "privateCommit": 2042810368
+          },
+          "incrementalPrivateResidentBytes": 1725657088
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 41685.08500003815,
+          "phase": "warm-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 1081278464,
+          "stagedFiles": 1,
+          "stagedBytes": 744345,
+          "stagedCapacity": 744345,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 744345,
+              "capacity": 744345
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1839779840,
+            "rss": 2117668864,
+            "privateCommit": 2030964736
+          },
+          "incrementalPrivateResidentBytes": 1715355648
+        }
+      ],
+      "readyMsIncludingProfilingHolds": 18997.274999976158,
+      "readyMsExcludingIntentionalHolds": 13997.274999976158,
+      "warmFixture": "recursive_log_abs.json",
+      "warmMs": [
+        671.9450000524521,
+        675.6299999952316,
+        677.2400000095367,
+        671.0400000810623,
+        733.5049999952316
+      ],
+      "corpusMedianMs": 149.12249994277954,
+      "corpusMaxMs": 719.9900000095367,
+      "memoryMeasurement": {
+        "uss": {
+          "peak": 2022068224,
+          "steady": 1841180672,
+          "incrementalPeak": 1897644032,
+          "incrementalSteady": 1716756480
+        },
+        "rss": {
+          "peak": 2300125184,
+          "steady": 2119000064,
+          "incrementalPeak": 1985220608,
+          "incrementalSteady": 1804095488
+        },
+        "privateCommit": {
+          "peak": 2216103936,
+          "steady": 2031345664,
+          "incrementalPeak": 2031431680,
+          "incrementalSteady": 1846673408
+        }
+      },
+      "afterWorkerDiscard": {
+        "uss": -2043904,
+        "rss": 3563520,
+        "privateCommit": -2666496
+      },
+      "cache": {
+        "downloads": 16,
+        "downloadedBytes": 52122465,
+        "hits": 90,
+        "writable": true,
+        "bodyBytes": 335343074,
+        "entries": 106,
+        "complete": true,
+        "method": "Verified compressed body lengths; excludes browser metadata"
+      },
+      "originStorage": {
+        "quota": 186818492006,
+        "usage": 1188983540,
+        "usageDetails": {
+          "caches": 335413760,
+          "fileSystem": 853569780
+        }
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "environment": "qm-formal-v1-bb0d3439bce63261",
+      "identity": "c85e57e95fdbc7f94aa05880ca492e72030735f9024e10fc1085a48581d0cc07",
+      "runKind": "new-environment-shared-cache",
+      "rounds": 3,
+      "positiveExecutions": 243,
+      "releaseStaged": "all",
+      "phases": [
+        {
+          "stage": "memory-phase",
+          "atMs": 4797.550000071526,
+          "phase": "runtime-initialized",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 0,
+          "stagedBytes": 0,
+          "stagedCapacity": 0,
+          "byType": {},
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 869400576,
+            "rss": 1145499648,
+            "privateCommit": 1084256256
+          },
+          "incrementalPrivateResidentBytes": 744976384
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 15059.795000076294,
+          "phase": "closure-staged",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 134217728,
+          "stagedFiles": 11758,
+          "stagedBytes": 792104861,
+          "stagedCapacity": 711985,
+          "byType": {
+            "olean": {
+              "files": 3919,
+              "bytes": 563835732,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 3919,
+              "bytes": 227008484,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 3919,
+              "bytes": 548660,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 711985,
+              "capacity": 711985
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 904511488,
+            "rss": 1182384128,
+            "privateCommit": 1119551488
+          },
+          "incrementalPrivateResidentBytes": 780087296
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 19735.460000038147,
+          "phase": "imports-ready",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 982122496,
+          "stagedFiles": 11758,
+          "stagedBytes": 792104861,
+          "stagedCapacity": 711985,
+          "byType": {
+            "olean": {
+              "files": 3919,
+              "bytes": 563835732,
+              "capacity": 0
+            },
+            "ir": {
+              "files": 3919,
+              "bytes": 227008484,
+              "capacity": 0
+            },
+            "ir.sig": {
+              "files": 3919,
+              "bytes": 548660,
+              "capacity": 0
+            },
+            "json": {
+              "files": 1,
+              "bytes": 711985,
+              "capacity": 711985
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1878028288,
+            "rss": 2156322816,
+            "privateCommit": 2018787328
+          },
+          "incrementalPrivateResidentBytes": 1753604096
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 22377.274999976158,
+          "phase": "staged-files-released",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 982122496,
+          "stagedFiles": 1,
+          "stagedBytes": 711985,
+          "stagedCapacity": 711985,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 711985,
+              "capacity": 711985
+            }
+          },
+          "pthreads": {
+            "running": 0,
+            "unused": 2
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1879166976,
+            "rss": 2157375488,
+            "privateCommit": 2018451456
+          },
+          "incrementalPrivateResidentBytes": 1754742784
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 185061.70500004292,
+          "phase": "corpus-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 1082851328,
+          "stagedFiles": 1,
+          "stagedBytes": 711985,
+          "stagedCapacity": 711985,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 711985,
+              "capacity": 711985
+            }
+          },
+          "pthreads": {
+            "running": 1,
+            "unused": 1
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1809666048,
+            "rss": 2090553344,
+            "privateCommit": 2018988032
+          },
+          "incrementalPrivateResidentBytes": 1685241856
+        },
+        {
+          "stage": "memory-phase",
+          "atMs": 205911.39499998093,
+          "phase": "warm-complete",
+          "holdingMs": 2500,
+          "type": "profile_memory",
+          "heapBytes": 1082851328,
+          "stagedFiles": 1,
+          "stagedBytes": 711985,
+          "stagedCapacity": 711985,
+          "byType": {
+            "json": {
+              "files": 1,
+              "bytes": 711985,
+              "capacity": 711985
+            }
+          },
+          "pthreads": {
+            "running": 1,
+            "unused": 1
+          },
+          "dynamicLinker": {
+            "gotEntries": 106298,
+            "wasmExports": 106300,
+            "tableSlots": 125411
+          },
+          "sampleCount": 3,
+          "privateMemory": {
+            "uss": 1810305024,
+            "rss": 2090426368,
+            "privateCommit": 2019561472
+          },
+          "incrementalPrivateResidentBytes": 1685880832
+        }
+      ],
+      "readyMsIncludingProfilingHolds": 17131.47000002861,
+      "readyMsExcludingIntentionalHolds": 12131.47000002861,
+      "warmFixture": "series_root_polynomial_quotient_domain_guard_needed.json",
+      "warmMs": [
+        3641.9800000190735,
+        3639.664999961853,
+        3707.8799999952316,
+        3651.25,
+        3633.5449999570847
+      ],
+      "corpusMedianMs": 263.414999961853,
+      "corpusMaxMs": 3713.3150000572205,
+      "memoryMeasurement": {
+        "uss": {
+          "peak": 1909534720,
+          "steady": 1809809408,
+          "incrementalPeak": 1785110528,
+          "incrementalSteady": 1685385216
+        },
+        "rss": {
+          "peak": 2187792384,
+          "steady": 2090770432,
+          "incrementalPeak": 1872887808,
+          "incrementalSteady": 1775865856
+        },
+        "privateCommit": {
+          "peak": 2042241024,
+          "steady": 2018914304,
+          "incrementalPeak": 1857568768,
+          "incrementalSteady": 1834242048
+        }
+      },
+      "afterWorkerDiscard": {
+        "uss": -434176,
+        "rss": 8851456,
+        "privateCommit": -962560
+      },
+      "cache": {
+        "downloads": 1,
+        "downloadedBytes": 152355,
+        "hits": 101,
+        "writable": true,
+        "bodyBytes": 319674695,
+        "entries": 102,
+        "complete": true,
+        "method": "Verified compressed body lengths; excludes browser metadata"
+      },
+      "originStorage": {
+        "quota": 186818492006,
+        "usage": 1152435372,
+        "usageDetails": {
+          "caches": 335566848,
+          "fileSystem": 816868524
+        }
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+      "assessment_eligible": false,
+      "certificate": null
+    }
+  ]
+}

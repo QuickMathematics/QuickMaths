@@ -1,0 +1,69 @@
+{
+  "method": "Owned Chromium process-tree USS above normal QuickMaths map baseline. Initialization window ends at staged-files-released diagnostic hold, before rejection controls or corpus execution. Includes explicitly instrumented idle holds. Desktop measurements, not Android process-memory readings.",
+  "baseline": {
+    "source": "chromium-a17-baseline-derivatives-128.json",
+    "sha256": "e22b3bc9af0b7f31fd6e23dbde44139cf971826df55803502e43cdb064f379b1",
+    "rows": [
+      {
+        "environment": "qm-formal-v1-d9180291ee776ddb",
+        "initializationIncrementalPrivatePeakBytes": 2863923200,
+        "peakAtMs": 23515.00000001397,
+        "initializationBoundaryMs": 25514.855000019073,
+        "wholeRunIncrementalPrivatePeakBytes": 2863923200,
+        "assessment_eligible": false,
+        "certificate": null
+      }
+    ]
+  },
+  "candidate": {
+    "source": "chromium-a17-opfs-parity-128.json",
+    "sha256": "66f672679f3e291cf86ded79c9fbc774e77b6cb2ce489d64cda791945794b02b",
+    "rows": [
+      {
+        "environment": "qm-formal-v1-ed8d51650a0bb7da",
+        "initializationIncrementalPrivatePeakBytes": 1642434560,
+        "peakAtMs": 21061.999999918044,
+        "initializationBoundaryMs": 21564.884999990463,
+        "wholeRunIncrementalPrivatePeakBytes": 1662455808,
+        "assessment_eligible": false,
+        "certificate": null
+      },
+      {
+        "environment": "qm-formal-v1-47dfa7faf67fa573",
+        "initializationIncrementalPrivatePeakBytes": 1555333120,
+        "peakAtMs": 19625.0,
+        "initializationBoundaryMs": 20296.02999997139,
+        "wholeRunIncrementalPrivatePeakBytes": 1563758592,
+        "assessment_eligible": false,
+        "certificate": null
+      },
+      {
+        "environment": "qm-formal-v1-a8d843f013bdac16",
+        "initializationIncrementalPrivatePeakBytes": 1729462272,
+        "peakAtMs": 19984.99999998603,
+        "initializationBoundaryMs": 21461.955000042915,
+        "wholeRunIncrementalPrivatePeakBytes": 1753063424,
+        "assessment_eligible": false,
+        "certificate": null
+      },
+      {
+        "environment": "qm-formal-v1-d9180291ee776ddb",
+        "initializationIncrementalPrivatePeakBytes": 1883439104,
+        "peakAtMs": 21609.99999998603,
+        "initializationBoundaryMs": 24263.37000000477,
+        "wholeRunIncrementalPrivatePeakBytes": 1897644032,
+        "assessment_eligible": false,
+        "certificate": null
+      },
+      {
+        "environment": "qm-formal-v1-bb0d3439bce63261",
+        "initializationIncrementalPrivatePeakBytes": 1755045888,
+        "peakAtMs": 22079.00000002701,
+        "initializationBoundaryMs": 22377.274999976158,
+        "wholeRunIncrementalPrivatePeakBytes": 1785110528,
+        "assessment_eligible": false,
+        "certificate": null
+      }
+    ]
+  }
+}

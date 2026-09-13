@@ -781,6 +781,10 @@ not make it an assessment provider; Studio's capability guidance and the
 companion reference-check workflow remain unchanged. Technical progress is
 recorded in the [browser Lean update](releases/2026-09-13-browser-lean-parity.md).
 
+The [A17 initialization update](releases/2026-09-13-a17-initialization-peak.md)
+adds temporary disk-backed module delivery to the isolated phone test. It
+changes neither lesson authoring/Studio capabilities nor assessment eligibility.
+
 Setup and the tutor contract: https://quickmathematics.github.io/QuickMaths/FORMAL_LEARNING.md
 
 Declarative authoring format: https://quickmathematics.github.io/QuickMaths/CUSTOM_LESSON_SETS.md

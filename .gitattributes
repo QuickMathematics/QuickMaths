@@ -9,3 +9,4 @@ docs/experiments/browser-lean/assets/** -text -diff linguist-generated=true
 docs/experiments/browser-lean/curated.js -text
 docs/experiments/browser-lean/compatibility.js -text
 docs/experiments/app/formal-environment-loader.js -text
+experiments/browser-lean/curated-opfs.js -text

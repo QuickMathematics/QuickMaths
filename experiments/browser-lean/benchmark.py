@@ -33,6 +33,7 @@ parser.add_argument('--assets',default='assets',help='Prepared asset directory b
 parser.add_argument('--timeout',type=int,default=240,help='Overall diagnostic run budget in seconds')
 parser.add_argument('--group',default='',help='One recorded corpus import group per fresh worker')
 parser.add_argument('--suite',choices=['legacy','curated'],default='legacy')
+parser.add_argument('--staging',choices=['memfs','opfs'],default='memfs')
 parser.add_argument('--mode',choices=['modules','snapshot'],default='modules')
 parser.add_argument('--fixture',help='One named canonical fixture for a clearly labelled diagnostic run')
 parser.add_argument('--corpus-rounds',type=int,choices=range(1,6),default=1)
@@ -47,7 +48,7 @@ os.environ['TEMP']=os.environ['TMP']=str(BASE)
 if 'LOCALAPPDATA' in os.environ:
     os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH',str(Path(os.environ['LOCALAPPDATA'])/'ms-playwright'))
 body_bytes=0
-host_paths=[Path(__file__),Path(__file__).with_name('curated.js'),Path(__file__).with_name('curated.html'),
+host_paths=[Path(__file__),Path(__file__).with_name('curated.js'),Path(__file__).with_name('curated.html'),Path(__file__).with_name('curated-opfs.js'),Path(__file__).with_name('opfs-module-worker.js'),
             Path(__file__).with_name('compatibility.js'),ROOT/'docs/formal-environment-loader.js',asset_root/'viability-worker.js']
 def host_hashes():
     return {str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest() for path in host_paths if path.exists()}
@@ -126,7 +127,7 @@ with sync_playwright() as pw:
     cases=[(group,index) for group in groups for index in range(args.repeat)]
     for group,index in cases:
         probe=context.new_page()
-        entry='curated.html' if args.suite=='curated' else 'viability.html'
+        entry=('curated-opfs.html' if args.staging=='opfs' else 'curated.html') if args.suite=='curated' else 'viability.html'
         probe.goto(origin+'/probe/'+entry+'?initialMB='+str(args.initial_mb)+'&group='+group+'&mode='+args.mode+'&rounds='+str(args.corpus_rounds)+('&fixture='+quote(args.fixture) if args.fixture else '')+('&memoryProfile=1' if args.memory_profile else '')+'&releaseStaged='+args.release_staged,wait_until='networkidle')
         probe.wait_for_function('() => typeof window.startProbe === "function"')
         start=time.monotonic();network_start=body_bytes

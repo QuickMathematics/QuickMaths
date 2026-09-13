@@ -709,3 +709,10 @@ https://quickmathematics.github.io/QuickMaths/FORMAL_LEARNING.md
 Browser-local Lean is an ongoing experiment, not yet an option for completing
 formal assessments on your phone. Your proof stays saved while verification
 is unavailable.
+
+For voluntary device testing, the separate
+[experimental phone runner](experiments/browser-lean/?candidate=a17-opfs-v1)
+can run a fixed proof corpus and export diagnostics. Its A17 candidate uses
+temporary disk staging; allow about 1.2 GiB of free site storage. It cannot
+award mastery. After a test crash, close other experimental tabs and use
+**Clear temporary staging**, which keeps your workspace and shared downloads.

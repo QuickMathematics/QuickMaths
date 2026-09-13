@@ -34,7 +34,19 @@ with sync_playwright() as p:
  assert run['assessment_eligible'] is False and run['certificate'] is None
  assert len([x for x in run['proofs'] if x['name'].startswith('warm-repeat-') and x['experimentalKernelSuccess']])==5
  assert not page.locator('iframe').count()
+ if run.get('staging')=='opfs':
+  folders=page.evaluate("async()=>{try{const root=await navigator.storage.getDirectory();const area=await root.getDirectoryHandle('qm-lean-experimental-staging');const names=[];for await(const name of area.keys())names.push(name);return names;}catch(e){if(e.name==='NotFoundError')return [];throw e;}}")
+  assert run['diskStagingSession'] not in folders,'Completed staging directory retained'
  page.click('#export')
+ if run.get('staging')=='opfs':
+  page.click('#start')
+  page.wait_for_function('document.querySelector("iframe")?.contentWindow.report?.stages.some(s=>s.stage==="pack-staged")',timeout=180000)
+  session=page.evaluate('document.querySelector("iframe").contentWindow.report.diskStagingSession')
+  page.click('#stop')
+  page.wait_for_function('!document.querySelector("#start").disabled',timeout=15000)
+  assert not page.locator('iframe').count()
+  folders=page.evaluate("async()=>{const root=await navigator.storage.getDirectory();const area=await root.getDirectoryHandle('qm-lean-experimental-staging');const names=[];for await(const name of area.keys())names.push(name);return names;}")
+  assert session not in folders,'Stopped staging directory retained'
  page.screenshot(path=str(base/'phone-layout.png'),full_page=True)
  print(json.dumps(result['summary']))
  context.close()

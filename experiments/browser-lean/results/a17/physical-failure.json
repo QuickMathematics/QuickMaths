@@ -1,0 +1,79 @@
+{
+  "source": "https://github.com/QuickMathematics/QM_dev_depot/blob/main/quickmaths-phone-lean-results.json",
+  "sha256": "fffd44a3a9436c0bb75dc04453a430e3660ad1b286dcdd995f79164a0ef7c406",
+  "userAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Mobile Safari/537.36",
+  "deviceMemoryGiB": 4,
+  "lastSavedMarker": {
+    "group": "qm-formal-v1-d9180291ee776ddb",
+    "stage": {
+      "stage": "memory-phase",
+      "atMs": 57776.07499998808,
+      "phase": "closure-staged",
+      "holdingMs": 2500,
+      "type": "profile_memory",
+      "heapBytes": 134217728,
+      "stagedFiles": 12193,
+      "stagedBytes": 828653181,
+      "stagedCapacity": 828653181,
+      "byType": {
+        "olean": {
+          "files": 4064,
+          "bytes": 598892176,
+          "capacity": 598892176
+        },
+        "ir": {
+          "files": 4064,
+          "bytes": 228447700,
+          "capacity": 228447700
+        },
+        "ir.sig": {
+          "files": 4064,
+          "bytes": 568960,
+          "capacity": 568960
+        },
+        "json": {
+          "files": 1,
+          "bytes": 744345,
+          "capacity": 744345
+        }
+      },
+      "pthreads": {
+        "running": 0,
+        "unused": 2
+      },
+      "dynamicLinker": {
+        "gotEntries": 106298,
+        "wasmExports": 106300,
+        "tableSlots": 125411
+      }
+    },
+    "proof": {
+      "name": "import-warmup",
+      "sourceHash": "be7f344f6f5f573c7882dd00252b973c96967a2b2081003f6602baa9d23d97d9",
+      "budgetMs": 600000
+    },
+    "at": "2026-09-13T19:54:45.440Z"
+  },
+  "completed": [
+    {
+      "environment": "qm-formal-v1-ed8d51650a0bb7da",
+      "error": null,
+      "positiveExecutions": 9,
+      "successfulPositiveExecutions": 9
+    },
+    {
+      "environment": "qm-formal-v1-47dfa7faf67fa573",
+      "error": null,
+      "positiveExecutions": 6,
+      "successfulPositiveExecutions": 6
+    },
+    {
+      "environment": "qm-formal-v1-a8d843f013bdac16",
+      "error": null,
+      "positiveExecutions": 60,
+      "successfulPositiveExecutions": 60
+    }
+  ],
+  "assessment_eligible": false,
+  "certificate": null
+}

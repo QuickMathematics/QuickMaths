@@ -9,6 +9,17 @@ and **Download and run**, then **Export results**. It never issues certificates.
 See `docs/releases/2026-09-13-browser-lean-phone-deployment.md` for download sizes,
 test interpretation, and deployment lifecycle.
 
+The A17 initialization candidate uses temporary OPFS pack storage and bounded
+64 KiB reads rather than a fully resident MEMFS closure. Reproduce with
+`prepare-opfs-variant.py`, then `benchmark.py --suite curated --staging opfs
+--assets assets-a17-opfs-v1 --group all --mode modules --corpus-rounds 3
+--memory-profile --release-staged all --repeat 1 --timeout 900`. Run the usual
+`check-browser-parity.py` against the completed result. Stage the phone route
+with `prepare-phone.py --assets assets-a17-opfs-v1 --staging opfs` only after
+the gate passes. This candidate changes file delivery, not mathematical imports
+or certificate authority. Temporary OPFS data is separate from verified shared
+compressed caches and from user workspace storage.
+
 This is an isolated feasibility harness, **not a production verifier**. It loads
 real hash-pinned cauli Lean WASM and compiled Mathlib artifacts into a persistent
 worker. No hosted verification service is involved. It cannot award mastery or
