@@ -1,0 +1,162 @@
+{
+  "started": "2026-09-13T11:01:57.224Z",
+  "isolated": true,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+  "stages": [
+    {
+      "stage": "runtime-downloaded-and-verified",
+      "atMs": 579.2900000214577
+    },
+    {
+      "stage": "runtime-initialized",
+      "atMs": 2743.100000023842
+    },
+    {
+      "stage": "core-staged",
+      "atMs": 3480.675000011921,
+      "elapsedMs": 737.3949999809265,
+      "compressedBytes": 32184975,
+      "rawBytes": 79760876
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 3934.525000035763,
+      "name": "init-control",
+      "elapsedMs": 452.53500002622604,
+      "experimentalKernelSuccess": true
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 3959.835000038147,
+      "name": "invalid-control",
+      "elapsedMs": 22.039999961853027,
+      "experimentalKernelSuccess": false
+    },
+    {
+      "stage": "done",
+      "atMs": 3960.160000026226
+    }
+  ],
+  "proofs": [
+    {
+      "name": "init-control",
+      "sourceHash": "f53ba8b81f9534e4586f0ea4eb3f391162a14528c45bbb2d95b32ba11521d728",
+      "type": "compile_result",
+      "success": true,
+      "elapsed": 452.53500002622604,
+      "errors": [],
+      "output": [
+        "{\"caption\":\"\",\"data\":\"'_private.0.QuickMathsGenerated.result' does not depend on any axioms\",\"endPos\":{\"column\":6,\"line\":5},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":5},\"severity\":\"information\"}"
+      ],
+      "axioms": [],
+      "experimentalKernelSuccess": true,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "invalid-control",
+      "sourceHash": "c02469a16f8442cfa3ab328e0c80599dc1b7e6620a368223eacda7c8df2b995c",
+      "type": "compile_result",
+      "success": true,
+      "elapsed": 22.039999961853027,
+      "errors": [
+        "{\"caption\":\"\",\"data\":\"Tactic `rfl` failed: Expected the goal to be a binary relation\\n\\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\\n\\n\u22a2 False\",\"endPos\":{\"column\":32,\"line\":3},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":29,\"line\":3},\"severity\":\"error\"}"
+      ],
+      "output": [
+        "{\"caption\":\"\",\"data\":\"Tactic `rfl` failed: Expected the goal to be a binary relation\\n\\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\\n\\n\u22a2 False\",\"endPos\":{\"column\":32,\"line\":3},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":29,\"line\":3},\"severity\":\"error\"}",
+        "{\"caption\":\"\",\"data\":\"'_private.0.QuickMathsGenerated.result' depends on axioms: [sorryAx]\",\"endPos\":{\"column\":6,\"line\":5},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":5},\"severity\":\"information\"}"
+      ],
+      "axioms": [
+        "sorryAx"
+      ],
+      "experimentalKernelSuccess": false,
+      "assessment_eligible": false,
+      "certificate": null
+    }
+  ],
+  "assessment_eligible": false,
+  "certificate": null,
+  "referenceEnvironment": {
+    "leanCommit": "62b6a2291302d4bbeace37642a066b7510d0145c"
+  },
+  "memory": {
+    "type": "memory",
+    "heapBytes": 2147483648
+  },
+  "resources": [
+    {
+      "name": "/probe.js",
+      "encodedBytes": 6489,
+      "decodedBytes": 6489,
+      "durationMs": 1.715000033378601
+    },
+    {
+      "name": "/assets/experiment.json",
+      "encodedBytes": 32412,
+      "decodedBytes": 32412,
+      "durationMs": 2.884999990463257
+    },
+    {
+      "name": "/assets/lean.js",
+      "encodedBytes": 148402,
+      "decodedBytes": 148402,
+      "durationMs": 3.784999966621399
+    },
+    {
+      "name": "/assets/lean.wasm",
+      "encodedBytes": 100838905,
+      "decodedBytes": 100838905,
+      "durationMs": 173.20999997854233
+    },
+    {
+      "name": "/assets/worker.js",
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": -3.625
+    },
+    {
+      "name": "/assets/core-layer.json",
+      "encodedBytes": 313732,
+      "decodedBytes": 313732,
+      "durationMs": 6.535000026226044
+    },
+    {
+      "name": "/assets/core-lib/artifacts-000.pack",
+      "encodedBytes": 6609819,
+      "decodedBytes": 6609819,
+      "durationMs": 26.5349999666214
+    },
+    {
+      "name": "/assets/core-lib/artifacts-001.pack",
+      "encodedBytes": 7211654,
+      "decodedBytes": 7211654,
+      "durationMs": 21.959999978542328
+    },
+    {
+      "name": "/assets/core-lib/artifacts-002.pack",
+      "encodedBytes": 6613886,
+      "decodedBytes": 6613886,
+      "durationMs": 34.530000030994415
+    },
+    {
+      "name": "/assets/core-lib/artifacts-003.pack",
+      "encodedBytes": 6024201,
+      "decodedBytes": 6024201,
+      "durationMs": 32.544999957084656
+    },
+    {
+      "name": "/assets/core-lib/artifacts-004.pack",
+      "encodedBytes": 5725415,
+      "decodedBytes": 5725415,
+      "durationMs": 35.60000002384186
+    }
+  ],
+  "done": true,
+  "wallSeconds": 4.25,
+  "processMemory": {
+    "peakSummedRssBytes": 1590083584,
+    "peakSummedPrivateBytes": 3501965312,
+    "samplingSeconds": 1,
+    "scope": "owned browser process tree; RSS can double-count shared pages; private is committed, not resident"
+  }
+}

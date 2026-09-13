@@ -1,0 +1,10 @@
+{
+  "slim/lean.js": {
+    "bytes": 3430113,
+    "gzipBytes": 338894
+  },
+  "slim/lean.wasm": {
+    "bytes": 70444966,
+    "gzipBytes": 13734980
+  }
+}

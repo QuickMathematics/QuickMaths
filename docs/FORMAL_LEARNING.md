@@ -2,6 +2,12 @@
 
 Local implementation: 13 September 2026. This integrates the existing Lean/mathlib engine; it does not replace it. The current delivery is source, not a deployed service or a bundled Lean installation.
 
+Browser-local verification is being evaluated before choosing a hosted verifier
+or mandatory companion. See the [measured browser Lean investigation](releases/2026-09-13-browser-local-lean.md)
+and [reproducible experiment](../experiments/browser-lean/README.md). The prototype
+runs real Lean locally in a browser but does not issue production certificates;
+the runtime and Mathlib must first match the pinned environment below.
+
 ## Try the learner loop
 
 Install the ordinary application and companion dependencies in an environment with package access:

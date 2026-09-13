@@ -1,0 +1,18 @@
+{
+  "started": "2026-09-13T10:52:41.293Z",
+  "isolated": false,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+  "stages": [
+    {
+      "stage": "failed",
+      "atMs": 109,
+      "error": "Error: Shared-memory runtime requires cross-origin isolation"
+    }
+  ],
+  "proofs": [],
+  "assessment_eligible": false,
+  "certificate": null,
+  "error": "Error: Shared-memory runtime requires cross-origin isolation",
+  "done": true,
+  "wallSeconds": 0.125
+}

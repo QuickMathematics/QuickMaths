@@ -1,0 +1,214 @@
+{
+  "scope": "read-only closure audit; no production pins or source files changed",
+  "reference": {
+    "browser_lean_commit": "62b6a2291302d4bbeace37642a066b7510d0145c",
+    "lean_upstream_commit": "ecf55de08b9d855e749f80c491c6f294dd307e60",
+    "mathlib_commit": "de3a9cf33016bbb6d15880d7680643f7ca2d25ba",
+    "real_analysis_game_commit": "930c38333b2edcc3ad27c5f68b9f09210cfaaf62",
+    "emscripten_version": "4.0.22",
+    "runtime_asset_version": "62b6a2291302d4bbeace37642a066b7510d0145c-dlsym1-compact1",
+    "runtime_fixture_compressed_bytes": 290396150,
+    "static_pages_assets_compressed_bytes": 1082970062,
+    "core_manifest": {
+      "path": ".bridge-runtime/lean-browser/reference/public/lean-manifest.json",
+      "generated": "2026-07-11T20:31:41.450Z",
+      "modules": 2311,
+      "declared_olean_bytes": 229402424,
+      "mathlib_modules_present": false
+    },
+    "real_analysis_layer_metadata": {
+      "source": ".bridge-runtime/lean-browser/assets/real-analysis-layer.json",
+      "version": "lean-4.33.0-pre-62b6a229-real-analysis",
+      "modules": 4303,
+      "raw_olean_bytes": 849175216,
+      "layer_file_count": 12909,
+      "compressed_pack_count": 52,
+      "compressed_pack_bytes": 331667212,
+      "dependency_modules": 4303,
+      "file_type_counts": {
+        "olean": 4303,
+        "ir": 4303,
+        "ir_sig": 4303
+      },
+      "file_type_raw_bytes": {
+        "olean": 546254732,
+        "ir": 302318064,
+        "ir_sig": 602420
+      },
+      "manifest_import_metadata": "The layer manifest records the exact packaged closure and pack entries; per-module import edges are not included."
+    }
+  },
+  "quickmaths_local": {
+    "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+    "mathlib_commit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+    "render_request_fixture_count": 193,
+    "analysis_fixture_count": 186,
+    "guarded_cancellation_fixture": "formal-verifier/fixtures/guarded_cancellation.json"
+  },
+  "root_modules": {
+    "count": 23,
+    "modules": [
+      "Mathlib.Basic.Real.Basic",
+      "Mathlib.Topology.Defs.Filter",
+      "Mathlib.Tactic.FieldSimp",
+      "Mathlib.Tactic.Ring",
+      "Mathlib.Tactic.Linarith",
+      "Mathlib.Tactic.NormNum",
+      "Mathlib.Tactic.Positivity",
+      "Mathlib.Analysis.Calculus.Deriv.Abs",
+      "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+      "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+      "Mathlib.Analysis.SpecialFunctions.Sqrt",
+      "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+      "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+      "Mathlib.Analysis.SpecificLimits.Normed",
+      "Mathlib.Analysis.PSeries",
+      "Mathlib.Analysis.Polynomial.Basic",
+      "Mathlib.Topology.Order.IntermediateValue",
+      "Mathlib.Tactic.FunProp",
+      "Mathlib.Tactic.Convert",
+      "Mathlib.Tactic.GCongr",
+      "Mathlib.Tactic.FinCases",
+      "Mathlib.Tactic.Continuity",
+      "Mathlib.Tactic.NormNum.RealSqrt"
+    ],
+    "local_mathlib_direct_root_status": "23 available, 0 missing",
+    "local_direct_root_raw_olean_bytes": 5083152,
+    "reference_core_status": "23 missing from the core Init/Lean/Std manifest",
+    "reference_real_analysis_layer_status": "verified against extracted real-analysis-layer.json"
+  },
+  "browser_root_membership": {
+    "available_in_real_analysis_layer": [
+      "Mathlib.Topology.Defs.Filter",
+      "Mathlib.Tactic.FieldSimp",
+      "Mathlib.Tactic.Ring",
+      "Mathlib.Tactic.Linarith",
+      "Mathlib.Tactic.NormNum",
+      "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+      "Mathlib.Analysis.SpecificLimits.Normed",
+      "Mathlib.Tactic.FunProp",
+      "Mathlib.Tactic.Convert",
+      "Mathlib.Tactic.GCongr",
+      "Mathlib.Tactic.FinCases",
+      "Mathlib.Tactic.Continuity",
+      "Mathlib.Topology.Order.IntermediateValue"
+    ],
+    "missing_from_real_analysis_layer": [
+      "Mathlib.Basic.Real.Basic",
+      "Mathlib.Tactic.Positivity",
+      "Mathlib.Analysis.Calculus.Deriv.Abs",
+      "Mathlib.Analysis.PSeries",
+      "Mathlib.Analysis.Polynomial.Basic",
+      "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+      "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+      "Mathlib.Analysis.SpecialFunctions.Sqrt",
+      "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+      "Mathlib.Tactic.NormNum.RealSqrt"
+    ],
+    "available_count": 13,
+    "missing_count": 10,
+    "guarded_cancellation_available_count": 5,
+    "guarded_cancellation_missing": [
+      "Mathlib.Basic.Real.Basic",
+      "Mathlib.Tactic.Positivity"
+    ],
+    "browser_shim_rewrites_verified": {
+      "Mathlib.Basic.Real.Basic": "Mathlib.Data.Real.Basic",
+      "Mathlib.Tactic.Positivity": "Mathlib.Tactic.Positivity.Basic"
+    },
+    "positive_122_fixture_count": 122,
+    "positive_122_root_union_count": 23,
+    "positive_122_direct_pack_ids": [
+      "artifacts-030.pack",
+      "artifacts-038.pack",
+      "artifacts-039.pack",
+      "artifacts-040.pack",
+      "artifacts-041.pack",
+      "artifacts-043.pack",
+      "artifacts-044.pack"
+    ],
+    "guarded_cancellation_direct_pack_ids": [
+      "artifacts-038.pack",
+      "artifacts-039.pack",
+      "artifacts-040.pack",
+      "artifacts-041.pack",
+      "artifacts-043.pack"
+    ]
+  },
+  "native_closure_by_request_set": {
+    "positive_122": {
+      "modules": 4069,
+      "compiled_olean_modules": 4069,
+      "olean_bytes": 868058368,
+      "ir_bytes": 360863008,
+      "ir_sig_bytes": 716144,
+      "unresolved_modules": 0
+    },
+    "guarded_cancellation": {
+      "modules": 2461,
+      "compiled_olean_modules": 2461,
+      "olean_bytes": 469906184,
+      "ir_bytes": 304187792,
+      "ir_sig_bytes": 433136,
+      "unresolved_modules": 0
+    }
+  },
+  "browser_effective_layer_load": {
+    "core_modules": 629,
+    "core_raw_bytes": 79760876,
+    "core_compressed_pack_bytes": 32184975,
+    "real_analysis_modules": 4303,
+    "real_analysis_raw_bytes": 849175216,
+    "real_analysis_compressed_pack_bytes": 331667212,
+    "combined_raw_bytes": 928936092,
+    "combined_compressed_pack_bytes": 363852187,
+    "core_file_type_raw_bytes": {
+      "olean": 68116396,
+      "ir": 11556420,
+      "ir_sig": 88060
+    },
+    "real_analysis_file_type_raw_bytes": {
+      "olean": 546254732,
+      "ir": 302318064,
+      "ir_sig": 602420
+    },
+    "combined_file_type_raw_bytes": {
+      "olean": 614371128,
+      "ir": 313874484,
+      "ir_sig": 690480
+    },
+    "note": "The browser loader stages every pack in a requested packed layer; direct root pack sums are not the effective transfer size.",
+    "combined_module_entries": 4932,
+    "unique_modules": 4303,
+    "duplicate_core_modules": 629
+  },
+  "local_closure_measurements": {
+    "method": "Nested-comment-stripped ordinary/public/meta imports including import all; implicit Init seeded; pinned package and toolchain sources",
+    "all_roots": {
+      "modules": 4069,
+      "compiled_olean_modules": 4069,
+      "olean_bytes": 868058368,
+      "ir_bytes": 360863008,
+      "ir_sig_bytes": 716144,
+      "unresolved_modules": 0
+    },
+    "guarded_cancellation": {
+      "modules": 2461,
+      "compiled_olean_modules": 2461,
+      "olean_bytes": 469906184,
+      "ir_bytes": 304187792,
+      "ir_sig_bytes": 433136,
+      "unresolved_modules": 0
+    },
+    "portability": "Native 64-bit artifacts cannot be used as WASM32 artifacts."
+  },
+  "representative_guarded_cancellation_imports": [
+    "Mathlib.Basic.Real.Basic",
+    "Mathlib.Topology.Defs.Filter",
+    "Mathlib.Tactic.FieldSimp",
+    "Mathlib.Tactic.Ring",
+    "Mathlib.Tactic.Linarith",
+    "Mathlib.Tactic.NormNum",
+    "Mathlib.Tactic.Positivity"
+  ]
+}

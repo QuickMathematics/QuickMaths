@@ -1,0 +1,996 @@
+{
+  "started": "2026-09-13T11:00:52.666Z",
+  "isolated": true,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+  "stages": [
+    {
+      "stage": "runtime-downloaded-and-verified",
+      "atMs": 639.0749999880791
+    },
+    {
+      "stage": "runtime-initialized",
+      "atMs": 2721.4650000333786
+    },
+    {
+      "stage": "core-staged",
+      "atMs": 3428.2950000166893,
+      "elapsedMs": 706.7549999952316,
+      "compressedBytes": 32184975,
+      "rawBytes": 79760876
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 3898.520000040531,
+      "name": "init-control",
+      "elapsedMs": 469.1650000214577,
+      "experimentalKernelSuccess": true
+    },
+    {
+      "stage": "real-analysis-staged",
+      "atMs": 11307.564999997616,
+      "elapsedMs": 7408.939999997616,
+      "compressedBytes": 331667212,
+      "rawBytes": 849175216
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 11453.990000009537,
+      "name": "guarded_cancellation-unchanged",
+      "elapsedMs": 145.15500003099442,
+      "experimentalKernelSuccess": false
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 13544.355000019073,
+      "name": "guarded_cancellation-import-adapter",
+      "elapsedMs": 2089.8849999904633,
+      "experimentalKernelSuccess": true
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 13678.530000030994,
+      "name": "warm-cancellation-0",
+      "elapsedMs": 132.94499999284744,
+      "experimentalKernelSuccess": true
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 13796.29500001669,
+      "name": "warm-cancellation-1",
+      "elapsedMs": 117.45000004768372,
+      "experimentalKernelSuccess": true
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 13910.590000033379,
+      "name": "warm-cancellation-2",
+      "elapsedMs": 113.9549999833107,
+      "experimentalKernelSuccess": true
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 14058.175000011921,
+      "name": "difference_quotient-unchanged",
+      "elapsedMs": 145.3400000333786,
+      "experimentalKernelSuccess": false
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 14189.694999992847,
+      "name": "difference_quotient-import-adapter",
+      "elapsedMs": 131.17500001192093,
+      "experimentalKernelSuccess": true
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 14333.410000026226,
+      "name": "conjugate_identity-unchanged",
+      "elapsedMs": 143.12999999523163,
+      "experimentalKernelSuccess": false
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 15416.850000023842,
+      "name": "conjugate_identity-import-adapter",
+      "elapsedMs": 1082.8700000047684,
+      "experimentalKernelSuccess": false
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 15574.740000009537,
+      "name": "polynomial_derivative-unchanged",
+      "elapsedMs": 157.22000002861023,
+      "experimentalKernelSuccess": false
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 16727.740000009537,
+      "name": "polynomial_derivative-import-adapter",
+      "elapsedMs": 1152.364999949932,
+      "experimentalKernelSuccess": false
+    },
+    {
+      "stage": "compile-complete",
+      "atMs": 16750.990000009537,
+      "name": "invalid-control",
+      "elapsedMs": 21.69999998807907,
+      "experimentalKernelSuccess": false
+    },
+    {
+      "stage": "done",
+      "atMs": 16756.87999999523
+    }
+  ],
+  "proofs": [
+    {
+      "name": "init-control",
+      "sourceHash": "f53ba8b81f9534e4586f0ea4eb3f391162a14528c45bbb2d95b32ba11521d728",
+      "type": "compile_result",
+      "success": true,
+      "elapsed": 469.1650000214577,
+      "errors": [],
+      "output": [
+        "{\"caption\":\"\",\"data\":\"'_private.0.QuickMathsGenerated.result' does not depend on any axioms\",\"endPos\":{\"column\":6,\"line\":5},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":5},\"severity\":\"information\"}"
+      ],
+      "axioms": [],
+      "experimentalKernelSuccess": true,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "guarded_cancellation-unchanged",
+      "sourceHash": "f98906c3ef09f5e2f85a33972c56688cf1e36c755cfaa75c92ccd4f285fb011e",
+      "type": "compile_result",
+      "success": false,
+      "error": "lean_wasm_compile returned an IO error (see output)",
+      "elapsed": 145.15500003099442,
+      "errors": [],
+      "output": [
+        "uncaught exception: object file '/lib/lean/Mathlib/Basic/Real/Basic.olean' of module Mathlib.Basic.Real.Basic does not exist"
+      ],
+      "axioms": null,
+      "experimentalKernelSuccess": false,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "guarded_cancellation-import-adapter",
+      "sourceHash": "a732ce54cd0ffb6f0cf92cb459d68c77da3e9894336f7fe42a256492321a3809",
+      "type": "compile_result",
+      "success": true,
+      "elapsed": 2089.8849999904633,
+      "errors": [],
+      "output": [
+        "{\"caption\":\"\",\"data\":\"Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice\\n\\nNote: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`\",\"endPos\":{\"column\":25,\"line\":15},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unnecessarySeqFocus\",\"pos\":{\"column\":22,\"line\":15},\"severity\":\"warning\"}",
+        "{\"caption\":\"\",\"data\":\"'_private.0.QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]\",\"endPos\":{\"column\":6,\"line\":18},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":18},\"severity\":\"information\"}"
+      ],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "warm-cancellation-0",
+      "sourceHash": "a732ce54cd0ffb6f0cf92cb459d68c77da3e9894336f7fe42a256492321a3809",
+      "type": "compile_result",
+      "success": true,
+      "elapsed": 132.94499999284744,
+      "errors": [],
+      "output": [
+        "{\"caption\":\"\",\"data\":\"Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice\\n\\nNote: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`\",\"endPos\":{\"column\":25,\"line\":15},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unnecessarySeqFocus\",\"pos\":{\"column\":22,\"line\":15},\"severity\":\"warning\"}",
+        "{\"caption\":\"\",\"data\":\"'_private.0.QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]\",\"endPos\":{\"column\":6,\"line\":18},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":18},\"severity\":\"information\"}"
+      ],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "warm-cancellation-1",
+      "sourceHash": "a732ce54cd0ffb6f0cf92cb459d68c77da3e9894336f7fe42a256492321a3809",
+      "type": "compile_result",
+      "success": true,
+      "elapsed": 117.45000004768372,
+      "errors": [],
+      "output": [
+        "{\"caption\":\"\",\"data\":\"Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice\\n\\nNote: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`\",\"endPos\":{\"column\":25,\"line\":15},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unnecessarySeqFocus\",\"pos\":{\"column\":22,\"line\":15},\"severity\":\"warning\"}",
+        "{\"caption\":\"\",\"data\":\"'_private.0.QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]\",\"endPos\":{\"column\":6,\"line\":18},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":18},\"severity\":\"information\"}"
+      ],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "warm-cancellation-2",
+      "sourceHash": "a732ce54cd0ffb6f0cf92cb459d68c77da3e9894336f7fe42a256492321a3809",
+      "type": "compile_result",
+      "success": true,
+      "elapsed": 113.9549999833107,
+      "errors": [],
+      "output": [
+        "{\"caption\":\"\",\"data\":\"Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice\\n\\nNote: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`\",\"endPos\":{\"column\":25,\"line\":15},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unnecessarySeqFocus\",\"pos\":{\"column\":22,\"line\":15},\"severity\":\"warning\"}",
+        "{\"caption\":\"\",\"data\":\"'_private.0.QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]\",\"endPos\":{\"column\":6,\"line\":18},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":18},\"severity\":\"information\"}"
+      ],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "difference_quotient-unchanged",
+      "sourceHash": "02b74fc55e999a81ac9f264f47d2628ca9607271cd175fc6f64693a11391beb9",
+      "type": "compile_result",
+      "success": false,
+      "error": "lean_wasm_compile returned an IO error (see output)",
+      "elapsed": 145.3400000333786,
+      "errors": [],
+      "output": [
+        "uncaught exception: object file '/lib/lean/Mathlib/Basic/Real/Basic.olean' of module Mathlib.Basic.Real.Basic does not exist"
+      ],
+      "axioms": null,
+      "experimentalKernelSuccess": false,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "difference_quotient-import-adapter",
+      "sourceHash": "8d06163e583e7e40c8493df333ffceb6fd7f66fd4f0fcc6809894b05ba08a9c6",
+      "type": "compile_result",
+      "success": true,
+      "elapsed": 131.17500001192093,
+      "errors": [],
+      "output": [
+        "{\"caption\":\"\",\"data\":\"Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice\\n\\nNote: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`\",\"endPos\":{\"column\":23,\"line\":15},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unnecessarySeqFocus\",\"pos\":{\"column\":20,\"line\":15},\"severity\":\"warning\"}",
+        "{\"caption\":\"\",\"data\":\"'_private.0.QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]\",\"endPos\":{\"column\":6,\"line\":18},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":18},\"severity\":\"information\"}"
+      ],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "conjugate_identity-unchanged",
+      "sourceHash": "7c02960bbf348ace0e10eed504dbf84f24b69158fc9af95e286679d9131738f7",
+      "type": "compile_result",
+      "success": false,
+      "error": "lean_wasm_compile returned an IO error (see output)",
+      "elapsed": 143.12999999523163,
+      "errors": [],
+      "output": [
+        "uncaught exception: object file '/lib/lean/Mathlib/Basic/Real/Basic.olean' of module Mathlib.Basic.Real.Basic does not exist"
+      ],
+      "axioms": null,
+      "experimentalKernelSuccess": false,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "conjugate_identity-import-adapter",
+      "sourceHash": "ec9aa4cc7a3b16ed4c2f17159386f70158056b3e03a258e32f2530cc2fa3ea8d",
+      "type": "compile_result",
+      "success": false,
+      "error": "lean_wasm_compile returned an IO error (see output)",
+      "elapsed": 1082.8700000047684,
+      "errors": [],
+      "output": [
+        "uncaught exception: object file '/lib/lean/Mathlib/Analysis/SpecialFunctions/Sqrt.olean' of module Mathlib.Analysis.SpecialFunctions.Sqrt does not exist"
+      ],
+      "axioms": null,
+      "experimentalKernelSuccess": false,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "polynomial_derivative-unchanged",
+      "sourceHash": "53ae8bd1fdf2ffa1ba00a2a7c4adb90c88e17dc66f74f5f97aa3aa2441e7c160",
+      "type": "compile_result",
+      "success": false,
+      "error": "lean_wasm_compile returned an IO error (see output)",
+      "elapsed": 157.22000002861023,
+      "errors": [],
+      "output": [
+        "uncaught exception: object file '/lib/lean/Mathlib/Basic/Real/Basic.olean' of module Mathlib.Basic.Real.Basic does not exist"
+      ],
+      "axioms": null,
+      "experimentalKernelSuccess": false,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "polynomial_derivative-import-adapter",
+      "sourceHash": "84cf6c9f1c9ac15bf47616aacc4e1f43d74368640de282bf7e1e4dc4fa5c48d1",
+      "type": "compile_result",
+      "success": false,
+      "error": "lean_wasm_compile returned an IO error (see output)",
+      "elapsed": 1152.364999949932,
+      "errors": [],
+      "output": [
+        "uncaught exception: object file '/lib/lean/Mathlib/Analysis/Calculus/Deriv/Abs.olean' of module Mathlib.Analysis.Calculus.Deriv.Abs does not exist"
+      ],
+      "axioms": null,
+      "experimentalKernelSuccess": false,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "invalid-control",
+      "sourceHash": "c02469a16f8442cfa3ab328e0c80599dc1b7e6620a368223eacda7c8df2b995c",
+      "type": "compile_result",
+      "success": true,
+      "elapsed": 21.69999998807907,
+      "errors": [
+        "{\"caption\":\"\",\"data\":\"Tactic `rfl` failed: Expected the goal to be a binary relation\\n\\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\\n\\n\u22a2 False\",\"endPos\":{\"column\":32,\"line\":3},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":29,\"line\":3},\"severity\":\"error\"}"
+      ],
+      "output": [
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.getStateImpl Lean.Environment:1376:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.getStateImpl Lean.Environment:1376:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.modifyStateImpl Lean.Environment:1370:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.getStateImpl Lean.Environment:1376:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.getStateImpl Lean.Environment:1376:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.getStateImpl Lean.Environment:1376:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.getStateImpl Lean.Environment:1376:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.getStateImpl Lean.Environment:1376:4: invalid environment extension has been accessed",
+        "PANIC at _private.Lean.Environment.0.Lean.EnvExtension.getStateImpl Lean.Environment:1376:4: invalid environment extension has been accessed",
+        "{\"caption\":\"\",\"data\":\"Tactic `rfl` failed: Expected the goal to be a binary relation\\n\\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\\n\\n\u22a2 False\",\"endPos\":{\"column\":32,\"line\":3},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":29,\"line\":3},\"severity\":\"error\"}",
+        "{\"caption\":\"\",\"data\":\"'_private.0.QuickMathsGenerated.result' depends on axioms: [sorryAx]\",\"endPos\":{\"column\":6,\"line\":5},\"fileName\":\"/workspace/input.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":5},\"severity\":\"information\"}"
+      ],
+      "axioms": [
+        "sorryAx"
+      ],
+      "experimentalKernelSuccess": false,
+      "assessment_eligible": false,
+      "certificate": null
+    }
+  ],
+  "assessment_eligible": false,
+  "certificate": null,
+  "referenceEnvironment": {
+    "leanCommit": "62b6a2291302d4bbeace37642a066b7510d0145c"
+  },
+  "memory": {
+    "type": "memory",
+    "heapBytes": 2551775232
+  },
+  "resources": [
+    {
+      "name": "/probe.js",
+      "encodedBytes": 6489,
+      "decodedBytes": 6489,
+      "durationMs": 0
+    },
+    {
+      "name": "/assets/experiment.json",
+      "encodedBytes": 32412,
+      "decodedBytes": 32412,
+      "durationMs": 4.305000007152557
+    },
+    {
+      "name": "/assets/lean.js",
+      "encodedBytes": 148402,
+      "decodedBytes": 148402,
+      "durationMs": 18.665000021457672
+    },
+    {
+      "name": "/assets/lean.wasm",
+      "encodedBytes": 100838905,
+      "decodedBytes": 100838905,
+      "durationMs": 245.87999999523163
+    },
+    {
+      "name": "/assets/worker.js",
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": -2.4600000381469727
+    },
+    {
+      "name": "/assets/core-layer.json",
+      "encodedBytes": 313732,
+      "decodedBytes": 313732,
+      "durationMs": 7.149999976158142
+    },
+    {
+      "name": "/assets/core-lib/artifacts-000.pack",
+      "encodedBytes": 6609819,
+      "decodedBytes": 6609819,
+      "durationMs": 21.289999961853027
+    },
+    {
+      "name": "/assets/core-lib/artifacts-001.pack",
+      "encodedBytes": 7211654,
+      "decodedBytes": 7211654,
+      "durationMs": 19.9650000333786
+    },
+    {
+      "name": "/assets/core-lib/artifacts-002.pack",
+      "encodedBytes": 6613886,
+      "decodedBytes": 6613886,
+      "durationMs": 19.935000002384186
+    },
+    {
+      "name": "/assets/core-lib/artifacts-003.pack",
+      "encodedBytes": 6024201,
+      "decodedBytes": 6024201,
+      "durationMs": 28.994999945163727
+    },
+    {
+      "name": "/assets/core-lib/artifacts-004.pack",
+      "encodedBytes": 5725415,
+      "decodedBytes": 5725415,
+      "durationMs": 19.259999990463257
+    },
+    {
+      "name": "/assets/real-analysis-layer.json",
+      "encodedBytes": 2245344,
+      "decodedBytes": 2245344,
+      "durationMs": 18.68499994277954
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-000.pack",
+      "encodedBytes": 6109959,
+      "decodedBytes": 6109959,
+      "durationMs": 37.52999997138977
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-001.pack",
+      "encodedBytes": 6457613,
+      "decodedBytes": 6457613,
+      "durationMs": 20.695000052452087
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-002.pack",
+      "encodedBytes": 6288663,
+      "decodedBytes": 6288663,
+      "durationMs": 26.189999997615814
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-003.pack",
+      "encodedBytes": 6888839,
+      "decodedBytes": 6888839,
+      "durationMs": 20.0450000166893
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-004.pack",
+      "encodedBytes": 7055513,
+      "decodedBytes": 7055513,
+      "durationMs": 36.14999997615814
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-005.pack",
+      "encodedBytes": 6350295,
+      "decodedBytes": 6350295,
+      "durationMs": 40.9650000333786
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-006.pack",
+      "encodedBytes": 6472773,
+      "decodedBytes": 6472773,
+      "durationMs": 22.2049999833107
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-007.pack",
+      "encodedBytes": 6322963,
+      "decodedBytes": 6322963,
+      "durationMs": 67.47499996423721
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-008.pack",
+      "encodedBytes": 6110024,
+      "decodedBytes": 6110024,
+      "durationMs": 63.68000000715256
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-009.pack",
+      "encodedBytes": 6268154,
+      "decodedBytes": 6268154,
+      "durationMs": 25.055000007152557
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-010.pack",
+      "encodedBytes": 6083822,
+      "decodedBytes": 6083822,
+      "durationMs": 28.69999998807907
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-011.pack",
+      "encodedBytes": 6114034,
+      "decodedBytes": 6114034,
+      "durationMs": 23.49500000476837
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-012.pack",
+      "encodedBytes": 5844273,
+      "decodedBytes": 5844273,
+      "durationMs": 34.85499995946884
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-013.pack",
+      "encodedBytes": 5793037,
+      "decodedBytes": 5793037,
+      "durationMs": 24.875
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-014.pack",
+      "encodedBytes": 5761995,
+      "decodedBytes": 5761995,
+      "durationMs": 31.97000002861023
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-015.pack",
+      "encodedBytes": 6207536,
+      "decodedBytes": 6207536,
+      "durationMs": 40.13499999046326
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-016.pack",
+      "encodedBytes": 6024041,
+      "decodedBytes": 6024041,
+      "durationMs": 60.94499999284744
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-017.pack",
+      "encodedBytes": 5973694,
+      "decodedBytes": 5973694,
+      "durationMs": 23.50499999523163
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-018.pack",
+      "encodedBytes": 5876498,
+      "decodedBytes": 5876498,
+      "durationMs": 47.59500002861023
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-019.pack",
+      "encodedBytes": 6008737,
+      "decodedBytes": 6008737,
+      "durationMs": 24.439999997615814
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-020.pack",
+      "encodedBytes": 6037291,
+      "decodedBytes": 6037291,
+      "durationMs": 34.735000014305115
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-021.pack",
+      "encodedBytes": 6165608,
+      "decodedBytes": 6165608,
+      "durationMs": 48.77000004053116
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-022.pack",
+      "encodedBytes": 6202769,
+      "decodedBytes": 6202769,
+      "durationMs": 44.04000002145767
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-023.pack",
+      "encodedBytes": 6159492,
+      "decodedBytes": 6159492,
+      "durationMs": 70.07499998807907
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-024.pack",
+      "encodedBytes": 7267326,
+      "decodedBytes": 7267326,
+      "durationMs": 34.839999973773956
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-025.pack",
+      "encodedBytes": 6971859,
+      "decodedBytes": 6971859,
+      "durationMs": 31.5450000166893
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-026.pack",
+      "encodedBytes": 7098909,
+      "decodedBytes": 7098909,
+      "durationMs": 45.99500000476837
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-027.pack",
+      "encodedBytes": 7000122,
+      "decodedBytes": 7000122,
+      "durationMs": 40.8400000333786
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-028.pack",
+      "encodedBytes": 7160506,
+      "decodedBytes": 7160506,
+      "durationMs": 23.139999985694885
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-029.pack",
+      "encodedBytes": 6963845,
+      "decodedBytes": 6963845,
+      "durationMs": 39.12999999523163
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-030.pack",
+      "encodedBytes": 6911332,
+      "decodedBytes": 6911332,
+      "durationMs": 49.38000005483627
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-031.pack",
+      "encodedBytes": 7084136,
+      "decodedBytes": 7084136,
+      "durationMs": 26.32499998807907
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-032.pack",
+      "encodedBytes": 6832365,
+      "decodedBytes": 6832365,
+      "durationMs": 27.139999985694885
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-033.pack",
+      "encodedBytes": 7109024,
+      "decodedBytes": 7109024,
+      "durationMs": 29.625
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-034.pack",
+      "encodedBytes": 7226741,
+      "decodedBytes": 7226741,
+      "durationMs": 62.80500000715256
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-035.pack",
+      "encodedBytes": 7080631,
+      "decodedBytes": 7080631,
+      "durationMs": 25.115000009536743
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-036.pack",
+      "encodedBytes": 7015750,
+      "decodedBytes": 7015750,
+      "durationMs": 26.125
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-037.pack",
+      "encodedBytes": 6556339,
+      "decodedBytes": 6556339,
+      "durationMs": 41.435000002384186
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-038.pack",
+      "encodedBytes": 5798694,
+      "decodedBytes": 5798694,
+      "durationMs": 59.144999980926514
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-039.pack",
+      "encodedBytes": 5926923,
+      "decodedBytes": 5926923,
+      "durationMs": 24.064999997615814
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-040.pack",
+      "encodedBytes": 5691610,
+      "decodedBytes": 5691610,
+      "durationMs": 24.87999999523163
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-041.pack",
+      "encodedBytes": 5870497,
+      "decodedBytes": 5870497,
+      "durationMs": 32.82499998807907
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-042.pack",
+      "encodedBytes": 6409568,
+      "decodedBytes": 6409568,
+      "durationMs": 26.639999985694885
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-043.pack",
+      "encodedBytes": 7244295,
+      "decodedBytes": 7244295,
+      "durationMs": 34.719999969005585
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-044.pack",
+      "encodedBytes": 6641673,
+      "decodedBytes": 6641673,
+      "durationMs": 43.39999997615814
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-045.pack",
+      "encodedBytes": 6119693,
+      "decodedBytes": 6119693,
+      "durationMs": 55.764999985694885
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-046.pack",
+      "encodedBytes": 6952846,
+      "decodedBytes": 6952846,
+      "durationMs": 24.97000002861023
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-047.pack",
+      "encodedBytes": 7135699,
+      "decodedBytes": 7135699,
+      "durationMs": 40.55500000715256
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-048.pack",
+      "encodedBytes": 6672384,
+      "decodedBytes": 6672384,
+      "durationMs": 25.950000047683716
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-049.pack",
+      "encodedBytes": 6609469,
+      "decodedBytes": 6609469,
+      "durationMs": 25.350000023841858
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-050.pack",
+      "encodedBytes": 6670181,
+      "decodedBytes": 6670181,
+      "durationMs": 26.685000002384186
+    },
+    {
+      "name": "/assets/real-analysis-lib/artifacts-051.pack",
+      "encodedBytes": 1067172,
+      "decodedBytes": 1067172,
+      "durationMs": 9.430000007152557
+    }
+  ],
+  "done": true,
+  "wallSeconds": 17.655999999959022,
+  "processMemory": {
+    "peakSummedRssBytes": 5012553728,
+    "peakSummedPrivateBytes": 5022593024,
+    "samplingSeconds": 1,
+    "scope": "owned browser process tree; RSS can double-count shared pages; private is committed, not resident"
+  }
+}
