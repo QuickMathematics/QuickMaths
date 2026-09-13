@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import threading
+import sys
 from playwright.sync_api import sync_playwright
 
 root=Path(__file__).resolve().parents[2]
@@ -18,7 +19,7 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 with sync_playwright() as p:
  context=p.chromium.launch_persistent_context(str(base/'profile'),headless=True,viewport={'width':412,'height':915})
  page=context.new_page()
- page.goto(f'http://127.0.0.1:{server.server_port}/experiments/browser-lean/')
+ page.goto(sys.argv[1] if len(sys.argv)>1 else f'http://127.0.0.1:{server.server_port}/experiments/browser-lean/')
  page.locator('#start').wait_for()
  page.wait_for_function('!document.querySelector("#start").disabled',timeout=30000)
  assert page.evaluate('crossOriginIsolated')

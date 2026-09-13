@@ -5,7 +5,7 @@
 *.pdn binary
 *.pdf binary
 experiments/browser-lean/results/curated/*.json linguist-generated=true
-docs/experiments/browser-lean/assets/** -text linguist-generated=true
+docs/experiments/browser-lean/assets/** -text -diff linguist-generated=true
 docs/experiments/browser-lean/curated.js -text
 docs/experiments/browser-lean/compatibility.js -text
 docs/experiments/app/formal-environment-loader.js -text

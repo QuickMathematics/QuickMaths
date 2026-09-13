@@ -1,5 +1,14 @@
 # Browser-local Lean experiment
 
+## Temporary phone test
+
+Open <https://quickmathematics.github.io/QuickMaths/experiments/browser-lean/>
+in Android Chrome. This isolated route hosts the production-pinned parity
+candidate, not the older reference runtime described below. Choose **All five**
+and **Download and run**, then **Export results**. It never issues certificates.
+See `docs/releases/2026-09-13-browser-lean-phone-deployment.md` for download sizes,
+test interpretation, and deployment lifecycle.
+
 This is an isolated feasibility harness, **not a production verifier**. It loads
 real hash-pinned cauli Lean WASM and compiled Mathlib artifacts into a persistent
 worker. No hosted verification service is involved. It cannot award mastery or
