@@ -1,0 +1,179 @@
+{
+  "identity": "e4b7ce3726ed7933776b405ed1863891e034a2f018dc444732e401168d4917f5",
+  "runtime": {
+    "lean.js": {
+      "file": "lean.js-49f1c42f79017916ee4478875495ef1cf230ed3ab84ff5715f8c890ca3b2b41c.gz",
+      "bytes": 146586,
+      "compressedBytes": 37925,
+      "sha256": "49f1c42f79017916ee4478875495ef1cf230ed3ab84ff5715f8c890ca3b2b41c",
+      "rawSha256": "f0e08a979d821d108421cfc81ab8f1021b66b2c4639ef37aa9b489211f4d70a6"
+    },
+    "lean.wasm": {
+      "file": "lean.wasm-cfa032d27e9b4f582c1db691131ccfc067973c63673fac05193d50807a2f3334.gz",
+      "bytes": 105123005,
+      "compressedBytes": 17722765,
+      "sha256": "cfa032d27e9b4f582c1db691131ccfc067973c63673fac05193d50807a2f3334",
+      "rawSha256": "85762fb897fa0dbf22ef8bd55e0f8ef7f6a0d66986825dc8680a5d1a87527cb5"
+    }
+  },
+  "portSha256": "98ce75ed861ba17ad85bc22b3c09cd5bea7a56d96e05bbf92714c29ab58346cf",
+  "profiles": {
+    "qm-formal-v1-ed8d51650a0bb7da": {
+      "capabilities": [
+        "algebra"
+      ],
+      "modules": 2455,
+      "rawModuleBytes": 509331120,
+      "compressedModuleBytes": 188685820,
+      "packCount": 63,
+      "snapshot": {
+        "file": "snapshot-3ab07a96ca58d870881b96e3c6fedd9135a9e4a186fdbb0b9b286d8146bbd812.gz",
+        "bytes": 359261273,
+        "compressedBytes": 142098767,
+        "sha256": "3ab07a96ca58d870881b96e3c6fedd9135a9e4a186fdbb0b9b286d8146bbd812",
+        "rawSha256": "99b4e9f37a9eeea185ad23f6f58d2d78e3d13678cf5af8dbcf869a1008ab1f89",
+        "build": {
+          "binding": {
+            "wasm": "85762fb897fa0dbf22ef8bd55e0f8ef7f6a0d66986825dc8680a5d1a87527cb5",
+            "js": "f0e08a979d821d108421cfc81ab8f1021b66b2c4639ef37aa9b489211f4d70a6",
+            "header": "cecec891388ae0b8d31019ca467201adc7b4e9a7fca5a037f0091c5b1c29a6a4",
+            "driver": "2c3bc3461e0bdd9bf48aa52b4fa9a9f765a8af27ef7d07f507e5df44c830fc83",
+            "profile": "qm-formal-v1-ed8d51650a0bb7da",
+            "setup": "e5ed1727ee63c9182fa54efc1c75f91ab69076766b097d2f04d663c4d8bf9f10",
+            "nodeVersion": "24.21.0",
+            "format": "qm-environment-v1"
+          },
+          "exitCode": 0,
+          "elapsedSeconds": 34.21457326400002
+        }
+      }
+    },
+    "qm-formal-v1-47dfa7faf67fa573": {
+      "capabilities": [
+        "algebra",
+        "radicals"
+      ],
+      "modules": 2998,
+      "rawModuleBytes": 593291372,
+      "compressedModuleBytes": 222560782,
+      "packCount": 74,
+      "snapshot": {
+        "file": "snapshot-452040b59bc1ffc51c16e48c874a03ef02f8cfdd4193933157ad19f13d4a3f17.gz",
+        "bytes": 427754985,
+        "compressedBytes": 170747757,
+        "sha256": "452040b59bc1ffc51c16e48c874a03ef02f8cfdd4193933157ad19f13d4a3f17",
+        "rawSha256": "afbd0e4cc23e15da1bf58738d48d205c8956180145d92bd835d3085110c31e37",
+        "build": {
+          "binding": {
+            "wasm": "85762fb897fa0dbf22ef8bd55e0f8ef7f6a0d66986825dc8680a5d1a87527cb5",
+            "js": "f0e08a979d821d108421cfc81ab8f1021b66b2c4639ef37aa9b489211f4d70a6",
+            "header": "28d6e1ba6df1a5ffe8dd2ca5e0e331310a25fb844a95a2462cb59bbd8a8f024f",
+            "driver": "2c3bc3461e0bdd9bf48aa52b4fa9a9f765a8af27ef7d07f507e5df44c830fc83",
+            "profile": "qm-formal-v1-47dfa7faf67fa573",
+            "setup": "fe529bf950ff523d2e21fe5565a1db2da4316325639ff6ed829fb86dc32469bc",
+            "nodeVersion": "24.21.0",
+            "format": "qm-environment-v1"
+          },
+          "exitCode": 0,
+          "elapsedSeconds": 74.698702149
+        }
+      }
+    },
+    "qm-formal-v1-a8d843f013bdac16": {
+      "capabilities": [
+        "algebra",
+        "limits",
+        "radicals"
+      ],
+      "modules": 3451,
+      "rawModuleBytes": 702080840,
+      "compressedModuleBytes": 267471808,
+      "packCount": 88,
+      "snapshot": {
+        "file": "snapshot-f7f2e97027474c7d29df59c29a1d0d7d5e9bc4efc56de091e0a1aca0fc63be76.gz",
+        "bytes": 516632277,
+        "compressedBytes": 208725398,
+        "sha256": "f7f2e97027474c7d29df59c29a1d0d7d5e9bc4efc56de091e0a1aca0fc63be76",
+        "rawSha256": "6de620c1edac0e88fec9e1c2c2c82a9ae5afaf53ffadaf4896e78863b239bb6d",
+        "build": {
+          "binding": {
+            "wasm": "85762fb897fa0dbf22ef8bd55e0f8ef7f6a0d66986825dc8680a5d1a87527cb5",
+            "js": "f0e08a979d821d108421cfc81ab8f1021b66b2c4639ef37aa9b489211f4d70a6",
+            "header": "dd6852f04261d6c45c1ec3998d17b7bb4e8f0f09b30663dd0b1f1147a1a6dee6",
+            "driver": "2c3bc3461e0bdd9bf48aa52b4fa9a9f765a8af27ef7d07f507e5df44c830fc83",
+            "profile": "qm-formal-v1-a8d843f013bdac16",
+            "setup": "52a650a4ca7295dc4884030004b4da7d0836dbed3fd5f69509cec13a60b32ee0",
+            "nodeVersion": "24.21.0",
+            "format": "qm-environment-v1"
+          },
+          "exitCode": 0,
+          "elapsedSeconds": 61.942330820999985
+        }
+      }
+    },
+    "qm-formal-v1-d9180291ee776ddb": {
+      "capabilities": [
+        "algebra",
+        "derivatives",
+        "radicals"
+      ],
+      "modules": 4064,
+      "rawModuleBytes": 827908836,
+      "compressedModuleBytes": 319594273,
+      "packCount": 104,
+      "snapshot": {
+        "file": "snapshot-dc09c5da5f8f94008405fc21e06f5c5007d28520789b4e6af2f1817d30cfea20.gz",
+        "bytes": 612300669,
+        "compressedBytes": 250293885,
+        "sha256": "dc09c5da5f8f94008405fc21e06f5c5007d28520789b4e6af2f1817d30cfea20",
+        "rawSha256": "267c594788e82eabbf70d27b223925afa6e289519ab3adf587328e2d4b5a76fb",
+        "build": {
+          "binding": {
+            "wasm": "85762fb897fa0dbf22ef8bd55e0f8ef7f6a0d66986825dc8680a5d1a87527cb5",
+            "js": "f0e08a979d821d108421cfc81ab8f1021b66b2c4639ef37aa9b489211f4d70a6",
+            "header": "4f09553bc19ab97579ed45fad49e21a67c3988e6dcb1cd584444e74f46a76ec8",
+            "driver": "2c3bc3461e0bdd9bf48aa52b4fa9a9f765a8af27ef7d07f507e5df44c830fc83",
+            "profile": "qm-formal-v1-d9180291ee776ddb",
+            "setup": "725628386ebde1a91ec378dce4b6ca70fb7ddd792e8fe7c8f492ed6d97473b24",
+            "nodeVersion": "24.21.0",
+            "format": "qm-environment-v1"
+          },
+          "exitCode": 0,
+          "elapsedSeconds": 67.17438029600004
+        }
+      }
+    },
+    "qm-formal-v1-bb0d3439bce63261": {
+      "capabilities": [
+        "algebra",
+        "radicals",
+        "sequences-series"
+      ],
+      "modules": 3919,
+      "rawModuleBytes": 791392876,
+      "compressedModuleBytes": 303925894,
+      "packCount": 100,
+      "snapshot": {
+        "file": "snapshot-10c88b4afc2523ac95d555b90ce7fe8058347cfc864d7eb76fe3c9444aaca34d.gz",
+        "bytes": 583870721,
+        "compressedBytes": 237582921,
+        "sha256": "10c88b4afc2523ac95d555b90ce7fe8058347cfc864d7eb76fe3c9444aaca34d",
+        "rawSha256": "be2930bebdc33e400e5e8b88d12096dc12cf1134ed7474c1be2ea405e06aaf83",
+        "build": {
+          "binding": {
+            "wasm": "85762fb897fa0dbf22ef8bd55e0f8ef7f6a0d66986825dc8680a5d1a87527cb5",
+            "js": "f0e08a979d821d108421cfc81ab8f1021b66b2c4639ef37aa9b489211f4d70a6",
+            "header": "83925f2f7fcb082aaddbe5d61a00278c53144c26f1549bfeaa5fdac209f7d83a",
+            "driver": "2c3bc3461e0bdd9bf48aa52b4fa9a9f765a8af27ef7d07f507e5df44c830fc83",
+            "profile": "qm-formal-v1-bb0d3439bce63261",
+            "setup": "3213c8c21759617cc8d16ad287ba8e73b16e8c3f583251e43910c22aeb9888b1",
+            "nodeVersion": "24.21.0",
+            "format": "qm-environment-v1"
+          },
+          "exitCode": 0,
+          "elapsedSeconds": 66.47561699099992
+        }
+      }
+    }
+  }
+}

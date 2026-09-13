@@ -1,0 +1,1362 @@
+{
+  "perProofBudgetSeconds": 60,
+  "leanToolchain": "leanprover/lean4:v4.34.0-rc2",
+  "mathlibRevision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+  "logs": {
+    "native-corpus-final.log": "1bea326e4f4909842194ecc1fedb6c6d899f764328de81fadf0f7f095517b4c0",
+    "native-retry.log": "a7c3f319886b25b4b9a631f42adbc9c70c93e5e9e1c093007b3b2b72e2072952"
+  },
+  "rows": [
+    {
+      "name": "guarded_cancellation.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": true
+    },
+    {
+      "name": "difference_quotient.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": true
+    },
+    {
+      "name": "sqrt_square_nonnegative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": true
+    },
+    {
+      "name": "conjugate_identity.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "inverse_right_infinity.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "inverse_left_infinity.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "removable_hole_limit.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "conjugate_limit.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "piecewise_jump.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "ivt_existence.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "polynomial_derivative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "quotient_derivative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sqrt_derivative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "abs_derivative_positive.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "abs_derivative_negative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "exp_derivative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "log_derivative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sin_derivative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "cos_derivative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_nested_sin_exp.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_exp_quotient.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_sqrt_quotient.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_log_abs.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_abs_sin_symbolic.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_log_exp_auto_positive.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_sqrt_square_plus_one.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuity_abs_limit.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuity_log_exp_limit.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuity_guarded_quotient_limit.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuity_sqrt_square_limit.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuity_sqrt_right_limit.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuous_ivt_guarded_quotient.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuous_ivt_exp_with_brackets.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuous_ivt_quantified_guard.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "bounded_interval_positive.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "limit_algebra_basic.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "limit_algebra_one_sided.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "limit_algebra_hole_composition.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "limit_algebra_symbolic_denominator.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "limit_algebra_log_composition.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "limit_algebra_sqrt_positive.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_reciprocal_shift.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_geometric_half.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_geometric_symbolic.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_composed.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_reuse_sublimit.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_nat_at_top.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_rational_shift.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_rational_shift_offset.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_affine_ratio.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_affine_ratio_negative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_affine_ratio_rational.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_quadratic_ratio.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_quadratic_ratio_negative.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_quadratic_ratio_factored.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_degree_ratio_zero.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_degree_ratio_pos_inf.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_degree_ratio_neg_inf.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_degree_ratio_gap2_neg_inf.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_general_equal_degree.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_general_lower_degree.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_general_pos_inf.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_squeeze_sin_over_shift.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_squeeze_sin_auto.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_squeeze_cos_auto.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_monotone_bounded_increasing.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_monotone_bounded_decreasing.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_monotone_bounded_auto_increasing.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_monotone_bounded_auto_decreasing.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_alternating_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_alternating_affine_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_mod2_piecewise_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_mod3_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_mod4_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_alternating_vanishing_reciprocal_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_mod3_vanishing_reciprocal_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_mod4_vanishing_geometric_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_alternating_finite_reciprocal_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_mod3_finite_reciprocal_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_mod4_finite_symbolic_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_cited_finite_tail_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_eventually_periodic_mod3_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_eventually_alternating_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_geometric_two_pos_inf.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_geometric_two_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_geometric_negative_two_no_finite.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_geometric_half_sum.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_geometric_scaled_negative_sum.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_geometric_two_not_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_geometric_negative_one_not_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p2_shift1_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p3_scaled_shift2_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p1_harmonic_not_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p0_not_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p_real_three_halves_shift1_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p_real_half_scaled_shift2_not_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_comparison_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_comparison_not_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_eventual_linear_geometric_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_global_geometric_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_geometric_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_geometric_divergent.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_geometric_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_geometric_divergent.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_monomial_geometric_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_monomial_geometric_divergent.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_polynomial_geometric_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_polynomial_geometric_divergent.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_missing_nonzero.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_wrong_nonzero.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_monotone_bounded_missing_bound.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_squeeze_missing_upper.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_geometric_product_divergent.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_geometric_product_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_polynomial_quotient_denominator_geometric_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_polynomial_quotient_domain_guard_needed.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_polynomial_quotient_geometric_divergent.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_polynomial_quotient_geometric_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_reciprocal_polynomial_geometric_summable.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_balanced_powered_shifted_factorials.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_extra_denominator_factorial.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_extra_numerator_factorial.json",
+      "stage": "kernel",
+      "expected": "verified",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_geometric_product_boundary_one.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_nonpolynomial_quotient_needs_limit.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_polynomial_quotient_boundary_one.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_zero_geometric_denominator_needs_domain.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "missing_restriction.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "wrong_limit_direction.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "leaked_assumption.json",
+      "stage": "preflight",
+      "expected": "ambiguous_input",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "ivt_false_uniqueness_method.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "abs_derivative_kink.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "log_derivative_missing_domain.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_abs_missing_sign.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_abs_kink.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "recursive_wrong_formula.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuity_wrong_value.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuity_log_zero_domain_violation.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuous_ivt_missing_brackets.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "continuous_ivt_missing_interval_guard.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "limit_algebra_log_nonpositive_target.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "limit_algebra_missing_hole_premise.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_geometric_bad_ratio.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_geometric_missing_ratio.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_wrong_reciprocal_target.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_rational_shift_wrong_target.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_affine_ratio_wrong_target.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_affine_ratio_zero_leading_denominator.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_quadratic_ratio_wrong_target.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_quadratic_ratio_lower_degree.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_degree_ratio_wrong_sign.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_degree_ratio_wrong_zero_target.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_degree_ratio_equal_degree.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_general_wrong_equal_target.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_general_zero_denominator.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_polynomial_general_degree_overflow.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_squeeze_auto_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_monotone_bounded_auto_bad_ratio.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_alternating_wrong_infinity.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_geometric_half_wrong_no_finite.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_geometric_one_wrong_no_finite.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_constant_wrong_no_finite.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_mod5_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_with_drift_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_alternating_growing_tail_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_alternating_finite_plus_growing_tail_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_alternating_unsafe_reciprocal_tail_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_cited_finite_tail_missing.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_periodic_cited_finite_tail_wrong_citation.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_eventually_constant_wrong_no_finite.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "sequence_eventually_periodic_le_cutoff_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_geometric_wrong_sum.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_geometric_false_divergence.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_geometric_false_finite.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p2_false_not_summable.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p1_false_summable.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p2_zero_shift_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p_real_three_halves_false_not_summable.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p_real_half_false_summable.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_p_real_overflow_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_comparison_missing_evidence.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_comparison_wrong_direction.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_missing_evidence.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_bound_one_unsupported.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_wrong_direction.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_non_geometric_missing_limit.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_boundary_one_inconclusive.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_ratio_limit_lt_one_false_divergence.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_boundary_one_inconclusive.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_lt_one_false_divergence.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_gt_one_false_convergence.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_monomial_boundary_one.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_polynomial_boundary_one.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    },
+    {
+      "name": "series_root_nonpolynomial_needs_limit.json",
+      "stage": "preflight",
+      "expected": "needs_justification",
+      "passed": true,
+      "startupTimeoutRetried": false
+    }
+  ]
+}

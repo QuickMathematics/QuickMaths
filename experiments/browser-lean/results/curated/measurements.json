@@ -1,0 +1,893 @@
+[
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-ed8d51650a0bb7da",
+    "format": "modules",
+    "runKind": "cold",
+    "readyMs": 10663.625,
+    "warmMs": [
+      104.33500003814697,
+      106.16999995708466,
+      109.01999998092651,
+      115.39499998092651,
+      104.875
+    ],
+    "workerInitializations": 1,
+    "successfulCorpusMedianMs": 143.52499997615814,
+    "successfulCorpusMaxMs": 222.73500001430511,
+    "cache": {
+      "downloads": 65,
+      "downloadedBytes": 206446510,
+      "hits": 0,
+      "writable": true,
+      "bodyBytes": 206446510,
+      "entries": 65,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2559815680,
+        "steady": 2541121536,
+        "incrementalPeak": 2429161472,
+        "incrementalSteady": 2410467328
+      },
+      "rss": {
+        "peak": 2829611008,
+        "steady": 2811351040,
+        "incrementalPeak": 2512166912,
+        "incrementalSteady": 2493906944
+      },
+      "privateCommit": {
+        "peak": 2765565952,
+        "steady": 2746531840,
+        "incrementalPeak": 2576961536,
+        "incrementalSteady": 2557927424
+      }
+    },
+    "afterDiscard": {
+      "uss": 28418048,
+      "rss": 31600640,
+      "privateCommit": 29417472
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 119,
+      "kernel_success": 3,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-47dfa7faf67fa573",
+    "format": "modules",
+    "runKind": "new-environment-shared-cache",
+    "readyMs": 10237.674999952316,
+    "warmMs": [
+      40.295000076293945,
+      39.0349999666214,
+      38.8050000667572,
+      39.9300000667572,
+      42.81000006198883
+    ],
+    "workerInitializations": 1,
+    "successfulCorpusMedianMs": 187.63999998569489,
+    "successfulCorpusMaxMs": 267.5,
+    "cache": {
+      "downloads": 11,
+      "downloadedBytes": 33874962,
+      "hits": 65,
+      "writable": true,
+      "bodyBytes": 240321472,
+      "entries": 76,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2592460800,
+        "steady": 2591977472,
+        "incrementalPeak": 2461806592,
+        "incrementalSteady": 2461323264
+      },
+      "rss": {
+        "peak": 2866126848,
+        "steady": 2865643520,
+        "incrementalPeak": 2548682752,
+        "incrementalSteady": 2548199424
+      },
+      "privateCommit": {
+        "peak": 2808922112,
+        "steady": 2808504320,
+        "incrementalPeak": 2620317696,
+        "incrementalSteady": 2619899904
+      }
+    },
+    "afterDiscard": {
+      "uss": -1855488,
+      "rss": 2707456,
+      "privateCommit": -2134016
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 120,
+      "kernel_success": 2,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-a8d843f013bdac16",
+    "format": "modules",
+    "runKind": "new-environment-shared-cache",
+    "readyMs": 11807.659999966621,
+    "warmMs": [
+      53.00999999046326,
+      54.639999985694885,
+      54.83500003814697,
+      58.09500002861023,
+      60.419999957084656
+    ],
+    "workerInitializations": 1,
+    "successfulCorpusMedianMs": 196.0799999833107,
+    "successfulCorpusMaxMs": 556.4099999666214,
+    "cache": {
+      "downloads": 14,
+      "downloadedBytes": 44911026,
+      "hits": 76,
+      "writable": true,
+      "bodyBytes": 285232498,
+      "entries": 90,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2863857664,
+        "steady": 2858704896,
+        "incrementalPeak": 2733203456,
+        "incrementalSteady": 2728050688
+      },
+      "rss": {
+        "peak": 3135590400,
+        "steady": 3130437632,
+        "incrementalPeak": 2818146304,
+        "incrementalSteady": 2812993536
+      },
+      "privateCommit": {
+        "peak": 3042000896,
+        "steady": 3036696576,
+        "incrementalPeak": 2853396480,
+        "incrementalSteady": 2848092160
+      }
+    },
+    "afterDiscard": {
+      "uss": -8716288,
+      "rss": -3928064,
+      "privateCommit": -9371648
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 102,
+      "kernel_success": 20,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-d9180291ee776ddb",
+    "format": "modules",
+    "runKind": "new-environment-shared-cache",
+    "readyMs": 13230.299999952316,
+    "warmMs": [
+      107.81000006198883,
+      107.40499997138977,
+      99.23500001430511,
+      124.37999999523163,
+      114.32999992370605
+    ],
+    "workerInitializations": 6,
+    "successfulCorpusMedianMs": 242.07999992370605,
+    "successfulCorpusMaxMs": 874.960000038147,
+    "cache": {
+      "downloads": 16,
+      "downloadedBytes": 52122465,
+      "hits": 620,
+      "writable": true,
+      "bodyBytes": 337354963,
+      "entries": 106,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 3148943360,
+        "steady": 3137556480,
+        "incrementalPeak": 3018289152,
+        "incrementalSteady": 3006902272
+      },
+      "rss": {
+        "peak": 3422609408,
+        "steady": 3412074496,
+        "incrementalPeak": 3105165312,
+        "incrementalSteady": 3094630400
+      },
+      "privateCommit": {
+        "peak": 3398041600,
+        "steady": 3382743040,
+        "incrementalPeak": 3209437184,
+        "incrementalSteady": 3194138624
+      }
+    },
+    "afterDiscard": {
+      "uss": -7897088,
+      "rss": -2633728,
+      "privateCommit": -8638464
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 106,
+      "kernel_failure": 5,
+      "kernel_success": 11,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-bb0d3439bce63261",
+    "format": "modules",
+    "runKind": "new-environment-shared-cache",
+    "readyMs": 14058.304999947548,
+    "warmMs": [
+      249.20499992370605,
+      148.65499997138977,
+      159.45999991893768,
+      139.05999994277954,
+      157.11000001430511
+    ],
+    "workerInitializations": 13,
+    "successfulCorpusMedianMs": 344.0050001144409,
+    "successfulCorpusMaxMs": 1190.7549999952316,
+    "cache": {
+      "downloads": 1,
+      "downloadedBytes": 152355,
+      "hits": 1325,
+      "writable": true,
+      "bodyBytes": 321686584,
+      "entries": 102,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 3181150208,
+        "steady": 2996080640,
+        "incrementalPeak": 3050496000,
+        "incrementalSteady": 2865426432
+      },
+      "rss": {
+        "peak": 3408318464,
+        "steady": 3273822208,
+        "incrementalPeak": 3090874368,
+        "incrementalSteady": 2956378112
+      },
+      "privateCommit": {
+        "peak": 3456356352,
+        "steady": 3180044288,
+        "incrementalPeak": 3267751936,
+        "incrementalSteady": 2991439872
+      }
+    },
+    "afterDiscard": {
+      "uss": -9326592,
+      "rss": -753664,
+      "privateCommit": -10063872
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 41,
+      "kernel_failure": 12,
+      "kernel_success": 69,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-ed8d51650a0bb7da",
+    "format": "snapshot",
+    "runKind": "cold",
+    "readyMs": 5983.710000038147,
+    "warmMs": [
+      104.57999992370605,
+      103.16999995708466,
+      106.4099999666214,
+      103.65499997138977,
+      100.94500005245209
+    ],
+    "workerInitializations": 1,
+    "successfulCorpusMedianMs": 140.33000004291534,
+    "successfulCorpusMaxMs": 229.5899999141693,
+    "cache": {
+      "downloads": 3,
+      "downloadedBytes": 159859457,
+      "hits": 0,
+      "writable": true,
+      "bodyBytes": 159859457,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2224406528,
+        "steady": 2222874624,
+        "incrementalPeak": 2094800896,
+        "incrementalSteady": 2093268992
+      },
+      "rss": {
+        "peak": 2492882944,
+        "steady": 2491342848,
+        "incrementalPeak": 2175668224,
+        "incrementalSteady": 2174128128
+      },
+      "privateCommit": {
+        "peak": 2435432448,
+        "steady": 2433982464,
+        "incrementalPeak": 2246225920,
+        "incrementalSteady": 2244775936
+      }
+    },
+    "afterDiscard": {
+      "uss": 21401600,
+      "rss": 24350720,
+      "privateCommit": 21098496
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 119,
+      "kernel_success": 3,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-ed8d51650a0bb7da",
+    "format": "snapshot",
+    "runKind": "cached-new-worker",
+    "readyMs": 5679.9400000572205,
+    "warmMs": [
+      109.51999998092651,
+      103.7150000333786,
+      108.76999998092651,
+      103.57500004768372,
+      101.87000000476837
+    ],
+    "workerInitializations": 1,
+    "successfulCorpusMedianMs": 158.36500000953674,
+    "successfulCorpusMaxMs": 245.4650000333786,
+    "cache": {
+      "downloads": 0,
+      "downloadedBytes": 0,
+      "hits": 3,
+      "writable": true,
+      "bodyBytes": 159859457,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2585374720,
+        "steady": 2211606528,
+        "incrementalPeak": 2455769088,
+        "incrementalSteady": 2082000896
+      },
+      "rss": {
+        "peak": 2857951232,
+        "steady": 2486005760,
+        "incrementalPeak": 2540736512,
+        "incrementalSteady": 2168791040
+      },
+      "privateCommit": {
+        "peak": 2803752960,
+        "steady": 2425335808,
+        "incrementalPeak": 2614546432,
+        "incrementalSteady": 2236129280
+      }
+    },
+    "afterDiscard": {
+      "uss": -4685824,
+      "rss": 135168,
+      "privateCommit": -7114752
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 119,
+      "kernel_success": 3,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-47dfa7faf67fa573",
+    "format": "snapshot",
+    "runKind": "new-environment-shared-cache",
+    "readyMs": 6629.524999976158,
+    "warmMs": [
+      40.7150000333786,
+      37.99500000476837,
+      38.450000047683716,
+      38.390000104904175,
+      39.21000003814697
+    ],
+    "workerInitializations": 1,
+    "successfulCorpusMedianMs": 189.72999995946884,
+    "successfulCorpusMaxMs": 272.13499999046326,
+    "cache": {
+      "downloads": 1,
+      "downloadedBytes": 170747757,
+      "hits": 2,
+      "writable": true,
+      "bodyBytes": 188508447,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2856878080,
+        "steady": 2854846464,
+        "incrementalPeak": 2727272448,
+        "incrementalSteady": 2725240832
+      },
+      "rss": {
+        "peak": 3127549952,
+        "steady": 3127136256,
+        "incrementalPeak": 2810335232,
+        "incrementalSteady": 2809921536
+      },
+      "privateCommit": {
+        "peak": 3113996288,
+        "steady": 3113582592,
+        "incrementalPeak": 2924789760,
+        "incrementalSteady": 2924376064
+      }
+    },
+    "afterDiscard": {
+      "uss": -2777088,
+      "rss": 1720320,
+      "privateCommit": -5431296
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 120,
+      "kernel_success": 2,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-47dfa7faf67fa573",
+    "format": "snapshot",
+    "runKind": "cached-new-worker",
+    "readyMs": 6143.579999923706,
+    "warmMs": [
+      39.325000047683716,
+      39.37000000476837,
+      38.44000005722046,
+      38.9449999332428,
+      38.40499997138977
+    ],
+    "workerInitializations": 1,
+    "successfulCorpusMedianMs": 191.0275000333786,
+    "successfulCorpusMaxMs": 275.33000004291534,
+    "cache": {
+      "downloads": 0,
+      "downloadedBytes": 0,
+      "hits": 3,
+      "writable": true,
+      "bodyBytes": 188508447,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2884550656,
+        "steady": 2850922496,
+        "incrementalPeak": 2754945024,
+        "incrementalSteady": 2721316864
+      },
+      "rss": {
+        "peak": 3158777856,
+        "steady": 3125567488,
+        "incrementalPeak": 2841563136,
+        "incrementalSteady": 2808352768
+      },
+      "privateCommit": {
+        "peak": 3148836864,
+        "steady": 3113299968,
+        "incrementalPeak": 2959630336,
+        "incrementalSteady": 2924093440
+      }
+    },
+    "afterDiscard": {
+      "uss": -4730880,
+      "rss": -69632,
+      "privateCommit": -6574080
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 120,
+      "kernel_success": 2,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-a8d843f013bdac16",
+    "format": "snapshot",
+    "runKind": "new-environment-shared-cache",
+    "readyMs": 7038.6849999427795,
+    "warmMs": [
+      51.68999993801117,
+      51.28000009059906,
+      50.94500005245209,
+      50.91499996185303,
+      51.674999952316284
+    ],
+    "workerInitializations": 1,
+    "successfulCorpusMedianMs": 189.70999997854233,
+    "successfulCorpusMaxMs": 560.2400000095367,
+    "cache": {
+      "downloads": 1,
+      "downloadedBytes": 208725398,
+      "hits": 2,
+      "writable": true,
+      "bodyBytes": 226486088,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2694754304,
+        "steady": 2693304320,
+        "incrementalPeak": 2565148672,
+        "incrementalSteady": 2563698688
+      },
+      "rss": {
+        "peak": 2969182208,
+        "steady": 2967805952,
+        "incrementalPeak": 2651967488,
+        "incrementalSteady": 2650591232
+      },
+      "privateCommit": {
+        "peak": 2933248000,
+        "steady": 2931818496,
+        "incrementalPeak": 2744041472,
+        "incrementalSteady": 2742611968
+      }
+    },
+    "afterDiscard": {
+      "uss": -8617984,
+      "rss": -4182016,
+      "privateCommit": -10362880
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 102,
+      "kernel_success": 20,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-a8d843f013bdac16",
+    "format": "snapshot",
+    "runKind": "cached-new-worker",
+    "readyMs": 6577.445000052452,
+    "warmMs": [
+      49.855000019073486,
+      49.5,
+      49.080000042915344,
+      49.34999990463257,
+      48.84500002861023
+    ],
+    "workerInitializations": 1,
+    "successfulCorpusMedianMs": 190.3375000357628,
+    "successfulCorpusMaxMs": 558.5199999809265,
+    "cache": {
+      "downloads": 0,
+      "downloadedBytes": 0,
+      "hits": 3,
+      "writable": true,
+      "bodyBytes": 226486088,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2674401280,
+        "steady": 2665668608,
+        "incrementalPeak": 2544795648,
+        "incrementalSteady": 2536062976
+      },
+      "rss": {
+        "peak": 2948104192,
+        "steady": 2940080128,
+        "incrementalPeak": 2630889472,
+        "incrementalSteady": 2622865408
+      },
+      "privateCommit": {
+        "peak": 2918002688,
+        "steady": 2903818240,
+        "incrementalPeak": 2728796160,
+        "incrementalSteady": 2714611712
+      }
+    },
+    "afterDiscard": {
+      "uss": -9318400,
+      "rss": -4894720,
+      "privateCommit": -11165696
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 102,
+      "kernel_success": 20,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-d9180291ee776ddb",
+    "format": "snapshot",
+    "runKind": "new-environment-shared-cache",
+    "readyMs": 7952.575000047684,
+    "warmMs": [
+      101.13000011444092,
+      107.37999999523163,
+      96.62000000476837,
+      101.20999991893768,
+      121.19000005722046
+    ],
+    "workerInitializations": 6,
+    "successfulCorpusMedianMs": 236.29500007629395,
+    "successfulCorpusMaxMs": 862.6499999761581,
+    "cache": {
+      "downloads": 1,
+      "downloadedBytes": 250293885,
+      "hits": 17,
+      "writable": true,
+      "bodyBytes": 268054575,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 3612729344,
+        "steady": 2321637376,
+        "incrementalPeak": 3483123712,
+        "incrementalSteady": 2192031744
+      },
+      "rss": {
+        "peak": 3887947776,
+        "steady": 2597044224,
+        "incrementalPeak": 3570733056,
+        "incrementalSteady": 2279829504
+      },
+      "privateCommit": {
+        "peak": 3904397312,
+        "steady": 2536202240,
+        "incrementalPeak": 3715190784,
+        "incrementalSteady": 2346995712
+      }
+    },
+    "afterDiscard": {
+      "uss": -8798208,
+      "rss": -3715072,
+      "privateCommit": -10752000
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 106,
+      "kernel_failure": 5,
+      "kernel_success": 11,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-d9180291ee776ddb",
+    "format": "snapshot",
+    "runKind": "cached-new-worker",
+    "readyMs": 7383.659999966621,
+    "warmMs": [
+      102.125,
+      106.32500004768372,
+      95.46000003814697,
+      103.29999995231628,
+      121.86000001430511
+    ],
+    "workerInitializations": 6,
+    "successfulCorpusMedianMs": 240.76499998569489,
+    "successfulCorpusMaxMs": 868.0049999952316,
+    "cache": {
+      "downloads": 0,
+      "downloadedBytes": 0,
+      "hits": 18,
+      "writable": true,
+      "bodyBytes": 268054575,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 2978361344,
+        "steady": 2318848000,
+        "incrementalPeak": 2848755712,
+        "incrementalSteady": 2189242368
+      },
+      "rss": {
+        "peak": 3250593792,
+        "steady": 2591834112,
+        "incrementalPeak": 2933379072,
+        "incrementalSteady": 2274619392
+      },
+      "privateCommit": {
+        "peak": 3289423872,
+        "steady": 2531602432,
+        "incrementalPeak": 3100217344,
+        "incrementalSteady": 2342395904
+      }
+    },
+    "afterDiscard": {
+      "uss": -7446528,
+      "rss": -2609152,
+      "privateCommit": -9379840
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 106,
+      "kernel_failure": 5,
+      "kernel_success": 11,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-bb0d3439bce63261",
+    "format": "snapshot",
+    "runKind": "new-environment-shared-cache",
+    "readyMs": 7562.4800000190735,
+    "warmMs": [
+      256.1200000047684,
+      137.93499994277954,
+      136.62000000476837,
+      127.43999993801117,
+      125.51999998092651
+    ],
+    "workerInitializations": 13,
+    "successfulCorpusMedianMs": 327.5149999856949,
+    "successfulCorpusMaxMs": 1171.7749999761581,
+    "cache": {
+      "downloads": 1,
+      "downloadedBytes": 237582921,
+      "hits": 38,
+      "writable": true,
+      "bodyBytes": 255343611,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 3057131520,
+        "steady": 2834681856,
+        "incrementalPeak": 2927525888,
+        "incrementalSteady": 2705076224
+      },
+      "rss": {
+        "peak": 3329548288,
+        "steady": 3110330368,
+        "incrementalPeak": 3012333568,
+        "incrementalSteady": 2793115648
+      },
+      "privateCommit": {
+        "peak": 3430498304,
+        "steady": 3074129920,
+        "incrementalPeak": 3241291776,
+        "incrementalSteady": 2884923392
+      }
+    },
+    "afterDiscard": {
+      "uss": -9682944,
+      "rss": -1429504,
+      "privateCommit": -11608064
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 41,
+      "kernel_failure": 12,
+      "kernel_success": 69,
+      "needs_justification": 70
+    },
+    "error": null
+  },
+  {
+    "browser": "chromium",
+    "environment": "qm-formal-v1-bb0d3439bce63261",
+    "format": "snapshot",
+    "runKind": "cached-new-worker",
+    "readyMs": 7205.714999914169,
+    "warmMs": [
+      257.039999961853,
+      136.86000001430511,
+      135.25,
+      128.08000004291534,
+      129.25
+    ],
+    "workerInitializations": 13,
+    "successfulCorpusMedianMs": 346.2300000190735,
+    "successfulCorpusMaxMs": 1146.3500000238419,
+    "cache": {
+      "downloads": 0,
+      "downloadedBytes": 0,
+      "hits": 39,
+      "writable": true,
+      "bodyBytes": 255343611,
+      "entries": 3,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 3069894656,
+        "steady": 2887983104,
+        "incrementalPeak": 2940289024,
+        "incrementalSteady": 2758377472
+      },
+      "rss": {
+        "peak": 3348033536,
+        "steady": 3166388224,
+        "incrementalPeak": 3030818816,
+        "incrementalSteady": 2849173504
+      },
+      "privateCommit": {
+        "peak": 3312594944,
+        "steady": 3129860096,
+        "incrementalPeak": 3123388416,
+        "incrementalSteady": 2940653568
+      }
+    },
+    "afterDiscard": {
+      "uss": -8945664,
+      "rss": -1085440,
+      "privateCommit": -11026432
+    },
+    "outcomes": {
+      "ambiguous_input": 1,
+      "different_environment_required": 41,
+      "kernel_failure": 12,
+      "kernel_success": 69,
+      "needs_justification": 70
+    },
+    "error": null
+  }
+]

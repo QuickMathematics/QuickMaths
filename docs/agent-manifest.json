@@ -495,6 +495,7 @@
   },
   "formal_proof_authoring": {
     "schema": "../schemas/formal-proof-spec.schema.json",
+    "capabilities": "Optional proof_spec.capabilities lists algebra, radicals, limits, derivatives, or sequences-series. Include algebra and every capability inferred from the statement and allowed rules; leave the Studio field blank for automatic inference. These are loading hints, not permission to import modules or grant proof rules. The curated browser runtime remains an assessment-ineligible experiment; certificate requirements are unchanged.",
     "status": "Local learner integration: proof_spec questions use the native proof workspace and require a fresh complete Lean certificate or replay for assessment. No Lean kernel is bundled; pending/unavailable verification is explicit. Reference proofs must be checked with the pinned companion before publication.",
     "parameter_binding": "Generated proof specifications resolve only from exact named values visible in the learner prompt; hidden derived generator values are rejected.",
     "trusted_boundary": "Lesson packages provide declarative statements and policy metadata only. Lean source, tactics, imports, macros and executable package code are not accepted.",

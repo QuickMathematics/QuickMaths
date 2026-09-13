@@ -30,7 +30,10 @@ parser.add_argument('--label',default='minimal',help='Name for this distinct exp
 parser.add_argument('--assets',default='assets',help='Prepared asset directory below the ignored experiment directory')
 parser.add_argument('--timeout',type=int,default=240,help='Overall diagnostic run budget in seconds')
 parser.add_argument('--group',default='',help='One recorded corpus import group per fresh worker')
+parser.add_argument('--suite',choices=['legacy','curated'],default='legacy')
+parser.add_argument('--mode',choices=['modules','snapshot'],default='modules')
 args=parser.parse_args()
+if args.suite=='curated':BASE=ROOT/'.bridge-runtime/curated-formal'
 if not args.label.replace('-','').isalnum():parser.error('Use a simple alphanumeric result label')
 if args.group and not args.group.replace('-','').isalnum():parser.error('Use a recorded alphanumeric group id')
 asset_root=(BASE/args.assets).resolve();asset_root.relative_to(BASE.resolve())
@@ -52,7 +55,7 @@ class Files(http.server.SimpleHTTPRequestHandler):
         if self.path.startswith('/probe/'):
             self.send_header('Cross-Origin-Opener-Policy','same-origin')
             self.send_header('Cross-Origin-Embedder-Policy','require-corp')
-            self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' blob: 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'; object-src 'none'")
+            self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' blob: 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self' blob:; object-src 'none'")
         self.send_header('Cache-Control','no-store')
         super().end_headers()
     def copyfile(self,source,outputfile):
@@ -108,9 +111,12 @@ with sync_playwright() as pw:
     baseline=samples[-5:]
     results['baselineMemory']={k:statistics.median([s[k] for s in baseline if s[k] is not None]) for k in ['uss','rss','privateCommit']}
     print('Baseline private resident bytes:',results['baselineMemory']['uss'],flush=True)
-    for index in range(args.repeat):
+    groups=list(json.loads((asset_root/'viability.json').read_text())['profiles']) if args.group=='all' else [args.group]
+    cases=[(group,index) for group in groups for index in range(args.repeat)]
+    for group,index in cases:
         probe=context.new_page()
-        probe.goto(origin+'/probe/viability.html?initialMB='+str(args.initial_mb)+'&group='+args.group,wait_until='networkidle')
+        entry='curated.html' if args.suite=='curated' else 'viability.html'
+        probe.goto(origin+'/probe/'+entry+'?initialMB='+str(args.initial_mb)+'&group='+group+'&mode='+args.mode,wait_until='networkidle')
         probe.wait_for_function('() => typeof window.startProbe === "function"')
         start=time.monotonic();network_start=body_bytes
         probe.evaluate('() => { void window.startProbe(); }')
@@ -141,11 +147,12 @@ with sync_playwright() as pw:
             report['memoryMeasurement'][key]={'peak':max(vals) if vals else None,'steady':statistics.median(vals[-5:]) if vals else None,
                 'incrementalPeak':max(vals)-results['baselineMemory'][key] if vals else None,
                 'incrementalSteady':statistics.median(vals[-5:])-results['baselineMemory'][key] if vals else None}
-        report['runKind']='cold' if index==0 else 'cached-new-worker'
+        report['runKind']=('cold' if group==groups[0] else 'new-environment-shared-cache') if index==0 else 'cached-new-worker'
         results['runs'].append(report)
         (BASE/(args.browser+'-'+args.label+'-'+str(args.initial_mb)+'.json')).write_text(json.dumps(results,indent=2)+'\n',encoding='utf-8')
         try:
-            probe.evaluate('() => window.stopProbe()');probe.close();page.wait_for_timeout(2000)
+            probe.evaluate('() => window.stopProbe()');probe.close();page.wait_for_timeout(3000)
+            report['afterWorkerDiscard']={key:statistics.median([s[key] for s in samples[-5:] if s[key] is not None])-results['baselineMemory'][key] for key in ['uss','rss','privateCommit']}
         except Exception:
             break
     context.close()

@@ -86,6 +86,26 @@ The complete learner proof must remain unchanged through submission and reflecti
 
 Backups, sync, assignment imports and Agent Bridge checkpoints carry data, not the private runtime closure. Restored certificates and formal assessment receipts are marked replay-required. Imported progress cannot hydrate verified-step badges. Historical mastery scores remain historical local records, not newly authenticated mathematical evidence. Historical formal results are labelled archived rather than displayed to the tutor as live correctness. Ordinary lessons remain usable when the companion is missing.
 
+## Curated browser environment experiment
+
+Formal lessons may declare optional `proof_spec.capabilities`: `algebra`,
+`radicals`, `limits`, `derivatives`, and `sequences-series`. Lesson Studio exposes
+this as loading guidance; leaving it blank preserves existing specifications.
+The verifier derives its required imports from the normalized mathematical
+request, independently of these author hints. Changing a label cannot authorize
+another theorem, rule, artifact URL, or certificate.
+
+The generator now uses versioned public-module import groups. Shared compressed
+artifacts are addressed and checked by hash. The experimental browser loader
+reuses cached bytes across groups and keeps at most one live worker; changing
+groups or explicitly discarding the worker releases its runtime. A failed cache
+write permits verified online use but does not establish offline availability.
+Snapshots must match the exact WASM/JavaScript binary and import header.
+
+This is a runtime experiment, not an enabled assessment backend. Browser results
+remain `assessment_eligible: false` with `certificate: null`. Formal mastery still
+uses the pinned native verifier and existing fresh-receipt/replay checks.
+
 ## Trust limits
 
 The Lean kernel and permitted foundational axioms remain the mathematical authority. Python, JavaScript, parser reports, preflight and the tutor do not confer verification. No axiom allowlist, sorry/admit protection, Lean-injection restriction, source binding or environment pin was relaxed.

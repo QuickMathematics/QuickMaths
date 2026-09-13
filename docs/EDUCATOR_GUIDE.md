@@ -760,7 +760,12 @@ Native media builds now report current bytes, remaining budget and optional grow
 ## Authoring formal proof exercises
 
 Studio's formal proof settings define the exact public statement, variable
-domains, assumptions, allowed rules and optional reference steps. Run **Check
+domains, assumptions, allowed rules, optional curated capability loading guidance
+and optional reference steps. Capability guidance is experimental: leave the
+comma-separated field blank for automatic inference, or choose from `algebra`,
+`limits`, `derivatives`, `sequences-series`, and `radicals`. A `sqrt` expression
+or a rule containing `sqrt` or `conjugate` infers `radicals`. It only guides curated loading
+and does not enable browser certification or alter the proof contract. Run **Check
 reference proof with companion verifier** after editing, before publishing. The
 reference is checked in its own mode and cannot pass a learner's assessment.
 Only a fresh complete learner proof accepted by the pinned Lean companion can

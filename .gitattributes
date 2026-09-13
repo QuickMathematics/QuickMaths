@@ -4,3 +4,4 @@
 *.zip binary
 *.pdn binary
 *.pdf binary
+experiments/browser-lean/results/curated/*.json linguist-generated=true

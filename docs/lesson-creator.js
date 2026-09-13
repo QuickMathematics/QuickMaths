@@ -5,6 +5,7 @@ import { normalizeLessonMedia, renderLessonMedia, mediaPath, mediaDigest, encode
 import { includeLessonIllustrations } from "./lesson-illustrations.js?v=20260908-statistics-v1";
 import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260908-statistics-v1";
 import { checkFormalReferenceProof } from "./formal-proof-client.js?v=20260913-formal-kernel-v1";
+import { normalizeFormalCapabilities } from "./formal-capabilities.js?v=20260913-formal-capabilities-v1";
 const DRAFT_KEY = "quickmaths.lesson-creator.v1";
 
 const FORMAL_ENVIRONMENT = Object.freeze({
@@ -153,15 +154,21 @@ function buildFormalProofSpec(problem) {
   const referenceMode = problem.formalReferenceMode ?? "none";
   const referenceProof = referenceMode === "auto" ? { mode: "auto", steps: [] }
     : referenceMode === "steps" ? { mode: "steps", steps: formalReferenceSteps(problem) } : {};
-  return {
+  const statement = { declarations: lines(problem.formalDeclarations), assumptions: lines(problem.formalAssumptions), goal };
+  const spec = {
     version: "0.1",
-    statement: { declarations: lines(problem.formalDeclarations), assumptions: lines(problem.formalAssumptions), goal },
+    statement,
     parameter_contract: { required_public: requiredPublic },
     allowed_rules: allowedRules,
     assessment_policy: assessmentPolicy,
     reference_proof: referenceProof,
     environment: structuredClone(problem.formalEnvironment ?? FORMAL_ENVIRONMENT),
   };
+  const rawCapabilities = String(problem.formalCapabilities ?? "").trim();
+  if (rawCapabilities) {
+    spec.capabilities = normalizeFormalCapabilities(rawCapabilities.split(",").map((item) => item.trim()), { statement, allowedRules, templateId: "Formal Studio" });
+  }
+  return spec;
 }
 
 function buildFormalReferenceJob(problem) {
@@ -218,6 +225,7 @@ function blankProblem(skillId, index = 0) {
     pythonBuiltins: "", pythonWallTime: 1500, pythonStepLimit: 20000, pythonStdoutChars: 1000,
     formalEnabled: false, formalDeclarations: "x:real", formalAssumptions: "", formalGoal: "",
     formalRequiredPublic: "", formalAllowedRules: FORMAL_STARTER_RULES.join("\n"), formalRequiredMethod: "",
+    formalCapabilities: "",
     formalAssessmentPolicy: {}, formalEnvironment: structuredClone(FORMAL_ENVIRONMENT),
     formalReferenceMode: "none", formalReferenceSteps: [], formalReferenceCheck: null,
   };
@@ -466,6 +474,7 @@ function renderFormalProofAuthoring(problem, index) {
       <div class="studio-two">${indexed(area("Declarations — one per line", "problem.formalDeclarations", problem.formalDeclarations, { rows:4, hint:"Examples: x:real, n:nat, f:real->real, A:set[real]. Identifiers must be declared explicitly." }))}${indexed(area("Assumptions — one per line", "problem.formalAssumptions", problem.formalAssumptions, { rows:4, hint:"Examples: x != 3, 0 <= x, p -> q." }))}</div>
       ${indexed(area("Formal goal", "problem.formalGoal", problem.formalGoal, { rows:3, hint:"The exact theorem that the certificate must establish. Enabling this bypasses the short-answer grader; only a fresh complete Lean certificate can earn assessment credit." }))}
       <div class="studio-two">${indexed(area("Allowed proof rules — one per line", "problem.formalAllowedRules", problem.formalAllowedRules, { rows:7, hint:"Curated rule names only; this limits the learner and reference prover interface." }))}${indexed(area("Public generator parameters — one per line", "problem.formalRequiredPublic", problem.formalRequiredPublic, { rows:4, hint:"For parameterized native questions, every name here must also be visible in the learner prompt." }))}</div>
+      ${indexed(field("Capability bundles (optional)", "problem.formalCapabilities", problem.formalCapabilities, { hint:"Comma-separated: algebra, limits, derivatives, sequences-series, radicals. Leave blank for automatic inference; loading guidance only, not browser certification." }))}
       ${indexed(field("Required method (optional)", "problem.formalRequiredMethod", problem.formalRequiredMethod, { hint:"Reserved for method-specific policy. Leave blank for assessable exercises in this build; unsupported method policies block credit rather than being silently ignored." }))}
       <div class="studio-runtime-preview"><header><div><span>Pinned formal environment</span><strong>${esc(environment.backend ?? "lean4")} · ${esc(environment.library ?? "mathlib")}</strong></div></header><div><dl><div><dt>Lean</dt><dd>${esc(environment.toolchain ?? "")}</dd></div><div><dt>mathlib</dt><dd>${esc(environment.library_revision ?? "")}</dd></div></dl></div><footer>Changing the formal environment creates a new verification provenance; old certificates remain attached to their original environment.</footer></div>
       <section class="studio-formal-reference"><div class="studio-section-title"><div><p class="eyebrow">Author reference proof</p><h3>Prove the exercise before publishing it</h3></div><button type="button" class="quiet-button" data-creator-action="apply-formal-example" data-index="${index}">Load algebra example</button></div>
@@ -797,6 +806,7 @@ function draftFromPack(pack, snapshot) {
       formalGoal: problem.proof_spec?.statement?.goal ?? "",
       formalRequiredPublic: (problem.proof_spec?.parameter_contract?.required_public ?? []).join("\n"),
       formalAllowedRules: (problem.proof_spec?.allowed_rules ?? FORMAL_STARTER_RULES).join("\n"),
+      formalCapabilities: (problem.proof_spec?.capabilities ?? []).join(", "),
       formalRequiredMethod: problem.proof_spec?.assessment_policy?.required_method ?? "",
       formalAssessmentPolicy: structuredClone(problem.proof_spec?.assessment_policy ?? {}),
       formalEnvironment: structuredClone(problem.proof_spec?.environment ?? FORMAL_ENVIRONMENT),
@@ -1151,6 +1161,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
       problem.formalGoal = "x^2 - 9 = (x - 3) * (x + 3)";
       problem.formalRequiredPublic = "";
       problem.formalAllowedRules = "ring_identity";
+      problem.formalCapabilities = "";
       problem.formalRequiredMethod = "";
       problem.formalAssessmentPolicy = {};
       problem.formalEnvironment = structuredClone(FORMAL_ENVIRONMENT);

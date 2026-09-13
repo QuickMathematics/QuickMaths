@@ -8,6 +8,7 @@ resolved specification into mathematical verification evidence.
 from __future__ import annotations
 
 from copy import deepcopy
+import re
 from typing import Any
 
 from quickmaths.utils import SafeExpressionError, render_template
@@ -19,6 +20,7 @@ _MAX_DECLARATIONS = 32
 _MAX_ASSUMPTIONS = 64
 _MAX_RULES = 64
 _MAX_PUBLIC_PARAMETERS = 32
+FORMAL_CAPABILITY_IDS = ("algebra", "limits", "derivatives", "sequences-series", "radicals")
 
 _TOP_LEVEL_FIELDS = {
     "version",
@@ -28,6 +30,7 @@ _TOP_LEVEL_FIELDS = {
     "assessment_policy",
     "reference_proof",
     "environment",
+    "capabilities",
 }
 _STATEMENT_FIELDS = {"declarations", "assumptions", "goal"}
 _PARAMETER_FIELDS = {"required_public"}
@@ -93,7 +96,15 @@ def normalize_proof_spec(value: Any) -> dict[str, Any]:
         for key, item in environment.items()
     }
 
-    return {
+    capabilities = None
+    if "capabilities" in value:
+        capabilities = normalize_capabilities(
+            value["capabilities"],
+            statement={"declarations": declarations, "assumptions": assumptions, "goal": goal},
+            allowed_rules=allowed_rules,
+        )
+
+    normalized = {
         "version": FORMAL_PROOF_SPEC_VERSION,
         "statement": {
             "declarations": declarations,
@@ -106,6 +117,59 @@ def normalize_proof_spec(value: Any) -> dict[str, Any]:
         "reference_proof": reference_proof,
         "environment": normalized_environment,
     }
+    if capabilities is not None:
+        normalized["capabilities"] = capabilities
+    return normalized
+
+
+def infer_capabilities(statement: dict[str, Any] | None = None, allowed_rules: list[str] | None = None) -> list[str]:
+    statement = statement or {}
+    rules = allowed_rules or []
+    statement_text = " ".join(
+        item
+        for item in [*(statement.get("declarations", []) or []), *(statement.get("assumptions", []) or []), statement.get("goal", "")]
+        if isinstance(item, str)
+    ).lower()
+    inferred = ["algebra"]
+    goal = str(statement.get("goal", "")).strip()
+    if re.match(r"(?i)^as\s+[a-z][a-z0-9_]*\s+tends\s+to\s+infinity\b", goal) or re.match(r"(?i)^the\s+series\s+from\b", goal):
+        inferred.append("sequences-series")
+    elif re.match(r"(?i)^the\s+derivative\s+of\b", goal):
+        inferred.append("derivatives")
+    elif re.match(r"(?i)^(?:as\s+[a-z][a-z0-9_]*\s+approaches\b|the\s+limit\b)", goal):
+        inferred.append("limits")
+    rule_capabilities: set[str] = set()
+    for rule in rules:
+        if not isinstance(rule, str):
+            continue
+        lowered = rule.lower()
+        if "sequence_" in lowered or "series_" in lowered:
+            rule_capabilities.add("sequences-series")
+        elif "derivative" in lowered:
+            rule_capabilities.add("derivatives")
+        elif any(token in lowered for token in ("limit", "continuity", "continuous", "ivt")):
+            rule_capabilities.add("limits")
+    for capability in ("derivatives", "limits", "sequences-series"):
+        if capability in rule_capabilities and capability not in inferred:
+            inferred.append(capability)
+    if "sqrt" in statement_text or any(isinstance(rule, str) and any(token in rule.lower() for token in ("sqrt", "conjugate")) for rule in rules):
+        inferred.append("radicals")
+    return inferred
+
+
+def normalize_capabilities(value: Any, *, statement: dict[str, Any] | None = None, allowed_rules: list[str] | None = None) -> list[str]:
+    if not isinstance(value, list):
+        raise ValueError("proof_spec.capabilities must be a list")
+    if len(value) > len(FORMAL_CAPABILITY_IDS):
+        raise ValueError("proof_spec.capabilities contains unsupported entries")
+    if any(not isinstance(item, str) or item not in FORMAL_CAPABILITY_IDS for item in value):
+        raise ValueError("proof_spec.capabilities contains an unsupported capability")
+    if len(value) != len(set(value)):
+        raise ValueError("proof_spec.capabilities must not contain duplicate items")
+    missing = next((item for item in infer_capabilities(statement, allowed_rules) if item not in value), None)
+    if missing:
+        raise ValueError(f"proof_spec.capabilities must include inferred capability {missing!r}")
+    return list(value)
 
 
 def resolve_proof_spec(value: Any, public_values: dict[str, object]) -> dict[str, Any]:

@@ -15,7 +15,7 @@ class Exports(unittest.TestCase):
         self.assertIsNone(exports.nm_record('missing U 0 0'))
         self.assertIsNone(exports.nm_record('archive(member.o):'))
     def test_interpreter_contract(self):
-        for name,t in [('_lean_mk_string','T'),('_initialize_Lean','T'),('_l_Thing___boxed','T'),('_l_Thing','D')]:
+        for name,t in [('_lean_mk_string','T'),('_initialize_Lean','T'),('_runtime_initialize_Lean_Message','T'),('_meta_initialize_Lean_Message','T'),('_l_Thing___boxed','T'),('_l_Thing','D')]:
             self.assertTrue(exports.keep(name,t),(name,t))
         self.assertFalse(exports.keep('_l_Thing','T'))
         self.assertFalse(exports.keep('_arbitrary','T'))

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {assertFormalCertificate, formalRequestHash} from '../../docs/formal-proof-trust.js';
 
-const {request,result}=JSON.parse(fs.readFileSync(new URL('../../.bridge-runtime/lean-browser/native-certificate.json',import.meta.url)));
+const {request,result}=JSON.parse(fs.readFileSync(process.argv[2] ?? new URL('../../.bridge-runtime/lean-browser/native-certificate.json',import.meta.url)));
 assert.equal(result.status,'verified','Requires a fresh real native certificate as the positive control');
 assertFormalCertificate(result,request);
 const mismatched=structuredClone(result);

@@ -4,6 +4,7 @@ from typing import Any
 from fractions import Fraction
 
 from .contract import canonical_hash
+from .environments import request_environment
 from .calculus import (
     abs_argument_exact_sign,
     continuity_guard_auto_tactic,
@@ -5198,39 +5199,16 @@ def _render_have(
     return lines
 
 def _request_imports(request: dict[str, Any]) -> list[str]:
-    """Load supported theories only, instead of all 8,000+ mathlib modules."""
-    kinds: set[str] = set()
-    rules: set[str] = set()
-    def visit(value):
-        if isinstance(value, dict):
-            kinds.add(value.get("kind", ""))
-            rules.add(value.get("rule", ""))
-            for child in value.values():
-                visit(child)
-        elif isinstance(value, list):
-            for child in value:
-                visit(child)
-    visit(request)
-    modules = ["Mathlib.Basic.Real.Basic", "Mathlib.Topology.Defs.Filter", "Mathlib.Tactic.FieldSimp", "Mathlib.Tactic.Ring",
-               "Mathlib.Tactic.Linarith", "Mathlib.Tactic.NormNum", "Mathlib.Tactic.Positivity"]
-    if "sqrt" in kinds or any("sqrt" in rule or "conjugate" in rule for rule in rules):
-        modules.append("Mathlib.Analysis.SpecialFunctions.Sqrt")
-    analysis = kinds & {"limit", "derivative", "sequence_limit", "series_sum"}
-    if analysis or any(rule.startswith(("sequence_", "series_", "continuous_", "ivt_")) for rule in rules):
-        modules += ["Mathlib.Analysis.Calculus.Deriv.Abs", "Mathlib.Analysis.SpecialFunctions.ExpDeriv", "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
-                    "Mathlib.Analysis.SpecialFunctions.Sqrt", "Mathlib.Analysis.SpecialFunctions.Pow.Real",
-                    "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv", "Mathlib.Analysis.SpecificLimits.Normed",
-                    "Mathlib.Analysis.PSeries", "Mathlib.Analysis.Polynomial.Basic", "Mathlib.Topology.Order.IntermediateValue",
-                    "Mathlib.Tactic.FunProp", "Mathlib.Tactic.Convert", "Mathlib.Tactic.GCongr",
-                    "Mathlib.Tactic.FinCases", "Mathlib.Tactic.Continuity", "Mathlib.Tactic.NormNum.RealSqrt"]
-    return [f"import {module}" for module in dict.fromkeys(modules)]
+    """Use a stable, capability-scoped header shared by its curated environment."""
+    return [f"public import {module}" for module in request_environment(request)["imports"]]
 
 
 def render_request(request: dict[str, Any]) -> str:
     lines = [
+        "module",
         *_request_imports(request),
         "",
-        "open Filter Topology Set",
+        "open Filter Topology Set" if set(request_environment(request)["capabilities"]) & {"limits", "derivatives", "sequences-series"} else "open Set",
         "",
         "namespace QuickMathsGenerated",
         "",
@@ -5247,7 +5225,7 @@ def render_request(request: dict[str, Any]) -> str:
         if row["scope"] == "root"
     )
     binders = " ".join(part for part in [variables, assumptions] if part)
-    prefix = f"theorem result {binders}" if binders else "theorem result"
+    prefix = f"public theorem result {binders}" if binders else "public theorem result"
     lines.append(f"{prefix} : {render_goal(request['goal'])} := by")
 
     available_nodes = [row["id"] for row in request["assumptions"] if row["scope"] == "root"]

@@ -1,0 +1,342 @@
+{
+  "abs_derivative_negative.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "abs_derivative_positive.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "polynomial_derivative.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "quotient_derivative.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "recursive_abs_sin_symbolic.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_ratio_limit_balanced_powered_shifted_factorials.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_ratio_limit_extra_denominator_factorial.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_ratio_limit_extra_numerator_factorial.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_root_monomial_geometric_divergent.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_root_monomial_geometric_summable.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_root_polynomial_geometric_divergent.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_root_polynomial_geometric_summable.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_root_polynomial_quotient_denominator_geometric_summable.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_root_polynomial_quotient_domain_guard_needed.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_root_polynomial_quotient_geometric_divergent.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_root_polynomial_quotient_geometric_summable.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ],
+  "series_root_reciprocal_polynomial_geometric_summable.json": [
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "modules",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "new-environment-shared-cache"
+    },
+    {
+      "error": "Maximum call stack size exceeded",
+      "fatalRuntimeError": true,
+      "format": "snapshot",
+      "runKind": "cached-new-worker"
+    }
+  ]
+}

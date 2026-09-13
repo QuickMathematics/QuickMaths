@@ -22,7 +22,7 @@ def test_guarded_cancellation_mentions_exact_nonzero_evidence():
 
 def test_limit_variable_is_bound_by_filter_not_a_spurious_theorem_parameter():
     source = render("removable_hole_limit.json")
-    theorem_line = next(line for line in source.splitlines() if line.startswith("theorem result"))
+    theorem_line = next(line for line in source.splitlines() if line.startswith("public theorem result"))
     assert "theorem result : Filter.Tendsto" in theorem_line
     assert "𝓝[≠] 3" in source
     assert "sub_ne_zero.mpr hx" in source

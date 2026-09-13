@@ -1,0 +1,254 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 2d153eaf6d..fca92c434c 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -779,7 +779,7 @@ file(WRITE "${CMAKE_BINARY_DIR}/lake-githash" "${LAKE_LEAN_GITHASH}")
+ # Git HASH
+ if(USE_GITHASH)
+   include(GetGitRevisionDescription)
+-  get_git_head_revision(GIT_REFSPEC GIT_SHA1 ALLOW_LOOKING_ABOVE_CMAKE_SOURCE_DIR)
++  execute_process(COMMAND git rev-parse HEAD WORKING_DIRECTORY "${LEAN_SOURCE_DIR}" OUTPUT_VARIABLE GIT_SHA1 OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+   if(GIT_SHA1 MATCHES "GITDIR-NOTFOUND")
+     message(STATUS "Failed to read git_sha1")
+     set(GIT_SHA1 "")
+diff --git a/src/Lean/Elab/Import.lean b/src/Lean/Elab/Import.lean
+index a3908ba93a..5bc9ebc00f 100644
+--- a/src/Lean/Elab/Import.lean
++++ b/src/Lean/Elab/Import.lean
+@@ -148,16 +148,13 @@ def processHeaderCore
+     (headerStx? : Option HeaderSyntax := none)
+     (origHeaderStx? : Option HeaderSyntax := none)
+     : IO (Environment × MessageLog) := do
+-  -- Determine import level based on context
+-  -- Emscripten/WASM builds only have .exported level files, so always use that
+-  let level : OLeanLevel := if System.Platform.isEmscripten then
+-    .exported
+-  else if isModule then
+-    if Elab.inServer.get opts then .server else .exported
++  let level := if isModule then
++    if Elab.inServer.get opts then
++      .server
++    else
++      .exported
+   else
+     .private
+-  if System.Platform.isEmscripten then
+-    IO.println s!"[DEBUG:IMPORT] Emscripten detected, using level = {repr level}"
+   let (env, messages) ← try
+     let env ←
+       importModules (leakEnv := leakEnv) (loadExts := true) (level := level)
+diff --git a/src/Lean/Environment.lean b/src/Lean/Environment.lean
+index 2aa5b845e8..3166f86c8a 100644
+--- a/src/Lean/Environment.lean
++++ b/src/Lean/Environment.lean
+@@ -2021,23 +2021,15 @@ private def ImportedModule.publicModule? (self : ImportedModule) : Option Module
+     -- (should not have any constants)
+     self.irParts.back?.map (·.1)
+ 
+-private def ImportedModule.getData? (self : ImportedModule) (level : OLeanLevel) : Option ModuleData :=
++private def ImportedModule.getData? (self : ImportedModule) (level : OLeanLevel) : Option ModuleData := do
+   -- Without the module system, we only have the exported level.
+-  -- Use .exported as fallback if publicModule? is unavailable (e.g., WASM with partial files)
+-  let level := match self.publicModule? with
+-    | some mod => if mod.isModule then level else .exported
+-    | none => .exported
++  let level := if (← self.publicModule?).isModule then level else .exported
+   self.parts[level.ctorIdx]?.map (·.1)
+ 
+ /-- The main module data that will eventually be used to construct the kernel environment. -/
+ private def ImportedModule.mainModule? (self : ImportedModule) : Option ModuleData :=
+   if self.hasData then
+-    let level := if self.importAll then OLeanLevel.private else .exported
+-    -- Fall back to lower levels if the requested level doesn't exist.
+-    -- This handles builds that only include base .olean files (e.g., WASM/Emscripten).
+-    -- Also try directly accessing parts[0] as last resort for partial builds.
+-    self.getData? level <|> self.getData? .server <|> self.getData? .exported
+-      <|> self.parts[0]?.map (·.1)
++    self.getData? (if self.importAll then .private else .exported)
+   else
+     self.irParts.back?.map (·.1)
+ 
+@@ -2094,14 +2086,8 @@ private def readModuleDataPartsOfMod (mod : Name) : IO (Array (ModuleData × Com
+   -- Opportunistically load all available parts.
+   -- Necessary because the import level may be upgraded a later import.
+   let sFile := OLeanLevel.server.adjustFileName mFile
+-  -- Parts may be missing in stripped installs (e.g. WASM builds that ship only
+-  -- base .olean files); load what exists.
+-  unless (← sFile.pathExists) do
+-    return #[main]
+   let server ← unsafe CompactedRegion.read (α := ModuleData) sFile #[main.2]
+   let pFile := OLeanLevel.private.adjustFileName mFile
+-  unless (← pFile.pathExists) do
+-    return #[main, server]
+   let priv ← unsafe CompactedRegion.read (α := ModuleData) pFile #[main.2, server.2]
+   return #[main, server, priv]
+ 
+diff --git a/src/Lean/Shell.lean b/src/Lean/Shell.lean
+index d6fdae6f3f..289953605f 100644
+--- a/src/Lean/Shell.lean
++++ b/src/Lean/Shell.lean
+@@ -59,23 +59,23 @@ between calls, avoiding the slow re-import of Init modules on each compile.
+ /-- Cache of import-set → environment. Each distinct set of header imports gets
+ its own cached environment, so `import Std …` (or any imports) is slow only on
+ its first compile and fast on every repeat, just like Init-only code. -/
+-private initialize wasmEnvCache : IO.Ref (Array (Array Name × Environment)) ← IO.mkRef #[]
++private initialize wasmEnvCache : IO.Ref (Array ((Array Import × Bool) × Environment)) ← IO.mkRef #[]
+ 
+ /-- Get or create the cached WASM environment for the given header `imports`.
+ The first compile with a given import set imports it (slow); later compiles with
+ the same set reuse the cached environment (fast). -/
+-def getOrCreateWasmEnvFor (imports : Array Import) : IO Environment := do
+-  let key := imports.map (·.module)
++def getOrCreateWasmEnvFor (imports : Array Import) (isModule : Bool) : IO Environment := do
++  let key := (imports, isModule)
+   for (k, env) in (← wasmEnvCache.get) do
+     if k == key then
+       IO.eprintln "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env"
+       return env
+-  IO.eprintln s!"[WASM DEBUG] getOrCreateWasmEnvFor: cache miss, importing {key}…"
++  IO.eprintln s!"[WASM DEBUG] getOrCreateWasmEnvFor: cache miss, importing {reprStr key}…"
+   -- Mirror the frontend's header import (`processHeaderCore`, Elab/Import.lean):
+   --  * `loadExts := true` loads the environment extensions — parser notation
+   --    (e.g. `+`) and the instance database (e.g. `OfNat`). Without it (the
+   --    default `false`), `#check 2 + 2` fails with "OfNat" / "unexpected '+'".
+-  --  * `level := .exported` matches the only data the WASM build ships (base
++  --  * `level := .private` matches non-module generated production requests (complete
+   --    `.olean`); the default `.private` expects absent private/server data.
+   --  * `leakEnv := true` keeps the compacted regions alive. Environments are
+   --    cached and reused across compiles; with the default (regions freed after
+@@ -86,8 +86,11 @@ def getOrCreateWasmEnvFor (imports : Array Import) : IO Environment := do
+   -- without it — so every cache-miss import after the first would throw.
+   -- Re-enable it each time, as `runFrontend` does after `--incr-load`.
+   unsafe enableInitializersExecution
+-  let env ← importModules imports {} 0
+-    (level := .exported) (loadExts := true) (leakEnv := true)
++  -- Curated packs name every public/IR artifact explicitly, as Lake does.
++  -- The strict importer still rejects any required but unprovided part.
++  let setup ← ModuleSetup.load "/lib/lean/qm-setup.json"
++  let env ← importModules imports {} 0 (arts := setup.importArts)
++    (level := if isModule then .exported else .private) (loadExts := true) (leakEnv := true)
+   IO.eprintln "[WASM DEBUG] getOrCreateWasmEnvFor: importModules completed"
+   wasmEnvCache.modify (·.push (key, env))
+   return env
+@@ -115,7 +118,7 @@ def wasmCompile (code : String) (fileName : String := "<input>") : IO UInt32 :=
+   -- `prelude`, matching the normal frontend.
+   let (header, parserState, headerMessages) ← Parser.parseHeader inputCtx
+   IO.eprintln "[WASM DEBUG] Getting or creating environment for header imports..."
+-  let env ← getOrCreateWasmEnvFor (Elab.headerToImports header)
++  let env ← getOrCreateWasmEnvFor (Elab.headerToImports header) (Elab.HeaderSyntax.isModule header)
+   IO.eprintln "[WASM DEBUG] Environment ready"
+ 
+   let opts : Options := {}
+@@ -211,14 +214,44 @@ def wasmLoadSnapshot (path : String) : IO UInt32 := do
+     withImporting do
+       unsafe runInitAttrsForModules env initModIdxs {}
+     unsafe enableInitializersExecution
+-    let key := env.header.imports.map (·.module)
++    let key := (env.header.imports, env.header.isModule)
+     wasmEnvCache.modify (·.push (key, env))
+-    IO.eprintln s!"[WASM DEBUG] wasmLoadSnapshot: cached env for {key}"
++    IO.eprintln s!"[WASM DEBUG] wasmLoadSnapshot: cached env for {reprStr key}"
+     return 0
+   catch e =>
+     IO.eprintln s!"[WASM DEBUG] wasmLoadSnapshot failed: {e}"
+     return 1
+ 
++-- Versioned curated environment format: no command/task snapshot tree and no proof body.
++@[export lean_wasm_save_environment]
++def wasmSaveEnvironment (code : String) (path : String) : IO UInt32 := do
++  let inputCtx := Parser.mkInputContext code "QuickMathsHeader.lean"
++  let (header, _, messages) ← Parser.parseHeader inputCtx
++  if messages.hasErrors || !Elab.HeaderSyntax.isModule header then
++    throw <| IO.userError "Expected a valid public module header"
++  let env ← getOrCreateWasmEnvFor (Elab.headerToImports header) true
++  IO.eprintln "[WASM ENV] imported; compacting environment"
++  let payload := (env, getRegularInitAttrModIdxs env)
++  let compactor ← unsafe CompactedRegion.save ⟨path⟩ `_qm_environment_v1 payload
++    #[] none (allowClosures := true)
++  Runtime.forget compactor
++  IO.FS.writeFile ⟨path ++ ".deps"⟩ "[]"
++  IO.eprintln "[WASM ENV] saved"
++  return 0
++
++@[export lean_wasm_load_environment]
++def wasmLoadEnvironment (path : String) : IO UInt32 := do
++  let (payload, region) ← unsafe CompactedRegion.read (α := Environment × Array Nat) ⟨path⟩ #[]
++  -- Cache lifetime owns these imported regions until the worker is discarded.
++  Runtime.forget region
++  let (env, initModIdxs) := payload
++  unsafe enableInitializersExecution
++  withImporting do
++    unsafe runInitAttrsForModules env initModIdxs {}
++  unsafe enableInitializersExecution
++  wasmEnvCache.modify (·.push ((env.header.imports, env.header.isModule), env))
++  return 0
++
+ /-- Whether Lean was built with an address sanitizer enabled. -/
+ @[extern "lean_internal_has_address_sanitizer"]
+ opaque Internal.hasAddressSanitizer (_ : Unit) : Bool
+diff --git a/src/util/io.h b/src/util/io.h
+index 1bcbb21f17..ad881171f0 100644
+--- a/src/util/io.h
++++ b/src/util/io.h
+@@ -49,7 +49,7 @@ inline void consume_io_result(object * o) {
+     dec(o);
+ }
+ 
+-template<typename T> T get_io_scalar_result(object * o) {
++inline uint32 get_io_uint32_result(object * o) {
+     if (io_result_is_error(o)) {
+         object * err_obj = io_result_get_error(o);
+         inc(err_obj);
+@@ -57,7 +57,7 @@ template<typename T> T get_io_scalar_result(object * o) {
+         string_ref error(lean_io_error_to_string(err_obj));
+         throw exception(error.to_std_string());
+     } else {
+-        T r = unbox(io_result_get_value(o));
++        uint32 r = lean_unbox_uint32(io_result_get_value(o));
+         dec(o);
+         return r;
+     }
+diff --git a/src/util/shell.cpp b/src/util/shell.cpp
+index 232e8357a1..2f1602de03 100644
+--- a/src/util/shell.cpp
++++ b/src/util/shell.cpp
+@@ -208,7 +208,7 @@ static char const * g_opt_str =
+ ; // NOLINT
+ 
+ namespace lean {
+-extern "C" obj_res lean_shell_main(obj_arg args, obj_arg shell_opts, obj_arg world);
++extern "C" obj_res lean_shell_main(obj_arg args, obj_arg shell_opts);
+ int run_shell_main(int argc, char* argv[], object_ref const & shell_opts) {
+     // #region agent log
+ #ifdef LEAN_EMSCRIPTEN
+@@ -246,13 +246,13 @@ int run_shell_main(int argc, char* argv[], object_ref const & shell_opts) {
+ #ifdef LEAN_EMSCRIPTEN
+     EM_ASM({ console.log("[DEBUG:G] Now calling lean_shell_main..."); });
+ #endif
+-    object * result = lean_shell_main(args_obj, opts_obj, lean_box(0));
++    object * result = lean_shell_main(args_obj, opts_obj);
+     // #region agent log
+ #ifdef LEAN_EMSCRIPTEN
+     EM_ASM({ console.log("[DEBUG:G] lean_shell_main returned, processing result..."); });
+ #endif
+     // #endregion
+-    return get_io_scalar_result<uint32>(result);
++    return get_io_uint32_result(result);
+ }
+ 
+ extern "C" object* lean_init_search_path();
+@@ -274,7 +274,7 @@ bool process_shell_option(object_ref & shell_opts, int opt, char const * optarg,
+         dec_ref(r);
+         return false;
+     } else {
+-        rc = unbox(io_result_get_error(r));
++        rc = lean_unbox_uint32(io_result_get_error(r));
+         dec_ref(r);
+         return true;
+     }
+diff --git a/stage0/src/util/io.h b/stage0/src/util/io.h
+index c648a52d1a..377d545814 100644
+Binary files a/stage0/src/util/io.h and b/stage0/src/util/io.h differ
+diff --git a/stage0/src/util/shell.cpp b/stage0/src/util/shell.cpp
+index 29b859887e..937c6d564b 100644
+Binary files a/stage0/src/util/shell.cpp and b/stage0/src/util/shell.cpp differ

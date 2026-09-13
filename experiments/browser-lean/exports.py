@@ -26,6 +26,10 @@ STARTUP_ABI = {
     "_lean_init_search_path",
     "_lean_mk_string",
     "_lean_wasm_compile",
+    "_lean_wasm_save_environment",
+    "_lean_wasm_load_environment",
+    "_runtime_initialize_Lean_Message",
+    "_meta_initialize_Lean_Message",
     "_main",
     "_malloc",
     "_free",
@@ -58,7 +62,7 @@ def keep(name: str, symbol_type: str) -> bool:
     return (
         name in REQUIRED
         or name.startswith("_lean_")
-        or name.startswith("_initialize_")
+        or name.startswith(("_initialize_", "_runtime_initialize_", "_meta_initialize_"))
         or bool(BOXED.match(name))
         or (name.startswith("_l_") and symbol_type in DATA_TYPES)
     )
@@ -119,7 +123,7 @@ def main() -> int:
                     "sha256": digest,
                     "classes": {
                         "runtime": sum(n.startswith("_lean_") for n in ordered),
-                        "initializers": sum(n.startswith("_initialize_") for n in ordered),
+                        "initializers": sum(n.startswith(("_initialize_", "_runtime_initialize_", "_meta_initialize_")) for n in ordered),
                         "boxed": sum(bool(BOXED.match(n)) for n in ordered),
                         "entrypoints": sum(n in REQUIRED for n in ordered),
                     },

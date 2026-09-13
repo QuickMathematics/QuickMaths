@@ -475,6 +475,18 @@ test("Lesson Studio authors a pinned declarative formal proof spec and round-tri
   assert.deepEqual(problem.proof_spec.parameter_contract.required_public, ["a"]);
 });
 
+test("formal capability declarations survive Studio edits and export", () => {
+  const { studio } = studioHarness();
+  studio.handleAction({ dataset: { creatorAction: "apply-formal-example", index: "0" } });
+  changeProblemField(studio, "formalCapabilities", "algebra");
+  const pack = studio.buildPack();
+  assert.deepEqual(pack.skills[0].problems[0].proof_spec.capabilities, ["algebra"]);
+  assert.equal(studio.loadRaw(JSON.stringify(pack)), true);
+  assert.deepEqual(studio.buildPack().skills[0].problems[0].proof_spec.capabilities, ["algebra"]);
+  changeProblemField(studio, "formalCapabilities", "");
+  assert.equal(Object.hasOwn(studio.buildPack().skills[0].problems[0].proof_spec, "capabilities"), false);
+});
+
 test("browser ingestion binds a Studio formal question even when the author file has no precomputed job", () => {
   const { studio } = studioHarness();
   studio.handleAction({ dataset: { creatorAction: "apply-formal-example", index: "0" } });

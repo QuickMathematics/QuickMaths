@@ -507,6 +507,8 @@ proof_spec:
   parameter_contract:
     required_public: ["a"]
   allowed_rules: [ring_identity]
+  # Optional loading guidance; blank/absent means automatic inference.
+  capabilities: [algebra]
   assessment_policy: {}
   environment:
     backend: lean4
@@ -515,7 +517,7 @@ proof_spec:
 
 Generated formal statements resolve from the **same public parameter snapshot as the learner prompt**. A value is public only when it appears as an exact named prompt placeholder such as `{a}`; hidden derived generator state is not available to `proof_spec`. If the formal statement references a hidden value, generation fails rather than proving a theorem different from the displayed exercise. Fixed questions may use a proof specification with no placeholders.
 
-The authoring layer accepts only declarative data: declarations, assumptions, a goal, an optional public-parameter contract, allowed rule names, assessment metadata, a reference-proof candidate, and pinned-environment metadata. It does not accept Lean source, tactics, imports, macros or executable package code. Reference proofs remain candidates until independently checked by the isolated verifier.
+The authoring layer accepts only declarative data: declarations, assumptions, a goal, an optional public-parameter contract, allowed rule names, optional curated capability loading guidance, assessment metadata, a reference-proof candidate, and pinned-environment metadata. Capability IDs are `algebra`, `limits`, `derivatives`, `sequences-series`, and `radicals`. If supplied, the array must include the capabilities inferred from the statement and allowed rules; unknown or duplicate IDs fail closed. A `sqrt` expression or a rule containing `sqrt` or `conjugate` infers `radicals`; for example, `sqrt_derivative` infers both `derivatives` and `radicals`, while `conjugate_limit` infers both `limits` and `radicals`. If omitted, the persisted specification remains unchanged and the loader may infer guidance automatically. This experimental metadata only guides curated capability loading; it does not change rules, environments, certificates, trust checks, or enable browser certification. It does not accept Lean source, tactics, imports, macros or executable package code. Reference proofs remain candidates until independently checked by the isolated verifier.
 
 Leave method-specific `assessment_policy` metadata empty for this build. Unsupported method policies explicitly block final assessment rather than being ignored. Reference candidates must be checked with the pinned companion before publication. The fields used by the legacy short-answer schema are compatibility data only when `proof_spec` is present; neither matching those fields nor a tutor review can pass the formal question.
 

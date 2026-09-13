@@ -8,6 +8,7 @@ import { buildFormalEvidenceRecord, formalEvidenceReceipt, normalizeFormalEviden
 import { createFormalLearning } from "./formal-learning.js?v=20260913-formal-kernel-v1";
 import { assertFormalCertificate } from "./formal-proof-trust.js?v=20260913-formal-kernel-v1";
 import { buildBoundFormalJob } from "./formal-binding.js?v=20260913-formal-kernel-v1";
+import { normalizeFormalCapabilities } from "./formal-capabilities.js?v=20260913-formal-capabilities-v1";
 
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
@@ -638,7 +639,7 @@ function normalizePythonProgramSpec(candidate, templateId) {
 export function normalizeFormalProofSpec(candidate, templateId = "formal problem") {
   if (candidate == null) return null;
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${templateId} proof_spec must be an object.`);
-  const unknown = Object.keys(candidate).find((key) => !["version", "statement", "parameter_contract", "allowed_rules", "assessment_policy", "reference_proof", "environment"].includes(key));
+  const unknown = Object.keys(candidate).find((key) => !["version", "statement", "parameter_contract", "allowed_rules", "assessment_policy", "reference_proof", "environment", "capabilities"].includes(key));
   if (unknown) throw new Error(`${templateId} proof_spec contains unsupported field ${unknown}.`);
   if (candidate.version !== "0.1") throw new Error(`${templateId} proof_spec version must be 0.1.`);
   const statement = candidate.statement;
@@ -719,6 +720,9 @@ export function normalizeFormalProofSpec(candidate, templateId = "formal problem
   const environmentUnknown = Object.keys(environmentCandidate).find((key) => !["backend", "toolchain", "library", "library_revision"].includes(key));
   if (environmentUnknown) throw new Error(`${templateId} formal environment contains unsupported field ${environmentUnknown}.`);
   const environment = Object.fromEntries(Object.entries(environmentCandidate).map(([key, value]) => [key, requiredText(value, `${templateId} formal environment ${key}`, 2000)]));
+  const capabilities = Object.prototype.hasOwnProperty.call(candidate, "capabilities")
+    ? normalizeFormalCapabilities(candidate.capabilities, { statement: { declarations, assumptions, goal }, allowedRules: rules, templateId })
+    : null;
   return {
     version: "0.1",
     statement: { declarations, assumptions, goal },
@@ -727,6 +731,7 @@ export function normalizeFormalProofSpec(candidate, templateId = "formal problem
     assessment_policy: assessmentPolicy,
     reference_proof: referenceProof,
     environment,
+    ...(capabilities ? { capabilities } : {}),
   };
 }
 

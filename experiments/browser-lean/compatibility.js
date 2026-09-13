@@ -26,8 +26,11 @@ export function sourceForExperiment(source, environment) {
     return referenceSource(source,environment);
   if(environment.leanCommit!=='6a10ac8c22beadecabdbb0919c2b50214762f91d' ||
      environment.mathlibCommit!=='42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c' ||
-     environment.importPolicy!=='production-private-strict' ||
+     !['production-private-strict','production-module-public'].includes(environment.importPolicy) ||
      !/^[a-f0-9]{64}$/.test(environment.portSha256||''))
     throw Error('Unrecognized aligned experimental environment');
+  const isModule=/^module\r?\n/.test(source);
+  if((environment.importPolicy==='production-module-public')!==isModule)
+    throw Error('Source module mode does not match its curated environment');
   return {source,substitutions:[],assessment_eligible:false,certificate:null};
 }

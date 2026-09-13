@@ -71,6 +71,17 @@
         "maxLength": 2000
       }
     },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "description": "Optional curated loading guidance. This metadata does not enable browser certification or change the proof rule contract.",
+      "items": {
+        "type": "string",
+        "enum": ["algebra", "limits", "derivatives", "sequences-series", "radicals"]
+      }
+    },
     "assessment_policy": {
       "type": "object"
     },
