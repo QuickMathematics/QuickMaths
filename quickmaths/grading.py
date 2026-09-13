@@ -13,7 +13,7 @@ from quickmaths.math_syntax import (
     rational_expression_equal,
     symbolic_equal,
 )
-from quickmaths.models import FinalAnswerGrade, GradingResult, ProblemInstance, UserResponse
+from quickmaths.models import FinalAnswerGrade, GradingResult, ProblemInstance, UserResponse, WorkCheckResult
 from quickmaths.utils import normalize_spaces
 from quickmaths.work_checker import check_work
 
@@ -27,6 +27,16 @@ def grade_attempt(instances: list[ProblemInstance], user_answers: list[str | Use
 
 def grade_answer(instance: ProblemInstance, user_answer: str | UserResponse) -> GradingResult:
     response = coerce_user_response(user_answer, instance)
+    if instance.proof_spec:
+        # This legacy CLI grader is not the Lean verifier. Neither a matching
+        # conclusion nor a JSON certificate supplied as work can confer credit.
+        message = "Formal verification required: check the exact learner proof with Lean. This grader cannot certify it."
+        return GradingResult(
+            instance.template_id, response.final_answer or "", "", False,
+            "formal_proof", message, response.work, "formal_verification_required",
+            FinalAnswerGrade("uncertain", 0.0, "formal_proof", [message]),
+            WorkCheckResult("verification_required", "formal_proof", "lean_only", messages=[message]),
+        )
     method = instance.grading_method
     expected = instance.expected_answer
     user = response.final_answer or ""

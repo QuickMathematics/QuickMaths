@@ -4,6 +4,10 @@ import { normalizeMathBlocks, resolveMathBlocks } from "./math-display.js?v=2026
 import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260908-statistics-v1";
 import { normalizeLessonAssets, normalizeLessonMedia, validateMediaReferences, mediaBaseUrl } from "./lesson-media.js?v=20260906-media-v1";
 import { chi_square_cdf, chi_square_sf, f_sf, inverse_normal_cdf, normal_cdf, t_cdf } from "./distributions.js?v=20260908-statistics-v1";
+import { buildFormalEvidenceRecord, formalEvidenceReceipt, normalizeFormalEvidenceRecord } from "./formal-evidence.js?v=20260913-formal-kernel-v1";
+import { createFormalLearning } from "./formal-learning.js?v=20260913-formal-kernel-v1";
+import { assertFormalCertificate } from "./formal-proof-trust.js?v=20260913-formal-kernel-v1";
+import { buildBoundFormalJob } from "./formal-binding.js?v=20260913-formal-kernel-v1";
 
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
@@ -44,6 +48,7 @@ const TUTORIAL_STEPS = 7;
 const MAX_ACTIVITY = 60;
 const MAX_ATTEMPTS = 500;
 const MAX_REVIEWS = 1000;
+const MAX_FORMAL_EVIDENCE = 500;
 const MAX_PROFILES = 30;
 const MAX_LESSON_SETS = 10;
 const MAX_CURRICULA = 30;
@@ -630,6 +635,142 @@ function normalizePythonProgramSpec(candidate, templateId) {
   };
 }
 
+export function normalizeFormalProofSpec(candidate, templateId = "formal problem") {
+  if (candidate == null) return null;
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${templateId} proof_spec must be an object.`);
+  const unknown = Object.keys(candidate).find((key) => !["version", "statement", "parameter_contract", "allowed_rules", "assessment_policy", "reference_proof", "environment"].includes(key));
+  if (unknown) throw new Error(`${templateId} proof_spec contains unsupported field ${unknown}.`);
+  if (candidate.version !== "0.1") throw new Error(`${templateId} proof_spec version must be 0.1.`);
+  const statement = candidate.statement;
+  if (!statement || typeof statement !== "object" || Array.isArray(statement)) throw new Error(`${templateId} proof_spec needs a statement.`);
+  const statementUnknown = Object.keys(statement).find((key) => !["declarations", "assumptions", "goal"].includes(key));
+  if (statementUnknown) throw new Error(`${templateId} proof statement contains unsupported field ${statementUnknown}.`);
+  const boundedArray = (value, label, maximum) => {
+    if (value == null) return [];
+    if (!Array.isArray(value)) throw new Error(`${templateId} ${label} must be an array.`);
+    if (value.length > maximum) throw new Error(`${templateId} ${label} supports at most ${maximum} entries; nothing was truncated.`);
+    return value;
+  };
+  const optionalObject = (value, label) => {
+    if (value == null) return {};
+    if (typeof value !== "object" || Array.isArray(value)) throw new Error(`${templateId} ${label} must be an object.`);
+    return value;
+  };
+  boundedArray(statement.declarations, "formal declarations", 32);
+  boundedArray(statement.assumptions, "formal assumptions", 64);
+  boundedArray(candidate.allowed_rules, "formal rules", 64);
+  boundedArray(candidate.parameter_contract?.required_public, "formal public parameters", 32);
+  optionalObject(candidate.parameter_contract, "formal parameter contract");
+  optionalObject(candidate.assessment_policy, "formal assessment policy");
+  optionalObject(candidate.environment, "formal environment");
+  const declarations = Array.isArray(statement.declarations) ? statement.declarations.map((item, index) => requiredText(item, `${templateId} formal declaration ${index + 1}`, 2000)).slice(0, 32) : [];
+  const assumptions = Array.isArray(statement.assumptions) ? statement.assumptions.map((item, index) => requiredText(item, `${templateId} formal assumption ${index + 1}`, 2000)).slice(0, 64) : [];
+  const goal = requiredText(statement.goal, `${templateId} formal goal`, 2000);
+  const rules = Array.isArray(candidate.allowed_rules) ? candidate.allowed_rules.map((item, index) => requiredText(item, `${templateId} formal rule ${index + 1}`, 200)).slice(0, 64) : [];
+  if (new Set(rules).size !== rules.length) throw new Error(`${templateId} formal rules must not be duplicated.`);
+  const parameterCandidate = candidate.parameter_contract && typeof candidate.parameter_contract === "object" && !Array.isArray(candidate.parameter_contract) ? candidate.parameter_contract : {};
+  const parameterUnknown = Object.keys(parameterCandidate).find((key) => key !== "required_public");
+  if (parameterUnknown) throw new Error(`${templateId} formal parameter contract contains unsupported field ${parameterUnknown}.`);
+  const requiredPublic = Array.isArray(parameterCandidate.required_public)
+    ? parameterCandidate.required_public.map((item, index) => requiredText(item, `${templateId} formal public parameter ${index + 1}`, 200)).slice(0, 32)
+    : [];
+  if (new Set(requiredPublic).size !== requiredPublic.length) throw new Error(`${templateId} formal public parameters must not be duplicated.`);
+  const assessmentPolicy = candidate.assessment_policy && typeof candidate.assessment_policy === "object" && !Array.isArray(candidate.assessment_policy)
+    ? clone(candidate.assessment_policy) : {};
+  let referenceProof = {};
+  if (candidate.reference_proof != null && !(typeof candidate.reference_proof === "object" && !Array.isArray(candidate.reference_proof))) {
+    throw new Error(`${templateId} formal reference proof must be an object.`);
+  }
+  if (candidate.reference_proof && Object.keys(candidate.reference_proof).length) {
+    const referenceUnknown = Object.keys(candidate.reference_proof).find((key) => !["mode", "steps"].includes(key));
+    if (referenceUnknown) throw new Error(`${templateId} formal reference proof contains unsupported field ${referenceUnknown}.`);
+    let mode = candidate.reference_proof.mode ?? "steps";
+    if (mode === "author_candidate") mode = "steps";
+    if (!['steps', 'auto'].includes(mode)) throw new Error(`${templateId} formal reference proof mode must be steps or auto.`);
+    const rawSteps = boundedArray(candidate.reference_proof.steps, "formal reference steps", 128);
+    if (rawSteps.length > 128) throw new Error(`${templateId} formal reference proof supports at most 128 steps.`);
+    if (mode === "auto" && rawSteps.length) throw new Error(`${templateId} formal auto reference proof cannot contain submitted steps.`);
+    const steps = rawSteps.map((row, stepIndex) => {
+      if (!row || typeof row !== "object" || Array.isArray(row)) throw new Error(`${templateId} formal reference step ${stepIndex + 1} must be an object.`);
+      const unknownStep = Object.keys(row).find((key) => !["claim", "rule", "premises", "parameters", "scope"].includes(key));
+      if (unknownStep) throw new Error(`${templateId} formal reference step ${stepIndex + 1} contains unsupported field ${unknownStep}.`);
+      boundedArray(row.premises, "formal reference premises", 32);
+      optionalObject(row.parameters, "formal reference parameters");
+      const premises = Array.isArray(row.premises) ? row.premises.map((item, premiseIndex) => requiredText(item, `${templateId} formal reference step ${stepIndex + 1} premise ${premiseIndex + 1}`, 2000)).slice(0, 32) : [];
+      const rawParameters = row.parameters && typeof row.parameters === "object" && !Array.isArray(row.parameters) ? row.parameters : {};
+      const parameters = Object.fromEntries(Object.entries(rawParameters).map(([key, value]) => {
+        const parameterName = requiredText(key, `${templateId} formal reference step ${stepIndex + 1} parameter name`, 200);
+        if (!(typeof value === "string" || typeof value === "boolean" || (Number.isInteger(value) && Number.isFinite(value)))) {
+          throw new Error(`${templateId} formal reference step ${stepIndex + 1} parameter ${parameterName} must be text, integer or boolean.`);
+        }
+        return [parameterName, typeof value === "string" ? requiredText(value, `${templateId} formal reference step ${stepIndex + 1} parameter ${parameterName}`, 2000) : value];
+      }));
+      return {
+        claim: requiredText(row.claim, `${templateId} formal reference step ${stepIndex + 1} claim`, 2000),
+        rule: requiredText(row.rule, `${templateId} formal reference step ${stepIndex + 1} rule`, 200),
+        premises,
+        parameters,
+        scope: requiredText(row.scope ?? "root", `${templateId} formal reference step ${stepIndex + 1} scope`, 200),
+      };
+    });
+    referenceProof = { mode, steps };
+  }
+  const environmentCandidate = candidate.environment && typeof candidate.environment === "object" && !Array.isArray(candidate.environment) ? candidate.environment : {};
+  const environmentUnknown = Object.keys(environmentCandidate).find((key) => !["backend", "toolchain", "library", "library_revision"].includes(key));
+  if (environmentUnknown) throw new Error(`${templateId} formal environment contains unsupported field ${environmentUnknown}.`);
+  const environment = Object.fromEntries(Object.entries(environmentCandidate).map(([key, value]) => [key, requiredText(value, `${templateId} formal environment ${key}`, 2000)]));
+  return {
+    version: "0.1",
+    statement: { declarations, assumptions, goal },
+    parameter_contract: { required_public: requiredPublic },
+    allowed_rules: rules,
+    assessment_policy: assessmentPolicy,
+    reference_proof: referenceProof,
+    environment,
+  };
+}
+
+export function normalizeFormalJob(candidate, proofSpec, templateId = "formal problem", expectedBinding = null) {
+  if (candidate == null) return null;
+  if (!proofSpec) throw new Error(`${templateId} formal_job requires proof_spec.`);
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${templateId} formal_job must be an object.`);
+  if (candidate.version !== "0.1") throw new Error(`${templateId} formal_job version must be 0.1.`);
+  const binding = requiredText(candidate.problem_binding_sha256, `${templateId} formal problem binding`, 64);
+  if (!/^[a-f0-9]{64}$/.test(binding)) throw new Error(`${templateId} formal problem binding must be a SHA-256 digest.`);
+  if (expectedBinding && binding !== expectedBinding) throw new Error(`${templateId} formal problem binding does not match the displayed problem.`);
+  const rpc = candidate.rpc;
+  if (!rpc || typeof rpc !== "object" || Array.isArray(rpc)) throw new Error(`${templateId} formal_job needs an RPC request.`);
+  if (rpc.protocol_version !== "0.1" || rpc.op !== "new_text_request") throw new Error(`${templateId} formal_job must start protocol 0.1 new_text_request.`);
+  if (rpc.request_id !== `quickmaths:${binding}`) throw new Error(`${templateId} formal request ID does not match its problem binding.`);
+  const declarations = Array.isArray(rpc.declarations) ? rpc.declarations.map(String) : [];
+  const assumptions = Array.isArray(rpc.assumptions) ? rpc.assumptions.map(String) : [];
+  const rules = Array.isArray(rpc.allowed_rules) ? rpc.allowed_rules.map(String) : [];
+  if (JSON.stringify(declarations) !== JSON.stringify(proofSpec.statement.declarations)
+      || JSON.stringify(assumptions) !== JSON.stringify(proofSpec.statement.assumptions)
+      || String(rpc.goal ?? "") !== proofSpec.statement.goal
+      || JSON.stringify(rules) !== JSON.stringify(proofSpec.allowed_rules)) {
+    throw new Error(`${templateId} formal_job statement does not match proof_spec.`);
+  }
+  const requirements = candidate.environment_requirements && typeof candidate.environment_requirements === "object" && !Array.isArray(candidate.environment_requirements) ? candidate.environment_requirements : {};
+  if (JSON.stringify(requirements) !== JSON.stringify(proofSpec.environment)) throw new Error(`${templateId} formal_job environment does not match proof_spec.`);
+  const maxSeconds = Math.floor(cleanNumber(Number(rpc.max_seconds), 10, 1, 60));
+  return {
+    version: "0.1",
+    problem_binding_sha256: binding,
+    environment_requirements: clone(requirements),
+    rpc: {
+      protocol_version: "0.1",
+      op: "new_text_request",
+      request_id: `quickmaths:${binding}`,
+      declarations,
+      assumptions,
+      goal: proofSpec.statement.goal,
+      allowed_rules: rules,
+      max_seconds: maxSeconds,
+    },
+  };
+}
+
 function normalizeProblem(candidate, skillId, questionIds) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error(`${skillId} contains an invalid problem.`);
   const templateId = requiredText(candidate.template_id, `${skillId} problem ID`, 120);
@@ -708,18 +849,34 @@ function normalizeProblem(candidate, skillId, questionIds) {
     const pointKeys = signChart.critical_points.map((point) => `${point.value}`.trim());
     if (new Set(pointKeys).size !== pointKeys.length) throw new Error(`${templateId} sign chart critical points must not be duplicated.`);
   }
+  const seed = Math.floor(cleanNumber(Number(candidate.seed), 1, 0, 2_000_000_000));
+  const prompt = requiredText(candidate.prompt, `${templateId} prompt`, 2000);
+  const problemValues = candidate.values && typeof candidate.values === "object" && !Array.isArray(candidate.values) ? clone(candidate.values) : {};
+  const proofSpec = normalizeFormalProofSpec(candidate.proof_spec, templateId);
+  const expectedFormalJob = proofSpec ? buildBoundFormalJob({
+    skill_id: skillId,
+    template_id: templateId,
+    seed,
+    values: problemValues,
+    prompt,
+    proof_spec: proofSpec,
+  }) : null;
+  const rawFormalJob = candidate.formal_job ?? expectedFormalJob;
+  const formalJob = normalizeFormalJob(rawFormalJob, proofSpec, templateId, expectedFormalJob?.problem_binding_sha256 ?? null);
   return {
     template_id: templateId,
     source_template_id: sourceTemplateId,
     skill_id: skillId,
-    seed: Math.floor(cleanNumber(Number(candidate.seed), 1, 0, 2_000_000_000)),
+    seed,
     difficulty: ["easy", "medium", "hard", "brutal"].includes(candidate.difficulty) ? candidate.difficulty : "medium",
-    values: {},
-    prompt: requiredText(candidate.prompt, `${templateId} prompt`, 2000),
+    values: problemValues,
+    prompt,
     prompt_blocks: normalizePromptBlocks(candidate.prompt_blocks, templateId),
     ...(candidate.media != null ? { media: normalizeLessonMedia(candidate.media) } : {}),
     ...(candidate.math_blocks?.length ? { math_blocks: normalizeMathBlocks(candidate.math_blocks) } : {}),
     ...(candidate.diagram ? { diagram: normalizeCartesianDiagram(candidate.diagram) } : {}),
+    ...(proofSpec ? { proof_spec: proofSpec } : {}),
+    ...(formalJob ? { formal_job: formalJob } : {}),
     expected_answer: expectedAnswer,
     answer_type: optionalText(candidate.answer_type, `${templateId} answer_type`, 60) || "text",
     grading_method: gradingMethod,
@@ -1103,6 +1260,7 @@ function initialState() {
     progress: {},
     attempts: [],
     reviews: [],
+    formalEvidence: [],
     drafts: {},
     mapPlans: {},
     lessonPacks: [],
@@ -1112,6 +1270,7 @@ function initialState() {
       lastExportAt: null,
       attemptCountAtExport: 0,
       reviewCountAtExport: 0,
+      formalEvidenceCountAtExport: 0,
       lessonPackCountAtExport: 0,
       curriculumUpdatedAtAtExport: null,
     },
@@ -1466,6 +1625,17 @@ function sanitizeResult(candidate) {
     expectedAnswer: cleanText(candidate.expectedAnswer, 300),
     correct: Boolean(candidate.correct),
     gradingMethod: cleanText(candidate.gradingMethod, 60),
+    ...(candidate.formalAssessment ? { formalAssessment: {
+      status: "replay_required", authority: "lean4",
+      ...Object.fromEntries(["evidence_id", "problem_binding_sha256", "request_hash", "statement_hash", "submission_hash", "certificate_digest", "verified_at"].map((key) => [key, cleanText(candidate.formalAssessment[key], 100)])),
+    } } : {}),
+    ...(candidate.formalContext?.statement ? { formalContext: {
+      statement: { goal: cleanText(candidate.formalContext.statement.goal, 2000),
+        declarations: (Array.isArray(candidate.formalContext.statement.declarations) ? candidate.formalContext.statement.declarations : []).filter((v) => typeof v === "string").slice(0, 32).map((v) => cleanText(v, 2000)),
+        assumptions: (Array.isArray(candidate.formalContext.statement.assumptions) ? candidate.formalContext.statement.assumptions : []).filter((v) => typeof v === "string").slice(0, 64).map((v) => cleanText(v, 2000)) },
+      problem_binding_sha256: cleanText(candidate.formalContext.problem_binding_sha256, 64),
+    } } : {}),
+
     solutionSteps: Array.isArray(candidate.solutionSteps) ? candidate.solutionSteps.map((step) => cleanText(step, 1000)).filter(Boolean).slice(0, 20) : [],
     mistakeTags: Array.isArray(candidate.mistakeTags) ? candidate.mistakeTags.map((tag) => cleanText(tag, 80)).filter(Boolean).slice(0, 12) : [],
     workRequired: Boolean(candidate.workRequired),
@@ -1705,6 +1875,18 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
   const reviews = Array.isArray(candidate.reviews)
     ? candidate.reviews.map((item) => sanitizeReview(item, profileIds)).filter(Boolean).slice(-MAX_REVIEWS)
     : [];
+  const formalEvidence = [];
+  const seenEvidenceIds = new Set();
+  if (Array.isArray(candidate.formalEvidence)) {
+    for (const item of candidate.formalEvidence.slice(-MAX_FORMAL_EVIDENCE)) {
+      try {
+        const evidence = normalizeFormalEvidenceRecord(item);
+        if (!profileIds.has(evidence.profileId) || !skills.has(evidence.skillId) || seenEvidenceIds.has(evidence.evidenceId)) continue;
+        seenEvidenceIds.add(evidence.evidenceId);
+        formalEvidence.push(evidence);
+      } catch { /* Invalid proof evidence is never imported as trusted provenance. */ }
+    }
+  }
   const activity = Array.isArray(candidate.activity)
     ? candidate.activity
         .filter((item) => item && typeof item === "object")
@@ -1731,6 +1913,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
     progress: sanitizeProgress(candidate.progress, profileIds, skills),
     attempts,
     reviews,
+    formalEvidence,
     drafts: sanitizeDrafts(candidate.drafts, profileIds, catalog),
     mapPlans: sanitizeMapPlans(candidate.mapPlans, profileIds, skills, subjects),
     lessonPacks,
@@ -1739,6 +1922,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
       lastExportAt: cleanText(candidate.backup?.lastExportAt, 40) || null,
       attemptCountAtExport: Math.floor(cleanNumber(candidate.backup?.attemptCountAtExport, 0, 0, MAX_ATTEMPTS)),
       reviewCountAtExport: Math.floor(cleanNumber(candidate.backup?.reviewCountAtExport, 0, 0, MAX_REVIEWS)),
+      formalEvidenceCountAtExport: Math.floor(cleanNumber(candidate.backup?.formalEvidenceCountAtExport, 0, 0, MAX_FORMAL_EVIDENCE)),
       lessonPackCountAtExport: Math.floor(cleanNumber(candidate.backup?.lessonPackCountAtExport, 0, 0, MAX_LESSON_SETS)),
       curriculumUpdatedAtAtExport: cleanText(candidate.backup?.curriculumUpdatedAtAtExport, 40) || null,
     },
@@ -2280,6 +2464,8 @@ function signChartBoundaryMatches(actual, expected, side) {
 }
 
 export function gradeProblem(problem, answer, structuredWork = null) {
+  // A text match, CAS result or persisted JSON flag cannot grade a formal proof.
+  if (problem.proof_spec) return { correct: false, expected: "", method: "formal_proof", status: "formal_verification_required" };
   const expected = String(problem.expected_answer ?? "");
   if (!String(answer ?? "").trim()) return { correct: false, expected, method: problem.grading_method };
   const acceptedForms = [expected, ...(problem.accepted_forms ?? [])].map(String);
@@ -2568,7 +2754,7 @@ function reviewDate(status, score, confidence, date, mastery = {}) {
   return next.toISOString();
 }
 
-export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks = [], now = () => new Date() }) {
+export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks = [], now = () => new Date(), formalOptions = {} }) {
   const skillsById = {};
   const skillOrder = [];
   const unlocks = {};
@@ -2857,7 +3043,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (storageError) {
       recommended = true;
       reason = "Browser autosave reported a problem; download a backup now.";
-    } else if (!state.backup.lastExportAt && (state.attempts.length > 0 || state.lessonPacks.length > 0)) {
+    } else if (!state.backup.lastExportAt && (state.attempts.length > 0 || state.formalEvidence.length > 0 || state.lessonPacks.length > 0)) {
       recommended = true;
       reason = "No portable backup has been downloaded yet.";
     } else if (state.attempts.length > state.backup.attemptCountAtExport) {
@@ -2866,6 +3052,9 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     } else if (state.reviews.length > state.backup.reviewCountAtExport) {
       recommended = true;
       reason = "New tutor or self reviews have been saved since the last backup.";
+    } else if (state.formalEvidence.length > state.backup.formalEvidenceCountAtExport) {
+      recommended = true;
+      reason = "New kernel proof certificates have been archived since the last backup.";
     } else if (state.lessonPacks.length !== state.backup.lessonPackCountAtExport) {
       recommended = true;
       reason = "The installed lesson sets changed since the last backup.";
@@ -2881,6 +3070,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       recommended,
       reason,
       attemptsSinceExport: Math.max(0, state.attempts.length - state.backup.attemptCountAtExport),
+      formalEvidenceSinceExport: Math.max(0, state.formalEvidence.length - state.backup.formalEvidenceCountAtExport),
     };
   };
 
@@ -3007,6 +3197,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   });
 
   const selectProfile = (profileId) => {
+    formalLearning.clear();
     if (!state.profiles.some((profile) => profile.id === profileId)) throw new Error("Profile not found.");
     heartbeat(true);
     state.activeProfileId = profileId;
@@ -3088,6 +3279,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   };
 
   const resetProfileUi = () => {
+    formalLearning.clear();
     state.activeProfileId = null;
     state.session = null;
     state.ui.route = "welcome";
@@ -3117,6 +3309,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     delete state.drafts[profile.id];
     delete state.mapPlans[profile.id];
     state.attempts = state.attempts.filter((attempt) => attempt.profileId !== profile.id);
+    state.formalEvidence = state.formalEvidence.filter((evidence) => evidence.profileId !== profile.id);
     for (const attempt of state.attempts) {
       if (deletedCurriculumIds.has(attempt.curriculumId)) attempt.curriculumId = null;
     }
@@ -3142,6 +3335,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       attempts: state.attempts.length,
       reviews: state.reviews.length,
     };
+    formalLearning.clear();
     state = initialState();
     storageError = null;
     rebuildCatalog();
@@ -3921,14 +4115,54 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return clone(state.drafts[profileId][skillId]);
   };
 
+  const formalLearning = createFormalLearning({
+    options: formalOptions,
+    read: (questionId) => {
+      const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
+      const problem = draft?.problems.find((item) => item.template_id === questionId);
+      if (!problem) return null;
+      return { profileId: state.activeProfileId, draftId: draft.draftId, problem: clone(problem),
+        evidence: clone(draft.responses[questionId]?.structuredWorkJson?.formal ?? null) };
+    },
+    write: (questionId, evidence) => {
+      const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
+      const response = draft?.responses[questionId];
+      if (!response) throw new Error("The formal draft is no longer active.");
+      const structured = { ...(response.structuredWorkJson ?? {}), formal: clone(evidence) };
+      if (JSON.stringify(structured).length > 30_000) throw new Error("The proof draft exceeds the browser storage limit; previous work is preserved.");
+      response.structuredWorkJson = structured;
+      persist();
+    },
+    archive: (...args) => recordFormalEvidence(...args),
+    getArchive: (id) => getFormalEvidence(id),
+  });
+  const getFormalWorkspace = (questionId) => ({ ...formalLearning.display(questionId), tutor: formalLearning.inspect(questionId) });
+  const runFormalProof = (questionId, action, input = {}) => formalLearning.run(questionId, action, input);
+  const inspectFormalProof = ({ questionId = "" } = {}) => {
+    const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
+    const id = questionId || draft?.problems.find((item) => item.proof_spec)?.template_id;
+    return formalLearning.inspect(id);
+  };
+  const recordFormalGuidance = ({ questionId, proofRevision, guidanceId, activityActor = "learner" }) => {
+    if (activityActor === "agent" && activeCurriculum()?.settings?.agentEnabled === false) throw new Error("This curriculum has Agent tutoring turned off.");
+    const result = formalLearning.recordGuidance(questionId, proofRevision, guidanceId);
+    addActivity("record_formal_guidance", "Saved a bounded question about the learner's current proof. No grade was changed.", undefined, activityActor);
+    notify();
+    return result;
+  };
+
   const updateResponse = (questionId, { finalAnswer, work, structuredWorkJson = null }) => {
     const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
     if (!draft || !draft.responses[questionId]) throw new Error("Question is not in the active test.");
     const problem = draft.problems.find((item) => item.template_id === questionId);
     const previous = draft.responses[questionId];
+    // An attempted edit withdraws live verification even if storage validation
+    // rejects it. The editor must never show new text beside an old live badge.
+    formalLearning.invalidate(questionId);
     const answerLimit = problem?.grading_method === "python_program" ? 12_000 : 300;
     if (typeof work === "string" && work.length > MAX_LONG_WORK_CHARS) throw new Error(`Shown work is limited to ${MAX_LONG_WORK_CHARS.toLocaleString()} characters.`);
     const safeAnswer = cleanText(finalAnswer, answerLimit);
+    if (problem?.proof_spec && structuredWorkJson && !sanitizeStructuredWork(structuredWorkJson)) throw new Error("The formal proof draft is too large to save; previous work is preserved.");
     const nextStructured = sanitizeStructuredWork(structuredWorkJson) ?? {};
     if (previous?.structuredWorkJson?.python_source === safeAnswer && previous.structuredWorkJson.python_grade) {
       nextStructured.python_source = safeAnswer;
@@ -3957,12 +4191,60 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     return clone(structured.python_grade);
   };
 
+  const recordFormalEvidence = (questionId, problemBindingSha256, request, verification) => {
+    const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
+    const problem = draft?.problems.find((item) => item.template_id === questionId);
+    if (!draft || !problem?.formal_job) throw new Error("Formal question is not in the active test.");
+    if (problem.formal_job.problem_binding_sha256 !== problemBindingSha256) throw new Error("Formal evidence does not match the displayed problem binding.");
+    const requirements = problem.formal_job.environment_requirements ?? {};
+    const certificateEnvironment = verification?.certificate?.environment ?? {};
+    if (requirements.toolchain && certificateEnvironment.lean_toolchain !== requirements.toolchain) throw new Error("Formal certificate Lean toolchain does not match the authored problem.");
+    if (requirements.library_revision && certificateEnvironment.mathlib_revision !== requirements.library_revision) throw new Error("Formal certificate mathlib revision does not match the authored problem.");
+    // Archiving is not runtime authority. Only the private fresh-RPC path grants eligibility.
+    assertFormalCertificate(verification, request);
+    const record = buildFormalEvidenceRecord({
+      profileId: state.activeProfileId,
+      skillId: draft.skillId,
+      questionId,
+      problemBindingSha256,
+      request,
+      verification,
+      recordedAt: isoNow(),
+    });
+    const existing = state.formalEvidence.find((item) => item.evidenceId === record.evidenceId);
+    if (existing) {
+      const sameBinding = existing.profileId === record.profileId
+        && existing.skillId === record.skillId
+        && existing.questionId === record.questionId
+        && existing.problemBindingSha256 === record.problemBindingSha256
+        && existing.requestHash === record.requestHash
+        && existing.statementHash === record.statementHash
+        && existing.submissionHash === record.submissionHash
+        && existing.certificateDigest === record.certificateDigest;
+      if (!sameBinding) throw new Error("A formal evidence ID is already bound to different content.");
+      return clone(formalEvidenceReceipt(existing));
+    }
+    if (state.formalEvidence.length >= MAX_FORMAL_EVIDENCE) throw new Error("The formal evidence archive is full. Export a backup before recording more kernel certificates.");
+    state.formalEvidence.push(record);
+    persist();
+    return clone(formalEvidenceReceipt(record));
+  };
+
+  const getFormalEvidence = (evidenceId) => {
+    const evidence = state.formalEvidence.find((item) => item.evidenceId === evidenceId && item.profileId === state.activeProfileId);
+    return evidence ? clone(evidence) : null;
+  };
+
+  const liveFormalAttempts = new WeakSet();
+
   const submitTest = () => {
     const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
     if (!draft) throw new Error("No active test.");
     const workIssues = draft.problems.map((problem) => ({
       questionId: problem.template_id,
-      message: problem.grading_method === "python_program" && draft.responses[problem.template_id]?.structuredWorkJson?.python_grade?.status === "unavailable"
+      message: problem.proof_spec
+        ? formalLearning.assessment(problem.template_id) ? null : "Verify or replay this exact complete proof with Lean before submitting. Pending or unavailable verification is not a learner mistake."
+        : problem.grading_method === "python_program" && draft.responses[problem.template_id]?.structuredWorkJson?.python_grade?.status === "unavailable"
         ? "The local Python runtime is unavailable. Retry the sandbox before submitting; infrastructure failures are never graded as learner mistakes."
         : problem.grading_method === "python_program" && (
           draft.responses[problem.template_id]?.structuredWorkJson?.python_source !== draft.responses[problem.template_id]?.finalAnswer
@@ -3974,7 +4256,9 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (workIssues.length) return { ok: false, missingWork: workIssues.map((issue) => issue.questionId), workIssues };
     const results = draft.problems.map((problem) => {
       const response = draft.responses[problem.template_id] ?? { finalAnswer: "", work: "" };
-      const grade = gradeProblem(problem, response.finalAnswer, response.structuredWorkJson);
+      const formalAssessment = problem.proof_spec ? formalLearning.assessment(problem.template_id) : null;
+      const grade = problem.proof_spec ? { correct: Boolean(formalAssessment), expected: "", method: "formal_proof" }
+        : gradeProblem(problem, response.finalAnswer, response.structuredWorkJson);
       return {
         questionId: problem.template_id,
         prompt: problem.prompt,
@@ -3987,16 +4271,20 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         expectedAnswer: grade.expected,
         correct: grade.correct,
         gradingMethod: grade.method,
-        solutionSteps: clone(problem.solution_steps ?? []),
+        ...(formalAssessment ? { formalAssessment, formalContext: {
+          statement: clone(problem.proof_spec.statement), allowed_rules: clone(problem.proof_spec.allowed_rules),
+          problem_binding_sha256: problem.formal_job.problem_binding_sha256,
+        } } : {}),
+        solutionSteps: problem.proof_spec ? [] : clone(problem.solution_steps ?? []),
         mistakeTags: grade.correct ? [] : clone(problem.mistake_tags ?? []),
         workRequired: Boolean(problem.work_required),
-        reviewRequired: ["proof_obligations", "rubric_check", "limit_steps"].includes(problem.work?.mode) || problem.review_policy?.mastery_requires_review_pass === true,
-        allowSelfReview: problem.work?.mode !== "limit_steps" && problem.review_policy?.allow_self_review !== false,
-        workMode: problem.work?.mode ?? "none",
+        reviewRequired: !problem.proof_spec && (["proof_obligations", "rubric_check", "limit_steps"].includes(problem.work?.mode) || problem.review_policy?.mastery_requires_review_pass === true),
+        allowSelfReview: !problem.proof_spec && problem.work?.mode !== "limit_steps" && problem.review_policy?.allow_self_review !== false,
+        workMode: problem.proof_spec ? "formal_proof" : problem.work?.mode ?? "none",
         ...(problem.work?.mode === "limit_steps" ? { limitSpec: clone(problem.work.limit) } : {}),
-        proofObligations: clone((problem.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation)),
-        rubricCriteria: clone((problem.work?.rubric?.criteria ?? []).map(normalizeReviewCriterion)),
-        reviewPolicy: problem.review_policy?.work_review ?? "none",
+        proofObligations: problem.proof_spec ? [] : clone((problem.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation)),
+        rubricCriteria: problem.proof_spec ? [] : clone((problem.work?.rubric?.criteria ?? []).map(normalizeReviewCriterion)),
+        reviewPolicy: problem.proof_spec ? "lean_only" : problem.review_policy?.work_review ?? "none",
         traceDiagnostics: problem.work?.mode === "code_trace_steps" ? gradeTraceTable(problem, response.structuredWorkJson).diagnostics : [],
       };
     });
@@ -4020,6 +4308,20 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const pending = state.ui.pendingResults;
     if (!pending) throw new Error("No result is waiting to be saved.");
     const skill = skillsById[pending.skillId];
+    const draft = state.drafts[state.activeProfileId]?.[pending.skillId];
+    const formalQuestions = draft?.problems.filter((problem) => problem.proof_spec) ?? [];
+    if (formalQuestions.length || pending.results.some((result) => result.gradingMethod === "formal_proof" || result.structuredWorkJson?.formal)) {
+      if (!draft || draft.draftId !== pending.draftId || state.ui.selectedSkillId !== pending.skillId) throw new Error("Reopen and verify the formal draft before recording mastery.");
+      for (const problem of formalQuestions) {
+        const receipt = formalLearning.assessment(problem.template_id);
+        const results = pending.results.filter((result) => result.questionId === problem.template_id);
+        if (!receipt || results.length !== 1 || results[0].gradingMethod !== "formal_proof"
+            || JSON.stringify(receipt) !== JSON.stringify(results[0].formalAssessment)) {
+          throw new Error("This formal result is stale or restored. Verify or replay the current proof, then submit again before recording mastery.");
+        }
+      }
+      if (pending.results.some((r) => r.gradingMethod === "formal_proof" && !formalQuestions.some((p) => p.template_id === r.questionId))) throw new Error("The formal assessment no longer matches this lesson.");
+    }
     const reflection = {
       confidenceRating: Math.round(cleanNumber(Number(input.confidenceRating), 3, 1, 5)),
       difficultyFelt: ["easy", "medium", "hard", "brutal"].includes(input.difficultyFelt) ? input.difficultyFelt : "medium",
@@ -4032,6 +4334,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const previous = activeProgress()[skill.id] ?? { status: "ready", masteryScore: 0, attemptCount: 0, bestTestScore: null };
     const hasPendingReview = pending.results.some((result) => {
       const source = state.drafts[state.activeProfileId]?.[skill.id]?.problems.find((problem) => problem.template_id === result.questionId);
+      if (source?.proof_spec) return false;
       const mode = source?.work?.mode;
       return ["proof_obligations", "rubric_check"].includes(mode) || source?.review_policy?.mastery_requires_review_pass === true;
     });
@@ -4081,6 +4384,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       }
     }
     state.attempts = [...state.attempts, attempt].slice(-MAX_ATTEMPTS);
+    if (formalQuestions.length) liveFormalAttempts.add(attempt);
     resolveAttemptReview(attempt);
     delete state.drafts[state.activeProfileId][skill.id];
     state.ui.pendingResults = null;
@@ -4147,7 +4451,10 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   const resolveAttemptReview = (attempt) => {
     if (!attempt?.hasPendingReview && !attempt?.reviewResolution) return;
-    const required = attempt.results.filter((result) => result.reviewRequired);
+    // Never let imported tutor reviews regrade a kernel-gated result.
+    const hasFormal = attempt.results.some((result) => result.gradingMethod === "formal_proof" || result.structuredWorkJson?.formal);
+    if (hasFormal && !liveFormalAttempts.has(attempt)) return;
+    const required = attempt.results.filter((result) => result.reviewRequired && result.gradingMethod !== "formal_proof" && !result.structuredWorkJson?.formal);
     const latest = required.map((result) => state.reviews.filter((item) => item.attemptId === attempt.attemptId && item.questionId === result.questionId).at(-1) ?? null);
     if (!latest.length || latest.some((review) => !review)) return;
     const score = latest.reduce((total, review) => total + review.score, 0) / latest.length;
@@ -4187,6 +4494,16 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const saved = Boolean(attempt);
     const questionKey = item.template_id ?? item.questionId;
     const response = saved ? { finalAnswer: item.finalAnswer, work: item.work, structuredWorkJson: item.structuredWorkJson } : draft.responses[questionKey] ?? { finalAnswer: "", work: "", structuredWorkJson: null };
+    if (item.proof_spec || item.gradingMethod === "formal_proof" || response.structuredWorkJson?.formal) {
+      if (!saved) return { ...formalLearning.inspect(questionKey), source: "active_draft", skill_id: draft.skillId,
+        final_answer_status: "verifier_only", work_status: "formal_proof", structured_work_json: null,
+        messages: ["Use inspect_formal_proof and record_formal_guidance. Tutor reviews cannot grade this response."] };
+      return { ok: true, source: "saved_attempt", question_id: questionKey, attempt_id: attempt.attemptId,
+        skill_id: attempt.skillId, theorem: clone(item.formalContext?.statement ?? null),
+        proof_status: "archived_replay_required", final_answer_status: "recorded_assessment_not_live_verification",
+        tutor_can_grade: false, structured_work_json: null,
+        messages: ["This is an archived assessment, not fresh verification. Resume a proof draft for revision-bound tutoring."] };
+    }
     const correct = saved ? item.correct : response.finalAnswer ? gradeProblem(item, response.finalAnswer, response.structuredWorkJson).correct : false;
     const mode = saved ? item.workMode : item.work?.mode ?? "none";
     const proofObligations = saved ? item.proofObligations : (item.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation);
@@ -4237,6 +4554,9 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!["pass", "partial", "needs_revision", "fail"].includes(verdict)) throw new Error("verdict is invalid.");
     const activeResult = activeAttempt?.results?.find((result) => result.questionId === safeQuestionId);
     const activeProblem = activeDraft?.problems?.find((problem) => problem.template_id === safeQuestionId);
+    if (activeProblem?.proof_spec || activeResult?.gradingMethod === "formal_proof" || activeResult?.structuredWorkJson?.formal) {
+      throw new Error("Formal proofs are graded only by Lean. Use inspect_formal_proof and record_formal_guidance; tutor verdicts cannot change formal mastery.");
+    }
     const target = activeResult ?? (activeProblem ? {
       proofObligations: (activeProblem.work?.proof_policy?.obligations ?? []).map(normalizeReviewObligation),
       rubricCriteria: (activeProblem.work?.rubric?.criteria ?? []).map(normalizeReviewCriterion),
@@ -4279,7 +4599,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       lesson_media: { items: clone(skill.media ?? []), ...(() => { const pack = skill.packId ? state.lessonPacks.find(item => item.id === skill.packId) : curriculum; return { assets: (pack?.assets ?? []).map(({ data_base64, ...asset }) => asset), asset_base_url: pack?.asset_base_url ?? "" }; })() },
       active_test: draft ? {
         question_count: draft.problems.length,
-        answered_count: Object.values(draft.responses).filter((response) => response.finalAnswer).length,
+        answered_count: draft.problems.filter((problem) => problem.proof_spec ? Boolean(formalLearning.assessment(problem.template_id)) : Boolean(draft.responses[problem.template_id]?.finalAnswer)).length,
         questions: draft.problems.map((problem) => ({
           question_id: problem.template_id,
           prompt: problem.prompt,
@@ -4288,8 +4608,10 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         ...(problem.diagram ? { diagram: clone(problem.diagram) } : {}),
         ...(problem.math_blocks?.length ? { math_blocks: clone(problem.math_blocks) } : {}),
           difficulty: problem.difficulty,
-          answer_mode: problem.answer_mode,
-          work_mode: problem.work?.mode ?? "none",
+          answer_mode: problem.proof_spec ? "formal_proof" : problem.answer_mode,
+          work_mode: problem.proof_spec ? "formal_proof" : problem.work?.mode ?? "none",
+          ...(problem.proof_spec ? { formal_proof: { theorem: clone(problem.proof_spec.statement),
+            assessment_authority: "lean4", inspect_tool: "inspect_formal_proof", guidance_tool: "record_formal_guidance" } } : {}),
           trace: problem.work?.mode === "code_trace_steps" ? {
             language: problem.work.trace_spec.language,
             display_code: problem.work.trace_spec.display_code,
@@ -4312,7 +4634,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         percent_score: attempt.percentScore,
         review_status: attempt.reviewStatus,
         pending_review: attempt.hasPendingReview,
-        questions: attempt.results.map((result) => ({ question_id: result.questionId, prompt: result.prompt, ...(result.media?.length ? { media: clone(result.media) } : {}), final_answer_status: result.correct ? "correct" : "incorrect", work_mode: result.workMode, review_required: result.reviewRequired })),
+        questions: attempt.results.map((result) => ({ question_id: result.questionId, prompt: result.prompt, ...(result.media?.length ? { media: clone(result.media) } : {}), final_answer_status: result.gradingMethod === "formal_proof" ? result.formalAssessment?.status === "verified" ? "lean_verified_at_submission" : "archived_requires_replay" : result.correct ? "correct" : "incorrect", work_mode: result.workMode, review_required: result.reviewRequired })),
       } : null,
       progress: { mastery_score: row.masteryScore, attempt_count: row.attemptCount, mistake_tags: row.mistakeTags },
       recent_attempts: includeHistory ? profileAttempts().slice(-5).map((attempt) => ({ skill_id: attempt.skillId, percent_score: attempt.percentScore, completed_at: attempt.completedAt })) : [],
@@ -4529,6 +4851,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     state.backup.lastExportAt = isoNow();
     state.backup.attemptCountAtExport = state.attempts.length;
     state.backup.reviewCountAtExport = state.reviews.length;
+    state.backup.formalEvidenceCountAtExport = state.formalEvidence.length;
     state.backup.lessonPackCountAtExport = state.lessonPacks.length;
     state.backup.curriculumUpdatedAtAtExport = state.curricula.map((item) => item.updatedAt).filter(Boolean).sort().at(-1) ?? null;
     addActivity("export_progress_backup", "Downloaded a portable progress backup.");
@@ -4580,6 +4903,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       profileNames: imported.profiles.map((profile) => profile.displayName),
       attemptCount: imported.attempts.length,
       reviewCount: imported.reviews.length,
+      formalEvidenceCount: imported.formalEvidence.length,
       lessonPackCount: imported.lessonPacks.length,
       lessonPackNames: imported.lessonPacks.map((pack) => pack.name),
       curriculumCount: imported.curricula.length,
@@ -4588,12 +4912,14 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         profileCount: state.profiles.length,
         attemptCount: state.attempts.length,
         reviewCount: state.reviews.length,
+        formalEvidenceCount: state.formalEvidence.length,
       },
     };
   };
 
   const importBackup = (raw) => {
     const { imported } = parseBackup(raw);
+    formalLearning.clear();
     state = imported;
     rebuildCatalog();
     state.activeProfileId = null;
@@ -4606,6 +4932,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
 
   const importSyncState = (raw) => {
     const { imported } = parseBackup(raw);
+    formalLearning.clear();
     state = imported;
     rebuildCatalog();
     if (state.activeProfileId && state.profiles.some((profile) => profile.id === state.activeProfileId)) {
@@ -4648,7 +4975,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
       }
       if ((plan.hiddenSkillIds ?? []).some((id) => !next?.hiddenSkillIds?.includes(id))) fail();
     };
-    for (const [key, id] of Object.entries({ profiles: "id", curricula: "id", lessonPacks: "id", attempts: "attemptId", reviews: "reviewId" })) {
+    for (const [key, id] of Object.entries({ profiles: "id", curricula: "id", lessonPacks: "id", attempts: "attemptId", reviews: "reviewId", formalEvidence: "evidenceId" })) {
       const retained = new Set(imported[key].map((item) => item[id]));
       if ((candidate[key] ?? []).some((item) => !retained.has(item[id]))) fail();
     }
@@ -4773,6 +5100,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   };
 
   const replaceFromStorage = () => {
+    formalLearning.clear();
     state = loadState(storage, curriculum);
     rebuildCatalog();
     notify();
@@ -4829,6 +5157,12 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     updateResponse,
     submitTest,
     recordPythonGrade,
+    runFormalProof,
+    getFormalWorkspace,
+    inspectFormalProof,
+    recordFormalGuidance,
+    recordFormalEvidence,
+    getFormalEvidence,
     saveReflection,
     getAttempt,
     openAttempt,

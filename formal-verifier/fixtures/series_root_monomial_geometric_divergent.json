@@ -1,0 +1,102 @@
+{
+  "version": "0.1",
+  "request_id": "series_root_monomial_geometric_divergent",
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null,
+      "binders": []
+    }
+  ],
+  "assumptions": [],
+  "steps": [
+    {
+      "id": "series",
+      "scope": "root",
+      "claim": {
+        "kind": "series_sum",
+        "variable": "n",
+        "expression": {
+          "kind": "mul",
+          "left": {
+            "kind": "pow",
+            "base": {
+              "kind": "cast_real",
+              "arg": {
+                "kind": "var",
+                "id": "n"
+              }
+            },
+            "exponent": 3
+          },
+          "right": {
+            "kind": "pow_nat",
+            "base": {
+              "kind": "int",
+              "value": 2
+            },
+            "exponent": {
+              "kind": "var",
+              "id": "n"
+            }
+          }
+        },
+        "result": {
+          "kind": "not_summable"
+        }
+      },
+      "rule": "series_root_test",
+      "premises": [],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "series_sum",
+    "variable": "n",
+    "expression": {
+      "kind": "mul",
+      "left": {
+        "kind": "pow",
+        "base": {
+          "kind": "cast_real",
+          "arg": {
+            "kind": "var",
+            "id": "n"
+          }
+        },
+        "exponent": 3
+      },
+      "right": {
+        "kind": "pow_nat",
+        "base": {
+          "kind": "int",
+          "value": 2
+        },
+        "exponent": {
+          "kind": "var",
+          "id": "n"
+        }
+      }
+    },
+    "result": {
+      "kind": "not_summable"
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "series_root_test"
+    ],
+    "max_seconds": 10,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

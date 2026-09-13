@@ -1,0 +1,80 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "arg": {
+        "id": "x",
+        "kind": "var"
+      },
+      "kind": "abs"
+    },
+    "kind": "derivative",
+    "point": {
+      "kind": "int",
+      "value": 0
+    },
+    "result": {
+      "kind": "int",
+      "value": 0
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "recursive_derivative"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "recursive_abs_kink",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "arg": {
+            "id": "x",
+            "kind": "var"
+          },
+          "kind": "abs"
+        },
+        "kind": "derivative",
+        "point": {
+          "kind": "int",
+          "value": 0
+        },
+        "result": {
+          "kind": "int",
+          "value": 0
+        },
+        "variable": "x"
+      },
+      "id": "derivative_step",
+      "parameters": {},
+      "premises": [],
+      "rule": "recursive_derivative",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "a",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

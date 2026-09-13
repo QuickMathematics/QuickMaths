@@ -1,0 +1,199 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "kind": "div",
+      "left": {
+        "arg": {
+          "arg": {
+            "id": "n",
+            "kind": "var"
+          },
+          "kind": "cast_real"
+        },
+        "kind": "exp"
+      },
+      "right": {
+        "arg": {
+          "kind": "add",
+          "left": {
+            "id": "n",
+            "kind": "var"
+          },
+          "right": {
+            "kind": "int",
+            "value": 1
+          }
+        },
+        "kind": "cast_real"
+      }
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 0
+      }
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_algebra",
+      "sequence_squeeze"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence-squeeze-auto-unsupported",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "kind": "div",
+          "left": {
+            "arg": {
+              "kind": "int",
+              "value": 1
+            },
+            "kind": "neg"
+          },
+          "right": {
+            "arg": {
+              "kind": "add",
+              "left": {
+                "id": "n",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            },
+            "kind": "cast_real"
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "variable": "n"
+      },
+      "id": "lower_limit",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_algebra",
+      "scope": "root"
+    },
+    {
+      "claim": {
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "int",
+            "value": 1
+          },
+          "right": {
+            "arg": {
+              "kind": "add",
+              "left": {
+                "id": "n",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            },
+            "kind": "cast_real"
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "variable": "n"
+      },
+      "id": "upper_limit",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_algebra",
+      "scope": "root"
+    },
+    {
+      "claim": {
+        "expression": {
+          "kind": "div",
+          "left": {
+            "arg": {
+              "arg": {
+                "id": "n",
+                "kind": "var"
+              },
+              "kind": "cast_real"
+            },
+            "kind": "exp"
+          },
+          "right": {
+            "arg": {
+              "kind": "add",
+              "left": {
+                "id": "n",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            },
+            "kind": "cast_real"
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "variable": "n"
+      },
+      "id": "squeeze",
+      "parameters": {},
+      "premises": [
+        "lower_limit",
+        "upper_limit"
+      ],
+      "rule": "sequence_squeeze",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

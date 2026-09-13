@@ -1,0 +1,158 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "kind": "div",
+      "left": {
+        "kind": "add",
+        "left": {
+          "kind": "mul",
+          "left": {
+            "kind": "int",
+            "value": 2
+          },
+          "right": {
+            "arg": {
+              "id": "n",
+              "kind": "var"
+            },
+            "kind": "cast_real"
+          }
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      },
+      "right": {
+        "kind": "add",
+        "left": {
+          "kind": "mul",
+          "left": {
+            "kind": "int",
+            "value": 5
+          },
+          "right": {
+            "base": {
+              "arg": {
+                "id": "n",
+                "kind": "var"
+              },
+              "kind": "cast_real"
+            },
+            "exponent": 2,
+            "kind": "pow"
+          }
+        },
+        "right": {
+          "kind": "int",
+          "value": 3
+        }
+      }
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 0
+      }
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_polynomial_degree_ratio"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence_polynomial_degree_ratio_zero",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "add",
+            "left": {
+              "kind": "mul",
+              "left": {
+                "kind": "int",
+                "value": 2
+              },
+              "right": {
+                "arg": {
+                  "id": "n",
+                  "kind": "var"
+                },
+                "kind": "cast_real"
+              }
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          },
+          "right": {
+            "kind": "add",
+            "left": {
+              "kind": "mul",
+              "left": {
+                "kind": "int",
+                "value": 5
+              },
+              "right": {
+                "base": {
+                  "arg": {
+                    "id": "n",
+                    "kind": "var"
+                  },
+                  "kind": "cast_real"
+                },
+                "exponent": 2,
+                "kind": "pow"
+              }
+            },
+            "right": {
+              "kind": "int",
+              "value": 3
+            }
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "variable": "n"
+      },
+      "id": "ratio",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_polynomial_degree_ratio",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import argparse
 import base64
 import hashlib
@@ -14,6 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from quickmaths.content_loader import load_curriculum
+from quickmaths.formal_bridge import build_formal_job
 from quickmaths.problem_generator import generate_test
 from quickmaths.lesson_media import prepare_lesson_media
 
@@ -27,6 +28,13 @@ DEFAULT_NATIVE_MEDIA_BUDGET = 1_000_000
 def stable_seed(skill_id: str) -> int:
     digest = hashlib.sha256(skill_id.encode("utf-8")).hexdigest()
     return int(digest[:8], 16) % 2_000_000_000 or 1
+
+
+def _formal_job_for_export(instance, exported_template_id: str):
+    """Bind formal evidence to the exact question ID shipped to the browser."""
+    if not instance.proof_spec:
+        return None
+    return build_formal_job(replace(instance, template_id=exported_template_id))
 
 
 def _attribution_key(value: object, fallback: str) -> str:
@@ -98,12 +106,15 @@ def build_payload(*, native_media_budget: int = DEFAULT_NATIVE_MEDIA_BUDGET, med
                 if signature in signatures:
                     continue
                 signatures.add(signature)
+                exported_template_id = f"{instance.template_id}__{len(problems) + 1:02d}"
                 row = asdict(instance)
-                for optional in ("media", "diagram", "math_blocks"):
+                if instance.proof_spec:
+                    row["formal_job"] = _formal_job_for_export(instance, exported_template_id)
+                for optional in ("media", "diagram", "math_blocks", "proof_spec"):
                     if not row.get(optional):
                         row.pop(optional, None)
                 row["source_template_id"] = instance.template_id
-                row["template_id"] = f"{instance.template_id}__{len(problems) + 1:02d}"
+                row["template_id"] = exported_template_id
                 row["work_required"] = instance.answer_mode in {
                     "final_plus_required_work",
                     "structured_steps",

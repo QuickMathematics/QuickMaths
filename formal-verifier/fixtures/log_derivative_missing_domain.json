@@ -1,0 +1,121 @@
+{
+  "version": "0.1",
+  "request_id": "log-derivative-missing-domain",
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "a",
+      "type": "real"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "assumptions": [],
+  "steps": [
+    {
+      "id": "derivative_step",
+      "scope": "root",
+      "claim": {
+        "kind": "derivative",
+        "variable": "x",
+        "expression": {
+          "kind": "log",
+          "arg": {
+            "kind": "add",
+            "left": {
+              "kind": "var",
+              "id": "x"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          }
+        },
+        "point": {
+          "kind": "var",
+          "id": "a"
+        },
+        "result": {
+          "kind": "div",
+          "left": {
+            "kind": "int",
+            "value": 1
+          },
+          "right": {
+            "kind": "add",
+            "left": {
+              "kind": "var",
+              "id": "a"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          }
+        }
+      },
+      "rule": "log_derivative",
+      "premises": [],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "derivative",
+    "variable": "x",
+    "expression": {
+      "kind": "log",
+      "arg": {
+        "kind": "add",
+        "left": {
+          "kind": "var",
+          "id": "x"
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      }
+    },
+    "point": {
+      "kind": "var",
+      "id": "a"
+    },
+    "result": {
+      "kind": "div",
+      "left": {
+        "kind": "int",
+        "value": 1
+      },
+      "right": {
+        "kind": "add",
+        "left": {
+          "kind": "var",
+          "id": "a"
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      }
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "log_derivative"
+    ],
+    "max_seconds": 10,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

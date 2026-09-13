@@ -5,8 +5,8 @@ const clone = (value) => value === undefined ? undefined : JSON.parse(JSON.strin
 const own = (value, key) => Object.prototype.hasOwnProperty.call(value ?? {}, key);
 const get = (value, key) => own(value, key) ? value[key] : undefined;
 const set = (value, key, item) => Object.defineProperty(value, key, { value: item, enumerable: true, configurable: true, writable: true });
-const keyedArrays = { profiles: "id", curricula: "id", lessonPacks: "id", attempts: "attemptId", reviews: "reviewId" };
-const labels = { profiles: "Profile", curricula: "Curriculum", lessonPacks: "Lesson set", attempts: "Attempt", reviews: "Review", progress: "Progress", drafts: "Unfinished test", mapPlans: "Mastery map plan", stagedLessonPacks: "Lesson approval queue", activity: "Activity history", ui: "Pending test result" };
+const keyedArrays = { profiles: "id", curricula: "id", lessonPacks: "id", attempts: "attemptId", reviews: "reviewId", formalEvidence: "evidenceId" };
+const labels = { profiles: "Profile", curricula: "Curriculum", lessonPacks: "Lesson set", attempts: "Attempt", reviews: "Review", formalEvidence: "Formal proof evidence", progress: "Progress", drafts: "Unfinished test", mapPlans: "Mastery map plan", stagedLessonPacks: "Lesson approval queue", activity: "Activity history", ui: "Pending test result" };
 const navigationActivity = new Set(["select_profile", "logout_profile", "navigate_learning_app", "export_progress_backup"]);
 
 function canonical(value) {
@@ -133,9 +133,13 @@ export function createWorkspaceMerge({ baseJson = null, localJson, remoteJson, s
         if (["problems", "native_templates"].includes(path.at(-2))) subject = `Question in ${name(path[3])} · ${record?.prompt || record?.name || name(path.at(-1))}`;
       }
       else if (path[0] === "lessonPacks" && path[2] === "assets") subject = `Media file · ${path[3]}`;
-      else if (["attempts", "reviews"].includes(path[0]) && path.length === 2) {
-        const attempt = path[0] === "attempts" ? record : [...(local.attempts ?? []), ...(remote.attempts ?? [])].find((a) => a.attemptId === record?.attemptId);
-        subject = `${path[0] === "attempts" ? "Test attempt" : "Feedback"} · ${attempt?.skillName || name(attempt?.skillId || "lesson")}${record?.completedAt || record?.createdAt ? ` · ${record.completedAt || record.createdAt}` : ""}`;
+      else if (["attempts", "reviews", "formalEvidence"].includes(path[0]) && path.length === 2) {
+        if (path[0] === "formalEvidence") {
+          subject = `Formal proof evidence · ${name(record?.skillId || "lesson")} · ${record?.questionId || "question"}`;
+        } else {
+          const attempt = path[0] === "attempts" ? record : [...(local.attempts ?? []), ...(remote.attempts ?? [])].find((a) => a.attemptId === record?.attemptId);
+          subject = `${path[0] === "attempts" ? "Test attempt" : "Feedback"} · ${attempt?.skillName || name(attempt?.skillId || "lesson")}${record?.completedAt || record?.createdAt ? ` · ${record.completedAt || record.createdAt}` : ""}`;
+        }
       } else if (path[0] === "stagedLessonPacks" && path.length === 2) subject = `Lesson approval · ${record?.pack?.name || name(path[1])}`;
       title = `${before === undefined ? "Added" : after === undefined ? "Removed" : "Changed"} ${subject}`;
     }
@@ -184,7 +188,7 @@ export function createWorkspaceMerge({ baseJson = null, localJson, remoteJson, s
     if ((pp?.length === 1 && last === "hiddenSkillIds" || ["curricula", "profiles"].includes(section) && last === "enabledPackIds") && [l, r, b ?? []].every((items) => Array.isArray(items) && items.every((item) => typeof item === "string"))) {
       return { members: [...new Set([...l, ...r, ...(b ?? [])])].map((key) => [key, walk(b?.includes(key) ?? false, l.includes(key), r.includes(key), [...path, key])]) };
     }
-    const intact = (["attempts", "reviews", "stagedLessonPacks"].includes(section) && path.length === 2) || (section === "drafts" && path.length === 3) || (pp?.[0] === "layouts" && pp.length === 3) || (pp?.[0] === "annotations" && pp[2] === "positions" && pp.length === 4) || (section === "lessonPacks" && ["problems", "native_templates", "assets"].includes(path.at(-2)));
+    const intact = (["attempts", "reviews", "formalEvidence", "stagedLessonPacks"].includes(section) && path.length === 2) || (section === "drafts" && path.length === 3) || (pp?.[0] === "layouts" && pp.length === 3) || (pp?.[0] === "annotations" && pp[2] === "positions" && pp.length === 4) || (section === "lessonPacks" && ["problems", "native_templates", "assets"].includes(path.at(-2)));
     if (!intact && object(l) && object(r) && (b === undefined || object(b))) {
       // An added/deleted record is one choice. Existing records are compared by
       // field; this preserves delete-versus-edit conflicts and required IDs.

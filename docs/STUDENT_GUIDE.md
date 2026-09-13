@@ -687,3 +687,21 @@ A lesson or test can now show a graph whose coordinates match its randomized que
 Piecewise definitions, stacked fractions, directed limits and multi-line calculations may appear as formatted mathematical blocks. Open **Linear text** to select and copy a plain-text equivalent. On a narrow screen, wide mathematics can scroll horizontally; branch conditions are retained. Keyboard users can focus the mathematical block or its text description.
 
 A **Limit work** question asks for the approaching variable and input, direction, original expression, domain restrictions, steps and result kind. Distinguish a finite limit, positive infinity, negative infinity and no common limit. Start with the original expression and preserve restrictions after cancellation. These arguments always need tutor review; completing the form or getting the short answer correct does not prove the reasoning or immediately award mastery.
+
+## Formal proof exercises
+
+Some optional lessons use a **Proof workspace**. Add a mathematical claim, choose
+its justification, and cite the given facts or earlier step IDs. **Check my
+reasoning** reveals verified steps and remaining obligations. **Verify complete
+proof** checks your entire argument against the exact question with Lean.
+
+Only that complete check permits formal assessment. A tutor's guidance question
+or a checked lesson-author reference does not count as your proof. Editing a step
+withdraws verification; an offline edit stays saved and must be checked again.
+Restored proofs and certificates also require replay. An unavailable companion
+leaves the exercise pending without penalizing mastery.
+
+This feature needs the local Lean companion on the computer running the browser;
+opening GitHub Pages alone does not install it on a phone. Ordinary lessons
+continue to work without it. Setup guide:
+https://quickmathematics.github.io/QuickMaths/FORMAL_LEARNING.md

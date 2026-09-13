@@ -1,0 +1,141 @@
+{
+  "assumptions": [],
+  "goal": {
+    "kind": "proposition",
+    "proposition": {
+      "kind": "eq",
+      "left": {
+        "kind": "div",
+        "left": {
+          "kind": "sub",
+          "left": {
+            "base": {
+              "id": "x",
+              "kind": "var"
+            },
+            "exponent": 2,
+            "kind": "pow"
+          },
+          "right": {
+            "kind": "int",
+            "value": 9
+          }
+        },
+        "right": {
+          "kind": "sub",
+          "left": {
+            "id": "x",
+            "kind": "var"
+          },
+          "right": {
+            "kind": "int",
+            "value": 3
+          }
+        }
+      },
+      "right": {
+        "kind": "add",
+        "left": {
+          "id": "x",
+          "kind": "var"
+        },
+        "right": {
+          "kind": "int",
+          "value": 3
+        }
+      }
+    }
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "guarded_cancel"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "missing-restriction",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "kind": "eq",
+          "left": {
+            "kind": "div",
+            "left": {
+              "kind": "sub",
+              "left": {
+                "base": {
+                  "id": "x",
+                  "kind": "var"
+                },
+                "exponent": 2,
+                "kind": "pow"
+              },
+              "right": {
+                "kind": "int",
+                "value": 9
+              }
+            },
+            "right": {
+              "kind": "sub",
+              "left": {
+                "id": "x",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 3
+              }
+            }
+          },
+          "right": {
+            "kind": "add",
+            "left": {
+              "id": "x",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 3
+            }
+          }
+        }
+      },
+      "id": "cancel",
+      "parameters": {
+        "divisor": {
+          "kind": "sub",
+          "left": {
+            "id": "x",
+            "kind": "var"
+          },
+          "right": {
+            "kind": "int",
+            "value": 3
+          }
+        }
+      },
+      "premises": [],
+      "rule": "guarded_cancel",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuickMaths Formal Workbench</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">QuickMaths · formal verifier</p>
+      <h1>Proof workbench</h1>
+      <p class="lede">Write school-style mathematics. The assistant may construct a candidate proof, but only the pinned Lean kernel can issue a verified certificate.</p>
+      <div id="runtime" class="runtime">Checking verifier…</div>
+    </header>
+
+    <section class="card input-card">
+      <div class="field-grid">
+        <label>Declarations <span>one per line</span>
+          <textarea id="declarations" rows="4">x:real</textarea>
+        </label>
+        <label>Assumptions <span>one proposition per line</span>
+          <textarea id="assumptions" rows="4">x != 3</textarea>
+        </label>
+      </div>
+      <label>Goal
+        <textarea id="goal" rows="3">(x^2 - 9)/(x - 3) = x + 3</textarea>
+      </label>
+      <div class="actions">
+        <button id="prove" type="button">Build proof automatically</button>
+        <button id="manual-start" class="secondary" type="button">Start manual proof</button>
+        <select id="example" aria-label="Load example">
+          <option value="">Load an example…</option>
+          <option value="cancel">Guarded cancellation</option>
+          <option value="logic">Scoped implication</option>
+          <option value="forall">Universal identity</option>
+          <option value="funext">Function extensionality</option>
+          <option value="setext">Set extensionality</option>
+        </select>
+      </div>
+      <section id="manual-editor" class="manual-editor hidden" aria-label="Manual proof step editor">
+        <div class="panel-head"><div><p class="eyebrow">Manual proof</p><h2>Add one justified step</h2></div><span id="manual-state" class="badge">not started</span></div>
+        <div class="field-grid manual-grid">
+          <label>Claim
+            <textarea id="step-claim" rows="3" placeholder="x - 3 != 0"></textarea>
+          </label>
+          <label>Rule
+            <select id="step-rule"><option value="">Choose a rule…</option></select>
+          </label>
+          <label>Premise IDs <span>comma-separated</span>
+            <input id="step-premises" type="text" placeholder="h1, user_step_1">
+          </label>
+          <label><span id="step-parameter-label">Common term / witness (optional)</span>
+            <input id="step-term" type="text" placeholder="2">
+          </label>
+        </div>
+        <button id="add-step" type="button">Add checked step</button>
+        <p class="microcopy">A locally accepted step is still only a candidate until the pinned Lean kernel verifies the complete artifact.</p>
+      </section>
+    </section>
+
+    <section id="result" class="card result-card hidden" aria-live="polite">
+      <div class="result-head">
+        <div><p class="eyebrow">Result</p><h2 id="status-title">—</h2></div>
+        <span id="status-badge" class="badge">—</span>
+      </div>
+      <p id="message"></p>
+      <div class="panel"><h3>Canonical statement</h3><p id="preview"></p></div>
+      <div class="panel"><h3>Available assumptions</h3><ul id="context"></ul></div>
+      <div class="panel"><h3>Proof plan</h3><ol id="steps"></ol></div>
+      <div id="obligation-panel" class="panel hidden"><h3>Remaining obligations</h3><ul id="obligations"></ul></div>
+      <details class="panel"><summary>Generated Lean artifact</summary><pre id="lean"></pre></details>
+      <details class="panel"><summary>Exact verifier response</summary><pre id="raw"></pre></details>
+    </section>
+
+    <section class="card capability-card">
+      <h2>Advertised capability</h2>
+      <div id="capabilities">Loading…</div>
+    </section>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

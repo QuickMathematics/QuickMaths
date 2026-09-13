@@ -1,0 +1,90 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "kind": "sub",
+      "left": {
+        "kind": "int",
+        "value": 1
+      },
+      "right": {
+        "base": {
+          "denominator": 2,
+          "kind": "rat",
+          "numerator": 1
+        },
+        "exponent": {
+          "id": "n",
+          "kind": "var"
+        },
+        "kind": "pow_nat"
+      }
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "exists_finite"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_monotone_bounded"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence-monotone-bounded-auto-increasing",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "kind": "sub",
+          "left": {
+            "kind": "int",
+            "value": 1
+          },
+          "right": {
+            "base": {
+              "denominator": 2,
+              "kind": "rat",
+              "numerator": 1
+            },
+            "exponent": {
+              "id": "n",
+              "kind": "var"
+            },
+            "kind": "pow_nat"
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "exists_finite"
+        },
+        "variable": "n"
+      },
+      "id": "converges",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_monotone_bounded",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

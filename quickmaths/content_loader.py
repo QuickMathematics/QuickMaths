@@ -10,6 +10,7 @@ from yaml.constructor import ConstructorError
 from yaml.nodes import MappingNode
 
 from quickmaths.config import DEFAULT_TRACK_DIR, SUPPORTED_GRADING_METHODS
+from quickmaths.formal_spec import normalize_proof_spec
 from quickmaths.lesson_display import LessonDisplayError, normalize_cartesian_diagram, normalize_math_blocks
 from quickmaths.models import Example, MasteryRules, ProblemTemplate, Skill, SkillTest, Track
 
@@ -126,6 +127,10 @@ def validate_content(track: Track, skills: dict[str, Skill]) -> list[str]:
                     normalize_cartesian_diagram(question.diagram)
             except LessonDisplayError as exc:
                 raise ContentError(f"{skill.source_path}: question '{question.id}' has invalid native display: {exc}") from exc
+            try:
+                normalize_proof_spec(question.proof_spec)
+            except ValueError as exc:
+                raise ContentError(f"{skill.source_path}: question '{question.id}' has invalid proof_spec: {exc}") from exc
     return warnings
 
 
@@ -176,6 +181,7 @@ def _skill_from_dict(data: dict[str, Any], path: Path, content_hash: str) -> Ski
                 media=list(item.get("media", [])),
                 diagram=deepcopy(item.get("diagram")) if item.get("diagram") is not None else None,
                 math_blocks=list(item.get("math_blocks", [])),
+                proof_spec=deepcopy(item.get("proof_spec", {})),
             )
             for item in data["test"].get("questions", [])
         ]

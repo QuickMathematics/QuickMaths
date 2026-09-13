@@ -31,6 +31,8 @@ export const TOOL_NAMES = Object.freeze([
   "get_learning_context",
   "start_skill_test",
   "inspect_student_work",
+  "inspect_formal_proof",
+  "record_formal_guidance",
   "record_tutor_feedback",
   "create_followup_problem",
 ]);
@@ -204,7 +206,7 @@ function guideForSection(guide, section, state = {}) {
     tutoring_policy: guide.agent_policy?.tutoring ?? [],
     response_style: guide.response_style?.learner ?? [],
     activity_attribution: guide.state_model?.activity_attribution,
-    tools: ["get_app_state", "get_progress_summary", "get_curriculum_map", "get_learning_context", "start_skill_test", "inspect_student_work", "record_tutor_feedback", "create_followup_problem"],
+    tools: ["get_app_state", "get_progress_summary", "get_curriculum_map", "get_learning_context", "start_skill_test", "inspect_student_work", "inspect_formal_proof", "record_formal_guidance", "record_tutor_feedback", "create_followup_problem"],
   };
   if (section === "navigation") return {
     ...base,
@@ -987,6 +989,35 @@ export function buildToolDefinitions(store, agentManifest = {}, lessonDepot = nu
         requireObject(input); rejectUnknown(input, ["question_id"]);
         const policy = requireTutoringEnabled(store);
         return { ...store.inspectStudentWork({ questionId: optionalString(input, "question_id", 120) }), active_curriculum_policy: policy };
+      },
+    },
+    {
+      name: "inspect_formal_proof",
+      title: "Inspect the learner's formal proof",
+      description: "Read the exact public theorem, learner steps, Lean-established root steps and unresolved obligations. Never includes reference proofs, answer keys, proof artifacts or auto-solver strategies. Read again after edits; no verifier is invoked by this tool.",
+      inputSchema: { type: "object", properties: { question_id: stringSchema("Formal question in the active test; defaults to its first formal question.", 120) }, additionalProperties: false },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      async execute(input = {}) {
+        requireObject(input); rejectUnknown(input, ["question_id"]);
+        const policy = requireTutoringEnabled(store);
+        return { ...store.inspectFormalProof({ questionId: optionalString(input, "question_id", 120) }), active_curriculum_policy: policy };
+      },
+    },
+    {
+      name: "record_formal_guidance",
+      title: "Ask one revision-bound proof question",
+      description: "Select one Socratic question from inspect_formal_proof.guidance_options for the exact proof_revision. Cannot accept free-form solutions, proof steps, verdicts or certificates; cannot change grades or mastery. Stale guidance is rejected.",
+      inputSchema: { type: "object", properties: {
+        question_id: stringSchema("The inspected formal question.", 120),
+        proof_revision: stringSchema("Exact proof_revision from the latest inspection.", 64),
+        guidance_id: stringSchema("One guidance_options ID returned by that inspection.", 80),
+      }, required: ["question_id", "proof_revision", "guidance_id"], additionalProperties: false },
+      annotations: { untrustedContentHint: true },
+      async execute(input) {
+        requireObject(input); rejectUnknown(input, ["question_id", "proof_revision", "guidance_id"]);
+        requireTutoringEnabled(store);
+        return store.recordFormalGuidance({ questionId: requiredString(input, "question_id", 120),
+          proofRevision: requiredString(input, "proof_revision", 64), guidanceId: requiredString(input, "guidance_id", 80), activityActor: "agent" });
       },
     },
     {

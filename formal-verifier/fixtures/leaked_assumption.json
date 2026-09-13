@@ -1,0 +1,87 @@
+{
+  "assumptions": [
+    {
+      "claim": {
+        "kind": "gt",
+        "left": {
+          "id": "x",
+          "kind": "var"
+        },
+        "right": {
+          "kind": "int",
+          "value": 0
+        }
+      },
+      "id": "case_positive",
+      "scope": "case"
+    }
+  ],
+  "goal": {
+    "kind": "proposition",
+    "proposition": {
+      "kind": "gt",
+      "left": {
+        "id": "x",
+        "kind": "var"
+      },
+      "right": {
+        "kind": "int",
+        "value": 0
+      }
+    }
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "exact"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "leaked-assumption",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    },
+    {
+      "id": "case",
+      "parent": "root"
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "kind": "gt",
+          "left": {
+            "id": "x",
+            "kind": "var"
+          },
+          "right": {
+            "kind": "int",
+            "value": 0
+          }
+        }
+      },
+      "id": "leak",
+      "parameters": {},
+      "premises": [
+        "case_positive"
+      ],
+      "rule": "exact",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

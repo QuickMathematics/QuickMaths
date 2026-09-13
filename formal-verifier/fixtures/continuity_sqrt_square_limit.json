@@ -1,0 +1,94 @@
+{
+  "assumptions": [],
+  "goal": {
+    "direction": "both",
+    "domain": [],
+    "expression": {
+      "arg": {
+        "base": {
+          "id": "x",
+          "kind": "var"
+        },
+        "exponent": 2,
+        "kind": "pow"
+      },
+      "kind": "sqrt"
+    },
+    "kind": "limit",
+    "point": {
+      "kind": "int",
+      "value": 0
+    },
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 0
+      }
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "continuity_limit"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "continuity_sqrt_square_limit",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "direction": "both",
+        "domain": [],
+        "expression": {
+          "arg": {
+            "base": {
+              "id": "x",
+              "kind": "var"
+            },
+            "exponent": 2,
+            "kind": "pow"
+          },
+          "kind": "sqrt"
+        },
+        "kind": "limit",
+        "point": {
+          "kind": "int",
+          "value": 0
+        },
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "variable": "x"
+      },
+      "id": "proof",
+      "parameters": {},
+      "premises": [],
+      "rule": "continuity_limit",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

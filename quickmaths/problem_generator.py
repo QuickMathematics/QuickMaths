@@ -5,6 +5,7 @@ import re
 from copy import deepcopy
 from fractions import Fraction
 
+from quickmaths.formal_spec import resolve_proof_spec
 from quickmaths.math_syntax import equation_text_from_prompt, rational_equation_restrictions
 from quickmaths.lesson_display import LessonDisplayError, resolve_cartesian_diagram, resolve_math_blocks
 from quickmaths.limit_work import normalize_limit_spec
@@ -105,6 +106,7 @@ def _build_instance(skill_id: str, template: ProblemTemplate, seed: int, values:
         solution_steps = [render_template(line, values) for line in template.explanation_template.splitlines() if line.strip()]
     public_values = _public_values(template.prompt_template, values)
     diagram, math_blocks = _resolve_displays(template, public_values)
+    proof_spec = _resolve_formal_spec(template, public_values)
     review_policy = _review_policy_for_work(template.review_policy, work)
     return ProblemInstance(
         template_id=template.id,
@@ -130,6 +132,7 @@ def _build_instance(skill_id: str, template: ProblemTemplate, seed: int, values:
         media=deepcopy(template.media),
         diagram=diagram,
         math_blocks=math_blocks,
+        proof_spec=proof_spec,
     )
 
 
@@ -138,6 +141,7 @@ def _fixed_problem(skill_id: str, template: ProblemTemplate, seed: int) -> Probl
     work = _prepare_work(_enrich_structured_work(_render_nested(template.work, {}), template.prompt_template))
     review_policy = _review_policy_for_work(template.review_policy, work)
     diagram, math_blocks = _resolve_displays(template, {})
+    proof_spec = _resolve_formal_spec(template, {})
     return ProblemInstance(
         template_id=template.id,
         skill_id=skill_id,
@@ -162,6 +166,7 @@ def _fixed_problem(skill_id: str, template: ProblemTemplate, seed: int) -> Probl
         media=deepcopy(template.media),
         diagram=diagram,
         math_blocks=math_blocks,
+        proof_spec=proof_spec,
     )
 
 
@@ -194,6 +199,13 @@ def _resolve_displays(template: ProblemTemplate, public_values: dict[str, object
     except LessonDisplayError as exc:
         raise GenerationError(f"{template.id}: invalid native display: {exc}") from exc
     return diagram, math_blocks
+
+
+def _resolve_formal_spec(template: ProblemTemplate, public_values: dict[str, object]) -> dict:
+    try:
+        return resolve_proof_spec(template.proof_spec, public_values)
+    except ValueError as exc:
+        raise GenerationError(f"{template.id}: invalid proof_spec: {exc}") from exc
 
 
 def _prepare_work(work: dict) -> dict:

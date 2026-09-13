@@ -1,0 +1,193 @@
+{
+  "assumptions": [
+    {
+      "claim": {
+        "binder": {
+          "id": "k",
+          "type": "nat"
+        },
+        "body": {
+          "kind": "and",
+          "left": {
+            "kind": "le",
+            "left": {
+              "kind": "int",
+              "value": 0
+            },
+            "right": {
+              "arg": {
+                "kind": "add",
+                "left": {
+                  "id": "k",
+                  "kind": "var"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 1
+                }
+              },
+              "kind": "cast_real"
+            }
+          },
+          "right": {
+            "kind": "le",
+            "left": {
+              "arg": {
+                "kind": "add",
+                "left": {
+                  "id": "k",
+                  "kind": "var"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 1
+                }
+              },
+              "kind": "cast_real"
+            },
+            "right": {
+              "kind": "div",
+              "left": {
+                "kind": "int",
+                "value": 1
+              },
+              "right": {
+                "arg": {
+                  "kind": "add",
+                  "left": {
+                    "id": "k",
+                    "kind": "var"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 1
+                  }
+                },
+                "kind": "cast_real"
+              }
+            }
+          }
+        },
+        "kind": "forall"
+      },
+      "id": "h1",
+      "scope": "root"
+    }
+  ],
+  "goal": {
+    "expression": {
+      "arg": {
+        "kind": "add",
+        "left": {
+          "id": "n",
+          "kind": "var"
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      },
+      "kind": "cast_real"
+    },
+    "kind": "series_sum",
+    "result": {
+      "kind": "not_summable"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "series_p_series",
+      "series_comparison"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "series_comparison_wrong_direction",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "int",
+            "value": 1
+          },
+          "right": {
+            "arg": {
+              "kind": "add",
+              "left": {
+                "id": "n",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            },
+            "kind": "cast_real"
+          }
+        },
+        "kind": "series_sum",
+        "result": {
+          "kind": "not_summable"
+        },
+        "variable": "n"
+      },
+      "id": "comparison",
+      "parameters": {},
+      "premises": [],
+      "rule": "series_p_series",
+      "scope": "root"
+    },
+    {
+      "claim": {
+        "expression": {
+          "arg": {
+            "kind": "add",
+            "left": {
+              "id": "n",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          },
+          "kind": "cast_real"
+        },
+        "kind": "series_sum",
+        "result": {
+          "kind": "not_summable"
+        },
+        "variable": "n"
+      },
+      "id": "series",
+      "parameters": {},
+      "premises": [
+        "comparison",
+        "h1"
+      ],
+      "rule": "series_comparison",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

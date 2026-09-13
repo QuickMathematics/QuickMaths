@@ -11,7 +11,7 @@ import ast
 import math
 import re
 
-from sympy import Add, Float, Integer, Mul, Pow, Rational, Symbol
+from sympy import Abs, Add, Float, Integer, Mul, Pow, Rational, Symbol, cos, exp, log, sin
 from sympy.parsing.sympy_parser import stringify_expr
 
 
@@ -28,6 +28,7 @@ def parse_school_expression(source: str, names: dict, transformations: tuple, *,
     if any(not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", name) or "__" in name for name in names):
         raise ValueError("Invalid variable name.")
     constructors = {"Symbol": Symbol, "Integer": Integer, "Float": Float, "Rational": Rational}
+    unary_functions = {"abs": Abs, "exp": exp, "log": log, "sin": sin, "cos": cos}
     code = stringify_expr(source, dict(names), constructors, transformations)
     tree = ast.parse(code, mode="eval")
     if sum(1 for _ in ast.walk(tree)) > 256:
@@ -75,6 +76,8 @@ def parse_school_expression(source: str, names: dict, transformations: tuple, *,
             name = node.func.id
             if name == "sqrt" and len(node.args) == 1:
                 return power(child(node.args[0]), Rational(1, 2))
+            if name in unary_functions and len(node.args) == 1:
+                return unary_functions[name](child(node.args[0]))
             if name in constructors and len(node.args) == 1 and isinstance(node.args[0], ast.Constant):
                 value = node.args[0].value
                 if name == "Symbol" and isinstance(value, str) and re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", value) and "__" not in value:

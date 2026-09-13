@@ -1,0 +1,116 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "kind": "div",
+      "left": {
+        "kind": "add",
+        "left": {
+          "kind": "mul",
+          "left": {
+            "kind": "int",
+            "value": 2
+          },
+          "right": {
+            "arg": {
+              "id": "n",
+              "kind": "var"
+            },
+            "kind": "cast_real"
+          }
+        },
+        "right": {
+          "kind": "int",
+          "value": 3
+        }
+      },
+      "right": {
+        "kind": "int",
+        "value": 7
+      }
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 0
+      }
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_affine_ratio"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence_affine_ratio_zero_leading_denominator",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "add",
+            "left": {
+              "kind": "mul",
+              "left": {
+                "kind": "int",
+                "value": 2
+              },
+              "right": {
+                "arg": {
+                  "id": "n",
+                  "kind": "var"
+                },
+                "kind": "cast_real"
+              }
+            },
+            "right": {
+              "kind": "int",
+              "value": 3
+            }
+          },
+          "right": {
+            "kind": "int",
+            "value": 7
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "variable": "n"
+      },
+      "id": "ratio",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_affine_ratio",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

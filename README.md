@@ -134,3 +134,7 @@ pip install -e ".[media]"
 quickmaths build-lesson docs/examples/geometry-media/lesson-set.yaml --output built-lesson
 # Add --portable for one JSON file with up to 1 MB of embedded attachments.
 ```
+
+## Local formal-learning build
+
+Formal questions now connect the native proof workspace to reference-free WebMCP guidance and fresh Lean-certificate-gated assessment. Import `examples/formal-proof-lab.lesson-set.json` to try three candidate lessons. Pending/unavailable verification is not a learner failure. See [setup and trust boundaries](docs/FORMAL_LEARNING.md) and [the local release and validation notes](LOCAL_RELEASE.md). This source release does not bundle Lean or claim its reference candidates have been kernel-verified here.

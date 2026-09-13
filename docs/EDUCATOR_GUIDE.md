@@ -756,3 +756,21 @@ Studio's optional **Mathematical displays and function graph** panel accepts val
 Select **Limit argument · tutor review** for structured calculus work. Configure the original expression, approach, direction and required domain restrictions. The engine checks setup and form completeness; a tutor must judge legal transformations, admissible domains, limit-law hypotheses and proof completeness. The mode requires review and disallows self-review. Keep open IVT and uniqueness arguments in proof/rubric review modes. Do not interpret pending review as a proof pass.
 
 Native media builds now report current bytes, remaining budget and optional growth since the previous batch. The default native embedded budget remains 1 MB; imported pack limits remain separate. Hosted native chunks and an explicit offline download workflow are not part of this update.
+
+## Authoring formal proof exercises
+
+Studio's formal proof settings define the exact public statement, variable
+domains, assumptions, allowed rules and optional reference steps. Run **Check
+reference proof with companion verifier** after editing, before publishing. The
+reference is checked in its own mode and cannot pass a learner's assessment.
+Only a fresh complete learner proof accepted by the pinned Lean companion can
+do that. Existing rubric and limit-argument review modes remain distinct.
+
+The optional Proof Lab pack contains three kernel-checked reference examples.
+Tutors can inspect public proof state and offer bounded guidance questions;
+their tools cannot expose references, insert proof steps or grade formal work.
+Backups preserve proof data but restored verification needs replay.
+
+Setup and the tutor contract: https://quickmathematics.github.io/QuickMaths/FORMAL_LEARNING.md
+
+Declarative authoring format: https://quickmathematics.github.io/QuickMaths/CUSTOM_LESSON_SETS.md

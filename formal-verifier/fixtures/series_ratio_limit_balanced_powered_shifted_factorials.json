@@ -1,0 +1,230 @@
+{
+  "version": "0.1",
+  "request_id": "series_ratio_limit_balanced_powered_shifted_factorials",
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null,
+      "binders": []
+    }
+  ],
+  "assumptions": [],
+  "steps": [
+    {
+      "id": "auto_proof",
+      "scope": "root",
+      "claim": {
+        "kind": "series_sum",
+        "variable": "n",
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "mul",
+            "left": {
+              "kind": "mul",
+              "left": {
+                "kind": "pow",
+                "base": {
+                  "kind": "factorial",
+                  "arg": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "n"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 1
+                    }
+                  }
+                },
+                "exponent": 2
+              },
+              "right": {
+                "kind": "pow",
+                "base": {
+                  "kind": "factorial",
+                  "arg": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "n"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                },
+                "exponent": 3
+              }
+            },
+            "right": {
+              "kind": "pow_nat",
+              "base": {
+                "kind": "rat",
+                "numerator": 1,
+                "denominator": 3
+              },
+              "exponent": {
+                "kind": "var",
+                "id": "n"
+              }
+            }
+          },
+          "right": {
+            "kind": "mul",
+            "left": {
+              "kind": "pow",
+              "base": {
+                "kind": "factorial",
+                "arg": {
+                  "kind": "var",
+                  "id": "n"
+                }
+              },
+              "exponent": 2
+            },
+            "right": {
+              "kind": "pow",
+              "base": {
+                "kind": "factorial",
+                "arg": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "n"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 2
+                  }
+                }
+              },
+              "exponent": 3
+            }
+          }
+        },
+        "result": {
+          "kind": "summable"
+        }
+      },
+      "rule": "series_ratio_limit_test",
+      "premises": [],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "series_sum",
+    "variable": "n",
+    "expression": {
+      "kind": "div",
+      "left": {
+        "kind": "mul",
+        "left": {
+          "kind": "mul",
+          "left": {
+            "kind": "pow",
+            "base": {
+              "kind": "factorial",
+              "arg": {
+                "kind": "add",
+                "left": {
+                  "kind": "var",
+                  "id": "n"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 1
+                }
+              }
+            },
+            "exponent": 2
+          },
+          "right": {
+            "kind": "pow",
+            "base": {
+              "kind": "factorial",
+              "arg": {
+                "kind": "add",
+                "left": {
+                  "kind": "var",
+                  "id": "n"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            },
+            "exponent": 3
+          }
+        },
+        "right": {
+          "kind": "pow_nat",
+          "base": {
+            "kind": "rat",
+            "numerator": 1,
+            "denominator": 3
+          },
+          "exponent": {
+            "kind": "var",
+            "id": "n"
+          }
+        }
+      },
+      "right": {
+        "kind": "mul",
+        "left": {
+          "kind": "pow",
+          "base": {
+            "kind": "factorial",
+            "arg": {
+              "kind": "var",
+              "id": "n"
+            }
+          },
+          "exponent": 2
+        },
+        "right": {
+          "kind": "pow",
+          "base": {
+            "kind": "factorial",
+            "arg": {
+              "kind": "add",
+              "left": {
+                "kind": "var",
+                "id": "n"
+              },
+              "right": {
+                "kind": "int",
+                "value": 2
+              }
+            }
+          },
+          "exponent": 3
+        }
+      }
+    },
+    "result": {
+      "kind": "summable"
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "series_ratio_limit_test"
+    ],
+    "max_seconds": 10,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

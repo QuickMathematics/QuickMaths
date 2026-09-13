@@ -1,0 +1,144 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "arg": {
+        "kind": "add",
+        "left": {
+          "base": {
+            "id": "x",
+            "kind": "var"
+          },
+          "exponent": 2,
+          "kind": "pow"
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      },
+      "kind": "sqrt"
+    },
+    "kind": "derivative",
+    "point": {
+      "id": "a",
+      "kind": "var"
+    },
+    "result": {
+      "kind": "div",
+      "left": {
+        "id": "a",
+        "kind": "var"
+      },
+      "right": {
+        "arg": {
+          "kind": "add",
+          "left": {
+            "base": {
+              "id": "a",
+              "kind": "var"
+            },
+            "exponent": 2,
+            "kind": "pow"
+          },
+          "right": {
+            "kind": "int",
+            "value": 1
+          }
+        },
+        "kind": "sqrt"
+      }
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "recursive_derivative"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "recursive_sqrt_square_plus_one",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "arg": {
+            "kind": "add",
+            "left": {
+              "base": {
+                "id": "x",
+                "kind": "var"
+              },
+              "exponent": 2,
+              "kind": "pow"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          },
+          "kind": "sqrt"
+        },
+        "kind": "derivative",
+        "point": {
+          "id": "a",
+          "kind": "var"
+        },
+        "result": {
+          "kind": "div",
+          "left": {
+            "id": "a",
+            "kind": "var"
+          },
+          "right": {
+            "arg": {
+              "kind": "add",
+              "left": {
+                "base": {
+                  "id": "a",
+                  "kind": "var"
+                },
+                "exponent": 2,
+                "kind": "pow"
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            },
+            "kind": "sqrt"
+          }
+        },
+        "variable": "x"
+      },
+      "id": "auto_proof",
+      "parameters": {},
+      "premises": [],
+      "rule": "recursive_derivative",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "a",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

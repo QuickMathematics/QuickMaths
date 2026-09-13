@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Unified Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 31,
+  "app_version": 33,
   "description": "The single operating guide for routing fresh visitors, tutoring learners, and helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -227,8 +227,9 @@
     "tutoring": [
       "Work Socratically: diagnose briefly, ask one useful question or give one next step, then let the learner attempt it.",
       "Never reveal expected answers or solution steps before submission.",
-      "Inspect only visible student work from the active draft or saved attempt. For proofs, return one status for every proof obligation; for rubric responses, return points for every criterion. Save concise evidence, a Socratic next step, and the structured results with record_tutor_feedback.",
-      "Do not mark a skill mastered or claim progress was saved unless the app result confirms it."
+      "For formal proof questions, call inspect_formal_proof and select one offered question with record_formal_guidance using its exact proof_revision. Never use record_tutor_feedback, a verdict, or your own correctness judgment to grade a formal proof. Reference proofs remain excluded, including after submission. For ordinary proof-obligation or rubric exercises only, use the existing structured review workflow.",
+      "Do not mark a skill mastered or claim progress was saved unless the app result confirms it.",
+      "Candidate-ready is not verified. Report only returned Lean-verified steps. A missing denominator condition is a question to investigate, not a conclusion that the theorem is false. Unavailable verification grants no new mastery and is not a learner failure."
     ],
     "navigation": [
       "Use navigate_learning_app and start_skill_test so agent changes remain visible in the human interface.",
@@ -329,6 +330,8 @@
     "get_learning_context",
     "start_skill_test",
     "inspect_student_work",
+    "inspect_formal_proof",
+    "record_formal_guidance",
     "record_tutor_feedback",
     "create_followup_problem"
   ],
@@ -407,7 +410,13 @@
       "exact_text",
       "theorem_conclusion"
     ],
-    "calculus_authoring": {"guide":"./CALCULUS_ENGINE.md","math_display_guide":"./MATH_DISPLAY.md","diagrams":"Bounded declarative Cartesian diagrams bind only to public prompt givens and persist with resolved questions.","limit_work":"limit_steps captures setup, restrictions and typed results; transformations and theorem applicability always require tutor review. No automatic semantic limit proof grading.","native_media":"Default native embedded budget remains 1000000 bytes; exporter can report batch growth and accept an explicit native-only budget. Hosted chunks and offline prefetch are not implemented."},
+    "calculus_authoring": {
+      "guide": "./CALCULUS_ENGINE.md",
+      "math_display_guide": "./MATH_DISPLAY.md",
+      "diagrams": "Bounded declarative Cartesian diagrams bind only to public prompt givens and persist with resolved questions.",
+      "limit_work": "limit_steps captures setup, restrictions and typed results; transformations and theorem applicability always require tutor review. No automatic semantic limit proof grading.",
+      "native_media": "Default native embedded budget remains 1000000 bytes; exporter can report batch growth and accept an explicit native-only budget. Hosted chunks and offline prefetch are not implemented."
+    },
     "supported_work_modes": [
       "limit_steps",
       "none",
@@ -483,5 +492,21 @@
       "illustration_library": "All 128 shipped lesson pages have teaching figures. A content-matched library adds 130 hosted Matplotlib SVGs across 118 library lessons without reinstalling packs or rewriting saved work. Native overrides keep their own media. Studio copies include matching assets under normal media limits. Hosted figures load near the viewport and are not guaranteed offline. Spatial tests include 73 trigonometry scenarios and eleven additional triangle-area scenarios, derived only from displayed givens; six abstract identity scenarios remain text-only."
     },
     "native_authoring_function_allowlist": "Trusted native authoring may use normal_cdf(z), inverse_normal_cdf(p), t_cdf(t, df), chi_square_cdf(x, df), chi_square_sf(x, df), and f_sf(x, df1, df2), with finite/domain-checked inputs. These helpers are first-party native functions only; uploaded, Depot, and community lesson packages remain fixed data and cannot execute generator or helper code."
+  },
+  "formal_proof_authoring": {
+    "schema": "../schemas/formal-proof-spec.schema.json",
+    "status": "Local learner integration: proof_spec questions use the native proof workspace and require a fresh complete Lean certificate or replay for assessment. No Lean kernel is bundled; pending/unavailable verification is explicit. Reference proofs must be checked with the pinned companion before publication.",
+    "parameter_binding": "Generated proof specifications resolve only from exact named values visible in the learner prompt; hidden derived generator values are rejected.",
+    "trusted_boundary": "Lesson packages provide declarative statements and policy metadata only. Lean source, tactics, imports, macros and executable package code are not accepted.",
+    "assessment_policy": "Nonempty method-specific assessment policies are not implemented by the learner assessment path and explicitly block credit. Leave assessment_policy empty for this build."
+  },
+  "formal_proof_learning": {
+    "inspect_tool": "inspect_formal_proof",
+    "guidance_tool": "record_formal_guidance",
+    "reference_boundary": "Public theorem, learner claims, scopes, verified root-step IDs and obligations only. No reference proof, answer key, generated Lean or solver strategy.",
+    "guidance_boundary": "Choose one offered guidance_id for the exact proof_revision. Free text, verdicts, certificates, supplied proof steps and obligation verdicts are rejected. Guidance has no assessment effect.",
+    "assessment_boundary": "The app alone requests verification. Fresh complete submitted-proof certificates enable submission and reflection. Prefix/reference/assisted certificates, imported JSON and tutor opinions cannot do so.",
+    "persistence_boundary": "Backup, assignment import, sync and Agent Bridge transport archive data only. Edits invalidate live verification; restore requires replay. Historical scores are records, not current certificates.",
+    "threat_model": "The loopback companion and local app origin are trusted. Digest consistency is binding, not cryptographic server authentication or high-stakes anti-cheating security."
   }
 }

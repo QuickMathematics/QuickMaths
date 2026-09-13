@@ -1,0 +1,137 @@
+{
+  "assumptions": [],
+  "goal": {
+    "kind": "proposition",
+    "proposition": {
+      "binder": {
+        "id": "c",
+        "type": "real"
+      },
+      "body": {
+        "kind": "and",
+        "left": {
+          "kind": "le",
+          "left": {
+            "kind": "int",
+            "value": -1
+          },
+          "right": {
+            "id": "c",
+            "kind": "var"
+          }
+        },
+        "right": {
+          "kind": "and",
+          "left": {
+            "kind": "le",
+            "left": {
+              "id": "c",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          },
+          "right": {
+            "kind": "eq",
+            "left": {
+              "arg": {
+                "id": "c",
+                "kind": "var"
+              },
+              "kind": "exp"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          }
+        }
+      },
+      "kind": "exists"
+    }
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "continuous_ivt_exists"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "continuous_ivt_missing_brackets",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "binder": {
+            "id": "c",
+            "type": "real"
+          },
+          "body": {
+            "kind": "and",
+            "left": {
+              "kind": "le",
+              "left": {
+                "kind": "int",
+                "value": -1
+              },
+              "right": {
+                "id": "c",
+                "kind": "var"
+              }
+            },
+            "right": {
+              "kind": "and",
+              "left": {
+                "kind": "le",
+                "left": {
+                  "id": "c",
+                  "kind": "var"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 1
+                }
+              },
+              "right": {
+                "kind": "eq",
+                "left": {
+                  "arg": {
+                    "id": "c",
+                    "kind": "var"
+                  },
+                  "kind": "exp"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 1
+                }
+              }
+            }
+          },
+          "kind": "exists"
+        }
+      },
+      "id": "proof",
+      "parameters": {},
+      "premises": [],
+      "rule": "continuous_ivt_exists",
+      "scope": "root"
+    }
+  ],
+  "variables": [],
+  "version": "0.1"
+}

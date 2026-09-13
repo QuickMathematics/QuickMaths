@@ -1,0 +1,131 @@
+{
+  "version": "0.1",
+  "request_id": "sqrt-derivative",
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "a",
+      "type": "real"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "hpos",
+      "scope": "root",
+      "claim": {
+        "kind": "lt",
+        "left": {
+          "kind": "int",
+          "value": 0
+        },
+        "right": {
+          "kind": "var",
+          "id": "a"
+        }
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": "derivative_step",
+      "scope": "root",
+      "claim": {
+        "kind": "derivative",
+        "variable": "x",
+        "expression": {
+          "kind": "sqrt",
+          "arg": {
+            "kind": "var",
+            "id": "x"
+          }
+        },
+        "point": {
+          "kind": "var",
+          "id": "a"
+        },
+        "result": {
+          "kind": "div",
+          "left": {
+            "kind": "int",
+            "value": 1
+          },
+          "right": {
+            "kind": "mul",
+            "left": {
+              "kind": "int",
+              "value": 2
+            },
+            "right": {
+              "kind": "sqrt",
+              "arg": {
+                "kind": "var",
+                "id": "a"
+              }
+            }
+          }
+        }
+      },
+      "rule": "sqrt_derivative",
+      "premises": [
+        "hpos"
+      ],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "derivative",
+    "variable": "x",
+    "expression": {
+      "kind": "sqrt",
+      "arg": {
+        "kind": "var",
+        "id": "x"
+      }
+    },
+    "point": {
+      "kind": "var",
+      "id": "a"
+    },
+    "result": {
+      "kind": "div",
+      "left": {
+        "kind": "int",
+        "value": 1
+      },
+      "right": {
+        "kind": "mul",
+        "left": {
+          "kind": "int",
+          "value": 2
+        },
+        "right": {
+          "kind": "sqrt",
+          "arg": {
+            "kind": "var",
+            "id": "a"
+          }
+        }
+      }
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "sqrt_derivative"
+    ],
+    "max_seconds": 10,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

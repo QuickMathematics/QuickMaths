@@ -100,3 +100,12 @@ def test_interval_set_rejects_closed_infinity():
 
     with pytest.raises(Exception):
         parse_interval_set("[-inf, 3]")
+
+
+def test_elementary_functions_parse_and_compare_without_becoming_variable_names():
+    assert expressions_equivalent("2*a*exp(a^2)", "exp(a^2)*2a", ["a"]) is True
+    assert expressions_equivalent("2*cos(2*a)", "cos(2*a)*2", ["a"]) is True
+    assert expressions_equivalent("-2*a*sin(a^2)", "-(2*a)*sin(a^2)", ["a"]) is True
+    assert expressions_equivalent("1/(a+1)", "1/(1+a)", ["a"]) is True
+    assert parse_expression("log(a + 1)", ["a"]).func.__name__ == "log"
+    assert parse_expression("abs(a - 1)", ["a"]).func.__name__ == "Abs"

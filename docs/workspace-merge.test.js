@@ -251,3 +251,24 @@ test('independent profile pack selections merge per pack without leaking between
  assert.deepEqual(new Set(merged.profiles[0].enabledPackIds),new Set(['one','two']));
  assert.deepEqual(merged.profiles[1].enabledPackIds,[]);
 });
+
+test("formal proof evidence merges as immutable records and never field-splices certificates", () => {
+  const base = { profiles: [], curricula: [], lessonPacks: [], attempts: [], reviews: [], formalEvidence: [], progress: {}, drafts: {}, mapPlans: {}, stagedLessonPacks: [], activity: [], ui: {} };
+  const left = structuredClone(base);
+  const right = structuredClone(base);
+  left.formalEvidence.push({ evidenceId: "formal:a", profileId: "p", certificateDigest: "a" });
+  right.formalEvidence.push({ evidenceId: "formal:b", profileId: "p", certificateDigest: "b" });
+  const independent = createWorkspaceMerge({ baseJson: JSON.stringify(base), localJson: JSON.stringify(left), remoteJson: JSON.stringify(right) });
+  assert.deepEqual(JSON.parse(independent.resolve({})).formalEvidence.map((item) => item.evidenceId).sort(), ["formal:a", "formal:b"]);
+
+  const original = structuredClone(base);
+  original.formalEvidence = [{ evidenceId: "formal:a", profileId: "p", certificateDigest: "a", requestHash: "r0" }];
+  const local = structuredClone(original);
+  const remote = structuredClone(original);
+  local.formalEvidence[0].requestHash = "local-tamper";
+  remote.formalEvidence[0].certificateDigest = "remote-tamper";
+  const conflict = createWorkspaceMerge({ baseJson: JSON.stringify(original), localJson: JSON.stringify(local), remoteJson: JSON.stringify(remote) });
+  const rows = conflict.rows;
+  assert.equal(rows.filter((row) => row.path[0] === "formalEvidence").length, 1);
+  assert.equal(rows.find((row) => row.path[0] === "formalEvidence")?.conflict, true);
+});

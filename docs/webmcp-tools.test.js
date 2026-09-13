@@ -179,7 +179,7 @@ test("browser shell exposes Settings, Lesson Depot, map zoom, prompt copy, and p
   assert.match(js, /map-hint-desktop/);
   assert.match(js, /map-hint-touch/);
   assert.match(js, /data-action=\"toggle-plan-mode\"/);
-  assert.match(js, /data-action=\"toggle-plan-view\"/);
+  assert.doesNotMatch(js, /data-action=\"toggle-plan-view\"/); // Read-only plan view follows the active plan, not a separate toggle.
   assert.match(js, /Plan view · read only/);
   assert.match(js, /class=\"map-selection-marquee\"/);
   assert.match(js, /event\.ctrlKey \|\| event\.metaKey/);
@@ -278,13 +278,13 @@ test("agent bridge ships as a dedicated top-level WebMCP workspace", () => {
   assert.match(js, /local-git-transport/);
 });
 
-test("registers all thirty-three tools once with the WebMCP document context", async () => {
+test("registers all thirty-five tools once with the WebMCP document context", async () => {
   const registered = [];
   const result = await registerWebMcpTools(createStore(), {
     async registerTool(definition) { registered.push(definition); },
   }, agentManifest, null, null, authoringGuide, { learner: learnerManual, educator: educatorManual });
   assert.equal(result.available, true);
-  assert.equal(TOOL_NAMES.length, 33);
+  assert.equal(TOOL_NAMES.length, 35);
   assert.deepEqual(result.registered, TOOL_NAMES);
   assert.deepEqual(result.failures, []);
   assert.deepEqual(registered.map(({ name }) => name), TOOL_NAMES);
@@ -310,7 +310,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   const serialized = JSON.stringify(full);
   assert.equal(summary.section, "summary");
   assert.equal(summary.guide.app, "QuickMaths Web");
-  assert.equal(summary.guide.app_version, 30);
+  assert.equal(summary.guide.app_version, agentManifest.app_version);
   assert.match(summary.guide.browser_boundary, /ChatGPT or Codex in-app browser/);
   assert.match(summary.guide.browser_boundary, /already-open in-app QuickMaths tab/);
   assert.match(summary.guide.mobile_boundary, /First-time agent-in-the-loop setup must be completed on a computer/);
@@ -318,7 +318,7 @@ test("agent guide exposes operating, backup, and custom-content policy without l
   assert.match(summary.guide.source_fallback, /github\.com\/QuickMathematics\/QuickMaths/);
   assert.match(summary.guide.source_fallback, /fallback source of truth/);
   assert.deepEqual(summary.guide.recommended_sequence, ["get_app_state", "get_progress_summary", "get_learning_context"]);
-  assert.equal(summary.guide.tools.length, 33);
+  assert.equal(summary.guide.tools.length, TOOL_NAMES.length);
   assert.equal(summary.guide.active_role_guidance.role, "learner");
   assert.match(summary.guide.active_role_guidance.response_style.join(" "), /lightly quirky/);
   assert.match(summary.guide.remote_mobile.first_setup, /computer that will remain online/);

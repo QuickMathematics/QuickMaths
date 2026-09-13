@@ -394,6 +394,10 @@ def _dry_run_question(skill: Skill, question: ProblemTemplate, report: Validatio
     structured = None
     if instance.grading_method == "rational_expression":
         structured = {"excluded_values": list(instance.answer_metadata.get("excluded_values", []))}
+    if instance.proof_spec:
+        # Declarative content validation is not a reference-proof certificate.
+        # The generated instance has already validated its formal specification.
+        return
     result = grade_answer(instance, UserResponse(final_answer=instance.expected_answer, structured_work_json=structured))
     if not result.is_correct:
         report.add_error(

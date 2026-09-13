@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createLessonStudio } from "./lesson-creator.js";
-import { gradeProblem } from "./challenge-core.js";
+import { gradeProblem, normalizeLessonPack } from "./challenge-core.js";
 
 function snapshot() {
   const activeSubject = {
@@ -444,4 +444,81 @@ test("editing lesson text preserves prompt blocks, proof obligations and weighte
   const editedCriteria = studio.buildPack().skills[0].problems[0].work.rubric.criteria;
   assert.deepEqual(editedCriteria.slice(0, 2), [criteria[1], criteria[0]]);
   assert.equal(new Set(editedCriteria.map(item => item.id)).size, 3);
+});
+
+test("Lesson Studio authors a pinned declarative formal proof spec and round-trips its reference proof", () => {
+  const { studio, state } = studioHarness();
+  studio.handleAction({ dataset: { creatorAction: "apply-formal-example", index: "0" } });
+  const html = studio.render(state);
+  let problem = studio.buildPack().skills[0].problems[0];
+  assert.match(html, /QuickMaths owns the meaning; Lean checks the proof/);
+  assert.match(html, /Prove the exercise before publishing it/);
+  assert.equal(problem.proof_spec.version, "0.1");
+  assert.deepEqual(problem.proof_spec.statement.declarations, ["x:real"]);
+  assert.equal(problem.proof_spec.statement.goal, "x^2 - 9 = (x - 3) * (x + 3)");
+  assert.deepEqual(problem.proof_spec.allowed_rules, ["ring_identity"]);
+  assert.equal(problem.proof_spec.reference_proof.mode, "steps");
+  assert.equal(problem.proof_spec.reference_proof.steps[0].rule, "ring_identity");
+  assert.equal(problem.proof_spec.environment.backend, "lean4");
+  assert.match(problem.proof_spec.environment.toolchain, /lean4:v4\.34\.0-rc2/);
+  assert.match(problem.proof_spec.environment.library_revision, /^[a-f0-9]{40}$/);
+
+  problem.proof_spec.assessment_policy = { required_method: "direct", allow_routine_gaps: false };
+  problem.proof_spec.parameter_contract = { required_public: ["a"] };
+  assert.equal(studio.loadRaw(JSON.stringify(studio.buildPack())), true);
+  // Reload the modified object explicitly so the round-trip covers non-UI policy fields too.
+  const source = studio.buildPack();
+  source.skills[0].problems[0].proof_spec = problem.proof_spec;
+  assert.equal(studio.loadRaw(JSON.stringify(source)), true);
+  problem = studio.buildPack().skills[0].problems[0];
+  assert.deepEqual(problem.proof_spec.assessment_policy, { required_method: "direct", allow_routine_gaps: false });
+  assert.deepEqual(problem.proof_spec.parameter_contract.required_public, ["a"]);
+});
+
+test("browser ingestion binds a Studio formal question even when the author file has no precomputed job", () => {
+  const { studio } = studioHarness();
+  studio.handleAction({ dataset: { creatorAction: "apply-formal-example", index: "0" } });
+  changeProblemField(studio, "expectedAnswer", "x^2 - 9 = (x - 3) * (x + 3)");
+  const authorPack = studio.buildPack();
+  assert.equal(authorPack.skills[0].problems[0].formal_job, undefined);
+  const normalized = normalizeLessonPack(authorPack, { knownSkillIds: ["MATH_ARITH_001"] });
+  const problem = normalized.skills[0].problems[0];
+  assert.match(problem.formal_job.problem_binding_sha256, /^[a-f0-9]{64}$/);
+  assert.equal(problem.formal_job.rpc.request_id, `quickmaths:${problem.formal_job.problem_binding_sha256}`);
+  assert.equal(problem.formal_job.rpc.goal, problem.proof_spec.statement.goal);
+  assert.deepEqual(problem.formal_job.environment_requirements, problem.proof_spec.environment);
+
+  const forged = structuredClone(authorPack);
+  forged.skills[0].problems[0].formal_job = structuredClone(problem.formal_job);
+  forged.skills[0].problems[0].formal_job.problem_binding_sha256 = "0".repeat(64);
+  forged.skills[0].problems[0].formal_job.rpc.request_id = `quickmaths:${"0".repeat(64)}`;
+  assert.throws(() => normalizeLessonPack(forged, { knownSkillIds: ["MATH_ARITH_001"] }), /binding does not match the displayed problem/);
+});
+
+test("Studio reference proof check reports kernel unavailability without claiming certification", async (t) => {
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options = {}) => {
+    const path = new URL(url).pathname;
+    if (path === "/health") return { ok: true, status: 200, json: async () => ({
+      service: "quickmaths-formal", protocol_version: "0.1", lean_available: false,
+      environment: { backend: "lean4", library: "mathlib", lean_toolchain: "leanprover/lean4:v4.34.0-rc2", mathlib_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c" },
+    }) };
+    if (path === "/v1/rpc") {
+      const rpc = JSON.parse(options.body);
+      assert.equal(rpc.op, "check_reference_text");
+      assert.equal(rpc.reference_steps[0].rule, "ring_identity");
+      return { ok: true, status: 200, json: async () => ({ protocol_version: "0.1", ok: true, result: {
+        request: { request_id: rpc.request_id }, proof_state: { status: "ready_for_kernel", message: "Ready", obligations: [] },
+        verification: { status: "verification_unavailable", certificate: null },
+      } }) };
+    }
+    throw new Error(`Unexpected Studio verifier path ${path}`);
+  };
+  t.after(() => { globalThis.fetch = previousFetch; });
+  const { studio, state } = studioHarness();
+  studio.handleAction({ dataset: { creatorAction: "apply-formal-example", index: "0" } });
+  const changed = await studio.handleAction({ dataset: { creatorAction: "check-formal-reference", index: "0" } });
+  assert.equal(changed, true);
+  assert.match(studio.render(state), /Lean kernel unavailable/);
+  assert.doesNotMatch(studio.render(state), /Kernel-certified reference proof/);
 });

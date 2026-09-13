@@ -1,0 +1,156 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "kind": "div",
+      "left": {
+        "kind": "add",
+        "left": {
+          "kind": "mul",
+          "left": {
+            "denominator": 2,
+            "kind": "rat",
+            "numerator": 1
+          },
+          "right": {
+            "arg": {
+              "id": "n",
+              "kind": "var"
+            },
+            "kind": "cast_real"
+          }
+        },
+        "right": {
+          "kind": "int",
+          "value": 3
+        }
+      },
+      "right": {
+        "kind": "add",
+        "left": {
+          "kind": "mul",
+          "left": {
+            "denominator": 4,
+            "kind": "rat",
+            "numerator": 3
+          },
+          "right": {
+            "arg": {
+              "id": "n",
+              "kind": "var"
+            },
+            "kind": "cast_real"
+          }
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      }
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "finite",
+      "value": {
+        "denominator": 3,
+        "kind": "rat",
+        "numerator": 2
+      }
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_affine_ratio"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence_affine_ratio_rational",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "add",
+            "left": {
+              "kind": "mul",
+              "left": {
+                "denominator": 2,
+                "kind": "rat",
+                "numerator": 1
+              },
+              "right": {
+                "arg": {
+                  "id": "n",
+                  "kind": "var"
+                },
+                "kind": "cast_real"
+              }
+            },
+            "right": {
+              "kind": "int",
+              "value": 3
+            }
+          },
+          "right": {
+            "kind": "add",
+            "left": {
+              "kind": "mul",
+              "left": {
+                "denominator": 4,
+                "kind": "rat",
+                "numerator": 3
+              },
+              "right": {
+                "arg": {
+                  "id": "n",
+                  "kind": "var"
+                },
+                "kind": "cast_real"
+              }
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "finite",
+          "value": {
+            "denominator": 3,
+            "kind": "rat",
+            "numerator": 2
+          }
+        },
+        "variable": "n"
+      },
+      "id": "ratio",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_affine_ratio",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

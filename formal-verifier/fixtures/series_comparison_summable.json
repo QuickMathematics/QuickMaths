@@ -1,0 +1,208 @@
+{
+  "assumptions": [
+    {
+      "claim": {
+        "binder": {
+          "id": "eventuallyN",
+          "type": "nat"
+        },
+        "body": {
+          "binder": {
+            "id": "k",
+            "type": "nat"
+          },
+          "body": {
+            "kind": "implies",
+            "left": {
+              "kind": "le",
+              "left": {
+                "id": "eventuallyN",
+                "kind": "var"
+              },
+              "right": {
+                "id": "k",
+                "kind": "var"
+              }
+            },
+            "right": {
+              "kind": "and",
+              "left": {
+                "kind": "le",
+                "left": {
+                  "kind": "int",
+                  "value": 0
+                },
+                "right": {
+                  "base": {
+                    "base": {
+                      "denominator": 2,
+                      "kind": "rat",
+                      "numerator": 1
+                    },
+                    "exponent": {
+                      "id": "k",
+                      "kind": "var"
+                    },
+                    "kind": "pow_nat"
+                  },
+                  "exponent": 2,
+                  "kind": "pow"
+                }
+              },
+              "right": {
+                "kind": "le",
+                "left": {
+                  "base": {
+                    "base": {
+                      "denominator": 2,
+                      "kind": "rat",
+                      "numerator": 1
+                    },
+                    "exponent": {
+                      "id": "k",
+                      "kind": "var"
+                    },
+                    "kind": "pow_nat"
+                  },
+                  "exponent": 2,
+                  "kind": "pow"
+                },
+                "right": {
+                  "base": {
+                    "denominator": 2,
+                    "kind": "rat",
+                    "numerator": 1
+                  },
+                  "exponent": {
+                    "id": "k",
+                    "kind": "var"
+                  },
+                  "kind": "pow_nat"
+                }
+              }
+            }
+          },
+          "kind": "forall"
+        },
+        "kind": "exists"
+      },
+      "id": "h1",
+      "scope": "root"
+    }
+  ],
+  "goal": {
+    "expression": {
+      "base": {
+        "base": {
+          "denominator": 2,
+          "kind": "rat",
+          "numerator": 1
+        },
+        "exponent": {
+          "id": "n",
+          "kind": "var"
+        },
+        "kind": "pow_nat"
+      },
+      "exponent": 2,
+      "kind": "pow"
+    },
+    "kind": "series_sum",
+    "result": {
+      "kind": "summable"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "series_geometric",
+      "series_comparison"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "series_comparison_summable",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "base": {
+            "denominator": 2,
+            "kind": "rat",
+            "numerator": 1
+          },
+          "exponent": {
+            "id": "n",
+            "kind": "var"
+          },
+          "kind": "pow_nat"
+        },
+        "kind": "series_sum",
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 2
+          }
+        },
+        "variable": "n"
+      },
+      "id": "comparison",
+      "parameters": {},
+      "premises": [],
+      "rule": "series_geometric",
+      "scope": "root"
+    },
+    {
+      "claim": {
+        "expression": {
+          "base": {
+            "base": {
+              "denominator": 2,
+              "kind": "rat",
+              "numerator": 1
+            },
+            "exponent": {
+              "id": "n",
+              "kind": "var"
+            },
+            "kind": "pow_nat"
+          },
+          "exponent": 2,
+          "kind": "pow"
+        },
+        "kind": "series_sum",
+        "result": {
+          "kind": "summable"
+        },
+        "variable": "n"
+      },
+      "id": "series",
+      "parameters": {},
+      "premises": [
+        "comparison",
+        "h1"
+      ],
+      "rule": "series_comparison",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

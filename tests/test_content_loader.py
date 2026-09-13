@@ -238,3 +238,57 @@ test:
       grading:
         method: exact_numeric
 """
+
+
+def test_loads_opt_in_formal_proof_spec(tmp_path: Path):
+    skill_dir = tmp_path / "skills"
+    skill_dir.mkdir()
+    yaml_text = _skill_yaml("FORMAL", "Formal Skill").replace(
+        "      grading:\n        method: exact_numeric",
+        "      grading:\n        method: exact_numeric\n"
+        "      proof_spec:\n"
+        "        version: '0.1'\n"
+        "        statement:\n"
+        "          declarations: ['x:real']\n"
+        "          goal: 'x + 0 = x'\n"
+        "        allowed_rules: [ring]",
+        1,
+    )
+    (skill_dir / "formal.yaml").write_text(yaml_text, encoding="utf-8")
+    skills = load_skills(tmp_path)
+    question = skills["FORMAL"].test.questions[0]
+    assert question.proof_spec["version"] == "0.1"
+    assert question.proof_spec["statement"]["goal"] == "x + 0 = x"
+
+
+def test_curriculum_validation_rejects_invalid_formal_proof_spec(tmp_path: Path):
+    skill_dir = tmp_path / "skills"
+    skill_dir.mkdir()
+    (tmp_path / "track.yaml").write_text(
+        """
+id: TRACK_FORMAL
+schema_version: 0.2
+name: Formal
+field: Mathematics
+domain: Math
+description: Formal test track
+entry_skills: [FORMAL_BAD]
+exit_skills: [FORMAL_BAD]
+skills: [FORMAL_BAD]
+""",
+        encoding="utf-8",
+    )
+    yaml_text = _skill_yaml("FORMAL_BAD", "Bad Formal Skill").replace(
+        "      grading:\n        method: exact_numeric",
+        "      grading:\n        method: exact_numeric\n"
+        "      proof_spec:\n"
+        "        version: '0.1'\n"
+        "        statement:\n"
+        "          declarations: ['x:real']\n"
+        "          goal: 'x = x'\n"
+        "        surprise: true",
+        1,
+    )
+    (skill_dir / "formal-bad.yaml").write_text(yaml_text, encoding="utf-8")
+    with pytest.raises(ContentError, match="invalid proof_spec"):
+        load_curriculum(tmp_path)

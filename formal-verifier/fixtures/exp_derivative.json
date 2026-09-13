@@ -1,0 +1,129 @@
+{
+  "version": "0.1",
+  "request_id": "exp-derivative",
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "a",
+      "type": "real"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "assumptions": [],
+  "steps": [
+    {
+      "id": "derivative_step",
+      "scope": "root",
+      "claim": {
+        "kind": "derivative",
+        "variable": "x",
+        "expression": {
+          "kind": "exp",
+          "arg": {
+            "kind": "pow",
+            "base": {
+              "kind": "var",
+              "id": "x"
+            },
+            "exponent": 2
+          }
+        },
+        "point": {
+          "kind": "var",
+          "id": "a"
+        },
+        "result": {
+          "kind": "mul",
+          "left": {
+            "kind": "exp",
+            "arg": {
+              "kind": "pow",
+              "base": {
+                "kind": "var",
+                "id": "a"
+              },
+              "exponent": 2
+            }
+          },
+          "right": {
+            "kind": "mul",
+            "left": {
+              "kind": "int",
+              "value": 2
+            },
+            "right": {
+              "kind": "var",
+              "id": "a"
+            }
+          }
+        }
+      },
+      "rule": "exp_derivative",
+      "premises": [],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "derivative",
+    "variable": "x",
+    "expression": {
+      "kind": "exp",
+      "arg": {
+        "kind": "pow",
+        "base": {
+          "kind": "var",
+          "id": "x"
+        },
+        "exponent": 2
+      }
+    },
+    "point": {
+      "kind": "var",
+      "id": "a"
+    },
+    "result": {
+      "kind": "mul",
+      "left": {
+        "kind": "exp",
+        "arg": {
+          "kind": "pow",
+          "base": {
+            "kind": "var",
+            "id": "a"
+          },
+          "exponent": 2
+        }
+      },
+      "right": {
+        "kind": "mul",
+        "left": {
+          "kind": "int",
+          "value": 2
+        },
+        "right": {
+          "kind": "var",
+          "id": "a"
+        }
+      }
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "exp_derivative"
+    ],
+    "max_seconds": 10,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

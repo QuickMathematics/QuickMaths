@@ -47,6 +47,7 @@ class ProblemTemplate:
     media: list[dict[str, Any]] = field(default_factory=list)
     diagram: dict[str, Any] | None = None
     math_blocks: list[dict[str, Any]] = field(default_factory=list)
+    proof_spec: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -120,6 +121,7 @@ class ProblemInstance:
     media: list[dict[str, Any]] = field(default_factory=list)
     diagram: dict[str, Any] | None = None
     math_blocks: list[dict[str, Any]] = field(default_factory=list)
+    proof_spec: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

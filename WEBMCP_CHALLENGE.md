@@ -86,7 +86,9 @@ When QuickMaths is open inside the ChatGPT or Codex in-app browser, it discovers
 | `get_learning_context` | Read the selected lesson or active test without answer keys. |
 | `start_skill_test` | Create or resume a test for an unlocked skill and show it on screen. |
 | `inspect_student_work` | Inspect one visible response without returning its expected answer. |
-| `record_tutor_feedback` | Save concise Socratic feedback beside the correct draft or attempt. |
+| `inspect_formal_proof` | Inspect the public theorem, learner proof, current verified steps and remaining obligations; never reference proofs. |
+| `record_formal_guidance` | Record one offered Socratic question for the exact proof revision, with no grading effect. |
+| `record_tutor_feedback` | Save ordinary obligation/rubric feedback; rejects formal proof verdicts. |
 | `create_followup_problem` | Move a misconception-targeted question to the front of the visible test. |
 
 The top-level `agent-bridge.html` workspace registers the same thirty-three learning tools plus three transport tools:

@@ -1,0 +1,262 @@
+{
+  "version": "0.1",
+  "request_id": "quotient-derivative",
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "a",
+      "type": "real"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "hden",
+      "scope": "root",
+      "claim": {
+        "kind": "ne",
+        "left": {
+          "kind": "sub",
+          "left": {
+            "kind": "var",
+            "id": "a"
+          },
+          "right": {
+            "kind": "int",
+            "value": 1
+          }
+        },
+        "right": {
+          "kind": "int",
+          "value": 0
+        }
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": "derivative_step",
+      "scope": "root",
+      "claim": {
+        "kind": "derivative",
+        "variable": "x",
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "add",
+            "left": {
+              "kind": "pow",
+              "base": {
+                "kind": "var",
+                "id": "x"
+              },
+              "exponent": 2
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          },
+          "right": {
+            "kind": "sub",
+            "left": {
+              "kind": "var",
+              "id": "x"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          }
+        },
+        "point": {
+          "kind": "var",
+          "id": "a"
+        },
+        "result": {
+          "kind": "div",
+          "left": {
+            "kind": "sub",
+            "left": {
+              "kind": "mul",
+              "left": {
+                "kind": "mul",
+                "left": {
+                  "kind": "int",
+                  "value": 2
+                },
+                "right": {
+                  "kind": "var",
+                  "id": "a"
+                }
+              },
+              "right": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "a"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 1
+                }
+              }
+            },
+            "right": {
+              "kind": "add",
+              "left": {
+                "kind": "pow",
+                "base": {
+                  "kind": "var",
+                  "id": "a"
+                },
+                "exponent": 2
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            }
+          },
+          "right": {
+            "kind": "pow",
+            "base": {
+              "kind": "sub",
+              "left": {
+                "kind": "var",
+                "id": "a"
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            },
+            "exponent": 2
+          }
+        }
+      },
+      "rule": "quotient_derivative",
+      "premises": [
+        "hden"
+      ],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "derivative",
+    "variable": "x",
+    "expression": {
+      "kind": "div",
+      "left": {
+        "kind": "add",
+        "left": {
+          "kind": "pow",
+          "base": {
+            "kind": "var",
+            "id": "x"
+          },
+          "exponent": 2
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      },
+      "right": {
+        "kind": "sub",
+        "left": {
+          "kind": "var",
+          "id": "x"
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      }
+    },
+    "point": {
+      "kind": "var",
+      "id": "a"
+    },
+    "result": {
+      "kind": "div",
+      "left": {
+        "kind": "sub",
+        "left": {
+          "kind": "mul",
+          "left": {
+            "kind": "mul",
+            "left": {
+              "kind": "int",
+              "value": 2
+            },
+            "right": {
+              "kind": "var",
+              "id": "a"
+            }
+          },
+          "right": {
+            "kind": "sub",
+            "left": {
+              "kind": "var",
+              "id": "a"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          }
+        },
+        "right": {
+          "kind": "add",
+          "left": {
+            "kind": "pow",
+            "base": {
+              "kind": "var",
+              "id": "a"
+            },
+            "exponent": 2
+          },
+          "right": {
+            "kind": "int",
+            "value": 1
+          }
+        }
+      },
+      "right": {
+        "kind": "pow",
+        "base": {
+          "kind": "sub",
+          "left": {
+            "kind": "var",
+            "id": "a"
+          },
+          "right": {
+            "kind": "int",
+            "value": 1
+          }
+        },
+        "exponent": 2
+      }
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "quotient_derivative"
+    ],
+    "max_seconds": 10,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

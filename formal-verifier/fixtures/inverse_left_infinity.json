@@ -1,0 +1,87 @@
+{
+  "assumptions": [],
+  "goal": {
+    "direction": "left",
+    "domain": [],
+    "expression": {
+      "kind": "div",
+      "left": {
+        "kind": "int",
+        "value": 1
+      },
+      "right": {
+        "id": "x",
+        "kind": "var"
+      }
+    },
+    "kind": "limit",
+    "point": {
+      "kind": "int",
+      "value": 0
+    },
+    "result": {
+      "kind": "negative_infinity"
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "inverse_one_sided_limit"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "inverse-left-infinity",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "direction": "left",
+        "domain": [],
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "int",
+            "value": 1
+          },
+          "right": {
+            "id": "x",
+            "kind": "var"
+          }
+        },
+        "kind": "limit",
+        "point": {
+          "kind": "int",
+          "value": 0
+        },
+        "result": {
+          "kind": "negative_infinity"
+        },
+        "variable": "x"
+      },
+      "id": "limit",
+      "parameters": {
+        "direction": "left"
+      },
+      "premises": [],
+      "rule": "inverse_one_sided_limit",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

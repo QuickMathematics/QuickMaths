@@ -1,0 +1,102 @@
+{
+  "assumptions": [
+    {
+      "claim": {
+        "kind": "le",
+        "left": {
+          "kind": "int",
+          "value": 0
+        },
+        "right": {
+          "id": "x",
+          "kind": "var"
+        }
+      },
+      "id": "hx",
+      "scope": "root"
+    }
+  ],
+  "goal": {
+    "kind": "proposition",
+    "proposition": {
+      "kind": "eq",
+      "left": {
+        "arg": {
+          "base": {
+            "id": "x",
+            "kind": "var"
+          },
+          "exponent": 2,
+          "kind": "pow"
+        },
+        "kind": "sqrt"
+      },
+      "right": {
+        "id": "x",
+        "kind": "var"
+      }
+    }
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sqrt_square_nonnegative"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sqrt-square-nonnegative",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "kind": "eq",
+          "left": {
+            "arg": {
+              "base": {
+                "id": "x",
+                "kind": "var"
+              },
+              "exponent": 2,
+              "kind": "pow"
+            },
+            "kind": "sqrt"
+          },
+          "right": {
+            "id": "x",
+            "kind": "var"
+          }
+        }
+      },
+      "id": "sqrt_step",
+      "parameters": {
+        "argument": {
+          "id": "x",
+          "kind": "var"
+        }
+      },
+      "premises": [
+        "hx"
+      ],
+      "rule": "sqrt_square_nonnegative",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

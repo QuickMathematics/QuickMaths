@@ -1,0 +1,108 @@
+{
+  "assumptions": [],
+  "goal": {
+    "direction": "both",
+    "domain": [],
+    "expression": {
+      "arg": {
+        "kind": "add",
+        "left": {
+          "base": {
+            "id": "x",
+            "kind": "var"
+          },
+          "exponent": 2,
+          "kind": "pow"
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      },
+      "kind": "sqrt"
+    },
+    "kind": "limit",
+    "point": {
+      "kind": "int",
+      "value": 0
+    },
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 1
+      }
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "limit_algebra"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "limit-algebra-sqrt-positive",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "direction": "both",
+        "domain": [],
+        "expression": {
+          "arg": {
+            "kind": "add",
+            "left": {
+              "base": {
+                "id": "x",
+                "kind": "var"
+              },
+              "exponent": 2,
+              "kind": "pow"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          },
+          "kind": "sqrt"
+        },
+        "kind": "limit",
+        "point": {
+          "kind": "int",
+          "value": 0
+        },
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 1
+          }
+        },
+        "variable": "x"
+      },
+      "id": "proof",
+      "parameters": {},
+      "premises": [],
+      "rule": "limit_algebra",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

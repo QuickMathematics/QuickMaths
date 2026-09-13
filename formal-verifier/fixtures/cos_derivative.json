@@ -1,0 +1,135 @@
+{
+  "version": "0.1",
+  "request_id": "cos-derivative",
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "a",
+      "type": "real"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "assumptions": [],
+  "steps": [
+    {
+      "id": "derivative_step",
+      "scope": "root",
+      "claim": {
+        "kind": "derivative",
+        "variable": "x",
+        "expression": {
+          "kind": "cos",
+          "arg": {
+            "kind": "pow",
+            "base": {
+              "kind": "var",
+              "id": "x"
+            },
+            "exponent": 2
+          }
+        },
+        "point": {
+          "kind": "var",
+          "id": "a"
+        },
+        "result": {
+          "kind": "mul",
+          "left": {
+            "kind": "neg",
+            "arg": {
+              "kind": "mul",
+              "left": {
+                "kind": "int",
+                "value": 2
+              },
+              "right": {
+                "kind": "var",
+                "id": "a"
+              }
+            }
+          },
+          "right": {
+            "kind": "sin",
+            "arg": {
+              "kind": "pow",
+              "base": {
+                "kind": "var",
+                "id": "a"
+              },
+              "exponent": 2
+            }
+          }
+        }
+      },
+      "rule": "cos_derivative",
+      "premises": [],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "derivative",
+    "variable": "x",
+    "expression": {
+      "kind": "cos",
+      "arg": {
+        "kind": "pow",
+        "base": {
+          "kind": "var",
+          "id": "x"
+        },
+        "exponent": 2
+      }
+    },
+    "point": {
+      "kind": "var",
+      "id": "a"
+    },
+    "result": {
+      "kind": "mul",
+      "left": {
+        "kind": "neg",
+        "arg": {
+          "kind": "mul",
+          "left": {
+            "kind": "int",
+            "value": 2
+          },
+          "right": {
+            "kind": "var",
+            "id": "a"
+          }
+        }
+      },
+      "right": {
+        "kind": "sin",
+        "arg": {
+          "kind": "pow",
+          "base": {
+            "kind": "var",
+            "id": "a"
+          },
+          "exponent": 2
+        }
+      }
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "cos_derivative"
+    ],
+    "max_seconds": 10,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

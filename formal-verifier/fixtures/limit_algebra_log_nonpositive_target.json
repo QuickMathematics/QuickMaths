@@ -1,0 +1,92 @@
+{
+  "assumptions": [],
+  "goal": {
+    "direction": "right",
+    "domain": [],
+    "expression": {
+      "arg": {
+        "id": "x",
+        "kind": "var"
+      },
+      "kind": "log"
+    },
+    "kind": "limit",
+    "point": {
+      "kind": "int",
+      "value": 0
+    },
+    "result": {
+      "kind": "finite",
+      "value": {
+        "arg": {
+          "kind": "int",
+          "value": 0
+        },
+        "kind": "log"
+      }
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "limit_algebra"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "limit-algebra-log-nonpositive-target",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "direction": "right",
+        "domain": [],
+        "expression": {
+          "arg": {
+            "id": "x",
+            "kind": "var"
+          },
+          "kind": "log"
+        },
+        "kind": "limit",
+        "point": {
+          "kind": "int",
+          "value": 0
+        },
+        "result": {
+          "kind": "finite",
+          "value": {
+            "arg": {
+              "kind": "int",
+              "value": 0
+            },
+            "kind": "log"
+          }
+        },
+        "variable": "x"
+      },
+      "id": "proof",
+      "parameters": {},
+      "premises": [],
+      "rule": "limit_algebra",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

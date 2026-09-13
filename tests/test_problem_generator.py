@@ -134,3 +134,64 @@ def test_generated_prompts_avoid_plus_minus_when_formatting_helper_is_used():
     problem = generate_problem("TEST", template, seed=1)
     assert "+ -" not in problem.prompt
     assert problem.prompt == "Simplify: 4x - 3x"
+
+
+def test_formal_proof_spec_resolves_from_public_prompt_snapshot():
+    template = ProblemTemplate(
+        id="FORMAL_PUBLIC",
+        type="generated",
+        prompt_template="For the visible parameter a = {a}, prove a commutative identity.",
+        variables={"a": {"type": "int", "min": 3, "max": 3}},
+        answer={"type": "numeric", "value": "{a}"},
+        grading={"method": "exact_numeric"},
+        proof_spec={
+            "version": "0.1",
+            "statement": {
+                "declarations": ["x:real"],
+                "assumptions": ["x != {a}"],
+                "goal": "x + {a} = {a} + x",
+            },
+            "parameter_contract": {"required_public": ["a"]},
+            "allowed_rules": ["ring"],
+        },
+    )
+    problem = generate_problem("TEST", template, seed=1)
+    assert problem.proof_spec["statement"]["assumptions"] == ["x != 3"]
+    assert problem.proof_spec["statement"]["goal"] == "x + 3 = 3 + x"
+    assert problem.proof_spec["allowed_rules"] == ["ring"]
+
+
+def test_formal_proof_spec_cannot_reference_hidden_derived_values():
+    template = ProblemTemplate(
+        id="FORMAL_HIDDEN",
+        type="generated",
+        prompt_template="For the visible parameter a = {a}, prove the claim.",
+        variables={"a": {"type": "int", "min": 2, "max": 2}},
+        derived={"secret": "a + 10"},
+        answer={"type": "numeric", "value": "{a}"},
+        grading={"method": "exact_numeric"},
+        proof_spec={
+            "version": "0.1",
+            "statement": {"declarations": ["x:real"], "goal": "x = {secret}"},
+            "allowed_rules": [],
+        },
+    )
+    with pytest.raises(GenerationError, match="non-public or invalid parameter"):
+        generate_problem("TEST", template, seed=1)
+
+
+def test_fixed_formal_proof_spec_round_trips_without_placeholders():
+    template = ProblemTemplate(
+        id="FORMAL_FIXED",
+        type="fixed",
+        prompt_template="Prove x + 0 = x for every real x.",
+        answer={"type": "text", "value": "proved"},
+        grading={"method": "exact_text"},
+        proof_spec={
+            "version": "0.1",
+            "statement": {"declarations": ["x:real"], "goal": "x + 0 = x"},
+            "allowed_rules": ["ring"],
+        },
+    )
+    problem = generate_problem("TEST", template, seed=1)
+    assert problem.proof_spec["statement"]["goal"] == "x + 0 = x"

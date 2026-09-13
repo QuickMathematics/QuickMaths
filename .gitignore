@@ -9,6 +9,7 @@ build/
 node_modules/
 *.egg-info/
 .bridge-runtime/
+formal-verifier/.lake/
 .codex-remote-attachments/
 /ChatGPT Installer.exe
 /Microsoft.Services.Store.winmd

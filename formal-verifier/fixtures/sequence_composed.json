@@ -1,0 +1,138 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "kind": "add",
+      "left": {
+        "arg": {
+          "kind": "div",
+          "left": {
+            "kind": "int",
+            "value": 1
+          },
+          "right": {
+            "arg": {
+              "kind": "add",
+              "left": {
+                "id": "n",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            },
+            "kind": "cast_real"
+          }
+        },
+        "kind": "sin"
+      },
+      "right": {
+        "base": {
+          "denominator": 2,
+          "kind": "rat",
+          "numerator": 1
+        },
+        "exponent": {
+          "id": "n",
+          "kind": "var"
+        },
+        "kind": "pow_nat"
+      }
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 0
+      }
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_algebra",
+      "sequence_nat_at_top"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence-composed",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "kind": "add",
+          "left": {
+            "arg": {
+              "kind": "div",
+              "left": {
+                "kind": "int",
+                "value": 1
+              },
+              "right": {
+                "arg": {
+                  "kind": "add",
+                  "left": {
+                    "id": "n",
+                    "kind": "var"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 1
+                  }
+                },
+                "kind": "cast_real"
+              }
+            },
+            "kind": "sin"
+          },
+          "right": {
+            "base": {
+              "denominator": 2,
+              "kind": "rat",
+              "numerator": 1
+            },
+            "exponent": {
+              "id": "n",
+              "kind": "var"
+            },
+            "kind": "pow_nat"
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "variable": "n"
+      },
+      "id": "seq",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_algebra",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

@@ -1,0 +1,332 @@
+{
+  "assumptions": [
+    {
+      "claim": {
+        "kind": "and",
+        "left": {
+          "kind": "le",
+          "left": {
+            "kind": "int",
+            "value": 0
+          },
+          "right": {
+            "id": "t",
+            "kind": "var"
+          }
+        },
+        "right": {
+          "kind": "le",
+          "left": {
+            "id": "t",
+            "kind": "var"
+          },
+          "right": {
+            "kind": "int",
+            "value": 1
+          }
+        }
+      },
+      "id": "auto_assumption_3",
+      "scope": "auto_scope_2"
+    }
+  ],
+  "goal": {
+    "kind": "proposition",
+    "proposition": {
+      "binder": {
+        "id": "t",
+        "type": "real"
+      },
+      "body": {
+        "kind": "implies",
+        "left": {
+          "kind": "and",
+          "left": {
+            "kind": "le",
+            "left": {
+              "kind": "int",
+              "value": 0
+            },
+            "right": {
+              "id": "t",
+              "kind": "var"
+            }
+          },
+          "right": {
+            "kind": "le",
+            "left": {
+              "id": "t",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          }
+        },
+        "right": {
+          "kind": "lt",
+          "left": {
+            "kind": "int",
+            "value": 0
+          },
+          "right": {
+            "kind": "add",
+            "left": {
+              "id": "t",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 2
+            }
+          }
+        }
+      },
+      "kind": "forall"
+    }
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "forall_intro",
+      "imp_intro",
+      "and_elim_left",
+      "and_elim_right",
+      "linarith"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "bounded-interval-positive",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    },
+    {
+      "binders": [
+        {
+          "id": "t",
+          "type": "real"
+        }
+      ],
+      "id": "auto_scope_1",
+      "parent": "root"
+    },
+    {
+      "binders": [],
+      "id": "auto_scope_2",
+      "parent": "auto_scope_1"
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "kind": "le",
+          "left": {
+            "kind": "int",
+            "value": 0
+          },
+          "right": {
+            "id": "t",
+            "kind": "var"
+          }
+        }
+      },
+      "id": "auto_proof_4",
+      "parameters": {},
+      "premises": [
+        "auto_assumption_3"
+      ],
+      "rule": "and_elim_left",
+      "scope": "auto_scope_2"
+    },
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "kind": "le",
+          "left": {
+            "id": "t",
+            "kind": "var"
+          },
+          "right": {
+            "kind": "int",
+            "value": 1
+          }
+        }
+      },
+      "id": "auto_proof_5",
+      "parameters": {},
+      "premises": [
+        "auto_assumption_3"
+      ],
+      "rule": "and_elim_right",
+      "scope": "auto_scope_2"
+    },
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "kind": "lt",
+          "left": {
+            "kind": "int",
+            "value": 0
+          },
+          "right": {
+            "kind": "add",
+            "left": {
+              "id": "t",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 2
+            }
+          }
+        }
+      },
+      "id": "auto_proof_6",
+      "parameters": {},
+      "premises": [
+        "auto_proof_4",
+        "auto_proof_5"
+      ],
+      "rule": "linarith",
+      "scope": "auto_scope_2"
+    },
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "kind": "implies",
+          "left": {
+            "kind": "and",
+            "left": {
+              "kind": "le",
+              "left": {
+                "kind": "int",
+                "value": 0
+              },
+              "right": {
+                "id": "t",
+                "kind": "var"
+              }
+            },
+            "right": {
+              "kind": "le",
+              "left": {
+                "id": "t",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            }
+          },
+          "right": {
+            "kind": "lt",
+            "left": {
+              "kind": "int",
+              "value": 0
+            },
+            "right": {
+              "kind": "add",
+              "left": {
+                "id": "t",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 2
+              }
+            }
+          }
+        }
+      },
+      "id": "auto_proof_7",
+      "parameters": {},
+      "premises": [
+        "auto_assumption_3",
+        "auto_proof_6"
+      ],
+      "rule": "imp_intro",
+      "scope": "auto_scope_1"
+    },
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "binder": {
+            "id": "t",
+            "type": "real"
+          },
+          "body": {
+            "kind": "implies",
+            "left": {
+              "kind": "and",
+              "left": {
+                "kind": "le",
+                "left": {
+                  "kind": "int",
+                  "value": 0
+                },
+                "right": {
+                  "id": "t",
+                  "kind": "var"
+                }
+              },
+              "right": {
+                "kind": "le",
+                "left": {
+                  "id": "t",
+                  "kind": "var"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 1
+                }
+              }
+            },
+            "right": {
+              "kind": "lt",
+              "left": {
+                "kind": "int",
+                "value": 0
+              },
+              "right": {
+                "kind": "add",
+                "left": {
+                  "id": "t",
+                  "kind": "var"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 2
+                }
+              }
+            }
+          },
+          "kind": "forall"
+        }
+      },
+      "id": "auto_proof_8",
+      "parameters": {},
+      "premises": [
+        "auto_proof_7"
+      ],
+      "rule": "forall_intro",
+      "scope": "root"
+    }
+  ],
+  "variables": [],
+  "version": "0.1"
+}

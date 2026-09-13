@@ -1,0 +1,195 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "condition": {
+        "kind": "le",
+        "left": {
+          "id": "n",
+          "kind": "var"
+        },
+        "right": {
+          "kind": "int",
+          "value": 5
+        }
+      },
+      "else": {
+        "condition": {
+          "kind": "eq",
+          "left": {
+            "kind": "mod_nat",
+            "left": {
+              "id": "n",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 3
+            }
+          },
+          "right": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "else": {
+          "condition": {
+            "kind": "eq",
+            "left": {
+              "kind": "mod_nat",
+              "left": {
+                "id": "n",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 3
+              }
+            },
+            "right": {
+              "kind": "int",
+              "value": 1
+            }
+          },
+          "else": {
+            "kind": "int",
+            "value": 2
+          },
+          "kind": "if",
+          "then": {
+            "kind": "int",
+            "value": 1
+          }
+        },
+        "kind": "if",
+        "then": {
+          "kind": "int",
+          "value": 0
+        }
+      },
+      "kind": "if",
+      "then": {
+        "kind": "int",
+        "value": 99
+      }
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "no_finite_limit"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_elementary_divergence"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence_eventually_periodic_le_cutoff_unsupported",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "condition": {
+            "kind": "le",
+            "left": {
+              "id": "n",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 5
+            }
+          },
+          "else": {
+            "condition": {
+              "kind": "eq",
+              "left": {
+                "kind": "mod_nat",
+                "left": {
+                  "id": "n",
+                  "kind": "var"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 0
+              }
+            },
+            "else": {
+              "condition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "mod_nat",
+                  "left": {
+                    "id": "n",
+                    "kind": "var"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 1
+                }
+              },
+              "else": {
+                "kind": "int",
+                "value": 2
+              },
+              "kind": "if",
+              "then": {
+                "kind": "int",
+                "value": 1
+              }
+            },
+            "kind": "if",
+            "then": {
+              "kind": "int",
+              "value": 0
+            }
+          },
+          "kind": "if",
+          "then": {
+            "kind": "int",
+            "value": 99
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "no_finite_limit"
+        },
+        "variable": "n"
+      },
+      "id": "seq",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_elementary_divergence",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

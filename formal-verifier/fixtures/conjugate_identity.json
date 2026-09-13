@@ -1,0 +1,156 @@
+{
+  "assumptions": [
+    {
+      "claim": {
+        "kind": "le",
+        "left": {
+          "kind": "int",
+          "value": 0
+        },
+        "right": {
+          "id": "x",
+          "kind": "var"
+        }
+      },
+      "id": "hx",
+      "scope": "root"
+    }
+  ],
+  "goal": {
+    "kind": "proposition",
+    "proposition": {
+      "kind": "eq",
+      "left": {
+        "kind": "mul",
+        "left": {
+          "kind": "sub",
+          "left": {
+            "arg": {
+              "id": "x",
+              "kind": "var"
+            },
+            "kind": "sqrt"
+          },
+          "right": {
+            "kind": "int",
+            "value": 2
+          }
+        },
+        "right": {
+          "kind": "add",
+          "left": {
+            "arg": {
+              "id": "x",
+              "kind": "var"
+            },
+            "kind": "sqrt"
+          },
+          "right": {
+            "kind": "int",
+            "value": 2
+          }
+        }
+      },
+      "right": {
+        "kind": "sub",
+        "left": {
+          "id": "x",
+          "kind": "var"
+        },
+        "right": {
+          "kind": "int",
+          "value": 4
+        }
+      }
+    }
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "conjugate_identity"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "conjugate-identity",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "kind": "proposition",
+        "proposition": {
+          "kind": "eq",
+          "left": {
+            "kind": "mul",
+            "left": {
+              "kind": "sub",
+              "left": {
+                "arg": {
+                  "id": "x",
+                  "kind": "var"
+                },
+                "kind": "sqrt"
+              },
+              "right": {
+                "kind": "int",
+                "value": 2
+              }
+            },
+            "right": {
+              "kind": "add",
+              "left": {
+                "arg": {
+                  "id": "x",
+                  "kind": "var"
+                },
+                "kind": "sqrt"
+              },
+              "right": {
+                "kind": "int",
+                "value": 2
+              }
+            }
+          },
+          "right": {
+            "kind": "sub",
+            "left": {
+              "id": "x",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 4
+            }
+          }
+        }
+      },
+      "id": "conjugate",
+      "parameters": {
+        "radicand": {
+          "id": "x",
+          "kind": "var"
+        }
+      },
+      "premises": [
+        "hx"
+      ],
+      "rule": "conjugate_identity",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

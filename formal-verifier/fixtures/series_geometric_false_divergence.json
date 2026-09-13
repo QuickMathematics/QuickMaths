@@ -1,0 +1,76 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "base": {
+        "denominator": 2,
+        "kind": "rat",
+        "numerator": 1
+      },
+      "exponent": {
+        "id": "n",
+        "kind": "var"
+      },
+      "kind": "pow_nat"
+    },
+    "kind": "series_sum",
+    "result": {
+      "kind": "not_summable"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "series_geometric"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "series_geometric_false_divergence",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "base": {
+            "denominator": 2,
+            "kind": "rat",
+            "numerator": 1
+          },
+          "exponent": {
+            "id": "n",
+            "kind": "var"
+          },
+          "kind": "pow_nat"
+        },
+        "kind": "series_sum",
+        "result": {
+          "kind": "not_summable"
+        },
+        "variable": "n"
+      },
+      "id": "series",
+      "parameters": {},
+      "premises": [],
+      "rule": "series_geometric",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

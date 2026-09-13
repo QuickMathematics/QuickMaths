@@ -1,0 +1,107 @@
+{
+  "assumptions": [
+    {
+      "claim": {
+        "kind": "lt",
+        "left": {
+          "arg": {
+            "id": "r",
+            "kind": "var"
+          },
+          "kind": "abs"
+        },
+        "right": {
+          "kind": "int",
+          "value": 1
+        }
+      },
+      "id": "hr",
+      "scope": "root"
+    }
+  ],
+  "goal": {
+    "expression": {
+      "base": {
+        "id": "r",
+        "kind": "var"
+      },
+      "exponent": {
+        "id": "n",
+        "kind": "var"
+      },
+      "kind": "pow_nat"
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 0
+      }
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_algebra",
+      "sequence_nat_at_top"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence-geometric-symbolic",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "base": {
+            "id": "r",
+            "kind": "var"
+          },
+          "exponent": {
+            "id": "n",
+            "kind": "var"
+          },
+          "kind": "pow_nat"
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "variable": "n"
+      },
+      "id": "seq",
+      "parameters": {},
+      "premises": [
+        "hr"
+      ],
+      "rule": "sequence_algebra",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    },
+    {
+      "id": "r",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

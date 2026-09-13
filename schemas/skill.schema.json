@@ -46,6 +46,7 @@
               "prompt": { "type": "string" },
               "math_blocks": { "$ref": "math-display.schema.json" }, "media": { "$ref": "#/$defs/media" },
               "diagram": { "$ref": "cartesian-diagram.schema.json" },
+              "proof_spec": { "$ref": "formal-proof-spec.schema.json" },
               "prompt_template": { "type": "string" },
               "variables": { "type": "object" },
               "derived": { "type": "object" },

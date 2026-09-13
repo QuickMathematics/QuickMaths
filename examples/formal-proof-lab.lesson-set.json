@@ -1,0 +1,343 @@
+{
+  "format": "quickmaths.lesson-set",
+  "schema_version": "2.0",
+  "id": "PACK_PROOF_LAB",
+  "name": "Proof Lab: reasons that hold up",
+  "description": "Three school-level proof lessons about equality, cancellation and inequalities. Construct your own reasoning; only Lean can certify it. Reference candidates still require a pinned-kernel run before public publication.",
+  "author": "QuickMaths",
+  "version": "0.1.0",
+  "subject": {
+    "id": "SUBJECT_MATH",
+    "name": "Mathematics",
+    "short_name": "Maths",
+    "icon": "∑",
+    "description": "The built-in Mathematics curriculum. Its existing theme is preserved."
+  },
+  "track": {
+    "id": "TRACK_PROOF_LAB",
+    "name": "Proof Lab",
+    "domain": "Math",
+    "description": "A small laboratory for explicit assumptions, justified steps and honest verification.",
+    "entry_skills": [
+      "CUSTOM_PROOF_CANCEL",
+      "CUSTOM_PROOF_LINEAR",
+      "CUSTOM_PROOF_SQUARE"
+    ],
+    "exit_skills": [
+      "CUSTOM_PROOF_CANCEL",
+      "CUSTOM_PROOF_LINEAR",
+      "CUSTOM_PROOF_SQUARE"
+    ],
+    "skills": [
+      "CUSTOM_PROOF_CANCEL",
+      "CUSTOM_PROOF_LINEAR",
+      "CUSTOM_PROOF_SQUARE"
+    ]
+  },
+  "skills": [
+    {
+      "id": "CUSTOM_PROOF_CANCEL",
+      "name": "The missing condition",
+      "domain": "Math",
+      "subdomain": "Proofs",
+      "topic": "Cancellation and domains",
+      "description": "Find the gap in a cancellation argument and repair it without hiding the domain.",
+      "prerequisites": [],
+      "unlocks": [],
+      "tags": [
+        "formal-proof",
+        "proof-lab",
+        "demo"
+      ],
+      "mastery": {
+        "passing_score": 1,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "no",
+        "review_after_days_if_mastered": 7,
+        "review_after_days_if_learning": 2
+      },
+      "theory": "An algebraic line can look familiar and still need a condition. Cancelling a factor uses the fact that it is nonzero. Keep that fact visible and cite it at the step that depends on it.\n\nIn the proof workspace, declarations fix the domain, assumptions are the facts you begin with, and each new line states a claim plus its justification. The names h1, h2, and so on refer to the assumptions in order. You can cite an earlier line using its displayed step ID.\n\nTry a fraction simplification before supplying its denominator condition. Read the remaining obligation, then repair the earlier reasoning. A candidate line is not a verified line: only the Lean label marks a kernel-accepted argument.",
+      "examples": [
+        {
+          "prompt": "Let t be real and t ≠ 2. Why does (t − 2)(t + 4)/(t − 2) = t + 4 need the restriction?",
+          "solution": "The common factor t − 2 must be nonzero.",
+          "explanation": "The restriction t ≠ 2 establishes this condition. At t = 2 the original school-style quotient is undefined; cancelling it would silently change the domain."
+        }
+      ],
+      "applications": [
+        {
+          "title": "Algebraic modelling",
+          "description": "Before simplifying a rate or a ratio, retain the values excluded by its original denominator."
+        }
+      ],
+      "question_count": 1,
+      "problems": [
+        {
+          "template_id": "CUSTOM_PROOF_CANCEL_Q01",
+          "skill_id": "CUSTOM_PROOF_CANCEL",
+          "difficulty": "medium",
+          "prompt": "Let x be real with x ≠ 3. Prove (x² − 9)/(x − 3) = x + 3. Show explicitly why any denominator you cancel is nonzero.",
+          "expected_answer": "Complete Lean-verified proof",
+          "answer_type": "text",
+          "grading_method": "exact_text",
+          "solution_steps": [
+            "Author reference candidate is stored in proof_spec and is not a learner grading key."
+          ],
+          "mistake_tags": [
+            "proof_dependencies"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "proof_spec": {
+            "version": "0.1",
+            "statement": {
+              "declarations": [
+                "x:real"
+              ],
+              "assumptions": [
+                "x != 3"
+              ],
+              "goal": "(x^2 - 9)/(x - 3) = x + 3"
+            },
+            "allowed_rules": [
+              "sub_ne_zero_from_ne",
+              "field_identity",
+              "ring_identity",
+              "eq_refl"
+            ],
+            "assessment_policy": {},
+            "reference_proof": {
+              "mode": "steps",
+              "steps": [
+                {
+                  "claim": "x - 3 != 0",
+                  "rule": "sub_ne_zero_from_ne",
+                  "premises": [
+                    "h1"
+                  ]
+                },
+                {
+                  "claim": "(x^2 - 9)/(x - 3) = x + 3",
+                  "rule": "field_identity",
+                  "premises": [
+                    "reference_step_1"
+                  ]
+                }
+              ]
+            },
+            "environment": {
+              "backend": "lean4",
+              "library": "mathlib",
+              "toolchain": "leanprover/lean4:v4.34.0-rc2",
+              "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "CUSTOM_PROOF_LINEAR",
+      "name": "Two equations, one conclusion",
+      "domain": "Math",
+      "subdomain": "Proofs",
+      "topic": "Linear reasoning",
+      "description": "Combine the assumptions you actually have, rather than checking a guessed answer.",
+      "prerequisites": [],
+      "unlocks": [],
+      "tags": [
+        "formal-proof",
+        "proof-lab",
+        "demo"
+      ],
+      "mastery": {
+        "passing_score": 1,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "no",
+        "review_after_days_if_mastered": 7,
+        "review_after_days_if_learning": 2
+      },
+      "theory": "A proof must work for every value satisfying its assumptions. Trying a few pairs can suggest a conclusion, but it does not establish it. Combining linear equalities is a way to derive a new equality from named facts.\n\nGive a claim, select Combine linear equalities or inequalities, and cite only the assumptions or earlier lines that support it. The verifier checks the exact argument in the declared real-number domain. A conclusion that looks right still needs its premises.\n\nTry proving an intermediate equality first. Then connect it to the goal. After checking, ask which assumption was essential and what would change without it.",
+      "examples": [
+        {
+          "prompt": "Real a and b satisfy a + b = 14 and a − b = 4. What follows by adding the equations?",
+          "solution": "2a = 18.",
+          "explanation": "Adding the left and right sides eliminates b. Both equalities are premises of the new claim; neither alone establishes it."
+        }
+      ],
+      "applications": [
+        {
+          "title": "Recovering unknown measurements",
+          "description": "Two independent measurements of a sum and a difference can determine an unknown. A proof records which measurements support the conclusion."
+        }
+      ],
+      "question_count": 1,
+      "problems": [
+        {
+          "template_id": "CUSTOM_PROOF_LINEAR_Q01",
+          "skill_id": "CUSTOM_PROOF_LINEAR",
+          "difficulty": "medium",
+          "prompt": "Let x and y be real. Assume x + y = 10 and x − y = 2. Prove x = 6 by combining the stated equalities.",
+          "expected_answer": "Complete Lean-verified proof",
+          "answer_type": "text",
+          "grading_method": "exact_text",
+          "solution_steps": [
+            "Author reference candidate is stored in proof_spec and is not a learner grading key."
+          ],
+          "mistake_tags": [
+            "proof_dependencies"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "proof_spec": {
+            "version": "0.1",
+            "statement": {
+              "declarations": [
+                "x:real",
+                "y:real"
+              ],
+              "assumptions": [
+                "x + y = 10",
+                "x - y = 2"
+              ],
+              "goal": "x = 6"
+            },
+            "allowed_rules": [
+              "linarith",
+              "eq_trans",
+              "eq_symm",
+              "assumption"
+            ],
+            "assessment_policy": {},
+            "reference_proof": {
+              "mode": "steps",
+              "steps": [
+                {
+                  "claim": "2*x = 12",
+                  "rule": "linarith",
+                  "premises": [
+                    "h1",
+                    "h2"
+                  ]
+                },
+                {
+                  "claim": "x = 6",
+                  "rule": "linarith",
+                  "premises": [
+                    "reference_step_1"
+                  ]
+                }
+              ]
+            },
+            "environment": {
+              "backend": "lean4",
+              "library": "mathlib",
+              "toolchain": "leanprover/lean4:v4.34.0-rc2",
+              "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "CUSTOM_PROOF_SQUARE",
+      "name": "A square is a reason",
+      "domain": "Math",
+      "subdomain": "Proofs",
+      "topic": "Nonnegative squares",
+      "description": "Turn a universal sign fact into a reusable inequality argument.",
+      "prerequisites": [],
+      "unlocks": [],
+      "tags": [
+        "formal-proof",
+        "proof-lab",
+        "demo"
+      ],
+      "mastery": {
+        "passing_score": 1,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "no",
+        "review_after_days_if_mastered": 7,
+        "review_after_days_if_learning": 2
+      },
+      "theory": "For a real number, a square cannot be negative. This is a statement about every real input, not a pattern inferred from examples. A proof can use a square as an intermediate claim and then connect that claim to the desired inequality.\n\nChoose Establish a sign when your claim concerns a nonnegative expression. Choose Combine polynomial inequalities when you need to relate polynomial expressions to facts already established. Keep the intermediate fact explicit so that the learner, verifier, and tutor can all follow the same dependency.\n\nAsk yourself why checking three numbers would not be enough. The declared variable represents an arbitrary real number.",
+      "examples": [
+        {
+          "prompt": "Why is (t + 5)² ≥ 0 for every real t?",
+          "solution": "t + 5 is real, and its square is nonnegative.",
+          "explanation": "The sign fact does not require choosing a value of t. Equality is possible at t = −5, so replacing ≥ with > would require more justification."
+        }
+      ],
+      "applications": [
+        {
+          "title": "Lower bounds",
+          "description": "Writing a quantity in terms of a square can reveal a lower bound and the values where equality is possible."
+        }
+      ],
+      "question_count": 1,
+      "problems": [
+        {
+          "template_id": "CUSTOM_PROOF_SQUARE_Q01",
+          "skill_id": "CUSTOM_PROOF_SQUARE",
+          "difficulty": "medium",
+          "prompt": "Let x be real. Prove x² − 2x + 1 ≥ 0. A nonnegative square may be a useful intermediate claim.",
+          "expected_answer": "Complete Lean-verified proof",
+          "answer_type": "text",
+          "grading_method": "exact_text",
+          "solution_steps": [
+            "Author reference candidate is stored in proof_spec and is not a learner grading key."
+          ],
+          "mistake_tags": [
+            "proof_dependencies"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "proof_spec": {
+            "version": "0.1",
+            "statement": {
+              "declarations": [
+                "x:real"
+              ],
+              "assumptions": [],
+              "goal": "x^2 - 2*x + 1 >= 0"
+            },
+            "allowed_rules": [
+              "positivity",
+              "nlinarith",
+              "ring_identity"
+            ],
+            "assessment_policy": {},
+            "reference_proof": {
+              "mode": "steps",
+              "steps": [
+                {
+                  "claim": "(x - 1)^2 >= 0",
+                  "rule": "positivity",
+                  "premises": []
+                },
+                {
+                  "claim": "x^2 - 2*x + 1 >= 0",
+                  "rule": "nlinarith",
+                  "premises": [
+                    "reference_step_1"
+                  ]
+                }
+              ]
+            },
+            "environment": {
+              "backend": "lean4",
+              "library": "mathlib",
+              "toolchain": "leanprover/lean4:v4.34.0-rc2",
+              "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

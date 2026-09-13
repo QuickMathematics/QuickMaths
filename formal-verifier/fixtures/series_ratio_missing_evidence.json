@@ -1,0 +1,110 @@
+{
+  "version": "0.1",
+  "request_id": "series_ratio_missing_evidence",
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null,
+      "binders": []
+    }
+  ],
+  "assumptions": [],
+  "steps": [
+    {
+      "id": "series",
+      "scope": "root",
+      "claim": {
+        "kind": "series_sum",
+        "variable": "n",
+        "expression": {
+          "kind": "mul",
+          "left": {
+            "kind": "cast_real",
+            "arg": {
+              "kind": "add",
+              "left": {
+                "kind": "var",
+                "id": "n"
+              },
+              "right": {
+                "kind": "int",
+                "value": 1
+              }
+            }
+          },
+          "right": {
+            "kind": "pow_nat",
+            "base": {
+              "kind": "rat",
+              "numerator": 1,
+              "denominator": 2
+            },
+            "exponent": {
+              "kind": "var",
+              "id": "n"
+            }
+          }
+        },
+        "result": {
+          "kind": "summable"
+        }
+      },
+      "rule": "series_ratio_test",
+      "premises": [],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "series_sum",
+    "variable": "n",
+    "expression": {
+      "kind": "mul",
+      "left": {
+        "kind": "cast_real",
+        "arg": {
+          "kind": "add",
+          "left": {
+            "kind": "var",
+            "id": "n"
+          },
+          "right": {
+            "kind": "int",
+            "value": 1
+          }
+        }
+      },
+      "right": {
+        "kind": "pow_nat",
+        "base": {
+          "kind": "rat",
+          "numerator": 1,
+          "denominator": 2
+        },
+        "exponent": {
+          "kind": "var",
+          "id": "n"
+        }
+      }
+    },
+    "result": {
+      "kind": "summable"
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "series_ratio_test"
+    ],
+    "max_seconds": 10,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

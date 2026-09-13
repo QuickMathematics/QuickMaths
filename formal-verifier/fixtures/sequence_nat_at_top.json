@@ -1,0 +1,80 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "arg": {
+        "kind": "add",
+        "left": {
+          "id": "n",
+          "kind": "var"
+        },
+        "right": {
+          "kind": "int",
+          "value": 2
+        }
+      },
+      "kind": "cast_real"
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "positive_infinity"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_algebra",
+      "sequence_nat_at_top"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence-nat-at-top",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "arg": {
+            "kind": "add",
+            "left": {
+              "id": "n",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 2
+            }
+          },
+          "kind": "cast_real"
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "positive_infinity"
+        },
+        "variable": "n"
+      },
+      "id": "seq",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_nat_at_top",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

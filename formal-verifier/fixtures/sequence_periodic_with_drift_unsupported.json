@@ -1,0 +1,129 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "kind": "add",
+      "left": {
+        "arg": {
+          "id": "n",
+          "kind": "var"
+        },
+        "kind": "cast_real"
+      },
+      "right": {
+        "condition": {
+          "kind": "eq",
+          "left": {
+            "kind": "mod_nat",
+            "left": {
+              "id": "n",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 3
+            }
+          },
+          "right": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "else": {
+          "kind": "int",
+          "value": 1
+        },
+        "kind": "if",
+        "then": {
+          "kind": "int",
+          "value": 0
+        }
+      }
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "no_finite_limit"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_elementary_divergence"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence-periodic-with-drift-unsupported",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "kind": "add",
+          "left": {
+            "arg": {
+              "id": "n",
+              "kind": "var"
+            },
+            "kind": "cast_real"
+          },
+          "right": {
+            "condition": {
+              "kind": "eq",
+              "left": {
+                "kind": "mod_nat",
+                "left": {
+                  "id": "n",
+                  "kind": "var"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 0
+              }
+            },
+            "else": {
+              "kind": "int",
+              "value": 1
+            },
+            "kind": "if",
+            "then": {
+              "kind": "int",
+              "value": 0
+            }
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "no_finite_limit"
+        },
+        "variable": "n"
+      },
+      "id": "seq",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_elementary_divergence",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

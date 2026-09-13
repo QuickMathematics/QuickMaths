@@ -4,7 +4,22 @@ import { normalizeCartesianDiagram, renderCartesianDiagram } from "./cartesian-d
 import { normalizeLessonMedia, renderLessonMedia, mediaPath, mediaDigest, encodeMediaData, MEDIA_TYPES, MAX_EMBEDDED_MEDIA_BYTES } from "./lesson-media.js?v=20260906-media-v1";
 import { includeLessonIllustrations } from "./lesson-illustrations.js?v=20260908-statistics-v1";
 import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260908-statistics-v1";
+import { checkFormalReferenceProof } from "./formal-proof-client.js?v=20260913-formal-kernel-v1";
 const DRAFT_KEY = "quickmaths.lesson-creator.v1";
+
+const FORMAL_ENVIRONMENT = Object.freeze({
+  backend: "lean4",
+  toolchain: "leanprover/lean4:v4.34.0-rc2",
+  library: "mathlib",
+  library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+});
+
+const FORMAL_STARTER_RULES = [
+  "eq_refl", "eq_symm", "eq_trans", "eq_subst", "ring_identity", "field_identity", "guarded_cancel",
+  "norm_num", "linarith", "nlinarith", "positivity", "sub_ne_zero_from_ne", "sqrt_square_nonnegative",
+  "true_intro", "and_intro", "and_elim_left", "and_elim_right", "modus_ponens", "imp_intro", "not_intro",
+  "forall_intro", "forall_elim", "exists_intro", "exists_elim", "contradiction", "nat_induction",
+];
 
 const DEFAULT_THEME = {
   paper: "#eef6f1", paperDeep: "#dcebe2", paperLight: "#ffffff", ink: "#18231d",
@@ -93,6 +108,83 @@ function lines(value) {
   return String(value ?? "").split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
 }
 
+function formalParameterLines(value) {
+  const parameters = {};
+  for (const [index, row] of lines(value).entries()) {
+    const separator = row.indexOf("=");
+    if (separator <= 0) throw new Error(`Formal reference parameter line ${index + 1} must use name = value.`);
+    const key = row.slice(0, separator).trim();
+    const raw = row.slice(separator + 1).trim();
+    if (!key || !raw) throw new Error(`Formal reference parameter line ${index + 1} must use name = value.`);
+    if (Object.hasOwn(parameters, key)) throw new Error(`Formal reference parameter ${key} is duplicated.`);
+    parameters[key] = /^(true|false)$/i.test(raw) ? raw.toLowerCase() === "true" : /^-?\d+$/.test(raw) ? Number(raw) : raw;
+  }
+  return parameters;
+}
+
+function formalReferenceSteps(problem) {
+  return (problem.formalReferenceSteps ?? []).map((row, index) => {
+    const claim = String(row.claim ?? "").trim();
+    const rule = String(row.rule ?? "").trim();
+    if (!claim) throw new Error(`Formal reference step ${index + 1} needs a claim.`);
+    if (!rule) throw new Error(`Formal reference step ${index + 1} needs a rule.`);
+    return {
+      claim,
+      rule,
+      premises: lines(row.premises),
+      parameters: formalParameterLines(row.parameters),
+      scope: String(row.scope ?? "root").trim() || "root",
+    };
+  });
+}
+
+function buildFormalProofSpec(problem) {
+  if (!problem.formalEnabled) return null;
+  const goal = String(problem.formalGoal ?? "").trim();
+  if (!goal) throw new Error("Formal proof goal is required when kernel verification is enabled.");
+  const requiredPublic = lines(problem.formalRequiredPublic);
+  const allowedRules = lines(problem.formalAllowedRules);
+  if (new Set(requiredPublic).size !== requiredPublic.length) throw new Error("Formal public parameters must not contain duplicates.");
+  if (new Set(allowedRules).size !== allowedRules.length) throw new Error("Formal allowed rules must not contain duplicates.");
+  const assessmentPolicy = structuredClone(problem.formalAssessmentPolicy ?? {});
+  const requiredMethod = String(problem.formalRequiredMethod ?? "").trim();
+  if (requiredMethod) assessmentPolicy.required_method = requiredMethod;
+  else delete assessmentPolicy.required_method;
+  const referenceMode = problem.formalReferenceMode ?? "none";
+  const referenceProof = referenceMode === "auto" ? { mode: "auto", steps: [] }
+    : referenceMode === "steps" ? { mode: "steps", steps: formalReferenceSteps(problem) } : {};
+  return {
+    version: "0.1",
+    statement: { declarations: lines(problem.formalDeclarations), assumptions: lines(problem.formalAssumptions), goal },
+    parameter_contract: { required_public: requiredPublic },
+    allowed_rules: allowedRules,
+    assessment_policy: assessmentPolicy,
+    reference_proof: referenceProof,
+    environment: structuredClone(problem.formalEnvironment ?? FORMAL_ENVIRONMENT),
+  };
+}
+
+function buildFormalReferenceJob(problem) {
+  const spec = buildFormalProofSpec(problem);
+  if (!spec?.reference_proof?.mode) throw new Error("Choose submitted reference steps or bounded auto-search first.");
+  const auto = spec.reference_proof.mode === "auto";
+  return {
+    version: "0.1",
+    environment_requirements: structuredClone(spec.environment),
+    rpc: {
+      protocol_version: "0.1",
+      op: auto ? "prove_text" : "check_reference_text",
+      request_id: `studio:${String(problem.templateId ?? "reference").replace(/[^A-Za-z0-9_.:-]/g, "_")}`,
+      declarations: spec.statement.declarations,
+      assumptions: spec.statement.assumptions,
+      goal: spec.statement.goal,
+      allowed_rules: spec.allowed_rules,
+      ...(auto ? {} : { reference_steps: spec.reference_proof.steps }),
+      max_seconds: 20,
+    },
+  };
+}
+
 const prerequisiteId = (reference) => typeof reference === "string" ? reference : reference.skill_id;
 // Draft links keep a stable identity while the author edits the exported lesson ID.
 const lessonReferenceId = (skill) => skill.referenceId ?? cleanId(skill.id, "CUSTOM_");
@@ -124,6 +216,10 @@ function blankProblem(skillId, index = 0) {
     pythonEntrypoint: "solve", pythonParameters: "value | int", pythonReturnType: "json",
     pythonTests: 'example | ordinary | [2] | 4\nafter_submission | boundary | [0] | 0\nhidden | negative | [-3] | -6',
     pythonBuiltins: "", pythonWallTime: 1500, pythonStepLimit: 20000, pythonStdoutChars: 1000,
+    formalEnabled: false, formalDeclarations: "x:real", formalAssumptions: "", formalGoal: "",
+    formalRequiredPublic: "", formalAllowedRules: FORMAL_STARTER_RULES.join("\n"), formalRequiredMethod: "",
+    formalAssessmentPolicy: {}, formalEnvironment: structuredClone(FORMAL_ENVIRONMENT),
+    formalReferenceMode: "none", formalReferenceSteps: [], formalReferenceCheck: null,
   };
 }
 
@@ -337,10 +433,55 @@ function renderMediaEditor(items = [], scope, sectionIndex, assets = [], owner =
   </section>`;
 }
 
+function renderFormalReferenceStatus(check) {
+  if (!check) return `<div class="studio-validation"><strong>Reference proof not checked</strong><p>Use the local companion verifier before publishing a formal exercise. <a href="./FORMAL_LEARNING.md" target="_blank" rel="noopener">Companion setup and proof guide</a></p></div>`;
+  const labels = {
+    verified: ["is-valid", "✓ Kernel-certified reference proof"],
+    ready: ["is-valid", "Ready for kernel verification"],
+    incomplete: ["is-error", "Reference proof needs justification"],
+    unavailable: ["", "Verifier available, Lean kernel unavailable"],
+    invalid: ["is-error", "Reference proof check failed"],
+    checking: ["", "Checking reference proof…"],
+  };
+  const [className, label] = labels[check.state] ?? ["", "Reference proof status"];
+  return `<div class="studio-validation ${className}"><strong>${esc(label)}</strong><p>${esc(check.message ?? "")}</p></div>`;
+}
+
+function renderFormalProofAuthoring(problem, index) {
+  const indexed = (markup) => markup.replaceAll("data-creator-field", `data-index="${index}" data-creator-field`);
+  const rows = (problem.formalReferenceSteps ?? []).map((row, referenceIndex) => {
+    const reference = (markup) => markup.replaceAll("data-creator-field", `data-index="${index}" data-reference-index="${referenceIndex}" data-creator-field`);
+    return `<article class="studio-formal-reference-step"><div class="studio-repeat-head"><b>Reference step ${referenceIndex + 1}</b><button type="button" data-creator-action="remove-formal-reference-step" data-index="${index}" data-reference-index="${referenceIndex}">Remove</button></div>
+      ${reference(area("Claim established by this step", "formalReference.claim", row.claim ?? "", { rows:2, hint:"Use the same school notation learners use, not Lean syntax." }))}
+      <div class="studio-two">${reference(field("Rule", "formalReference.rule", row.rule ?? "", { hint:"For example ring_identity, guarded_cancel, modus_ponens, forall_intro." }))}${reference(field("Scope", "formalReference.scope", row.scope ?? "root", { hint:"Usually root. Nested proof scopes are explicit when needed." }))}</div>
+      <div class="studio-two">${reference(area("Premise IDs — one per line", "formalReference.premises", row.premises ?? "", { rows:3, hint:"Reference assumptions or earlier step IDs, such as h1 or reference_step_1." }))}${reference(area("Rule parameters — name = value", "formalReference.parameters", row.parameters ?? "", { rows:3, hint:"Only declarative scalar parameters. Example: divisor = x - 3" }))}</div>
+    </article>`;
+  }).join("");
+  const environment = problem.formalEnvironment ?? FORMAL_ENVIRONMENT;
+  return `<details class="studio-advanced studio-formal-authoring" ${problem.formalEnabled ? "open" : ""}>
+    <summary><span>Kernel-checked theorem proof</span><b>${problem.formalEnabled ? "Formal verifier enabled" : "Optional"}</b></summary>
+    <label class="studio-check"><input type="checkbox" data-index="${index}" data-creator-field="problem.formalEnabled" ${problem.formalEnabled ? "checked" : ""}> Attach a formal proof specification to this exact question</label>
+    <aside class="studio-syntax-note"><strong>QuickMaths owns the meaning; Lean checks the proof.</strong><p>This contract is declarative. Authors and learners write school-style statements and named rules; lesson files cannot inject Lean source, tactics, macros, imports, or executable proof code.</p></aside>
+    ${problem.formalEnabled ? `
+      <div class="studio-two">${indexed(area("Declarations — one per line", "problem.formalDeclarations", problem.formalDeclarations, { rows:4, hint:"Examples: x:real, n:nat, f:real->real, A:set[real]. Identifiers must be declared explicitly." }))}${indexed(area("Assumptions — one per line", "problem.formalAssumptions", problem.formalAssumptions, { rows:4, hint:"Examples: x != 3, 0 <= x, p -> q." }))}</div>
+      ${indexed(area("Formal goal", "problem.formalGoal", problem.formalGoal, { rows:3, hint:"The exact theorem that the certificate must establish. Enabling this bypasses the short-answer grader; only a fresh complete Lean certificate can earn assessment credit." }))}
+      <div class="studio-two">${indexed(area("Allowed proof rules — one per line", "problem.formalAllowedRules", problem.formalAllowedRules, { rows:7, hint:"Curated rule names only; this limits the learner and reference prover interface." }))}${indexed(area("Public generator parameters — one per line", "problem.formalRequiredPublic", problem.formalRequiredPublic, { rows:4, hint:"For parameterized native questions, every name here must also be visible in the learner prompt." }))}</div>
+      ${indexed(field("Required method (optional)", "problem.formalRequiredMethod", problem.formalRequiredMethod, { hint:"Reserved for method-specific policy. Leave blank for assessable exercises in this build; unsupported method policies block credit rather than being silently ignored." }))}
+      <div class="studio-runtime-preview"><header><div><span>Pinned formal environment</span><strong>${esc(environment.backend ?? "lean4")} · ${esc(environment.library ?? "mathlib")}</strong></div></header><div><dl><div><dt>Lean</dt><dd>${esc(environment.toolchain ?? "")}</dd></div><div><dt>mathlib</dt><dd>${esc(environment.library_revision ?? "")}</dd></div></dl></div><footer>Changing the formal environment creates a new verification provenance; old certificates remain attached to their original environment.</footer></div>
+      <section class="studio-formal-reference"><div class="studio-section-title"><div><p class="eyebrow">Author reference proof</p><h3>Prove the exercise before publishing it</h3></div><button type="button" class="quiet-button" data-creator-action="apply-formal-example" data-index="${index}">Load algebra example</button></div>
+        ${indexed(select("Reference proof source", "problem.formalReferenceMode", problem.formalReferenceMode ?? "none", [["none","No reference proof yet"],["steps","Submitted declarative steps"],["auto","Bounded prover search"]], "A reference proof is an author candidate until the pinned Lean kernel accepts it."))}
+        ${problem.formalReferenceMode === "steps" ? `<div class="studio-repeat">${rows || `<p class="studio-field-intro">Add the first declarative proof step. The verifier will expose any remaining obligation rather than guessing.</p>`}<button type="button" class="button button-outline" data-creator-action="add-formal-reference-step" data-index="${index}">＋ Add reference step</button></div>` : problem.formalReferenceMode === "auto" ? `<p class="studio-field-intro">The verifier will run bounded deterministic search using only the allowed rule registry. Search success is still not a certificate until Lean accepts the generated artifact.</p>` : ""}
+        ${problem.formalReferenceMode !== "none" ? `<button type="button" class="button button-secondary" data-creator-action="check-formal-reference" data-index="${index}" ${problem.formalReferenceCheck?.state === "checking" ? "disabled" : ""}>Check reference proof with companion verifier</button>` : ""}
+        ${renderFormalReferenceStatus(problem.formalReferenceCheck)}
+      </section>
+    ` : ""}
+  </details>`;
+}
+
 function renderProblemEditor(skill, problem, index, assets) {
   const indexed = (markup) => markup.replaceAll("data-creator-field", `data-index="${index}" data-creator-field`);
   const isProof = problem.workMode === "proof_obligations";
-  const graderHelp = isProof ? "This grades only the short conclusion. It never decides whether the proof is valid; that happens through the obligation review below." : "This checks only the final-answer field. Proofs and long responses are handled separately under How the learner answers.";
+  const graderHelp = problem.formalEnabled ? "The formal specification overrides this legacy compatibility field. A matching short answer or tutor verdict cannot certify the proof." : isProof ? "This grades only the short conclusion. It never decides whether the proof is valid; that happens through the obligation review below." : "This checks only the final-answer field. Proofs and long responses are handled separately under How the learner answers.";
   return `<details open>
     <summary><span>${String(index + 1).padStart(2, "0")}</span><b>${esc(problem.prompt || "Untitled question")}</b><small>${esc(problem.gradingMethod)} · ${esc(WORK_MODE_GUIDES[problem.workMode]?.title ?? problem.workMode)}</small></summary>
     <div class="studio-problem-body">
@@ -366,6 +507,7 @@ function renderProblemEditor(skill, problem, index, assets) {
       ${problem.workMode === "limit_steps" ? `<section class="studio-card"><h3>Limit setup for review</h3>${indexed(field("Variable", "problem.limitVariable", problem.limitVariable ?? "x"))}${indexed(field("Approaching", "problem.limitApproach", problem.limitApproach ?? "0"))}${indexed(select("Direction", "problem.limitDirection", problem.limitDirection ?? "both", [["both","Both sides"],["left","From the left"],["right","From the right"]]))}${indexed(area("Original expression", "problem.limitOriginal", problem.limitOriginal ?? "", {rows:2}))}${indexed(area("Required original restrictions (one per line)", "problem.limitRestrictions", problem.limitRestrictions ?? "", {rows:3}))}<p>Transformations and limit laws always require tutor review.</p></section>` : ""}
       ${renderMediaEditor(problem.media, "problem", index, assets, problem)}
       ${renderAdvancedWork(problem, index)}
+      ${renderFormalProofAuthoring(problem, index)}
     </div>
   </details>`;
 }
@@ -569,6 +711,8 @@ function buildPack(draft) {
             policy: { allowed_builtins: lines(problem.pythonBuiltins), imports: [], network: false, storage: false, clock: false, randomness: false },
           };
         }
+        const proofSpec = buildFormalProofSpec(problem);
+        if (proofSpec) output.proof_spec = proofSpec;
         if (problem.acceptedForms.trim()) output.accepted_forms = lines(problem.acceptedForms);
         return output;
       }),
@@ -647,6 +791,21 @@ function draftFromPack(pack, snapshot) {
       pythonBuiltins: (problem.program_spec?.policy?.allowed_builtins ?? []).join("\n"), pythonWallTime: problem.program_spec?.limits?.wall_time_ms ?? 1500,
       pythonMemoryMb: problem.program_spec?.limits?.memory_mb ?? 32,
       pythonStepLimit: problem.program_spec?.limits?.step_limit ?? 20000, pythonStdoutChars: problem.program_spec?.limits?.stdout_chars ?? 1000,
+      formalEnabled: Boolean(problem.proof_spec),
+      formalDeclarations: (problem.proof_spec?.statement?.declarations ?? []).join("\n"),
+      formalAssumptions: (problem.proof_spec?.statement?.assumptions ?? []).join("\n"),
+      formalGoal: problem.proof_spec?.statement?.goal ?? "",
+      formalRequiredPublic: (problem.proof_spec?.parameter_contract?.required_public ?? []).join("\n"),
+      formalAllowedRules: (problem.proof_spec?.allowed_rules ?? FORMAL_STARTER_RULES).join("\n"),
+      formalRequiredMethod: problem.proof_spec?.assessment_policy?.required_method ?? "",
+      formalAssessmentPolicy: structuredClone(problem.proof_spec?.assessment_policy ?? {}),
+      formalEnvironment: structuredClone(problem.proof_spec?.environment ?? FORMAL_ENVIRONMENT),
+      formalReferenceMode: problem.proof_spec?.reference_proof?.mode ?? "none",
+      formalReferenceSteps: (problem.proof_spec?.reference_proof?.steps ?? []).map((row) => ({
+        claim: row.claim ?? "", rule: row.rule ?? "", premises: (row.premises ?? []).join("\n"),
+        parameters: Object.entries(row.parameters ?? {}).map(([key, value]) => `${key} = ${String(value)}`).join("\n"), scope: row.scope ?? "root",
+      })),
+      formalReferenceCheck: null,
     })),
   }));
   if (!base.skills.length) base.skills = [blankSkill(0)];
@@ -731,7 +890,18 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     else if (path.startsWith("draft.")) draft[path.slice(6)] = value;
     else if (path.startsWith("theme.")) draft.theme[path.slice(6)] = value;
     else if (path.startsWith("skill.")) skill[path.slice(6)] = value;
-    else if (path.startsWith("problem.")) skill.problems[Number(target.dataset.index)][path.slice(8)] = target.type === "checkbox" ? target.checked : value;
+    else if (path.startsWith("problem.")) {
+      const problem = skill.problems[Number(target.dataset.index)];
+      problem[path.slice(8)] = target.type === "checkbox" ? target.checked : value;
+      if (path.startsWith("problem.formal")) problem.formalReferenceCheck = null;
+    }
+    else if (path.startsWith("formalReference.")) {
+      const problem = skill.problems[Number(target.dataset.index)];
+      const row = problem.formalReferenceSteps?.[Number(target.dataset.referenceIndex)];
+      if (!row) return;
+      row[path.slice("formalReference.".length)] = value;
+      problem.formalReferenceCheck = null;
+    }
     else if (path.startsWith("example.")) skill.examples[Number(target.dataset.index)][path.slice(8)] = value;
     else if (path.startsWith("application.")) skill.applications[Number(target.dataset.index)][path.slice(12)] = value;
     if (path === "problem.workMode") applyWorkModeDefaults(skill.problems[Number(target.dataset.index)], value);
@@ -863,12 +1033,40 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     const path = target.dataset.creatorField;
     if (!path) return false;
     setField(path, target.value, target);
-    return ["draft.subjectMode", "draft.subjectId", "problem.gradingMethod", "problem.workMode"].includes(path);
+    return ["draft.subjectMode", "draft.subjectId", "problem.gradingMethod", "problem.workMode", "problem.formalEnabled", "problem.formalReferenceMode"].includes(path);
   };
 
   const handleAction = (target) => {
     const action = target.dataset.creatorAction;
     if (!action) return false;
+    if (action === "check-formal-reference") {
+      const skill = currentSkill();
+      const problem = skill.problems[Number(target.dataset.index)];
+      problem.formalReferenceCheck = { state: "checking", message: "Submitting the exact authored theorem and reference proof to the local companion verifier." };
+      save();
+      return (async () => {
+        try {
+          const checked = await checkFormalReferenceProof(buildFormalReferenceJob(problem));
+          if (checked.kernelVerified) {
+            problem.formalReferenceCheck = { state: "verified", message: "The pinned Lean kernel accepted the exact reference proof and theorem." };
+          } else if (checked.proofState && checked.proofState.status !== "ready_for_kernel") {
+            const count = Array.isArray(checked.proofState.obligations) ? checked.proofState.obligations.length : 0;
+            problem.formalReferenceCheck = { state: "incomplete", message: checked.proofState.message || `The reference proof still has ${count} unresolved obligation${count === 1 ? "" : "s"}.` };
+          } else if (checked.verification?.status === "verification_unavailable") {
+            problem.formalReferenceCheck = { state: "unavailable", message: "The declarative reference proof is ready for kernel checking, but Lean is not available in the companion service." };
+          } else {
+            problem.formalReferenceCheck = { state: "invalid", message: checked.verification?.message || `Verifier returned ${checked.verification?.status ?? "an unresolved result"}.` };
+          }
+          save();
+          showToast(problem.formalReferenceCheck.message);
+        } catch (error) {
+          problem.formalReferenceCheck = { state: "invalid", message: error instanceof Error ? error.message : String(error) };
+          save();
+          showToast(problem.formalReferenceCheck.message);
+        }
+        return true;
+      })();
+    }
     if (action === "load-native") {
       const source = store.skillsById[draft.nativeSkillId];
       if (!source) { showToast("Choose a native lesson first."); return true; }
@@ -944,6 +1142,32 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
       problem.pythonBuiltins = "";
       problem.solutionSteps = "Use remainder modulo two.\nCompare the remainder with zero.\nReturn the Boolean result rather than printing it.";
       problem.mistakeTags = "modulo\nboolean_expression\nreturn_vs_print";
+    }
+    if (action === "apply-formal-example") {
+      const problem = skill.problems[index];
+      problem.formalEnabled = true;
+      problem.formalDeclarations = "x:real";
+      problem.formalAssumptions = "";
+      problem.formalGoal = "x^2 - 9 = (x - 3) * (x + 3)";
+      problem.formalRequiredPublic = "";
+      problem.formalAllowedRules = "ring_identity";
+      problem.formalRequiredMethod = "";
+      problem.formalAssessmentPolicy = {};
+      problem.formalEnvironment = structuredClone(FORMAL_ENVIRONMENT);
+      problem.formalReferenceMode = "steps";
+      problem.formalReferenceSteps = [{ claim: "x^2 - 9 = (x - 3) * (x + 3)", rule: "ring_identity", premises: "", parameters: "", scope: "root" }];
+      problem.formalReferenceCheck = null;
+    }
+    if (action === "add-formal-reference-step") {
+      const problem = skill.problems[index];
+      problem.formalReferenceSteps ??= [];
+      problem.formalReferenceSteps.push({ claim: "", rule: "", premises: "", parameters: "", scope: "root" });
+      problem.formalReferenceCheck = null;
+    }
+    if (action === "remove-formal-reference-step") {
+      const problem = skill.problems[index];
+      problem.formalReferenceSteps?.splice(Number(target.dataset.referenceIndex), 1);
+      problem.formalReferenceCheck = null;
     }
     if (action === "add-example") skill.examples.push({ prompt: "", solution: "", explanation: "" });
     if (action === "remove-example") skill.examples.splice(index, 1);

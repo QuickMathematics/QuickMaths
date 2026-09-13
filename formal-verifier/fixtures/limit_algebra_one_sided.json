@@ -1,0 +1,108 @@
+{
+  "assumptions": [],
+  "goal": {
+    "direction": "right",
+    "domain": [],
+    "expression": {
+      "kind": "add",
+      "left": {
+        "arg": {
+          "id": "x",
+          "kind": "var"
+        },
+        "kind": "sin"
+      },
+      "right": {
+        "base": {
+          "id": "x",
+          "kind": "var"
+        },
+        "exponent": 2,
+        "kind": "pow"
+      }
+    },
+    "kind": "limit",
+    "point": {
+      "kind": "int",
+      "value": 0
+    },
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 0
+      }
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "limit_algebra"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "limit-algebra-one-sided",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "direction": "right",
+        "domain": [],
+        "expression": {
+          "kind": "add",
+          "left": {
+            "arg": {
+              "id": "x",
+              "kind": "var"
+            },
+            "kind": "sin"
+          },
+          "right": {
+            "base": {
+              "id": "x",
+              "kind": "var"
+            },
+            "exponent": 2,
+            "kind": "pow"
+          }
+        },
+        "kind": "limit",
+        "point": {
+          "kind": "int",
+          "value": 0
+        },
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 0
+          }
+        },
+        "variable": "x"
+      },
+      "id": "proof",
+      "parameters": {},
+      "premises": [],
+      "rule": "limit_algebra",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

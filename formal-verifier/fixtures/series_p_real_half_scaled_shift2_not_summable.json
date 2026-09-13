@@ -1,0 +1,110 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "kind": "div",
+      "left": {
+        "kind": "int",
+        "value": 2
+      },
+      "right": {
+        "base": {
+          "arg": {
+            "kind": "add",
+            "left": {
+              "id": "n",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 2
+            }
+          },
+          "kind": "cast_real"
+        },
+        "exponent": {
+          "denominator": 2,
+          "kind": "rat",
+          "numerator": 1
+        },
+        "kind": "rpow"
+      }
+    },
+    "kind": "series_sum",
+    "result": {
+      "kind": "not_summable"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "series_p_series"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "series_p_real_half_scaled_shift2_not_summable",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "int",
+            "value": 2
+          },
+          "right": {
+            "base": {
+              "arg": {
+                "kind": "add",
+                "left": {
+                  "id": "n",
+                  "kind": "var"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 2
+                }
+              },
+              "kind": "cast_real"
+            },
+            "exponent": {
+              "denominator": 2,
+              "kind": "rat",
+              "numerator": 1
+            },
+            "kind": "rpow"
+          }
+        },
+        "kind": "series_sum",
+        "result": {
+          "kind": "not_summable"
+        },
+        "variable": "n"
+      },
+      "id": "series",
+      "parameters": {},
+      "premises": [],
+      "rule": "series_p_series",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

@@ -1,0 +1,2236 @@
+id: MATH_FORMAL_002
+name: Kernel-backed algebra and calculus proofs
+domain: Math
+subdomain: Proof Foundations
+description: Experimental QuickMaths formal-proof examples using declarative lesson metadata and the isolated Lean verifier.
+prerequisites: []
+tags:
+  - proof
+  - algebra
+  - calculus
+  - formal verification
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 14
+  review_after_days_if_learning: 2
+theory: |
+  A formal QuickMaths question keeps three things separate: the displayed mathematical statement,
+  the learner's submitted steps, and the kernel certificate. A candidate proof is not called verified
+  unless the exact bound statement and submission are accepted by the pinned Lean environment.
+examples:
+  - prompt: "Why must x != 3 be retained when cancelling x - 3?"
+    solution: "Because cancellation is only valid where the cancelled factor is nonzero."
+    explanation: "The simplified formula and the original rational expression do not have the same domain."
+test:
+  question_count: 46
+  randomize_order: false
+  questions:
+    - id: FORMAL_GUARDED_CANCEL_001
+      type: fixed
+      prompt: "For real x with x ≠ 3, simplify (x² - 9)/(x - 3)."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "x + 3"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions:
+            - "x != 3"
+          goal: "(x^2 - 9)/(x - 3) = x + 3"
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sub_ne_zero_from_ne
+          - field_identity
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: guarded_cancellation
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "x - 3 != 0"
+              rule: sub_ne_zero_from_ne
+              premises: [h1]
+            - claim: "(x^2 - 9)/(x - 3) = x + 3"
+              rule: field_identity
+              premises: [reference_step_1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Factor the numerator, retain x ≠ 3, then cancel the nonzero factor.
+      mistake_tags:
+        - lost_domain_restriction
+
+    - id: FORMAL_REMOVABLE_HOLE_001
+      type: fixed
+      prompt: "Find the two-sided limit of (x² - 9)/(x - 3) as x approaches 3."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "6"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "As x approaches 3 from both sides, (x^2 - 9)/(x - 3) approaches 6."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - rational_hole_limit
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: preserve_punctured_domain
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As x approaches 3 from both sides, (x^2 - 9)/(x - 3) approaches 6."
+              rule: rational_hole_limit
+              premises: []
+              parameters:
+                simplified: "x + 3"
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        On the punctured neighborhood x ≠ 3, factor and cancel to x + 3, then take its limit at 3.
+      mistake_tags:
+        - value_limit_confusion
+        - lost_domain_restriction
+
+    - id: FORMAL_POLYNOMIAL_DERIVATIVE_001
+      type: fixed
+      prompt: "For f(x) = x² + 3x, find f'(a) for real a."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "2*a + 3"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+            - "a:real"
+          assumptions: []
+          goal: "The derivative of x^2 + 3*x with respect to x at a is 2*a + 3."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - polynomial_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: polynomial_derivative
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of x^2 + 3*x with respect to x at a is 2*a + 3."
+              rule: polynomial_derivative
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Differentiate x² and 3x term-by-term; the result at a is 2a + 3.
+      mistake_tags:
+        - derivative_power_rule
+
+    - id: FORMAL_QUOTIENT_DERIVATIVE_001
+      type: fixed
+      prompt: "For f(x) = (x² + 1)/(x - 1), find f'(a) for real a with a ≠ 1."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "(a^2 - 2*a - 1)/(a - 1)^2"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+            - "a:real"
+          assumptions:
+            - "a != 1"
+          goal: "The derivative of (x^2 + 1)/(x - 1) with respect to x at a is (a^2 - 2*a - 1)/(a - 1)^2."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sub_ne_zero_from_ne
+          - quotient_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: quotient_rule_with_domain_guard
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "a - 1 != 0"
+              rule: sub_ne_zero_from_ne
+              premises: [h1]
+            - claim: "The derivative of (x^2 + 1)/(x - 1) with respect to x at a is (a^2 - 2*a - 1)/(a - 1)^2."
+              rule: quotient_derivative
+              premises: [reference_step_1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The quotient rule is valid at a only after establishing a - 1 ≠ 0; the authored a ≠ 1 hypothesis supplies that guard.
+      mistake_tags:
+        - quotient_rule
+        - lost_domain_restriction
+
+
+    - id: FORMAL_ABS_DERIVATIVE_001
+      type: fixed
+      prompt: "For f(x) = |x - 1|, find f'(a) for real a with 0 < a - 1."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "1"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+            - "a:real"
+          assumptions:
+            - "0 < a - 1"
+          goal: "The derivative of |x - 1| with respect to x at a is 1."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - abs_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: absolute_value_positive_branch
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of |x - 1| with respect to x at a is 1."
+              rule: abs_derivative
+              premises: [h1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The strict positive sign selects the x - 1 branch of the absolute value, so the derivative is 1.
+      mistake_tags:
+        - absolute_value_branch
+
+    - id: FORMAL_EXP_DERIVATIVE_001
+      type: fixed
+      prompt: "For f(x) = exp(x²), find f'(a) for real a."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "2*a*exp(a^2)"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+            - "a:real"
+          assumptions: []
+          goal: "The derivative of exp(x^2) with respect to x at a is 2*a*exp(a^2)."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - exp_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: exponential_chain_rule
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of exp(x^2) with respect to x at a is 2*a*exp(a^2)."
+              rule: exp_derivative
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Apply the chain rule: exp(x²) keeps the exponential factor and multiplies by 2x.
+      mistake_tags:
+        - chain_rule
+
+    - id: FORMAL_LOG_DERIVATIVE_001
+      type: fixed
+      prompt: "For f(x) = log(x + 1), find f'(a) for real a with 0 < a + 1."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "1/(a + 1)"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+            - "a:real"
+          assumptions:
+            - "0 < a + 1"
+          goal: "The derivative of log(x + 1) with respect to x at a is 1/(a + 1)."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - log_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: logarithm_chain_rule_with_domain_guard
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of log(x + 1) with respect to x at a is 1/(a + 1)."
+              rule: log_derivative
+              premises: [h1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The school-real logarithm requires a + 1 > 0; the chain rule then gives 1/(a + 1).
+      mistake_tags:
+        - chain_rule
+        - logarithm_domain
+
+    - id: FORMAL_SIN_DERIVATIVE_001
+      type: fixed
+      prompt: "For f(x) = sin(2x), find f'(a) for real a."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "2*cos(2*a)"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+            - "a:real"
+          assumptions: []
+          goal: "The derivative of sin(2*x) with respect to x at a is 2*cos(2*a)."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sin_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: sine_chain_rule
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of sin(2*x) with respect to x at a is 2*cos(2*a)."
+              rule: sin_derivative
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Differentiate the outer sine to cosine and multiply by the inner derivative 2.
+      mistake_tags:
+        - chain_rule
+        - trigonometric_derivative
+
+    - id: FORMAL_COS_DERIVATIVE_001
+      type: fixed
+      prompt: "For f(x) = cos(x²), find f'(a) for real a."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "-2*a*sin(a^2)"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+            - "a:real"
+          assumptions: []
+          goal: "The derivative of cos(x^2) with respect to x at a is -2*a*sin(a^2)."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - cos_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: cosine_chain_rule
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of cos(x^2) with respect to x at a is -2*a*sin(a^2)."
+              rule: cos_derivative
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Differentiate cosine to negative sine and multiply by the inner derivative 2x.
+      mistake_tags:
+        - chain_rule
+        - trigonometric_derivative
+
+    - id: FORMAL_RECURSIVE_SIN_EXP_001
+      type: fixed
+      prompt: "Find the derivative of sin(exp(x²)) at x = 1."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "2*exp(1)*cos(exp(1))"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "The derivative of sin(exp(x^2)) with respect to x at 1 is 2*exp(1)*cos(exp(1))."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - recursive_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: recursive_chain_rule
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of sin(exp(x^2)) with respect to x at 1 is 2*exp(1)*cos(exp(1))."
+              rule: recursive_derivative
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Differentiate from the inside out: x², then exp, then sin. Each composition is reconstructed as a HasDerivAt chain.
+      mistake_tags:
+        - chain_rule
+        - nested_composition
+
+    - id: FORMAL_RECURSIVE_EXP_QUOTIENT_001
+      type: fixed
+      prompt: "Find the derivative of exp((x² + 1)/(x - 1)) at x = 2."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "-exp(5)"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "The derivative of exp((x^2 + 1)/(x - 1)) with respect to x at 2 is -exp(5)."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - recursive_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: recursive_quotient_chain_rule
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of exp((x^2 + 1)/(x - 1)) with respect to x at 2 is -exp(5)."
+              rule: recursive_derivative
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The recursive plan proves the quotient denominator is nonzero at 2, applies the quotient rule, then composes with exp.
+      mistake_tags:
+        - quotient_rule
+        - chain_rule
+        - lost_domain_restriction
+
+    - id: FORMAL_RECURSIVE_SQRT_QUOTIENT_001
+      type: fixed
+      prompt: "Find the derivative of sqrt((x² + 1)/(x + 1)) at x = 1."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "1/4"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "The derivative of sqrt((x^2 + 1)/(x + 1)) with respect to x at 1 is 1/4."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - recursive_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: recursive_guarded_sqrt_quotient
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of sqrt((x^2 + 1)/(x + 1)) with respect to x at 1 is 1/4."
+              rule: recursive_derivative
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The recursive plan carries both guards: the quotient denominator is nonzero and the square-root radicand is strictly positive at x = 1.
+      mistake_tags:
+        - quotient_rule
+        - square_root_domain
+        - chain_rule
+
+    - id: FORMAL_RECURSIVE_LOG_ABS_001
+      type: fixed
+      prompt: "Find the derivative of log(|x|) at x = -2."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "-(1/2)"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "The derivative of log(abs(x)) with respect to x at -2 is -(1/2)."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - recursive_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: recursive_log_absolute_value
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of log(abs(x)) with respect to x at -2 is -(1/2)."
+              rule: recursive_derivative
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        At -2 the absolute-value branch is negative, while |−2| is positive for the school-real logarithm; both facts are kernel-reconstructed.
+      mistake_tags:
+        - absolute_value_branch
+        - logarithm_domain
+        - chain_rule
+
+    - id: FORMAL_RECURSIVE_ABS_SIN_001
+      type: fixed
+      prompt: "For real a with sin(a) > 0, find the derivative of |sin(x)| at x = a."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "cos(a)"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+            - "a:real"
+          assumptions:
+            - "0 < sin(a)"
+          goal: "The derivative of abs(sin(x)) with respect to x at a is cos(a)."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - recursive_derivative
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: recursive_absolute_value_branch
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The derivative of abs(sin(x)) with respect to x at a is cos(a)."
+              rule: recursive_derivative
+              premises: [h1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The strict sign of sin(a) selects the positive absolute-value branch, then the inner sine derivative supplies cos(a).
+      mistake_tags:
+        - absolute_value_branch
+        - trigonometric_derivative
+        - chain_rule
+
+    - id: FORMAL_CONTINUITY_ABS_LIMIT_001
+      type: fixed
+      prompt: "Find the two-sided limit of |x| as x approaches 0."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "As x approaches 0 from both sides, abs(x) approaches 0."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - continuity_limit
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: continuity_direct_substitution
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As x approaches 0 from both sides, abs(x) approaches 0."
+              rule: continuity_limit
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Absolute value is continuous at 0 even though it is not differentiable there, so direct substitution gives the limit.
+      mistake_tags:
+        - continuity_vs_differentiability
+
+    - id: FORMAL_CONTINUITY_LOG_EXP_LIMIT_001
+      type: fixed
+      prompt: "Find the two-sided limit of log(exp(x)) as x approaches 2."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "2"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "As x approaches 2 from both sides, log(exp(x)) approaches 2."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - continuity_limit
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: continuity_with_school_domain_guard
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As x approaches 2 from both sides, log(exp(x)) approaches 2."
+              rule: continuity_limit
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The continuity plan proves exp(2) > 0 in Lean, preserving the school-real logarithm domain before applying direct substitution.
+      mistake_tags:
+        - logarithm_domain
+        - continuity_direct_substitution
+
+    - id: FORMAL_CONTINUITY_QUOTIENT_LIMIT_001
+      type: fixed
+      prompt: "Find the two-sided limit of 1/(x² + 1) as x approaches 0."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "1"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "As x approaches 0 from both sides, 1/(x^2 + 1) approaches 1."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - continuity_limit
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: continuity_with_nonzero_denominator
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As x approaches 0 from both sides, 1/(x^2 + 1) approaches 1."
+              rule: continuity_limit
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The denominator is nonzero at the approach point, so the quotient is continuous there and direct substitution is valid.
+      mistake_tags:
+        - denominator_domain
+        - continuity_direct_substitution
+
+    - id: FORMAL_CONTINUITY_SQRT_RIGHT_LIMIT_001
+      type: fixed
+      prompt: "Find the right-hand limit of sqrt(x) as x approaches 0 within the school-real domain x ≥ 0."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "As x approaches 0 from the right, with 0 <= x, sqrt(x) approaches 0."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - continuity_limit
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: one_sided_continuity_with_school_domain
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As x approaches 0 from the right, with 0 <= x, sqrt(x) approaches 0."
+              rule: continuity_limit
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Square root is continuous at the boundary point 0 on its school-real domain. The formal limit keeps both the right-hand approach and x >= 0 restriction explicit.
+      mistake_tags:
+        - square_root_domain
+        - one_sided_limit
+        - continuity_direct_substitution
+
+
+    - id: FORMAL_LIMIT_ALGEBRA_BASIC_001
+      type: fixed
+      prompt: "Find the two-sided limit of (x² + 3x - 1)/(x + 1) as x approaches 2."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "3"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "As x approaches 2 from both sides, (x^2 + 3*x - 1)/(x + 1) approaches 3."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - limit_algebra
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: compositional_finite_limit_algebra
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As x approaches 2 from both sides, (x^2 + 3*x - 1)/(x + 1) approaches 3."
+              rule: limit_algebra
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Build the limit compositionally from x -> 2, constants, powers, sums, products, and the quotient rule. The denominator limit is 3, so Lean verifies the required nonzero target guard.
+      mistake_tags:
+        - limit_algebra
+        - quotient_limit
+
+    - id: FORMAL_LIMIT_ALGEBRA_ONE_SIDED_001
+      type: fixed
+      prompt: "Find the right-hand limit of sin(x) + x² as x approaches 0."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "As x approaches 0 from the right, sin(x) + x^2 approaches 0."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - limit_algebra
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: one_sided_compositional_limit
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As x approaches 0 from the right, sin(x) + x^2 approaches 0."
+              rule: limit_algebra
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The same Tendsto algebra works over the right-hand neighborhood filter: sin(x) tends to 0 and x² tends to 0, so their sum tends to 0.
+      mistake_tags:
+        - one_sided_limit
+        - limit_algebra
+
+    - id: FORMAL_LIMIT_ALGEBRA_HOLE_COMPOSE_001
+      type: fixed
+      prompt: "Find the two-sided limit of (x² - 9)/(x - 3) + sin(x - 3) as x approaches 3."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "6"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "x:real"
+          assumptions: []
+          goal: "As x approaches 3 from both sides, (x^2 - 9)/(x - 3) + sin(x - 3) approaches 6."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - rational_hole_limit
+          - limit_algebra
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: reuse_verified_sublimit
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As x approaches 3 from both sides, (x^2 - 9)/(x - 3) approaches 6."
+              rule: rational_hole_limit
+              premises: []
+              parameters:
+                simplified: "x + 3"
+            - claim: "As x approaches 3 from both sides, (x^2 - 9)/(x - 3) + sin(x - 3) approaches 6."
+              rule: limit_algebra
+              premises: [reference_step_1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        First certify the removable-hole sublimit. Then reuse that exact two-sided sublimit as a leaf in the larger Tendsto proof and combine it with sin(x - 3) -> 0.
+      mistake_tags:
+        - removable_discontinuity
+        - sublimit_reuse
+        - limit_algebra
+
+    - id: FORMAL_SEQUENCE_RECIPROCAL_001
+      type: fixed
+      prompt: "Find the limit of the sequence a_n = 1/(n+1) as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, 1 / real(n + 1) tends to 0."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_algebra
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: nat_at_top_shifted_reciprocal
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, 1 / real(n + 1) tends to 0."
+              rule: sequence_algebra
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The natural index tends to infinity, so the shifted real denominator n + 1 tends to positive infinity. Dividing the constant numerator by that denominator gives a sequence tending to 0.
+      mistake_tags:
+        - sequence_limit
+        - reciprocal_sequence
+
+    - id: FORMAL_SEQUENCE_GEOMETRIC_001
+      type: fixed
+      prompt: "Find the limit of the geometric sequence a_n = (1/2)^n as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, (1/2)^n tends to 0."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_algebra
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: geometric_sequence_abs_ratio_lt_one
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, (1/2)^n tends to 0."
+              rule: sequence_algebra
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        A geometric sequence r^n tends to 0 when |r| < 1. Here Lean checks |1/2| < 1 explicitly before applying the geometric convergence theorem.
+      mistake_tags:
+        - sequence_limit
+        - geometric_sequence
+
+    - id: FORMAL_SEQUENCE_COMPOSED_001
+      type: fixed
+      prompt: "Find the limit of sin(1/(n+1)) + (1/2)^n as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, sin(1 / real(n + 1)) + (1/2)^n tends to 0."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_algebra
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: compositional_sequence_algebra
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, sin(1 / real(n + 1)) + (1/2)^n tends to 0."
+              rule: sequence_algebra
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The shifted reciprocal tends to 0, sine is continuous at 0, and the geometric tail also tends to 0. Tendsto addition then combines the two certified sublimits.
+      mistake_tags:
+        - sequence_limit
+        - compositional_limit
+        - geometric_sequence
+
+    - id: FORMAL_SEQUENCE_RATIONAL_SHIFT_001
+      type: fixed
+      prompt: "Find the limit of the sequence a_n = n/(n+1) as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "1"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, real(n) / real(n + 1) tends to 1."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_rational_shift
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: rational_shift_asymptotic
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, real(n) / real(n + 1) tends to 1."
+              rule: sequence_rational_shift
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Rewrite n/(n+1) as 1 - 1/(n+1). The reciprocal tail tends to 0 along Nat.atTop, so the whole sequence tends to 1.
+      mistake_tags:
+        - sequence_limit
+        - rational_asymptotic
+
+    - id: FORMAL_SEQUENCE_RATIONAL_SHIFT_OFFSET_001
+      type: fixed
+      prompt: "Find the limit of the sequence a_n = (n+2)/(n+5) as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "1"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, real(n + 2) / real(n + 5) tends to 1."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_rational_shift
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: rational_shift_asymptotic
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, real(n + 2) / real(n + 5) tends to 1."
+              rule: sequence_rational_shift
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Numerator and denominator have the same leading growth. The formal proof rewrites the ratio as 1 plus a constant multiple of a shifted reciprocal tail.
+      mistake_tags:
+        - sequence_limit
+        - rational_asymptotic
+
+    - id: FORMAL_SEQUENCE_AFFINE_RATIO_001
+      type: fixed
+      prompt: "Find the limit of the sequence a_n = (2n+3)/(5n+7) as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "2/5"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, (2 * real(n) + 3) / (5 * real(n) + 7) tends to 2/5."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_affine_ratio
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: affine_ratio_asymptotic
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, (2 * real(n) + 3) / (5 * real(n) + 7) tends to 2/5."
+              rule: sequence_affine_ratio
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        For an affine ratio, only the leading coefficients survive asymptotically. The formal proof applies mathlib's exact Nat.atTop affine-ratio theorem, so (2n+3)/(5n+7) tends to 2/5.
+      mistake_tags:
+        - sequence_limit
+        - rational_asymptotic
+        - leading_coefficients
+
+    - id: FORMAL_SEQUENCE_QUADRATIC_RATIO_001
+      type: fixed
+      prompt: "Find the limit of the sequence a_n = (3n^2+2n+1)/(5n^2-4n+7) as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "3/5"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, (3 * real(n)^2 + 2 * real(n) + 1) / (5 * real(n)^2 - 4 * real(n) + 7) tends to 3/5."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_quadratic_ratio
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: quadratic_ratio_asymptotic
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, (3 * real(n)^2 + 2 * real(n) + 1) / (5 * real(n)^2 - 4 * real(n) + 7) tends to 3/5."
+              rule: sequence_quadratic_ratio
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Divide numerator and denominator by n^2. The 1/n and 1/n^2 terms vanish, leaving the ratio 3/5 of the quadratic coefficients.
+      mistake_tags:
+        - sequence_limit
+        - rational_asymptotic
+        - leading_coefficients
+        - quadratic_ratio
+
+    - id: FORMAL_SEQUENCE_DEGREE_RATIO_ZERO_001
+      type: fixed
+      prompt: "Find the limit of the sequence a_n = (2n+1)/(5n^2+3) as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, (2 * real(n) + 1) / (5 * real(n)^2 + 3) tends to 0."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_polynomial_degree_ratio
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: polynomial_degree_comparison_asymptotic
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, (2 * real(n) + 1) / (5 * real(n)^2 + 3) tends to 0."
+              rule: sequence_polynomial_degree_ratio
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The denominator has strictly higher polynomial degree. Divide both numerator and denominator by n^2: every numerator term vanishes, while the denominator tends to its nonzero leading coefficient 5, so the ratio tends to 0.
+      mistake_tags:
+        - sequence_limit
+        - rational_asymptotic
+        - degree_comparison
+        - vanishing_ratio
+
+    - id: FORMAL_SEQUENCE_GENERAL_POLYNOMIAL_RATIO_001
+      type: fixed
+      prompt: "Find the limit of the sequence a_n = (3n^5-2n^2+1)/(2n^5+7n-4) as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "3/2"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, (3 * real(n)^5 - 2 * real(n)^2 + 1) / (2 * real(n)^5 + 7 * real(n) - 4) tends to 3/2."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_polynomial_degree_ratio
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: general_polynomial_ratio_asymptotic
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, (3 * real(n)^5 - 2 * real(n)^2 + 1) / (2 * real(n)^5 + 7 * real(n) - 4) tends to 3/2."
+              rule: sequence_polynomial_degree_ratio
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Numerator and denominator are exact degree-five polynomials. The formal prover rebuilds them as mathlib Polynomial values and applies the equal-degree quotient theorem, leaving the exact leading-coefficient ratio 3/2.
+      mistake_tags:
+        - sequence_limit
+        - rational_asymptotic
+        - polynomial_ratio
+        - leading_coefficients
+
+    - id: FORMAL_SEQUENCE_SQUEEZE_001
+      type: fixed
+      prompt: "Use the squeeze theorem to find the limit of a_n = sin(n)/(n+1) as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: numeric
+        value: "0"
+      grading:
+        method: exact_numeric
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, sin(real(n)) / real(n + 1) tends to 0."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_algebra
+          - sequence_squeeze
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: automatic_order_squeeze
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, -1 / real(n + 1) tends to 0."
+              rule: sequence_algebra
+              premises: []
+            - claim: "As n tends to infinity, 1 / real(n + 1) tends to 0."
+              rule: sequence_algebra
+              premises: []
+            - claim: "As n tends to infinity, sin(real(n)) / real(n + 1) tends to 0."
+              rule: sequence_squeeze
+              premises: [reference_step_1, reference_step_2]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The reciprocal bounds both tend to 0. The formal prover reconstructs -1 <= sin(n) <= 1 and divides by the positive denominator n+1, so the squeeze theorem forces sin(n)/(n+1) to tend to 0 even though sin(n) itself does not converge.
+      mistake_tags:
+        - sequence_limit
+        - squeeze_theorem
+        - eventually
+
+
+
+    - id: FORMAL_SEQUENCE_ALTERNATING_DIVERGENCE_001
+      type: fixed
+      prompt: "Determine whether the sequence a_n = (-1)^n converges as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: text
+        value: "does not converge"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, (-1)^n does not converge to a finite real limit."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_elementary_divergence
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: parity_subsequence_divergence
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, (-1)^n does not converge to a finite real limit."
+              rule: sequence_elementary_divergence
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The even-index subsequence is constantly 1 while the odd-index subsequence is constantly -1. If the original sequence had a finite real limit, both subsequences would have to share it, contradicting uniqueness of limits.
+      mistake_tags:
+        - sequence_limit
+        - divergence
+        - oscillation
+        - subsequences
+
+    - id: FORMAL_SEQUENCE_PERIODIC_MOD3_DIVERGENCE_001
+      type: fixed
+      prompt: "Determine whether the sequence a_n = 0,1,2,0,1,2,... converges as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: text
+        value: "does not converge"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, if n % 3 = 0 then 0 else if n % 3 = 1 then 1 else 2 does not converge to a finite real limit."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_elementary_divergence
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: residue_subsequence_divergence
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, if n % 3 = 0 then 0 else if n % 3 = 1 then 1 else 2 does not converge to a finite real limit."
+              rule: sequence_elementary_divergence
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The subsequence with indices 3k is constantly 0, while the subsequence with indices 3k+1 is constantly 1. If the full sequence had a finite real limit, both subsequences would have to converge to that same limit, which is impossible.
+      mistake_tags:
+        - sequence_limit
+        - divergence
+        - periodic
+        - subsequences
+
+    - id: FORMAL_SEQUENCE_PERIODIC_VANISHING_TAIL_001
+      type: fixed
+      prompt: "Determine whether the sequence a_n = (-1)^n + 1/(n+1) converges as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: text
+        value: "does not converge"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, (-1)^n + 1 / real(n + 1) does not converge to a finite real limit."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_elementary_divergence
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: subsequence_divergence_with_vanishing_tail
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, (-1)^n + 1 / real(n + 1) does not converge to a finite real limit."
+              rule: sequence_elementary_divergence
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The reciprocal perturbation tends to 0. Along even indices the sequence therefore tends to 1, while along odd indices it tends to -1. Two subsequences of a convergent sequence cannot have different limits, so the full sequence has no finite real limit.
+      mistake_tags:
+        - sequence_limit
+        - divergence
+        - oscillation
+        - vanishing_perturbation
+        - subsequences
+
+
+    - id: FORMAL_SEQUENCE_PERIODIC_FINITE_TAIL_001
+      type: fixed
+      prompt: "Determine whether the sequence a_n = (-1)^n + 2 + 1/(n+1) converges as n tends to infinity."
+      answer_mode: final_only
+      answer:
+        type: text
+        value: "does not converge"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, (-1)^n + (2 + 1 / real(n + 1)) does not converge to a finite real limit."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_elementary_divergence
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: subsequence_divergence_with_common_finite_tail
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, (-1)^n + (2 + 1 / real(n + 1)) does not converge to a finite real limit."
+              rule: sequence_elementary_divergence
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The common perturbation 2 + 1/(n+1) tends to 2. Along even indices the full sequence therefore tends to 3, while along odd indices it tends to 1. Adding the same finite limit to both residue-class limits cannot make them equal, so the sequence has no finite real limit.
+      mistake_tags:
+        - sequence_limit
+        - divergence
+        - oscillation
+        - finite_perturbation
+        - subsequences
+
+    - id: FORMAL_SEQUENCE_PERIODIC_CITED_FINITE_TAIL_001
+      type: fixed
+      prompt: "Determine whether a_n = (-1)^n + n/(n+1) converges, explicitly reusing the limit n/(n+1) -> 1."
+      answer_mode: final_only
+      answer:
+        type: text
+        value: "does not converge"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, (-1)^n + real(n) / real(n + 1) does not converge to a finite real limit."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_rational_shift
+          - sequence_elementary_divergence
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: subsequence_divergence_with_cited_common_finite_tail
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, real(n) / real(n + 1) tends to 1."
+              rule: sequence_rational_shift
+              premises: []
+            - claim: "As n tends to infinity, (-1)^n + real(n) / real(n + 1) does not converge to a finite real limit."
+              rule: sequence_elementary_divergence
+              premises: [reference_step_1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        First prove the common perturbation n/(n+1) tends to 1. The divergence step cites that theorem rather than re-solving it. Along even indices the full sequence tends to 2; along odd indices it tends to 0. Since one convergent sequence cannot have two different subsequence limits, the sequence has no finite real limit.
+      mistake_tags:
+        - sequence_limit
+        - divergence
+        - oscillation
+        - cited_finite_perturbation
+        - subsequences
+
+    - id: FORMAL_SEQUENCE_EVENTUALLY_PERIODIC_DIVERGENCE_001
+      type: fixed
+      prompt: "A sequence starts with the arbitrary prefix 0,1,2,3,4 and then repeats 0,1,2 forever. Determine whether it converges."
+      answer_mode: final_only
+      answer:
+        type: text
+        value: "does not converge"
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "As n tends to infinity, if n < 5 then n else if n % 3 = 0 then 0 else if n % 3 = 1 then 1 else 2 does not converge to a finite real limit."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - sequence_elementary_divergence
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: eventually_periodic_subsequence_divergence
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "As n tends to infinity, if n < 5 then n else if n % 3 = 0 then 0 else if n % 3 = 1 then 1 else 2 does not converge to a finite real limit."
+              rule: sequence_elementary_divergence
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The first five values do not affect convergence at Nat.atTop. From n = 5 onward the sequence is exactly period 3. Two residue-class subsequences are constantly 0 and 1, so a finite common limit is impossible.
+      mistake_tags:
+        - sequence_limit
+        - divergence
+        - eventually_periodic
+        - finite_prefix
+        - subsequences
+
+
+    - id: FORMAL_SERIES_GEOMETRIC_001
+      type: fixed
+      prompt: "Find the sum of the infinite geometric series 1 + 1/2 + 1/4 + 1/8 + ..."
+      answer_mode: final_only
+      answer:
+        type: expression
+        value: "2"
+      grading:
+        method: symbolic_expression
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "The series from n = 0 to infinity of (1/2)^n sums to 2."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - series_geometric
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: geometric_series_sum
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The series from n = 0 to infinity of (1/2)^n sums to 2."
+              rule: series_geometric
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        This is a geometric series with first term 1 and ratio 1/2. Since |1/2| < 1, mathlib's geometric-series theorem gives the exact sum 1/(1 - 1/2) = 2.
+      mistake_tags:
+        - infinite_series
+        - geometric_series
+        - convergence
+
+    - id: FORMAL_SERIES_P2_001
+      type: fixed
+      prompt: "Does the p-series sum from n = 0 to infinity of 1/(n+1)^2 converge?"
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "Converges"
+        - id: B
+          label: "Diverges"
+      answer:
+        type: multiple_choice
+        value: A
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "The series from n = 0 to infinity of 1 / real(n + 1)^2 is summable."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - series_p_series
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: p_series_summability
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The series from n = 0 to infinity of 1 / real(n + 1)^2 is summable."
+              rule: series_p_series
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        This is a shifted p-series with p = 2. Removing or adding finitely many initial terms does not change summability, and mathlib proves the p-series is summable exactly when p > 1.
+      mistake_tags:
+        - infinite_series
+        - p_series
+        - convergence
+
+    - id: FORMAL_SERIES_P_REAL_001
+      type: fixed
+      prompt: "Does the real-exponent p-series sum from n = 0 to infinity of 1/(n+1)^(3/2) converge?"
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "Converges"
+        - id: B
+          label: "Diverges"
+      answer:
+        type: multiple_choice
+        value: A
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "The series from n = 0 to infinity of 1 / real(n + 1)^(3/2) is summable."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - series_p_series
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: real_exponent_p_series_summability
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The series from n = 0 to infinity of 1 / real(n + 1)^(3/2) is summable."
+              rule: series_p_series
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        This is a shifted p-series with the exact real exponent p = 3/2. Mathlib proves real p-series are summable exactly when p > 1, so this series converges.
+      mistake_tags:
+        - infinite_series
+        - p_series
+        - real_exponent
+        - convergence
+
+    - id: FORMAL_SERIES_COMPARISON_001
+      type: fixed
+      prompt: "Use comparison to decide whether the series sum from n = 0 to infinity of ((1/2)^n)^2 converges."
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "Converges"
+        - id: B
+          label: "Diverges"
+      answer:
+        type: multiple_choice
+        value: A
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions:
+            - "eventually k:nat, 0 <= ((1/2)^k)^2 and ((1/2)^k)^2 <= (1/2)^k"
+          goal: "The series from n = 0 to infinity of ((1/2)^n)^2 is summable."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - series_geometric
+          - series_comparison
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: nonnegative_series_comparison
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The series from n = 0 to infinity of (1/2)^n sums to 2."
+              rule: series_geometric
+              premises: []
+            - claim: "The series from n = 0 to infinity of ((1/2)^n)^2 is summable."
+              rule: series_comparison
+              premises: [reference_step_1, h1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The terms are nonnegative and are bounded above by (1/2)^n. The comparison series is geometric and summable, so the nonnegative comparison test proves the target series is summable.
+      mistake_tags:
+        - infinite_series
+        - comparison_test
+        - convergence
+
+
+    - id: FORMAL_SERIES_RATIO_TEST_001
+      type: fixed
+      prompt: "Use the supplied eventual ratio bound to decide whether the series sum from n = 0 to infinity of (n+1)(1/2)^n converges."
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "Converges"
+        - id: B
+          label: "Diverges"
+      answer:
+        type: multiple_choice
+        value: A
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions:
+            - "eventually k:nat, abs(real(k + 2) * (1/2)^(k + 1)) <= (3/4) * abs(real(k + 1) * (1/2)^k)"
+          goal: "The series from n = 0 to infinity of real(n + 1) * (1/2)^n is summable."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - series_ratio_test
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: eventual_ratio_bound_test
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The series from n = 0 to infinity of real(n + 1) * (1/2)^n is summable."
+              rule: series_ratio_test
+              premises: [h1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        Eventually the absolute value of each next term is at most 3/4 times the absolute value of the current term. Because 3/4 < 1, mathlib's ratio comparison theorem bounds the tail by a geometric series, so the series is summable.
+      mistake_tags:
+        - infinite_series
+        - ratio_test
+        - convergence
+
+    - id: FORMAL_SERIES_RATIO_LIMIT_001
+      type: fixed
+      prompt: "Use the quotient-limit ratio test to decide whether the geometric series sum from n = 0 to infinity of (1/2)^n converges."
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "Converges"
+        - id: B
+          label: "Diverges"
+      answer:
+        type: multiple_choice
+        value: A
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions:
+            - "eventually k:nat, (1/2)^k != 0"
+          goal: "The series from n = 0 to infinity of (1/2)^n is summable."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - series_ratio_limit_test
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: quotient_limit_ratio_test
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The series from n = 0 to infinity of (1/2)^n is summable."
+              rule: series_ratio_limit_test
+              premises: [h1]
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The absolute successive-term quotient is constantly 1/2, so its limit is L = 1/2 < 1. The supplied eventual-nonzero fact discharges the hypothesis needed to divide by the current term, and mathlib's quotient-limit ratio theorem proves summability.
+      mistake_tags:
+        - infinite_series
+        - ratio_test
+        - quotient_limit
+        - convergence
+
+    - id: FORMAL_SERIES_RATIO_LIMIT_DIVERGENCE_001
+      type: fixed
+      prompt: "Use the quotient-limit ratio test to decide whether the series from n = 0 to infinity of 2^n converges."
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "Converges"
+        - id: B
+          label: "Diverges"
+        - id: C
+          label: "Ratio test is inconclusive"
+      answer:
+        type: multiple_choice
+        value: B
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "The series from n = 0 to infinity of 2^n is not summable."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - series_ratio_limit_test
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: quotient_limit_ratio_test_divergence
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The series from n = 0 to infinity of 2^n is not summable."
+              rule: series_ratio_limit_test
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The absolute successive-term quotient is constantly 2, so its limit is L = 2 > 1. Mathlib's quotient-limit ratio theorem therefore proves that the series is not summable. Unlike the L < 1 convergence direction, this theorem derives eventual nonzero behavior internally, so no separate nonzero premise is needed.
+      mistake_tags:
+        - infinite_series
+        - ratio_test
+        - quotient_limit
+        - divergence
+
+    - id: FORMAL_SERIES_ROOT_TEST_001
+      type: fixed
+      prompt: "Use the root test to decide whether the geometric series sum from n = 0 to infinity of (1/2)^n converges."
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "Converges"
+        - id: B
+          label: "Diverges"
+        - id: C
+          label: "Root test is inconclusive"
+      answer:
+        type: multiple_choice
+        value: A
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "The series from n = 0 to infinity of (1/2)^n is summable."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - series_root_test
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: nth_root_test
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The series from n = 0 to infinity of (1/2)^n is summable."
+              rule: series_root_test
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The n-th root of the absolute term is eventually exactly 1/2, so its limit is L = 1/2 < 1. The verifier turns an eventual root bound below 1 into domination by a geometric series and proves summability.
+      mistake_tags:
+        - infinite_series
+        - root_test
+        - convergence
+
+    - id: FORMAL_SERIES_ROOT_POLY_GEOM_001
+      type: fixed
+      prompt: "Use the root test to decide whether the series sum from n = 0 to infinity of 3*n^2*(1/2)^n converges."
+      answer_mode: final_only
+      options:
+        - id: A
+          label: "Converges"
+        - id: B
+          label: "Diverges"
+        - id: C
+          label: "Root test is inconclusive"
+      answer:
+        type: multiple_choice
+        value: A
+      grading:
+        method: multiple_choice
+      work:
+        mode: none
+      review_policy:
+        work_review: optional
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: "0.1"
+        statement:
+          declarations:
+            - "n:nat"
+          assumptions: []
+          goal: "The series from n = 0 to infinity of 3 * real(n)^2 * (1/2)^n is summable."
+        parameter_contract:
+          required_public: []
+        allowed_rules:
+          - series_root_test
+        assessment_policy:
+          formal_mode: experimental_companion
+          required_method: automatic_polynomial_growth_root_test
+        reference_proof:
+          mode: steps
+          steps:
+            - claim: "The series from n = 0 to infinity of 3 * real(n)^2 * (1/2)^n is summable."
+              rule: series_root_test
+              premises: []
+        environment:
+          backend: "lean4"
+          toolchain: "leanprover/lean4:v4.34.0-rc2"
+          library: mathlib
+          library_revision: "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      explanation_template: |
+        The n-th root of 3*n^2 contributes factors 3^(1/n) and n^(2/n), and both tend to 1. The geometric factor contributes 1/2, so the full n-th-root limit is L = 1/2 < 1 and the root test proves summability.
+      mistake_tags:
+        - infinite_series
+        - root_test
+        - polynomial_growth
+        - convergence

@@ -493,6 +493,32 @@ WebMCP cannot execute learner or agent-authored Python. It may validate or stage
 
 Allowed builtins are: `abs`, `all`, `any`, `bool`, `dict`, `enumerate`, `float`, `int`, `len`, `list`, `max`, `min`, `range`, `round`, `set`, `sorted`, `str`, `sum`, `tuple`, and `zip`. Grant only what the problem needs. The supported value-method allowlist covers ordinary string, list, and dictionary transformations documented in Lesson Studio. Programs that need imports, files, exceptions, classes, command-line input, real time, or randomness remain capture/rubric tasks; do not pretend the subset runs them.
 
+### Kernel-backed formal proof specifications
+
+A question opts into the native proof workspace with `proof_spec`. It bypasses the legacy short-answer grader and requires a fresh complete learner-proof certificate from the existing Lean companion before assessment. Metadata, reference proofs and tutor opinions do not create a badge or a passing grade. Unavailable verification leaves the question pending without penalizing the learner. See [the formal learning guide](FORMAL_LEARNING.md) for setup, demo lessons and the reference-free tutor contract.
+
+```yaml
+proof_spec:
+  version: "0.1"
+  statement:
+    declarations: ["x:real"]
+    assumptions: ["x != {a}"]
+    goal: "x + {a} = {a} + x"
+  parameter_contract:
+    required_public: ["a"]
+  allowed_rules: [ring_identity]
+  assessment_policy: {}
+  environment:
+    backend: lean4
+    library: mathlib
+```
+
+Generated formal statements resolve from the **same public parameter snapshot as the learner prompt**. A value is public only when it appears as an exact named prompt placeholder such as `{a}`; hidden derived generator state is not available to `proof_spec`. If the formal statement references a hidden value, generation fails rather than proving a theorem different from the displayed exercise. Fixed questions may use a proof specification with no placeholders.
+
+The authoring layer accepts only declarative data: declarations, assumptions, a goal, an optional public-parameter contract, allowed rule names, assessment metadata, a reference-proof candidate, and pinned-environment metadata. It does not accept Lean source, tactics, imports, macros or executable package code. Reference proofs remain candidates until independently checked by the isolated verifier.
+
+Leave method-specific `assessment_policy` metadata empty for this build. Unsupported method policies explicitly block final assessment rather than being ignored. Reference candidates must be checked with the pinned companion before publication. The fields used by the legacy short-answer schema are compatibility data only when `proof_spec` is present; neither matching those fields nor a tutor review can pass the formal question.
+
 ### Checked maths steps are not formal proofs
 
 The Advanced Algebra curriculum primarily uses `procedural_steps`. The learner writes one equivalent equation, inequality, or expression per line, and QuickMaths conservatively checks each transition plus the final-line match. Use `line_type: "equation"` for `=` steps and `line_type: "inequality"` for `<`, `<=`, `>`, or `>=` steps; inequality mode checks the complete one-variable solution set, including sign reversals. That workflow can finish automatically.

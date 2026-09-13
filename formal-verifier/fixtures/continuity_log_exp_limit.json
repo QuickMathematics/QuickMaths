@@ -1,0 +1,92 @@
+{
+  "assumptions": [],
+  "goal": {
+    "direction": "both",
+    "domain": [],
+    "expression": {
+      "arg": {
+        "arg": {
+          "id": "x",
+          "kind": "var"
+        },
+        "kind": "exp"
+      },
+      "kind": "log"
+    },
+    "kind": "limit",
+    "point": {
+      "kind": "int",
+      "value": 2
+    },
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 2
+      }
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "continuity_limit"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "continuity_log_exp_limit",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "direction": "both",
+        "domain": [],
+        "expression": {
+          "arg": {
+            "arg": {
+              "id": "x",
+              "kind": "var"
+            },
+            "kind": "exp"
+          },
+          "kind": "log"
+        },
+        "kind": "limit",
+        "point": {
+          "kind": "int",
+          "value": 2
+        },
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 2
+          }
+        },
+        "variable": "x"
+      },
+      "id": "proof",
+      "parameters": {},
+      "premises": [],
+      "rule": "continuity_limit",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

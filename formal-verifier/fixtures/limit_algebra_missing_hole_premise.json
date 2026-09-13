@@ -1,0 +1,164 @@
+{
+  "assumptions": [],
+  "goal": {
+    "direction": "both",
+    "domain": [],
+    "expression": {
+      "kind": "add",
+      "left": {
+        "kind": "div",
+        "left": {
+          "kind": "sub",
+          "left": {
+            "base": {
+              "id": "x",
+              "kind": "var"
+            },
+            "exponent": 2,
+            "kind": "pow"
+          },
+          "right": {
+            "kind": "int",
+            "value": 9
+          }
+        },
+        "right": {
+          "kind": "sub",
+          "left": {
+            "id": "x",
+            "kind": "var"
+          },
+          "right": {
+            "kind": "int",
+            "value": 3
+          }
+        }
+      },
+      "right": {
+        "arg": {
+          "kind": "sub",
+          "left": {
+            "id": "x",
+            "kind": "var"
+          },
+          "right": {
+            "kind": "int",
+            "value": 3
+          }
+        },
+        "kind": "sin"
+      }
+    },
+    "kind": "limit",
+    "point": {
+      "kind": "int",
+      "value": 3
+    },
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 6
+      }
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "limit_algebra"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "limit-algebra-missing-hole-premise",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "direction": "both",
+        "domain": [],
+        "expression": {
+          "kind": "add",
+          "left": {
+            "kind": "div",
+            "left": {
+              "kind": "sub",
+              "left": {
+                "base": {
+                  "id": "x",
+                  "kind": "var"
+                },
+                "exponent": 2,
+                "kind": "pow"
+              },
+              "right": {
+                "kind": "int",
+                "value": 9
+              }
+            },
+            "right": {
+              "kind": "sub",
+              "left": {
+                "id": "x",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 3
+              }
+            }
+          },
+          "right": {
+            "arg": {
+              "kind": "sub",
+              "left": {
+                "id": "x",
+                "kind": "var"
+              },
+              "right": {
+                "kind": "int",
+                "value": 3
+              }
+            },
+            "kind": "sin"
+          }
+        },
+        "kind": "limit",
+        "point": {
+          "kind": "int",
+          "value": 3
+        },
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 6
+          }
+        },
+        "variable": "x"
+      },
+      "id": "combine",
+      "parameters": {},
+      "premises": [],
+      "rule": "limit_algebra",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

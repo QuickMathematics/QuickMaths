@@ -1,0 +1,859 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "formal-proof.schema.json",
+  "title": "QuickMaths Formal Proof Request",
+  "description": "Declarative input contract for the isolated QuickMaths formal verifier. Schema validation is only the structural boundary; the verifier additionally enforces identifiers, types, scope, domains, rule semantics and kernel verification.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "request_id",
+    "variables",
+    "scopes",
+    "assumptions",
+    "steps",
+    "goal",
+    "policy"
+  ],
+  "properties": {
+    "version": {
+      "const": "0.1"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "variables": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/variable"
+      }
+    },
+    "scopes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/scope"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/assumption"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    },
+    "goal": {
+      "$ref": "#/$defs/goal"
+    },
+    "policy": {
+      "$ref": "#/$defs/policy"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "math_type": {
+      "anyOf": [
+        {
+          "enum": [
+            "real",
+            "int",
+            "rat",
+            "nat"
+          ]
+        },
+        {
+          "type": "string",
+          "pattern": "^set\\[(real|int|rat|nat)\\]$"
+        },
+        {
+          "type": "string",
+          "pattern": "^(real|int|rat|nat)->(real|int|rat|nat)$"
+        }
+      ]
+    },
+    "variable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "$ref": "#/$defs/math_type"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "parent"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "parent": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "binders": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/binder"
+          }
+        }
+      }
+    },
+    "expr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "int"
+            },
+            "value": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "numerator",
+            "denominator"
+          ],
+          "properties": {
+            "kind": {
+              "const": "rat"
+            },
+            "numerator": {
+              "type": "integer"
+            },
+            "denominator": {
+              "type": "integer",
+              "not": {
+                "const": 0
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "id"
+          ],
+          "properties": {
+            "kind": {
+              "const": "var"
+            },
+            "id": {
+              "$ref": "#/$defs/identifier"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "arg"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "neg",
+                "sqrt",
+                "abs",
+                "exp",
+                "log",
+                "sin",
+                "cos"
+              ]
+            },
+            "arg": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "base",
+            "exponent"
+          ],
+          "properties": {
+            "kind": {
+              "const": "pow"
+            },
+            "base": {
+              "$ref": "#/$defs/expr"
+            },
+            "exponent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "base",
+            "exponent"
+          ],
+          "properties": {
+            "kind": {
+              "const": "rpow"
+            },
+            "base": {
+              "$ref": "#/$defs/expr"
+            },
+            "exponent": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "left",
+            "right"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "add",
+                "sub",
+                "mul",
+                "div",
+                "mod_nat"
+              ]
+            },
+            "left": {
+              "$ref": "#/$defs/expr"
+            },
+            "right": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "condition",
+            "then",
+            "else"
+          ],
+          "properties": {
+            "kind": {
+              "const": "if"
+            },
+            "condition": {
+              "$ref": "#/$defs/prop"
+            },
+            "then": {
+              "$ref": "#/$defs/expr"
+            },
+            "else": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "function",
+            "arg"
+          ],
+          "properties": {
+            "kind": {
+              "const": "apply"
+            },
+            "function": {
+              "$ref": "#/$defs/expr"
+            },
+            "arg": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "arg"
+          ],
+          "properties": {
+            "kind": {
+              "const": "cast_real"
+            },
+            "arg": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "arg"
+          ],
+          "properties": {
+            "kind": {
+              "const": "factorial"
+            },
+            "arg": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "base",
+            "exponent"
+          ],
+          "properties": {
+            "kind": {
+              "const": "pow_nat"
+            },
+            "base": {
+              "$ref": "#/$defs/expr"
+            },
+            "exponent": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        }
+      ]
+    },
+    "binder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "$ref": "#/$defs/math_type"
+        }
+      }
+    },
+    "prop": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "left",
+            "right"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "eq",
+                "ne",
+                "lt",
+                "le",
+                "gt",
+                "ge",
+                "mem",
+                "subset"
+              ]
+            },
+            "left": {
+              "$ref": "#/$defs/expr"
+            },
+            "right": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "left",
+            "right"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "and",
+                "or",
+                "implies",
+                "iff"
+              ]
+            },
+            "left": {
+              "$ref": "#/$defs/prop"
+            },
+            "right": {
+              "$ref": "#/$defs/prop"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "arg"
+          ],
+          "properties": {
+            "kind": {
+              "const": "not"
+            },
+            "arg": {
+              "$ref": "#/$defs/prop"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "binder",
+            "body"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "forall",
+                "exists"
+              ]
+            },
+            "binder": {
+              "$ref": "#/$defs/binder"
+            },
+            "body": {
+              "$ref": "#/$defs/prop"
+            }
+          }
+        }
+      ]
+    },
+    "limit_result": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "finite"
+            },
+            "value": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "positive_infinity",
+                "negative_infinity",
+                "no_common_limit"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "sequence_result": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "finite"
+            },
+            "value": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "exists_finite",
+                "positive_infinity",
+                "negative_infinity",
+                "no_finite_limit"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "goal": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "proposition"
+          ],
+          "properties": {
+            "kind": {
+              "const": "proposition"
+            },
+            "proposition": {
+              "$ref": "#/$defs/prop"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "variable",
+            "expression",
+            "point",
+            "direction",
+            "domain",
+            "result"
+          ],
+          "properties": {
+            "kind": {
+              "const": "limit"
+            },
+            "variable": {
+              "$ref": "#/$defs/identifier"
+            },
+            "expression": {
+              "$ref": "#/$defs/expr"
+            },
+            "point": {
+              "$ref": "#/$defs/expr"
+            },
+            "direction": {
+              "enum": [
+                "left",
+                "right",
+                "both"
+              ]
+            },
+            "domain": {
+              "type": "array",
+              "maxItems": 16,
+              "items": {
+                "$ref": "#/$defs/prop"
+              }
+            },
+            "result": {
+              "$ref": "#/$defs/limit_result"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "variable",
+            "expression",
+            "point",
+            "result"
+          ],
+          "properties": {
+            "kind": {
+              "const": "derivative"
+            },
+            "variable": {
+              "$ref": "#/$defs/identifier"
+            },
+            "expression": {
+              "$ref": "#/$defs/expr"
+            },
+            "point": {
+              "$ref": "#/$defs/expr"
+            },
+            "result": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "variable",
+            "expression",
+            "result"
+          ],
+          "properties": {
+            "kind": {
+              "const": "sequence_limit"
+            },
+            "variable": {
+              "$ref": "#/$defs/identifier"
+            },
+            "expression": {
+              "$ref": "#/$defs/expr"
+            },
+            "result": {
+              "$ref": "#/$defs/sequence_result"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "variable",
+            "expression",
+            "result"
+          ],
+          "properties": {
+            "kind": {
+              "const": "series_sum"
+            },
+            "variable": {
+              "$ref": "#/$defs/identifier"
+            },
+            "expression": {
+              "$ref": "#/$defs/expr"
+            },
+            "result": {
+              "$ref": "#/$defs/series_result"
+            }
+          }
+        }
+      ]
+    },
+    "assumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "scope",
+        "claim"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "scope": {
+          "$ref": "#/$defs/identifier"
+        },
+        "claim": {
+          "$ref": "#/$defs/prop"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "scope",
+        "claim",
+        "rule",
+        "premises",
+        "parameters"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "scope": {
+          "$ref": "#/$defs/identifier"
+        },
+        "claim": {
+          "$ref": "#/$defs/goal"
+        },
+        "rule": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "premises": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "parameters": {
+          "type": "object"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed_rules",
+        "max_seconds",
+        "accepted_axioms"
+      ],
+      "properties": {
+        "allowed_rules": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "max_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60
+        },
+        "accepted_axioms": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        }
+      }
+    },
+    "series_result": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "finite"
+            },
+            "value": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "summable"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "not_summable"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

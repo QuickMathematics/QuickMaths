@@ -1,0 +1,126 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "arg": {
+        "arg": {
+          "base": {
+            "id": "x",
+            "kind": "var"
+          },
+          "exponent": 2,
+          "kind": "pow"
+        },
+        "kind": "exp"
+      },
+      "kind": "sin"
+    },
+    "kind": "derivative",
+    "point": {
+      "kind": "int",
+      "value": 1
+    },
+    "result": {
+      "kind": "mul",
+      "left": {
+        "arg": {
+          "kind": "int",
+          "value": 1
+        },
+        "kind": "exp"
+      },
+      "right": {
+        "arg": {
+          "arg": {
+            "kind": "int",
+            "value": 1
+          },
+          "kind": "exp"
+        },
+        "kind": "cos"
+      }
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "recursive_derivative"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "recursive_wrong_formula",
+  "scopes": [
+    {
+      "binders": [],
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "arg": {
+            "arg": {
+              "base": {
+                "id": "x",
+                "kind": "var"
+              },
+              "exponent": 2,
+              "kind": "pow"
+            },
+            "kind": "exp"
+          },
+          "kind": "sin"
+        },
+        "kind": "derivative",
+        "point": {
+          "kind": "int",
+          "value": 1
+        },
+        "result": {
+          "kind": "mul",
+          "left": {
+            "arg": {
+              "kind": "int",
+              "value": 1
+            },
+            "kind": "exp"
+          },
+          "right": {
+            "arg": {
+              "arg": {
+                "kind": "int",
+                "value": 1
+              },
+              "kind": "exp"
+            },
+            "kind": "cos"
+          }
+        },
+        "variable": "x"
+      },
+      "id": "derivative_step",
+      "parameters": {},
+      "premises": [],
+      "rule": "recursive_derivative",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "a",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}

@@ -1,0 +1,26 @@
+[project]
+name = "quickmaths-formal-verifier"
+version = "0.2.0"
+description = "Isolated typed Lean-backed educational proof verifier for QuickMaths."
+requires-python = ">=3.10"
+dependencies = ["sympy>=1.12"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "jsonschema>=4.20"]
+
+[project.scripts]
+qm-formal = "quickmaths_formal.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.setuptools.package-data]
+quickmaths_formal = ["web/*.html", "web/*.js", "web/*.css"]

@@ -1,0 +1,115 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "condition": {
+        "kind": "lt",
+        "left": {
+          "id": "n",
+          "kind": "var"
+        },
+        "right": {
+          "kind": "int",
+          "value": 5
+        }
+      },
+      "else": {
+        "kind": "int",
+        "value": 3
+      },
+      "kind": "if",
+      "then": {
+        "base": {
+          "arg": {
+            "kind": "int",
+            "value": 1
+          },
+          "kind": "neg"
+        },
+        "exponent": {
+          "id": "n",
+          "kind": "var"
+        },
+        "kind": "pow_nat"
+      }
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "no_finite_limit"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_elementary_divergence"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence_eventually_constant_wrong_no_finite",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "condition": {
+            "kind": "lt",
+            "left": {
+              "id": "n",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 5
+            }
+          },
+          "else": {
+            "kind": "int",
+            "value": 3
+          },
+          "kind": "if",
+          "then": {
+            "base": {
+              "arg": {
+                "kind": "int",
+                "value": 1
+              },
+              "kind": "neg"
+            },
+            "exponent": {
+              "id": "n",
+              "kind": "var"
+            },
+            "kind": "pow_nat"
+          }
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "no_finite_limit"
+        },
+        "variable": "n"
+      },
+      "id": "seq",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_elementary_divergence",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

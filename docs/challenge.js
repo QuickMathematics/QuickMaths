@@ -1,4 +1,5 @@
 import { renderLimitWork, collectLimitWork } from "./limit-work.js?v=20260909-calculus-v1";
+import { renderFormalWorkspace } from "./formal-proof-workspace.js?v=20260913-formal-kernel-v1";
 import { renderMathBlocks } from "./math-display.js?v=20260909-calculus-v1";
 import { parseLessonManifest, readLessonFolder } from "./lesson-folder.js?v=20260906-media-v1";
 import { renderQuestionDiagram } from "./question-diagrams.js?v=20260909-calculus-v1";
@@ -11,9 +12,9 @@ import { learningFields, branchName } from "./learning-fields.js?v=20260908-stat
 import { storageStatus } from "./storage-status.js?v=20260906-optimization-v1";
 import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260908-profile-sync-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260909-calculus-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260908-statistics-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260909-calculus-v1";
+import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260913-formal-kernel-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260913-formal-kernel-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260913-formal-kernel-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -118,6 +119,18 @@ let welcomeStorageOpen = new URLSearchParams(window.location.search).get("handof
 let welcomePath = "learner";
 let pendingLandingCurriculumId = null;
 let legacyGeographyMigrationPromise = null;
+const formalDraftCache = new Map();
+function formalDraftKey(questionId) {
+  const snapshot = store.snapshot();
+  return JSON.stringify([snapshot.activeProfile?.id, snapshot.activeTest?.draftId, questionId]);
+}
+const formalBusyQuestionIds = new Set();
+const FORMAL_RULE_PARAMETER_KEYS = {
+  add_both_sides: "term", subtract_both_sides: "term", multiply_both_sides: "term", divide_both_sides: "term", add_inequality: "term",
+  scale_inequality_positive: "factor", scale_inequality_negative: "factor", guarded_cancel: "divisor",
+  sqrt_square_nonnegative: "argument", conjugate_identity: "radicand", exists_intro: "witness", forall_elim: "witness",
+  eq_subst: "term", congr_arg: "term",
+};
 const communityUi = { phase: "idle", activePack: null, discussion: null, commentDraft: "", error: "", busy: false, connectionError: "", requestId: 0 };
 const runningPythonQuestionIds = new Set();
 
@@ -1588,6 +1601,33 @@ function renderPythonResponse(problem, response) {
   return `<div class="python-response"><label class="response-field code-response-field"><span>Python solution</span><textarea rows="13" maxlength="12000" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="def ${escapeHtml(problem.program_spec?.entrypoint?.name ?? "solve")}(...):\n    ...">${escapeHtml(response.finalAnswer)}</textarea></label><div class="python-run-row"><button class="button button-secondary" type="button" data-action="run-python-tests" data-question-id="${escapeHtml(problem.template_id)}" ${running ? "disabled" : ""}>${running ? "Running…" : "Run sandboxed tests"}</button><small>Human-triggered only · local disposable runtime · no files, network, imports, browser APIs, packages, or input</small></div><p class="python-privacy-note">Your source and bounded pass/fail summary autosave with this profile and may enter its backup or GitHub workspace sync. Captured output is discarded. The authored memory figure is guidance; the disposable worker and wall timeout are the hard browser boundary.</p>${pythonGradePanel(problem, response)}</div>`;
 }
 
+function formalEvidenceFor(problem) {
+  if (!problem?.formal_job) return null;
+  const evidence = store.getFormalWorkspace(problem.template_id).evidence;
+  if (evidence) formalDraftCache.set(formalDraftKey(problem.template_id), evidence);
+  else formalDraftCache.delete(formalDraftKey(problem.template_id));
+  return evidence;
+}
+
+function renderFormalProofPanel(problem) {
+  if (!problem.proof_spec) return "";
+  if (!problem.formal_job) return renderFormalWorkspace({ problem });
+  const evidence = formalEvidenceFor(problem);
+  const view = store.getFormalWorkspace(problem.template_id);
+  return renderFormalWorkspace({ problem, evidence, progress: view.progress, tutor: view.tutor,
+    busy: view.busy || formalBusyQuestionIds.has(problem.template_id) });
+}
+
+function persistFormalEvidence(card, evidence) {
+  const questionId = card.id.replace(/^question-/, "");
+  if (evidence) formalDraftCache.set(formalDraftKey(questionId), evidence); else formalDraftCache.delete(formalDraftKey(questionId));
+  const answerField = card.querySelector('[data-response-kind="answer"]:checked') ?? card.querySelector('[data-response-kind="answer"]');
+  const workField = card.querySelector('[data-response-kind="work"]');
+  const structured = collectStructuredWork(card) ?? {};
+  if (evidence) structured.formal = evidence; else delete structured.formal;
+  store.updateResponse(questionId, { finalAnswer: answerField?.value ?? "", work: workField?.value ?? "", structuredWorkJson: Object.keys(structured).length ? structured : null });
+}
+
 function renderStructuredWorkEditor(problem, response) {
   if (problem.work?.mode === "limit_steps") return renderLimitWork(problem.work.limit, response.structuredWorkJson?.limit ?? {});
   const data = response.structuredWorkJson ?? {};
@@ -1648,8 +1688,10 @@ function syncSignChartLayout(card) {
 }
 
 function collectStructuredWork(card) {
-  if (card.dataset.workMode === "limit_steps") return { limit: collectLimitWork(card) };
-  const output = {};
+  const questionId = card.id.replace(/^question-/, "");
+  const formal = formalDraftCache.get(formalDraftKey(questionId)) ?? null;
+  if (card.dataset.workMode === "limit_steps") return { limit: collectLimitWork(card), ...(formal ? { formal } : {}) };
+  const output = formal ? { formal } : {};
   const exclusions = card.querySelector('[data-structured-field="excluded-values"]');
   if (exclusions) output.excluded_values = exclusions.value;
   if (card.dataset.workMode === "rational_equation_steps") {
@@ -1681,7 +1723,7 @@ function renderTest(snapshot) {
     `;
     return;
   }
-  const answered = Object.values(draft.responses).filter((response) => response.finalAnswer).length;
+  const answered = draft.problems.filter((problem) => problem.proof_spec ? Boolean(problem.formal_job && store.getFormalWorkspace(problem.template_id).assessmentEligible) : draft.responses[problem.template_id]?.finalAnswer).length;
   const questionIds = new Set(draft.problems.map((problem) => problem.template_id));
   const latestReview = snapshot.reviews.find((review) => questionIds.has(review.questionId));
   elements.view.innerHTML = `
@@ -1694,12 +1736,13 @@ function renderTest(snapshot) {
       ${draft.problems.map((problem, index) => {
         const response = draft.responses[problem.template_id] ?? { finalAnswer: "", work: "" };
         return `<article class="question-card" id="question-${escapeHtml(problem.template_id)}" data-work-mode="${escapeHtml(problem.work?.mode ?? "none")}" data-grading-method="${escapeHtml(problem.grading_method)}">
-          <div class="question-number"><span>${String(index + 1).padStart(2, "0")}</span><small>${escapeHtml(problem.difficulty)} · ${escapeHtml(problem.answer_mode.replaceAll("_", " "))}</small></div>
+          <div class="question-number"><span>${String(index + 1).padStart(2, "0")}</span><small>${escapeHtml(problem.difficulty)} · ${escapeHtml(problem.proof_spec ? "formal proof" : problem.answer_mode.replaceAll("_", " "))}</small></div>
           ${renderProblemPrompt(problem)}
-          ${problem.grading_method === "python_program" ? renderPythonResponse(problem, response) : problem.options?.length ? `<fieldset class="answer-options"><legend>Final answer</legend>${problem.options.map((option) => `<label><input type="radio" name="answer-${escapeHtml(problem.template_id)}" value="${escapeHtml(option.id)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" ${response.finalAnswer === String(option.id) ? "checked" : ""}><span><b>${escapeHtml(option.id)}</b>${escapeHtml(option.label ?? option.id)}</span></label>`).join("")}</fieldset>` : `<label class="response-field"><span>Final answer</span><input type="text" value="${escapeHtml(response.finalAnswer)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" autocomplete="off" spellcheck="false" placeholder="Enter your answer"></label>`}
-          ${renderWorkGuide(problem)}
-          ${renderStructuredWorkEditor(problem, response)}
-          ${problem.work?.mode && problem.work.mode !== "none" && !["rational_equation_steps", "sign_chart_steps", "code_trace_steps", "limit_steps"].includes(problem.work.mode) ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="${["proof_obligations", "rubric_check"].includes(problem.work.mode) ? 7 : 4}" maxlength="${MAX_LONG_WORK_CHARS}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="${escapeHtml(workResponsePlaceholder(problem))}">${escapeHtml(response.work)}</textarea><small>${Number(response.work?.length ?? 0).toLocaleString()} / ${MAX_LONG_WORK_CHARS.toLocaleString()} characters · saved without silent truncation</small></label>` : ""}
+          ${renderFormalProofPanel(problem, response)}
+          ${problem.proof_spec ? `<p class="proof-assessment-note">Your submitted reasoning is the answer. Only a complete Lean verification unlocks assessment; tutor guidance cannot grade it.</p>` : problem.grading_method === "python_program" ? renderPythonResponse(problem, response) : problem.options?.length ? `<fieldset class="answer-options"><legend>Final answer</legend>${problem.options.map((option) => `<label><input type="radio" name="answer-${escapeHtml(problem.template_id)}" value="${escapeHtml(option.id)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" ${response.finalAnswer === String(option.id) ? "checked" : ""}><span><b>${escapeHtml(option.id)}</b>${escapeHtml(option.label ?? option.id)}</span></label>`).join("")}</fieldset>` : `<label class="response-field"><span>Final answer</span><input type="text" value="${escapeHtml(response.finalAnswer)}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="answer" autocomplete="off" spellcheck="false" placeholder="Enter your answer"></label>`}
+          ${problem.proof_spec ? "" : renderWorkGuide(problem)}
+          ${problem.proof_spec ? "" : renderStructuredWorkEditor(problem, response)}
+          ${!problem.proof_spec && problem.work?.mode && problem.work.mode !== "none" && !["rational_equation_steps", "sign_chart_steps", "code_trace_steps", "limit_steps"].includes(problem.work.mode) ? `<label class="response-field work-field"><span>${escapeHtml(problem.work.prompt ?? "Show your work")} ${problem.work_required ? "(required)" : "(optional)"}</span><textarea rows="${["proof_obligations", "rubric_check"].includes(problem.work.mode) ? 7 : 4}" maxlength="${MAX_LONG_WORK_CHARS}" data-question-id="${escapeHtml(problem.template_id)}" data-response-kind="work" placeholder="${escapeHtml(workResponsePlaceholder(problem))}">${escapeHtml(response.work)}</textarea><small>${Number(response.work?.length ?? 0).toLocaleString()} / ${MAX_LONG_WORK_CHARS.toLocaleString()} characters · saved without silent truncation</small></label>` : ""}
         </article>`;
       }).join("")}
       <p id="test-error" class="form-message" role="alert"></p>
@@ -1720,7 +1763,7 @@ function resultReviewGuide(result) {
 
 function resultStructuredDetails(result) {
   const structured = result.structuredWorkJson;
-  if (!structured) return "";
+  if (!structured || result.gradingMethod === "formal_proof") return "";
   if (result.workMode === "limit_steps" && structured.limit) {
     const data = structured.limit;
     const kind = {finite:"Finite limit",positive_infinity:"Positive infinity",negative_infinity:"Negative infinity",no_common_limit:"No common limit"}[data.result_kind] ?? "No result selected";
@@ -1741,13 +1784,13 @@ function resultStructuredDetails(result) {
 
 function resultDetails(results, packId = "", skillId = "") {
   return results.map((result, index) => `<details class="result-question" ${!result.correct || result.reviewRequired ? "open" : ""}>
-    <summary><span class="result-icon ${result.correct ? "correct" : "incorrect"}">${result.correct ? "✓" : "×"}</span><span><strong>Question ${index + 1}</strong><small>${escapeHtml(result.prompt)}</small></span><b>${result.reviewRequired ? "Review required" : result.correct ? "Correct" : "Needs work"}</b></summary>
-    <div class="result-body">${renderMathBlocks(result.math_blocks)}${renderLessonMedia(result.media, packId)}${renderQuestionDiagram(result, skillId)}<dl><div><dt>Your answer</dt><dd>${result.gradingMethod === "python_program" ? `<pre class="result-code"><code>${escapeHtml(result.finalAnswer || "No code submitted")}</code></pre>` : escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${resultStructuredDetails(result)}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
+    <summary><span class="result-icon ${result.gradingMethod === "formal_proof" && result.formalAssessment?.status !== "verified" ? "archived" : result.correct ? "correct" : "incorrect"}">${result.gradingMethod === "formal_proof" && result.formalAssessment?.status !== "verified" ? "○" : result.correct ? "✓" : "×"}</span><span><strong>Question ${index + 1}</strong><small>${escapeHtml(result.prompt)}</small></span><b>${result.gradingMethod === "formal_proof" && result.formalAssessment?.status !== "verified" ? "Archived record" : result.reviewRequired ? "Review required" : result.correct ? "Correct" : "Needs work"}</b></summary>
+    <div class="result-body">${result.gradingMethod === "formal_proof" ? `<p class="proof-assessment-note"><strong>${result.formalAssessment?.status === "verified" ? "Lean-verified assessment" : "Archived formal assessment · replay required for live verification"}</strong><br>This result records the exact learner proof, not a tutor verdict.<br><code>${escapeHtml(result.formalAssessment?.certificate_digest)}</code></p>` : ""}${renderMathBlocks(result.math_blocks)}${renderLessonMedia(result.media, packId)}${renderQuestionDiagram(result, skillId)}${result.gradingMethod === "formal_proof" ? `<div class="shown-work"><strong>Your submitted reasoning (historical copy)</strong><ol>${(Array.isArray(result.structuredWorkJson?.formal?.proof_state?.steps) ? result.structuredWorkJson.formal.proof_state.steps : []).filter((step) => step && typeof step === "object").map((step) => `<li><p>${escapeHtml(step.claim)}</p><small>${escapeHtml(step.rule)}${Array.isArray(step.premises) && step.premises.length ? ` · ${step.premises.map(escapeHtml).join(", ")}` : ""}</small></li>`).join("")}</ol></div>` : `<dl><div><dt>Your answer</dt><dd>${result.gradingMethod === "python_program" ? `<pre class="result-code"><code>${escapeHtml(result.finalAnswer || "No code submitted")}</code></pre>` : escapeHtml(result.finalAnswer || "No answer")}</dd></div><div><dt>Expected</dt><dd>${escapeHtml(result.expectedAnswer)}</dd></div></dl>`}${resultReviewGuide(result)}${result.work ? `<div class="shown-work"><strong>Your work</strong><pre>${escapeHtml(result.work)}</pre></div>` : ""}${resultStructuredDetails(result)}${result.mistakeTags?.length ? `<p class="mistake-tags">Review: ${result.mistakeTags.map(escapeHtml).join(" · ")}</p>` : ""}${result.solutionSteps?.length ? `<ol>${result.solutionSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>` : ""}</div>
   </details>`).join("");
 }
 
 function renderAttemptReviewForm(attempt) {
-  const targets = attempt?.results?.filter((item) => item.work) ?? [];
+  const targets = attempt?.results?.filter((item) => item.work && item.gradingMethod !== "formal_proof" && !item.structuredWorkJson?.formal) ?? [];
   if (!targets.length) return "";
   const first = targets[0];
   const structured = targets.map((result, index) => {
@@ -2806,6 +2849,45 @@ for (const name of ["pointerover", "focusin"]) document.addEventListener(name, (
 window.addEventListener("resize", () => document.querySelectorAll('[data-studio-help]:hover, [data-studio-help]:focus, [data-studio-help][aria-expanded="true"]').forEach(positionStudioHelp));
 
 document.addEventListener("click", async (event) => {
+  const formalAction = event.target.closest?.('[data-action^="formal-"]');
+  if (formalAction) {
+    event.preventDefault();
+    const questionId = formalAction.dataset.questionId;
+    const card = document.querySelector(`#question-${CSS.escape(questionId)}`);
+    if (!card || formalBusyQuestionIds.has(questionId)) return;
+    const actionName = formalAction.dataset.action;
+    if (actionName === "formal-guidance") {
+      try {
+        store.recordFormalGuidance({ questionId, proofRevision: formalAction.dataset.proofRevision,
+          guidanceId: formalAction.dataset.guidanceId });
+      } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+      return;
+    }
+    const actions = { "formal-start": "start", "formal-add-step": "append", "formal-verify": "verify",
+      "formal-replay": "replay", "formal-check-progress": "progress", "formal-edit-step": "edit", "formal-cancel-edit": "cancel" };
+    const action = actions[actionName];
+    if (!action) return;
+    const rule = card.querySelector('[data-formal-field="rule"]')?.value.trim() ?? "";
+    const parameter = card.querySelector('[data-formal-field="parameter"]')?.value.trim() ?? "";
+    const parameterKey = FORMAL_RULE_PARAMETER_KEYS[rule];
+    const input = { stepId: formalAction.dataset.stepId,
+      claim: card.querySelector('[data-formal-field="claim"]')?.value ?? "", rule,
+      premises: (card.querySelector('[data-formal-field="premises"]')?.value ?? "").split(/[,;\s]+/).filter(Boolean),
+      parameters: parameter && parameterKey ? { [parameterKey]: parameter } : {} };
+    formalBusyQuestionIds.add(questionId);
+    card.querySelectorAll("[data-formal-field], [data-formal-proof-panel] button").forEach((field) => { field.disabled = true; });
+    try {
+      const result = await store.runFormalProof(questionId, action, input);
+      if (result.assessment_eligible) showToast("Lean accepted the exact learner proof. This question is ready for assessment.");
+      else if (result.verification_status === "verification_unavailable") showToast("Lean is unavailable. Your reasoning is saved; no incorrect assessment was recorded.");
+    } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    finally {
+      formalBusyQuestionIds.delete(questionId);
+      render(store.snapshot());
+      if (action === "edit") document.querySelector(`#question-${CSS.escape(questionId)} [data-formal-field="claim"]`)?.focus();
+    }
+    return;
+  }
   const structuredAction = event.target.closest?.('[data-action="add-rational-candidate"], [data-action="remove-structured-row"]');
   if (structuredAction) {
     event.preventDefault();
@@ -2854,7 +2936,11 @@ document.addEventListener("click", async (event) => {
   const creatorAction = event.target.closest?.("[data-creator-action]");
   if (creatorAction && currentSnapshot?.ui.route === "creator") {
     event.preventDefault();
-    if (lessonStudio.handleAction(creatorAction)) render(store.snapshot());
+    const result = lessonStudio.handleAction(creatorAction);
+    if (result && typeof result.then === "function") {
+      try { if (await result) render(store.snapshot()); }
+      catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
+    } else if (result) render(store.snapshot());
     return;
   }
   const depotSourceAction = event.target.closest?.("[data-depot-source-action]");
@@ -3479,11 +3565,15 @@ document.addEventListener("submit", (event) => {
   if (event.target.id === "reflection-form") {
     event.preventDefault();
     const data = new FormData(event.target);
-    store.saveReflection({
-      confidenceRating: Number(data.get("confidence")), difficultyFelt: data.get("difficulty"), hintsUsed: data.get("hints"),
-      guessed: data.get("guessed"), wantsMorePractice: data.get("more"), confusingParts: data.get("confusing"), notes: data.get("notes"),
-    });
-    showToast("Result saved and mastery map updated.");
+    try {
+      store.saveReflection({
+        confidenceRating: Number(data.get("confidence")), difficultyFelt: data.get("difficulty"), hintsUsed: data.get("hints"),
+        guessed: data.get("guessed"), wantsMorePractice: data.get("more"), confusingParts: data.get("confusing"), notes: data.get("notes"),
+      });
+      showToast("Result saved and mastery map updated.");
+    } catch (error) {
+      showToast(error.message || "The result could not be saved. Your work is preserved.");
+    }
   }
   if (event.target.id === "self-review-form") {
     event.preventDefault();
@@ -3778,3 +3868,38 @@ document.addEventListener("click", event => {
 document.addEventListener("toggle", event => {
   if (event.target.id === "workspace-storage-manager" && event.target.isConnected) storageManagerOpen = event.target.open;
 }, true);
+
+
+// Keep an in-place edit local-first. Typing does not call the verifier and never
+// updates an old certificate. The persisted pending marker blocks verification.
+document.addEventListener("input", (event) => {
+  if (!event.target.matches?.("[data-formal-field]")) return;
+  const card = event.target.closest(".question-card");
+  if (!card) return;
+  const questionId = card.id.replace(/^question-/, "");
+  const evidence = formalDraftCache.get(formalDraftKey(questionId));
+  if (!evidence?.request) return;
+  const field = (name) => card.querySelector(`[data-formal-field="${name}"]`)?.value ?? "";
+  let saved = true;
+  try {
+    persistFormalEvidence(card, {
+      ...evidence, verification: null,
+      pending_edit: { step_id: evidence.pending_edit?.step_id ?? null, claim: field("claim"), rule: field("rule"),
+        premises: field("premises").split(/[,;\s]+/).filter(Boolean), parameter: field("parameter") },
+    });
+  } catch (error) {
+    saved = false;
+    showToast(error.message || "The edit could not be saved. Previous work is preserved; live verification is withdrawn.");
+  }
+  // Avoid a full rerender while typing, but withdraw every visible live badge.
+  const panel = card.querySelector("[data-formal-proof-panel]");
+  panel?.classList.remove("verified");
+  const status = panel?.querySelector(".formal-proof-status");
+  if (status) status.textContent = saved ? "Draft changed · save before checking" : "Unsaved edit · verification withdrawn";
+  panel?.querySelectorAll(".kernel-verified").forEach((row) => {
+    row.classList.remove("kernel-verified");
+    row.querySelector(".proof-step-badge").textContent = "Needs rechecking";
+  });
+  panel?.querySelectorAll('[data-action="formal-check-progress"], [data-action="formal-verify"], [data-action="formal-replay"]').forEach((button) => { button.disabled = true; });
+  panel?.querySelectorAll(".proof-certificate, .formal-proof-certified, .proof-tutor-guidance").forEach((item) => { item.hidden = true; });
+});

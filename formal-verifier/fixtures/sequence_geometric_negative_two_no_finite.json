@@ -1,0 +1,79 @@
+{
+  "assumptions": [],
+  "goal": {
+    "expression": {
+      "base": {
+        "arg": {
+          "kind": "int",
+          "value": 2
+        },
+        "kind": "neg"
+      },
+      "exponent": {
+        "id": "n",
+        "kind": "var"
+      },
+      "kind": "pow_nat"
+    },
+    "kind": "sequence_limit",
+    "result": {
+      "kind": "no_finite_limit"
+    },
+    "variable": "n"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "sequence_elementary_divergence"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "sequence-geometric-negative-two-no-finite",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "expression": {
+          "base": {
+            "arg": {
+              "kind": "int",
+              "value": 2
+            },
+            "kind": "neg"
+          },
+          "exponent": {
+            "id": "n",
+            "kind": "var"
+          },
+          "kind": "pow_nat"
+        },
+        "kind": "sequence_limit",
+        "result": {
+          "kind": "no_finite_limit"
+        },
+        "variable": "n"
+      },
+      "id": "seq",
+      "parameters": {},
+      "premises": [],
+      "rule": "sequence_elementary_divergence",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "n",
+      "type": "nat"
+    }
+  ],
+  "version": "0.1"
+}

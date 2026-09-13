@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from decimal import Decimal, InvalidOperation
 
-from sympy import E, Eq, FiniteSet, Ge, Gt, Interval, Le, Lt, N, S, Symbol, Union, fraction, gcd, oo, pi, simplify, solve, solveset, sqrt, together
+from sympy import Abs, E, Eq, FiniteSet, Ge, Gt, Interval, Le, Lt, N, S, Symbol, Union, cos, exp, fraction, gcd, log, oo, pi, simplify, sin, solve, solveset, sqrt, together
 from sympy.parsing.sympy_parser import (
     convert_xor,
     implicit_multiplication_application,
@@ -17,6 +17,11 @@ from quickmaths.safe_math import parse_school_expression
 TRANSFORMATIONS = standard_transformations + (implicit_multiplication_application, convert_xor)
 LOCAL_DICT = {
     "sqrt": sqrt,
+    "abs": Abs,
+    "exp": exp,
+    "log": log,
+    "sin": sin,
+    "cos": cos,
     "pi": pi,
     "e": E,
 }

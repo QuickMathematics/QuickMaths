@@ -1,0 +1,127 @@
+{
+  "version": "0.1",
+  "request_id": "sin-derivative",
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "a",
+      "type": "real"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "assumptions": [],
+  "steps": [
+    {
+      "id": "derivative_step",
+      "scope": "root",
+      "claim": {
+        "kind": "derivative",
+        "variable": "x",
+        "expression": {
+          "kind": "sin",
+          "arg": {
+            "kind": "mul",
+            "left": {
+              "kind": "int",
+              "value": 2
+            },
+            "right": {
+              "kind": "var",
+              "id": "x"
+            }
+          }
+        },
+        "point": {
+          "kind": "var",
+          "id": "a"
+        },
+        "result": {
+          "kind": "mul",
+          "left": {
+            "kind": "int",
+            "value": 2
+          },
+          "right": {
+            "kind": "cos",
+            "arg": {
+              "kind": "mul",
+              "left": {
+                "kind": "int",
+                "value": 2
+              },
+              "right": {
+                "kind": "var",
+                "id": "a"
+              }
+            }
+          }
+        }
+      },
+      "rule": "sin_derivative",
+      "premises": [],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "derivative",
+    "variable": "x",
+    "expression": {
+      "kind": "sin",
+      "arg": {
+        "kind": "mul",
+        "left": {
+          "kind": "int",
+          "value": 2
+        },
+        "right": {
+          "kind": "var",
+          "id": "x"
+        }
+      }
+    },
+    "point": {
+      "kind": "var",
+      "id": "a"
+    },
+    "result": {
+      "kind": "mul",
+      "left": {
+        "kind": "int",
+        "value": 2
+      },
+      "right": {
+        "kind": "cos",
+        "arg": {
+          "kind": "mul",
+          "left": {
+            "kind": "int",
+            "value": 2
+          },
+          "right": {
+            "kind": "var",
+            "id": "a"
+          }
+        }
+      }
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "sin_derivative"
+    ],
+    "max_seconds": 10,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

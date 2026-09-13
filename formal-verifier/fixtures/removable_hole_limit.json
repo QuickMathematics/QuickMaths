@@ -1,0 +1,141 @@
+{
+  "assumptions": [],
+  "goal": {
+    "direction": "both",
+    "domain": [],
+    "expression": {
+      "kind": "div",
+      "left": {
+        "kind": "sub",
+        "left": {
+          "base": {
+            "id": "x",
+            "kind": "var"
+          },
+          "exponent": 2,
+          "kind": "pow"
+        },
+        "right": {
+          "kind": "int",
+          "value": 9
+        }
+      },
+      "right": {
+        "kind": "sub",
+        "left": {
+          "id": "x",
+          "kind": "var"
+        },
+        "right": {
+          "kind": "int",
+          "value": 3
+        }
+      }
+    },
+    "kind": "limit",
+    "point": {
+      "kind": "int",
+      "value": 3
+    },
+    "result": {
+      "kind": "finite",
+      "value": {
+        "kind": "int",
+        "value": 6
+      }
+    },
+    "variable": "x"
+  },
+  "policy": {
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "allowed_rules": [
+      "rational_hole_limit"
+    ],
+    "max_seconds": 10
+  },
+  "request_id": "removable-hole-limit",
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null
+    }
+  ],
+  "steps": [
+    {
+      "claim": {
+        "direction": "both",
+        "domain": [],
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "sub",
+            "left": {
+              "base": {
+                "id": "x",
+                "kind": "var"
+              },
+              "exponent": 2,
+              "kind": "pow"
+            },
+            "right": {
+              "kind": "int",
+              "value": 9
+            }
+          },
+          "right": {
+            "kind": "sub",
+            "left": {
+              "id": "x",
+              "kind": "var"
+            },
+            "right": {
+              "kind": "int",
+              "value": 3
+            }
+          }
+        },
+        "kind": "limit",
+        "point": {
+          "kind": "int",
+          "value": 3
+        },
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 6
+          }
+        },
+        "variable": "x"
+      },
+      "id": "limit",
+      "parameters": {
+        "simplified": {
+          "kind": "add",
+          "left": {
+            "id": "x",
+            "kind": "var"
+          },
+          "right": {
+            "kind": "int",
+            "value": 3
+          }
+        }
+      },
+      "premises": [],
+      "rule": "rational_hole_limit",
+      "scope": "root"
+    }
+  ],
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    }
+  ],
+  "version": "0.1"
+}
