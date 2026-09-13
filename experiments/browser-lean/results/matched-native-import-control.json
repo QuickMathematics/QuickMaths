@@ -1,0 +1,17 @@
+{
+  "purpose": "Diagnostic native i386 comparison for the browser's largest import group; not curriculum proof coverage",
+  "leanBase": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+  "mathlib": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+  "group": "closure-fe493671a4bbacd7",
+  "source": "The unchanged import header from inverse_right_infinity.json, followed by public theorem QuickMathsGenerated.result : True := True.intro and #print axioms",
+  "command": "lake --no-cache env lean matched-native-warmup.lean",
+  "measurement": "Linux /usr/bin/time -v; F-backed WSL, matched native32 toolchain; concurrent browser cached-import diagnostic",
+  "exitStatus": 0,
+  "axiomAudit": "'QuickMathsGenerated.result' does not depend on any axioms",
+  "wallSeconds": 23.64,
+  "userSeconds": 4.08,
+  "systemSeconds": 7.91,
+  "maximumResidentKiB": 2455532,
+  "assessment_eligible": false,
+  "certificate": null
+}

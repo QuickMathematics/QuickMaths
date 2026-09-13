@@ -1,0 +1,41 @@
+{
+  "identity": "35b6ae575c5d61ff23951f73cc34f2bbbc958264732a741abfd16df1e504c0e4",
+  "environment": {
+    "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+    "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+    "portSha256": "522326ea60c331fa6ac00ad48351a5d02d8dce407383c33f8df029602c9e1069",
+    "importPolicy": "production-private-strict"
+  },
+  "variant": "matched",
+  "scope": "full",
+  "nativeVersion": "Lean (version 4.34.0, x86_64-unknown-linux-gnu, commit 6a10ac8c22beadecabdbb0919c2b50214762f91d, Release)",
+  "suffixBytes": {
+    ".ir": 227805436,
+    ".ir.sig": 569660,
+    ".olean": 599206640,
+    ".olean.private": 1362861860,
+    ".olean.server": 44435536
+  },
+  "runtime": {
+    "lean.js": {
+      "file": "lean.js.gz",
+      "sha256": "b3fd2865d222009e5e1a4c8faf090d807758b5f7a7f05ce23badfb13c7fd7144",
+      "rawSha256": "a8059e21a30baba1d46ab4c895141c0c00e536a8851802a7cac750a73e943000",
+      "bytes": 146538,
+      "compressedBytes": 37894
+    },
+    "lean.wasm": {
+      "file": "lean.wasm.gz",
+      "sha256": "3477c8e894ed44face2aa3e34811bfbc67fcf842ac3c4bf5674856b236a851e6",
+      "rawSha256": "7e6dc0a0cea208307f8bd7ebe90a6b5a4e813c76dd5dd473282cc8a5ebb09d76",
+      "bytes": 104711144,
+      "compressedBytes": 17660783
+    }
+  },
+  "moduleCount": 4069,
+  "fileCount": 20345,
+  "packCount": 283,
+  "compressedLibraryBytes": 919217256,
+  "compressedRuntimeBytes": 17698677,
+  "manifestSha256": "30360b6cd995a774a3e9e28017ae72e069b2961f27f3f15388fae677e8c0e258"
+}

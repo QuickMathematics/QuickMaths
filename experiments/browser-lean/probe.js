@@ -1,3 +1,4 @@
+import {referenceSource} from './compatibility.js';
 const status = document.querySelector('#status');
 const query = new URLSearchParams(location.search);
 const report = window.report = {started: new Date().toISOString(), isolated: crossOriginIsolated,
@@ -22,6 +23,7 @@ async function verifiedFetch(name) {
 async function stageLayer(layer) {
   const start=performance.now();
   const manifest=JSON.parse(new TextDecoder().decode(await verifiedFetch(layer+'-layer.json')));
+  if (manifest.mathlibCommit) report.mathlibCommit = manifest.mathlibCommit;
   let compressed=0, raw=0;
   for(const pack of manifest.packs) {
     const bytes=await verifiedFetch(layer+'-lib/'+pack.file); compressed+=bytes.byteLength;
@@ -70,7 +72,7 @@ try {
       for(const fixture of config.fixtures) {
         await compile(fixture.name+'-unchanged',fixture.source,300000);
         // Explicit experimental import-name adapter for the older Mathlib. Never certifies.
-        const adapted=fixture.source.replaceAll('Mathlib.Basic.Real.Basic','Mathlib.Data.Real.Basic').replaceAll('import Mathlib.Tactic.Positivity\n','import Mathlib.Tactic.Positivity.Basic\n');
+        const adapted=referenceSource(fixture.source,{leanCommit:config.release.leanCommit,mathlibCommit:report.mathlibCommit}).source;
         if(adapted!==fixture.source) await compile(fixture.name+'-import-adapter',adapted,300000);
         if(fixture.name==='guarded_cancellation') for(let i=0;i<3;i++)await compile('warm-cancellation-'+i,adapted);
       }

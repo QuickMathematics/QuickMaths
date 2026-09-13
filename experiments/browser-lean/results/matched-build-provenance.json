@@ -1,0 +1,55 @@
+{
+  "leanBase": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+  "mathlib": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+  "port": {
+    "bytes": 60478,
+    "sha256": "522326ea60c331fa6ac00ad48351a5d02d8dce407383c33f8df029602c9e1069"
+  },
+  "emsdkCommit": "15915cad554b707837024dc2758b6a1c5b94b036",
+  "emscripten": "4.0.22",
+  "cmake": "cmake version 3.31.6",
+  "nativeVersion": "Lean (version 4.34.0, x86_64-unknown-linux-gnu, commit 6a10ac8c22beadecabdbb0919c2b50214762f91d, Release)",
+  "nativeElfClass": 1,
+  "exports": {
+    "schemaVersion": 1,
+    "stage1": "build-matched32/stage1",
+    "inputCount": 7,
+    "symbolCount": 101551,
+    "sha256": "ad5afc9962db613e4b4db01f145200e4775908eda1ff4d59a4b055fde44fb660",
+    "classes": {
+      "runtime": 758,
+      "initializers": 2357,
+      "boxed": 90141,
+      "entrypoints": 3
+    }
+  },
+  "options": {
+    "gmp": false,
+    "mimalloc": false,
+    "mmap": false,
+    "pthreads": true,
+    "pthreadPool": 4,
+    "maximumMemoryBytes": 4294967296,
+    "declareAsmModuleExports": false
+  },
+  "objects": {
+    "build-matched32/stage1/bin/lean.js": {
+      "bytes": 146538,
+      "sha256": "a8059e21a30baba1d46ab4c895141c0c00e536a8851802a7cac750a73e943000"
+    },
+    "build-matched32/stage1/bin/lean.wasm": {
+      "bytes": 104711144,
+      "sha256": "7e6dc0a0cea208307f8bd7ebe90a6b5a4e813c76dd5dd473282cc8a5ebb09d76"
+    },
+    "build-native32/bin/lean": {
+      "bytes": 15008,
+      "sha256": "b87b4aa004b23f45278e39ca2e82d804dc8d7262e0052c417e26ae367f601d0d"
+    },
+    "build-native32/lib/lean/libleanshared.so": {
+      "bytes": 171476564,
+      "sha256": "346a736fd1dd1dd0c5cef56a6e9fd03bbba272aa6aa65f3d6557a54a7671ebfe"
+    }
+  },
+  "assessment_eligible": false,
+  "certificate": null
+}

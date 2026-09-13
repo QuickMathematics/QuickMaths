@@ -1,0 +1,217 @@
+{
+  "archiveSha256": "e0c1ae4d40fd5c4da18d4a38e254e8adef603b855757daff103659a4b80c9a39",
+  "objects": {
+    "real-analysis-layer.json": {
+      "bytes": 2245344,
+      "sha256": "9100ad71510b2f22bc1acd4cd66b3b31e9013cff26826466a1508afcf15cf059"
+    },
+    "real-analysis-lib/artifacts-006.pack": {
+      "bytes": 6472773,
+      "sha256": "b26429aaad7892fe1566bbbca6b65eb0d65da6daee9aef51e5c1f766eab1bd01"
+    },
+    "real-analysis-lib/artifacts-051.pack": {
+      "bytes": 1067172,
+      "sha256": "5e6a113776356ca98130032b61c87ea6862d8273b4c37426bae1eb47878b6ce8"
+    },
+    "real-analysis-lib/artifacts-047.pack": {
+      "bytes": 7135699,
+      "sha256": "2cfbe0577d14da7ff1883fca1a41bafc5dc02a24a962b559de7f06e6d3fcecfb"
+    },
+    "real-analysis-lib/artifacts-010.pack": {
+      "bytes": 6083822,
+      "sha256": "400be310c3158124be31aec1410ff93d730993293986ede63007f43049421d44"
+    },
+    "real-analysis-lib/artifacts-030.pack": {
+      "bytes": 6911332,
+      "sha256": "fdd3d23499348ecea8b9c34f79a147d32469e1440cb27fc953d03ab9b0873616"
+    },
+    "real-analysis-lib/artifacts-026.pack": {
+      "bytes": 7098909,
+      "sha256": "87216d5e0925b79295585f6a414a7cc491bf10370b3b2bd602c7b39535be495a"
+    },
+    "real-analysis-lib/artifacts-027.pack": {
+      "bytes": 7000122,
+      "sha256": "937e1911d805d80741841cb456a5af8de500786a9a09022c3d90412f3267be71"
+    },
+    "real-analysis-lib/artifacts-031.pack": {
+      "bytes": 7084136,
+      "sha256": "368a224bf077e01bc19be664bbe119034322eb0c8c2599a3c9af45e32b92332b"
+    },
+    "real-analysis-lib/artifacts-011.pack": {
+      "bytes": 6114034,
+      "sha256": "a76aceb5f019a63a4109eafc2ecde7f10256035e3ad367a8ff1c9e4a20d5245d"
+    },
+    "real-analysis-lib/artifacts-046.pack": {
+      "bytes": 6952846,
+      "sha256": "b53b4a3a31b50aee812ab995cf1ad97385b893b4993a87b73103db479d6d9cf7"
+    },
+    "real-analysis-lib/artifacts-050.pack": {
+      "bytes": 6670181,
+      "sha256": "639bbcfc41d22ef54afd3a1b14366e61a35dcc6b56f91fe808660e8592beffae"
+    },
+    "real-analysis-lib/artifacts-007.pack": {
+      "bytes": 6322963,
+      "sha256": "91ac854967acb7f21895e971bf7b2768669fd54727ade51c55b25ab2324ec72c"
+    },
+    "real-analysis-lib/artifacts-036.pack": {
+      "bytes": 7015750,
+      "sha256": "867158b4cf51e013f2f88b476e948b881770e3f9caac1f4ab66fc7d8b7713638"
+    },
+    "real-analysis-lib/artifacts-020.pack": {
+      "bytes": 6037291,
+      "sha256": "2c087e2d8643d06de2cfe1c2a9b72a5dc2eae396aaf413a2e38d308fae893415"
+    },
+    "real-analysis-lib/artifacts-000.pack": {
+      "bytes": 6109959,
+      "sha256": "23f8c054f83833bed558b5b3384f8dc41f6924a6d2f21b76de37fe21220be705"
+    },
+    "real-analysis-lib/artifacts-041.pack": {
+      "bytes": 5870497,
+      "sha256": "1600af4992c345f75a21be4716cf1ea5a031e9dd3dc878b191fbe0f7e4425caf"
+    },
+    "real-analysis-lib/artifacts-016.pack": {
+      "bytes": 6024041,
+      "sha256": "404b0156d2a9ad4df111b39da7cfa4ec824272a9808bd64a81b74018d1525226"
+    },
+    "real-analysis-lib/artifacts-017.pack": {
+      "bytes": 5973694,
+      "sha256": "e697098a404adab770a080dfe882f0a42c6bb92ebffb8dcb93cb05e8f0e2cdbd"
+    },
+    "real-analysis-lib/artifacts-040.pack": {
+      "bytes": 5691610,
+      "sha256": "7ad4f74f8622d7a3373a1f7ef1a63ba9870cacec5d24a73e8a956d6205666478"
+    },
+    "real-analysis-lib/artifacts-001.pack": {
+      "bytes": 6457613,
+      "sha256": "e6fec8279aa4c27d1960238969ef9b703387b78e01ad25947e892281935c42cb"
+    },
+    "real-analysis-lib/artifacts-021.pack": {
+      "bytes": 6165608,
+      "sha256": "ecc3443f06898ad7c79a7b091d3938f39fe426e8825bea93daf29d552d390bfb"
+    },
+    "real-analysis-lib/artifacts-037.pack": {
+      "bytes": 6556339,
+      "sha256": "fc6c2582b3f689b8d8043a9c356a7a9222465ed5bb82433808b89a845a82fc47"
+    },
+    "real-analysis-lib/artifacts-022.pack": {
+      "bytes": 6202769,
+      "sha256": "4003ec8b210ee2877a510aad544a84046ee038b372b8c65722ef94547392a8e8"
+    },
+    "real-analysis-lib/artifacts-034.pack": {
+      "bytes": 7226741,
+      "sha256": "8f565d8aad6ed7976b9b4e36a4d555cded7d2289b466fb9b2eaf37c5a607b774"
+    },
+    "real-analysis-lib/artifacts-018.pack": {
+      "bytes": 5876498,
+      "sha256": "b97dde4547b0b4277881e788b99346f67c6220952476a3bba826d6b0e73bdb55"
+    },
+    "real-analysis-lib/artifacts-038.pack": {
+      "bytes": 5798694,
+      "sha256": "cd17865eb113a94a8c4faec1228e2097d7ff2b4e7c10d0185f9bdd8b90d00d28"
+    },
+    "real-analysis-lib/artifacts-014.pack": {
+      "bytes": 5761995,
+      "sha256": "1ff3a837728fe2042848fa3756aa8741289101721c167cfa4454035f65ea7cb9"
+    },
+    "real-analysis-lib/artifacts-043.pack": {
+      "bytes": 7244295,
+      "sha256": "31cc93e1c78523ff8ed32d308de58c9d01ebcfa5bad2e6ee851a97ea882f1847"
+    },
+    "real-analysis-lib/artifacts-002.pack": {
+      "bytes": 6288663,
+      "sha256": "1608b6544498e189a073ec210049345f61b70f04d8800cd84dccb0ddd261700a"
+    },
+    "real-analysis-lib/artifacts-003.pack": {
+      "bytes": 6888839,
+      "sha256": "0c7dc3fb351ae471e6fa252d215b92e19184dff964fb7c7d7a197f0fd8e69e49"
+    },
+    "real-analysis-lib/artifacts-042.pack": {
+      "bytes": 6409568,
+      "sha256": "a5b27c1feb57ce22a34c4a6b6cdb0feeda3a0580df0071322783d7aca0fe746b"
+    },
+    "real-analysis-lib/artifacts-015.pack": {
+      "bytes": 6207536,
+      "sha256": "128b27858b197097c7797c198af6e13a2d17f7cc3da834b49a7a2d015e5e7d10"
+    },
+    "real-analysis-lib/artifacts-039.pack": {
+      "bytes": 5926923,
+      "sha256": "a66574933f6aaa99647b851a89b41a3e7a36aeae19f96a425bc74452b7432b30"
+    },
+    "real-analysis-lib/artifacts-019.pack": {
+      "bytes": 6008737,
+      "sha256": "800ef5177e93c5caca685172c27532046c53a591a83d4bf1095f537c98b6fbf5"
+    },
+    "real-analysis-lib/artifacts-035.pack": {
+      "bytes": 7080631,
+      "sha256": "9db0179e9e39f0ef26a0281d913f1cb5d03a75dbd57623d2fb3e2cf9ad556edc"
+    },
+    "real-analysis-lib/artifacts-023.pack": {
+      "bytes": 6159492,
+      "sha256": "03b346d38d8b2f2c100eac9d99e467878a3ce44add485fb3551281098a521a6b"
+    },
+    "real-analysis-lib/artifacts-028.pack": {
+      "bytes": 7160506,
+      "sha256": "ce514881925b1f7663e937fc66200f9877518402ed598f9e57f3d3d4b6cb933a"
+    },
+    "real-analysis-lib/artifacts-012.pack": {
+      "bytes": 5844273,
+      "sha256": "be808801aa065b4701551a1d7679b7660377e9a1067790b1dcdf8e8337309228"
+    },
+    "real-analysis-lib/artifacts-045.pack": {
+      "bytes": 6119693,
+      "sha256": "9c229b13813205d28fd465a5bb401b8d53af6a9c0779493e3623e0e4c28ba52a"
+    },
+    "real-analysis-lib/artifacts-004.pack": {
+      "bytes": 7055513,
+      "sha256": "72ab2eefe60ad6674ded3cece2e801488cad06c36caefbdeafd8ae6bf88e3b4a"
+    },
+    "real-analysis-lib/artifacts-024.pack": {
+      "bytes": 7267326,
+      "sha256": "43bd800d46ff98ddcae18252d2ad7d1e9566174a6763e53c717f21d10a63b70c"
+    },
+    "real-analysis-lib/artifacts-032.pack": {
+      "bytes": 6832365,
+      "sha256": "228fb29e81f79bafe54a038cc1e1d1fcd5609dfd1f28b6295538674121745276"
+    },
+    "real-analysis-lib/artifacts-049.pack": {
+      "bytes": 6609469,
+      "sha256": "bfa05bcc0790eed92164859f83b4e7d97233109ba03bb150db1531c37d57407d"
+    },
+    "real-analysis-lib/artifacts-008.pack": {
+      "bytes": 6110024,
+      "sha256": "cfb1ef100201657a9cacb3ce4b00bd50cf6d7a526189c5cb609ce885449f2977"
+    },
+    "real-analysis-lib/artifacts-009.pack": {
+      "bytes": 6268154,
+      "sha256": "fd49a50b619535394d72ef14a7b079e67955bcb51a452fcd14a5bdb90eb76e6c"
+    },
+    "real-analysis-lib/artifacts-048.pack": {
+      "bytes": 6672384,
+      "sha256": "d255a04b3ffe116bb882c4b2ddcb2b07a190f70e684a0e02dff6a3e976299df5"
+    },
+    "real-analysis-lib/artifacts-033.pack": {
+      "bytes": 7109024,
+      "sha256": "093a8c055a5703f6257272d18f06953e9a1ab93352b857c7dca4bf12ef53eb64"
+    },
+    "real-analysis-lib/artifacts-025.pack": {
+      "bytes": 6971859,
+      "sha256": "d3b1292e2fa079ce8e6371188eabe794a6de7ecfee2a0dad1c66d84af60e2e57"
+    },
+    "real-analysis-lib/artifacts-005.pack": {
+      "bytes": 6350295,
+      "sha256": "f444decb827fe19d8d0e509dc64fbbab1bdaeabf17427fc935c6aecf3636aecb"
+    },
+    "real-analysis-lib/artifacts-044.pack": {
+      "bytes": 6641673,
+      "sha256": "8ce21c03c5b6415fbabd6c3900cecb7f41a633b4a66fccf4918571ad75b7be53"
+    },
+    "real-analysis-lib/artifacts-013.pack": {
+      "bytes": 5793037,
+      "sha256": "9bdda03f5dd69b2a069381342b5767b714c8b75bf5d47c42a940a4121219d855"
+    },
+    "real-analysis-lib/artifacts-029.pack": {
+      "bytes": 6963845,
+      "sha256": "c8a469459cb12ff31f6b4ea00b316292b8d57e9e2ad69042d22210230584ee49"
+    }
+  }
+}

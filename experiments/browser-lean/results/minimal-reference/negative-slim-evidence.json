@@ -1,0 +1,2194 @@
+{
+  "generator": "summarize-results.py",
+  "negativeTrial": {
+    "browser": "chromium",
+    "initialMB": 128,
+    "baseline": "Actual native QuickMaths mastery map, fresh profile, default curriculum, no verifier",
+    "memoryMethod": "Sum of per-process USS (private resident pages); sample interval >=0.5 s, plus labelled RSS/private commit; only owned browser descendants",
+    "baselineTitle": "QuickMaths — Map your mastery",
+    "baselineUrl": "http://127.0.0.1:53518/app/#/map/MATH_ARITH_001",
+    "baselineMemory": {
+      "uss": 124256256,
+      "rss": 315965440,
+      "privateCommit": 182431744
+    },
+    "profileLogicalFileBytes": 257535298,
+    "source": {
+      "file": "chromium-minimal-slim-128.json",
+      "sha256": "0c6ec24401d13c8c300c3601d55989e6bfadc7d4fa41fdca8a7d82124721262a"
+    },
+    "runs": [
+      {
+        "ready": true,
+        "done": true,
+        "stages": [
+          {
+            "stage": "runtime-assets-ready",
+            "atMs": 1005.1750000119209
+          },
+          {
+            "stage": "runtime-initialized",
+            "atMs": 3081.649999976158
+          },
+          {
+            "stage": "closure-staged",
+            "atMs": 14951.159999966621,
+            "modules": 3169
+          },
+          {
+            "stage": "proof",
+            "atMs": 22650.360000014305,
+            "name": "import-warmup",
+            "elapsedMs": null,
+            "success": false
+          },
+          {
+            "stage": "ready-to-verify",
+            "atMs": 22650.685000002384
+          },
+          {
+            "stage": "proof",
+            "atMs": 30543.944999992847,
+            "name": "guarded_cancellation.json",
+            "elapsedMs": null,
+            "success": false
+          },
+          {
+            "stage": "proof",
+            "atMs": 38245.310000002384,
+            "name": "difference_quotient.json",
+            "elapsedMs": null,
+            "success": false
+          },
+          {
+            "stage": "failed",
+            "atMs": 48247.935000002384,
+            "error": "Error: compile timed out"
+          }
+        ],
+        "proofs": [
+          {
+            "name": "import-warmup",
+            "type": "compile_result",
+            "success": false,
+            "error": "Maximum call stack size exceeded",
+            "errors": [],
+            "axioms": null,
+            "experimentalKernelSuccess": false,
+            "sourceHash": "1b574a5a306761bc8c3651f561d4ba54051be09a537b84f803e5c86c94b2de67",
+            "output": [],
+            "assessment_eligible": false,
+            "certificate": null
+          },
+          {
+            "name": "guarded_cancellation.json",
+            "type": "compile_result",
+            "success": false,
+            "error": "Maximum call stack size exceeded",
+            "errors": [],
+            "axioms": null,
+            "experimentalKernelSuccess": false,
+            "sourceHash": "a732ce54cd0ffb6f0cf92cb459d68c77da3e9894336f7fe42a256492321a3809",
+            "output": [],
+            "assessment_eligible": false,
+            "certificate": null,
+            "substitutions": [
+              {
+                "from": "Mathlib.Basic.Real.Basic",
+                "to": "Mathlib.Data.Real.Basic"
+              },
+              {
+                "from": "Mathlib.Tactic.Positivity",
+                "to": "Mathlib.Tactic.Positivity.Basic"
+              }
+            ]
+          },
+          {
+            "name": "difference_quotient.json",
+            "type": "compile_result",
+            "success": false,
+            "error": "Maximum call stack size exceeded",
+            "errors": [],
+            "axioms": null,
+            "experimentalKernelSuccess": false,
+            "sourceHash": "8d06163e583e7e40c8493df333ffceb6fd7f66fd4f0fcc6809894b05ba08a9c6",
+            "output": [],
+            "assessment_eligible": false,
+            "certificate": null,
+            "substitutions": [
+              {
+                "from": "Mathlib.Basic.Real.Basic",
+                "to": "Mathlib.Data.Real.Basic"
+              },
+              {
+                "from": "Mathlib.Tactic.Positivity",
+                "to": "Mathlib.Tactic.Positivity.Basic"
+              }
+            ]
+          }
+        ],
+        "assessment_eligible": false,
+        "certificate": null,
+        "startMs": 646.7250000238419,
+        "isolated": true,
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+        "environment": {
+          "leanCommit": "62b6a2291302d4bbeace37642a066b7510d0145c",
+          "mathlibCommit": "de3a9cf33016bbb6d15880d7680643f7ca2d25ba"
+        },
+        "profile": "d3a111a01cdc36500d360eda72ca1f34ccfa399941feb63abc59a51dd3c8cd07",
+        "corpusCount": 122,
+        "variant": "slim",
+        "verifiedBinaryConsumed": true,
+        "cache": {
+          "bodyBytes": 249570298,
+          "entries": 81,
+          "expectedBodyBytes": 249570298,
+          "missing": [],
+          "method": "Present cache keys times their verified compressed payload lengths; excludes browser metadata/overhead",
+          "complete": true
+        },
+        "originStorage": {
+          "quota": 186818492006,
+          "usage": 249614592,
+          "usageDetails": {
+            "caches": 249614592
+          }
+        },
+        "unsupported": [
+          {
+            "name": "sqrt_square_nonnegative.json",
+            "missingImports": [
+              "Mathlib.Analysis.SpecialFunctions.Sqrt"
+            ]
+          },
+          {
+            "name": "conjugate_identity.json",
+            "missingImports": [
+              "Mathlib.Analysis.SpecialFunctions.Sqrt"
+            ]
+          },
+          {
+            "name": "inverse_right_infinity.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "inverse_left_infinity.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "removable_hole_limit.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "conjugate_limit.json",
+            "missingImports": [
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "piecewise_jump.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "ivt_existence.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "polynomial_derivative.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "quotient_derivative.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sqrt_derivative.json",
+            "missingImports": [
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "abs_derivative_positive.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "abs_derivative_negative.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "exp_derivative.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "log_derivative.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sin_derivative.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "cos_derivative.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "recursive_nested_sin_exp.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "recursive_exp_quotient.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "recursive_sqrt_quotient.json",
+            "missingImports": [
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "recursive_log_abs.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "recursive_abs_sin_symbolic.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "recursive_log_exp_auto_positive.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "recursive_sqrt_square_plus_one.json",
+            "missingImports": [
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "continuity_abs_limit.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "continuity_log_exp_limit.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "continuity_guarded_quotient_limit.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "continuity_sqrt_square_limit.json",
+            "missingImports": [
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "continuity_sqrt_right_limit.json",
+            "missingImports": [
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "continuous_ivt_guarded_quotient.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "continuous_ivt_exp_with_brackets.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "continuous_ivt_quantified_guard.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "limit_algebra_basic.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "limit_algebra_one_sided.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "limit_algebra_hole_composition.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "limit_algebra_symbolic_denominator.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "limit_algebra_log_composition.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "limit_algebra_sqrt_positive.json",
+            "missingImports": [
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_reciprocal_shift.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_geometric_half.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_geometric_symbolic.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_composed.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_reuse_sublimit.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_nat_at_top.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_rational_shift.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_rational_shift_offset.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_affine_ratio.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_affine_ratio_negative.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_affine_ratio_rational.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_quadratic_ratio.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_quadratic_ratio_negative.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_quadratic_ratio_factored.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_polynomial_degree_ratio_zero.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_polynomial_degree_ratio_pos_inf.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_polynomial_degree_ratio_neg_inf.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_polynomial_degree_ratio_gap2_neg_inf.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_polynomial_general_equal_degree.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_polynomial_general_lower_degree.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_polynomial_general_pos_inf.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_squeeze_sin_over_shift.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_squeeze_sin_auto.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_squeeze_cos_auto.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_monotone_bounded_increasing.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_monotone_bounded_decreasing.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_monotone_bounded_auto_increasing.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_monotone_bounded_auto_decreasing.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_alternating_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_alternating_affine_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_periodic_mod2_piecewise_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_periodic_mod3_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_periodic_mod4_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_alternating_vanishing_reciprocal_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_periodic_mod3_vanishing_reciprocal_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_periodic_mod4_vanishing_geometric_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_alternating_finite_reciprocal_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_periodic_mod3_finite_reciprocal_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_periodic_mod4_finite_symbolic_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_periodic_cited_finite_tail_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_eventually_periodic_mod3_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_eventually_alternating_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_geometric_two_pos_inf.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_geometric_two_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_geometric_negative_two_no_finite.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_geometric_half_sum.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_geometric_scaled_negative_sum.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_geometric_two_not_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_geometric_negative_one_not_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_p2_shift1_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_p3_scaled_shift2_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_p1_harmonic_not_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_p0_not_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_p_real_three_halves_shift1_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_p_real_half_scaled_shift2_not_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_comparison_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_comparison_not_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_ratio_eventual_linear_geometric_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_ratio_global_geometric_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_ratio_limit_geometric_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_ratio_limit_geometric_divergent.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_geometric_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_geometric_divergent.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_monomial_geometric_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_monomial_geometric_divergent.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_polynomial_geometric_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_polynomial_geometric_divergent.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_ratio_limit_missing_nonzero.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_ratio_limit_wrong_nonzero.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_monotone_bounded_missing_bound.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "sequence_squeeze_missing_upper.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_geometric_product_divergent.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_geometric_product_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_polynomial_quotient_denominator_geometric_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_polynomial_quotient_domain_guard_needed.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_polynomial_quotient_geometric_divergent.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_polynomial_quotient_geometric_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_root_reciprocal_polynomial_geometric_summable.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_ratio_limit_balanced_powered_shifted_factorials.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_ratio_limit_extra_denominator_factorial.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          },
+          {
+            "name": "series_ratio_limit_extra_numerator_factorial.json",
+            "missingImports": [
+              "Mathlib.Analysis.Calculus.Deriv.Abs",
+              "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+              "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+              "Mathlib.Analysis.SpecialFunctions.Sqrt",
+              "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+              "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+              "Mathlib.Analysis.SpecificLimits.Normed",
+              "Mathlib.Analysis.PSeries",
+              "Mathlib.Analysis.Polynomial.Basic",
+              "Mathlib.Topology.Order.IntermediateValue",
+              "Mathlib.Tactic.FinCases",
+              "Mathlib.Tactic.NormNum.RealSqrt"
+            ]
+          }
+        ],
+        "supportedCount": 3,
+        "error": "Error: compile timed out",
+        "runtimeOutput": [],
+        "httpResponseBodyBytes": 269942514,
+        "memoryMeasurement": {
+          "uss": {
+            "peak": 4203352064,
+            "steady": 497553408,
+            "incrementalPeak": 4079095808,
+            "incrementalSteady": 373297152
+          },
+          "rss": {
+            "peak": 4441161728,
+            "steady": 735223808,
+            "incrementalPeak": 4125196288,
+            "incrementalSteady": 419258368
+          },
+          "privateCommit": {
+            "peak": 4440653824,
+            "steady": 573382656,
+            "incrementalPeak": 4258222080,
+            "incrementalSteady": 390950912
+          }
+        },
+        "runKind": "cold",
+        "derived": {
+          "warmMedianMs": null,
+          "warmRangeMs": null,
+          "unsupportedCount": 119
+        }
+      }
+    ]
+  }
+}

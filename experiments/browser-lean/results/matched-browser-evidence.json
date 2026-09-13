@@ -1,0 +1,521 @@
+{
+  "generator": "summarize-matched.py",
+  "corpus": {
+    "total": 122,
+    "fixturesWithRecordedOutcomes": [],
+    "successfulFixturesAtLeastOnce": [],
+    "notVerified": [
+      "abs_derivative_negative.json",
+      "abs_derivative_positive.json",
+      "bounded_interval_positive.json",
+      "conjugate_identity.json",
+      "conjugate_limit.json",
+      "continuity_abs_limit.json",
+      "continuity_guarded_quotient_limit.json",
+      "continuity_log_exp_limit.json",
+      "continuity_sqrt_right_limit.json",
+      "continuity_sqrt_square_limit.json",
+      "continuous_ivt_exp_with_brackets.json",
+      "continuous_ivt_guarded_quotient.json",
+      "continuous_ivt_quantified_guard.json",
+      "cos_derivative.json",
+      "difference_quotient.json",
+      "exp_derivative.json",
+      "guarded_cancellation.json",
+      "inverse_left_infinity.json",
+      "inverse_right_infinity.json",
+      "ivt_existence.json",
+      "limit_algebra_basic.json",
+      "limit_algebra_hole_composition.json",
+      "limit_algebra_log_composition.json",
+      "limit_algebra_one_sided.json",
+      "limit_algebra_sqrt_positive.json",
+      "limit_algebra_symbolic_denominator.json",
+      "log_derivative.json",
+      "piecewise_jump.json",
+      "polynomial_derivative.json",
+      "quotient_derivative.json",
+      "recursive_abs_sin_symbolic.json",
+      "recursive_exp_quotient.json",
+      "recursive_log_abs.json",
+      "recursive_log_exp_auto_positive.json",
+      "recursive_nested_sin_exp.json",
+      "recursive_sqrt_quotient.json",
+      "recursive_sqrt_square_plus_one.json",
+      "removable_hole_limit.json",
+      "sequence_affine_ratio.json",
+      "sequence_affine_ratio_negative.json",
+      "sequence_affine_ratio_rational.json",
+      "sequence_alternating_affine_no_finite.json",
+      "sequence_alternating_finite_reciprocal_no_finite.json",
+      "sequence_alternating_no_finite.json",
+      "sequence_alternating_vanishing_reciprocal_no_finite.json",
+      "sequence_composed.json",
+      "sequence_eventually_alternating_no_finite.json",
+      "sequence_eventually_periodic_mod3_no_finite.json",
+      "sequence_geometric_half.json",
+      "sequence_geometric_negative_two_no_finite.json",
+      "sequence_geometric_symbolic.json",
+      "sequence_geometric_two_no_finite.json",
+      "sequence_geometric_two_pos_inf.json",
+      "sequence_monotone_bounded_auto_decreasing.json",
+      "sequence_monotone_bounded_auto_increasing.json",
+      "sequence_monotone_bounded_decreasing.json",
+      "sequence_monotone_bounded_increasing.json",
+      "sequence_monotone_bounded_missing_bound.json",
+      "sequence_nat_at_top.json",
+      "sequence_periodic_cited_finite_tail_no_finite.json",
+      "sequence_periodic_mod2_piecewise_no_finite.json",
+      "sequence_periodic_mod3_finite_reciprocal_no_finite.json",
+      "sequence_periodic_mod3_no_finite.json",
+      "sequence_periodic_mod3_vanishing_reciprocal_no_finite.json",
+      "sequence_periodic_mod4_finite_symbolic_no_finite.json",
+      "sequence_periodic_mod4_no_finite.json",
+      "sequence_periodic_mod4_vanishing_geometric_no_finite.json",
+      "sequence_polynomial_degree_ratio_gap2_neg_inf.json",
+      "sequence_polynomial_degree_ratio_neg_inf.json",
+      "sequence_polynomial_degree_ratio_pos_inf.json",
+      "sequence_polynomial_degree_ratio_zero.json",
+      "sequence_polynomial_general_equal_degree.json",
+      "sequence_polynomial_general_lower_degree.json",
+      "sequence_polynomial_general_pos_inf.json",
+      "sequence_quadratic_ratio.json",
+      "sequence_quadratic_ratio_factored.json",
+      "sequence_quadratic_ratio_negative.json",
+      "sequence_rational_shift.json",
+      "sequence_rational_shift_offset.json",
+      "sequence_reciprocal_shift.json",
+      "sequence_reuse_sublimit.json",
+      "sequence_squeeze_cos_auto.json",
+      "sequence_squeeze_missing_upper.json",
+      "sequence_squeeze_sin_auto.json",
+      "sequence_squeeze_sin_over_shift.json",
+      "series_comparison_not_summable.json",
+      "series_comparison_summable.json",
+      "series_geometric_half_sum.json",
+      "series_geometric_negative_one_not_summable.json",
+      "series_geometric_scaled_negative_sum.json",
+      "series_geometric_two_not_summable.json",
+      "series_p0_not_summable.json",
+      "series_p1_harmonic_not_summable.json",
+      "series_p2_shift1_summable.json",
+      "series_p3_scaled_shift2_summable.json",
+      "series_p_real_half_scaled_shift2_not_summable.json",
+      "series_p_real_three_halves_shift1_summable.json",
+      "series_ratio_eventual_linear_geometric_summable.json",
+      "series_ratio_global_geometric_summable.json",
+      "series_ratio_limit_balanced_powered_shifted_factorials.json",
+      "series_ratio_limit_extra_denominator_factorial.json",
+      "series_ratio_limit_extra_numerator_factorial.json",
+      "series_ratio_limit_geometric_divergent.json",
+      "series_ratio_limit_geometric_summable.json",
+      "series_ratio_limit_missing_nonzero.json",
+      "series_ratio_limit_wrong_nonzero.json",
+      "series_root_geometric_divergent.json",
+      "series_root_geometric_product_divergent.json",
+      "series_root_geometric_product_summable.json",
+      "series_root_geometric_summable.json",
+      "series_root_monomial_geometric_divergent.json",
+      "series_root_monomial_geometric_summable.json",
+      "series_root_polynomial_geometric_divergent.json",
+      "series_root_polynomial_geometric_summable.json",
+      "series_root_polynomial_quotient_denominator_geometric_summable.json",
+      "series_root_polynomial_quotient_domain_guard_needed.json",
+      "series_root_polynomial_quotient_geometric_divergent.json",
+      "series_root_polynomial_quotient_geometric_summable.json",
+      "series_root_reciprocal_polynomial_geometric_summable.json",
+      "sin_derivative.json",
+      "sqrt_derivative.json",
+      "sqrt_square_nonnegative.json"
+    ]
+  },
+  "interpretation": "Success-at-least-once is diagnostic coverage, not a cross-browser pass or a certificate. Early harness runs do not include an outcome record for the interrupted command; an empty outcome list does not prove no command was attempted. Initialization failure leaves warm verification latency unavailable.",
+  "benchmarks": [
+    {
+      "browser": "chromium",
+      "initialMB": 128,
+      "baseline": "Actual native QuickMaths mastery map, fresh profile, default curriculum, no verifier",
+      "memoryMethod": "Sum of per-process USS (private resident pages); sample interval >=0.5 s, plus labelled RSS/private commit; only owned browser descendants",
+      "executedAt": "2026-09-13T13:57:08.459073+00:00",
+      "host": {
+        "os": "Windows-10-10.0.26100-SP0",
+        "logicalCpus": 16,
+        "physicalCpus": 8,
+        "physicalMemoryBytes": 34261053440
+      },
+      "baselineTitle": "QuickMaths \u2014 Map your mastery",
+      "baselineUrl": "http://127.0.0.1:64572/app/#/map/MATH_ARITH_001",
+      "baselineMemory": {
+        "uss": 129871872,
+        "rss": 317087744,
+        "privateCommit": 188735488
+      },
+      "profileLogicalFileBytes": 944735736,
+      "source": {
+        "file": "chromium-matched-broad-128.json",
+        "sha256": "c571c06776cf97512f164c5f579c30beb58d63e8ec681d5477215799d6d07bed"
+      },
+      "runs": [
+        {
+          "ready": true,
+          "done": true,
+          "stages": [
+            {
+              "stage": "runtime-assets-ready",
+              "atMs": 771.0049999952316
+            },
+            {
+              "stage": "runtime-initialized",
+              "atMs": 2806.864999949932
+            },
+            {
+              "stage": "closure-staged",
+              "atMs": 27544.169999957085,
+              "modules": 4069
+            },
+            {
+              "stage": "failed",
+              "atMs": 627595.0849999785,
+              "error": "Error: compile timed out"
+            }
+          ],
+          "proofs": [],
+          "assessment_eligible": false,
+          "certificate": null,
+          "startMs": 588.6450000405312,
+          "isolated": true,
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+          "selectedGroup": "closure-fe493671a4bbacd7",
+          "selectedFixtureCount": 117,
+          "environment": {
+            "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+            "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+            "portSha256": "522326ea60c331fa6ac00ad48351a5d02d8dce407383c33f8df029602c9e1069",
+            "importPolicy": "production-private-strict"
+          },
+          "profile": "35b6ae575c5d61ff23951f73cc34f2bbbc958264732a741abfd16df1e504c0e4",
+          "corpusCount": 122,
+          "variant": "matched",
+          "verifiedBinaryConsumed": true,
+          "verifiedJsConsumed": true,
+          "cache": {
+            "bodyBytes": 936915933,
+            "entries": 285,
+            "totalCacheEntries": 285,
+            "expectedBodyBytes": 936915933,
+            "missing": [],
+            "method": "Present cache keys times their verified compressed payload lengths; excludes browser metadata/overhead",
+            "complete": true
+          },
+          "originStorage": {
+            "quota": 186818492006,
+            "usage": 937073408,
+            "usageDetails": {
+              "caches": 937073408
+            }
+          },
+          "unsupported": [],
+          "supportedCount": 117,
+          "error": "Error: compile timed out",
+          "runtimeOutput": [],
+          "httpResponseBodyBytes": 943036706,
+          "memoryMeasurement": {
+            "uss": {
+              "peak": 6042259456,
+              "steady": 5601923072,
+              "incrementalPeak": 5912387584,
+              "incrementalSteady": 5472051200
+            },
+            "rss": {
+              "peak": 6310772736,
+              "steady": 6094721024,
+              "incrementalPeak": 5993684992,
+              "incrementalSteady": 5777633280
+            },
+            "privateCommit": {
+              "peak": 6305468416,
+              "steady": 6015950848,
+              "incrementalPeak": 6116732928,
+              "incrementalSteady": 5827215360
+            }
+          },
+          "runKind": "cold",
+          "derived": {
+            "warmMedianMs": null,
+            "warmRangeMs": null,
+            "unsupportedCount": 0,
+            "runtimeInitializedMs": 2806.864999949932,
+            "closureStagedMs": 27544.169999957085,
+            "readyToVerifyMs": null,
+            "failureAtMs": 627595.0849999785
+          }
+        },
+        {
+          "ready": true,
+          "done": true,
+          "stages": [
+            {
+              "stage": "runtime-assets-ready",
+              "atMs": 627.1699999570847
+            },
+            {
+              "stage": "runtime-initialized",
+              "atMs": 2628.714999973774
+            },
+            {
+              "stage": "closure-staged",
+              "atMs": 20622.52999997139,
+              "modules": 4069
+            },
+            {
+              "stage": "failed",
+              "atMs": 620687.5950000286,
+              "error": "Error: compile timed out"
+            }
+          ],
+          "proofs": [],
+          "assessment_eligible": false,
+          "certificate": null,
+          "startMs": 588.4550000429153,
+          "isolated": true,
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+          "selectedGroup": "closure-fe493671a4bbacd7",
+          "selectedFixtureCount": 117,
+          "environment": {
+            "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+            "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+            "portSha256": "522326ea60c331fa6ac00ad48351a5d02d8dce407383c33f8df029602c9e1069",
+            "importPolicy": "production-private-strict"
+          },
+          "profile": "35b6ae575c5d61ff23951f73cc34f2bbbc958264732a741abfd16df1e504c0e4",
+          "corpusCount": 122,
+          "variant": "matched",
+          "verifiedBinaryConsumed": true,
+          "verifiedJsConsumed": true,
+          "cache": {
+            "bodyBytes": 936915933,
+            "entries": 285,
+            "totalCacheEntries": 285,
+            "expectedBodyBytes": 936915933,
+            "missing": [],
+            "method": "Present cache keys times their verified compressed payload lengths; excludes browser metadata/overhead",
+            "complete": true
+          },
+          "originStorage": {
+            "quota": 186818492006,
+            "usage": 937073408,
+            "usageDetails": {
+              "caches": 937073408
+            }
+          },
+          "unsupported": [],
+          "supportedCount": 117,
+          "error": "Error: compile timed out",
+          "runtimeOutput": [],
+          "httpResponseBodyBytes": 6120773,
+          "memoryMeasurement": {
+            "uss": {
+              "peak": 5810339840,
+              "steady": 4948037632,
+              "incrementalPeak": 5680467968,
+              "incrementalSteady": 4818165760
+            },
+            "rss": {
+              "peak": 6087438336,
+              "steady": 5642428416,
+              "incrementalPeak": 5770350592,
+              "incrementalSteady": 5325340672
+            },
+            "privateCommit": {
+              "peak": 6071816192,
+              "steady": 5553278976,
+              "incrementalPeak": 5883080704,
+              "incrementalSteady": 5364543488
+            }
+          },
+          "runKind": "cached-new-worker",
+          "derived": {
+            "warmMedianMs": null,
+            "warmRangeMs": null,
+            "unsupportedCount": 0,
+            "runtimeInitializedMs": 2628.714999973774,
+            "closureStagedMs": 20622.52999997139,
+            "readyToVerifyMs": null,
+            "failureAtMs": 620687.5950000286
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "initialMB": 128,
+      "baseline": "Actual native QuickMaths mastery map, fresh profile, default curriculum, no verifier",
+      "memoryMethod": "Sum of per-process USS (private resident pages); sample interval >=0.5 s, plus labelled RSS/private commit; only owned browser descendants",
+      "executedAt": "2026-09-13T14:18:21.046843+00:00",
+      "host": {
+        "os": "Windows-10-10.0.26200-SP0",
+        "logicalCpus": 16,
+        "physicalCpus": 8,
+        "physicalMemoryBytes": 34261053440
+      },
+      "baselineTitle": "QuickMaths \u2014 Map your mastery",
+      "baselineUrl": "http://127.0.0.1:62194/app/#/map/MATH_ARITH_001",
+      "baselineMemory": {
+        "uss": 135405568,
+        "rss": 333524992,
+        "privateCommit": 194392064
+      },
+      "profileLogicalFileBytes": 714040736,
+      "source": {
+        "file": "chromium-matched-small-128.json",
+        "sha256": "fc21d11dc9eb8d7ee60dd0eb2de8f7339160e75b73cf273f14bffa74df776d40"
+      },
+      "runs": [
+        {
+          "ready": true,
+          "done": true,
+          "stages": [
+            {
+              "stage": "runtime-assets-ready",
+              "atMs": 745.5400000810623
+            },
+            {
+              "stage": "runtime-initialized",
+              "atMs": 2829.2400000095367
+            },
+            {
+              "stage": "closure-staged",
+              "atMs": 21816.43500006199,
+              "modules": 2461
+            },
+            {
+              "stage": "proof",
+              "atMs": 532788.3350000381,
+              "name": "import-warmup",
+              "elapsedMs": 510929.8400000334,
+              "success": true
+            },
+            {
+              "stage": "ready-to-verify",
+              "atMs": 532788.7350000143
+            },
+            {
+              "stage": "failed",
+              "atMs": 542790.0400000811,
+              "error": "Error: compile timed out"
+            }
+          ],
+          "proofs": [
+            {
+              "name": "import-warmup",
+              "type": "compile_result",
+              "success": true,
+              "elapsed": 510929.8400000334,
+              "errors": [],
+              "axioms": [],
+              "experimentalKernelSuccess": true,
+              "sourceHash": "e3e1231faa9a3d9aec1d5ece971cdf77b2aac599c9da4b75ed9358c0027a5424",
+              "output": [
+                "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' does not depend on any axioms\",\"endPos\":{\"column\":6,\"line\":11},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":11},\"severity\":\"information\"}"
+              ],
+              "assessment_eligible": false,
+              "certificate": null
+            }
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "startMs": 588.3799999952316,
+          "isolated": true,
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+          "selectedGroup": "closure-9311bf99cb80d8c7",
+          "selectedFixtureCount": 3,
+          "environment": {
+            "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+            "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+            "portSha256": "522326ea60c331fa6ac00ad48351a5d02d8dce407383c33f8df029602c9e1069",
+            "importPolicy": "production-private-strict"
+          },
+          "profile": "35b6ae575c5d61ff23951f73cc34f2bbbc958264732a741abfd16df1e504c0e4",
+          "corpusCount": 122,
+          "variant": "matched",
+          "verifiedBinaryConsumed": true,
+          "verifiedJsConsumed": true,
+          "cache": {
+            "bodyBytes": 711518337,
+            "entries": 221,
+            "totalCacheEntries": 221,
+            "expectedBodyBytes": 711518337,
+            "missing": [],
+            "method": "Present cache keys times their verified compressed payload lengths; excludes browser metadata/overhead",
+            "complete": true
+          },
+          "originStorage": {
+            "quota": 186818492006,
+            "usage": 711640320,
+            "usageDetails": {
+              "caches": 711640320
+            }
+          },
+          "unsupported": [],
+          "supportedCount": 3,
+          "diagnostics": [
+            "[WASM DEBUG] wasmCompile called with code length=358, fileName=/workspace/request.lean",
+            "[WASM DEBUG] Creating input context...",
+            "[WASM DEBUG] Getting or creating environment for header imports...",
+            "[WASM DEBUG] getOrCreateWasmEnvFor: cache miss, importing #[Init, Init, Mathlib.Basic.Real.Basic, Mathlib.Topology.Defs.Filter, Mathlib.Tactic.FieldSimp, Mathlib.Tactic.Ring, Mathlib.Tactic.Linarith, Mathlib.Tactic.NormNum, Mathlib.Tactic.Positivity]\u2026",
+            "[DEBUG:PROGRESS] Loading 2461 modules...",
+            "[WASM DEBUG] getOrCreateWasmEnvFor: importModules completed",
+            "[WASM DEBUG] Environment ready",
+            "[WASM DEBUG] Processing 1 messages...",
+            "[WASM DEBUG] Done, hasErrors=false",
+            "[WASM DEBUG] wasmCompile called with code length=538, fileName=/workspace/request.lean",
+            "[WASM DEBUG] Creating input context...",
+            "[WASM DEBUG] Getting or creating environment for header imports...",
+            "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env",
+            "[WASM DEBUG] Environment ready"
+          ],
+          "lastDiagnosticHeapBytes": 1488453632,
+          "importProgress": {
+            "loaded": 2461,
+            "total": 2461
+          },
+          "error": "Error: compile timed out",
+          "runtimeOutput": [],
+          "httpResponseBodyBytes": 717639557,
+          "memoryMeasurement": {
+            "uss": {
+              "peak": 4300513280,
+              "steady": 4037976064,
+              "incrementalPeak": 4165107712,
+              "incrementalSteady": 3902570496
+            },
+            "rss": {
+              "peak": 4581867520,
+              "steady": 4327227392,
+              "incrementalPeak": 4248342528,
+              "incrementalSteady": 3993702400
+            },
+            "privateCommit": {
+              "peak": 4508708864,
+              "steady": 4211109888,
+              "incrementalPeak": 4314316800,
+              "incrementalSteady": 4016717824
+            }
+          },
+          "runKind": "cold",
+          "derived": {
+            "warmMedianMs": null,
+            "warmRangeMs": null,
+            "unsupportedCount": 0,
+            "runtimeInitializedMs": 2829.2400000095367,
+            "closureStagedMs": 21816.43500006199,
+            "readyToVerifyMs": 532788.7350000143,
+            "failureAtMs": 542790.0400000811
+          }
+        }
+      ]
+    }
+  ],
+  "assessment_eligible": false,
+  "certificate": null
+}
