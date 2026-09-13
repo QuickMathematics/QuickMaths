@@ -36,6 +36,13 @@ async function createRuntime(profile,format) {
     worker.postMessage({type,...data},transfer);
   });
   let consumedWasm=false,consumedJs=false;
+  async function profileMemory(phase) {
+    if(!report.memoryProfile)return;
+    const memory=await command('profile_memory','profile_memory');
+    // Let the external private-page sampler observe a stable idle phase.
+    await new Promise(resolve=>setTimeout(resolve,2500));
+    log('memory-phase',{phase,holdingMs:2500,...memory});
+  }
   worker.onmessage=({data})=>{
     if(data.type==='verified_binary_consumed')consumedWasm=true;
     if(data.type==='verified_js_consumed')consumedJs=true;
@@ -67,6 +74,7 @@ async function createRuntime(profile,format) {
     await command('start_worker','worker_ready',{wasmBinary:wasm,runtimeJsUrl:jsUrl},[wasm],120000);
     if(!consumedWasm||!consumedJs)throw Error('Runtime did not consume verified bytes');
     log('runtime-initialized');
+    await profileMemory('runtime-initialized');
     if(format==='modules') {
       for(const pack of config.packs.filter(p=>p.profiles.includes(profile.id))) {
         const raw=await artifact(pack),files=[];
@@ -80,6 +88,7 @@ async function createRuntime(profile,format) {
       const setupData=new TextEncoder().encode(JSON.stringify(profile.setup)).buffer;
       await command('add_files','files_added',{files:[{name:'qm-setup.json',data:setupData}]},[setupData]);
       log('closure-staged',{modules:profile.modules.length});
+      await profileMemory('closure-staged');
     } else {
       const snapshot=config.snapshots[profile.id];
       if(!snapshot)throw Error('No successful exact-WASM snapshot for this environment');
@@ -100,11 +109,17 @@ async function createRuntime(profile,format) {
     const warmup=await prove('import-warmup',control(header,'True := True.intro'),config.importBudgetMs);
     if(!warmup.experimentalKernelSuccess)throw Error('Import warm-up failed');
     log('ready-to-verify');
+    await profileMemory('imports-ready');
+    if(report.releaseStaged!=='none') {
+      const released=await command('release_staged','released_staged',{mode:report.releaseStaged});
+      log('staged-files-released',released);
+      await profileMemory('staged-files-released');
+    }
     const invalid=await prove('invalid-control',control(header,'False := by rfl'),10000);
     const sorry=await prove('sorry-control',control(header,'False := by sorry'),10000);
     if(invalid.experimentalKernelSuccess||sorry.experimentalKernelSuccess||invalid.fatalRuntimeError||sorry.fatalRuntimeError)
       throw Error('Kernel rejection control failed');
-    return {dispose,prove,header,memory:()=>command('memory','memory'),get dead(){return dead;}};
+    return {dispose,prove,header,profileMemory,memory:()=>command('memory','memory'),get dead(){return dead;}};
   } catch(error) {dispose();throw error;}
 }
 window.startProbe=async()=>{
@@ -113,6 +128,10 @@ window.startProbe=async()=>{
     if(!crossOriginIsolated)throw Error('Cross-origin isolation unavailable');
     config=await(await fetch('assets/viability.json')).json();
     const params=new URLSearchParams(location.search),id=params.get('group'),format=params.get('mode')||'modules';
+    report.memoryProfile=params.get('memoryProfile')==='1';
+    report.releaseStaged=params.get('releaseStaged')||'none';
+    if(!['none','olean','all'].includes(report.releaseStaged)||(!report.memoryProfile&&report.releaseStaged!=='none'))
+      throw Error('Invalid diagnostic staged-file release mode');
     if(!Object.hasOwn(config.profiles,id))throw Error('Choose a versioned environment');
     report.selectedGroup=id;report.format=format;report.profile=config.identity;report.environment=config.environment;
     const cache=await caches.open('qm-formal-artifacts-v1');
@@ -161,11 +180,13 @@ window.startProbe=async()=>{
     report.warmFixture=successful?.name||null;
     report.warmSelection='slowest successful canonical proof';
     if(!report.error&&successful)await pool.withEnvironment(id,format,async runtime=>{
+      await runtime.profileMemory('corpus-complete');
       for(let i=0;i<5;i++) {
         const result=await runtime.prove('warm-repeat-'+i,successful.source,successful.request.policy.max_seconds*1000);
         if(!result.experimentalKernelSuccess) {report.error='Warm verification failed: '+(result.error||'kernel rejection');break;}
       }
       if(!runtime.dead)report.memory=await runtime.memory();
+      if(!runtime.dead)await runtime.profileMemory('warm-complete');
     });
     const keys=await cache.keys(),present=new Set(keys.map(k=>new URL(k.url).pathname.split('/').pop()));
     const unique=[...new Map(report.assets.map(a=>[a.cacheKey,a])).values()];

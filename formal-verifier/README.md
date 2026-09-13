@@ -21,6 +21,12 @@ This directory implements the theorem-prover trust boundary described in `docs/T
 
 SymPy, local rule checks and search **never issue `verified`**. They can produce candidates, missing obligations or checked counterexamples. Only the Lean verification path can issue a certificate.
 
+The [browser parity experiment](../docs/releases/2026-09-13-browser-lean-parity.md)
+verifies the existing generated corpus with an aligned Lean/Mathlib build.
+It remains outside formal assessment: no browser certificate is issued or
+accepted. Shared module packs, worker lifetime and narrow rule-library research
+do not change this verifier's source generation, coverage or certificate contract.
+
 ## Pinned formal environment
 
 - mathlib revision: `42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c`

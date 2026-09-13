@@ -16,6 +16,7 @@ p.add_argument('--output',type=Path)
 args=p.parse_args()
 config=json.loads((args.assets/'viability.json').read_text())
 result=json.loads(args.result.read_text())
+assert config['identity']==hashlib.sha256(json.dumps({k:v for k,v in config.items() if k!='identity'},sort_keys=True).encode()).hexdigest(), 'Configuration identity mismatch'
 assert result.get('hostSourceHashes') and result.get('hostSourcesChanged') is False, 'Host code changed or was not recorded'
 assert result['hostSourceHashes']==result['finalHostSourceHashes']
 fixtures={f['name']:f for f in config['fixtures']}

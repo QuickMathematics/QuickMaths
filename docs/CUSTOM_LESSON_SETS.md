@@ -521,6 +521,12 @@ The authoring layer accepts only declarative data: declarations, assumptions, a 
 
 Leave method-specific `assessment_policy` metadata empty for this build. Unsupported method policies explicitly block final assessment rather than being ignored. Reference candidates must be checked with the pinned companion before publication. The fields used by the legacy short-answer schema are compatibility data only when `proof_spec` is present; neither matching those fields nor a tutor review can pass the formal question.
 
+The [browser Lean corpus-parity and memory experiment](releases/2026-09-13-browser-lean-parity.md)
+does not introduce new authoring fields or Studio controls. Continue declaring
+capabilities rather than module names, runtime URLs or worker settings.
+Passing the experimental desktop corpus does not enable browser assessment;
+reference checks and learner certification still use the pinned companion.
+
 ### Checked maths steps are not formal proofs
 
 The Advanced Algebra curriculum primarily uses `procedural_steps`. The learner writes one equivalent equation, inequality, or expression per line, and QuickMaths conservatively checks each transition plus the final-line match. Use `line_type: "equation"` for `=` steps and `line_type: "inequality"` for `<`, `<=`, `>`, or `>=` steps; inequality mode checks the complete one-variable solution set, including sign reversals. That workflow can finish automatically.

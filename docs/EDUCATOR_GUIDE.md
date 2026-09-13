@@ -776,6 +776,11 @@ Tutors can inspect public proof state and offer bounded guidance questions;
 their tools cannot expose references, insert proof steps or grade formal work.
 Backups preserve proof data but restored verification needs replay.
 
+Browser-local Lean is being evaluated separately. Desktop corpus results do
+not make it an assessment provider; Studio's capability guidance and the
+companion reference-check workflow remain unchanged. Technical progress is
+recorded in the [browser Lean update](releases/2026-09-13-browser-lean-parity.md).
+
 Setup and the tutor contract: https://quickmathematics.github.io/QuickMaths/FORMAL_LEARNING.md
 
 Declarative authoring format: https://quickmathematics.github.io/QuickMaths/CUSTOM_LESSON_SETS.md

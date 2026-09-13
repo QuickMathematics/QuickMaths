@@ -247,3 +247,68 @@ Import and rejection controls run again in each replacement worker. Earlier
 diagnostics that reused a trapped worker are excluded from the retained final
 evidence. The report records the first ready time separately from subsequent
 worker recreations. Localhost delivery timings are not internet download times.
+
+## Native-WASM exception and tail-call parity
+
+The unchanged 122-source corpus now passes Chromium with native WASM exception
+handling and tail-call code generation. The original passing harness and its
+three-round evidence are preserved in commit `aba0d2a`. This is corpus
+conformance, not universal semantic equivalence or assessment approval.
+The 71 invalid requests are freshly rejected by the existing native preflight;
+they produce no Lean source and are not counted as browser kernel executions.
+Every browser environment also runs false-proof and `sorry` kernel controls.
+
+From the F-backed build workspace:
+
+```bash
+scripts=/mnt/x/QuickMaths/experiments/browser-lean
+bash "$scripts/build-native-eh.sh" "$PWD" eh-tail
+python3 "$scripts/prepare-runtime-variant.py" "$PWD" \
+  --name native-eh-tail --source lean-upstream-eh-tail \
+  --runtime build-matched32-eh-tail --patch lean-6a10-native-eh-tail.patch
+```
+
+From X:\QuickMaths in the formal Python environment:
+
+```powershell
+. ./scripts/formal-env.ps1
+python experiments/browser-lean/benchmark.py --suite curated --mode modules --group all --assets assets-native-eh-tail --label native-eh-tail-parity --corpus-rounds 3 --repeat 1 --timeout 900
+python experiments/browser-lean/check-browser-parity.py .bridge-runtime/curated-formal/assets-native-eh-tail .bridge-runtime/curated-formal/chromium-native-eh-tail-parity-128.json
+```
+
+`--repeat` creates new workers; `--corpus-rounds` repeats every canonical proof
+inside the same worker. Five additional warm proofs use the slowest successful
+fixture. The gate checks original source hashes, actual compiler exit codes,
+axioms, fresh production preflight, complete rounds, host-source stability and
+null certificates. Diagnostic fixture runs cannot pass it.
+
+## Memory attribution and staged-file lifetime experiment
+
+Keep the passing worker immutable. `prepare-memory-profile.py` creates a
+separate instrumented directory, sharing identical content-addressed runtime
+and module files. `--memory-profile` records logical MEMFS bytes and linear
+WASM capacity, with 2.5-second idle holds for external private-page sampling.
+Capacity is not live allocator usage; process USS is recorded independently.
+
+`prepare-pool-variant.py` records an exact post-link JavaScript change to the
+prestarted pthread pool. The Lean task-manager setting stays at two. A zero
+pool failed guarded IVT cases and must not be selected as a verified environment.
+`--release-staged all` unlinks staged module files only after the canonical
+header has imported successfully; it leaves verified persistent cache entries
+and the imported environment intact. JavaScript collection need not happen
+immediately. Any new header requires a new worker and full staging.
+
+```powershell
+python experiments/browser-lean/prepare-pool-variant.py .bridge-runtime/curated-formal/assets-native-eh-tail .bridge-runtime/curated-formal/assets-native-eh-tail-pool2 --size 2
+python experiments/browser-lean/prepare-memory-profile.py .bridge-runtime/curated-formal/assets-native-eh-tail-pool2 .bridge-runtime/curated-formal/assets-native-eh-tail-pool2-release --release-staged
+python experiments/browser-lean/benchmark.py --suite curated --assets assets-native-eh-tail-pool2-release --mode modules --group all --corpus-rounds 3 --memory-profile --release-staged all --label pool2-release-parity --repeat 1 --timeout 900
+python experiments/browser-lean/check-browser-parity.py .bridge-runtime/curated-formal/assets-native-eh-tail-pool2-release .bridge-runtime/curated-formal/chromium-pool2-release-parity-128.json
+python experiments/browser-lean/import-costs.py
+```
+
+See the [update report](../../docs/releases/2026-09-13-browser-lean-parity.md),
+[per-import costs](../../docs/releases/2026-09-13-formal-import-costs.md) and
+[narrow rule-library experiment](../../docs/releases/2026-09-13-formal-rule-library.md).
+Shared module packs remain the baseline. No browser experiment can issue a
+certificate, and these results do not establish physical Android/iPhone or
+GitHub Pages deployment compatibility.

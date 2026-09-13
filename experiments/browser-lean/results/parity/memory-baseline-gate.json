@@ -1,0 +1,42 @@
+{
+  "positiveCases": 122,
+  "positiveKernelExecutions": 244,
+  "negativeCasesRejected": 71,
+  "negativeStage": "freshly re-executed production preflight; no generated Lean source or browser kernel invocation",
+  "environments": 5,
+  "minimumSameWorkerRounds": 1,
+  "identity": "99c652ea7ca123f51dd96e4888b36e1ef469bd787d3dd620b3f553cf170315d1",
+  "runtime": {
+    "lean.js": {
+      "file": "lean.js-f2b0f1509626023bc24ed9f991553669ae49baf7b171e49ce2e599a2411cd16e.gz",
+      "bytes": 134325,
+      "compressedBytes": 36142,
+      "rawSha256": "0708102aca19f0a897710cc862eea213a564e22289d37867151b437ab27db95c",
+      "sha256": "f2b0f1509626023bc24ed9f991553669ae49baf7b171e49ce2e599a2411cd16e"
+    },
+    "lean.wasm": {
+      "file": "lean.wasm-f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257.gz",
+      "bytes": 104721833,
+      "compressedBytes": 15712659,
+      "rawSha256": "3038cfd8f81cf650b17967881339256e0bb1cbd1a407c1a7b7225fa8e367df8b",
+      "sha256": "f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257"
+    }
+  },
+  "environment": {
+    "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+    "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+    "portSha256": "6829a2a80680ac561a70573edb1ccb3f6763b6b7d2f875b04ab892b450440387",
+    "importPolicy": "production-module-public"
+  },
+  "hostSourceHashes": {
+    "experiments\\browser-lean\\benchmark.py": "455bb33c93eca11c515250cb027bfde894ad0e99062e1e11393898538db3a368",
+    "experiments\\browser-lean\\curated.js": "6cae94ba4e37aaa61ee336420004adfd06f9e97bbc9d6cda2656b29e31482735",
+    "experiments\\browser-lean\\curated.html": "d1be431ed5229e1250128abaf07c227f4b894eb581a664136b6e9b637862037a",
+    "experiments\\browser-lean\\compatibility.js": "6cb5c2f6ad8f0110132205a4fa54c09b739e46b270a431f0f654d72d91f88a59",
+    "docs\\formal-environment-loader.js": "7f4cc65405555f8631da84b842fb08cd9f976d470156c59c64dde9c64225264f",
+    ".bridge-runtime\\curated-formal\\assets-native-eh-tail-memory\\viability-worker.js": "6acffa5b567da2c7b78c52dc885388f45868368a1314257b5d33ccf9600e89a2"
+  },
+  "resultSha256": "12e9c04d7c661cca67217d9dac58b7d5e1b191ad4a36f29022aa1065bd2aa07c",
+  "assessment_eligible": false,
+  "certificate": null
+}

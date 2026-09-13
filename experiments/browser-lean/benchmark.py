@@ -36,6 +36,8 @@ parser.add_argument('--suite',choices=['legacy','curated'],default='legacy')
 parser.add_argument('--mode',choices=['modules','snapshot'],default='modules')
 parser.add_argument('--fixture',help='One named canonical fixture for a clearly labelled diagnostic run')
 parser.add_argument('--corpus-rounds',type=int,choices=range(1,6),default=1)
+parser.add_argument('--memory-profile',action='store_true',help='Inspect staged file bytes and pause briefly for phase memory sampling')
+parser.add_argument('--release-staged',choices=['none','olean','all'],default='none')
 args=parser.parse_args()
 if args.suite=='curated':BASE=ROOT/'.bridge-runtime/curated-formal'
 if not args.label.replace('-','').isalnum():parser.error('Use a simple alphanumeric result label')
@@ -125,7 +127,7 @@ with sync_playwright() as pw:
     for group,index in cases:
         probe=context.new_page()
         entry='curated.html' if args.suite=='curated' else 'viability.html'
-        probe.goto(origin+'/probe/'+entry+'?initialMB='+str(args.initial_mb)+'&group='+group+'&mode='+args.mode+'&rounds='+str(args.corpus_rounds)+('&fixture='+quote(args.fixture) if args.fixture else ''),wait_until='networkidle')
+        probe.goto(origin+'/probe/'+entry+'?initialMB='+str(args.initial_mb)+'&group='+group+'&mode='+args.mode+'&rounds='+str(args.corpus_rounds)+('&fixture='+quote(args.fixture) if args.fixture else '')+('&memoryProfile=1' if args.memory_profile else '')+'&releaseStaged='+args.release_staged,wait_until='networkidle')
         probe.wait_for_function('() => typeof window.startProbe === "function"')
         start=time.monotonic();network_start=body_bytes
         probe.evaluate('() => { void window.startProbe(); }')
@@ -149,6 +151,16 @@ with sync_playwright() as pw:
             report['error']=f'Benchmark wall-clock budget exceeded ({args.timeout} seconds)'
             report['benchmarkTimedOut']=True
         end=time.monotonic();measured=[s for s in samples if start<=s['at']<=end]
+        report['measurementStartMonotonic']=start
+        report['measurementEndMonotonic']=end
+        report['phaseMemory']=[]
+        for stage in report.get('stages',[]):
+            if stage['stage']!='memory-phase':continue
+            phase_end=start+stage['atMs']/1000
+            phase_samples=[s for s in measured if phase_end-1.5<=s['at']<=phase_end]
+            report['phaseMemory'].append({**stage,'sampleCount':len(phase_samples),
+                'privateMemory':{key:statistics.median([s[key] for s in phase_samples if s[key] is not None])
+                    if any(s[key] is not None for s in phase_samples) else None for key in ['uss','rss','privateCommit']}})
         report['httpResponseBodyBytes']=body_bytes-network_start
         report['memoryMeasurement']={}
         for key in ['uss','rss','privateCommit']:

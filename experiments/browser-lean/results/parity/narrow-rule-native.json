@@ -1,0 +1,30 @@
+{
+  "sourceSha256": "a2f03e34c9c06ad87ccf44913112f92b998c1954eb39826d44818ea74a757bc5",
+  "log": "'QuickMaths.Formal.Experimental.abs_pos' depends on axioms: [propext, Classical.choice, Quot.sound]\n'QuickMaths.Formal.Experimental.abs_neg' depends on axioms: [propext, Classical.choice, Quot.sound]\n",
+  "nativeToolchain": "leanprover/lean4:v4.34.0-rc2",
+  "mathlibRevision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+  "artifacts": {
+    "QmAbs.ir": {
+      "bytes": 1592,
+      "sha256": "31ba6490514a4482035bc248afb1c32763ef666f45bbf73175e3f37e97cd641d"
+    },
+    "QmAbs.ir.sig": {
+      "bytes": 176,
+      "sha256": "8b48c2fb6f53cd569d1f38be331c9642ff372d26a33085532d60999f32cc4965"
+    },
+    "QmAbs.olean": {
+      "bytes": 13416,
+      "sha256": "46f20bf5d13184f7319428af1b8aa0eec8db0a0f558fb644eb3c08fc514c7238"
+    },
+    "QmAbs.olean.private": {
+      "bytes": 16656,
+      "sha256": "fb94e868aaa022d61fa654e6fe728c1bd748e297867b536e99161a4624b079be"
+    },
+    "QmAbs.olean.server": {
+      "bytes": 832,
+      "sha256": "52575ef7cf806a77b73e96892fd4635bbc976f80200c4bc42169265947ebdb83"
+    }
+  },
+  "productionGeneratorChanged": false,
+  "browserLibraryReplacementTested": false
+}

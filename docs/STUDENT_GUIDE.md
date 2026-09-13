@@ -705,3 +705,7 @@ This feature needs the local Lean companion on the computer running the browser;
 opening GitHub Pages alone does not install it on a phone. Ordinary lessons
 continue to work without it. Setup guide:
 https://quickmathematics.github.io/QuickMaths/FORMAL_LEARNING.md
+
+Browser-local Lean is an ongoing experiment, not yet an option for completing
+formal assessments on your phone. Your proof stays saved while verification
+is unavailable.
