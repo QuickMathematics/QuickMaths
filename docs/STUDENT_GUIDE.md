@@ -711,13 +711,13 @@ formal assessments on your phone. Your proof stays saved while verification
 is unavailable.
 
 For voluntary device testing, the separate
-[experimental phone runner](experiments/browser-lean/?candidate=a17-opfs-v1)
+[experimental phone runner](experiments/browser-lean/?candidate=monomial-direct-v1)
 can run a fixed proof corpus and export diagnostics. Its A17 candidate uses
 temporary disk staging; allow about 1.2 GiB of free site storage. It cannot
 award mastery. After a test crash, close other experimental tabs and use
 **Clear temporary staging**, which keeps your workspace and shared downloads.
 
-The latest A17 retest defaults to **12 slow cases · once each**, with no warm
+The latest A17 retest defaults to **2 optimized monomial cases · once each**, with no warm
 repeats. Close older experimental tabs and clear temporary staging to reclaim
 leftover test files; cleanup does not require running any proofs. The extended
 timing allowance measures completion time and does not change assessment policy.

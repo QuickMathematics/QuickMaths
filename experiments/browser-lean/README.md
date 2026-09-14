@@ -342,3 +342,15 @@ See the [update report](../../docs/releases/2026-09-13-browser-lean-parity.md),
 Shared module packs remain the baseline. No browser experiment can issue a
 certificate, and these results do not establish physical Android/iPhone or
 GitHub Pages deployment compatibility.
+
+
+## Bounded monomial optimization (2026-09-14)
+
+The [update report](../../docs/releases/2026-09-14-monomial-proof-optimization.md)
+records a two-case source-only optimization and focused desktop measurements.
+`prepare-source-variant.py SOURCE NEW_TARGET` regenerates native corpus sources
+while retaining the same module packs; it refuses environment-ID drift or an
+existing target. Preserve the baseline catalog for before/after comparisons.
+`test-phone.py --quick` checks the default two-case route through the isolation
+shim, with no warm repeats. Full corpus parity has not been rerun for this source
+revision; historical results retain their original source identities.

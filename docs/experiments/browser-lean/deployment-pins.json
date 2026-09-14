@@ -1,8 +1,8 @@
 {
-  "curated.js": "f9aa745e66656d899e5448f2f0fef4b33b4d6e9498333ceff6811c4e148e85d9",
+  "curated.js": "4ba241ccaca86d5bfb4450e9abcc62a4c2dc49e8723d1cbbc023e15684288f7f",
   "compatibility.js": "6cb5c2f6ad8f0110132205a4fa54c09b739e46b270a431f0f654d72d91f88a59",
   "timing-policy.js": "a19466fbe035695f93c42df81b97b1ec366bd40b788f377a36390f0e5ff37855",
-  "assets/viability.json": "bbf02bd5ff0fcb5e0b573f8c30e08aaa423520fd16724e69251af15df5490ab0",
+  "assets/viability.json": "88f029fe43bc039a8bc76fe0421a95824b492b26f322537053811b6234c82a4e",
   "assets/viability-worker.js": "f900a67feac37a5a0b45d13915233da40cbcc5875ac3119db09ea8b9fea702a4",
   "../app/formal-environment-loader.js": "7f4cc65405555f8631da84b842fb08cd9f976d470156c59c64dde9c64225264f"
 }

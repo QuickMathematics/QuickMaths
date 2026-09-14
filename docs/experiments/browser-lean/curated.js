@@ -161,7 +161,9 @@ window.startProbe=async()=>{
     report.corpusRounds=rounds;
     for(const fixture of config.fixtures.filter(f=>f.group===id&&requestedFixture&&f.name!==requestedFixture))
       report.matrix.push({name:fixture.name,status:'not_run_diagnostic',assessment_eligible:false,certificate:null});
-    const selected=config.fixtures.filter(f=>f.group===id&&(!requestedFixture||f.name===requestedFixture)&&(report.timingMode==='standard'||slowCases.has(f.name)));
+    report.caseSet=params.get('caseSet')||'all';
+    if(!['all','monomial'].includes(report.caseSet))throw Error('Unknown diagnostic case set');
+    const selected=config.fixtures.filter(f=>f.group===id&&(!requestedFixture||f.name===requestedFixture)&&(report.caseSet==='all'||['series_root_monomial_geometric_summable.json','series_root_monomial_geometric_divergent.json'].includes(f.name))&&(report.timingMode==='standard'||slowCases.has(f.name)));
     if(!selected.length)throw Error('No fixtures match this timing mode');
     report.selectedCaseCount=selected.length;
     corpusLoop: for(let round=0;round<rounds;round++) for(const fixture of selected) {

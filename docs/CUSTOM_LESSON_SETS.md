@@ -732,3 +732,10 @@ The Statistics and Probability native batches add 21 lessons and 280 authored sc
 ## Branch reference
 
 Consult [the complete lesson classification](./FIELDS_AND_BRANCHES.md) and [the machine-readable taxonomy](./learning-taxonomy.json). Keep file keys `subject`, `subjectId` / `subject_id`, and `subdomain` compatible. Add optional `topic` for focused subject matter. Prefer an existing broad branch; create another branch only when it describes a distinct area of the field. The map automatically creates its band.
+
+### Monomial root proof generation (September 2026)
+
+Existing supported monomial-times-geometric root tests now use a shorter
+kernel-checked proof. No new lesson fields, rules, capabilities, or Studio
+settings are required; nonmonomial polynomials retain their existing proof path.
+See the [focused update](releases/2026-09-14-monomial-proof-optimization.md).

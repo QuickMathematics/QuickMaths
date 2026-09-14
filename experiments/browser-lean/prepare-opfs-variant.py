@@ -59,6 +59,8 @@ harness=harness.replace("if(result.fatalRuntimeError)await pool.discard();","if(
 harness=harness.replace("log('fixture-failed',{name:fixture.name,error:String(error)});await pool.discard();","log('fixture-failed',{name:fixture.name,error:String(error)});await pool.discard();\n        if(report.timingMode==='slow'){report.error='Stopped after diagnostic failure; remaining cases were not retried: '+error;break corpusLoop;}")
 harness=harness.replace("report.warmFixture=successful?.name||null;","report.warmFixture=report.timingMode==='slow'?null:successful?.name||null;\n    report.warmRepeatsRequested=report.timingMode==='slow'?0:5;")
 harness=harness.replace('if(!report.error&&successful)await pool.withEnvironment',"if(!report.error&&successful&&report.timingMode==='standard')await pool.withEnvironment")
+harness=harness.replace("const selected=config.fixtures.filter", "report.caseSet=params.get('caseSet')||'all';\n    if(!['all','monomial'].includes(report.caseSet))throw Error('Unknown diagnostic case set');\n    const selected=config.fixtures.filter")
+harness=harness.replace("&&(report.timingMode==='standard'||slowCases.has(f.name))", "&&(report.caseSet==='all'||['series_root_monomial_geometric_summable.json','series_root_monomial_geometric_divergent.json'].includes(f.name))&&(report.timingMode==='standard'||slowCases.has(f.name))")
 Path(__file__).with_name('curated-opfs.js').write_text(harness)
 Path(__file__).with_name('curated-opfs.html').write_text(Path(__file__).with_name('curated.html').read_text().replace('curated.js','curated-opfs.js'))
 print(target)

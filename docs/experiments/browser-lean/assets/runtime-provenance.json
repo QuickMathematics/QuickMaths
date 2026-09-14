@@ -1,6 +1,6 @@
 {
   "variant": "native-eh-tail-pool2",
-  "identity": "c85e57e95fdbc7f94aa05880ca492e72030735f9024e10fc1085a48581d0cc07",
+  "identity": "cfcb7766888e0417f9b3c41f1a8ebc3179fc2d37ecf929ae2c801cad96feb5d2",
   "environment": {
     "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
     "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
@@ -52,5 +52,10 @@
   "memoryProbeSha256": "0a899f20005c6bae2f005eabd2d9f34e9345a4a36e17c719d4607f863af24ccf",
   "purpose": "A17 initialization peak: disk-backed verified module packs, bounded scratch reads",
   "stagedReleaseEnabled": true,
-  "opfsHookSha256": "c0511370767804ae56cee1a0088e7963c5e254f103d0d8bf83e6f6042d6f5f15"
+  "opfsHookSha256": "c0511370767804ae56cee1a0088e7963c5e254f103d0d8bf83e6f6042d6f5f15",
+  "sourceOnlyBaselineIdentity": "c85e57e95fdbc7f94aa05880ca492e72030735f9024e10fc1085a48581d0cc07",
+  "sourceOnlyChangedFixtures": [
+    "series_root_monomial_geometric_summable.json",
+    "series_root_monomial_geometric_divergent.json"
+  ]
 }

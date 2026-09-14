@@ -788,3 +788,7 @@ changes neither lesson authoring/Studio capabilities nor assessment eligibility.
 Setup and the tutor contract: https://quickmathematics.github.io/QuickMaths/FORMAL_LEARNING.md
 
 Declarative authoring format: https://quickmathematics.github.io/QuickMaths/CUSTOM_LESSON_SETS.md
+
+The [monomial proof optimization](releases/2026-09-14-monomial-proof-optimization.md)
+shortens existing native proofs without changing authoring syntax or Studio
+capabilities. The optional phone diagnostic now defaults to two changed cases.

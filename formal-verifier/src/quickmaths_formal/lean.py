@@ -3318,8 +3318,9 @@ def _render_polynomial_nth_root_limit(
     """Prove ``abs(p(n))^(1/n) -> 1`` for one exact nonzero polynomial.
 
     The coefficient vector came from the Python normalizer, but the generated
-    artifact rebuilds an explicit ``Polynomial ℝ`` and asks Lean/mathlib to
-    prove the leading-term asymptotic. ``tag`` only namespaces local names so
+    artifact proves the original-expression identity in Lean. Monomials use
+    direct coefficient/power limits; general polynomials rebuild an explicit
+    ``Polynomial ℝ`` for the leading-term asymptotic. ``tag`` only namespaces local names so
     numerator and denominator proofs can coexist in one root reconstruction.
     """
     polynomial_expr = render_expr(polynomial)
@@ -3358,6 +3359,38 @@ def _render_polynomial_nth_root_limit(
         Fraction(0) if index < degree else leading_coefficient
         for index in range(degree + 1)
     )
+
+    if coefficients == leading_coefficients:
+        # A monomial already is its leading term. Prove the coefficient and
+        # power limits directly instead of reconstructing two identical
+        # Polynomials and a relative-limit/cancellation argument. Lean still
+        # checks the identity with the original expression and all side goals.
+        return [
+            f"have {hexp} : Filter.Tendsto (fun n : ℕ => (1 : ℝ) / (n : ℝ)) Filter.atTop (𝓝 0) := by",
+            "  simpa [one_div] using (tendsto_inv_atTop_nhds_zero_nat (𝕜 := ℝ))",
+            f"have {hcoeff} : Filter.Tendsto (fun n : ℕ => ({abs_leading} : ℝ) ^ ((1 : ℝ) / (n : ℝ))) Filter.atTop (𝓝 1) := by",
+            f"  simpa using (tendsto_const_nhds.rpow {hexp} (Or.inl (by norm_num : ({abs_leading} : ℝ) ≠ 0)))",
+            f"have {hdegree_core} : Filter.Tendsto (fun n : ℕ => (n : ℝ) ^ (({degree} : ℝ) / (n : ℝ))) Filter.atTop (𝓝 1) := by",
+            f"  simpa [Function.comp_def] using ((tendsto_rpow_div_mul_add ({degree} : ℝ) 1 0 (by norm_num)).comp tendsto_natCast_atTop_atTop)",
+            f"have {hmonomial_root} : Filter.Tendsto (fun n : ℕ => (((n : ℝ) ^ {degree}) ^ ((1 : ℝ) / (n : ℝ)))) Filter.atTop (𝓝 1) := by",
+            f"  refine {hdegree_core}.congr' ?_",
+            f"  filter_upwards [Filter.eventually_ge_atTop 1] with {var} hn",
+            f"  rw [← Real.rpow_natCast_mul (Nat.cast_nonneg {var}) {degree} ((1 : ℝ) / ({var} : ℝ))]",
+            "  congr 1",
+            "  ring",
+            f"have {hlead_root_model} : Filter.Tendsto (fun {var} : ℕ => ({abs_leading} : ℝ) ^ ((1 : ℝ) / ({var} : ℝ)) * ((({var} : ℝ) ^ {degree}) ^ ((1 : ℝ) / ({var} : ℝ)))) Filter.atTop (𝓝 1) := by",
+            f"  simpa using {hcoeff}.mul {hmonomial_root}",
+            f"have hcanonical{tag} : ∀ {var} : ℕ, |({polynomial_expr} : ℝ)| = ({abs_leading} : ℝ) * (({var} : ℝ) ^ {degree}) := by",
+            f"  intro {var}",
+            f"  have hid : ({polynomial_expr} : ℝ) = ({leading} : ℝ) * (({var} : ℝ) ^ {degree}) := by ring",
+            f"  rw [hid, abs_mul, abs_pow]",
+            f"  simp only [abs_of_nonneg (Nat.cast_nonneg {var} : (0 : ℝ) ≤ ({var} : ℝ))]",
+            "  norm_num",
+            f"have {proof_name} : Filter.Tendsto (fun {var} : ℕ => |({polynomial_expr} : ℝ)| ^ ((1 : ℝ) / ({var} : ℝ))) Filter.atTop (𝓝 1) := by",
+            f"  refine {hlead_root_model}.congr' ?_",
+            f"  filter_upwards [] with {var}",
+            f"  rw [hcanonical{tag}, Real.mul_rpow (by norm_num : (0 : ℝ) ≤ {abs_leading}) (pow_nonneg (Nat.cast_nonneg {var}) {degree})]",
+        ]
 
     lines: list[str] = []
     lines.extend(_render_explicit_polynomial_facts(poly_name, coefficients, degree, need_leading=True))

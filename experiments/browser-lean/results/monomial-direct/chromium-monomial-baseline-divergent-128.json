@@ -1,0 +1,5083 @@
+{
+  "browser": "chromium",
+  "initialMB": 128,
+  "baseline": "Actual native QuickMaths mastery map, fresh profile, default curriculum, no verifier",
+  "hostSourceHashes": {
+    "experiments\\browser-lean\\benchmark.py": "cc07c39c7a245be6280db2125141924f0af3bcc208f2ed4544663f3427a469f3",
+    "experiments\\browser-lean\\curated.js": "c0ba27fd580aebe65f08fcb0ce2e76bb7ca362e2ead3400a3892c1c9a2ab76e7",
+    "experiments\\browser-lean\\curated.html": "d1be431ed5229e1250128abaf07c227f4b894eb581a664136b6e9b637862037a",
+    "experiments\\browser-lean\\curated-opfs.js": "f9aa745e66656d899e5448f2f0fef4b33b4d6e9498333ceff6811c4e148e85d9",
+    "experiments\\browser-lean\\opfs-module-worker.js": "c0511370767804ae56cee1a0088e7963c5e254f103d0d8bf83e6f6042d6f5f15",
+    "experiments\\browser-lean\\compatibility.js": "6cb5c2f6ad8f0110132205a4fa54c09b739e46b270a431f0f654d72d91f88a59",
+    "docs\\formal-environment-loader.js": "7f4cc65405555f8631da84b842fb08cd9f976d470156c59c64dde9c64225264f",
+    ".bridge-runtime\\curated-formal\\assets-a17-opfs-v2\\viability-worker.js": "f900a67feac37a5a0b45d13915233da40cbcc5875ac3119db09ea8b9fea702a4"
+  },
+  "memoryMethod": "Sum of per-process USS (private resident pages); sample interval >=0.5 s, plus labelled RSS/private commit; only owned browser descendants",
+  "executedAt": "2026-09-14T09:50:02.604624+00:00",
+  "host": {
+    "os": "Windows-10-10.0.26100-SP0",
+    "logicalCpus": 16,
+    "physicalCpus": 8,
+    "physicalMemoryBytes": 34261053440
+  },
+  "runs": [
+    {
+      "ready": true,
+      "done": true,
+      "stages": [
+        {
+          "stage": "runtime-assets-ready",
+          "atMs": 767.3600000143051,
+          "environment": "qm-formal-v1-bb0d3439bce63261",
+          "format": "modules"
+        },
+        {
+          "stage": "runtime-initialized",
+          "atMs": 2340.639999985695
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 2443.2300000190735,
+          "file": "modules-e13bfb4a979d23e9ec563643d423061466102637217de0d0a7160e26e7809cf4.gz",
+          "bytes": 7988628,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 2533.264999985695,
+          "file": "modules-df016886e69994296fda71f5d90f0d22f5e7544f78bebc427fa0f59db7577644.gz",
+          "bytes": 8225928,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 2626.9950000047684,
+          "file": "modules-0b958262e1a241aa6860efede7465b98ad8736189bc6901e7ae6b06ec6821426.gz",
+          "bytes": 8240592,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 2745.0499999523163,
+          "file": "modules-26b3052baaaba35c0cce54816b081b3a9766d0aabb923596f076614d03250e51.gz",
+          "bytes": 8257024,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 2841.225000023842,
+          "file": "modules-69a63c14fc81be0bdff7480d63983319be231007fa81573daa09ad66d351c908.gz",
+          "bytes": 8345608,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 2953.7149999141693,
+          "file": "modules-b15aa3165c610abcd1639ba986a9a5132419f88e77ecb293f47d90cdaecee623.gz",
+          "bytes": 8134908,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3063.679999947548,
+          "file": "modules-9d1578e8fe91d22784dca67f1cf1fd6d5e42f5ffe02c962933d2ba50650dd929.gz",
+          "bytes": 8336056,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3154.5499999523163,
+          "file": "modules-7760fa02f2da49a61ad8e0b6da3ba8e7ac71035ed79661439148aa110c1ed021.gz",
+          "bytes": 8370616,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3254.5849999189377,
+          "file": "modules-4b7108877f60010b8316fd984947e8b3c5a5a54742a44f8dc7e5153673251e5a.gz",
+          "bytes": 8206252,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3405.5599999427795,
+          "file": "modules-96ef9ef36451a5b0a85d809062205f96148860c93b8131d8c74d0193fea6e45a.gz",
+          "bytes": 8204112,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3434.235000014305,
+          "file": "modules-fc2ff4caa274f91d0bde66a73dbb7faef688882f8e691694ca790be6692ce7d7.gz",
+          "bytes": 1650528,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3533.0349999666214,
+          "file": "modules-2cca67bd44845fd9ec6ee5116c9a0a702cb1c9606d6c29b537778138ed3e8eac.gz",
+          "bytes": 8378332,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3641.3550000190735,
+          "file": "modules-2f964c8136db39d4b6152cd990cac7e679f3289c9ba6897f8eb91d98071e4d00.gz",
+          "bytes": 8272324,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3727.8550000190735,
+          "file": "modules-c33f5703e84152bfa00eed5d845724717a7c4ac47ce4e3c11bc3107eb1c1931e.gz",
+          "bytes": 8368968,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3856.9249999523163,
+          "file": "modules-131bc530234108a82ce79451b7b50ec3f83448c273c58547297633505d73de96.gz",
+          "bytes": 8339296,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 3960.6349999904633,
+          "file": "modules-ea29d4736e6c273527c2ed9fe408f08cc6c6d0b54ad0e8738195ed27876413e5.gz",
+          "bytes": 8083708,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 4075.475000023842,
+          "file": "modules-06fdc40aaf092fe709c2a927516e0d5c2ae54745d8f383875b1b8fe1e44469b8.gz",
+          "bytes": 8388072,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 4190.329999923706,
+          "file": "modules-0edcc7c843dcace4cc0f7563515e6beadc9db6d68320f38d2230ec4e29ef2065.gz",
+          "bytes": 8348320,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 4282.534999966621,
+          "file": "modules-4b9c1a2b8f891d5efea84e2fd6ec3e9c738143482222de0bc2e0d1651cc3b45d.gz",
+          "bytes": 8345712,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 4409.995000004768,
+          "file": "modules-ba8dc5ebbc9904f90b9ee009146bbe50f7532bbe0506f3cfb3c9761b118be050.gz",
+          "bytes": 8315940,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 4552.674999952316,
+          "file": "modules-d7b67bc59ef0c02239ad69e25b0a415e4d7096806d90976e6268530fd26383f2.gz",
+          "bytes": 8382308,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 4657.294999957085,
+          "file": "modules-facba71fc221b4506e4e25e8238cb7f33503f34917f12cb155b7a4fa8a658ce0.gz",
+          "bytes": 8070532,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 4754.709999918938,
+          "file": "modules-3c0a4f82ff2c7a1cf28af0f66207da18db31661fa391cea2081f1079c7f586fe.gz",
+          "bytes": 8328884,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 4847.689999938011,
+          "file": "modules-a0055f515f984f6ff72c9aa1fab4e06584134ec6a02d8d51f4abea1d8436153d.gz",
+          "bytes": 8355472,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 4967.5199999809265,
+          "file": "modules-3c5edc702d1b7e2b0ba5b18e44dc444eab5aa734be006c3368f21cfd2e73319e.gz",
+          "bytes": 8384184,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5068.495000004768,
+          "file": "modules-5432229baec8771e7b63d48f986aceed78755efa8a4db12655463baaaa0f72c0.gz",
+          "bytes": 8363116,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5196.5199999809265,
+          "file": "modules-931dfdb29d138cd2612a4099c54aff3ebf79fbe74f93c8f0b110dab9fd7425dc.gz",
+          "bytes": 8243312,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5304.219999909401,
+          "file": "modules-8ade019534275789ebd32446c5aedd29d623cf1defd0cd59661ad0792b2a98f6.gz",
+          "bytes": 8279244,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5399.689999938011,
+          "file": "modules-20dc24db51aa07ed06c813efb71661833a2154d0711166492a2e3e02d97f887a.gz",
+          "bytes": 8371372,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5516.240000009537,
+          "file": "modules-bcbde11edab1234761665b1d7ff855f8ed4f3e9020e0ce02d8c1131c5a7e097e.gz",
+          "bytes": 8239504,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5605.459999918938,
+          "file": "modules-023251873010635fadf9bdb8a298310be0f0a24c366e43e0ad6ac949058d97e7.gz",
+          "bytes": 8247144,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5710.969999909401,
+          "file": "modules-f81fbc6fd7b3348e17af1634b9bf6ec85a5ad689c2fd6c52e6f9628dc6ac52b8.gz",
+          "bytes": 7851636,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5793.324999928474,
+          "file": "modules-301a526ea6682a654d61b4733fc92ffd8b88ba56f37178603c04944350ab6ecb.gz",
+          "bytes": 8012688,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5891.350000023842,
+          "file": "modules-5b0f9758846f0279d7a5ac772d37c22d5167086ceb95a181b8f2051d95f61daf.gz",
+          "bytes": 8071272,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 5972.074999928474,
+          "file": "modules-bce762057c7ecdf390fcab7f716f11da5ceaf558951a87042d794b153f108f39.gz",
+          "bytes": 7562540,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6089.294999957085,
+          "file": "modules-4c3678be0a07e665352c236084b25e79da9181395fadc3dbf9a0233fa537a87e.gz",
+          "bytes": 8263708,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6177.990000009537,
+          "file": "modules-c5cb9c59981144c24674ff8098a0d0c8eaaf36575e82bad0b4e4ccb9aa27a6ca.gz",
+          "bytes": 8203152,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6262.475000023842,
+          "file": "modules-6a2920d4879007b289332c1cf741f787d271eb59a68f544b24a142c945513e40.gz",
+          "bytes": 8067172,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6360.634999990463,
+          "file": "modules-659211d5920a226c82d5ec645c20815f209117c5af8127a5a4ff2aaaf0911893.gz",
+          "bytes": 8312792,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6464.615000009537,
+          "file": "modules-0f09928e60b39d3f95fd02ed6c218753a35e2ed9ea33b169e5de93f0c7ef5d4a.gz",
+          "bytes": 8350188,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6564.044999957085,
+          "file": "modules-aa4e2492b77db03cdef85d0a818874dfe318bb1ada2b49ce87d0fe7778435dcb.gz",
+          "bytes": 8297932,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6685.02999997139,
+          "file": "modules-83171b243d2fef1ff729f52e2ca52d165f1f8502a75a2e1568270932e9b03884.gz",
+          "bytes": 8142196,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6779.125,
+          "file": "modules-b50bb87aeef1e3c18c4fd88d75d5dd848dd8c33b2cc433c8c763d07d6c5a4d7a.gz",
+          "bytes": 8284376,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6880.9349999427795,
+          "file": "modules-a807722d3670492a91a3595e399f91f31f356d9251bc7e9bd107a70d30385239.gz",
+          "bytes": 8232392,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 6967.174999952316,
+          "file": "modules-d79180020f59ce38d1256bce55bdeba72650c72c65814c6b0626b199173490a0.gz",
+          "bytes": 8295068,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 7070.600000023842,
+          "file": "modules-d1389356d625cacbb1f389045ce66a3fe7fc15ab45a670dbdd54325fc4fb5ccf.gz",
+          "bytes": 8382200,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 7194.464999914169,
+          "file": "modules-64671f2704b5871b19384003c345f8c4c9e30ecbe0b4f698d22f25376db6ff13.gz",
+          "bytes": 8111604,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 7308.064999938011,
+          "file": "modules-e7063f8708b223fc09916c9535c22349f3e818897431bd0f3b2c0b0898a5f486.gz",
+          "bytes": 8283580,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 7416.240000009537,
+          "file": "modules-d2da41b0b5420b52be834c91e708c75e411e81b853fa387fcc4a60976f1bc451.gz",
+          "bytes": 8381540,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 7517.294999957085,
+          "file": "modules-83b6801bb253c64e8b4cec8085161111441436a77fb0d61ad85d25895e05245c.gz",
+          "bytes": 8268824,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 7646.1849999427795,
+          "file": "modules-4550c6f9d278b0e4a079c9c633eda12e7c9b6bb7b3808f103de0598d30f9bc4d.gz",
+          "bytes": 8383672,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 7781.589999914169,
+          "file": "modules-1609435ffe070881e9def81692ec7154682465e1b646c64391ca698d493e4900.gz",
+          "bytes": 8378436,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 7882.625,
+          "file": "modules-dbf2d6aa83017413bededfe766375966bba77dc1bfc55b309d03d95b17e9f398.gz",
+          "bytes": 7794808,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 7988.344999909401,
+          "file": "modules-9eed0f93bd58a57bff840f731235c2719578e825c63513781ce3a7a23bd4aa27.gz",
+          "bytes": 7986112,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8076.4349999427795,
+          "file": "modules-4c39196476459459f00f3985263cb01b087cea86b6686f280489734501394956.gz",
+          "bytes": 8147396,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8159.219999909401,
+          "file": "modules-f1ba339bc5815b151f8e73ea947804f2d1eb872b01234e5a291c65467ab59949.gz",
+          "bytes": 8233256,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8280.144999980927,
+          "file": "modules-05fb70f0983cbf09fa95751ed5500acebdb9cfd159953cb59c70c1de0f7abbc2.gz",
+          "bytes": 7751020,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8364.30999994278,
+          "file": "modules-31627ac38cfc6ea5961602e243bdb57c2ccb7f24d0b780d375919c39f909c38a.gz",
+          "bytes": 8007096,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8448.054999947548,
+          "file": "modules-8d771a4fb0c67b04e3ccd1b61c95eeee9f4001a0af8a59a069178566286373ee.gz",
+          "bytes": 8221260,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8541.55999994278,
+          "file": "modules-309e180fd72cd6acc98eae9c9d239725a1b24d9bf09bde68dd0821730c5e0232.gz",
+          "bytes": 8342868,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8696.034999966621,
+          "file": "modules-9340141aa3b12f43b75903d1015ba441cbccbed4b6336a737de0db501c4df0f0.gz",
+          "bytes": 8304616,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8784.375,
+          "file": "modules-9ad54812a6178dac187576268a6f9bc073f216ebfc8c00510ae4f130244d3721.gz",
+          "bytes": 7517748,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8908.46499991417,
+          "file": "modules-3e988f0644aa189446e1fd4ecf8731948270b9af9ddde3ca3b8befc526725396.gz",
+          "bytes": 7942036,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9014.174999952316,
+          "file": "modules-9b8355c731b338db82d4d89ddce5549f0407133b2b7816feaaa31ddaba53a19a.gz",
+          "bytes": 8378588,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9141.554999947548,
+          "file": "modules-c9fb88321e004f4b64b797a73bd41a8a3bc604a73116e068e41cdc73be7139be.gz",
+          "bytes": 8292500,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9261.5,
+          "file": "modules-27b2ac07f79f9a88ec971fd986c4726dfe562506b623d86caaf278cc081f5bfd.gz",
+          "bytes": 8385764,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9381.069999933243,
+          "file": "modules-7e346ec2b183925a0c7ce95eb14ccc34a21b1ce72418573ab2d633f617d0f060.gz",
+          "bytes": 7681556,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9494.199999928474,
+          "file": "modules-1041e85bd6ad31cda1b93e22bc4e682e85a9cac2080fffa27a95db9948cb9f1b.gz",
+          "bytes": 6965772,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9617.80999994278,
+          "file": "modules-e55d46616d12b3081d78e13461e8085c89ec004d65359ce53e3f5ff3db5f69f5.gz",
+          "bytes": 8368000,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9712.990000009537,
+          "file": "modules-24a0f2a98bcc4f3e576eaecccc14172bb6349fc2ed999bf37607e0d1a9caf8bc.gz",
+          "bytes": 7997840,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9801.034999966621,
+          "file": "modules-999ab133d8cd62eddf9fe70dee1bb7e25b03fe6de407d0b5695f5f2571209f0b.gz",
+          "bytes": 7233868,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9929.199999928474,
+          "file": "modules-f4bb70144ffd5eaad47737e8dbd0c23bc76a3b128f15671b518243d8e05e5071.gz",
+          "bytes": 8311680,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10027.669999957085,
+          "file": "modules-e853f74c71dc1bf2200c5117e19f9fb00cfac551985e5e0a60ab337b95c2690f.gz",
+          "bytes": 8356900,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10076.014999985695,
+          "file": "modules-e921233de4abee74a1f7c856afc33f1fc3cdc871943716bbaf0f75cc8e335955.gz",
+          "bytes": 2867724,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10172.05999994278,
+          "file": "modules-7490fc34a2ce21b63bbe18ca0e196718001597aa38b24eb328b38112a997596e.gz",
+          "bytes": 8060892,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10274.304999947548,
+          "file": "modules-a6b0ef7789d80800b1621a7c3d9b19a2899bf9d9ee7bf4ef0d9d97ac028a4071.gz",
+          "bytes": 8381712,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10389.100000023842,
+          "file": "modules-c91ad436cf28b4191c0ac74eefb4c86645871d6dd663c7db8dd555817795ac8d.gz",
+          "bytes": 8287064,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10510.794999957085,
+          "file": "modules-f61e1f8a765734d68063b73462cbd957daaef771c5ca3315d2a993263c893110.gz",
+          "bytes": 8276980,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10602.33999991417,
+          "file": "modules-1591dd1079da2dc2f6332eed2f15dec2a674cb41382fb2c12801ee1d73a47966.gz",
+          "bytes": 7547156,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10690.230000019073,
+          "file": "modules-4494328ae74cb7e4b95221b52e0212bd24155303a828099b1526d783f7fe0b12.gz",
+          "bytes": 8045080,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10796.96499991417,
+          "file": "modules-d729fe31f4105a2cf0ab47d4911a442792386e6b0845a74ab7763b6bd15c3c1c.gz",
+          "bytes": 8244392,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10900.679999947548,
+          "file": "modules-789165d1a139943672388c6e447d5605a6861ba1476f2db2b1b679b31b6a0240.gz",
+          "bytes": 8208068,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11001.629999995232,
+          "file": "modules-0974a45252eca33284c5166556d968c46728d8c34dfbedf22d3ca9aa1c25d360.gz",
+          "bytes": 8285628,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11113.194999933243,
+          "file": "modules-ebe8442206c7a50945c48f558240549222b334d2c401d4ab7b6c68a1aea6bd58.gz",
+          "bytes": 8381056,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11227.600000023842,
+          "file": "modules-fc803738e0a3097064a8bc0bb9796ed33cf939f02ab0d06b8e5eb983257b40a7.gz",
+          "bytes": 8307248,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11318.334999918938,
+          "file": "modules-ea7cabb9313bb9b118c907a17da78ac3bffd637ffc943cac66fb1c94f58263f3.gz",
+          "bytes": 7540568,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11440.064999938011,
+          "file": "modules-7cd83ae6899ebbae0be315ecc1e0d72195dc1e07cadf4a85511c1f595a0c64ab.gz",
+          "bytes": 8354256,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11484.019999980927,
+          "file": "modules-adae517c4f42e4f65c4a6142d207f14b5a28f230ea44c8f62ab10c159fc2c211.gz",
+          "bytes": 2869368,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11531.55999994278,
+          "file": "modules-a87e5166d700b4e8883bf73911717f670b91386d8712cac933b916b3a373d62b.gz",
+          "bytes": 363424,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11643.804999947548,
+          "file": "modules-28f60716fd12b78d26aa1ef8806ac6c700f1664be8d524f353edcf617d053bc1.gz",
+          "bytes": 8347780,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11740.824999928474,
+          "file": "modules-c00a0c28d18333790161deaa7c6dadf90c9c5b5f3eddd5cf73311638e09ca19e.gz",
+          "bytes": 8048076,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11844.634999990463,
+          "file": "modules-afd33e732d57e28144d4bc908a592bd81f05108271145346d4b1210639bc9396.gz",
+          "bytes": 8370044,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11951.769999980927,
+          "file": "modules-ef10f65b162198fa8371e46e2842504321228deeb042f1e3e3f9e97c8d794f61.gz",
+          "bytes": 7977908,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12083.370000004768,
+          "file": "modules-681ff812cdd73f021d63cf0a1de8893f05b15f20b741388aab47b6090838a614.gz",
+          "bytes": 8364928,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12203.149999976158,
+          "file": "modules-0f0d22c762d3245537febea49baed0952b9262c1aff92462488b805da451f5a9.gz",
+          "bytes": 8089392,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12306.77999997139,
+          "file": "modules-c214ed26b1b364173468083e94b9abbb5cdebb51211361e5c0d7cad7d3a1e6db.gz",
+          "bytes": 8195920,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12400.519999980927,
+          "file": "modules-436395b0b28fba01fb4ee8b128aad9ed406f45329e4fb6533fee1d4f67e6689a.gz",
+          "bytes": 8361208,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12481.365000009537,
+          "file": "modules-7ea14b61970eb7fab9dad39adad7e232e49010936ebd17365ad72fa15f05e079.gz",
+          "bytes": 7126112,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12616.174999952316,
+          "file": "modules-dc0fb3eb606054d6bbc8a2bd781f569e57ffbe7218a0e65dfb15490acd2a4d40.gz",
+          "bytes": 8262484,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12720.414999961853,
+          "file": "modules-988550128cb622e98d26785defbd246437d952f1bcfc14aa2b4fcbc340ffba2c.gz",
+          "bytes": 7804760,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "closure-staged",
+          "atMs": 12725.65499997139,
+          "modules": 3919
+        },
+        {
+          "stage": "proof",
+          "atMs": 15114.55999994278,
+          "name": "import-warmup",
+          "elapsedMs": 2387.140000104904,
+          "success": true
+        },
+        {
+          "stage": "ready-to-verify",
+          "atMs": 15114.610000014305
+        },
+        {
+          "stage": "staged-files-released",
+          "atMs": 15262.264999985695,
+          "type": "released_staged",
+          "mode": "all",
+          "files": 11757,
+          "bytes": 791392876
+        },
+        {
+          "stage": "staging-closed",
+          "atMs": 15462.909999966621,
+          "type": "staging_closed",
+          "closedHandles": 100,
+          "temporaryFilesRemoved": true
+        },
+        {
+          "stage": "proof",
+          "atMs": 15506.814999938011,
+          "name": "invalid-control",
+          "elapsedMs": 42.61500000953674,
+          "success": false
+        },
+        {
+          "stage": "proof",
+          "atMs": 15522.834999918938,
+          "name": "sorry-control",
+          "elapsedMs": 15.449999928474426,
+          "success": false
+        },
+        {
+          "stage": "proof",
+          "atMs": 18227.93499994278,
+          "name": "series_root_monomial_geometric_divergent.json",
+          "elapsedMs": 2704.1350001096725,
+          "success": true
+        },
+        {
+          "stage": "complete",
+          "atMs": 18246.949999928474,
+          "matrixRows": 193
+        }
+      ],
+      "proofs": [
+        {
+          "name": "import-warmup",
+          "budgetMs": 600000,
+          "originalBudgetMs": 600000,
+          "exceededOriginalBudget": false,
+          "type": "compile_result",
+          "success": true,
+          "compilerExitCode": 0,
+          "elapsed": 2387.140000104904,
+          "errors": [],
+          "axioms": [],
+          "experimentalKernelSuccess": true,
+          "sourceHash": "cf2042b5a3cc5ff05e3c85287a67e3e2cd24f5878642f25d9e5cf6cc994e5efc",
+          "output": [
+            "   { module := `Init, importAll := false, isExported := true, isMeta := true },",
+            "   { module := `Lean.Elab.Tactic.NormCast, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Lean.Elab.Tactic.Omega, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.PSeries, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.Polynomial.Basic, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.Real.Sqrt, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecialFunctions.Exp, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecialFunctions.Log.Basic, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecialFunctions.Pow.Real, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic,",
+            "     importAll := false,",
+            "     isExported := true,",
+            "     isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecificLimits.Normed, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Basic.Real.Basic, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.ComputeDegree, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Continuity, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Convert, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.FieldSimp, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.FinCases, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.FunProp, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.GCongr, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Linarith, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.NormNum, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.NormNum.RealSqrt, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Positivity, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Ring, importAll := false, isExported := true, isMeta := false }],",
+            " true)\u2026",
+            "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' does not depend on any axioms\",\"endPos\":{\"column\":6,\"line\":28},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":28},\"severity\":\"information\"}"
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "fatalRuntimeError": false
+        },
+        {
+          "name": "invalid-control",
+          "budgetMs": 10000,
+          "originalBudgetMs": 10000,
+          "exceededOriginalBudget": false,
+          "type": "compile_result",
+          "success": false,
+          "compilerExitCode": 1,
+          "elapsed": 42.61500000953674,
+          "errors": [
+            {
+              "caption": "",
+              "data": "Tactic `rfl` failed: Expected the goal to be a binary relation\n\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\n\n\u22a2 False",
+              "endPos": {
+                "column": 39,
+                "line": 26
+              },
+              "fileName": "/workspace/request.lean",
+              "isSilent": false,
+              "keepFullRange": false,
+              "kind": "[anonymous]",
+              "pos": {
+                "column": 36,
+                "line": 26
+              },
+              "severity": "error"
+            },
+            {
+              "caption": "",
+              "data": "'QuickMathsGenerated.result' depends on axioms: [sorryAx]",
+              "endPos": {
+                "column": 6,
+                "line": 28
+              },
+              "fileName": "/workspace/request.lean",
+              "isSilent": false,
+              "keepFullRange": false,
+              "kind": "[anonymous]",
+              "pos": {
+                "column": 0,
+                "line": 28
+              },
+              "severity": "information"
+            }
+          ],
+          "axioms": [
+            "sorryAx"
+          ],
+          "experimentalKernelSuccess": false,
+          "sourceHash": "bbc378959385da669cba449ed09fb3bad914c17922a56093d7b3acbe1901a4cf",
+          "output": [
+            "{\"caption\":\"\",\"data\":\"Tactic `rfl` failed: Expected the goal to be a binary relation\\n\\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\\n\\n\u22a2 False\",\"endPos\":{\"column\":39,\"line\":26},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":36,\"line\":26},\"severity\":\"error\"}",
+            "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' depends on axioms: [sorryAx]\",\"endPos\":{\"column\":6,\"line\":28},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":28},\"severity\":\"information\"}"
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "fatalRuntimeError": false
+        },
+        {
+          "name": "sorry-control",
+          "budgetMs": 10000,
+          "originalBudgetMs": 10000,
+          "exceededOriginalBudget": false,
+          "type": "compile_result",
+          "success": true,
+          "compilerExitCode": 0,
+          "elapsed": 15.449999928474426,
+          "errors": [
+            {
+              "caption": "",
+              "data": "'QuickMathsGenerated.result' depends on axioms: [sorryAx]",
+              "endPos": {
+                "column": 6,
+                "line": 28
+              },
+              "fileName": "/workspace/request.lean",
+              "isSilent": false,
+              "keepFullRange": false,
+              "kind": "[anonymous]",
+              "pos": {
+                "column": 0,
+                "line": 28
+              },
+              "severity": "information"
+            }
+          ],
+          "axioms": [
+            "sorryAx"
+          ],
+          "experimentalKernelSuccess": false,
+          "sourceHash": "de6b7a069ac0405a1ef13cbe79d339f76332c5162cd1dfedc3878324a3a6cc9d",
+          "output": [
+            "{\"caption\":\"\",\"data\":\"declaration uses `sorry`\",\"endPos\":{\"column\":21,\"line\":26},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"hasSorry\",\"pos\":{\"column\":15,\"line\":26},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' depends on axioms: [sorryAx]\",\"endPos\":{\"column\":6,\"line\":28},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":28},\"severity\":\"information\"}"
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "fatalRuntimeError": false
+        },
+        {
+          "name": "series_root_monomial_geometric_divergent.json",
+          "budgetMs": 120000,
+          "originalBudgetMs": 10000,
+          "exceededOriginalBudget": false,
+          "type": "compile_result",
+          "success": true,
+          "compilerExitCode": 0,
+          "elapsed": 2704.1350001096725,
+          "errors": [],
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "experimentalKernelSuccess": true,
+          "sourceHash": "1f4767e4aba92a9bab0121621b0fae217cf39d01ddda3dba218da57b730d8763",
+          "output": [
+            "{\"caption\":\"\",\"data\":\"try 'simp' instead of 'simpa'\\n\\nNote: This linter can be disabled with `set_option linter.unnecessarySimpa false`\",\"endPos\":{\"column\":97,\"line\":54},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unnecessarySimpa\",\"pos\":{\"column\":58,\"line\":54},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"try 'simp' instead of 'simpa'\\n\\nNote: This linter can be disabled with `set_option linter.unnecessarySimpa false`\",\"endPos\":{\"column\":93,\"line\":74},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unnecessarySimpa\",\"pos\":{\"column\":8,\"line\":74},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"This simp argument is unused:\\n  div_eq_mul_inv\\n\\nHint: Omit it from the simp argument list.\\n  [apply] simp [mul_inv]\\n\\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\",\"endPos\":{\"column\":28,\"line\":115},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedSimpArgs\",\"pos\":{\"column\":14,\"line\":115},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"This simp argument is unused:\\n  mul_inv\\n\\nHint: Omit it from the simp argument list.\\n  [apply] simp [div_eq_mul_inv]\\n\\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\",\"endPos\":{\"column\":37,\"line\":115},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedSimpArgs\",\"pos\":{\"column\":30,\"line\":115},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":36,\"line\":39},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":28,\"line\":39},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":36,\"line\":44},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":28,\"line\":44},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":36,\"line\":48},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":28,\"line\":48},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":36,\"line\":53},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":28,\"line\":53},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":34,\"line\":65},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":30,\"line\":65},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":34,\"line\":66},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":30,\"line\":66},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":70,\"line\":74},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":62,\"line\":74},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":66,\"line\":107},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":62,\"line\":107},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":94,\"line\":112},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":71,\"line\":112},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":47,\"line\":115},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":43,\"line\":115},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice\\n\\nNote: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`\",\"endPos\":{\"column\":32,\"line\":107},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unnecessarySeqFocus\",\"pos\":{\"column\":29,\"line\":107},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `norm_num` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":36,\"line\":39},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":28,\"line\":39},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `norm_num` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":36,\"line\":44},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":28,\"line\":44},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `norm_num` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":36,\"line\":48},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":28,\"line\":48},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `norm_num` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":36,\"line\":53},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":28,\"line\":53},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `ring` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":34,\"line\":65},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":30,\"line\":65},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `ring` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":34,\"line\":66},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":30,\"line\":66},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `norm_num` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":70,\"line\":74},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":62,\"line\":74},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `ring` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":66,\"line\":107},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":62,\"line\":107},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `simp [one_div, inv_pow]` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":94,\"line\":112},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":71,\"line\":112},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `ring` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":47,\"line\":115},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":43,\"line\":115},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]\",\"endPos\":{\"column\":6,\"line\":152},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":152},\"severity\":\"information\"}"
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "fatalRuntimeError": false,
+          "corpusRound": 0
+        }
+      ],
+      "matrix": [
+        {
+          "name": "guarded_cancellation.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-ed8d51650a0bb7da",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "difference_quotient.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-ed8d51650a0bb7da",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sqrt_square_nonnegative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-47dfa7faf67fa573",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "conjugate_identity.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-47dfa7faf67fa573",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "inverse_right_infinity.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "inverse_left_infinity.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "removable_hole_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "conjugate_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "piecewise_jump.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "ivt_existence.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "polynomial_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "quotient_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sqrt_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "abs_derivative_positive.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "abs_derivative_negative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "exp_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "log_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sin_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "cos_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_nested_sin_exp.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_exp_quotient.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_sqrt_quotient.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_log_abs.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_abs_sin_symbolic.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_log_exp_auto_positive.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_sqrt_square_plus_one.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_abs_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_log_exp_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_guarded_quotient_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_sqrt_square_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_sqrt_right_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_guarded_quotient.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_exp_with_brackets.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_quantified_guard.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "bounded_interval_positive.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-ed8d51650a0bb7da",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_basic.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_one_sided.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_hole_composition.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_symbolic_denominator.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_log_composition.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_sqrt_positive.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_geometric_product_boundary_one.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_nonpolynomial_quotient_needs_limit.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_quotient_boundary_one.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_zero_geometric_denominator_needs_domain.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "missing_restriction.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "wrong_limit_direction.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "leaked_assumption.json",
+          "status": "ambiguous_input",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "ivt_false_uniqueness_method.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "abs_derivative_kink.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "log_derivative_missing_domain.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_abs_missing_sign.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_abs_kink.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_wrong_formula.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_wrong_value.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_log_zero_domain_violation.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_missing_brackets.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_missing_interval_guard.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_log_nonpositive_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_missing_hole_premise.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_bad_ratio.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_missing_ratio.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_wrong_reciprocal_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_rational_shift_wrong_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_affine_ratio_wrong_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_affine_ratio_zero_leading_denominator.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_quadratic_ratio_wrong_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_quadratic_ratio_lower_degree.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_wrong_sign.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_wrong_zero_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_equal_degree.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_general_wrong_equal_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_general_zero_denominator.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_general_degree_overflow.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_squeeze_auto_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_monotone_bounded_auto_bad_ratio.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_wrong_infinity.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_half_wrong_no_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_one_wrong_no_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_constant_wrong_no_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_mod5_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_with_drift_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_growing_tail_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_finite_plus_growing_tail_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_unsafe_reciprocal_tail_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_cited_finite_tail_missing.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_cited_finite_tail_wrong_citation.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_eventually_constant_wrong_no_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_eventually_periodic_le_cutoff_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_wrong_sum.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_false_divergence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_false_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p2_false_not_summable.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p1_false_summable.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p2_zero_shift_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p_real_three_halves_false_not_summable.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p_real_half_false_summable.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p_real_overflow_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_comparison_missing_evidence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_comparison_wrong_direction.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_missing_evidence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_bound_one_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_wrong_direction.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_non_geometric_missing_limit.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_boundary_one_inconclusive.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_lt_one_false_divergence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_boundary_one_inconclusive.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_lt_one_false_divergence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_gt_one_false_convergence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_monomial_boundary_one.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_boundary_one.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_nonpolynomial_needs_limit.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_reciprocal_shift.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_half.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_symbolic.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_composed.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_reuse_sublimit.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_nat_at_top.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_rational_shift.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_rational_shift_offset.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_affine_ratio.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_affine_ratio_negative.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_affine_ratio_rational.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_quadratic_ratio.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_quadratic_ratio_negative.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_quadratic_ratio_factored.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_zero.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_pos_inf.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_neg_inf.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_gap2_neg_inf.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_general_equal_degree.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_general_lower_degree.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_general_pos_inf.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_squeeze_sin_over_shift.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_squeeze_sin_auto.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_squeeze_cos_auto.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_monotone_bounded_increasing.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_monotone_bounded_decreasing.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_monotone_bounded_auto_increasing.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_monotone_bounded_auto_decreasing.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_affine_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_mod2_piecewise_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_mod3_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_mod4_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_vanishing_reciprocal_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_mod3_vanishing_reciprocal_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_mod4_vanishing_geometric_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_finite_reciprocal_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_mod3_finite_reciprocal_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_mod4_finite_symbolic_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_cited_finite_tail_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_eventually_periodic_mod3_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_eventually_alternating_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_two_pos_inf.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_two_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_negative_two_no_finite.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_half_sum.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_scaled_negative_sum.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_two_not_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_negative_one_not_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p2_shift1_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p3_scaled_shift2_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p1_harmonic_not_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p0_not_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p_real_three_halves_shift1_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p_real_half_scaled_shift2_not_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_comparison_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_comparison_not_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_eventual_linear_geometric_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_global_geometric_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_geometric_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_geometric_divergent.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_geometric_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_geometric_divergent.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_monomial_geometric_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_geometric_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_geometric_divergent.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_missing_nonzero.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_wrong_nonzero.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_monotone_bounded_missing_bound.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_squeeze_missing_upper.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_geometric_product_divergent.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_geometric_product_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_quotient_denominator_geometric_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_quotient_domain_guard_needed.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_quotient_geometric_divergent.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_quotient_geometric_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_reciprocal_polynomial_geometric_summable.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_balanced_powered_shifted_factorials.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_extra_denominator_factorial.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_extra_numerator_factorial.json",
+          "status": "not_run_diagnostic",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_monomial_geometric_divergent.json",
+          "round": 0,
+          "status": "kernel_success",
+          "assessment_eligible": false,
+          "certificate": null
+        }
+      ],
+      "assets": [
+        {
+          "file": "lean.wasm-f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257.gz",
+          "cacheKey": "f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257",
+          "compressedBytes": 15712659,
+          "cacheHit": false
+        },
+        {
+          "file": "lean.js-838f4150599cec67397abacccfa1158e2bfe3d561d1db70ffcbca75b18b63cd6.gz",
+          "cacheKey": "838f4150599cec67397abacccfa1158e2bfe3d561d1db70ffcbca75b18b63cd6",
+          "compressedBytes": 36142,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-e13bfb4a979d23e9ec563643d423061466102637217de0d0a7160e26e7809cf4.gz",
+          "cacheKey": "e13bfb4a979d23e9ec563643d423061466102637217de0d0a7160e26e7809cf4",
+          "compressedBytes": 3169755,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-df016886e69994296fda71f5d90f0d22f5e7544f78bebc427fa0f59db7577644.gz",
+          "cacheKey": "df016886e69994296fda71f5d90f0d22f5e7544f78bebc427fa0f59db7577644",
+          "compressedBytes": 3409237,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-0b958262e1a241aa6860efede7465b98ad8736189bc6901e7ae6b06ec6821426.gz",
+          "cacheKey": "0b958262e1a241aa6860efede7465b98ad8736189bc6901e7ae6b06ec6821426",
+          "compressedBytes": 3340567,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-26b3052baaaba35c0cce54816b081b3a9766d0aabb923596f076614d03250e51.gz",
+          "cacheKey": "26b3052baaaba35c0cce54816b081b3a9766d0aabb923596f076614d03250e51",
+          "compressedBytes": 3327846,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-69a63c14fc81be0bdff7480d63983319be231007fa81573daa09ad66d351c908.gz",
+          "cacheKey": "69a63c14fc81be0bdff7480d63983319be231007fa81573daa09ad66d351c908",
+          "compressedBytes": 3298207,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-b15aa3165c610abcd1639ba986a9a5132419f88e77ecb293f47d90cdaecee623.gz",
+          "cacheKey": "b15aa3165c610abcd1639ba986a9a5132419f88e77ecb293f47d90cdaecee623",
+          "compressedBytes": 3372467,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-9d1578e8fe91d22784dca67f1cf1fd6d5e42f5ffe02c962933d2ba50650dd929.gz",
+          "cacheKey": "9d1578e8fe91d22784dca67f1cf1fd6d5e42f5ffe02c962933d2ba50650dd929",
+          "compressedBytes": 3356590,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-7760fa02f2da49a61ad8e0b6da3ba8e7ac71035ed79661439148aa110c1ed021.gz",
+          "cacheKey": "7760fa02f2da49a61ad8e0b6da3ba8e7ac71035ed79661439148aa110c1ed021",
+          "compressedBytes": 3126425,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-4b7108877f60010b8316fd984947e8b3c5a5a54742a44f8dc7e5153673251e5a.gz",
+          "cacheKey": "4b7108877f60010b8316fd984947e8b3c5a5a54742a44f8dc7e5153673251e5a",
+          "compressedBytes": 3426330,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-96ef9ef36451a5b0a85d809062205f96148860c93b8131d8c74d0193fea6e45a.gz",
+          "cacheKey": "96ef9ef36451a5b0a85d809062205f96148860c93b8131d8c74d0193fea6e45a",
+          "compressedBytes": 3373472,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-fc2ff4caa274f91d0bde66a73dbb7faef688882f8e691694ca790be6692ce7d7.gz",
+          "cacheKey": "fc2ff4caa274f91d0bde66a73dbb7faef688882f8e691694ca790be6692ce7d7",
+          "compressedBytes": 674066,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-2cca67bd44845fd9ec6ee5116c9a0a702cb1c9606d6c29b537778138ed3e8eac.gz",
+          "cacheKey": "2cca67bd44845fd9ec6ee5116c9a0a702cb1c9606d6c29b537778138ed3e8eac",
+          "compressedBytes": 2948785,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-2f964c8136db39d4b6152cd990cac7e679f3289c9ba6897f8eb91d98071e4d00.gz",
+          "cacheKey": "2f964c8136db39d4b6152cd990cac7e679f3289c9ba6897f8eb91d98071e4d00",
+          "compressedBytes": 2916872,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-c33f5703e84152bfa00eed5d845724717a7c4ac47ce4e3c11bc3107eb1c1931e.gz",
+          "cacheKey": "c33f5703e84152bfa00eed5d845724717a7c4ac47ce4e3c11bc3107eb1c1931e",
+          "compressedBytes": 3000764,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-131bc530234108a82ce79451b7b50ec3f83448c273c58547297633505d73de96.gz",
+          "cacheKey": "131bc530234108a82ce79451b7b50ec3f83448c273c58547297633505d73de96",
+          "compressedBytes": 3257848,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-ea29d4736e6c273527c2ed9fe408f08cc6c6d0b54ad0e8738195ed27876413e5.gz",
+          "cacheKey": "ea29d4736e6c273527c2ed9fe408f08cc6c6d0b54ad0e8738195ed27876413e5",
+          "compressedBytes": 2833802,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-06fdc40aaf092fe709c2a927516e0d5c2ae54745d8f383875b1b8fe1e44469b8.gz",
+          "cacheKey": "06fdc40aaf092fe709c2a927516e0d5c2ae54745d8f383875b1b8fe1e44469b8",
+          "compressedBytes": 3130060,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-0edcc7c843dcace4cc0f7563515e6beadc9db6d68320f38d2230ec4e29ef2065.gz",
+          "cacheKey": "0edcc7c843dcace4cc0f7563515e6beadc9db6d68320f38d2230ec4e29ef2065",
+          "compressedBytes": 3269370,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-4b9c1a2b8f891d5efea84e2fd6ec3e9c738143482222de0bc2e0d1651cc3b45d.gz",
+          "cacheKey": "4b9c1a2b8f891d5efea84e2fd6ec3e9c738143482222de0bc2e0d1651cc3b45d",
+          "compressedBytes": 3389101,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-ba8dc5ebbc9904f90b9ee009146bbe50f7532bbe0506f3cfb3c9761b118be050.gz",
+          "cacheKey": "ba8dc5ebbc9904f90b9ee009146bbe50f7532bbe0506f3cfb3c9761b118be050",
+          "compressedBytes": 3508846,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-d7b67bc59ef0c02239ad69e25b0a415e4d7096806d90976e6268530fd26383f2.gz",
+          "cacheKey": "d7b67bc59ef0c02239ad69e25b0a415e4d7096806d90976e6268530fd26383f2",
+          "compressedBytes": 3295614,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-facba71fc221b4506e4e25e8238cb7f33503f34917f12cb155b7a4fa8a658ce0.gz",
+          "cacheKey": "facba71fc221b4506e4e25e8238cb7f33503f34917f12cb155b7a4fa8a658ce0",
+          "compressedBytes": 3041963,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-3c0a4f82ff2c7a1cf28af0f66207da18db31661fa391cea2081f1079c7f586fe.gz",
+          "cacheKey": "3c0a4f82ff2c7a1cf28af0f66207da18db31661fa391cea2081f1079c7f586fe",
+          "compressedBytes": 3180318,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-a0055f515f984f6ff72c9aa1fab4e06584134ec6a02d8d51f4abea1d8436153d.gz",
+          "cacheKey": "a0055f515f984f6ff72c9aa1fab4e06584134ec6a02d8d51f4abea1d8436153d",
+          "compressedBytes": 3138640,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-3c5edc702d1b7e2b0ba5b18e44dc444eab5aa734be006c3368f21cfd2e73319e.gz",
+          "cacheKey": "3c5edc702d1b7e2b0ba5b18e44dc444eab5aa734be006c3368f21cfd2e73319e",
+          "compressedBytes": 3162544,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-5432229baec8771e7b63d48f986aceed78755efa8a4db12655463baaaa0f72c0.gz",
+          "cacheKey": "5432229baec8771e7b63d48f986aceed78755efa8a4db12655463baaaa0f72c0",
+          "compressedBytes": 3061558,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-931dfdb29d138cd2612a4099c54aff3ebf79fbe74f93c8f0b110dab9fd7425dc.gz",
+          "cacheKey": "931dfdb29d138cd2612a4099c54aff3ebf79fbe74f93c8f0b110dab9fd7425dc",
+          "compressedBytes": 3057475,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-8ade019534275789ebd32446c5aedd29d623cf1defd0cd59661ad0792b2a98f6.gz",
+          "cacheKey": "8ade019534275789ebd32446c5aedd29d623cf1defd0cd59661ad0792b2a98f6",
+          "compressedBytes": 3027511,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-20dc24db51aa07ed06c813efb71661833a2154d0711166492a2e3e02d97f887a.gz",
+          "cacheKey": "20dc24db51aa07ed06c813efb71661833a2154d0711166492a2e3e02d97f887a",
+          "compressedBytes": 3048943,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-bcbde11edab1234761665b1d7ff855f8ed4f3e9020e0ce02d8c1131c5a7e097e.gz",
+          "cacheKey": "bcbde11edab1234761665b1d7ff855f8ed4f3e9020e0ce02d8c1131c5a7e097e",
+          "compressedBytes": 2870663,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-023251873010635fadf9bdb8a298310be0f0a24c366e43e0ad6ac949058d97e7.gz",
+          "cacheKey": "023251873010635fadf9bdb8a298310be0f0a24c366e43e0ad6ac949058d97e7",
+          "compressedBytes": 2914323,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-f81fbc6fd7b3348e17af1634b9bf6ec85a5ad689c2fd6c52e6f9628dc6ac52b8.gz",
+          "cacheKey": "f81fbc6fd7b3348e17af1634b9bf6ec85a5ad689c2fd6c52e6f9628dc6ac52b8",
+          "compressedBytes": 2797797,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-301a526ea6682a654d61b4733fc92ffd8b88ba56f37178603c04944350ab6ecb.gz",
+          "cacheKey": "301a526ea6682a654d61b4733fc92ffd8b88ba56f37178603c04944350ab6ecb",
+          "compressedBytes": 2745439,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-5b0f9758846f0279d7a5ac772d37c22d5167086ceb95a181b8f2051d95f61daf.gz",
+          "cacheKey": "5b0f9758846f0279d7a5ac772d37c22d5167086ceb95a181b8f2051d95f61daf",
+          "compressedBytes": 2875025,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-bce762057c7ecdf390fcab7f716f11da5ceaf558951a87042d794b153f108f39.gz",
+          "cacheKey": "bce762057c7ecdf390fcab7f716f11da5ceaf558951a87042d794b153f108f39",
+          "compressedBytes": 2753232,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-4c3678be0a07e665352c236084b25e79da9181395fadc3dbf9a0233fa537a87e.gz",
+          "cacheKey": "4c3678be0a07e665352c236084b25e79da9181395fadc3dbf9a0233fa537a87e",
+          "compressedBytes": 2933508,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-c5cb9c59981144c24674ff8098a0d0c8eaaf36575e82bad0b4e4ccb9aa27a6ca.gz",
+          "cacheKey": "c5cb9c59981144c24674ff8098a0d0c8eaaf36575e82bad0b4e4ccb9aa27a6ca",
+          "compressedBytes": 2889608,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-6a2920d4879007b289332c1cf741f787d271eb59a68f544b24a142c945513e40.gz",
+          "cacheKey": "6a2920d4879007b289332c1cf741f787d271eb59a68f544b24a142c945513e40",
+          "compressedBytes": 2831921,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-659211d5920a226c82d5ec645c20815f209117c5af8127a5a4ff2aaaf0911893.gz",
+          "cacheKey": "659211d5920a226c82d5ec645c20815f209117c5af8127a5a4ff2aaaf0911893",
+          "compressedBytes": 3044539,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-0f09928e60b39d3f95fd02ed6c218753a35e2ed9ea33b169e5de93f0c7ef5d4a.gz",
+          "cacheKey": "0f09928e60b39d3f95fd02ed6c218753a35e2ed9ea33b169e5de93f0c7ef5d4a",
+          "compressedBytes": 2872908,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-aa4e2492b77db03cdef85d0a818874dfe318bb1ada2b49ce87d0fe7778435dcb.gz",
+          "cacheKey": "aa4e2492b77db03cdef85d0a818874dfe318bb1ada2b49ce87d0fe7778435dcb",
+          "compressedBytes": 2944294,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-83171b243d2fef1ff729f52e2ca52d165f1f8502a75a2e1568270932e9b03884.gz",
+          "cacheKey": "83171b243d2fef1ff729f52e2ca52d165f1f8502a75a2e1568270932e9b03884",
+          "compressedBytes": 2917529,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-b50bb87aeef1e3c18c4fd88d75d5dd848dd8c33b2cc433c8c763d07d6c5a4d7a.gz",
+          "cacheKey": "b50bb87aeef1e3c18c4fd88d75d5dd848dd8c33b2cc433c8c763d07d6c5a4d7a",
+          "compressedBytes": 2923945,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-a807722d3670492a91a3595e399f91f31f356d9251bc7e9bd107a70d30385239.gz",
+          "cacheKey": "a807722d3670492a91a3595e399f91f31f356d9251bc7e9bd107a70d30385239",
+          "compressedBytes": 2929900,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-d79180020f59ce38d1256bce55bdeba72650c72c65814c6b0626b199173490a0.gz",
+          "cacheKey": "d79180020f59ce38d1256bce55bdeba72650c72c65814c6b0626b199173490a0",
+          "compressedBytes": 2993190,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-d1389356d625cacbb1f389045ce66a3fe7fc15ab45a670dbdd54325fc4fb5ccf.gz",
+          "cacheKey": "d1389356d625cacbb1f389045ce66a3fe7fc15ab45a670dbdd54325fc4fb5ccf",
+          "compressedBytes": 3074483,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-64671f2704b5871b19384003c345f8c4c9e30ecbe0b4f698d22f25376db6ff13.gz",
+          "cacheKey": "64671f2704b5871b19384003c345f8c4c9e30ecbe0b4f698d22f25376db6ff13",
+          "compressedBytes": 3306546,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-e7063f8708b223fc09916c9535c22349f3e818897431bd0f3b2c0b0898a5f486.gz",
+          "cacheKey": "e7063f8708b223fc09916c9535c22349f3e818897431bd0f3b2c0b0898a5f486",
+          "compressedBytes": 3341717,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-d2da41b0b5420b52be834c91e708c75e411e81b853fa387fcc4a60976f1bc451.gz",
+          "cacheKey": "d2da41b0b5420b52be834c91e708c75e411e81b853fa387fcc4a60976f1bc451",
+          "compressedBytes": 3359895,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-83b6801bb253c64e8b4cec8085161111441436a77fb0d61ad85d25895e05245c.gz",
+          "cacheKey": "83b6801bb253c64e8b4cec8085161111441436a77fb0d61ad85d25895e05245c",
+          "compressedBytes": 3343446,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-4550c6f9d278b0e4a079c9c633eda12e7c9b6bb7b3808f103de0598d30f9bc4d.gz",
+          "cacheKey": "4550c6f9d278b0e4a079c9c633eda12e7c9b6bb7b3808f103de0598d30f9bc4d",
+          "compressedBytes": 3374009,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-1609435ffe070881e9def81692ec7154682465e1b646c64391ca698d493e4900.gz",
+          "cacheKey": "1609435ffe070881e9def81692ec7154682465e1b646c64391ca698d493e4900",
+          "compressedBytes": 3191105,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-dbf2d6aa83017413bededfe766375966bba77dc1bfc55b309d03d95b17e9f398.gz",
+          "cacheKey": "dbf2d6aa83017413bededfe766375966bba77dc1bfc55b309d03d95b17e9f398",
+          "compressedBytes": 3083261,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-9eed0f93bd58a57bff840f731235c2719578e825c63513781ce3a7a23bd4aa27.gz",
+          "cacheKey": "9eed0f93bd58a57bff840f731235c2719578e825c63513781ce3a7a23bd4aa27",
+          "compressedBytes": 3265335,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-4c39196476459459f00f3985263cb01b087cea86b6686f280489734501394956.gz",
+          "cacheKey": "4c39196476459459f00f3985263cb01b087cea86b6686f280489734501394956",
+          "compressedBytes": 3089996,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-f1ba339bc5815b151f8e73ea947804f2d1eb872b01234e5a291c65467ab59949.gz",
+          "cacheKey": "f1ba339bc5815b151f8e73ea947804f2d1eb872b01234e5a291c65467ab59949",
+          "compressedBytes": 2781720,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-05fb70f0983cbf09fa95751ed5500acebdb9cfd159953cb59c70c1de0f7abbc2.gz",
+          "cacheKey": "05fb70f0983cbf09fa95751ed5500acebdb9cfd159953cb59c70c1de0f7abbc2",
+          "compressedBytes": 2607663,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-31627ac38cfc6ea5961602e243bdb57c2ccb7f24d0b780d375919c39f909c38a.gz",
+          "cacheKey": "31627ac38cfc6ea5961602e243bdb57c2ccb7f24d0b780d375919c39f909c38a",
+          "compressedBytes": 2754254,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-8d771a4fb0c67b04e3ccd1b61c95eeee9f4001a0af8a59a069178566286373ee.gz",
+          "cacheKey": "8d771a4fb0c67b04e3ccd1b61c95eeee9f4001a0af8a59a069178566286373ee",
+          "compressedBytes": 2761304,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-309e180fd72cd6acc98eae9c9d239725a1b24d9bf09bde68dd0821730c5e0232.gz",
+          "cacheKey": "309e180fd72cd6acc98eae9c9d239725a1b24d9bf09bde68dd0821730c5e0232",
+          "compressedBytes": 2950166,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-9340141aa3b12f43b75903d1015ba441cbccbed4b6336a737de0db501c4df0f0.gz",
+          "cacheKey": "9340141aa3b12f43b75903d1015ba441cbccbed4b6336a737de0db501c4df0f0",
+          "compressedBytes": 2743565,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-9ad54812a6178dac187576268a6f9bc073f216ebfc8c00510ae4f130244d3721.gz",
+          "cacheKey": "9ad54812a6178dac187576268a6f9bc073f216ebfc8c00510ae4f130244d3721",
+          "compressedBytes": 2591134,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-3e988f0644aa189446e1fd4ecf8731948270b9af9ddde3ca3b8befc526725396.gz",
+          "cacheKey": "3e988f0644aa189446e1fd4ecf8731948270b9af9ddde3ca3b8befc526725396",
+          "compressedBytes": 2709536,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-9b8355c731b338db82d4d89ddce5549f0407133b2b7816feaaa31ddaba53a19a.gz",
+          "cacheKey": "9b8355c731b338db82d4d89ddce5549f0407133b2b7816feaaa31ddaba53a19a",
+          "compressedBytes": 2911766,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-c9fb88321e004f4b64b797a73bd41a8a3bc604a73116e068e41cdc73be7139be.gz",
+          "cacheKey": "c9fb88321e004f4b64b797a73bd41a8a3bc604a73116e068e41cdc73be7139be",
+          "compressedBytes": 2858125,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-27b2ac07f79f9a88ec971fd986c4726dfe562506b623d86caaf278cc081f5bfd.gz",
+          "cacheKey": "27b2ac07f79f9a88ec971fd986c4726dfe562506b623d86caaf278cc081f5bfd",
+          "compressedBytes": 2943683,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-7e346ec2b183925a0c7ce95eb14ccc34a21b1ce72418573ab2d633f617d0f060.gz",
+          "cacheKey": "7e346ec2b183925a0c7ce95eb14ccc34a21b1ce72418573ab2d633f617d0f060",
+          "compressedBytes": 3102129,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-1041e85bd6ad31cda1b93e22bc4e682e85a9cac2080fffa27a95db9948cb9f1b.gz",
+          "cacheKey": "1041e85bd6ad31cda1b93e22bc4e682e85a9cac2080fffa27a95db9948cb9f1b",
+          "compressedBytes": 2853932,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-e55d46616d12b3081d78e13461e8085c89ec004d65359ce53e3f5ff3db5f69f5.gz",
+          "cacheKey": "e55d46616d12b3081d78e13461e8085c89ec004d65359ce53e3f5ff3db5f69f5",
+          "compressedBytes": 3597983,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-24a0f2a98bcc4f3e576eaecccc14172bb6349fc2ed999bf37607e0d1a9caf8bc.gz",
+          "cacheKey": "24a0f2a98bcc4f3e576eaecccc14172bb6349fc2ed999bf37607e0d1a9caf8bc",
+          "compressedBytes": 3308411,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-999ab133d8cd62eddf9fe70dee1bb7e25b03fe6de407d0b5695f5f2571209f0b.gz",
+          "cacheKey": "999ab133d8cd62eddf9fe70dee1bb7e25b03fe6de407d0b5695f5f2571209f0b",
+          "compressedBytes": 2915892,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-f4bb70144ffd5eaad47737e8dbd0c23bc76a3b128f15671b518243d8e05e5071.gz",
+          "cacheKey": "f4bb70144ffd5eaad47737e8dbd0c23bc76a3b128f15671b518243d8e05e5071",
+          "compressedBytes": 3376206,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-e853f74c71dc1bf2200c5117e19f9fb00cfac551985e5e0a60ab337b95c2690f.gz",
+          "cacheKey": "e853f74c71dc1bf2200c5117e19f9fb00cfac551985e5e0a60ab337b95c2690f",
+          "compressedBytes": 3011312,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-e921233de4abee74a1f7c856afc33f1fc3cdc871943716bbaf0f75cc8e335955.gz",
+          "cacheKey": "e921233de4abee74a1f7c856afc33f1fc3cdc871943716bbaf0f75cc8e335955",
+          "compressedBytes": 969411,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-7490fc34a2ce21b63bbe18ca0e196718001597aa38b24eb328b38112a997596e.gz",
+          "cacheKey": "7490fc34a2ce21b63bbe18ca0e196718001597aa38b24eb328b38112a997596e",
+          "compressedBytes": 3327804,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-a6b0ef7789d80800b1621a7c3d9b19a2899bf9d9ee7bf4ef0d9d97ac028a4071.gz",
+          "cacheKey": "a6b0ef7789d80800b1621a7c3d9b19a2899bf9d9ee7bf4ef0d9d97ac028a4071",
+          "compressedBytes": 3504354,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-c91ad436cf28b4191c0ac74eefb4c86645871d6dd663c7db8dd555817795ac8d.gz",
+          "cacheKey": "c91ad436cf28b4191c0ac74eefb4c86645871d6dd663c7db8dd555817795ac8d",
+          "compressedBytes": 3458263,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-f61e1f8a765734d68063b73462cbd957daaef771c5ca3315d2a993263c893110.gz",
+          "cacheKey": "f61e1f8a765734d68063b73462cbd957daaef771c5ca3315d2a993263c893110",
+          "compressedBytes": 3521095,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-1591dd1079da2dc2f6332eed2f15dec2a674cb41382fb2c12801ee1d73a47966.gz",
+          "cacheKey": "1591dd1079da2dc2f6332eed2f15dec2a674cb41382fb2c12801ee1d73a47966",
+          "compressedBytes": 3092536,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-4494328ae74cb7e4b95221b52e0212bd24155303a828099b1526d783f7fe0b12.gz",
+          "cacheKey": "4494328ae74cb7e4b95221b52e0212bd24155303a828099b1526d783f7fe0b12",
+          "compressedBytes": 3301135,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-d729fe31f4105a2cf0ab47d4911a442792386e6b0845a74ab7763b6bd15c3c1c.gz",
+          "cacheKey": "d729fe31f4105a2cf0ab47d4911a442792386e6b0845a74ab7763b6bd15c3c1c",
+          "compressedBytes": 3409825,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-789165d1a139943672388c6e447d5605a6861ba1476f2db2b1b679b31b6a0240.gz",
+          "cacheKey": "789165d1a139943672388c6e447d5605a6861ba1476f2db2b1b679b31b6a0240",
+          "compressedBytes": 3459054,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-0974a45252eca33284c5166556d968c46728d8c34dfbedf22d3ca9aa1c25d360.gz",
+          "cacheKey": "0974a45252eca33284c5166556d968c46728d8c34dfbedf22d3ca9aa1c25d360",
+          "compressedBytes": 3532209,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-ebe8442206c7a50945c48f558240549222b334d2c401d4ab7b6c68a1aea6bd58.gz",
+          "cacheKey": "ebe8442206c7a50945c48f558240549222b334d2c401d4ab7b6c68a1aea6bd58",
+          "compressedBytes": 3601823,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-fc803738e0a3097064a8bc0bb9796ed33cf939f02ab0d06b8e5eb983257b40a7.gz",
+          "cacheKey": "fc803738e0a3097064a8bc0bb9796ed33cf939f02ab0d06b8e5eb983257b40a7",
+          "compressedBytes": 3342675,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-ea7cabb9313bb9b118c907a17da78ac3bffd637ffc943cac66fb1c94f58263f3.gz",
+          "cacheKey": "ea7cabb9313bb9b118c907a17da78ac3bffd637ffc943cac66fb1c94f58263f3",
+          "compressedBytes": 2668289,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-7cd83ae6899ebbae0be315ecc1e0d72195dc1e07cadf4a85511c1f595a0c64ab.gz",
+          "cacheKey": "7cd83ae6899ebbae0be315ecc1e0d72195dc1e07cadf4a85511c1f595a0c64ab",
+          "compressedBytes": 3502558,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-adae517c4f42e4f65c4a6142d207f14b5a28f230ea44c8f62ab10c159fc2c211.gz",
+          "cacheKey": "adae517c4f42e4f65c4a6142d207f14b5a28f230ea44c8f62ab10c159fc2c211",
+          "compressedBytes": 1189406,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-a87e5166d700b4e8883bf73911717f670b91386d8712cac933b916b3a373d62b.gz",
+          "cacheKey": "a87e5166d700b4e8883bf73911717f670b91386d8712cac933b916b3a373d62b",
+          "compressedBytes": 152355,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-28f60716fd12b78d26aa1ef8806ac6c700f1664be8d524f353edcf617d053bc1.gz",
+          "cacheKey": "28f60716fd12b78d26aa1ef8806ac6c700f1664be8d524f353edcf617d053bc1",
+          "compressedBytes": 2905828,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-c00a0c28d18333790161deaa7c6dadf90c9c5b5f3eddd5cf73311638e09ca19e.gz",
+          "cacheKey": "c00a0c28d18333790161deaa7c6dadf90c9c5b5f3eddd5cf73311638e09ca19e",
+          "compressedBytes": 2892169,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-afd33e732d57e28144d4bc908a592bd81f05108271145346d4b1210639bc9396.gz",
+          "cacheKey": "afd33e732d57e28144d4bc908a592bd81f05108271145346d4b1210639bc9396",
+          "compressedBytes": 3502397,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-ef10f65b162198fa8371e46e2842504321228deeb042f1e3e3f9e97c8d794f61.gz",
+          "cacheKey": "ef10f65b162198fa8371e46e2842504321228deeb042f1e3e3f9e97c8d794f61",
+          "compressedBytes": 3448016,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-681ff812cdd73f021d63cf0a1de8893f05b15f20b741388aab47b6090838a614.gz",
+          "cacheKey": "681ff812cdd73f021d63cf0a1de8893f05b15f20b741388aab47b6090838a614",
+          "compressedBytes": 3441130,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-0f0d22c762d3245537febea49baed0952b9262c1aff92462488b805da451f5a9.gz",
+          "cacheKey": "0f0d22c762d3245537febea49baed0952b9262c1aff92462488b805da451f5a9",
+          "compressedBytes": 3431394,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-c214ed26b1b364173468083e94b9abbb5cdebb51211361e5c0d7cad7d3a1e6db.gz",
+          "cacheKey": "c214ed26b1b364173468083e94b9abbb5cdebb51211361e5c0d7cad7d3a1e6db",
+          "compressedBytes": 3548786,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-436395b0b28fba01fb4ee8b128aad9ed406f45329e4fb6533fee1d4f67e6689a.gz",
+          "cacheKey": "436395b0b28fba01fb4ee8b128aad9ed406f45329e4fb6533fee1d4f67e6689a",
+          "compressedBytes": 3539933,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-7ea14b61970eb7fab9dad39adad7e232e49010936ebd17365ad72fa15f05e079.gz",
+          "cacheKey": "7ea14b61970eb7fab9dad39adad7e232e49010936ebd17365ad72fa15f05e079",
+          "compressedBytes": 3081369,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-dc0fb3eb606054d6bbc8a2bd781f569e57ffbe7218a0e65dfb15490acd2a4d40.gz",
+          "cacheKey": "dc0fb3eb606054d6bbc8a2bd781f569e57ffbe7218a0e65dfb15490acd2a4d40",
+          "compressedBytes": 3202584,
+          "cacheHit": false
+        },
+        {
+          "file": "modules-988550128cb622e98d26785defbd246437d952f1bcfc14aa2b4fcbc340ffba2c.gz",
+          "cacheKey": "988550128cb622e98d26785defbd246437d952f1bcfc14aa2b4fcbc340ffba2c",
+          "compressedBytes": 3308125,
+          "cacheHit": false
+        }
+      ],
+      "assessment_eligible": false,
+      "certificate": null,
+      "startMs": 571.4950000047684,
+      "isolated": true,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36",
+      "timingMode": "slow",
+      "memoryProfile": false,
+      "releaseStaged": "all",
+      "selectedGroup": "qm-formal-v1-bb0d3439bce63261",
+      "format": "modules",
+      "profile": "c85e57e95fdbc7f94aa05880ca492e72030735f9024e10fc1085a48581d0cc07",
+      "environment": {
+        "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+        "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+        "portSha256": "6829a2a80680ac561a70573edb1ccb3f6763b6b7d2f875b04ab892b450440387",
+        "importPolicy": "production-module-public"
+      },
+      "diagnosticFixture": "series_root_monomial_geometric_divergent.json",
+      "corpusRounds": 1,
+      "selectedCaseCount": 1,
+      "diskStagingSession": "25f4e7bb-8107-4048-a679-c951ece9b3a2",
+      "staging": "opfs",
+      "taskWorkers": 2,
+      "activeProof": null,
+      "diagnostics": [
+        "[WASM DEBUG] wasmCompile called with code length=1141, fileName=/workspace/request.lean",
+        "[WASM DEBUG] Creating input context...",
+        "[WASM DEBUG] Getting or creating environment for header imports...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: cache miss, importing (#[{ module := `Init, importAll := false, isExported := true, isMeta := false },",
+        "[DEBUG:PROGRESS] Loading 3919 modules...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: importModules completed",
+        "[WASM DEBUG] Environment ready",
+        "[WASM DEBUG] Processing 1 messages...",
+        "[WASM DEBUG] Done, hasErrors=false",
+        "[WASM DEBUG] wasmCompile called with code length=1138, fileName=/workspace/request.lean",
+        "[WASM DEBUG] Creating input context...",
+        "[WASM DEBUG] Getting or creating environment for header imports...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env",
+        "[WASM DEBUG] Environment ready",
+        "[WASM DEBUG] Processing 2 messages...",
+        "[WASM DEBUG] Done, hasErrors=true",
+        "[WASM DEBUG] wasmCompile called with code length=1140, fileName=/workspace/request.lean",
+        "[WASM DEBUG] Creating input context...",
+        "[WASM DEBUG] Getting or creating environment for header imports...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env",
+        "[WASM DEBUG] Environment ready",
+        "[WASM DEBUG] Processing 2 messages...",
+        "[WASM DEBUG] Done, hasErrors=false",
+        "[WASM DEBUG] wasmCompile called with code length=9858, fileName=/workspace/request.lean",
+        "[WASM DEBUG] Creating input context...",
+        "[WASM DEBUG] Getting or creating environment for header imports...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env",
+        "[WASM DEBUG] Environment ready",
+        "[WASM DEBUG] Processing 26 messages...",
+        "[WASM DEBUG] Done, hasErrors=false"
+      ],
+      "lastDiagnosticHeapBytes": 982122496,
+      "importProgress": {
+        "loaded": 3919,
+        "total": 3919
+      },
+      "warmFixture": null,
+      "warmRepeatsRequested": 0,
+      "warmSelection": "slowest successful canonical proof",
+      "cache": {
+        "downloads": 102,
+        "downloadedBytes": 319674695,
+        "hits": 0,
+        "writable": true,
+        "bodyBytes": 319674695,
+        "entries": 102,
+        "complete": true,
+        "method": "Verified compressed body lengths; excludes browser metadata"
+      },
+      "originStorage": {
+        "quota": 186818492006,
+        "usage": 319743178,
+        "usageDetails": {
+          "caches": 319742976,
+          "fileSystem": 202
+        }
+      },
+      "measurementStartMonotonic": 607622.89,
+      "measurementEndMonotonic": 607644.687,
+      "phaseMemory": [],
+      "httpResponseBodyBytes": 334809003,
+      "memoryMeasurement": {
+        "uss": {
+          "peak": 2115219456,
+          "steady": 2113142784,
+          "incrementalPeak": 1990402048,
+          "incrementalSteady": 1988325376
+        },
+        "rss": {
+          "peak": 2385489920,
+          "steady": 2383400960,
+          "incrementalPeak": 2071814144,
+          "incrementalSteady": 2069725184
+        },
+        "privateCommit": {
+          "peak": 2240724992,
+          "steady": 2238754816,
+          "incrementalPeak": 2057895936,
+          "incrementalSteady": 2055925760
+        }
+      },
+      "runKind": "cold",
+      "afterWorkerDiscard": {
+        "uss": 39411712,
+        "rss": 42663936,
+        "privateCommit": 40988672
+      }
+    }
+  ],
+  "baselineTitle": "QuickMaths \u2014 Map your mastery",
+  "baselineUrl": "http://127.0.0.1:60678/app/#/map/MATH_ARITH_001",
+  "baselineMemory": {
+    "uss": 124817408,
+    "rss": 313675776,
+    "privateCommit": 182829056
+  },
+  "profileLogicalFileBytes": 327431519,
+  "samples": [
+    {
+      "at": 607617.656,
+      "uss": null,
+      "rss": 0,
+      "privateCommit": 0,
+      "processes": []
+    },
+    {
+      "at": 607618.171,
+      "uss": 7774208,
+      "rss": 31387648,
+      "privateCommit": 12091392,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 7774208,
+          "rss": 31387648,
+          "privateCommit": 12091392
+        }
+      ]
+    },
+    {
+      "at": 607618.703,
+      "uss": 119132160,
+      "rss": 305528832,
+      "privateCommit": 176992256,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 12439552,
+          "rss": 52498432,
+          "privateCommit": 17084416
+        },
+        {
+          "pid": 90824,
+          "uss": 18194432,
+          "rss": 59068416,
+          "privateCommit": 58822656
+        },
+        {
+          "pid": 45476,
+          "uss": 7450624,
+          "rss": 38932480,
+          "privateCommit": 11517952
+        },
+        {
+          "pid": 37744,
+          "uss": 81047552,
+          "rss": 155029504,
+          "privateCommit": 89567232
+        }
+      ]
+    },
+    {
+      "at": 607619.234,
+      "uss": 121028608,
+      "rss": 309096448,
+      "privateCommit": 178688000,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 12496896,
+          "rss": 53202944,
+          "privateCommit": 17137664
+        },
+        {
+          "pid": 90824,
+          "uss": 18247680,
+          "rss": 59121664,
+          "privateCommit": 58843136
+        },
+        {
+          "pid": 45476,
+          "uss": 7630848,
+          "rss": 40013824,
+          "privateCommit": 11812864
+        },
+        {
+          "pid": 37744,
+          "uss": 82653184,
+          "rss": 156758016,
+          "privateCommit": 90894336
+        }
+      ]
+    },
+    {
+      "at": 607619.765,
+      "uss": 123531264,
+      "rss": 312377344,
+      "privateCommit": 181379072,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 12754944,
+          "rss": 53493760,
+          "privateCommit": 17387520
+        },
+        {
+          "pid": 90824,
+          "uss": 18251776,
+          "rss": 59203584,
+          "privateCommit": 58847232
+        },
+        {
+          "pid": 45476,
+          "uss": 7630848,
+          "rss": 40013824,
+          "privateCommit": 11812864
+        },
+        {
+          "pid": 37744,
+          "uss": 84893696,
+          "rss": 159666176,
+          "privateCommit": 93331456
+        }
+      ]
+    },
+    {
+      "at": 607620.281,
+      "uss": 124084224,
+      "rss": 312930304,
+      "privateCommit": 181895168,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 12754944,
+          "rss": 53493760,
+          "privateCommit": 17387520
+        },
+        {
+          "pid": 90824,
+          "uss": 18255872,
+          "rss": 59207680,
+          "privateCommit": 58851328
+        },
+        {
+          "pid": 45476,
+          "uss": 7630848,
+          "rss": 40013824,
+          "privateCommit": 11812864
+        },
+        {
+          "pid": 37744,
+          "uss": 85442560,
+          "rss": 160215040,
+          "privateCommit": 93843456
+        }
+      ]
+    },
+    {
+      "at": 607620.812,
+      "uss": 124817408,
+      "rss": 313675776,
+      "privateCommit": 182829056,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 12754944,
+          "rss": 53493760,
+          "privateCommit": 17387520
+        },
+        {
+          "pid": 90824,
+          "uss": 18255872,
+          "rss": 59211776,
+          "privateCommit": 58851328
+        },
+        {
+          "pid": 45476,
+          "uss": 7630848,
+          "rss": 40013824,
+          "privateCommit": 11812864
+        },
+        {
+          "pid": 37744,
+          "uss": 86175744,
+          "rss": 160956416,
+          "privateCommit": 94777344
+        }
+      ]
+    },
+    {
+      "at": 607621.328,
+      "uss": 125464576,
+      "rss": 314322944,
+      "privateCommit": 183476224,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 12754944,
+          "rss": 53493760,
+          "privateCommit": 17387520
+        },
+        {
+          "pid": 90824,
+          "uss": 18255872,
+          "rss": 59211776,
+          "privateCommit": 58851328
+        },
+        {
+          "pid": 45476,
+          "uss": 7630848,
+          "rss": 40013824,
+          "privateCommit": 11812864
+        },
+        {
+          "pid": 37744,
+          "uss": 86822912,
+          "rss": 161603584,
+          "privateCommit": 95424512
+        }
+      ]
+    },
+    {
+      "at": 607621.875,
+      "uss": 126316544,
+      "rss": 315174912,
+      "privateCommit": 184401920,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 12754944,
+          "rss": 53493760,
+          "privateCommit": 17387520
+        },
+        {
+          "pid": 90824,
+          "uss": 18255872,
+          "rss": 59211776,
+          "privateCommit": 58851328
+        },
+        {
+          "pid": 45476,
+          "uss": 7630848,
+          "rss": 40013824,
+          "privateCommit": 11812864
+        },
+        {
+          "pid": 37744,
+          "uss": 87674880,
+          "rss": 162455552,
+          "privateCommit": 96350208
+        }
+      ]
+    },
+    {
+      "at": 607622.406,
+      "uss": 146350080,
+      "rss": 403681280,
+      "privateCommit": 211488768,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 13570048,
+          "rss": 54968320,
+          "privateCommit": 18268160
+        },
+        {
+          "pid": 90824,
+          "uss": 24346624,
+          "rss": 66256896,
+          "privateCommit": 64954368
+        },
+        {
+          "pid": 45476,
+          "uss": 7524352,
+          "rss": 40017920,
+          "privateCommit": 11694080
+        },
+        {
+          "pid": 37744,
+          "uss": 88338432,
+          "rss": 163139584,
+          "privateCommit": 97292288
+        },
+        {
+          "pid": 76480,
+          "uss": 12570624,
+          "rss": 79298560,
+          "privateCommit": 19279872
+        }
+      ]
+    },
+    {
+      "at": 607622.937,
+      "uss": 169082880,
+      "rss": 430661632,
+      "privateCommit": 235630592,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 13557760,
+          "rss": 54960128,
+          "privateCommit": 18198528
+        },
+        {
+          "pid": 90824,
+          "uss": 24367104,
+          "rss": 66277376,
+          "privateCommit": 64958464
+        },
+        {
+          "pid": 45476,
+          "uss": 7524352,
+          "rss": 42119168,
+          "privateCommit": 11702272
+        },
+        {
+          "pid": 37744,
+          "uss": 89178112,
+          "rss": 163979264,
+          "privateCommit": 97955840
+        },
+        {
+          "pid": 76480,
+          "uss": 34455552,
+          "rss": 103325696,
+          "privateCommit": 42815488
+        }
+      ]
+    },
+    {
+      "at": 607623.484,
+      "uss": 471912448,
+      "rss": 731734016,
+      "privateCommit": 591904768,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 29507584,
+          "rss": 72507392,
+          "privateCommit": 34185216
+        },
+        {
+          "pid": 90824,
+          "uss": 24367104,
+          "rss": 66277376,
+          "privateCommit": 64958464
+        },
+        {
+          "pid": 45476,
+          "uss": 7548928,
+          "rss": 40087552,
+          "privateCommit": 11726848
+        },
+        {
+          "pid": 37744,
+          "uss": 89894912,
+          "rss": 164696064,
+          "privateCommit": 98603008
+        },
+        {
+          "pid": 76480,
+          "uss": 320593920,
+          "rss": 388165632,
+          "privateCommit": 382431232
+        }
+      ]
+    },
+    {
+      "at": 607624.015,
+      "uss": 837230592,
+      "rss": 1101963264,
+      "privateCommit": 1039138816,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 30687232,
+          "rss": 73912320,
+          "privateCommit": 35401728
+        },
+        {
+          "pid": 90824,
+          "uss": 24379392,
+          "rss": 66494464,
+          "privateCommit": 64970752
+        },
+        {
+          "pid": 45476,
+          "uss": 7557120,
+          "rss": 40103936,
+          "privateCommit": 11735040
+        },
+        {
+          "pid": 37744,
+          "uss": 90710016,
+          "rss": 165019648,
+          "privateCommit": 99422208
+        },
+        {
+          "pid": 76480,
+          "uss": 683896832,
+          "rss": 756432896,
+          "privateCommit": 827609088
+        }
+      ]
+    },
+    {
+      "at": 607624.546,
+      "uss": 627163136,
+      "rss": 888807424,
+      "privateCommit": 833875968,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 30744576,
+          "rss": 73981952,
+          "privateCommit": 35459072
+        },
+        {
+          "pid": 90824,
+          "uss": 24395776,
+          "rss": 66510848,
+          "privateCommit": 64970752
+        },
+        {
+          "pid": 45476,
+          "uss": 7561216,
+          "rss": 40108032,
+          "privateCommit": 11739136
+        },
+        {
+          "pid": 37744,
+          "uss": 91398144,
+          "rss": 165707776,
+          "privateCommit": 100077568
+        },
+        {
+          "pid": 76480,
+          "uss": 473063424,
+          "rss": 542498816,
+          "privateCommit": 621629440
+        }
+      ]
+    },
+    {
+      "at": 607625.093,
+      "uss": 851841024,
+      "rss": 1116295168,
+      "privateCommit": 1064726528,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 30752768,
+          "rss": 73990144,
+          "privateCommit": 35467264
+        },
+        {
+          "pid": 90824,
+          "uss": 24395776,
+          "rss": 65990656,
+          "privateCommit": 64970752
+        },
+        {
+          "pid": 45476,
+          "uss": 7561216,
+          "rss": 40108032,
+          "privateCommit": 11739136
+        },
+        {
+          "pid": 37744,
+          "uss": 92323840,
+          "rss": 166633472,
+          "privateCommit": 100872192
+        },
+        {
+          "pid": 76480,
+          "uss": 696807424,
+          "rss": 769572864,
+          "privateCommit": 851677184
+        }
+      ]
+    },
+    {
+      "at": 607625.625,
+      "uss": 945098752,
+      "rss": 1215496192,
+      "privateCommit": 1160732672,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 44249088,
+          "rss": 88059904,
+          "privateCommit": 48992256
+        },
+        {
+          "pid": 90824,
+          "uss": 24395776,
+          "rss": 66134016,
+          "privateCommit": 64970752
+        },
+        {
+          "pid": 45476,
+          "uss": 7581696,
+          "rss": 40136704,
+          "privateCommit": 11759616
+        },
+        {
+          "pid": 37744,
+          "uss": 92966912,
+          "rss": 167276544,
+          "privateCommit": 101531648
+        },
+        {
+          "pid": 76480,
+          "uss": 775905280,
+          "rss": 853889024,
+          "privateCommit": 933478400
+        }
+      ]
+    },
+    {
+      "at": 607626.187,
+      "uss": 924917760,
+      "rss": 1194422272,
+      "privateCommit": 1138831360,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 15556608,
+          "rss": 59367424,
+          "privateCommit": 20226048
+        },
+        {
+          "pid": 90824,
+          "uss": 24395776,
+          "rss": 66134016,
+          "privateCommit": 64970752
+        },
+        {
+          "pid": 45476,
+          "uss": 7585792,
+          "rss": 40144896,
+          "privateCommit": 11763712
+        },
+        {
+          "pid": 37744,
+          "uss": 93741056,
+          "rss": 168050688,
+          "privateCommit": 102346752
+        },
+        {
+          "pid": 76480,
+          "uss": 783638528,
+          "rss": 860725248,
+          "privateCommit": 939524096
+        }
+      ]
+    },
+    {
+      "at": 607626.734,
+      "uss": 993144832,
+      "rss": 1259556864,
+      "privateCommit": 1208500224,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 18391040,
+          "rss": 62218240,
+          "privateCommit": 24125440
+        },
+        {
+          "pid": 90824,
+          "uss": 24395776,
+          "rss": 66134016,
+          "privateCommit": 64970752
+        },
+        {
+          "pid": 45476,
+          "uss": 7585792,
+          "rss": 40153088,
+          "privateCommit": 11763712
+        },
+        {
+          "pid": 37744,
+          "uss": 94642176,
+          "rss": 168955904,
+          "privateCommit": 103157760
+        },
+        {
+          "pid": 76480,
+          "uss": 848130048,
+          "rss": 922095616,
+          "privateCommit": 1004482560
+        }
+      ]
+    },
+    {
+      "at": 607627.281,
+      "uss": 998031360,
+      "rss": 1264533504,
+      "privateCommit": 1213251584,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 17911808,
+          "rss": 61739008,
+          "privateCommit": 23613440
+        },
+        {
+          "pid": 90824,
+          "uss": 24399872,
+          "rss": 66138112,
+          "privateCommit": 64974848
+        },
+        {
+          "pid": 45476,
+          "uss": 7589888,
+          "rss": 40169472,
+          "privateCommit": 11767808
+        },
+        {
+          "pid": 37744,
+          "uss": 95440896,
+          "rss": 169885696,
+          "privateCommit": 103792640
+        },
+        {
+          "pid": 76480,
+          "uss": 852688896,
+          "rss": 926601216,
+          "privateCommit": 1009102848
+        }
+      ]
+    },
+    {
+      "at": 607627.828,
+      "uss": 1085603840,
+      "rss": 1351106560,
+      "privateCommit": 1303605248,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 17813504,
+          "rss": 61640704,
+          "privateCommit": 23506944
+        },
+        {
+          "pid": 90824,
+          "uss": 24399872,
+          "rss": 66138112,
+          "privateCommit": 64974848
+        },
+        {
+          "pid": 45476,
+          "uss": 7593984,
+          "rss": 40177664,
+          "privateCommit": 11771904
+        },
+        {
+          "pid": 37744,
+          "uss": 96260096,
+          "rss": 170713088,
+          "privateCommit": 104849408
+        },
+        {
+          "pid": 76480,
+          "uss": 939536384,
+          "rss": 1012436992,
+          "privateCommit": 1098502144
+        }
+      ]
+    },
+    {
+      "at": 607628.375,
+      "uss": 1091895296,
+      "rss": 1358061568,
+      "privateCommit": 1308676096,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 26882048,
+          "rss": 70709248,
+          "privateCommit": 32665600
+        },
+        {
+          "pid": 90824,
+          "uss": 24399872,
+          "rss": 66138112,
+          "privateCommit": 64974848
+        },
+        {
+          "pid": 45476,
+          "uss": 7593984,
+          "rss": 40181760,
+          "privateCommit": 11771904
+        },
+        {
+          "pid": 37744,
+          "uss": 96927744,
+          "rss": 171380736,
+          "privateCommit": 105385984
+        },
+        {
+          "pid": 76480,
+          "uss": 936091648,
+          "rss": 1009651712,
+          "privateCommit": 1093877760
+        }
+      ]
+    },
+    {
+      "at": 607628.921,
+      "uss": 1080807424,
+      "rss": 1350320128,
+      "privateCommit": 1294192640,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 14962688,
+          "rss": 58789888,
+          "privateCommit": 20697088
+        },
+        {
+          "pid": 90824,
+          "uss": 24399872,
+          "rss": 66138112,
+          "privateCommit": 64974848
+        },
+        {
+          "pid": 45476,
+          "uss": 7598080,
+          "rss": 40202240,
+          "privateCommit": 11776000
+        },
+        {
+          "pid": 37744,
+          "uss": 97710080,
+          "rss": 172163072,
+          "privateCommit": 106196992
+        },
+        {
+          "pid": 76480,
+          "uss": 936136704,
+          "rss": 1013026816,
+          "privateCommit": 1090547712
+        }
+      ]
+    },
+    {
+      "at": 607629.468,
+      "uss": 1115348992,
+      "rss": 1385148416,
+      "privateCommit": 1330565120,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 23965696,
+          "rss": 67792896,
+          "privateCommit": 29716480
+        },
+        {
+          "pid": 90824,
+          "uss": 24399872,
+          "rss": 66138112,
+          "privateCommit": 64974848
+        },
+        {
+          "pid": 45476,
+          "uss": 7598080,
+          "rss": 40206336,
+          "privateCommit": 11776000
+        },
+        {
+          "pid": 37744,
+          "uss": 98304000,
+          "rss": 172740608,
+          "privateCommit": 106971136
+        },
+        {
+          "pid": 76480,
+          "uss": 961081344,
+          "rss": 1038270464,
+          "privateCommit": 1117126656
+        }
+      ]
+    },
+    {
+      "at": 607630.015,
+      "uss": 1081163776,
+      "rss": 1350995968,
+      "privateCommit": 1296289792,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 15159296,
+          "rss": 58986496,
+          "privateCommit": 20869120
+        },
+        {
+          "pid": 90824,
+          "uss": 24399872,
+          "rss": 66138112,
+          "privateCommit": 64974848
+        },
+        {
+          "pid": 45476,
+          "uss": 7602176,
+          "rss": 40218624,
+          "privateCommit": 11780096
+        },
+        {
+          "pid": 37744,
+          "uss": 99258368,
+          "rss": 173711360,
+          "privateCommit": 107769856
+        },
+        {
+          "pid": 76480,
+          "uss": 934744064,
+          "rss": 1011941376,
+          "privateCommit": 1090895872
+        }
+      ]
+    },
+    {
+      "at": 607630.562,
+      "uss": 1088303104,
+      "rss": 1366441984,
+      "privateCommit": 1311707136,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 18681856,
+          "rss": 62509056,
+          "privateCommit": 24395776
+        },
+        {
+          "pid": 90824,
+          "uss": 24399872,
+          "rss": 66138112,
+          "privateCommit": 64974848
+        },
+        {
+          "pid": 45476,
+          "uss": 7602176,
+          "rss": 40222720,
+          "privateCommit": 11780096
+        },
+        {
+          "pid": 37744,
+          "uss": 99889152,
+          "rss": 174342144,
+          "privateCommit": 108290048
+        },
+        {
+          "pid": 76480,
+          "uss": 937730048,
+          "rss": 1023229952,
+          "privateCommit": 1102266368
+        }
+      ]
+    },
+    {
+      "at": 607631.109,
+      "uss": 1172033536,
+      "rss": 1439637504,
+      "privateCommit": 1384812544,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 24588288,
+          "rss": 68415488,
+          "privateCommit": 30310400
+        },
+        {
+          "pid": 90824,
+          "uss": 24399872,
+          "rss": 66179072,
+          "privateCommit": 64974848
+        },
+        {
+          "pid": 45476,
+          "uss": 7602176,
+          "rss": 40226816,
+          "privateCommit": 11780096
+        },
+        {
+          "pid": 37744,
+          "uss": 100675584,
+          "rss": 175374336,
+          "privateCommit": 109121536
+        },
+        {
+          "pid": 76480,
+          "uss": 1014767616,
+          "rss": 1089441792,
+          "privateCommit": 1168625664
+        }
+      ]
+    },
+    {
+      "at": 607631.656,
+      "uss": 1128480768,
+      "rss": 1394536448,
+      "privateCommit": 1343700992,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20914176,
+          "rss": 64741376,
+          "privateCommit": 26611712
+        },
+        {
+          "pid": 90824,
+          "uss": 24399872,
+          "rss": 66183168,
+          "privateCommit": 64974848
+        },
+        {
+          "pid": 45476,
+          "uss": 7606272,
+          "rss": 40235008,
+          "privateCommit": 11784192
+        },
+        {
+          "pid": 37744,
+          "uss": 101531648,
+          "rss": 176246784,
+          "privateCommit": 110063616
+        },
+        {
+          "pid": 76480,
+          "uss": 974028800,
+          "rss": 1047130112,
+          "privateCommit": 1130266624
+        }
+      ]
+    },
+    {
+      "at": 607632.218,
+      "uss": 1099247616,
+      "rss": 1368428544,
+      "privateCommit": 1311551488,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 18800640,
+          "rss": 62627840,
+          "privateCommit": 24633344
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66269184,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7606272,
+          "rss": 40243200,
+          "privateCommit": 11784192
+        },
+        {
+          "pid": 37744,
+          "uss": 102166528,
+          "rss": 176881664,
+          "privateCommit": 110587904
+        },
+        {
+          "pid": 76480,
+          "uss": 946270208,
+          "rss": 1022406656,
+          "privateCommit": 1099567104
+        }
+      ]
+    },
+    {
+      "at": 607632.765,
+      "uss": 1107947520,
+      "rss": 1376505856,
+      "privateCommit": 1319567360,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 19341312,
+          "rss": 63168512,
+          "privateCommit": 25165824
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66269184,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7606272,
+          "rss": 40247296,
+          "privateCommit": 11784192
+        },
+        {
+          "pid": 37744,
+          "uss": 103002112,
+          "rss": 177717248,
+          "privateCommit": 111656960
+        },
+        {
+          "pid": 76480,
+          "uss": 953593856,
+          "rss": 1029103616,
+          "privateCommit": 1105981440
+        }
+      ]
+    },
+    {
+      "at": 607633.328,
+      "uss": 1095512064,
+      "rss": 1369362432,
+      "privateCommit": 1314316288,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 16113664,
+          "rss": 59944960,
+          "privateCommit": 21868544
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66273280,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7610368,
+          "rss": 40255488,
+          "privateCommit": 11788288
+        },
+        {
+          "pid": 37744,
+          "uss": 103718912,
+          "rss": 178434048,
+          "privateCommit": 112267264
+        },
+        {
+          "pid": 76480,
+          "uss": 943665152,
+          "rss": 1024454656,
+          "privateCommit": 1103413248
+        }
+      ]
+    },
+    {
+      "at": 607633.875,
+      "uss": 1181028352,
+      "rss": 1448042496,
+      "privateCommit": 1396744192,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 22376448,
+          "rss": 66207744,
+          "privateCommit": 28135424
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66277376,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7610368,
+          "rss": 40263680,
+          "privateCommit": 11788288
+        },
+        {
+          "pid": 37744,
+          "uss": 104566784,
+          "rss": 179281920,
+          "privateCommit": 113065984
+        },
+        {
+          "pid": 76480,
+          "uss": 1022070784,
+          "rss": 1096011776,
+          "privateCommit": 1178775552
+        }
+      ]
+    },
+    {
+      "at": 607634.406,
+      "uss": 1121640448,
+      "rss": 1392062464,
+      "privateCommit": 1336705024,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20267008,
+          "rss": 64098304,
+          "privateCommit": 26025984
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66277376,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7610368,
+          "rss": 40263680,
+          "privateCommit": 11788288
+        },
+        {
+          "pid": 37744,
+          "uss": 105218048,
+          "rss": 179933184,
+          "privateCommit": 113840128
+        },
+        {
+          "pid": 76480,
+          "uss": 964141056,
+          "rss": 1041489920,
+          "privateCommit": 1120071680
+        }
+      ]
+    },
+    {
+      "at": 607634.953,
+      "uss": 1182715904,
+      "rss": 1449283584,
+      "privateCommit": 1398050816,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 23359488,
+          "rss": 67190784,
+          "privateCommit": 29147136
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66281472,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7614464,
+          "rss": 40267776,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 106074112,
+          "rss": 180789248,
+          "privateCommit": 114642944
+        },
+        {
+          "pid": 76480,
+          "uss": 1021263872,
+          "rss": 1094754304,
+          "privateCommit": 1177489408
+        }
+      ]
+    },
+    {
+      "at": 607635.484,
+      "uss": 1104592896,
+      "rss": 1372106752,
+      "privateCommit": 1319374848,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 19906560,
+          "rss": 63737856,
+          "privateCommit": 25690112
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66281472,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7614464,
+          "rss": 40267776,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 106926080,
+          "rss": 181628928,
+          "privateCommit": 115159040
+        },
+        {
+          "pid": 76480,
+          "uss": 945741824,
+          "rss": 1020190720,
+          "privateCommit": 1101754368
+        }
+      ]
+    },
+    {
+      "at": 607636.062,
+      "uss": 1467777024,
+      "rss": 1730899968,
+      "privateCommit": 1595424768,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20021248,
+          "rss": 63852544,
+          "privateCommit": 25804800
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66289664,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 107708416,
+          "rss": 182423552,
+          "privateCommit": 115974144
+        },
+        {
+          "pid": 76480,
+          "uss": 1308024832,
+          "rss": 1378062336,
+          "privateCommit": 1376874496
+        }
+      ]
+    },
+    {
+      "at": 607636.625,
+      "uss": 1861591040,
+      "rss": 2119798784,
+      "privateCommit": 1983127552,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20025344,
+          "rss": 63856640,
+          "privateCommit": 25804800
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66293760,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 108310528,
+          "rss": 183025664,
+          "privateCommit": 116662272
+        },
+        {
+          "pid": 76480,
+          "uss": 1701232640,
+          "rss": 1766350848,
+          "privateCommit": 1763889152
+        }
+      ]
+    },
+    {
+      "at": 607637.171,
+      "uss": 1992011776,
+      "rss": 2262372352,
+      "privateCommit": 2190422016,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20025344,
+          "rss": 63856640,
+          "privateCommit": 25804800
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66293760,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 109076480,
+          "rss": 183791616,
+          "privateCommit": 117325824
+        },
+        {
+          "pid": 76480,
+          "uss": 1830887424,
+          "rss": 1908158464,
+          "privateCommit": 1970520064
+        }
+      ]
+    },
+    {
+      "at": 607637.75,
+      "uss": 2086785024,
+      "rss": 2357293056,
+      "privateCommit": 2228641792,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20025344,
+          "rss": 63856640,
+          "privateCommit": 25804800
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66297856,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 109928448,
+          "rss": 184643584,
+          "privateCommit": 118530048
+        },
+        {
+          "pid": 76480,
+          "uss": 1924808704,
+          "rss": 2002223104,
+          "privateCommit": 2007535616
+        }
+      ]
+    },
+    {
+      "at": 607638.312,
+      "uss": 2066276352,
+      "rss": 2337099776,
+      "privateCommit": 2205974528,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 19648512,
+          "rss": 63627264,
+          "privateCommit": 25370624
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66314240,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 110632960,
+          "rss": 185081856,
+          "privateCommit": 119324672
+        },
+        {
+          "pid": 76480,
+          "uss": 1903972352,
+          "rss": 1981804544,
+          "privateCommit": 1984507904
+        }
+      ]
+    },
+    {
+      "at": 607638.875,
+      "uss": 2088091648,
+      "rss": 2358517760,
+      "privateCommit": 2225967104,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20185088,
+          "rss": 64172032,
+          "privateCommit": 26226688
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66330624,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 111423488,
+          "rss": 185868288,
+          "privateCommit": 120127488
+        },
+        {
+          "pid": 76480,
+          "uss": 1924460544,
+          "rss": 2001874944,
+          "privateCommit": 2002841600
+        }
+      ]
+    },
+    {
+      "at": 607639.421,
+      "uss": 2090950656,
+      "rss": 2361556992,
+      "privateCommit": 2227302400,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20189184,
+          "rss": 64176128,
+          "privateCommit": 26230784
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66072576,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 112033792,
+          "rss": 186486784,
+          "privateCommit": 121057280
+        },
+        {
+          "pid": 76480,
+          "uss": 1926705152,
+          "rss": 2004549632,
+          "privateCommit": 2003243008
+        }
+      ]
+    },
+    {
+      "at": 607639.984,
+      "uss": 2096427008,
+      "rss": 2366951424,
+      "privateCommit": 2230853632,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20189184,
+          "rss": 64176128,
+          "privateCommit": 26230784
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66072576,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 113029120,
+          "rss": 187482112,
+          "privateCommit": 121978880
+        },
+        {
+          "pid": 76480,
+          "uss": 1931186176,
+          "rss": 2008948736,
+          "privateCommit": 2005872640
+        }
+      ]
+    },
+    {
+      "at": 607640.546,
+      "uss": 2101690368,
+      "rss": 2371969024,
+      "privateCommit": 2232496128,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20193280,
+          "rss": 64180224,
+          "privateCommit": 26234880
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66076672,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 113692672,
+          "rss": 188145664,
+          "privateCommit": 122515456
+        },
+        {
+          "pid": 76480,
+          "uss": 1935781888,
+          "rss": 2013294592,
+          "privateCommit": 2006974464
+        }
+      ]
+    },
+    {
+      "at": 607641.125,
+      "uss": 2110115840,
+      "rss": 2380865536,
+      "privateCommit": 2235875328,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20193280,
+          "rss": 64180224,
+          "privateCommit": 26234880
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66076672,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 114462720,
+          "rss": 188915712,
+          "privateCommit": 123326464
+        },
+        {
+          "pid": 76480,
+          "uss": 1943437312,
+          "rss": 2021421056,
+          "privateCommit": 2009542656
+        }
+      ]
+    },
+    {
+      "at": 607641.671,
+      "uss": 2110763008,
+      "rss": 2381262848,
+      "privateCommit": 2236633088,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 19664896,
+          "rss": 63750144,
+          "privateCommit": 25681920
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 66076672,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 115195904,
+          "rss": 189648896,
+          "privateCommit": 124403712
+        },
+        {
+          "pid": 76480,
+          "uss": 1943879680,
+          "rss": 2021515264,
+          "privateCommit": 2009776128
+        }
+      ]
+    },
+    {
+      "at": 607642.218,
+      "uss": 2111606784,
+      "rss": 2381844480,
+      "privateCommit": 2237235200,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 19664896,
+          "rss": 63750144,
+          "privateCommit": 25681920
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 65814528,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 115982336,
+          "rss": 190435328,
+          "privateCommit": 124948480
+        },
+        {
+          "pid": 76480,
+          "uss": 1943937024,
+          "rss": 2021572608,
+          "privateCommit": 2009833472
+        }
+      ]
+    },
+    {
+      "at": 607642.765,
+      "uss": 2112520192,
+      "rss": 2382708736,
+      "privateCommit": 2238226432,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 19701760,
+          "rss": 63811584,
+          "privateCommit": 25751552
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 65814528,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 116858880,
+          "rss": 191238144,
+          "privateCommit": 125870080
+        },
+        {
+          "pid": 76480,
+          "uss": 1943937024,
+          "rss": 2021572608,
+          "privateCommit": 2009833472
+        }
+      ]
+    },
+    {
+      "at": 607643.312,
+      "uss": 2113142784,
+      "rss": 2383400960,
+      "privateCommit": 2238754816,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 19701760,
+          "rss": 63811584,
+          "privateCommit": 25751552
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 65818624,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 117481472,
+          "rss": 191926272,
+          "privateCommit": 126398464
+        },
+        {
+          "pid": 76480,
+          "uss": 1943937024,
+          "rss": 2021572608,
+          "privateCommit": 2009833472
+        }
+      ]
+    },
+    {
+      "at": 607643.875,
+      "uss": 2114183168,
+      "rss": 2384453632,
+      "privateCommit": 2239606784,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 19742720,
+          "rss": 63856640,
+          "privateCommit": 25788416
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 65818624,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 118480896,
+          "rss": 192933888,
+          "privateCommit": 127213568
+        },
+        {
+          "pid": 76480,
+          "uss": 1943937024,
+          "rss": 2021572608,
+          "privateCommit": 2009833472
+        }
+      ]
+    },
+    {
+      "at": 607644.421,
+      "uss": 2115219456,
+      "rss": 2385489920,
+      "privateCommit": 2240724992,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 20176896,
+          "rss": 64290816,
+          "privateCommit": 26238976
+        },
+        {
+          "pid": 90824,
+          "uss": 24403968,
+          "rss": 65818624,
+          "privateCommit": 64978944
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40271872,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 119083008,
+          "rss": 193536000,
+          "privateCommit": 127881216
+        },
+        {
+          "pid": 76480,
+          "uss": 1943937024,
+          "rss": 2021572608,
+          "privateCommit": 2009833472
+        }
+      ]
+    },
+    {
+      "at": 607644.953,
+      "uss": 162226176,
+      "rss": 354336768,
+      "privateCommit": 221732864,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 16056320,
+          "rss": 60432384,
+          "privateCommit": 22077440
+        },
+        {
+          "pid": 90824,
+          "uss": 18632704,
+          "rss": 59265024,
+          "privateCommit": 59191296
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40267776,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 119918592,
+          "rss": 194371584,
+          "privateCommit": 128671744
+        }
+      ]
+    },
+    {
+      "at": 607645.484,
+      "uss": 162967552,
+      "rss": 355078144,
+      "privateCommit": 222244864,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 16056320,
+          "rss": 60432384,
+          "privateCommit": 22077440
+        },
+        {
+          "pid": 90824,
+          "uss": 18632704,
+          "rss": 59265024,
+          "privateCommit": 59191296
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40267776,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 120659968,
+          "rss": 195112960,
+          "privateCommit": 129183744
+        }
+      ]
+    },
+    {
+      "at": 607646.015,
+      "uss": 163647488,
+      "rss": 355749888,
+      "privateCommit": 223035392,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 16056320,
+          "rss": 60432384,
+          "privateCommit": 22077440
+        },
+        {
+          "pid": 90824,
+          "uss": 18632704,
+          "rss": 59265024,
+          "privateCommit": 59191296
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40267776,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 121339904,
+          "rss": 195784704,
+          "privateCommit": 129974272
+        }
+      ]
+    },
+    {
+      "at": 607646.531,
+      "uss": 164229120,
+      "rss": 356339712,
+      "privateCommit": 223817728,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 16056320,
+          "rss": 60432384,
+          "privateCommit": 22077440
+        },
+        {
+          "pid": 90824,
+          "uss": 18632704,
+          "rss": 59265024,
+          "privateCommit": 59191296
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40267776,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 121921536,
+          "rss": 196374528,
+          "privateCommit": 130756608
+        }
+      ]
+    },
+    {
+      "at": 607647.062,
+      "uss": 165093376,
+      "rss": 357203968,
+      "privateCommit": 224624640,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 16056320,
+          "rss": 60432384,
+          "privateCommit": 22077440
+        },
+        {
+          "pid": 90824,
+          "uss": 18632704,
+          "rss": 59265024,
+          "privateCommit": 59191296
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40267776,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 122785792,
+          "rss": 197238784,
+          "privateCommit": 131563520
+        }
+      ]
+    },
+    {
+      "at": 607647.593,
+      "uss": 165847040,
+      "rss": 357961728,
+      "privateCommit": 225439744,
+      "processes": [
+        {
+          "pid": 94252,
+          "uss": 16056320,
+          "rss": 60432384,
+          "privateCommit": 22077440
+        },
+        {
+          "pid": 90824,
+          "uss": 18632704,
+          "rss": 59265024,
+          "privateCommit": 59191296
+        },
+        {
+          "pid": 45476,
+          "uss": 7618560,
+          "rss": 40267776,
+          "privateCommit": 11792384
+        },
+        {
+          "pid": 37744,
+          "uss": 123539456,
+          "rss": 197996544,
+          "privateCommit": 132378624
+        }
+      ]
+    }
+  ],
+  "finalHostSourceHashes": {
+    "experiments\\browser-lean\\benchmark.py": "cc07c39c7a245be6280db2125141924f0af3bcc208f2ed4544663f3427a469f3",
+    "experiments\\browser-lean\\curated.js": "c0ba27fd580aebe65f08fcb0ce2e76bb7ca362e2ead3400a3892c1c9a2ab76e7",
+    "experiments\\browser-lean\\curated.html": "d1be431ed5229e1250128abaf07c227f4b894eb581a664136b6e9b637862037a",
+    "experiments\\browser-lean\\curated-opfs.js": "f9aa745e66656d899e5448f2f0fef4b33b4d6e9498333ceff6811c4e148e85d9",
+    "experiments\\browser-lean\\opfs-module-worker.js": "c0511370767804ae56cee1a0088e7963c5e254f103d0d8bf83e6f6042d6f5f15",
+    "experiments\\browser-lean\\compatibility.js": "6cb5c2f6ad8f0110132205a4fa54c09b739e46b270a431f0f654d72d91f88a59",
+    "docs\\formal-environment-loader.js": "7f4cc65405555f8631da84b842fb08cd9f976d470156c59c64dde9c64225264f",
+    ".bridge-runtime\\curated-formal\\assets-a17-opfs-v2\\viability-worker.js": "f900a67feac37a5a0b45d13915233da40cbcc5875ac3119db09ea8b9fea702a4"
+  },
+  "hostSourcesChanged": false
+}

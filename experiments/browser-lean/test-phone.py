@@ -19,18 +19,24 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 with sync_playwright() as p:
  context=p.chromium.launch_persistent_context(str(base/'profile'),headless=True,viewport={'width':412,'height':915})
  page=context.new_page()
- page.goto(sys.argv[1] if len(sys.argv)>1 else f'http://127.0.0.1:{server.server_port}/experiments/browser-lean/')
+ quick='--quick' in sys.argv
+ urls=[v for v in sys.argv[1:] if not v.startswith('--')]
+ page.goto(urls[0] if urls else f'http://127.0.0.1:{server.server_port}/experiments/browser-lean/')
  page.locator('#start').wait_for()
  page.wait_for_function('!document.querySelector("#start").disabled',timeout=30000)
  assert page.evaluate('crossOriginIsolated')
- page.select_option('#mode','standard')
- page.select_option('#group','qm-formal-v1-ed8d51650a0bb7da')
+ if not quick:
+  page.select_option('#mode','standard')
+  page.select_option('#group','qm-formal-v1-ed8d51650a0bb7da')
+ else:
+  assert page.input_value('#mode')=='monomial'
  page.click('#start')
+ page.wait_for_function('document.querySelector("#start").disabled',timeout=30000)
  page.wait_for_function('!document.querySelector("#start").disabled',timeout=600000)
  result=page.evaluate('JSON.parse(localStorage.getItem("qm-browser-lean-phone-results-v1"))')
  (base/'result.json').write_text(json.dumps(result,indent=2))
  assert not result.get('error'),result.get('error')
- assert {k:result['summary'][k] for k in ['positiveExecutions','passed','environmentErrors']}=={'positiveExecutions':9,'passed':9,'environmentErrors':0},result.get('summary')
+ assert {k:result['summary'][k] for k in ['positiveExecutions','passed','environmentErrors']}=={'positiveExecutions':2 if quick else 9,'passed':2 if quick else 9,'environmentErrors':0},result.get('summary')
  run=result['runs'][0]
  assert run['assessment_eligible'] is False and run['certificate'] is None
  if any(s['stage']=='staging-closed' for s in run['stages']):
@@ -38,13 +44,16 @@ with sync_playwright() as p:
   first=next(s for s in run['stages'] if s['stage']=='proof' and s['name']=='invalid-control')
   assert closed['temporaryFilesRemoved'] and closed['atMs']<first['atMs']
   assert result['storageAfterEnvironment']['temporaryDirectories']==0
- assert len([x for x in run['proofs'] if x['name'].startswith('warm-repeat-') and x['experimentalKernelSuccess']])==5
+ assert len([x for x in run['proofs'] if x['name'].startswith('warm-repeat-') and x['experimentalKernelSuccess']])==(0 if quick else 5)
+ if quick:
+  assert run['caseSet']=='monomial' and run['selectedCaseCount']==2
+  assert {p['name'] for p in run['proofs'] if p['name'].endswith('.json')}=={'series_root_monomial_geometric_summable.json','series_root_monomial_geometric_divergent.json'}
  assert not page.locator('iframe').count()
  if run.get('staging')=='opfs':
   folders=page.evaluate("async()=>{try{const root=await navigator.storage.getDirectory();const area=await root.getDirectoryHandle('qm-lean-experimental-staging');const names=[];for await(const name of area.keys())names.push(name);return names;}catch(e){if(e.name==='NotFoundError')return [];throw e;}}")
   assert run['diskStagingSession'] not in folders,'Completed staging directory retained'
  page.click('#export')
- if run.get('staging')=='opfs':
+ if run.get('staging')=='opfs' and not quick:
   page.click('#start')
   page.wait_for_function('document.querySelector("iframe")?.contentWindow.report?.stages.some(s=>s.stage==="pack-staged")',timeout=180000)
   session=page.evaluate('document.querySelector("iframe").contentWindow.report.diskStagingSession')

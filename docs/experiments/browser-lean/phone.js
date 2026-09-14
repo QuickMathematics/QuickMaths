@@ -6,7 +6,7 @@ try{results=JSON.parse(localStorage.getItem(key))||{runs:[]};}catch{results={run
 const save=()=>{try{localStorage.setItem(key,JSON.stringify(results));}catch{}};
 const status=text=>{$('status').textContent=text;};
 const showStorage=s=>{$('storage').textContent='Origin storage: '+((s.usage||0)/2**30).toFixed(2)+' GiB · temporary directories: '+s.temporaryDirectories;};
-$('mode').onchange=()=>{if($('mode').value==='slow')$('group').value='qm-formal-v1-bb0d3439bce63261';$('group').disabled=$('mode').value==='slow';};
+$('mode').onchange=()=>{if($('mode').value!=='standard')$('group').value='qm-formal-v1-bb0d3439bce63261';$('group').disabled=$('mode').value!=='standard';};
 $('mode').onchange();
 const digest=async data=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',data))].map(x=>x.toString(16).padStart(2,'0')).join('');
 async function checkPins(){
@@ -45,8 +45,9 @@ $('cleanup').onclick=async()=>{if(running)return;try{await withTestLock(async()=
 $('export').onclick=()=>{const blob=new Blob([JSON.stringify(results,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='quickmaths-phone-lean-results.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
 async function runSuite(){
  if(running)return;running=true;$('start').disabled=true;$('cleanup').disabled=true;$('stop').disabled=false;
- const timing=$('mode').value;
- results={started:new Date().toISOString(),timingMode:timing,userAgent:navigator.userAgent,isolated:crossOriginIsolated,deviceMemoryGiB:navigator.deviceMemory??null,assessment_eligible:false,certificate:null,runs:[]};save();
+ const caseSet=$('mode').value==='monomial'?'monomial':'all';
+ const timing=$('mode').value==='standard'?'standard':'slow';
+ results={started:new Date().toISOString(),timingMode:timing,caseSet,userAgent:navigator.userAgent,isolated:crossOriginIsolated,deviceMemoryGiB:navigator.deviceMemory??null,assessment_eligible:false,certificate:null,runs:[]};save();
  try{
   results.storageBeforeCleanup=await storageStatus();showStorage(results.storageBeforeCleanup);save();
   status('Removing leftover experimental staging before starting…');
@@ -55,7 +56,7 @@ async function runSuite(){
   const groups=timing==='slow'?['qm-formal-v1-bb0d3439bce63261']:$('group').value==='all'?[...$('group').options].map(o=>o.value).filter(v=>v!=='all'):[$('group').value];
   for(const group of groups){
    if(!running)break;await dispose();frame=document.createElement('iframe');
-   frame.src='runner.html?'+new URLSearchParams({group,mode:'modules',timing,rounds:timing==='slow'?'1':'3',memoryProfile:timing==='slow'?'0':'1',releaseStaged:'all'});
+   frame.src='runner.html?'+new URLSearchParams({group,mode:'modules',timing,caseSet,rounds:timing==='slow'?'1':'3',memoryProfile:timing==='slow'?'0':'1',releaseStaged:'all'});
    $('frame').append(frame);
    await new Promise((resolve,reject)=>{cancelLoad=resolve;frame.onload=resolve;frame.onerror=()=>reject(Error('Runner failed to load'));});cancelLoad=null;
    while(running&&!frame.contentWindow.startProbe)await new Promise(r=>setTimeout(r,100));
