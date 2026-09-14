@@ -1,0 +1,12 @@
+{
+  "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15",
+  "isolated": true,
+  "rawSha256": "3038cfd8f81cf650b17967881339256e0bb1cbd1a407c1a7b7225fa8e367df8b",
+  "certificate": null,
+  "assessment_eligible": false,
+  "bytes": 104721833,
+  "hashVerified": true,
+  "loadMs": 577.94,
+  "compiled": true,
+  "compileMs": 452.7400000000001
+}

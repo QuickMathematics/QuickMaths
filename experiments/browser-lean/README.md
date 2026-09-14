@@ -354,3 +354,11 @@ existing target. Preserve the baseline catalog for before/after comparisons.
 `test-phone.py --quick` checks the default two-case route through the isolation
 shim, with no warm repeats. Full corpus parity has not been rerun for this source
 revision; historical results retain their original source identities.
+
+## WebKit compatibility
+
+The [focused WebKit report](../../docs/releases/2026-09-14-webkit-compatibility.md)
+records successful exact-binary compilation and a native-generated proof in
+Windows WebKit. This port lacks OPFS; test the full storage path in Safari or
+the iOS Simulator on macOS. `check-webkit-compatibility.py` runs the small API
+and binary checks without a corpus suite.
