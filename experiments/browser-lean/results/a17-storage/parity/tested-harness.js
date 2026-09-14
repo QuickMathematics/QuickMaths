@@ -140,7 +140,7 @@ window.startProbe=async()=>{
     report.memoryProfile=params.get('memoryProfile')==='1';
     report.releaseStaged=params.get('releaseStaged')||'none';
     if(report.releaseStaged!=='all')throw Error('OPFS candidate requires releasing all imported staging');
-    if(!['none','olean','all'].includes(report.releaseStaged))
+    if(!['none','olean','all'].includes(report.releaseStaged)||(!report.memoryProfile&&report.releaseStaged!=='none'))
       throw Error('Invalid diagnostic staged-file release mode');
     if(!Object.hasOwn(config.profiles,id))throw Error('Choose a versioned environment');
     report.selectedGroup=id;report.format=format;report.profile=config.identity;report.environment=config.environment;
@@ -174,11 +174,9 @@ window.startProbe=async()=>{
         result.corpusRound=round;
         report.matrix.push({name:fixture.name,round,status:result.experimentalKernelSuccess?'kernel_success':'kernel_failure',assessment_eligible:false,certificate:null});
         if(result.fatalRuntimeError)await pool.discard();
-        if(report.timingMode==='slow'&&!result.experimentalKernelSuccess){report.error='Stopped after a diagnostic proof failure';break corpusLoop;}
       } catch(error) {
         report.matrix.push({name:fixture.name,round,status:'runtime_failure',error:String(error),assessment_eligible:false,certificate:null});
         log('fixture-failed',{name:fixture.name,error:String(error)});await pool.discard();
-        if(report.timingMode==='slow'){report.error='Stopped after diagnostic failure; remaining cases were not retried: '+error;break corpusLoop;}
         if(report.stagingCleanupError||report.error){report.error=report.error||report.stagingCleanupError;break corpusLoop;}
         // A failed environment initialization is a shared prerequisite failure,
         // not 100 individually run proofs. Record all remaining cases explicitly.
@@ -192,10 +190,9 @@ window.startProbe=async()=>{
     const slowest=report.proofs.filter(p=>selected.some(f=>f.name===p.name)&&p.experimentalKernelSuccess)
       .sort((a,b)=>(b.elapsed||0)-(a.elapsed||0))[0];
     const successful=selected.find(f=>f.name===slowest?.name);
-    report.warmFixture=report.timingMode==='slow'?null:successful?.name||null;
-    report.warmRepeatsRequested=report.timingMode==='slow'?0:5;
+    report.warmFixture=successful?.name||null;
     report.warmSelection='slowest successful canonical proof';
-    if(!report.error&&successful&&report.timingMode==='standard')await pool.withEnvironment(id,format,async runtime=>{
+    if(!report.error&&successful)await pool.withEnvironment(id,format,async runtime=>{
       await runtime.profileMemory('corpus-complete');
       for(let i=0;i<5;i++) {
         const result=await runtime.prove('warm-repeat-'+i,successful.source,timingBudget(report.timingMode,successful.request.policy.max_seconds*1000),successful.request.policy.max_seconds*1000);

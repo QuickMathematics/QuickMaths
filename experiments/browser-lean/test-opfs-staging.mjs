@@ -5,8 +5,8 @@ import {readFileSync} from 'node:fs';
 const source=readFileSync(new URL('./opfs-module-worker.js',import.meta.url),'utf8');
 function harness({shortWrite=false,shortRead=false}={}){
  let listener,stored;const nodes=new Map(),messages=[],reads=[];
- const handle={truncate(){},flush(){},write(bytes){stored=bytes.slice();return bytes.length-(shortWrite?1:0);},read(buffer,{at}){reads.push(buffer.length);const data=stored.subarray(at,at+buffer.length);buffer.set(data);return data.length-(shortRead?1:0);}};
- const directory={async getDirectoryHandle(){return directory;},async getFileHandle(){return {async createSyncAccessHandle(){return handle;}};}};
+ const handle={close(){messages.push({closed:true});},truncate(){},flush(){},write(bytes){stored=bytes.slice();return bytes.length-(shortWrite?1:0);},read(buffer,{at}){reads.push(buffer.length);const data=stored.subarray(at,at+buffer.length);buffer.set(data);return data.length-(shortRead?1:0);}};
+ const directory={async removeEntry(){assert.equal(messages.at(-1).closed,true);messages.push({removed:true});},async getDirectoryHandle(){return directory;},async getFileHandle(){return {async createSyncAccessHandle(){return handle;}};}};
  const memory=new ArrayBuffer(200000);
  const self={addEventListener(type,fn){listener=fn;},postMessage(msg){messages.push(msg);},probeMemory:{buffer:memory},mmapAlloc(){return 65536;}};
  const FS={writeFile(path){nodes.set(path,{stream_ops:{},usedBytes:0});},lookupPath(path){return {node:nodes.get(path)};},ErrnoError:class extends Error{constructor(n){super(String(n));}}};
@@ -28,3 +28,4 @@ test('disk reads and mappings preserve exact offsets with bounded scratch memory
 test('path traversal fails before staging a module',async()=>{const h=harness();h.request.entries[0].path='../escape';await h.run();assert.equal(h.messages.at(-1).type,'error');assert.equal(h.nodes.size,0);});
 test('incomplete disk writes fail closed',async()=>{const h=harness({shortWrite:true});await h.run();assert.equal(h.messages.at(-1).type,'error');assert.equal(h.nodes.size,0);});
 test('incomplete disk reads fail rather than returning truncated proof artifacts',async()=>{const h=harness({shortRead:true});await h.run();const node=h.nodes.get('/lib/lean/Mathlib/Test.olean');assert.throws(()=>node.stream_ops.read({},new Uint8Array(10),0,10,0),/29/);});
+test('staging handles close before directory removal and completion acknowledgement',async()=>{const h=harness();await h.run();await h.run({type:'close_staging'});assert.equal(h.messages.at(-1).type,'staging_closed');assert.equal(h.messages.at(-1).closedHandles,1);assert.equal(h.messages.at(-1).temporaryFilesRemoved,true);});

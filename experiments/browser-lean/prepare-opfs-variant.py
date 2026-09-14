@@ -4,7 +4,7 @@ from pathlib import Path
 root=Path(__file__).resolve().parents[2]
 base=root/'.bridge-runtime/curated-formal'
 source=base/'assets-native-eh-tail-pool2-release'
-target=base/'assets-a17-opfs-v1';target.mkdir(exist_ok=True)
+target=base/'assets-a17-opfs-v2';target.mkdir(exist_ok=True)
 sha=lambda data:hashlib.sha256(data).hexdigest()
 provenance=json.loads((source/'runtime-provenance.json').read_text())
 worker=(source/'viability-worker.js').read_bytes()
@@ -37,6 +37,28 @@ harness=harness.replace('const dispose=()=>{dead=true;worker.terminate();if(jsUr
     catch(error){if(error.name!=='NotFoundError')report.stagingCleanupError=String(error);}
   };""")
 harness=harness.replace('} catch(error) {dispose();throw error;}','} catch(error) {await dispose();throw error;}')
+harness="import {slowCases,timingBudget} from './timing-policy.js';\n"+harness
+harness=harness.replace('let pending,output=[],dead=false,jsUrl;',"if(report.stagingCleanupError)throw Error('Previous staging cleanup failed; stop and clean up before retrying');\n  let pending,output=[],dead=false,jsUrl;")
+harness=harness.replace('const dispose=async()=>{dead=true;', 'let disposal;const dispose=()=>disposal??=(async()=>{dead=true;')
+harness=harness.replace("report.stagingCleanupError=String(error);}\n  };", "report.stagingCleanupError=String(error);}\n  })();")
+harness=harness.replace("const timer=setTimeout(()=>{pending=null;dispose();reject(Error(type+' timed out'));},budget);", "const timer=setTimeout(async()=>{pending=null;await dispose();reject(Error(type+' timed out'));},budget);")
+harness=harness.replace("const invalid=await prove('invalid-control'", "const closed=await command('close_staging','staging_closed',{},[],30000);\n    log('staging-closed',closed);\n    const invalid=await prove('invalid-control'")
+harness=harness.replace('} catch(error) {await dispose();throw error;}',"} catch(error) {await dispose();report.error='Environment initialization failed: '+error;throw error;}")
+harness=harness.replace('async function prove(name,source,budget) {','async function prove(name,source,budget,originalBudget=budget) {')
+harness=harness.replace('report.activeProof={name,sourceHash,budgetMs:budget};','report.activeProof={name,sourceHash,budgetMs:budget,originalBudgetMs:originalBudget,startedAt:Date.now()};')
+harness=harness.replace('const record={name,...result,','const record={name,budgetMs:budget,originalBudgetMs:originalBudget,exceededOriginalBudget:result.elapsed>originalBudget,...result,')
+harness=harness.replace('const record={name,sourceHash,budgetMs:budget,','const record={name,sourceHash,budgetMs:budget,originalBudgetMs:originalBudget,')
+harness=harness.replace("report.memoryProfile=params.get('memoryProfile')==='1';","report.timingMode=params.get('timing')||'standard';timingBudget(report.timingMode,10000);\n    report.memoryProfile=params.get('memoryProfile')==='1';")
+harness=harness.replace("report.releaseStaged=params.get('releaseStaged')||'none';","report.releaseStaged=params.get('releaseStaged')||'none';\n    if(report.releaseStaged!=='all')throw Error('OPFS candidate requires releasing all imported staging');")
+harness=harness.replace('const selected=config.fixtures.filter(f=>f.group===id&&(!requestedFixture||f.name===requestedFixture));',"const selected=config.fixtures.filter(f=>f.group===id&&(!requestedFixture||f.name===requestedFixture)&&(report.timingMode==='standard'||slowCases.has(f.name)));\n    if(!selected.length)throw Error('No fixtures match this timing mode');\n    report.selectedCaseCount=selected.length;")
+harness=harness.replace('fixture.request.policy.max_seconds*1000);','timingBudget(report.timingMode,fixture.request.policy.max_seconds*1000),fixture.request.policy.max_seconds*1000);')
+harness=harness.replace('successful.request.policy.max_seconds*1000);','timingBudget(report.timingMode,successful.request.policy.max_seconds*1000),successful.request.policy.max_seconds*1000);')
+harness=harness.replace("log('fixture-failed',{name:fixture.name,error:String(error)});await pool.discard();","log('fixture-failed',{name:fixture.name,error:String(error)});await pool.discard();\n        if(report.stagingCleanupError||report.error){report.error=report.error||report.stagingCleanupError;break corpusLoop;}")
+harness=harness.replace("||(!report.memoryProfile&&report.releaseStaged!=='none')",'')
+harness=harness.replace("if(result.fatalRuntimeError)await pool.discard();","if(result.fatalRuntimeError)await pool.discard();\n        if(report.timingMode==='slow'&&!result.experimentalKernelSuccess){report.error='Stopped after a diagnostic proof failure';break corpusLoop;}")
+harness=harness.replace("log('fixture-failed',{name:fixture.name,error:String(error)});await pool.discard();","log('fixture-failed',{name:fixture.name,error:String(error)});await pool.discard();\n        if(report.timingMode==='slow'){report.error='Stopped after diagnostic failure; remaining cases were not retried: '+error;break corpusLoop;}")
+harness=harness.replace("report.warmFixture=successful?.name||null;","report.warmFixture=report.timingMode==='slow'?null:successful?.name||null;\n    report.warmRepeatsRequested=report.timingMode==='slow'?0:5;")
+harness=harness.replace('if(!report.error&&successful)await pool.withEnvironment',"if(!report.error&&successful&&report.timingMode==='standard')await pool.withEnvironment")
 Path(__file__).with_name('curated-opfs.js').write_text(harness)
 Path(__file__).with_name('curated-opfs.html').write_text(Path(__file__).with_name('curated.html').read_text().replace('curated.js','curated-opfs.js'))
 print(target)

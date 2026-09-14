@@ -16,6 +16,7 @@ p.add_argument('--output',type=Path)
 args=p.parse_args()
 config=json.loads((args.assets/'viability.json').read_text())
 result=json.loads(args.result.read_text())
+assert all(r.get('timingMode','standard')=='standard' for r in result['runs']), 'Timing diagnostics are not standard-budget parity evidence'
 assert config['identity']==hashlib.sha256(json.dumps({k:v for k,v in config.items() if k!='identity'},sort_keys=True).encode()).hexdigest(), 'Configuration identity mismatch'
 assert result.get('hostSourceHashes') and result.get('hostSourcesChanged') is False, 'Host code changed or was not recorded'
 assert result['hostSourceHashes']==result['finalHostSourceHashes']
@@ -63,6 +64,9 @@ for run in result['runs']:
         assert all(r['status']=='kernel_success' for r in rows), name
         expected_hash=hashlib.sha256(fixtures[name]['source'].encode()).hexdigest()
         assert all(r['sourceHash']==expected_hash for r in proofs), 'Source substitution: '+name
+        if 'timingMode' in run:
+            original_budget=fixtures[name]['request']['policy']['max_seconds']*1000
+            assert all(r['budgetMs']==r['originalBudgetMs']==original_budget for r in proofs), 'Standard proof budget changed: '+name
         positive_executions+=len(proofs)
     controls={name:[r for r in run['proofs'] if r['name']==name] for name in ['invalid-control','sorry-control']}
     assert all(controls.values())
@@ -74,6 +78,9 @@ for run in result['runs']:
     assert run['warmFixture'] in selected
     warm_hash=hashlib.sha256(fixtures[run['warmFixture']]['source'].encode()).hexdigest()
     assert all(r['sourceHash']==warm_hash for r in warm), 'Warm source substitution'
+    if 'timingMode' in run:
+        original_budget=fixtures[run['warmFixture']]['request']['policy']['max_seconds']*1000
+        assert all(r['budgetMs']==r['originalBudgetMs']==original_budget for r in warm), 'Standard warm budget changed'
     for proof in run['proofs']:
         assert not proof.get('hostException') and not proof.get('fatalRuntimeError') and not proof.get('error')
         assert proof['assessment_eligible'] is False and proof['certificate'] is None

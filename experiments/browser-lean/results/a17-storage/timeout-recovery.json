@@ -1,0 +1,386 @@
+{
+  "faultInjection": "one 10-second proof timer deliberately expires after 1 ms; regression only, not parity or timing evidence",
+  "proofs": [
+    {
+      "name": "import-warmup",
+      "budgetMs": 600000,
+      "originalBudgetMs": 600000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 1280.3899999856949,
+      "errors": [],
+      "axioms": [],
+      "experimentalKernelSuccess": true,
+      "sourceHash": "a2ca6546bd786131c5dd9e90c3ab3e2fe60ecb123fcb321f049a6ba3bc04f0b3",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "invalid-control",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": false,
+      "compilerExitCode": 1,
+      "elapsed": 39.62999999523163,
+      "errors": [
+        {
+          "caption": "",
+          "data": "Tactic `rfl` failed: Expected the goal to be a binary relation\n\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\n\n\u22a2 False",
+          "endPos": {
+            "column": 39,
+            "line": 9
+          },
+          "fileName": "/workspace/request.lean",
+          "isSilent": false,
+          "keepFullRange": false,
+          "kind": "[anonymous]",
+          "pos": {
+            "column": 36,
+            "line": 9
+          },
+          "severity": "error"
+        },
+        {
+          "caption": "",
+          "data": "'QuickMathsGenerated.result' depends on axioms: [sorryAx]",
+          "endPos": {
+            "column": 6,
+            "line": 11
+          },
+          "fileName": "/workspace/request.lean",
+          "isSilent": false,
+          "keepFullRange": false,
+          "kind": "[anonymous]",
+          "pos": {
+            "column": 0,
+            "line": 11
+          },
+          "severity": "information"
+        }
+      ],
+      "axioms": [
+        "sorryAx"
+      ],
+      "experimentalKernelSuccess": false,
+      "sourceHash": "0583d3ff4d2b5bda5ec700f12ecbe1e286e50058926232942d6a53da0f923c43",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "sorry-control",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 16.725000023841858,
+      "errors": [
+        {
+          "caption": "",
+          "data": "'QuickMathsGenerated.result' depends on axioms: [sorryAx]",
+          "endPos": {
+            "column": 6,
+            "line": 11
+          },
+          "fileName": "/workspace/request.lean",
+          "isSilent": false,
+          "keepFullRange": false,
+          "kind": "[anonymous]",
+          "pos": {
+            "column": 0,
+            "line": 11
+          },
+          "severity": "information"
+        }
+      ],
+      "axioms": [
+        "sorryAx"
+      ],
+      "experimentalKernelSuccess": false,
+      "sourceHash": "190ddcab070234dcabf676405f0c24914b8125e0897981d8faa493d9b5d1c66f",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "guarded_cancellation.json",
+      "sourceHash": "7dc95896f37973d8f4819637977993d5f579142749cbc555ab53f067e85c57fc",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "elapsedWallMs": 2.149999976158142,
+      "error": "Error: compile timed out",
+      "experimentalKernelSuccess": false,
+      "assessment_eligible": false,
+      "certificate": null
+    },
+    {
+      "name": "import-warmup",
+      "budgetMs": 600000,
+      "originalBudgetMs": 600000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 1308.625,
+      "errors": [],
+      "axioms": [],
+      "experimentalKernelSuccess": true,
+      "sourceHash": "a2ca6546bd786131c5dd9e90c3ab3e2fe60ecb123fcb321f049a6ba3bc04f0b3",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "invalid-control",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": false,
+      "compilerExitCode": 1,
+      "elapsed": 38.7150000333786,
+      "errors": [
+        {
+          "caption": "",
+          "data": "Tactic `rfl` failed: Expected the goal to be a binary relation\n\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\n\n\u22a2 False",
+          "endPos": {
+            "column": 39,
+            "line": 9
+          },
+          "fileName": "/workspace/request.lean",
+          "isSilent": false,
+          "keepFullRange": false,
+          "kind": "[anonymous]",
+          "pos": {
+            "column": 36,
+            "line": 9
+          },
+          "severity": "error"
+        },
+        {
+          "caption": "",
+          "data": "'QuickMathsGenerated.result' depends on axioms: [sorryAx]",
+          "endPos": {
+            "column": 6,
+            "line": 11
+          },
+          "fileName": "/workspace/request.lean",
+          "isSilent": false,
+          "keepFullRange": false,
+          "kind": "[anonymous]",
+          "pos": {
+            "column": 0,
+            "line": 11
+          },
+          "severity": "information"
+        }
+      ],
+      "axioms": [
+        "sorryAx"
+      ],
+      "experimentalKernelSuccess": false,
+      "sourceHash": "0583d3ff4d2b5bda5ec700f12ecbe1e286e50058926232942d6a53da0f923c43",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "sorry-control",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 16.55999994277954,
+      "errors": [
+        {
+          "caption": "",
+          "data": "'QuickMathsGenerated.result' depends on axioms: [sorryAx]",
+          "endPos": {
+            "column": 6,
+            "line": 11
+          },
+          "fileName": "/workspace/request.lean",
+          "isSilent": false,
+          "keepFullRange": false,
+          "kind": "[anonymous]",
+          "pos": {
+            "column": 0,
+            "line": 11
+          },
+          "severity": "information"
+        }
+      ],
+      "axioms": [
+        "sorryAx"
+      ],
+      "experimentalKernelSuccess": false,
+      "sourceHash": "190ddcab070234dcabf676405f0c24914b8125e0897981d8faa493d9b5d1c66f",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "guarded_cancellation.json",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 190.4450000524521,
+      "errors": [],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "sourceHash": "7dc95896f37973d8f4819637977993d5f579142749cbc555ab53f067e85c57fc",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false,
+      "corpusRound": 1
+    },
+    {
+      "name": "warm-repeat-0",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 101.35000002384186,
+      "errors": [],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "sourceHash": "7dc95896f37973d8f4819637977993d5f579142749cbc555ab53f067e85c57fc",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "warm-repeat-1",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 87.4650000333786,
+      "errors": [],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "sourceHash": "7dc95896f37973d8f4819637977993d5f579142749cbc555ab53f067e85c57fc",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "warm-repeat-2",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 82.78000009059906,
+      "errors": [],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "sourceHash": "7dc95896f37973d8f4819637977993d5f579142749cbc555ab53f067e85c57fc",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "warm-repeat-3",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 80.82000005245209,
+      "errors": [],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "sourceHash": "7dc95896f37973d8f4819637977993d5f579142749cbc555ab53f067e85c57fc",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    },
+    {
+      "name": "warm-repeat-4",
+      "budgetMs": 10000,
+      "originalBudgetMs": 10000,
+      "exceededOriginalBudget": false,
+      "type": "compile_result",
+      "success": true,
+      "compilerExitCode": 0,
+      "elapsed": 87.18499994277954,
+      "errors": [],
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "experimentalKernelSuccess": true,
+      "sourceHash": "7dc95896f37973d8f4819637977993d5f579142749cbc555ab53f067e85c57fc",
+      "assessment_eligible": false,
+      "certificate": null,
+      "fatalRuntimeError": false
+    }
+  ],
+  "stagingClosures": [
+    {
+      "stage": "staging-closed",
+      "atMs": 21114.87999999523,
+      "type": "staging_closed",
+      "closedHandles": 63,
+      "temporaryFilesRemoved": true
+    },
+    {
+      "stage": "staging-closed",
+      "atMs": 40041.71500003338,
+      "type": "staging_closed",
+      "closedHandles": 63,
+      "temporaryFilesRemoved": true
+    }
+  ],
+  "originStorage": {
+    "quota": 186818492006,
+    "usage": 204482250,
+    "usageDetails": {
+      "caches": 204482048,
+      "fileSystem": 202
+    }
+  },
+  "stagingCleanupError": null,
+  "assessment_eligible": false,
+  "certificate": null
+}

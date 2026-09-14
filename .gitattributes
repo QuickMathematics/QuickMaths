@@ -10,3 +10,4 @@ docs/experiments/browser-lean/curated.js -text
 docs/experiments/browser-lean/compatibility.js -text
 docs/experiments/app/formal-environment-loader.js -text
 experiments/browser-lean/curated-opfs.js -text
+experiments/browser-lean/results/a17-storage/parity/tested-harness.js -text

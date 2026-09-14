@@ -1,0 +1,304 @@
+[
+  {
+    "id": "qm-formal-v1-ed8d51650a0bb7da",
+    "runKind": "cold",
+    "capabilities": [
+      "algebra"
+    ],
+    "firstReadyMs": 16165.129999995232,
+    "runtimeInitializedMs": 2359.460000038147,
+    "corpusMedianMs": 98.74000000953674,
+    "corpusMaxMs": 194.96000003814697,
+    "warmFixture": "guarded_cancellation.json",
+    "warmMs": [
+      83.97000002861023,
+      76.71000003814697,
+      79.16500008106232,
+      84.10000002384186,
+      77.5699999332428
+    ],
+    "cache": {
+      "downloads": 65,
+      "downloadedBytes": 204434621,
+      "hits": 0,
+      "writable": true,
+      "bodyBytes": 204434621,
+      "entries": 65,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 1792745472,
+        "steady": 1664049152,
+        "incrementalPeak": 1665187840,
+        "incrementalSteady": 1536491520
+      },
+      "rss": {
+        "peak": 2063675392,
+        "steady": 1936306176,
+        "incrementalPeak": 1748594688,
+        "incrementalSteady": 1621225472
+      },
+      "privateCommit": {
+        "peak": 1964703744,
+        "steady": 1833336832,
+        "incrementalPeak": 1778253824,
+        "incrementalSteady": 1646886912
+      }
+    },
+    "afterDiscard": {
+      "uss": 1871872,
+      "rss": 7073792,
+      "privateCommit": 1224704
+    },
+    "linearMemory": {
+      "type": "memory",
+      "heapBytes": 678428672
+    },
+    "note": "Parity stress run; separate phase profiling is required for memory attribution."
+  },
+  {
+    "id": "qm-formal-v1-47dfa7faf67fa573",
+    "runKind": "new-environment-shared-cache",
+    "capabilities": [
+      "algebra",
+      "radicals"
+    ],
+    "firstReadyMs": 15980.009999990463,
+    "runtimeInitializedMs": 2474.8799999952316,
+    "corpusMedianMs": 134.29749995470047,
+    "corpusMaxMs": 236.0700000524521,
+    "warmFixture": "conjugate_identity.json",
+    "warmMs": [
+      213.26500010490417,
+      276.4800000190735,
+      163.70999991893768,
+      148.20499992370605,
+      157.72500002384186
+    ],
+    "cache": {
+      "downloads": 11,
+      "downloadedBytes": 33874962,
+      "hits": 65,
+      "writable": true,
+      "bodyBytes": 238309583,
+      "entries": 76,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 1673814016,
+        "steady": 1602125824,
+        "incrementalPeak": 1546256384,
+        "incrementalSteady": 1474568192
+      },
+      "rss": {
+        "peak": 1950826496,
+        "steady": 1879187456,
+        "incrementalPeak": 1635745792,
+        "incrementalSteady": 1564106752
+      },
+      "privateCommit": {
+        "peak": 1850097664,
+        "steady": 1777758208,
+        "incrementalPeak": 1663647744,
+        "incrementalSteady": 1591308288
+      }
+    },
+    "afterDiscard": {
+      "uss": -7614464,
+      "rss": -2322432,
+      "privateCommit": -8646656
+    },
+    "linearMemory": {
+      "type": "memory",
+      "heapBytes": 786038784
+    },
+    "note": "Parity stress run; separate phase profiling is required for memory attribution."
+  },
+  {
+    "id": "qm-formal-v1-a8d843f013bdac16",
+    "runKind": "new-environment-shared-cache",
+    "capabilities": [
+      "algebra",
+      "limits",
+      "radicals"
+    ],
+    "firstReadyMs": 17297.955000042915,
+    "runtimeInitializedMs": 2235.3700000047684,
+    "corpusMedianMs": 164.13249999284744,
+    "corpusMaxMs": 505.6650000810623,
+    "warmFixture": "conjugate_limit.json",
+    "warmMs": [
+      372.90499997138977,
+      380.2450000047684,
+      386.0749999284744,
+      368.08000004291534,
+      381.3949999809265
+    ],
+    "cache": {
+      "downloads": 14,
+      "downloadedBytes": 44911026,
+      "hits": 76,
+      "writable": true,
+      "bodyBytes": 283220609,
+      "entries": 90,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 1876721664,
+        "steady": 1734033408,
+        "incrementalPeak": 1749164032,
+        "incrementalSteady": 1606475776
+      },
+      "rss": {
+        "peak": 2154303488,
+        "steady": 2010939392,
+        "incrementalPeak": 1839222784,
+        "incrementalSteady": 1695858688
+      },
+      "privateCommit": {
+        "peak": 2013507584,
+        "steady": 1868308480,
+        "incrementalPeak": 1827057664,
+        "incrementalSteady": 1681858560
+      }
+    },
+    "afterDiscard": {
+      "uss": -5373952,
+      "rss": 53248,
+      "privateCommit": -6524928
+    },
+    "linearMemory": {
+      "type": "memory",
+      "heapBytes": 879624192
+    },
+    "note": "Parity stress run; separate phase profiling is required for memory attribution."
+  },
+  {
+    "id": "qm-formal-v1-d9180291ee776ddb",
+    "runKind": "new-environment-shared-cache",
+    "capabilities": [
+      "algebra",
+      "derivatives",
+      "radicals"
+    ],
+    "firstReadyMs": 18297.634999990463,
+    "runtimeInitializedMs": 2257.9650000333786,
+    "corpusMedianMs": 155.47500002384186,
+    "corpusMaxMs": 1046.5049999952316,
+    "warmFixture": "recursive_log_abs.json",
+    "warmMs": [
+      751.0700000524521,
+      744.9400000572205,
+      754.5649999380112,
+      739.4650000333786,
+      761.1499999761581
+    ],
+    "cache": {
+      "downloads": 16,
+      "downloadedBytes": 52122465,
+      "hits": 90,
+      "writable": true,
+      "bodyBytes": 335343074,
+      "entries": 106,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 1990627328,
+        "steady": 1841651712,
+        "incrementalPeak": 1863069696,
+        "incrementalSteady": 1714094080
+      },
+      "rss": {
+        "peak": 2265853952,
+        "steady": 2116317184,
+        "incrementalPeak": 1950773248,
+        "incrementalSteady": 1801236480
+      },
+      "privateCommit": {
+        "peak": 2185646080,
+        "steady": 2031910912,
+        "incrementalPeak": 1999196160,
+        "incrementalSteady": 1845460992
+      }
+    },
+    "afterDiscard": {
+      "uss": -7376896,
+      "rss": -1908736,
+      "privateCommit": -8630272
+    },
+    "linearMemory": {
+      "type": "memory",
+      "heapBytes": 1081278464
+    },
+    "note": "Parity stress run; separate phase profiling is required for memory attribution."
+  },
+  {
+    "id": "qm-formal-v1-bb0d3439bce63261",
+    "runKind": "new-environment-shared-cache",
+    "capabilities": [
+      "algebra",
+      "radicals",
+      "sequences-series"
+    ],
+    "firstReadyMs": 18252.40999996662,
+    "runtimeInitializedMs": 2274.094999909401,
+    "corpusMedianMs": 296.25999999046326,
+    "corpusMaxMs": 4139.40499997139,
+    "warmFixture": "series_root_polynomial_quotient_domain_guard_needed.json",
+    "warmMs": [
+      4040.8099999427795,
+      4057.9700000286102,
+      4042.850000023842,
+      4189.829999923706,
+      4017.2200000286102
+    ],
+    "cache": {
+      "downloads": 1,
+      "downloadedBytes": 152355,
+      "hits": 101,
+      "writable": true,
+      "bodyBytes": 319674695,
+      "entries": 102,
+      "complete": true,
+      "method": "Verified compressed body lengths; excludes browser metadata"
+    },
+    "memory": {
+      "uss": {
+        "peak": 1900777472,
+        "steady": 1822957568,
+        "incrementalPeak": 1773219840,
+        "incrementalSteady": 1695399936
+      },
+      "rss": {
+        "peak": 2175410176,
+        "steady": 2101039104,
+        "incrementalPeak": 1860329472,
+        "incrementalSteady": 1785958400
+      },
+      "privateCommit": {
+        "peak": 2032152576,
+        "steady": 2027098112,
+        "incrementalPeak": 1845702656,
+        "incrementalSteady": 1840648192
+      }
+    },
+    "afterDiscard": {
+      "uss": -5885952,
+      "rss": 3006464,
+      "privateCommit": -7331840
+    },
+    "linearMemory": {
+      "type": "memory",
+      "heapBytes": 1082851328
+    },
+    "note": "Parity stress run; separate phase profiling is required for memory attribution."
+  }
+]

@@ -20,6 +20,16 @@ the gate passes. This candidate changes file delivery, not mathematical imports
 or certificate authority. Temporary OPFS data is separate from verified shared
 compressed caches and from user workspace storage.
 
+The storage-repair candidate is `assets-a17-opfs-v2`. It explicitly closes and
+removes staging after import, before proof deadlines can kill the worker. The
+phone default is the twelve previously timed-out series cases, one round,
+no warm repeats, no profiling holds, and stop on the first failure. Desktop
+reproduction: `benchmark.py --suite curated --staging opfs --assets
+assets-a17-opfs-v2 --timing slow --group qm-formal-v1-bb0d3439bce63261
+--corpus-rounds 1 --release-staged all --repeat 1 --timeout 900`.
+The standard mode retains original budgets; slow timing evidence is rejected
+by the parity gate. See the 2026-09-14 A17 timing/storage release note.
+
 This is an isolated feasibility harness, **not a production verifier**. It loads
 real hash-pinned cauli Lean WASM and compiled Mathlib artifacts into a persistent
 worker. No hosted verification service is involved. It cannot award mastery or

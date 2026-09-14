@@ -23,15 +23,21 @@ with sync_playwright() as p:
  page.locator('#start').wait_for()
  page.wait_for_function('!document.querySelector("#start").disabled',timeout=30000)
  assert page.evaluate('crossOriginIsolated')
+ page.select_option('#mode','standard')
  page.select_option('#group','qm-formal-v1-ed8d51650a0bb7da')
  page.click('#start')
  page.wait_for_function('!document.querySelector("#start").disabled',timeout=600000)
  result=page.evaluate('JSON.parse(localStorage.getItem("qm-browser-lean-phone-results-v1"))')
  (base/'result.json').write_text(json.dumps(result,indent=2))
  assert not result.get('error'),result.get('error')
- assert result['summary']=={'positiveExecutions':9,'passed':9,'environmentErrors':0},result.get('summary')
+ assert {k:result['summary'][k] for k in ['positiveExecutions','passed','environmentErrors']}=={'positiveExecutions':9,'passed':9,'environmentErrors':0},result.get('summary')
  run=result['runs'][0]
  assert run['assessment_eligible'] is False and run['certificate'] is None
+ if any(s['stage']=='staging-closed' for s in run['stages']):
+  closed=next(s for s in run['stages'] if s['stage']=='staging-closed')
+  first=next(s for s in run['stages'] if s['stage']=='proof' and s['name']=='invalid-control')
+  assert closed['temporaryFilesRemoved'] and closed['atMs']<first['atMs']
+  assert result['storageAfterEnvironment']['temporaryDirectories']==0
  assert len([x for x in run['proofs'] if x['name'].startswith('warm-repeat-') and x['experimentalKernelSuccess']])==5
  assert not page.locator('iframe').count()
  if run.get('staging')=='opfs':

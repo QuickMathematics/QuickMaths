@@ -716,3 +716,8 @@ can run a fixed proof corpus and export diagnostics. Its A17 candidate uses
 temporary disk staging; allow about 1.2 GiB of free site storage. It cannot
 award mastery. After a test crash, close other experimental tabs and use
 **Clear temporary staging**, which keeps your workspace and shared downloads.
+
+The latest A17 retest defaults to **12 slow cases · once each**, with no warm
+repeats. Close older experimental tabs and clear temporary staging to reclaim
+leftover test files; cleanup does not require running any proofs. The extended
+timing allowance measures completion time and does not change assessment policy.

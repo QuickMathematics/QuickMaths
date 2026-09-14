@@ -340,10 +340,22 @@ self.addEventListener('message',event=>{
 // Read-only pack-backed filesystem. Verified raw packs live in temporary OPFS;
 // only bounded scratch reads and the Lean-requested WASM mapping enter RAM.
 let qmStageDirectory,qmStageRoot;
+let qmStageSession;
 const qmStageHandles=[];
 const qmScratch=new Uint8Array(65536);
 self.addEventListener('message',async event=>{
  const msg=event.data;
+ if(msg.type==='close_staging'){
+  try{
+   if(compileBusy)throw Error('Cannot close staging during compilation');
+   const count=qmStageHandles.length;
+   while(qmStageHandles.length)qmStageHandles.pop().close();
+   if(qmStageSession){const area=await qmStageRoot.getDirectoryHandle('qm-lean-experimental-staging');await area.removeEntry(qmStageSession,{recursive:true});}
+   qmStageDirectory=null;qmStageSession=null;
+   self.postMessage({type:'staging_closed',closedHandles:count,temporaryFilesRemoved:true});
+  }catch(error){self.postMessage({type:'error',data:'Staging cleanup failed: '+error});}
+  return;
+ }
  if(msg.type!=='stage_pack')return;
  try{
   if(compileBusy||!/^[a-f0-9-]{36}$/.test(msg.session)||!/^[a-f0-9]{64}$/.test(msg.pack))throw Error('Invalid disk staging request');
@@ -351,6 +363,7 @@ self.addEventListener('message',async event=>{
    qmStageRoot=await navigator.storage.getDirectory();
    const area=await qmStageRoot.getDirectoryHandle('qm-lean-experimental-staging',{create:true});
    qmStageDirectory=await area.getDirectoryHandle(msg.session,{create:true});
+   qmStageSession=msg.session;
   }
   const bytes=new Uint8Array(msg.raw);
   for(const entry of msg.entries)if(!/^[\w/.-]+$/.test(entry.path)||entry.path.includes('..')||!Number.isSafeInteger(entry.offset)||!Number.isSafeInteger(entry.bytes)||entry.offset<0||entry.bytes<1||entry.offset+entry.bytes>bytes.length)throw Error('Invalid disk-backed module');

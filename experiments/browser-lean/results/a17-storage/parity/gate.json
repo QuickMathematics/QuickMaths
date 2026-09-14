@@ -1,0 +1,44 @@
+{
+  "positiveCases": 122,
+  "positiveKernelExecutions": 366,
+  "negativeCasesRejected": 71,
+  "negativeStage": "freshly re-executed production preflight; no generated Lean source or browser kernel invocation",
+  "environments": 5,
+  "minimumSameWorkerRounds": 3,
+  "identity": "c85e57e95fdbc7f94aa05880ca492e72030735f9024e10fc1085a48581d0cc07",
+  "runtime": {
+    "lean.js": {
+      "file": "lean.js-838f4150599cec67397abacccfa1158e2bfe3d561d1db70ffcbca75b18b63cd6.gz",
+      "bytes": 134325,
+      "compressedBytes": 36142,
+      "rawSha256": "510cb2fccb4a39a584b1858dac7125d67cc8ddf00572afd558bc47281709de77",
+      "sha256": "838f4150599cec67397abacccfa1158e2bfe3d561d1db70ffcbca75b18b63cd6"
+    },
+    "lean.wasm": {
+      "file": "lean.wasm-f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257.gz",
+      "bytes": 104721833,
+      "compressedBytes": 15712659,
+      "rawSha256": "3038cfd8f81cf650b17967881339256e0bb1cbd1a407c1a7b7225fa8e367df8b",
+      "sha256": "f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257"
+    }
+  },
+  "environment": {
+    "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+    "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+    "portSha256": "6829a2a80680ac561a70573edb1ccb3f6763b6b7d2f875b04ab892b450440387",
+    "importPolicy": "production-module-public"
+  },
+  "hostSourceHashes": {
+    "experiments\\browser-lean\\benchmark.py": "cc07c39c7a245be6280db2125141924f0af3bcc208f2ed4544663f3427a469f3",
+    "experiments\\browser-lean\\curated.js": "c0ba27fd580aebe65f08fcb0ce2e76bb7ca362e2ead3400a3892c1c9a2ab76e7",
+    "experiments\\browser-lean\\curated.html": "d1be431ed5229e1250128abaf07c227f4b894eb581a664136b6e9b637862037a",
+    "experiments\\browser-lean\\curated-opfs.js": "dc9faffbeb042dbd37921990f9a7fc1dceb87acd6be76f331bcf1f2a27c03a0a",
+    "experiments\\browser-lean\\opfs-module-worker.js": "c0511370767804ae56cee1a0088e7963c5e254f103d0d8bf83e6f6042d6f5f15",
+    "experiments\\browser-lean\\compatibility.js": "6cb5c2f6ad8f0110132205a4fa54c09b739e46b270a431f0f654d72d91f88a59",
+    "docs\\formal-environment-loader.js": "7f4cc65405555f8631da84b842fb08cd9f976d470156c59c64dde9c64225264f",
+    ".bridge-runtime\\curated-formal\\assets-a17-opfs-v2\\viability-worker.js": "f900a67feac37a5a0b45d13915233da40cbcc5875ac3119db09ea8b9fea702a4"
+  },
+  "resultSha256": "5b0bfeef178689b3552ca426d69bb96152e0f475d2952dad3f8c7d1bf5a72fcb",
+  "assessment_eligible": false,
+  "certificate": null
+}

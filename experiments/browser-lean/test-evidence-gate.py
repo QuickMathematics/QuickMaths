@@ -21,6 +21,8 @@ mutations={
     'forbidden axiom disguised as success':lambda d:first_proof(d).update(axioms=['sorryAx']),
     'missing warm reuse':lambda d:d['runs'][0]['proofs'].pop(),
     'browser certificate promotion':lambda d:first_proof(d).update(certificate={'status':'verified'}),
+    'timing diagnostics disguised as parity':lambda d:d['runs'][0].update(timingMode='slow'),
+    'widened standard deadline':lambda d:(d['runs'][0].update(timingMode='standard'),first_proof(d).update(budgetMs=120000,originalBudgetMs=10000)),
 }
 with tempfile.TemporaryDirectory(dir=root/'.bridge-runtime/curated-formal',prefix='gate-') as folder:
     path=Path(folder)/'result.json'
