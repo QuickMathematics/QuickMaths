@@ -739,3 +739,14 @@ Existing supported monomial-times-geometric root tests now use a shorter
 kernel-checked proof. No new lesson fields, rules, capabilities, or Studio
 settings are required; nonmonomial polynomials retain their existing proof path.
 See the [focused update](releases/2026-09-14-monomial-proof-optimization.md).
+
+### Verification time allowance
+
+New formal proof jobs and Studio reference checks allow up to **60 seconds**
+per verification. On phones a proof can take tens of seconds; initial runtime
+setup/download can take longer. The proof workspace displays this guidance.
+Saved requests and certificates keep their original policy for exact replay;
+this update does not silently rewrite old evidence or enable browser grading.
+
+The reusable engineering workflow is documented in
+[Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).

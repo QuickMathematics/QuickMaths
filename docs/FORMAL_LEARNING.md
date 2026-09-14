@@ -143,3 +143,14 @@ the pinned Lean corpus, generated acceptance artifacts, real certificate replay,
 HTTP/store/WebMCP repair flow, and native browser verification with Lean.
 See [the integration report](releases/2026-09-13-formal-kernel-integration.md)
 for executed results and operational limits.
+
+### Verification time allowance
+
+New formal proof jobs and Studio reference checks allow up to **60 seconds**
+per verification. On phones a proof can take tens of seconds; initial runtime
+setup/download can take longer. The proof workspace displays this guidance.
+Saved requests and certificates keep their original policy for exact replay;
+this update does not silently rewrite old evidence or enable browser grading.
+
+The reusable engineering workflow is documented in
+[Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).

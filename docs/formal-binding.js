@@ -75,7 +75,7 @@ export function formalProblemBinding(problem) {
   return sha256Hex(canonicalJson(payload));
 }
 
-export function buildBoundFormalJob(problem, { maxSeconds = 30 } = {}) {
+export function buildBoundFormalJob(problem, { maxSeconds = 60 } = {}) {
   if (!Number.isInteger(maxSeconds) || maxSeconds < 1 || maxSeconds > 60) throw new Error("Formal verification budget must be an integer from 1 to 60 seconds.");
   const binding = formalProblemBinding(problem);
   const spec = problem.proof_spec;

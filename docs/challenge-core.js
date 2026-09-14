@@ -758,7 +758,7 @@ export function normalizeFormalJob(candidate, proofSpec, templateId = "formal pr
   }
   const requirements = candidate.environment_requirements && typeof candidate.environment_requirements === "object" && !Array.isArray(candidate.environment_requirements) ? candidate.environment_requirements : {};
   if (JSON.stringify(requirements) !== JSON.stringify(proofSpec.environment)) throw new Error(`${templateId} formal_job environment does not match proof_spec.`);
-  const maxSeconds = Math.floor(cleanNumber(Number(rpc.max_seconds), 10, 1, 60));
+  const maxSeconds = Math.floor(cleanNumber(Number(rpc.max_seconds), 60, 1, 60));
   return {
     version: "0.1",
     problem_binding_sha256: binding,

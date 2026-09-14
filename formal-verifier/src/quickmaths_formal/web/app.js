@@ -64,7 +64,7 @@ function inputPayload(){
     declarations:lines($('declarations').value),
     assumptions:lines($('assumptions').value),
     goal:$('goal').value,
-    max_seconds:30,
+    max_seconds:60,
   };
 }
 

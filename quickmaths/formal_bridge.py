@@ -47,7 +47,7 @@ def build_formal_job(
     instance: ProblemInstance,
     *,
     operation: str = "new_text_request",
-    max_seconds: int = 30,
+    max_seconds: int = 60,
 ) -> dict[str, Any]:
     """Build an isolated-verifier job without performing verification.
 
@@ -91,7 +91,7 @@ def build_formal_job(
 def build_reference_proof_job(
     instance: ProblemInstance,
     *,
-    max_seconds: int = 30,
+    max_seconds: int = 60,
 ) -> dict[str, Any]:
     """Build a verifier job for an author's reference proof candidate.
 

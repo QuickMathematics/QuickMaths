@@ -792,3 +792,14 @@ Declarative authoring format: https://quickmathematics.github.io/QuickMaths/CUST
 The [monomial proof optimization](releases/2026-09-14-monomial-proof-optimization.md)
 shortens existing native proofs without changing authoring syntax or Studio
 capabilities. The optional phone diagnostic now defaults to two changed cases.
+
+### Verification time allowance
+
+New formal proof jobs and Studio reference checks allow up to **60 seconds**
+per verification. On phones a proof can take tens of seconds; initial runtime
+setup/download can take longer. The proof workspace displays this guidance.
+Saved requests and certificates keep their original policy for exact replay;
+this update does not silently rewrite old evidence or enable browser grading.
+
+The reusable engineering workflow is documented in
+[Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).

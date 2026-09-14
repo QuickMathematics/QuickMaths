@@ -1,0 +1,2629 @@
+{
+  "started": "2026-09-14T10:12:18.811Z",
+  "timingMode": "slow",
+  "caseSet": "monomial",
+  "userAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Mobile Safari/537.36",
+  "isolated": true,
+  "deviceMemoryGiB": 4,
+  "assessment_eligible": false,
+  "certificate": null,
+  "runs": [
+    {
+      "ready": true,
+      "done": true,
+      "stages": [
+        {
+          "stage": "runtime-assets-ready",
+          "atMs": 1399.1949999928474,
+          "environment": "qm-formal-v1-bb0d3439bce63261",
+          "format": "modules"
+        },
+        {
+          "stage": "runtime-initialized",
+          "atMs": 7813.310000002384
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8065.915000021458,
+          "file": "modules-e13bfb4a979d23e9ec563643d423061466102637217de0d0a7160e26e7809cf4.gz",
+          "bytes": 7988628,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8274.185000002384,
+          "file": "modules-df016886e69994296fda71f5d90f0d22f5e7544f78bebc427fa0f59db7577644.gz",
+          "bytes": 8225928,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8471.625,
+          "file": "modules-0b958262e1a241aa6860efede7465b98ad8736189bc6901e7ae6b06ec6821426.gz",
+          "bytes": 8240592,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8676.745000004768,
+          "file": "modules-26b3052baaaba35c0cce54816b081b3a9766d0aabb923596f076614d03250e51.gz",
+          "bytes": 8257024,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 8892.254999995232,
+          "file": "modules-69a63c14fc81be0bdff7480d63983319be231007fa81573daa09ad66d351c908.gz",
+          "bytes": 8345608,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9116.824999988079,
+          "file": "modules-b15aa3165c610abcd1639ba986a9a5132419f88e77ecb293f47d90cdaecee623.gz",
+          "bytes": 8134908,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9339.45499998331,
+          "file": "modules-9d1578e8fe91d22784dca67f1cf1fd6d5e42f5ffe02c962933d2ba50650dd929.gz",
+          "bytes": 8336056,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9551.675000011921,
+          "file": "modules-7760fa02f2da49a61ad8e0b6da3ba8e7ac71035ed79661439148aa110c1ed021.gz",
+          "bytes": 8370616,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 9815.365000009537,
+          "file": "modules-4b7108877f60010b8316fd984947e8b3c5a5a54742a44f8dc7e5153673251e5a.gz",
+          "bytes": 8206252,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10071.495000004768,
+          "file": "modules-96ef9ef36451a5b0a85d809062205f96148860c93b8131d8c74d0193fea6e45a.gz",
+          "bytes": 8204112,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10155.280000030994,
+          "file": "modules-fc2ff4caa274f91d0bde66a73dbb7faef688882f8e691694ca790be6692ce7d7.gz",
+          "bytes": 1650528,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10417.605000019073,
+          "file": "modules-2cca67bd44845fd9ec6ee5116c9a0a702cb1c9606d6c29b537778138ed3e8eac.gz",
+          "bytes": 8378332,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10682.615000009537,
+          "file": "modules-2f964c8136db39d4b6152cd990cac7e679f3289c9ba6897f8eb91d98071e4d00.gz",
+          "bytes": 8272324,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 10946.775000035763,
+          "file": "modules-c33f5703e84152bfa00eed5d845724717a7c4ac47ce4e3c11bc3107eb1c1931e.gz",
+          "bytes": 8368968,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11217.949999988079,
+          "file": "modules-131bc530234108a82ce79451b7b50ec3f83448c273c58547297633505d73de96.gz",
+          "bytes": 8339296,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11431.199999988079,
+          "file": "modules-ea29d4736e6c273527c2ed9fe408f08cc6c6d0b54ad0e8738195ed27876413e5.gz",
+          "bytes": 8083708,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11626.79500001669,
+          "file": "modules-06fdc40aaf092fe709c2a927516e0d5c2ae54745d8f383875b1b8fe1e44469b8.gz",
+          "bytes": 8388072,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 11841.814999997616,
+          "file": "modules-0edcc7c843dcace4cc0f7563515e6beadc9db6d68320f38d2230ec4e29ef2065.gz",
+          "bytes": 8348320,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12097.79500001669,
+          "file": "modules-4b9c1a2b8f891d5efea84e2fd6ec3e9c738143482222de0bc2e0d1651cc3b45d.gz",
+          "bytes": 8345712,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12328.160000026226,
+          "file": "modules-ba8dc5ebbc9904f90b9ee009146bbe50f7532bbe0506f3cfb3c9761b118be050.gz",
+          "bytes": 8315940,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12590.254999995232,
+          "file": "modules-d7b67bc59ef0c02239ad69e25b0a415e4d7096806d90976e6268530fd26383f2.gz",
+          "bytes": 8382308,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 12940.29500001669,
+          "file": "modules-facba71fc221b4506e4e25e8238cb7f33503f34917f12cb155b7a4fa8a658ce0.gz",
+          "bytes": 8070532,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 13147.865000009537,
+          "file": "modules-3c0a4f82ff2c7a1cf28af0f66207da18db31661fa391cea2081f1079c7f586fe.gz",
+          "bytes": 8328884,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 13318.129999995232,
+          "file": "modules-a0055f515f984f6ff72c9aa1fab4e06584134ec6a02d8d51f4abea1d8436153d.gz",
+          "bytes": 8355472,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 13500.264999985695,
+          "file": "modules-3c5edc702d1b7e2b0ba5b18e44dc444eab5aa734be006c3368f21cfd2e73319e.gz",
+          "bytes": 8384184,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 13689.92000001669,
+          "file": "modules-5432229baec8771e7b63d48f986aceed78755efa8a4db12655463baaaa0f72c0.gz",
+          "bytes": 8363116,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 13859.115000009537,
+          "file": "modules-931dfdb29d138cd2612a4099c54aff3ebf79fbe74f93c8f0b110dab9fd7425dc.gz",
+          "bytes": 8243312,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 14029.254999995232,
+          "file": "modules-8ade019534275789ebd32446c5aedd29d623cf1defd0cd59661ad0792b2a98f6.gz",
+          "bytes": 8279244,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 14198.235000014305,
+          "file": "modules-20dc24db51aa07ed06c813efb71661833a2154d0711166492a2e3e02d97f887a.gz",
+          "bytes": 8371372,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 14357.694999992847,
+          "file": "modules-bcbde11edab1234761665b1d7ff855f8ed4f3e9020e0ce02d8c1131c5a7e097e.gz",
+          "bytes": 8239504,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 14525.45499998331,
+          "file": "modules-023251873010635fadf9bdb8a298310be0f0a24c366e43e0ad6ac949058d97e7.gz",
+          "bytes": 8247144,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 14679.340000033379,
+          "file": "modules-f81fbc6fd7b3348e17af1634b9bf6ec85a5ad689c2fd6c52e6f9628dc6ac52b8.gz",
+          "bytes": 7851636,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 14826.134999990463,
+          "file": "modules-301a526ea6682a654d61b4733fc92ffd8b88ba56f37178603c04944350ab6ecb.gz",
+          "bytes": 8012688,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 14969.745000004768,
+          "file": "modules-5b0f9758846f0279d7a5ac772d37c22d5167086ceb95a181b8f2051d95f61daf.gz",
+          "bytes": 8071272,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 15125.465000033379,
+          "file": "modules-bce762057c7ecdf390fcab7f716f11da5ceaf558951a87042d794b153f108f39.gz",
+          "bytes": 7562540,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 15336.160000026226,
+          "file": "modules-4c3678be0a07e665352c236084b25e79da9181395fadc3dbf9a0233fa537a87e.gz",
+          "bytes": 8263708,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 15531.350000023842,
+          "file": "modules-c5cb9c59981144c24674ff8098a0d0c8eaaf36575e82bad0b4e4ccb9aa27a6ca.gz",
+          "bytes": 8203152,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 15755.254999995232,
+          "file": "modules-6a2920d4879007b289332c1cf741f787d271eb59a68f544b24a142c945513e40.gz",
+          "bytes": 8067172,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 16077.895000040531,
+          "file": "modules-659211d5920a226c82d5ec645c20815f209117c5af8127a5a4ff2aaaf0911893.gz",
+          "bytes": 8312792,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 16269.949999988079,
+          "file": "modules-0f09928e60b39d3f95fd02ed6c218753a35e2ed9ea33b169e5de93f0c7ef5d4a.gz",
+          "bytes": 8350188,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 16480.780000030994,
+          "file": "modules-aa4e2492b77db03cdef85d0a818874dfe318bb1ada2b49ce87d0fe7778435dcb.gz",
+          "bytes": 8297932,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 16713.910000026226,
+          "file": "modules-83171b243d2fef1ff729f52e2ca52d165f1f8502a75a2e1568270932e9b03884.gz",
+          "bytes": 8142196,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 16869.530000030994,
+          "file": "modules-b50bb87aeef1e3c18c4fd88d75d5dd848dd8c33b2cc433c8c763d07d6c5a4d7a.gz",
+          "bytes": 8284376,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 17059.910000026226,
+          "file": "modules-a807722d3670492a91a3595e399f91f31f356d9251bc7e9bd107a70d30385239.gz",
+          "bytes": 8232392,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 17214.585000038147,
+          "file": "modules-d79180020f59ce38d1256bce55bdeba72650c72c65814c6b0626b199173490a0.gz",
+          "bytes": 8295068,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 17359.75499999523,
+          "file": "modules-d1389356d625cacbb1f389045ce66a3fe7fc15ab45a670dbdd54325fc4fb5ccf.gz",
+          "bytes": 8382200,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 17521.930000007153,
+          "file": "modules-64671f2704b5871b19384003c345f8c4c9e30ecbe0b4f698d22f25376db6ff13.gz",
+          "bytes": 8111604,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 17688.42500001192,
+          "file": "modules-e7063f8708b223fc09916c9535c22349f3e818897431bd0f3b2c0b0898a5f486.gz",
+          "bytes": 8283580,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 17851.87000000477,
+          "file": "modules-d2da41b0b5420b52be834c91e708c75e411e81b853fa387fcc4a60976f1bc451.gz",
+          "bytes": 8381540,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 18009.70499998331,
+          "file": "modules-83b6801bb253c64e8b4cec8085161111441436a77fb0d61ad85d25895e05245c.gz",
+          "bytes": 8268824,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 18178.305000007153,
+          "file": "modules-4550c6f9d278b0e4a079c9c633eda12e7c9b6bb7b3808f103de0598d30f9bc4d.gz",
+          "bytes": 8383672,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 18339.725000023842,
+          "file": "modules-1609435ffe070881e9def81692ec7154682465e1b646c64391ca698d493e4900.gz",
+          "bytes": 8378436,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 18472.305000007153,
+          "file": "modules-dbf2d6aa83017413bededfe766375966bba77dc1bfc55b309d03d95b17e9f398.gz",
+          "bytes": 7794808,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 18613.525000035763,
+          "file": "modules-9eed0f93bd58a57bff840f731235c2719578e825c63513781ce3a7a23bd4aa27.gz",
+          "bytes": 7986112,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 18795.02000004053,
+          "file": "modules-4c39196476459459f00f3985263cb01b087cea86b6686f280489734501394956.gz",
+          "bytes": 8147396,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 18938.34000003338,
+          "file": "modules-f1ba339bc5815b151f8e73ea947804f2d1eb872b01234e5a291c65467ab59949.gz",
+          "bytes": 8233256,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 19088.27000004053,
+          "file": "modules-05fb70f0983cbf09fa95751ed5500acebdb9cfd159953cb59c70c1de0f7abbc2.gz",
+          "bytes": 7751020,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 19225.900000035763,
+          "file": "modules-31627ac38cfc6ea5961602e243bdb57c2ccb7f24d0b780d375919c39f909c38a.gz",
+          "bytes": 8007096,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 19417.694999992847,
+          "file": "modules-8d771a4fb0c67b04e3ccd1b61c95eeee9f4001a0af8a59a069178566286373ee.gz",
+          "bytes": 8221260,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 19590.285000026226,
+          "file": "modules-309e180fd72cd6acc98eae9c9d239725a1b24d9bf09bde68dd0821730c5e0232.gz",
+          "bytes": 8342868,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 19743.915000021458,
+          "file": "modules-9340141aa3b12f43b75903d1015ba441cbccbed4b6336a737de0db501c4df0f0.gz",
+          "bytes": 8304616,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 19882.555000007153,
+          "file": "modules-9ad54812a6178dac187576268a6f9bc073f216ebfc8c00510ae4f130244d3721.gz",
+          "bytes": 7517748,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 20039.740000009537,
+          "file": "modules-3e988f0644aa189446e1fd4ecf8731948270b9af9ddde3ca3b8befc526725396.gz",
+          "bytes": 7942036,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 20209.02000004053,
+          "file": "modules-9b8355c731b338db82d4d89ddce5549f0407133b2b7816feaaa31ddaba53a19a.gz",
+          "bytes": 8378588,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 20351.444999992847,
+          "file": "modules-c9fb88321e004f4b64b797a73bd41a8a3bc604a73116e068e41cdc73be7139be.gz",
+          "bytes": 8292500,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 20514.639999985695,
+          "file": "modules-27b2ac07f79f9a88ec971fd986c4726dfe562506b623d86caaf278cc081f5bfd.gz",
+          "bytes": 8385764,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 20653.160000026226,
+          "file": "modules-7e346ec2b183925a0c7ce95eb14ccc34a21b1ce72418573ab2d633f617d0f060.gz",
+          "bytes": 7681556,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 20800.07499998808,
+          "file": "modules-1041e85bd6ad31cda1b93e22bc4e682e85a9cac2080fffa27a95db9948cb9f1b.gz",
+          "bytes": 6965772,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 20962.915000021458,
+          "file": "modules-e55d46616d12b3081d78e13461e8085c89ec004d65359ce53e3f5ff3db5f69f5.gz",
+          "bytes": 8368000,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 21128.944999992847,
+          "file": "modules-24a0f2a98bcc4f3e576eaecccc14172bb6349fc2ed999bf37607e0d1a9caf8bc.gz",
+          "bytes": 7997840,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 21271.780000030994,
+          "file": "modules-999ab133d8cd62eddf9fe70dee1bb7e25b03fe6de407d0b5695f5f2571209f0b.gz",
+          "bytes": 7233868,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 21458.540000021458,
+          "file": "modules-f4bb70144ffd5eaad47737e8dbd0c23bc76a3b128f15671b518243d8e05e5071.gz",
+          "bytes": 8311680,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 21744.165000021458,
+          "file": "modules-e853f74c71dc1bf2200c5117e19f9fb00cfac551985e5e0a60ab337b95c2690f.gz",
+          "bytes": 8356900,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 21843.32499998808,
+          "file": "modules-e921233de4abee74a1f7c856afc33f1fc3cdc871943716bbaf0f75cc8e335955.gz",
+          "bytes": 2867724,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 22012.439999997616,
+          "file": "modules-7490fc34a2ce21b63bbe18ca0e196718001597aa38b24eb328b38112a997596e.gz",
+          "bytes": 8060892,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 22218.389999985695,
+          "file": "modules-a6b0ef7789d80800b1621a7c3d9b19a2899bf9d9ee7bf4ef0d9d97ac028a4071.gz",
+          "bytes": 8381712,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 22401.405000030994,
+          "file": "modules-c91ad436cf28b4191c0ac74eefb4c86645871d6dd663c7db8dd555817795ac8d.gz",
+          "bytes": 8287064,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 22580.055000007153,
+          "file": "modules-f61e1f8a765734d68063b73462cbd957daaef771c5ca3315d2a993263c893110.gz",
+          "bytes": 8276980,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 22728.50499999523,
+          "file": "modules-1591dd1079da2dc2f6332eed2f15dec2a674cb41382fb2c12801ee1d73a47966.gz",
+          "bytes": 7547156,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 22944.09500002861,
+          "file": "modules-4494328ae74cb7e4b95221b52e0212bd24155303a828099b1526d783f7fe0b12.gz",
+          "bytes": 8045080,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 23228.84000003338,
+          "file": "modules-d729fe31f4105a2cf0ab47d4911a442792386e6b0845a74ab7763b6bd15c3c1c.gz",
+          "bytes": 8244392,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 23403.850000023842,
+          "file": "modules-789165d1a139943672388c6e447d5605a6861ba1476f2db2b1b679b31b6a0240.gz",
+          "bytes": 8208068,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 23587.490000009537,
+          "file": "modules-0974a45252eca33284c5166556d968c46728d8c34dfbedf22d3ca9aa1c25d360.gz",
+          "bytes": 8285628,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 23780.47000002861,
+          "file": "modules-ebe8442206c7a50945c48f558240549222b334d2c401d4ab7b6c68a1aea6bd58.gz",
+          "bytes": 8381056,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 23963.625,
+          "file": "modules-fc803738e0a3097064a8bc0bb9796ed33cf939f02ab0d06b8e5eb983257b40a7.gz",
+          "bytes": 8307248,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 24191.25,
+          "file": "modules-ea7cabb9313bb9b118c907a17da78ac3bffd637ffc943cac66fb1c94f58263f3.gz",
+          "bytes": 7540568,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 24377.915000021458,
+          "file": "modules-7cd83ae6899ebbae0be315ecc1e0d72195dc1e07cadf4a85511c1f595a0c64ab.gz",
+          "bytes": 8354256,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 24453.42500001192,
+          "file": "modules-adae517c4f42e4f65c4a6142d207f14b5a28f230ea44c8f62ab10c159fc2c211.gz",
+          "bytes": 2869368,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 24483.605000019073,
+          "file": "modules-a87e5166d700b4e8883bf73911717f670b91386d8712cac933b916b3a373d62b.gz",
+          "bytes": 363424,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 24635.67000001669,
+          "file": "modules-28f60716fd12b78d26aa1ef8806ac6c700f1664be8d524f353edcf617d053bc1.gz",
+          "bytes": 8347780,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 24806.210000038147,
+          "file": "modules-c00a0c28d18333790161deaa7c6dadf90c9c5b5f3eddd5cf73311638e09ca19e.gz",
+          "bytes": 8048076,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 25021.100000023842,
+          "file": "modules-afd33e732d57e28144d4bc908a592bd81f05108271145346d4b1210639bc9396.gz",
+          "bytes": 8370044,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 25217.47000002861,
+          "file": "modules-ef10f65b162198fa8371e46e2842504321228deeb042f1e3e3f9e97c8d794f61.gz",
+          "bytes": 7977908,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 25396.350000023842,
+          "file": "modules-681ff812cdd73f021d63cf0a1de8893f05b15f20b741388aab47b6090838a614.gz",
+          "bytes": 8364928,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 25613.225000023842,
+          "file": "modules-0f0d22c762d3245537febea49baed0952b9262c1aff92462488b805da451f5a9.gz",
+          "bytes": 8089392,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 25842.685000002384,
+          "file": "modules-c214ed26b1b364173468083e94b9abbb5cdebb51211361e5c0d7cad7d3a1e6db.gz",
+          "bytes": 8195920,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 26046.49500000477,
+          "file": "modules-436395b0b28fba01fb4ee8b128aad9ed406f45329e4fb6533fee1d4f67e6689a.gz",
+          "bytes": 8361208,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 26253.62999999523,
+          "file": "modules-7ea14b61970eb7fab9dad39adad7e232e49010936ebd17365ad72fa15f05e079.gz",
+          "bytes": 7126112,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 26411.97000002861,
+          "file": "modules-dc0fb3eb606054d6bbc8a2bd781f569e57ffbe7218a0e65dfb15490acd2a4d40.gz",
+          "bytes": 8262484,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "pack-staged",
+          "atMs": 26588.82999998331,
+          "file": "modules-988550128cb622e98d26785defbd246437d952f1bcfc14aa2b4fcbc340ffba2c.gz",
+          "bytes": 7804760,
+          "backing": "temporary-opfs"
+        },
+        {
+          "stage": "closure-staged",
+          "atMs": 26625.740000009537,
+          "modules": 3919
+        },
+        {
+          "stage": "proof",
+          "atMs": 41097.875,
+          "name": "import-warmup",
+          "elapsedMs": 14448.370000004768,
+          "success": true
+        },
+        {
+          "stage": "ready-to-verify",
+          "atMs": 41098.15000003576
+        },
+        {
+          "stage": "staged-files-released",
+          "atMs": 41418.30000001192,
+          "type": "released_staged",
+          "mode": "all",
+          "files": 11757,
+          "bytes": 791392876
+        },
+        {
+          "stage": "staging-closed",
+          "atMs": 42669.10000002384,
+          "type": "staging_closed",
+          "closedHandles": 100,
+          "temporaryFilesRemoved": true
+        },
+        {
+          "stage": "proof",
+          "atMs": 42924.22000002861,
+          "name": "invalid-control",
+          "elapsedMs": 244.55500000715256,
+          "success": false
+        },
+        {
+          "stage": "proof",
+          "atMs": 43015.24500000477,
+          "name": "sorry-control",
+          "elapsedMs": 85.625,
+          "success": false
+        },
+        {
+          "stage": "proof",
+          "atMs": 50873.21000003815,
+          "name": "series_root_monomial_geometric_summable.json",
+          "elapsedMs": 7853.064999997616,
+          "success": true
+        },
+        {
+          "stage": "proof",
+          "atMs": 57533.889999985695,
+          "name": "series_root_monomial_geometric_divergent.json",
+          "elapsedMs": 6642.435000002384,
+          "success": true
+        },
+        {
+          "stage": "complete",
+          "atMs": 57933.46000003815,
+          "matrixRows": 114
+        }
+      ],
+      "proofs": [
+        {
+          "name": "import-warmup",
+          "budgetMs": 600000,
+          "originalBudgetMs": 600000,
+          "exceededOriginalBudget": false,
+          "type": "compile_result",
+          "success": true,
+          "compilerExitCode": 0,
+          "elapsed": 14448.370000004768,
+          "errors": [],
+          "axioms": [],
+          "experimentalKernelSuccess": true,
+          "sourceHash": "cf2042b5a3cc5ff05e3c85287a67e3e2cd24f5878642f25d9e5cf6cc994e5efc",
+          "output": [
+            "   { module := `Init, importAll := false, isExported := true, isMeta := true },",
+            "   { module := `Lean.Elab.Tactic.NormCast, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Lean.Elab.Tactic.Omega, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.PSeries, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.Polynomial.Basic, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.Real.Sqrt, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecialFunctions.Exp, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecialFunctions.Log.Basic, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecialFunctions.Pow.Real, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic,",
+            "     importAll := false,",
+            "     isExported := true,",
+            "     isMeta := false },",
+            "   { module := `Mathlib.Analysis.SpecificLimits.Normed, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Basic.Real.Basic, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.ComputeDegree, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Continuity, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Convert, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.FieldSimp, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.FinCases, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.FunProp, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.GCongr, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Linarith, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.NormNum, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.NormNum.RealSqrt, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Positivity, importAll := false, isExported := true, isMeta := false },",
+            "   { module := `Mathlib.Tactic.Ring, importAll := false, isExported := true, isMeta := false }],",
+            " true)…",
+            "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' does not depend on any axioms\",\"endPos\":{\"column\":6,\"line\":28},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":28},\"severity\":\"information\"}"
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "fatalRuntimeError": false
+        },
+        {
+          "name": "invalid-control",
+          "budgetMs": 10000,
+          "originalBudgetMs": 10000,
+          "exceededOriginalBudget": false,
+          "type": "compile_result",
+          "success": false,
+          "compilerExitCode": 1,
+          "elapsed": 244.55500000715256,
+          "errors": [
+            {
+              "caption": "",
+              "data": "Tactic `rfl` failed: Expected the goal to be a binary relation\n\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\n\n⊢ False",
+              "endPos": {
+                "column": 39,
+                "line": 26
+              },
+              "fileName": "/workspace/request.lean",
+              "isSilent": false,
+              "keepFullRange": false,
+              "kind": "[anonymous]",
+              "pos": {
+                "column": 36,
+                "line": 26
+              },
+              "severity": "error"
+            },
+            {
+              "caption": "",
+              "data": "'QuickMathsGenerated.result' depends on axioms: [sorryAx]",
+              "endPos": {
+                "column": 6,
+                "line": 28
+              },
+              "fileName": "/workspace/request.lean",
+              "isSilent": false,
+              "keepFullRange": false,
+              "kind": "[anonymous]",
+              "pos": {
+                "column": 0,
+                "line": 28
+              },
+              "severity": "information"
+            }
+          ],
+          "axioms": [
+            "sorryAx"
+          ],
+          "experimentalKernelSuccess": false,
+          "sourceHash": "bbc378959385da669cba449ed09fb3bad914c17922a56093d7b3acbe1901a4cf",
+          "output": [
+            "{\"caption\":\"\",\"data\":\"Tactic `rfl` failed: Expected the goal to be a binary relation\\n\\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\\n\\n⊢ False\",\"endPos\":{\"column\":39,\"line\":26},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":36,\"line\":26},\"severity\":\"error\"}",
+            "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' depends on axioms: [sorryAx]\",\"endPos\":{\"column\":6,\"line\":28},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":28},\"severity\":\"information\"}"
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "fatalRuntimeError": false
+        },
+        {
+          "name": "sorry-control",
+          "budgetMs": 10000,
+          "originalBudgetMs": 10000,
+          "exceededOriginalBudget": false,
+          "type": "compile_result",
+          "success": true,
+          "compilerExitCode": 0,
+          "elapsed": 85.625,
+          "errors": [
+            {
+              "caption": "",
+              "data": "'QuickMathsGenerated.result' depends on axioms: [sorryAx]",
+              "endPos": {
+                "column": 6,
+                "line": 28
+              },
+              "fileName": "/workspace/request.lean",
+              "isSilent": false,
+              "keepFullRange": false,
+              "kind": "[anonymous]",
+              "pos": {
+                "column": 0,
+                "line": 28
+              },
+              "severity": "information"
+            }
+          ],
+          "axioms": [
+            "sorryAx"
+          ],
+          "experimentalKernelSuccess": false,
+          "sourceHash": "de6b7a069ac0405a1ef13cbe79d339f76332c5162cd1dfedc3878324a3a6cc9d",
+          "output": [
+            "{\"caption\":\"\",\"data\":\"declaration uses `sorry`\",\"endPos\":{\"column\":21,\"line\":26},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"hasSorry\",\"pos\":{\"column\":15,\"line\":26},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' depends on axioms: [sorryAx]\",\"endPos\":{\"column\":6,\"line\":28},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":28},\"severity\":\"information\"}"
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "fatalRuntimeError": false
+        },
+        {
+          "name": "series_root_monomial_geometric_summable.json",
+          "budgetMs": 120000,
+          "originalBudgetMs": 10000,
+          "exceededOriginalBudget": false,
+          "type": "compile_result",
+          "success": true,
+          "compilerExitCode": 0,
+          "elapsed": 7853.064999997616,
+          "errors": [],
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "experimentalKernelSuccess": true,
+          "sourceHash": "6296ca800850f1a0623f82dae7bd2851d0b33beb73fd0b5cc984c4c96ec60576",
+          "output": [
+            "{\"caption\":\"\",\"data\":\"This simp argument is unused:\\n  mul_inv\\n\\nHint: Omit it from the simp argument list.\\n  [apply] simp [div_eq_mul_inv]\\n\\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\",\"endPos\":{\"column\":37,\"line\":65},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedSimpArgs\",\"pos\":{\"column\":30,\"line\":65},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":94,\"line\":62},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":71,\"line\":62},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":47,\"line\":65},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":43,\"line\":65},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `simp [one_div, inv_pow]` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":94,\"line\":62},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":71,\"line\":62},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `ring` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":47,\"line\":65},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":43,\"line\":65},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]\",\"endPos\":{\"column\":6,\"line\":95},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":95},\"severity\":\"information\"}"
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "fatalRuntimeError": false,
+          "corpusRound": 0
+        },
+        {
+          "name": "series_root_monomial_geometric_divergent.json",
+          "budgetMs": 120000,
+          "originalBudgetMs": 10000,
+          "exceededOriginalBudget": false,
+          "type": "compile_result",
+          "success": true,
+          "compilerExitCode": 0,
+          "elapsed": 6642.435000002384,
+          "errors": [],
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "experimentalKernelSuccess": true,
+          "sourceHash": "1e9a2ad9c04c35729adbb4e11a87c7cfae4ec04f8f1ae7beb512e11f879555d5",
+          "output": [
+            "{\"caption\":\"\",\"data\":\"try 'simp' instead of 'simpa'\\n\\nNote: This linter can be disabled with `set_option linter.unnecessarySimpa false`\",\"endPos\":{\"column\":93,\"line\":39},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unnecessarySimpa\",\"pos\":{\"column\":8,\"line\":39},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"This simp argument is unused:\\n  div_eq_mul_inv\\n\\nHint: Omit it from the simp argument list.\\n  [apply] simp [mul_inv]\\n\\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\",\"endPos\":{\"column\":28,\"line\":65},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedSimpArgs\",\"pos\":{\"column\":14,\"line\":65},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"This simp argument is unused:\\n  mul_inv\\n\\nHint: Omit it from the simp argument list.\\n  [apply] simp [div_eq_mul_inv]\\n\\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\",\"endPos\":{\"column\":37,\"line\":65},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedSimpArgs\",\"pos\":{\"column\":30,\"line\":65},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":70,\"line\":39},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":62,\"line\":39},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":94,\"line\":62},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":71,\"line\":62},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"this tactic is never executed\\n\\nNote: This linter can be disabled with `set_option linter.unreachableTactic false`\",\"endPos\":{\"column\":47,\"line\":65},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unreachableTactic\",\"pos\":{\"column\":43,\"line\":65},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `norm_num` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":70,\"line\":39},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":62,\"line\":39},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `simp [one_div, inv_pow]` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":94,\"line\":62},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":71,\"line\":62},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"Unused tactic linter: `ring` does nothing\\n\\nNote: This linter can be disabled with `set_option linter.unusedTactic false`\",\"endPos\":{\"column\":47,\"line\":65},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"linter.unusedTactic\",\"pos\":{\"column\":43,\"line\":65},\"severity\":\"warning\"}",
+            "{\"caption\":\"\",\"data\":\"'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]\",\"endPos\":{\"column\":6,\"line\":102},\"fileName\":\"/workspace/request.lean\",\"isSilent\":false,\"keepFullRange\":false,\"kind\":\"[anonymous]\",\"pos\":{\"column\":0,\"line\":102},\"severity\":\"information\"}"
+          ],
+          "assessment_eligible": false,
+          "certificate": null,
+          "fatalRuntimeError": false,
+          "corpusRound": 0
+        }
+      ],
+      "matrix": [
+        {
+          "name": "guarded_cancellation.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-ed8d51650a0bb7da",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "difference_quotient.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-ed8d51650a0bb7da",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sqrt_square_nonnegative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-47dfa7faf67fa573",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "conjugate_identity.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-47dfa7faf67fa573",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "inverse_right_infinity.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "inverse_left_infinity.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "removable_hole_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "conjugate_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "piecewise_jump.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "ivt_existence.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "polynomial_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "quotient_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sqrt_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "abs_derivative_positive.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "abs_derivative_negative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "exp_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "log_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sin_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "cos_derivative.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_nested_sin_exp.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_exp_quotient.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_sqrt_quotient.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_log_abs.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_abs_sin_symbolic.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_log_exp_auto_positive.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_sqrt_square_plus_one.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-d9180291ee776ddb",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_abs_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_log_exp_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_guarded_quotient_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_sqrt_square_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_sqrt_right_limit.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_guarded_quotient.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_exp_with_brackets.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_quantified_guard.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "bounded_interval_positive.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-ed8d51650a0bb7da",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_basic.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_one_sided.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_hole_composition.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_symbolic_denominator.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_log_composition.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_sqrt_positive.json",
+          "status": "different_environment_required",
+          "environment": "qm-formal-v1-a8d843f013bdac16",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_geometric_product_boundary_one.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_nonpolynomial_quotient_needs_limit.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_quotient_boundary_one.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_zero_geometric_denominator_needs_domain.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "missing_restriction.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "wrong_limit_direction.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "leaked_assumption.json",
+          "status": "ambiguous_input",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "ivt_false_uniqueness_method.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "abs_derivative_kink.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "log_derivative_missing_domain.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_abs_missing_sign.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_abs_kink.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "recursive_wrong_formula.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_wrong_value.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuity_log_zero_domain_violation.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_missing_brackets.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "continuous_ivt_missing_interval_guard.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_log_nonpositive_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "limit_algebra_missing_hole_premise.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_bad_ratio.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_missing_ratio.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_wrong_reciprocal_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_rational_shift_wrong_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_affine_ratio_wrong_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_affine_ratio_zero_leading_denominator.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_quadratic_ratio_wrong_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_quadratic_ratio_lower_degree.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_wrong_sign.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_wrong_zero_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_degree_ratio_equal_degree.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_general_wrong_equal_target.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_general_zero_denominator.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_polynomial_general_degree_overflow.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_squeeze_auto_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_monotone_bounded_auto_bad_ratio.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_wrong_infinity.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_half_wrong_no_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_geometric_one_wrong_no_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_constant_wrong_no_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_mod5_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_with_drift_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_growing_tail_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_finite_plus_growing_tail_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_alternating_unsafe_reciprocal_tail_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_cited_finite_tail_missing.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_periodic_cited_finite_tail_wrong_citation.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_eventually_constant_wrong_no_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "sequence_eventually_periodic_le_cutoff_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_wrong_sum.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_false_divergence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_geometric_false_finite.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p2_false_not_summable.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p1_false_summable.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p2_zero_shift_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p_real_three_halves_false_not_summable.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p_real_half_false_summable.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_p_real_overflow_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_comparison_missing_evidence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_comparison_wrong_direction.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_missing_evidence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_bound_one_unsupported.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_wrong_direction.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_non_geometric_missing_limit.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_boundary_one_inconclusive.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_ratio_limit_lt_one_false_divergence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_boundary_one_inconclusive.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_lt_one_false_divergence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_gt_one_false_convergence.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_monomial_boundary_one.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_polynomial_boundary_one.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_nonpolynomial_needs_limit.json",
+          "status": "needs_justification",
+          "stage": "unchanged-production-preflight",
+          "evidence": "curated-corpus.py production preflight; no kernel invocation",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_monomial_geometric_summable.json",
+          "round": 0,
+          "status": "kernel_success",
+          "assessment_eligible": false,
+          "certificate": null
+        },
+        {
+          "name": "series_root_monomial_geometric_divergent.json",
+          "round": 0,
+          "status": "kernel_success",
+          "assessment_eligible": false,
+          "certificate": null
+        }
+      ],
+      "assets": [
+        {
+          "file": "lean.wasm-f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257.gz",
+          "cacheKey": "f96974be33f6d561a4473e4728b2206aa5694cf56239be6fa891fe316000e257",
+          "compressedBytes": 15712659,
+          "cacheHit": true
+        },
+        {
+          "file": "lean.js-838f4150599cec67397abacccfa1158e2bfe3d561d1db70ffcbca75b18b63cd6.gz",
+          "cacheKey": "838f4150599cec67397abacccfa1158e2bfe3d561d1db70ffcbca75b18b63cd6",
+          "compressedBytes": 36142,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-e13bfb4a979d23e9ec563643d423061466102637217de0d0a7160e26e7809cf4.gz",
+          "cacheKey": "e13bfb4a979d23e9ec563643d423061466102637217de0d0a7160e26e7809cf4",
+          "compressedBytes": 3169755,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-df016886e69994296fda71f5d90f0d22f5e7544f78bebc427fa0f59db7577644.gz",
+          "cacheKey": "df016886e69994296fda71f5d90f0d22f5e7544f78bebc427fa0f59db7577644",
+          "compressedBytes": 3409237,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-0b958262e1a241aa6860efede7465b98ad8736189bc6901e7ae6b06ec6821426.gz",
+          "cacheKey": "0b958262e1a241aa6860efede7465b98ad8736189bc6901e7ae6b06ec6821426",
+          "compressedBytes": 3340567,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-26b3052baaaba35c0cce54816b081b3a9766d0aabb923596f076614d03250e51.gz",
+          "cacheKey": "26b3052baaaba35c0cce54816b081b3a9766d0aabb923596f076614d03250e51",
+          "compressedBytes": 3327846,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-69a63c14fc81be0bdff7480d63983319be231007fa81573daa09ad66d351c908.gz",
+          "cacheKey": "69a63c14fc81be0bdff7480d63983319be231007fa81573daa09ad66d351c908",
+          "compressedBytes": 3298207,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-b15aa3165c610abcd1639ba986a9a5132419f88e77ecb293f47d90cdaecee623.gz",
+          "cacheKey": "b15aa3165c610abcd1639ba986a9a5132419f88e77ecb293f47d90cdaecee623",
+          "compressedBytes": 3372467,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-9d1578e8fe91d22784dca67f1cf1fd6d5e42f5ffe02c962933d2ba50650dd929.gz",
+          "cacheKey": "9d1578e8fe91d22784dca67f1cf1fd6d5e42f5ffe02c962933d2ba50650dd929",
+          "compressedBytes": 3356590,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-7760fa02f2da49a61ad8e0b6da3ba8e7ac71035ed79661439148aa110c1ed021.gz",
+          "cacheKey": "7760fa02f2da49a61ad8e0b6da3ba8e7ac71035ed79661439148aa110c1ed021",
+          "compressedBytes": 3126425,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-4b7108877f60010b8316fd984947e8b3c5a5a54742a44f8dc7e5153673251e5a.gz",
+          "cacheKey": "4b7108877f60010b8316fd984947e8b3c5a5a54742a44f8dc7e5153673251e5a",
+          "compressedBytes": 3426330,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-96ef9ef36451a5b0a85d809062205f96148860c93b8131d8c74d0193fea6e45a.gz",
+          "cacheKey": "96ef9ef36451a5b0a85d809062205f96148860c93b8131d8c74d0193fea6e45a",
+          "compressedBytes": 3373472,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-fc2ff4caa274f91d0bde66a73dbb7faef688882f8e691694ca790be6692ce7d7.gz",
+          "cacheKey": "fc2ff4caa274f91d0bde66a73dbb7faef688882f8e691694ca790be6692ce7d7",
+          "compressedBytes": 674066,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-2cca67bd44845fd9ec6ee5116c9a0a702cb1c9606d6c29b537778138ed3e8eac.gz",
+          "cacheKey": "2cca67bd44845fd9ec6ee5116c9a0a702cb1c9606d6c29b537778138ed3e8eac",
+          "compressedBytes": 2948785,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-2f964c8136db39d4b6152cd990cac7e679f3289c9ba6897f8eb91d98071e4d00.gz",
+          "cacheKey": "2f964c8136db39d4b6152cd990cac7e679f3289c9ba6897f8eb91d98071e4d00",
+          "compressedBytes": 2916872,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-c33f5703e84152bfa00eed5d845724717a7c4ac47ce4e3c11bc3107eb1c1931e.gz",
+          "cacheKey": "c33f5703e84152bfa00eed5d845724717a7c4ac47ce4e3c11bc3107eb1c1931e",
+          "compressedBytes": 3000764,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-131bc530234108a82ce79451b7b50ec3f83448c273c58547297633505d73de96.gz",
+          "cacheKey": "131bc530234108a82ce79451b7b50ec3f83448c273c58547297633505d73de96",
+          "compressedBytes": 3257848,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-ea29d4736e6c273527c2ed9fe408f08cc6c6d0b54ad0e8738195ed27876413e5.gz",
+          "cacheKey": "ea29d4736e6c273527c2ed9fe408f08cc6c6d0b54ad0e8738195ed27876413e5",
+          "compressedBytes": 2833802,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-06fdc40aaf092fe709c2a927516e0d5c2ae54745d8f383875b1b8fe1e44469b8.gz",
+          "cacheKey": "06fdc40aaf092fe709c2a927516e0d5c2ae54745d8f383875b1b8fe1e44469b8",
+          "compressedBytes": 3130060,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-0edcc7c843dcace4cc0f7563515e6beadc9db6d68320f38d2230ec4e29ef2065.gz",
+          "cacheKey": "0edcc7c843dcace4cc0f7563515e6beadc9db6d68320f38d2230ec4e29ef2065",
+          "compressedBytes": 3269370,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-4b9c1a2b8f891d5efea84e2fd6ec3e9c738143482222de0bc2e0d1651cc3b45d.gz",
+          "cacheKey": "4b9c1a2b8f891d5efea84e2fd6ec3e9c738143482222de0bc2e0d1651cc3b45d",
+          "compressedBytes": 3389101,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-ba8dc5ebbc9904f90b9ee009146bbe50f7532bbe0506f3cfb3c9761b118be050.gz",
+          "cacheKey": "ba8dc5ebbc9904f90b9ee009146bbe50f7532bbe0506f3cfb3c9761b118be050",
+          "compressedBytes": 3508846,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-d7b67bc59ef0c02239ad69e25b0a415e4d7096806d90976e6268530fd26383f2.gz",
+          "cacheKey": "d7b67bc59ef0c02239ad69e25b0a415e4d7096806d90976e6268530fd26383f2",
+          "compressedBytes": 3295614,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-facba71fc221b4506e4e25e8238cb7f33503f34917f12cb155b7a4fa8a658ce0.gz",
+          "cacheKey": "facba71fc221b4506e4e25e8238cb7f33503f34917f12cb155b7a4fa8a658ce0",
+          "compressedBytes": 3041963,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-3c0a4f82ff2c7a1cf28af0f66207da18db31661fa391cea2081f1079c7f586fe.gz",
+          "cacheKey": "3c0a4f82ff2c7a1cf28af0f66207da18db31661fa391cea2081f1079c7f586fe",
+          "compressedBytes": 3180318,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-a0055f515f984f6ff72c9aa1fab4e06584134ec6a02d8d51f4abea1d8436153d.gz",
+          "cacheKey": "a0055f515f984f6ff72c9aa1fab4e06584134ec6a02d8d51f4abea1d8436153d",
+          "compressedBytes": 3138640,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-3c5edc702d1b7e2b0ba5b18e44dc444eab5aa734be006c3368f21cfd2e73319e.gz",
+          "cacheKey": "3c5edc702d1b7e2b0ba5b18e44dc444eab5aa734be006c3368f21cfd2e73319e",
+          "compressedBytes": 3162544,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-5432229baec8771e7b63d48f986aceed78755efa8a4db12655463baaaa0f72c0.gz",
+          "cacheKey": "5432229baec8771e7b63d48f986aceed78755efa8a4db12655463baaaa0f72c0",
+          "compressedBytes": 3061558,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-931dfdb29d138cd2612a4099c54aff3ebf79fbe74f93c8f0b110dab9fd7425dc.gz",
+          "cacheKey": "931dfdb29d138cd2612a4099c54aff3ebf79fbe74f93c8f0b110dab9fd7425dc",
+          "compressedBytes": 3057475,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-8ade019534275789ebd32446c5aedd29d623cf1defd0cd59661ad0792b2a98f6.gz",
+          "cacheKey": "8ade019534275789ebd32446c5aedd29d623cf1defd0cd59661ad0792b2a98f6",
+          "compressedBytes": 3027511,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-20dc24db51aa07ed06c813efb71661833a2154d0711166492a2e3e02d97f887a.gz",
+          "cacheKey": "20dc24db51aa07ed06c813efb71661833a2154d0711166492a2e3e02d97f887a",
+          "compressedBytes": 3048943,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-bcbde11edab1234761665b1d7ff855f8ed4f3e9020e0ce02d8c1131c5a7e097e.gz",
+          "cacheKey": "bcbde11edab1234761665b1d7ff855f8ed4f3e9020e0ce02d8c1131c5a7e097e",
+          "compressedBytes": 2870663,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-023251873010635fadf9bdb8a298310be0f0a24c366e43e0ad6ac949058d97e7.gz",
+          "cacheKey": "023251873010635fadf9bdb8a298310be0f0a24c366e43e0ad6ac949058d97e7",
+          "compressedBytes": 2914323,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-f81fbc6fd7b3348e17af1634b9bf6ec85a5ad689c2fd6c52e6f9628dc6ac52b8.gz",
+          "cacheKey": "f81fbc6fd7b3348e17af1634b9bf6ec85a5ad689c2fd6c52e6f9628dc6ac52b8",
+          "compressedBytes": 2797797,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-301a526ea6682a654d61b4733fc92ffd8b88ba56f37178603c04944350ab6ecb.gz",
+          "cacheKey": "301a526ea6682a654d61b4733fc92ffd8b88ba56f37178603c04944350ab6ecb",
+          "compressedBytes": 2745439,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-5b0f9758846f0279d7a5ac772d37c22d5167086ceb95a181b8f2051d95f61daf.gz",
+          "cacheKey": "5b0f9758846f0279d7a5ac772d37c22d5167086ceb95a181b8f2051d95f61daf",
+          "compressedBytes": 2875025,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-bce762057c7ecdf390fcab7f716f11da5ceaf558951a87042d794b153f108f39.gz",
+          "cacheKey": "bce762057c7ecdf390fcab7f716f11da5ceaf558951a87042d794b153f108f39",
+          "compressedBytes": 2753232,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-4c3678be0a07e665352c236084b25e79da9181395fadc3dbf9a0233fa537a87e.gz",
+          "cacheKey": "4c3678be0a07e665352c236084b25e79da9181395fadc3dbf9a0233fa537a87e",
+          "compressedBytes": 2933508,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-c5cb9c59981144c24674ff8098a0d0c8eaaf36575e82bad0b4e4ccb9aa27a6ca.gz",
+          "cacheKey": "c5cb9c59981144c24674ff8098a0d0c8eaaf36575e82bad0b4e4ccb9aa27a6ca",
+          "compressedBytes": 2889608,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-6a2920d4879007b289332c1cf741f787d271eb59a68f544b24a142c945513e40.gz",
+          "cacheKey": "6a2920d4879007b289332c1cf741f787d271eb59a68f544b24a142c945513e40",
+          "compressedBytes": 2831921,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-659211d5920a226c82d5ec645c20815f209117c5af8127a5a4ff2aaaf0911893.gz",
+          "cacheKey": "659211d5920a226c82d5ec645c20815f209117c5af8127a5a4ff2aaaf0911893",
+          "compressedBytes": 3044539,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-0f09928e60b39d3f95fd02ed6c218753a35e2ed9ea33b169e5de93f0c7ef5d4a.gz",
+          "cacheKey": "0f09928e60b39d3f95fd02ed6c218753a35e2ed9ea33b169e5de93f0c7ef5d4a",
+          "compressedBytes": 2872908,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-aa4e2492b77db03cdef85d0a818874dfe318bb1ada2b49ce87d0fe7778435dcb.gz",
+          "cacheKey": "aa4e2492b77db03cdef85d0a818874dfe318bb1ada2b49ce87d0fe7778435dcb",
+          "compressedBytes": 2944294,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-83171b243d2fef1ff729f52e2ca52d165f1f8502a75a2e1568270932e9b03884.gz",
+          "cacheKey": "83171b243d2fef1ff729f52e2ca52d165f1f8502a75a2e1568270932e9b03884",
+          "compressedBytes": 2917529,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-b50bb87aeef1e3c18c4fd88d75d5dd848dd8c33b2cc433c8c763d07d6c5a4d7a.gz",
+          "cacheKey": "b50bb87aeef1e3c18c4fd88d75d5dd848dd8c33b2cc433c8c763d07d6c5a4d7a",
+          "compressedBytes": 2923945,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-a807722d3670492a91a3595e399f91f31f356d9251bc7e9bd107a70d30385239.gz",
+          "cacheKey": "a807722d3670492a91a3595e399f91f31f356d9251bc7e9bd107a70d30385239",
+          "compressedBytes": 2929900,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-d79180020f59ce38d1256bce55bdeba72650c72c65814c6b0626b199173490a0.gz",
+          "cacheKey": "d79180020f59ce38d1256bce55bdeba72650c72c65814c6b0626b199173490a0",
+          "compressedBytes": 2993190,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-d1389356d625cacbb1f389045ce66a3fe7fc15ab45a670dbdd54325fc4fb5ccf.gz",
+          "cacheKey": "d1389356d625cacbb1f389045ce66a3fe7fc15ab45a670dbdd54325fc4fb5ccf",
+          "compressedBytes": 3074483,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-64671f2704b5871b19384003c345f8c4c9e30ecbe0b4f698d22f25376db6ff13.gz",
+          "cacheKey": "64671f2704b5871b19384003c345f8c4c9e30ecbe0b4f698d22f25376db6ff13",
+          "compressedBytes": 3306546,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-e7063f8708b223fc09916c9535c22349f3e818897431bd0f3b2c0b0898a5f486.gz",
+          "cacheKey": "e7063f8708b223fc09916c9535c22349f3e818897431bd0f3b2c0b0898a5f486",
+          "compressedBytes": 3341717,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-d2da41b0b5420b52be834c91e708c75e411e81b853fa387fcc4a60976f1bc451.gz",
+          "cacheKey": "d2da41b0b5420b52be834c91e708c75e411e81b853fa387fcc4a60976f1bc451",
+          "compressedBytes": 3359895,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-83b6801bb253c64e8b4cec8085161111441436a77fb0d61ad85d25895e05245c.gz",
+          "cacheKey": "83b6801bb253c64e8b4cec8085161111441436a77fb0d61ad85d25895e05245c",
+          "compressedBytes": 3343446,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-4550c6f9d278b0e4a079c9c633eda12e7c9b6bb7b3808f103de0598d30f9bc4d.gz",
+          "cacheKey": "4550c6f9d278b0e4a079c9c633eda12e7c9b6bb7b3808f103de0598d30f9bc4d",
+          "compressedBytes": 3374009,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-1609435ffe070881e9def81692ec7154682465e1b646c64391ca698d493e4900.gz",
+          "cacheKey": "1609435ffe070881e9def81692ec7154682465e1b646c64391ca698d493e4900",
+          "compressedBytes": 3191105,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-dbf2d6aa83017413bededfe766375966bba77dc1bfc55b309d03d95b17e9f398.gz",
+          "cacheKey": "dbf2d6aa83017413bededfe766375966bba77dc1bfc55b309d03d95b17e9f398",
+          "compressedBytes": 3083261,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-9eed0f93bd58a57bff840f731235c2719578e825c63513781ce3a7a23bd4aa27.gz",
+          "cacheKey": "9eed0f93bd58a57bff840f731235c2719578e825c63513781ce3a7a23bd4aa27",
+          "compressedBytes": 3265335,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-4c39196476459459f00f3985263cb01b087cea86b6686f280489734501394956.gz",
+          "cacheKey": "4c39196476459459f00f3985263cb01b087cea86b6686f280489734501394956",
+          "compressedBytes": 3089996,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-f1ba339bc5815b151f8e73ea947804f2d1eb872b01234e5a291c65467ab59949.gz",
+          "cacheKey": "f1ba339bc5815b151f8e73ea947804f2d1eb872b01234e5a291c65467ab59949",
+          "compressedBytes": 2781720,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-05fb70f0983cbf09fa95751ed5500acebdb9cfd159953cb59c70c1de0f7abbc2.gz",
+          "cacheKey": "05fb70f0983cbf09fa95751ed5500acebdb9cfd159953cb59c70c1de0f7abbc2",
+          "compressedBytes": 2607663,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-31627ac38cfc6ea5961602e243bdb57c2ccb7f24d0b780d375919c39f909c38a.gz",
+          "cacheKey": "31627ac38cfc6ea5961602e243bdb57c2ccb7f24d0b780d375919c39f909c38a",
+          "compressedBytes": 2754254,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-8d771a4fb0c67b04e3ccd1b61c95eeee9f4001a0af8a59a069178566286373ee.gz",
+          "cacheKey": "8d771a4fb0c67b04e3ccd1b61c95eeee9f4001a0af8a59a069178566286373ee",
+          "compressedBytes": 2761304,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-309e180fd72cd6acc98eae9c9d239725a1b24d9bf09bde68dd0821730c5e0232.gz",
+          "cacheKey": "309e180fd72cd6acc98eae9c9d239725a1b24d9bf09bde68dd0821730c5e0232",
+          "compressedBytes": 2950166,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-9340141aa3b12f43b75903d1015ba441cbccbed4b6336a737de0db501c4df0f0.gz",
+          "cacheKey": "9340141aa3b12f43b75903d1015ba441cbccbed4b6336a737de0db501c4df0f0",
+          "compressedBytes": 2743565,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-9ad54812a6178dac187576268a6f9bc073f216ebfc8c00510ae4f130244d3721.gz",
+          "cacheKey": "9ad54812a6178dac187576268a6f9bc073f216ebfc8c00510ae4f130244d3721",
+          "compressedBytes": 2591134,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-3e988f0644aa189446e1fd4ecf8731948270b9af9ddde3ca3b8befc526725396.gz",
+          "cacheKey": "3e988f0644aa189446e1fd4ecf8731948270b9af9ddde3ca3b8befc526725396",
+          "compressedBytes": 2709536,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-9b8355c731b338db82d4d89ddce5549f0407133b2b7816feaaa31ddaba53a19a.gz",
+          "cacheKey": "9b8355c731b338db82d4d89ddce5549f0407133b2b7816feaaa31ddaba53a19a",
+          "compressedBytes": 2911766,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-c9fb88321e004f4b64b797a73bd41a8a3bc604a73116e068e41cdc73be7139be.gz",
+          "cacheKey": "c9fb88321e004f4b64b797a73bd41a8a3bc604a73116e068e41cdc73be7139be",
+          "compressedBytes": 2858125,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-27b2ac07f79f9a88ec971fd986c4726dfe562506b623d86caaf278cc081f5bfd.gz",
+          "cacheKey": "27b2ac07f79f9a88ec971fd986c4726dfe562506b623d86caaf278cc081f5bfd",
+          "compressedBytes": 2943683,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-7e346ec2b183925a0c7ce95eb14ccc34a21b1ce72418573ab2d633f617d0f060.gz",
+          "cacheKey": "7e346ec2b183925a0c7ce95eb14ccc34a21b1ce72418573ab2d633f617d0f060",
+          "compressedBytes": 3102129,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-1041e85bd6ad31cda1b93e22bc4e682e85a9cac2080fffa27a95db9948cb9f1b.gz",
+          "cacheKey": "1041e85bd6ad31cda1b93e22bc4e682e85a9cac2080fffa27a95db9948cb9f1b",
+          "compressedBytes": 2853932,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-e55d46616d12b3081d78e13461e8085c89ec004d65359ce53e3f5ff3db5f69f5.gz",
+          "cacheKey": "e55d46616d12b3081d78e13461e8085c89ec004d65359ce53e3f5ff3db5f69f5",
+          "compressedBytes": 3597983,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-24a0f2a98bcc4f3e576eaecccc14172bb6349fc2ed999bf37607e0d1a9caf8bc.gz",
+          "cacheKey": "24a0f2a98bcc4f3e576eaecccc14172bb6349fc2ed999bf37607e0d1a9caf8bc",
+          "compressedBytes": 3308411,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-999ab133d8cd62eddf9fe70dee1bb7e25b03fe6de407d0b5695f5f2571209f0b.gz",
+          "cacheKey": "999ab133d8cd62eddf9fe70dee1bb7e25b03fe6de407d0b5695f5f2571209f0b",
+          "compressedBytes": 2915892,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-f4bb70144ffd5eaad47737e8dbd0c23bc76a3b128f15671b518243d8e05e5071.gz",
+          "cacheKey": "f4bb70144ffd5eaad47737e8dbd0c23bc76a3b128f15671b518243d8e05e5071",
+          "compressedBytes": 3376206,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-e853f74c71dc1bf2200c5117e19f9fb00cfac551985e5e0a60ab337b95c2690f.gz",
+          "cacheKey": "e853f74c71dc1bf2200c5117e19f9fb00cfac551985e5e0a60ab337b95c2690f",
+          "compressedBytes": 3011312,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-e921233de4abee74a1f7c856afc33f1fc3cdc871943716bbaf0f75cc8e335955.gz",
+          "cacheKey": "e921233de4abee74a1f7c856afc33f1fc3cdc871943716bbaf0f75cc8e335955",
+          "compressedBytes": 969411,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-7490fc34a2ce21b63bbe18ca0e196718001597aa38b24eb328b38112a997596e.gz",
+          "cacheKey": "7490fc34a2ce21b63bbe18ca0e196718001597aa38b24eb328b38112a997596e",
+          "compressedBytes": 3327804,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-a6b0ef7789d80800b1621a7c3d9b19a2899bf9d9ee7bf4ef0d9d97ac028a4071.gz",
+          "cacheKey": "a6b0ef7789d80800b1621a7c3d9b19a2899bf9d9ee7bf4ef0d9d97ac028a4071",
+          "compressedBytes": 3504354,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-c91ad436cf28b4191c0ac74eefb4c86645871d6dd663c7db8dd555817795ac8d.gz",
+          "cacheKey": "c91ad436cf28b4191c0ac74eefb4c86645871d6dd663c7db8dd555817795ac8d",
+          "compressedBytes": 3458263,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-f61e1f8a765734d68063b73462cbd957daaef771c5ca3315d2a993263c893110.gz",
+          "cacheKey": "f61e1f8a765734d68063b73462cbd957daaef771c5ca3315d2a993263c893110",
+          "compressedBytes": 3521095,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-1591dd1079da2dc2f6332eed2f15dec2a674cb41382fb2c12801ee1d73a47966.gz",
+          "cacheKey": "1591dd1079da2dc2f6332eed2f15dec2a674cb41382fb2c12801ee1d73a47966",
+          "compressedBytes": 3092536,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-4494328ae74cb7e4b95221b52e0212bd24155303a828099b1526d783f7fe0b12.gz",
+          "cacheKey": "4494328ae74cb7e4b95221b52e0212bd24155303a828099b1526d783f7fe0b12",
+          "compressedBytes": 3301135,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-d729fe31f4105a2cf0ab47d4911a442792386e6b0845a74ab7763b6bd15c3c1c.gz",
+          "cacheKey": "d729fe31f4105a2cf0ab47d4911a442792386e6b0845a74ab7763b6bd15c3c1c",
+          "compressedBytes": 3409825,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-789165d1a139943672388c6e447d5605a6861ba1476f2db2b1b679b31b6a0240.gz",
+          "cacheKey": "789165d1a139943672388c6e447d5605a6861ba1476f2db2b1b679b31b6a0240",
+          "compressedBytes": 3459054,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-0974a45252eca33284c5166556d968c46728d8c34dfbedf22d3ca9aa1c25d360.gz",
+          "cacheKey": "0974a45252eca33284c5166556d968c46728d8c34dfbedf22d3ca9aa1c25d360",
+          "compressedBytes": 3532209,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-ebe8442206c7a50945c48f558240549222b334d2c401d4ab7b6c68a1aea6bd58.gz",
+          "cacheKey": "ebe8442206c7a50945c48f558240549222b334d2c401d4ab7b6c68a1aea6bd58",
+          "compressedBytes": 3601823,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-fc803738e0a3097064a8bc0bb9796ed33cf939f02ab0d06b8e5eb983257b40a7.gz",
+          "cacheKey": "fc803738e0a3097064a8bc0bb9796ed33cf939f02ab0d06b8e5eb983257b40a7",
+          "compressedBytes": 3342675,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-ea7cabb9313bb9b118c907a17da78ac3bffd637ffc943cac66fb1c94f58263f3.gz",
+          "cacheKey": "ea7cabb9313bb9b118c907a17da78ac3bffd637ffc943cac66fb1c94f58263f3",
+          "compressedBytes": 2668289,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-7cd83ae6899ebbae0be315ecc1e0d72195dc1e07cadf4a85511c1f595a0c64ab.gz",
+          "cacheKey": "7cd83ae6899ebbae0be315ecc1e0d72195dc1e07cadf4a85511c1f595a0c64ab",
+          "compressedBytes": 3502558,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-adae517c4f42e4f65c4a6142d207f14b5a28f230ea44c8f62ab10c159fc2c211.gz",
+          "cacheKey": "adae517c4f42e4f65c4a6142d207f14b5a28f230ea44c8f62ab10c159fc2c211",
+          "compressedBytes": 1189406,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-a87e5166d700b4e8883bf73911717f670b91386d8712cac933b916b3a373d62b.gz",
+          "cacheKey": "a87e5166d700b4e8883bf73911717f670b91386d8712cac933b916b3a373d62b",
+          "compressedBytes": 152355,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-28f60716fd12b78d26aa1ef8806ac6c700f1664be8d524f353edcf617d053bc1.gz",
+          "cacheKey": "28f60716fd12b78d26aa1ef8806ac6c700f1664be8d524f353edcf617d053bc1",
+          "compressedBytes": 2905828,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-c00a0c28d18333790161deaa7c6dadf90c9c5b5f3eddd5cf73311638e09ca19e.gz",
+          "cacheKey": "c00a0c28d18333790161deaa7c6dadf90c9c5b5f3eddd5cf73311638e09ca19e",
+          "compressedBytes": 2892169,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-afd33e732d57e28144d4bc908a592bd81f05108271145346d4b1210639bc9396.gz",
+          "cacheKey": "afd33e732d57e28144d4bc908a592bd81f05108271145346d4b1210639bc9396",
+          "compressedBytes": 3502397,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-ef10f65b162198fa8371e46e2842504321228deeb042f1e3e3f9e97c8d794f61.gz",
+          "cacheKey": "ef10f65b162198fa8371e46e2842504321228deeb042f1e3e3f9e97c8d794f61",
+          "compressedBytes": 3448016,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-681ff812cdd73f021d63cf0a1de8893f05b15f20b741388aab47b6090838a614.gz",
+          "cacheKey": "681ff812cdd73f021d63cf0a1de8893f05b15f20b741388aab47b6090838a614",
+          "compressedBytes": 3441130,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-0f0d22c762d3245537febea49baed0952b9262c1aff92462488b805da451f5a9.gz",
+          "cacheKey": "0f0d22c762d3245537febea49baed0952b9262c1aff92462488b805da451f5a9",
+          "compressedBytes": 3431394,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-c214ed26b1b364173468083e94b9abbb5cdebb51211361e5c0d7cad7d3a1e6db.gz",
+          "cacheKey": "c214ed26b1b364173468083e94b9abbb5cdebb51211361e5c0d7cad7d3a1e6db",
+          "compressedBytes": 3548786,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-436395b0b28fba01fb4ee8b128aad9ed406f45329e4fb6533fee1d4f67e6689a.gz",
+          "cacheKey": "436395b0b28fba01fb4ee8b128aad9ed406f45329e4fb6533fee1d4f67e6689a",
+          "compressedBytes": 3539933,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-7ea14b61970eb7fab9dad39adad7e232e49010936ebd17365ad72fa15f05e079.gz",
+          "cacheKey": "7ea14b61970eb7fab9dad39adad7e232e49010936ebd17365ad72fa15f05e079",
+          "compressedBytes": 3081369,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-dc0fb3eb606054d6bbc8a2bd781f569e57ffbe7218a0e65dfb15490acd2a4d40.gz",
+          "cacheKey": "dc0fb3eb606054d6bbc8a2bd781f569e57ffbe7218a0e65dfb15490acd2a4d40",
+          "compressedBytes": 3202584,
+          "cacheHit": true
+        },
+        {
+          "file": "modules-988550128cb622e98d26785defbd246437d952f1bcfc14aa2b4fcbc340ffba2c.gz",
+          "cacheKey": "988550128cb622e98d26785defbd246437d952f1bcfc14aa2b4fcbc340ffba2c",
+          "compressedBytes": 3308125,
+          "cacheHit": true
+        }
+      ],
+      "assessment_eligible": false,
+      "certificate": null,
+      "startMs": 241.5,
+      "isolated": true,
+      "userAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Mobile Safari/537.36",
+      "timingMode": "slow",
+      "memoryProfile": false,
+      "releaseStaged": "all",
+      "selectedGroup": "qm-formal-v1-bb0d3439bce63261",
+      "format": "modules",
+      "profile": "cfcb7766888e0417f9b3c41f1a8ebc3179fc2d37ecf929ae2c801cad96feb5d2",
+      "environment": {
+        "leanCommit": "6a10ac8c22beadecabdbb0919c2b50214762f91d",
+        "mathlibCommit": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c",
+        "portSha256": "6829a2a80680ac561a70573edb1ccb3f6763b6b7d2f875b04ab892b450440387",
+        "importPolicy": "production-module-public"
+      },
+      "diagnosticFixture": null,
+      "corpusRounds": 1,
+      "caseSet": "monomial",
+      "selectedCaseCount": 2,
+      "diskStagingSession": "1f4b2c93-888a-4981-98cf-de2878223e4b",
+      "staging": "opfs",
+      "taskWorkers": 2,
+      "activeProof": null,
+      "diagnostics": [
+        "[WASM DEBUG] wasmCompile called with code length=1141, fileName=/workspace/request.lean",
+        "[WASM DEBUG] Creating input context...",
+        "[WASM DEBUG] Getting or creating environment for header imports...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: cache miss, importing (#[{ module := `Init, importAll := false, isExported := true, isMeta := false },",
+        "[DEBUG:PROGRESS] Loading 3919 modules...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: importModules completed",
+        "[WASM DEBUG] Environment ready",
+        "[WASM DEBUG] Processing 1 messages...",
+        "[WASM DEBUG] Done, hasErrors=false",
+        "[WASM DEBUG] wasmCompile called with code length=1138, fileName=/workspace/request.lean",
+        "[WASM DEBUG] Creating input context...",
+        "[WASM DEBUG] Getting or creating environment for header imports...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env",
+        "[WASM DEBUG] Environment ready",
+        "[WASM DEBUG] Processing 2 messages...",
+        "[WASM DEBUG] Done, hasErrors=true",
+        "[WASM DEBUG] wasmCompile called with code length=1140, fileName=/workspace/request.lean",
+        "[WASM DEBUG] Creating input context...",
+        "[WASM DEBUG] Getting or creating environment for header imports...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env",
+        "[WASM DEBUG] Environment ready",
+        "[WASM DEBUG] Processing 2 messages...",
+        "[WASM DEBUG] Done, hasErrors=false",
+        "[WASM DEBUG] wasmCompile called with code length=6505, fileName=/workspace/request.lean",
+        "[WASM DEBUG] Creating input context...",
+        "[WASM DEBUG] Getting or creating environment for header imports...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env",
+        "[WASM DEBUG] Environment ready",
+        "[WASM DEBUG] Processing 6 messages...",
+        "[WASM DEBUG] Done, hasErrors=false",
+        "[WASM DEBUG] wasmCompile called with code length=6315, fileName=/workspace/request.lean",
+        "[WASM DEBUG] Creating input context...",
+        "[WASM DEBUG] Getting or creating environment for header imports...",
+        "[WASM DEBUG] getOrCreateWasmEnvFor: returning cached env",
+        "[WASM DEBUG] Environment ready",
+        "[WASM DEBUG] Processing 10 messages...",
+        "[WASM DEBUG] Done, hasErrors=false"
+      ],
+      "lastDiagnosticHeapBytes": 982122496,
+      "importProgress": {
+        "loaded": 3919,
+        "total": 3919
+      },
+      "warmFixture": null,
+      "warmRepeatsRequested": 0,
+      "warmSelection": "slowest successful canonical proof",
+      "cache": {
+        "downloads": 0,
+        "downloadedBytes": 0,
+        "hits": 102,
+        "writable": true,
+        "bodyBytes": 319674695,
+        "entries": 102,
+        "complete": true,
+        "method": "Verified compressed body lengths; excludes browser metadata"
+      },
+      "originStorage": {
+        "quota": 11072999455,
+        "usage": 335581215,
+        "usageDetails": {
+          "caches": 335580160,
+          "fileSystem": 202,
+          "serviceWorkerRegistrations": 853
+        }
+      }
+    }
+  ],
+  "storageBeforeCleanup": {
+    "at": "2026-09-14T10:12:18.829Z",
+    "quota": 11072999455,
+    "usage": 335581215,
+    "usageDetails": {
+      "caches": 335580160,
+      "fileSystem": 202,
+      "serviceWorkerRegistrations": 853
+    },
+    "temporaryDirectories": 0
+  },
+  "storageAfterCleanup": {
+    "at": "2026-09-14T10:12:18.849Z",
+    "quota": 11072999253,
+    "usage": 335581013,
+    "usageDetails": {
+      "caches": 335580160,
+      "serviceWorkerRegistrations": 853
+    },
+    "temporaryDirectories": 0
+  },
+  "pins": {
+    "curated.js": "4ba241ccaca86d5bfb4450e9abcc62a4c2dc49e8723d1cbbc023e15684288f7f",
+    "compatibility.js": "6cb5c2f6ad8f0110132205a4fa54c09b739e46b270a431f0f654d72d91f88a59",
+    "timing-policy.js": "a19466fbe035695f93c42df81b97b1ec366bd40b788f377a36390f0e5ff37855",
+    "assets/viability.json": "88f029fe43bc039a8bc76fe0421a95824b492b26f322537053811b6234c82a4e",
+    "assets/viability-worker.js": "f900a67feac37a5a0b45d13915233da40cbcc5875ac3119db09ea8b9fea702a4",
+    "../app/formal-environment-loader.js": "7f4cc65405555f8631da84b842fb08cd9f976d470156c59c64dde9c64225264f"
+  },
+  "storageAfterEnvironment": {
+    "at": "2026-09-14T10:13:20.075Z",
+    "quota": 11072999455,
+    "usage": 335581215,
+    "usageDetails": {
+      "caches": 335580160,
+      "fileSystem": 202,
+      "serviceWorkerRegistrations": 853
+    },
+    "temporaryDirectories": 0
+  },
+  "finished": "2026-09-14T10:13:20.083Z",
+  "summary": {
+    "positiveExecutions": 2,
+    "passed": 2,
+    "environmentErrors": 0,
+    "diagnosticTimingOnly": true,
+    "overOriginalBudget": 0
+  }
+}

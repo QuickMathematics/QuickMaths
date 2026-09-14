@@ -187,7 +187,7 @@ function buildFormalReferenceJob(problem) {
       goal: spec.statement.goal,
       allowed_rules: spec.allowed_rules,
       ...(auto ? {} : { reference_steps: spec.reference_proof.steps }),
-      max_seconds: 20,
+      max_seconds: 60,
     },
   };
 }
@@ -449,7 +449,7 @@ function renderFormalReferenceStatus(check) {
     incomplete: ["is-error", "Reference proof needs justification"],
     unavailable: ["", "Verifier available, Lean kernel unavailable"],
     invalid: ["is-error", "Reference proof check failed"],
-    checking: ["", "Checking reference proof…"],
+    checking: ["", "Checking reference proof… This may take up to a minute."],
   };
   const [className, label] = labels[check.state] ?? ["", "Reference proof status"];
   return `<div class="studio-validation ${className}"><strong>${esc(label)}</strong><p>${esc(check.message ?? "")}</p></div>`;

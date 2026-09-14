@@ -517,7 +517,7 @@ def normalize_request(value: Any) -> dict[str, Any]:
         allowed={"allowed_rules", "max_seconds", "accepted_axioms"},
     )
     allowed_rules = [_short_text(item, "allowed rule") for item in _expect_list(policy_raw.get("allowed_rules", []), "allowed rules", max_items=64)]
-    max_seconds = policy_raw.get("max_seconds", 30)
+    max_seconds = policy_raw.get("max_seconds", 60)
     if not isinstance(max_seconds, int) or isinstance(max_seconds, bool) or not 1 <= max_seconds <= 60:
         raise ContractError("policy max_seconds must be an integer from 1 to 60")
     accepted_axioms = [_short_text(item, "accepted axiom") for item in _expect_list(policy_raw.get("accepted_axioms", ["propext", "Classical.choice", "Quot.sound"]), "accepted axioms", max_items=16)]

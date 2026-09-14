@@ -93,7 +93,7 @@ export async function callFormalRpc(rpc, { fetchImpl = fetch, baseUrl = DEFAULT_
   if (!rpc || typeof rpc !== "object" || Array.isArray(rpc)) throw new Error("Formal RPC must be an object.");
   const body = JSON.stringify(rpc);
   if (new TextEncoder().encode(body).length > MAX_RPC_BYTES) throw new Error("Formal RPC exceeds the 1 MB request limit.");
-  const seconds = Number(rpc.request?.policy?.max_seconds ?? rpc.max_seconds ?? 30);
+  const seconds = Number(rpc.request?.policy?.max_seconds ?? rpc.max_seconds ?? 60);
   const budget = Number.isFinite(seconds) ? Math.max(15_000, Math.min(75_000, seconds * 1000 + 5_000)) : 15_000;
   const payload = await jsonFetch(fetchImpl, `${cleanBaseUrl(baseUrl)}/v1/rpc`, {
     method: "POST", cache: "no-store", timeoutMs: timeoutMs ?? budget,

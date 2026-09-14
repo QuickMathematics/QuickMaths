@@ -40,7 +40,7 @@ def new_text_request(message: dict[str, Any]) -> dict[str, Any]:
         goal_text=goal,
         assumptions=assumptions,
         allowed_rules=rules,
-        max_seconds=int(message.get("max_seconds", 30)),
+        max_seconds=int(message.get("max_seconds", 60)),
     )
     return {
         "request": request,

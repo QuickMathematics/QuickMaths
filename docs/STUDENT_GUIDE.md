@@ -721,3 +721,14 @@ The latest A17 retest defaults to **2 optimized monomial cases · once each**, w
 repeats. Close older experimental tabs and clear temporary staging to reclaim
 leftover test files; cleanup does not require running any proofs. The extended
 timing allowance measures completion time and does not change assessment policy.
+
+### Verification time allowance
+
+New formal proof jobs and Studio reference checks allow up to **60 seconds**
+per verification. On phones a proof can take tens of seconds; initial runtime
+setup/download can take longer. The proof workspace displays this guidance.
+Saved requests and certificates keep their original policy for exact replay;
+this update does not silently rewrite old evidence or enable browser grading.
+
+The reusable engineering workflow is documented in
+[Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).

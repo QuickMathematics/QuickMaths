@@ -46,7 +46,7 @@ def build_text_request(
     goal_text: str,
     assumptions: list[str] | None = None,
     allowed_rules: list[str] | None = None,
-    max_seconds: int = 30,
+    max_seconds: int = 60,
 ) -> dict[str, Any]:
     """Build a typed request from school-style proposition *or limit* text."""
     names = list(variables)
@@ -83,7 +83,7 @@ def build_proposition_request(
     goal_text: str,
     assumptions: list[str] | None = None,
     allowed_rules: list[str] | None = None,
-    max_seconds: int = 30,
+    max_seconds: int = 60,
 ) -> dict[str, Any]:
     """Compatibility wrapper for callers that still name proposition requests."""
     request = build_text_request(

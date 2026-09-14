@@ -49,6 +49,7 @@ export function renderFormalWorkspace({ problem, evidence = null, progress = nul
   }).join("");
   return `<section class="formal-proof-panel proof-workspace ${certified ? "verified" : "pending"}" data-formal-proof-panel aria-busy="${busy}">
     <header><div><p class="eyebrow">Proof workspace</p><h3>Build the argument. Justify every step.</h3></div><span class="formal-proof-status" role="status" aria-live="polite">${escape(status)}</span></header>
+    <p class="formal-proof-runtime-note">Proof verification may take up to a minute, especially on phones. Initial setup can take longer. Keep this page open while checking.</p>
     <div class="proof-theorem"><span class="eyebrow">Your goal</span><p>${escape(spec.statement.goal)}</p><div class="proof-domain-chips">${(spec.statement.declarations ?? []).map((text) => `<span>${escape(text)}</span>`).join("")}</div></div>
     <div class="proof-workspace-columns"><div class="proof-reasoning"><h4>Your reasoning</h4>
       ${steps.length ? `<ol class="proof-step-list">${rows}</ol>` : '<p class="proof-empty">Start with what you know. Add a claim and explain why it follows. You do not need to write Lean.</p>'}

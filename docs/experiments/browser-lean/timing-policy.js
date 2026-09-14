@@ -15,5 +15,5 @@ export const slowCases=new Set([
 ]);
 export function timingBudget(mode,original){
  if(!['standard','slow'].includes(mode)||!Number.isFinite(original)||original<=0)throw Error('Invalid timing policy');
- return mode==='slow'?Math.max(original,120000):original;
+ return mode==='slow'?Math.max(original,60000):original;
 }

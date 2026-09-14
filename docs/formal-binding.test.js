@@ -18,6 +18,9 @@ test("browser formal binding matches the Python bridge canonical digest", () => 
   };
   assert.equal(formalProblemBinding(problem), "7f9adcb683b2f475cf651af14072acf609273199b8ad230e6d611c429ccc5e96");
   const job = buildBoundFormalJob(problem);
+  assert.equal(job.rpc.max_seconds, 60);
+  assert.equal(buildBoundFormalJob(problem, { maxSeconds: 10 }).rpc.max_seconds, 10);
+  assert.throws(() => buildBoundFormalJob(problem, { maxSeconds: 61 }));
   assert.equal(job.problem_binding_sha256, formalProblemBinding(problem));
   assert.equal(job.rpc.request_id, `quickmaths:${job.problem_binding_sha256}`);
 });

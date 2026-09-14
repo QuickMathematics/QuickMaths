@@ -109,7 +109,7 @@ def handle_message(message: Any, *, project_dir: str | Path | None = None) -> di
                 goal_text=str(message.get("goal", "")),
                 assumptions=assumptions,
                 allowed_rules=rules,
-                max_seconds=int(message.get("max_seconds", 30)),
+                max_seconds=int(message.get("max_seconds", 60)),
             )
             result = prove_goal(request, project_dir=project_dir)
             return {
