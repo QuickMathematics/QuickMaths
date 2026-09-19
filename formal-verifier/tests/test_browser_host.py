@@ -1,11 +1,13 @@
 import json
+import os
 from pathlib import Path
 from quickmaths_formal.browser_host import browser_rpc
 from quickmaths_formal import verifier
 
 FIXTURES=Path(__file__).parents[1]/'fixtures'
 TEST_DIR=Path(__file__).resolve().parents[2]/'.bridge-runtime/formal-host-tests'
-assert TEST_DIR.drive.upper() in {'X:', 'F:'}
+if os.name == 'nt':
+    assert TEST_DIR.drive.upper() in {'X:', 'F:'}
 TEST_DIR.mkdir(parents=True,exist_ok=True)
 def request(name):
     return json.loads((FIXTURES/name).read_text())
