@@ -1,0 +1,967 @@
+[
+  {
+    "name": "guarded_cancellation.json",
+    "sourceHash": "7dc95896f37973d8f4819637977993d5f579142749cbc555ab53f067e85c57fc",
+    "exactNativeSource": true
+  },
+  {
+    "name": "difference_quotient.json",
+    "sourceHash": "9c13023a98084471d46526a1fb2edb6bf5e50431f034f541a5af21ef1eb0d67b",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sqrt_square_nonnegative.json",
+    "sourceHash": "e8c7bd8a2eb4882f2f84cfa9a1f8c03ee780f1f393062cd6fb0ca2d4f2d9b872",
+    "exactNativeSource": true
+  },
+  {
+    "name": "conjugate_identity.json",
+    "sourceHash": "53a60164f2a97ceea84a3c7ca21183b2e4905b7e65d9604f8dfd28487035660f",
+    "exactNativeSource": true
+  },
+  {
+    "name": "inverse_right_infinity.json",
+    "sourceHash": "7586b7ffeccb74c84fb0a0c1efc3fe45563089cb22b6db8da7d8fda84ec47bd1",
+    "exactNativeSource": true
+  },
+  {
+    "name": "inverse_left_infinity.json",
+    "sourceHash": "db2394528b23de1dacb47f4a70f974dbadbd87a94f68bf95b03fd155cd70ecf7",
+    "exactNativeSource": true
+  },
+  {
+    "name": "removable_hole_limit.json",
+    "sourceHash": "35327166bed17116dc15737903a4643e7425d813887baea148fe63f2cf1cafc6",
+    "exactNativeSource": true
+  },
+  {
+    "name": "conjugate_limit.json",
+    "sourceHash": "f0dbf065b990e3610f51606ea71c5000ba2f2236304a30fd5647244a09417bf3",
+    "exactNativeSource": true
+  },
+  {
+    "name": "piecewise_jump.json",
+    "sourceHash": "979875b749c43f2d8b3e34545a5a1eb1ef64f581c4f759536dbbac2e2a75c262",
+    "exactNativeSource": true
+  },
+  {
+    "name": "ivt_existence.json",
+    "sourceHash": "507dcd25aa750e6784e9390d34dff23d17b5b308aab0861b45a197ebacb8d619",
+    "exactNativeSource": true
+  },
+  {
+    "name": "polynomial_derivative.json",
+    "sourceHash": "576444fd31c453e8a24d9b53abcd1d0a3cc50948d0ac3d6e005ef4f7c48f0c13",
+    "exactNativeSource": true
+  },
+  {
+    "name": "quotient_derivative.json",
+    "sourceHash": "98381d94d2f978ae3a99afd665e4a9a3a16500379b5e9a60a2118584e1c04762",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sqrt_derivative.json",
+    "sourceHash": "0d73a635e7a8bd96c41ae06ac19bf27aa3f640bd98cd95b4c665651922989e75",
+    "exactNativeSource": true
+  },
+  {
+    "name": "abs_derivative_positive.json",
+    "sourceHash": "f104e239d92e830b33e72e179efc2cdfdc84256e00d3b840672b5573ad557066",
+    "exactNativeSource": true
+  },
+  {
+    "name": "abs_derivative_negative.json",
+    "sourceHash": "6a6ae236f79810356f8340260cd8f662add3bdf4870e8521a2f6dda2cc78cdb5",
+    "exactNativeSource": true
+  },
+  {
+    "name": "exp_derivative.json",
+    "sourceHash": "b81ba728daed9a436085df6fc9014dcf206d4e31161659e881df00b568f9a326",
+    "exactNativeSource": true
+  },
+  {
+    "name": "log_derivative.json",
+    "sourceHash": "5ab3b1b992dfea8881f11f96d38c818a2312233c443ed02dafb935a7af1dd2e4",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sin_derivative.json",
+    "sourceHash": "aa96b2c1b5d66ddc04bce076e60d7fa0577a3f71a5a2169ce3ac5280bb5d3ae2",
+    "exactNativeSource": true
+  },
+  {
+    "name": "cos_derivative.json",
+    "sourceHash": "7201a8a51431f13ea4f6d519d2b2b8f5cd1bafd07c895486b818b32a90261541",
+    "exactNativeSource": true
+  },
+  {
+    "name": "recursive_nested_sin_exp.json",
+    "sourceHash": "897500822725b0cd19bb335ccf2ec7740afaa821bd349732c729e24e4a8958fe",
+    "exactNativeSource": true
+  },
+  {
+    "name": "recursive_exp_quotient.json",
+    "sourceHash": "5b0254bffbd85422eb53008258a3563f56d20b24c0a6f53db0317a5bcf8e5896",
+    "exactNativeSource": true
+  },
+  {
+    "name": "recursive_sqrt_quotient.json",
+    "sourceHash": "4c53f6272beeead635cbf5c65da963fc9a216d13265918cf68071544d3649077",
+    "exactNativeSource": true
+  },
+  {
+    "name": "recursive_log_abs.json",
+    "sourceHash": "f8dd5e8fbf93cd2c2ff77b1191fd18eb1e1ae1281719a183ebdf133fc9059ecc",
+    "exactNativeSource": true
+  },
+  {
+    "name": "recursive_abs_sin_symbolic.json",
+    "sourceHash": "233a754b02d622c58f9481ae663d8821e3c31f7abf3a1289eda3b1b7aefe2cdc",
+    "exactNativeSource": true
+  },
+  {
+    "name": "recursive_log_exp_auto_positive.json",
+    "sourceHash": "dd7e0a047e9cafbaf8eece488931fd3db9742f1bb72ecba25df7aa806c73ca48",
+    "exactNativeSource": true
+  },
+  {
+    "name": "recursive_sqrt_square_plus_one.json",
+    "sourceHash": "d2087ee32ac9a38c7f9569ef9c433f5009a1e672cbd61a64c8034ecdf5f25937",
+    "exactNativeSource": true
+  },
+  {
+    "name": "continuity_abs_limit.json",
+    "sourceHash": "987d18365ba9b69d37448caf9731864ffebc60c268c25fc13f2b8099cd5b45a4",
+    "exactNativeSource": true
+  },
+  {
+    "name": "continuity_log_exp_limit.json",
+    "sourceHash": "29b1b40d68f452a5ef2d09c4a1c815efdb0d523f022fb9fd413132556b068d46",
+    "exactNativeSource": true
+  },
+  {
+    "name": "continuity_guarded_quotient_limit.json",
+    "sourceHash": "864bceb74de6788daa700b399d42cb9130143960d752af0ea766f934324e9836",
+    "exactNativeSource": true
+  },
+  {
+    "name": "continuity_sqrt_square_limit.json",
+    "sourceHash": "f7f6af532f4456657e52574e1333aca8cca0e8f62c6a115772d4f0568c3aaf66",
+    "exactNativeSource": true
+  },
+  {
+    "name": "continuity_sqrt_right_limit.json",
+    "sourceHash": "ecbd13e2dda23a3600f557ba5542a5a4071d67dbb30afc7e55a4191f8867ce8a",
+    "exactNativeSource": true
+  },
+  {
+    "name": "continuous_ivt_guarded_quotient.json",
+    "sourceHash": "9909cfb84b4a988d87d4a3435122045d78e9d029c74d0b11a19003351a7f666e",
+    "exactNativeSource": true
+  },
+  {
+    "name": "continuous_ivt_exp_with_brackets.json",
+    "sourceHash": "5fd261d633578ae06ab0eb9f5771ff0f1d5d22433c0d09c95109d79552a171f3",
+    "exactNativeSource": true
+  },
+  {
+    "name": "continuous_ivt_quantified_guard.json",
+    "sourceHash": "2711cef5e3612bcccc574d028a356dad01f81d06f4aeea0d63e8c79967c3d05f",
+    "exactNativeSource": true
+  },
+  {
+    "name": "bounded_interval_positive.json",
+    "sourceHash": "40ffa43ce3f4ed1004f1a16fe8eb4e14a99f8fdb5c92c6b0b0fcd87fa23a46aa",
+    "exactNativeSource": true
+  },
+  {
+    "name": "limit_algebra_basic.json",
+    "sourceHash": "dffcba3bb77be179f1e144c08feaa0533cdd19802312663ba4deff8729d0401e",
+    "exactNativeSource": true
+  },
+  {
+    "name": "limit_algebra_one_sided.json",
+    "sourceHash": "cc1296e60bcb91716bfac219da88d4b21cd081119ec7d779663a3d3d15966ec3",
+    "exactNativeSource": true
+  },
+  {
+    "name": "limit_algebra_hole_composition.json",
+    "sourceHash": "6c0225f2ca63eac7d14c5f73f41bc4c2a8571c9f00a21c08a8772c61d63df752",
+    "exactNativeSource": true
+  },
+  {
+    "name": "limit_algebra_symbolic_denominator.json",
+    "sourceHash": "3b9d69ecd5fe8b3e6dbcc84d83f9ac9ff8ca383540b4a8bb4544a9d28a854a5f",
+    "exactNativeSource": true
+  },
+  {
+    "name": "limit_algebra_log_composition.json",
+    "sourceHash": "cf1427d360e4af4d7e00db5bf6bcfae1d52727b72f27663003e2bed55f4058be",
+    "exactNativeSource": true
+  },
+  {
+    "name": "limit_algebra_sqrt_positive.json",
+    "sourceHash": "71cd6268e4d41729ec96040adc52b87e3b235b2663274dbc4768e963d2da5a37",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_reciprocal_shift.json",
+    "sourceHash": "eba002a795ece4deec2e1a2bf86bc0586001828793219d2d38a4f856879057e6",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_geometric_half.json",
+    "sourceHash": "c619a38aad6e0f91de91401669e5f5e073fa2f325b12948c857f2f8aa296e0c3",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_geometric_symbolic.json",
+    "sourceHash": "02805e243346e6e9c182756749a73bb3163a9269272730a9d1f514a6ca3ff65f",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_composed.json",
+    "sourceHash": "271722162ad49ecca238d67b7f633de01ddf9cff15bb6eddbf5d4c78b76b4f62",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_reuse_sublimit.json",
+    "sourceHash": "7dd85f83fd434bf06d56c49ca9c57c8f9d93e8237d9f967e9607aff240bdefb7",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_nat_at_top.json",
+    "sourceHash": "56a6f245cae5d683e29a0e09d78e448b36812ec3ba14181d2814b6f395eb9743",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_rational_shift.json",
+    "sourceHash": "c780943e2caa6e30f3923d5f18e6b11c686ec5cf011410c743ecd773d7065ac3",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_rational_shift_offset.json",
+    "sourceHash": "6df0ac2b542cadc16cf606e5adb49ee24aa049d8a79cbbd8712756029285e619",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_affine_ratio.json",
+    "sourceHash": "6512f958a9179ac2af10973e5e0379b5b6584ec746d4826f8d1a7fc89c62cc4e",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_affine_ratio_negative.json",
+    "sourceHash": "d34100d2ff6192c9a4bd62c0cfeab48facf3163febd7b463fd7c6a57d280d244",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_affine_ratio_rational.json",
+    "sourceHash": "b260767a17bff01e8246a2470a34e56329f816c0e5038f4fbe841d982754cf68",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_quadratic_ratio.json",
+    "sourceHash": "e310e9563cffc12257042ccd589e5119ec88924b2baf671620fda8c688649c82",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_quadratic_ratio_negative.json",
+    "sourceHash": "8d09a8f2c39be4f48f9b630e462074291c0953936bf6493c080fb25e6420ac35",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_quadratic_ratio_factored.json",
+    "sourceHash": "bf67329306a9b1f9c0a6885e8b01a63af7afdc1d98db90eb8ab30321d422033d",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_polynomial_degree_ratio_zero.json",
+    "sourceHash": "192e907ddfc4a8fa7b8ba1785d1bf399891ba48000c847a72d81237df706df5b",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_polynomial_degree_ratio_pos_inf.json",
+    "sourceHash": "00d462c7035b386cb9731b922cf762e81e0ff563aeb1b0aaf66dc03b174e92f0",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_polynomial_degree_ratio_neg_inf.json",
+    "sourceHash": "705ea90bdbe44cd072365522ab4e91787a9986e8313a53773b116247a53a35bc",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_polynomial_degree_ratio_gap2_neg_inf.json",
+    "sourceHash": "4f1133aff87850db2b500cf3b82d098a1c3ee34574ef80f23941e68e7ab51210",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_polynomial_general_equal_degree.json",
+    "sourceHash": "1ec156cdfbd5b4d049be4c92c2c3ad660700e002047ed9f34f2b965687b5088b",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_polynomial_general_lower_degree.json",
+    "sourceHash": "e5786618b134ee0476408cf2d33588ffa12d3965bdd67afccf976e2b3685c603",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_polynomial_general_pos_inf.json",
+    "sourceHash": "59cee5147b07b2fe3b0cdfe58718348fc35fea47acbd43005b5d66d1d399a20b",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_squeeze_sin_over_shift.json",
+    "sourceHash": "5ac105d79dfd43164cb54955f87ce72360181fe0d9b9874dcd17c861525d319f",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_squeeze_sin_auto.json",
+    "sourceHash": "b6b9f89da67f7679dad37c7c1661316a1a9422bd5ac5c8069745f6be0281b8be",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_squeeze_cos_auto.json",
+    "sourceHash": "28f9e8a4f2f4fbc0c8760ecdaaf6acb0b9673e4d3ef113091b35f13b5eec8f89",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_monotone_bounded_increasing.json",
+    "sourceHash": "f40817a8c648fc1cb8cac05b46ac7d6ddfae1421eeafc0d384aed90e122b21e4",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_monotone_bounded_decreasing.json",
+    "sourceHash": "1d05e5b135ef80c077c4b91ff07dce0ab92f52a1cc307b6d4b4290fb4d6b40c9",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_monotone_bounded_auto_increasing.json",
+    "sourceHash": "d1bf0e8cdc58135bcc443a112e873012947c4a9e3238cf92045c846816ec9d1d",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_monotone_bounded_auto_decreasing.json",
+    "sourceHash": "0ba682adab2e43742dfe3654a878c60b47071c1cc3d8e1a99322f46b2516f25e",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_alternating_no_finite.json",
+    "sourceHash": "9ed16d236dea0d5e6b2964c5d4948c28be8fa8d5b8e4c4cae8d473ddce8c3118",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_alternating_affine_no_finite.json",
+    "sourceHash": "65cda44fc8929e672caa58548b1d005cc20d7e1014f9a31283c962696fc29d48",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_periodic_mod2_piecewise_no_finite.json",
+    "sourceHash": "1a7f2e191bef65d8b277e7d779c8e33ad75e09f9701e4dbde0067c0658b4cf00",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_periodic_mod3_no_finite.json",
+    "sourceHash": "6429086594f39e4634bc220eb72bd350254439edf9cdc1e93803911df5983744",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_periodic_mod4_no_finite.json",
+    "sourceHash": "04565050e08cef3ce72837952184c44d9125b6f5f5ac6ce7bad118ec38619e95",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_alternating_vanishing_reciprocal_no_finite.json",
+    "sourceHash": "d6df1fc17a4edb9e955efbc5f1560a35df112670de332e55d3f3abd19ef98b18",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_periodic_mod3_vanishing_reciprocal_no_finite.json",
+    "sourceHash": "1d66c31d6cee72a80d2760a84a2d3e2eb2d965b12bdaf1f3afdeb031f096b2c4",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_periodic_mod4_vanishing_geometric_no_finite.json",
+    "sourceHash": "cdfab6204768820eeb82f0c75f6066986b9e53add2e79268f47c793cee5c5987",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_alternating_finite_reciprocal_no_finite.json",
+    "sourceHash": "f03811abd91df9156f4cc4c1559d128af62b121cd3749eb9ed290a351f0c409b",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_periodic_mod3_finite_reciprocal_no_finite.json",
+    "sourceHash": "94128e66803290293630803f82814c5e18096108c4e3d5daec8e7f58e43cbebe",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_periodic_mod4_finite_symbolic_no_finite.json",
+    "sourceHash": "81bba3d1982b6b49bdf1d45042769b87bece1b026817262a10720360b454f810",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_periodic_cited_finite_tail_no_finite.json",
+    "sourceHash": "505c4ec29d2e578ff86eb6d8654af56c21b323b62104b19e2139df7f37ddcb7b",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_eventually_periodic_mod3_no_finite.json",
+    "sourceHash": "597a7cb36e56bfb8f98fb5f673e255a4c012d4d7f11e0eac1cee0b417080c3ae",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_eventually_alternating_no_finite.json",
+    "sourceHash": "946ce8230cd03818ab01c35524b8cc0fa2e89a5434ffaf34677d4d6837d9a296",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_geometric_two_pos_inf.json",
+    "sourceHash": "e230385675e4bc6388d81a1766bb2d6e84183a36106c756798f1d449ec6fca32",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_geometric_two_no_finite.json",
+    "sourceHash": "a36bf8c882ca485bfd0d2b3943064068bdfaff664e49bfb89c4c35a9817c46c2",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_geometric_negative_two_no_finite.json",
+    "sourceHash": "a215feae6a5bb905235d6be9adb64d5652d88b27fc72fbc0c59b3f3b8da7e906",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_geometric_half_sum.json",
+    "sourceHash": "c231cc39175fadb139fd357c529fe059c31e1117de396ef20e5f24eabf7cfc43",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_geometric_scaled_negative_sum.json",
+    "sourceHash": "6d36ef9703c4b1c1d470f8dcd2e071876b1188e64f4e1fb762355011f6a31ba0",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_geometric_two_not_summable.json",
+    "sourceHash": "3a7517d47c7767670cbdd62e3b382ae72e15d0de8f8aae31bb71902433549a95",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_geometric_negative_one_not_summable.json",
+    "sourceHash": "630c09e37efaf2d21e8394f65ad95f9e0ab24ce9f5d353ab96c87600ddeba18e",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_p2_shift1_summable.json",
+    "sourceHash": "3e46a2d0f27b69a0b35f39202daa9cb1c8b48130865bc59b95aca9db19a0e994",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_p3_scaled_shift2_summable.json",
+    "sourceHash": "4dc8fc3c0066f1c4789271bdc1b474424c39cb8b2e23a56b1a56a7094df67666",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_p1_harmonic_not_summable.json",
+    "sourceHash": "d50ee18bf40da827d1dbcf35525e3cbbd0fba4b28f08a3c0b4fd6d10ca83f2d8",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_p0_not_summable.json",
+    "sourceHash": "931ca66a9a02a09410016291cedfa6ed4baeb3d583ce387563dca8a799d78ab9",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_p_real_three_halves_shift1_summable.json",
+    "sourceHash": "8813465d88337f54515772f007529f6ccecb9290d296fda928222fbbd442756b",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_p_real_half_scaled_shift2_not_summable.json",
+    "sourceHash": "1f4bcffb0f40c195ff832f8d9860fb5a474a3d6f7289eb46d4e7253a1ad6990c",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_comparison_summable.json",
+    "sourceHash": "517ae9b82e1b3df8fbc172cb5870bba698b88a3db76b410bf14c175e41dea32d",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_comparison_not_summable.json",
+    "sourceHash": "4a92d149e75f08b2f439c67aa14a02f105654e7676bd5339e384096f9799a23d",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_ratio_eventual_linear_geometric_summable.json",
+    "sourceHash": "2de6e90df27c883fae7640839c38f60647f0f8b5c6c5fb9e04273da0dfe7f586",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_ratio_global_geometric_summable.json",
+    "sourceHash": "3fe29dd694068b203dd5eb14c1a8da298e7c8b7eb21f60bf4fc13e2f6bbf44b7",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_ratio_limit_geometric_summable.json",
+    "sourceHash": "956f39d5035f7f1a62fbcf2d834caf084af54e168572bf206d738c5f4a9353d1",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_ratio_limit_geometric_divergent.json",
+    "sourceHash": "0ecff04573fa2742876febb6da41e5f8bb84f0b6f774784c47ad127284ae57aa",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_geometric_summable.json",
+    "sourceHash": "9c82c10b3937a74aea9f99d846ecee17f24c4705498983a7571124e50c51c181",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_geometric_divergent.json",
+    "sourceHash": "7c9f7f7e70953b867a7ff6864dccc55427e697d8c452d47af1ede11c9fc547fb",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_monomial_geometric_summable.json",
+    "sourceHash": "6296ca800850f1a0623f82dae7bd2851d0b33beb73fd0b5cc984c4c96ec60576",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_monomial_geometric_divergent.json",
+    "sourceHash": "1e9a2ad9c04c35729adbb4e11a87c7cfae4ec04f8f1ae7beb512e11f879555d5",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_polynomial_geometric_summable.json",
+    "sourceHash": "cf5e3dcd0b499e96555f3986c116071d9bea5cb164d84e9049e2c74c9f9e04b4",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_polynomial_geometric_divergent.json",
+    "sourceHash": "bd24dcb7a6a0c3cd4b16b7626aad7b85f9d6c95115afa885d3d93dabe9145b4f",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_ratio_limit_missing_nonzero.json",
+    "sourceHash": "a1af9db30c07bcb8c145d3de22127b3d72a36a8f7b7f295faf950a4c4097eff2",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_ratio_limit_wrong_nonzero.json",
+    "sourceHash": "1a150faf1184641e775b917c13652d88ac3fbeab25f28d45190cc12da9861c76",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_monotone_bounded_missing_bound.json",
+    "sourceHash": "7020a16e1946b179aeec4182e494c70a7c361a011a7b07e36bcc037f712cc140",
+    "exactNativeSource": true
+  },
+  {
+    "name": "sequence_squeeze_missing_upper.json",
+    "sourceHash": "2853c317eaed9e07bf1d0a2c6b92ba3a1a6a7a7c066f0febfd19431d317c8210",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_geometric_product_divergent.json",
+    "sourceHash": "2fb41f48c0d04602165b740c458ab5b288923cb7717c10d8862693668adf8d8c",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_geometric_product_summable.json",
+    "sourceHash": "1d443339d01628618901b2bf66e0647909c734cf7280874030b41b852d9ece30",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_polynomial_quotient_denominator_geometric_summable.json",
+    "sourceHash": "f7592a3e513e90b2ca0bbe384d5b74b24c9297b68e988434bf01309fa75ce5bd",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_polynomial_quotient_domain_guard_needed.json",
+    "sourceHash": "5849395ddf35d094d1bb2d5798e0dae0b73c331aa8db369e1c8c85975709d8c3",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_polynomial_quotient_geometric_divergent.json",
+    "sourceHash": "f78434cbf783a42aab21146edd8bb4b88f76a8e2f4416cf067bd0f72c262a52e",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_polynomial_quotient_geometric_summable.json",
+    "sourceHash": "ac12da011f06ef10c8b7865a8ed4fac0d9536feac2248d27b083a7a870be529e",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_reciprocal_polynomial_geometric_summable.json",
+    "sourceHash": "818e9a124dc2bd3a4902720d6ef0f12452025c1698f42d408f532459047bbec1",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_ratio_limit_balanced_powered_shifted_factorials.json",
+    "sourceHash": "97396a54f9e80d9fb781978bfaea850cf3d2de3652bc5b4cf73e04d25582dccf",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_ratio_limit_extra_denominator_factorial.json",
+    "sourceHash": "01d097fe4fc9d8e7ac9dbf42251c9e487c23a386350c4af53796db1b3ba3f687",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_ratio_limit_extra_numerator_factorial.json",
+    "sourceHash": "ecd9cde26b459e10aae429406b07d190be3a57eca6fdff48de229c04f270df63",
+    "exactNativeSource": true
+  },
+  {
+    "name": "series_root_geometric_product_boundary_one.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_root_nonpolynomial_quotient_needs_limit.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_root_polynomial_quotient_boundary_one.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_root_zero_geometric_denominator_needs_domain.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "missing_restriction.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "wrong_limit_direction.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "leaked_assumption.json",
+    "status": "ambiguous_input",
+    "certificate": null
+  },
+  {
+    "name": "ivt_false_uniqueness_method.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "abs_derivative_kink.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "log_derivative_missing_domain.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "recursive_abs_missing_sign.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "recursive_abs_kink.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "recursive_wrong_formula.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "continuity_wrong_value.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "continuity_log_zero_domain_violation.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "continuous_ivt_missing_brackets.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "continuous_ivt_missing_interval_guard.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "limit_algebra_log_nonpositive_target.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "limit_algebra_missing_hole_premise.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_geometric_bad_ratio.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_geometric_missing_ratio.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_wrong_reciprocal_target.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_rational_shift_wrong_target.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_affine_ratio_wrong_target.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_affine_ratio_zero_leading_denominator.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_quadratic_ratio_wrong_target.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_quadratic_ratio_lower_degree.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_polynomial_degree_ratio_wrong_sign.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_polynomial_degree_ratio_wrong_zero_target.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_polynomial_degree_ratio_equal_degree.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_polynomial_general_wrong_equal_target.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_polynomial_general_zero_denominator.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_polynomial_general_degree_overflow.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_squeeze_auto_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_monotone_bounded_auto_bad_ratio.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_alternating_wrong_infinity.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_geometric_half_wrong_no_finite.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_geometric_one_wrong_no_finite.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_periodic_constant_wrong_no_finite.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_periodic_mod5_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_periodic_with_drift_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_alternating_growing_tail_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_alternating_finite_plus_growing_tail_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_alternating_unsafe_reciprocal_tail_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_periodic_cited_finite_tail_missing.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_periodic_cited_finite_tail_wrong_citation.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_eventually_constant_wrong_no_finite.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "sequence_eventually_periodic_le_cutoff_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_geometric_wrong_sum.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_geometric_false_divergence.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_geometric_false_finite.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_p2_false_not_summable.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_p1_false_summable.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_p2_zero_shift_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_p_real_three_halves_false_not_summable.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_p_real_half_false_summable.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_p_real_overflow_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_comparison_missing_evidence.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_comparison_wrong_direction.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_ratio_missing_evidence.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_ratio_bound_one_unsupported.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_ratio_wrong_direction.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_ratio_limit_non_geometric_missing_limit.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_ratio_limit_boundary_one_inconclusive.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_ratio_limit_lt_one_false_divergence.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_root_boundary_one_inconclusive.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_root_lt_one_false_divergence.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_root_gt_one_false_convergence.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_root_monomial_boundary_one.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_root_polynomial_boundary_one.json",
+    "status": "needs_justification",
+    "certificate": null
+  },
+  {
+    "name": "series_root_nonpolynomial_needs_limit.json",
+    "status": "needs_justification",
+    "certificate": null
+  }
+]

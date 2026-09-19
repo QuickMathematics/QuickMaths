@@ -1,0 +1,4353 @@
+[
+  {
+    "name": "guarded_cancellation.json",
+    "result": {
+      "status": "verified",
+      "message": "Lean kernel accepted the exact generated statement and proof artifact.",
+      "request_hash": "da6f86e1f6e1cd3d23ad0c9250c814d793f67686d972b692fd2573c0436674d3",
+      "statement_hash": "61773d4b23dd84ee4015571ef579adf2e25337e0ae1cb0a8415d0a1e2d477dc1",
+      "obligations": [],
+      "lean_source": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) (hden : (x - 3) \u2260 0) : (((x ^ 2) - 9) / (x - 3)) = (x + 3) := by\n  have cancel : (((x ^ 2) - 9) / (x - 3)) = (x + 3) := by\n    field_simp [hden] <;> ring\n  exact cancel\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+      "stdout": "Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice\n\nNote: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`\n'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]",
+      "stderr": "",
+      "elapsed_ms": 211,
+      "certificate": {
+        "certificate_version": "0.2",
+        "verifier_version": "phase1.0",
+        "verified_at": "2026-09-19T15:58:50.393999+00:00",
+        "request_hash": "da6f86e1f6e1cd3d23ad0c9250c814d793f67686d972b692fd2573c0436674d3",
+        "statement_hash": "61773d4b23dd84ee4015571ef579adf2e25337e0ae1cb0a8415d0a1e2d477dc1",
+        "submission_hash": "4d59d0f60d170f6c9a8ba9799f42d5b1d8511ff6162e3a9bc74bcef01d5da335",
+        "lean_source_hash": "7dc95896f37973d8f4819637977993d5f579142749cbc555ab53f067e85c57fc",
+        "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) (hden : (x - 3) \u2260 0) : (((x ^ 2) - 9) / (x - 3)) = (x + 3) := by\n  have cancel : (((x ^ 2) - 9) / (x - 3)) = (x + 3) := by\n    field_simp [hden] <;> ring\n  exact cancel\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+        "proof_mode": "submitted",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "environment": {
+          "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+          "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+        },
+        "elapsed_ms": 211,
+        "certificate_digest": "7c78bc524e95e4e20240e145819ab024b299fd878a38e6f4cd0bf4d0b42371bb"
+      },
+      "proof_mode": "submitted",
+      "counterexample": null,
+      "resolved_request": {
+        "version": "0.1",
+        "request_id": "guarded-cancellation",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [
+          {
+            "id": "hden",
+            "scope": "root",
+            "claim": {
+              "kind": "ne",
+              "left": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 0
+              }
+            }
+          }
+        ],
+        "steps": [
+          {
+            "id": "cancel",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "div",
+                  "left": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 9
+                    }
+                  },
+                  "right": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                }
+              }
+            },
+            "rule": "guarded_cancel",
+            "premises": [
+              "hden"
+            ],
+            "parameters": {
+              "divisor": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            }
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "eq",
+            "left": {
+              "kind": "div",
+              "left": {
+                "kind": "sub",
+                "left": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 2
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 9
+                }
+              },
+              "right": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            },
+            "right": {
+              "kind": "add",
+              "left": {
+                "kind": "var",
+                "id": "x"
+              },
+              "right": {
+                "kind": "int",
+                "value": 3
+              }
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "guarded_cancel"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "missing_restriction.json",
+    "result": {
+      "status": "needs_justification",
+      "message": "Rational simplification needs a cited proof for every denominator that may be zero.",
+      "request_hash": "f5c0685a1db95a9159f5a261421ea806875739a333f0d6055b2e0dd5fe3d7be8",
+      "statement_hash": "61773d4b23dd84ee4015571ef579adf2e25337e0ae1cb0a8415d0a1e2d477dc1",
+      "obligations": [
+        {
+          "step_id": "cancel",
+          "code": "nonzero_required",
+          "message": "Rational simplification needs a cited proof for every denominator that may be zero.",
+          "expected_claim": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "ne",
+              "left": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 0
+              }
+            }
+          }
+        },
+        {
+          "step_id": "cancel",
+          "code": "nonzero_required",
+          "message": "Cancellation needs a cited proof that the cancelled divisor is nonzero in this scope.",
+          "expected_claim": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "ne",
+              "left": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 0
+              }
+            }
+          }
+        },
+        {
+          "step_id": "goal",
+          "code": "denominator_nonzero",
+          "message": "Division requires the denominator to be nonzero on the intended domain.",
+          "expected_claim": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "ne",
+              "left": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 0
+              }
+            }
+          }
+        }
+      ],
+      "lean_source": "",
+      "stdout": "",
+      "stderr": "",
+      "elapsed_ms": null,
+      "certificate": null,
+      "proof_mode": "submitted",
+      "counterexample": null,
+      "resolved_request": {
+        "version": "0.1",
+        "request_id": "missing-restriction",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [],
+        "steps": [
+          {
+            "id": "cancel",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "div",
+                  "left": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 9
+                    }
+                  },
+                  "right": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                }
+              }
+            },
+            "rule": "guarded_cancel",
+            "premises": [],
+            "parameters": {
+              "divisor": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            }
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "eq",
+            "left": {
+              "kind": "div",
+              "left": {
+                "kind": "sub",
+                "left": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 2
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 9
+                }
+              },
+              "right": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            },
+            "right": {
+              "kind": "add",
+              "left": {
+                "kind": "var",
+                "id": "x"
+              },
+              "right": {
+                "kind": "int",
+                "value": 3
+              }
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "guarded_cancel"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "MATH_POLY_001",
+    "result": {
+      "request": {
+        "version": "0.1",
+        "request_id": "rollout:MATH_POLY_001",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [],
+        "steps": [
+          {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      },
+                      "right": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 3
+                        },
+                        "right": {
+                          "kind": "var",
+                          "id": "x"
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "sub",
+                      "left": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 2
+                        },
+                        "right": {
+                          "kind": "pow",
+                          "base": {
+                            "kind": "var",
+                            "id": "x"
+                          },
+                          "exponent": 2
+                        }
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 4
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 3
+                      },
+                      "right": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      }
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 2
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 6
+                  }
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "eq",
+            "left": {
+              "kind": "add",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 2
+                  },
+                  "right": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 3
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 2
+                }
+              },
+              "right": {
+                "kind": "add",
+                "left": {
+                  "kind": "sub",
+                  "left": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 2
+                    },
+                    "right": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "var",
+                    "id": "x"
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 4
+                }
+              }
+            },
+            "right": {
+              "kind": "add",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "int",
+                    "value": 3
+                  },
+                  "right": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 2
+                  }
+                },
+                "right": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "int",
+                    "value": 2
+                  },
+                  "right": {
+                    "kind": "var",
+                    "id": "x"
+                  }
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 6
+              }
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "ring_identity"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      },
+      "proof_state": {
+        "status": "ready_for_kernel",
+        "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+        "preview": "Variables: x (real). Goal: ((((x)^2 + (3 * x)) + 2) + (((2 * (x)^2) - x) + 4)) = (((3 * (x)^2) + (2 * x)) + 6)",
+        "goal": "((((x)^2 + (3 * x)) + 2) + (((2 * (x)^2) - x) + 4)) = (((3 * (x)^2) + (2 * x)) + 6)",
+        "request_hash": "9ae4e8f9a5cac63d8c20680d29870ce30762b42479e68de6ce7cc622ede326c1",
+        "goal_established": true,
+        "kernel_ready": true,
+        "context": [],
+        "steps": [
+          {
+            "step_id": "reference_step_1",
+            "status": "candidate_ready",
+            "rule": "ring_identity",
+            "claim": "((((x)^2 + (3 * x)) + 2) + (((2 * (x)^2) - x) + 4)) = (((3 * (x)^2) + (2 * x)) + 6)",
+            "message": "Exact polynomial normalization confirms this candidate identity.",
+            "obligations": [],
+            "scope": "root",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "obligations": [],
+        "suggestions": [],
+        "counterexample": null
+      },
+      "checked_steps": [
+        {
+          "step": {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      },
+                      "right": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 3
+                        },
+                        "right": {
+                          "kind": "var",
+                          "id": "x"
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "sub",
+                      "left": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 2
+                        },
+                        "right": {
+                          "kind": "pow",
+                          "base": {
+                            "kind": "var",
+                            "id": "x"
+                          },
+                          "exponent": 2
+                        }
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 4
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 3
+                      },
+                      "right": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      }
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 2
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 6
+                  }
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          },
+          "proof_state": {
+            "status": "ready_for_kernel",
+            "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+            "preview": "Variables: x (real). Goal: ((((x)^2 + (3 * x)) + 2) + (((2 * (x)^2) - x) + 4)) = (((3 * (x)^2) + (2 * x)) + 6)",
+            "goal": "((((x)^2 + (3 * x)) + 2) + (((2 * (x)^2) - x) + 4)) = (((3 * (x)^2) + (2 * x)) + 6)",
+            "request_hash": "9ae4e8f9a5cac63d8c20680d29870ce30762b42479e68de6ce7cc622ede326c1",
+            "goal_established": true,
+            "kernel_ready": true,
+            "context": [],
+            "steps": [
+              {
+                "step_id": "reference_step_1",
+                "status": "candidate_ready",
+                "rule": "ring_identity",
+                "claim": "((((x)^2 + (3 * x)) + 2) + (((2 * (x)^2) - x) + 4)) = (((3 * (x)^2) + (2 * x)) + 6)",
+                "message": "Exact polynomial normalization confirms this candidate identity.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [],
+                "parameters": {}
+              }
+            ],
+            "obligations": [],
+            "suggestions": [],
+            "counterexample": null
+          }
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "message": "Lean kernel accepted the exact generated statement and proof artifact.",
+        "request_hash": "9ae4e8f9a5cac63d8c20680d29870ce30762b42479e68de6ce7cc622ede326c1",
+        "statement_hash": "a655b9c4ffaa209ad9b9b340ae19f011cbf4f2f1cc3fd985005b27a07fbcbcd3",
+        "obligations": [],
+        "lean_source": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : ((((x ^ 2) + (3 * x)) + 2) + (((2 * (x ^ 2)) - x) + 4)) = (((3 * (x ^ 2)) + (2 * x)) + 6) := by\n  have reference_step_1 : ((((x ^ 2) + (3 * x)) + 2) + (((2 * (x ^ 2)) - x) + 4)) = (((3 * (x ^ 2)) + (2 * x)) + 6) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+        "stdout": "'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "stderr": "",
+        "elapsed_ms": 176,
+        "certificate": {
+          "certificate_version": "0.2",
+          "verifier_version": "phase1.0",
+          "verified_at": "2026-09-19T15:58:50.655000+00:00",
+          "request_hash": "9ae4e8f9a5cac63d8c20680d29870ce30762b42479e68de6ce7cc622ede326c1",
+          "statement_hash": "a655b9c4ffaa209ad9b9b340ae19f011cbf4f2f1cc3fd985005b27a07fbcbcd3",
+          "submission_hash": "ba6c158c9299428baa0cb0dd950c798645f4949552ba7587a6445eee35040edd",
+          "lean_source_hash": "23d38d2381405c244192dc93f928c4df3f8c159ebaa1387530c0fc3b106aaa5d",
+          "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : ((((x ^ 2) + (3 * x)) + 2) + (((2 * (x ^ 2)) - x) + 4)) = (((3 * (x ^ 2)) + (2 * x)) + 6) := by\n  have reference_step_1 : ((((x ^ 2) + (3 * x)) + 2) + (((2 * (x ^ 2)) - x) + 4)) = (((3 * (x ^ 2)) + (2 * x)) + 6) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+          "proof_mode": "reference",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "environment": {
+            "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+            "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+          },
+          "elapsed_ms": 176,
+          "certificate_digest": "8f7578b15353486389e9ae48c5bd59e55ff54f5dbe266bb15e78a652d54f6dbe"
+        },
+        "proof_mode": "reference",
+        "counterexample": null,
+        "resolved_request": {
+          "version": "0.1",
+          "request_id": "rollout:MATH_POLY_001",
+          "variables": [
+            {
+              "id": "x",
+              "type": "real"
+            }
+          ],
+          "scopes": [
+            {
+              "id": "root",
+              "parent": null,
+              "binders": []
+            }
+          ],
+          "assumptions": [],
+          "steps": [
+            {
+              "id": "reference_step_1",
+              "scope": "root",
+              "claim": {
+                "kind": "proposition",
+                "proposition": {
+                  "kind": "eq",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "add",
+                        "left": {
+                          "kind": "pow",
+                          "base": {
+                            "kind": "var",
+                            "id": "x"
+                          },
+                          "exponent": 2
+                        },
+                        "right": {
+                          "kind": "mul",
+                          "left": {
+                            "kind": "int",
+                            "value": 3
+                          },
+                          "right": {
+                            "kind": "var",
+                            "id": "x"
+                          }
+                        }
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 2
+                      }
+                    },
+                    "right": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "sub",
+                        "left": {
+                          "kind": "mul",
+                          "left": {
+                            "kind": "int",
+                            "value": 2
+                          },
+                          "right": {
+                            "kind": "pow",
+                            "base": {
+                              "kind": "var",
+                              "id": "x"
+                            },
+                            "exponent": 2
+                          }
+                        },
+                        "right": {
+                          "kind": "var",
+                          "id": "x"
+                        }
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 4
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 3
+                        },
+                        "right": {
+                          "kind": "pow",
+                          "base": {
+                            "kind": "var",
+                            "id": "x"
+                          },
+                          "exponent": 2
+                        }
+                      },
+                      "right": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 2
+                        },
+                        "right": {
+                          "kind": "var",
+                          "id": "x"
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 6
+                    }
+                  }
+                }
+              },
+              "rule": "ring_identity",
+              "premises": [],
+              "parameters": {}
+            }
+          ],
+          "goal": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "eq",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 3
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 2
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 2
+                      },
+                      "right": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      }
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 4
+                  }
+                }
+              },
+              "right": {
+                "kind": "add",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 3
+                    },
+                    "right": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 2
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 6
+                }
+              }
+            }
+          },
+          "policy": {
+            "allowed_rules": [
+              "ring_identity"
+            ],
+            "max_seconds": 60,
+            "accepted_axioms": [
+              "propext",
+              "Classical.choice",
+              "Quot.sound"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "MATH_POLY_002",
+    "result": {
+      "request": {
+        "version": "0.1",
+        "request_id": "rollout:MATH_POLY_002",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [],
+        "steps": [
+          {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 5
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 6
+                  }
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "eq",
+            "left": {
+              "kind": "mul",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 2
+                }
+              },
+              "right": {
+                "kind": "add",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            },
+            "right": {
+              "kind": "add",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 2
+                },
+                "right": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "int",
+                    "value": 5
+                  },
+                  "right": {
+                    "kind": "var",
+                    "id": "x"
+                  }
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 6
+              }
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "ring_identity"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      },
+      "proof_state": {
+        "status": "ready_for_kernel",
+        "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+        "preview": "Variables: x (real). Goal: ((x + 2) * (x + 3)) = (((x)^2 + (5 * x)) + 6)",
+        "goal": "((x + 2) * (x + 3)) = (((x)^2 + (5 * x)) + 6)",
+        "request_hash": "38920444a31c879a209824efa2bc5921a77af2d6d25402e5d8dbcf8d4f688a7b",
+        "goal_established": true,
+        "kernel_ready": true,
+        "context": [],
+        "steps": [
+          {
+            "step_id": "reference_step_1",
+            "status": "candidate_ready",
+            "rule": "ring_identity",
+            "claim": "((x + 2) * (x + 3)) = (((x)^2 + (5 * x)) + 6)",
+            "message": "Exact polynomial normalization confirms this candidate identity.",
+            "obligations": [],
+            "scope": "root",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "obligations": [],
+        "suggestions": [],
+        "counterexample": null
+      },
+      "checked_steps": [
+        {
+          "step": {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 5
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 6
+                  }
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          },
+          "proof_state": {
+            "status": "ready_for_kernel",
+            "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+            "preview": "Variables: x (real). Goal: ((x + 2) * (x + 3)) = (((x)^2 + (5 * x)) + 6)",
+            "goal": "((x + 2) * (x + 3)) = (((x)^2 + (5 * x)) + 6)",
+            "request_hash": "38920444a31c879a209824efa2bc5921a77af2d6d25402e5d8dbcf8d4f688a7b",
+            "goal_established": true,
+            "kernel_ready": true,
+            "context": [],
+            "steps": [
+              {
+                "step_id": "reference_step_1",
+                "status": "candidate_ready",
+                "rule": "ring_identity",
+                "claim": "((x + 2) * (x + 3)) = (((x)^2 + (5 * x)) + 6)",
+                "message": "Exact polynomial normalization confirms this candidate identity.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [],
+                "parameters": {}
+              }
+            ],
+            "obligations": [],
+            "suggestions": [],
+            "counterexample": null
+          }
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "message": "Lean kernel accepted the exact generated statement and proof artifact.",
+        "request_hash": "38920444a31c879a209824efa2bc5921a77af2d6d25402e5d8dbcf8d4f688a7b",
+        "statement_hash": "93d244c38ccf7adec70bf5d0f6b585e632677b2e8c3c8bc8eac5902b52cbd882",
+        "obligations": [],
+        "lean_source": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : ((x + 2) * (x + 3)) = (((x ^ 2) + (5 * x)) + 6) := by\n  have reference_step_1 : ((x + 2) * (x + 3)) = (((x ^ 2) + (5 * x)) + 6) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+        "stdout": "'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "stderr": "",
+        "elapsed_ms": 86,
+        "certificate": {
+          "certificate_version": "0.2",
+          "verifier_version": "phase1.0",
+          "verified_at": "2026-09-19T15:58:50.795000+00:00",
+          "request_hash": "38920444a31c879a209824efa2bc5921a77af2d6d25402e5d8dbcf8d4f688a7b",
+          "statement_hash": "93d244c38ccf7adec70bf5d0f6b585e632677b2e8c3c8bc8eac5902b52cbd882",
+          "submission_hash": "7c355ab58b44658ec7dfe2f4d1f06624b17e9a0a2580110a03426db99de5860b",
+          "lean_source_hash": "31dbe3ea6859648cde58d7c4d86fc08cb20d58a1b17446e1f3028cc0fe766aec",
+          "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : ((x + 2) * (x + 3)) = (((x ^ 2) + (5 * x)) + 6) := by\n  have reference_step_1 : ((x + 2) * (x + 3)) = (((x ^ 2) + (5 * x)) + 6) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+          "proof_mode": "reference",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "environment": {
+            "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+            "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+          },
+          "elapsed_ms": 86,
+          "certificate_digest": "3fedabe3e57b478c6550f0a012b4de2fa6f5b9ddd943feca7b1de8668f5a9480"
+        },
+        "proof_mode": "reference",
+        "counterexample": null,
+        "resolved_request": {
+          "version": "0.1",
+          "request_id": "rollout:MATH_POLY_002",
+          "variables": [
+            {
+              "id": "x",
+              "type": "real"
+            }
+          ],
+          "scopes": [
+            {
+              "id": "root",
+              "parent": null,
+              "binders": []
+            }
+          ],
+          "assumptions": [],
+          "steps": [
+            {
+              "id": "reference_step_1",
+              "scope": "root",
+              "claim": {
+                "kind": "proposition",
+                "proposition": {
+                  "kind": "eq",
+                  "left": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 2
+                      }
+                    },
+                    "right": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 3
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      },
+                      "right": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 5
+                        },
+                        "right": {
+                          "kind": "var",
+                          "id": "x"
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 6
+                    }
+                  }
+                }
+              },
+              "rule": "ring_identity",
+              "premises": [],
+              "parameters": {}
+            }
+          ],
+          "goal": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "eq",
+              "left": {
+                "kind": "mul",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 2
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                }
+              },
+              "right": {
+                "kind": "add",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 2
+                  },
+                  "right": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 5
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 6
+                }
+              }
+            }
+          },
+          "policy": {
+            "allowed_rules": [
+              "ring_identity"
+            ],
+            "max_seconds": 60,
+            "accepted_axioms": [
+              "propext",
+              "Classical.choice",
+              "Quot.sound"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "MATH_POLY_003",
+    "result": {
+      "request": {
+        "version": "0.1",
+        "request_id": "rollout:MATH_POLY_003",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [],
+        "steps": [
+          {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 12
+                    },
+                    "right": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 18
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 6
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 2
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "eq",
+            "left": {
+              "kind": "add",
+              "left": {
+                "kind": "mul",
+                "left": {
+                  "kind": "int",
+                  "value": 12
+                },
+                "right": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 2
+                }
+              },
+              "right": {
+                "kind": "mul",
+                "left": {
+                  "kind": "int",
+                  "value": 18
+                },
+                "right": {
+                  "kind": "var",
+                  "id": "x"
+                }
+              }
+            },
+            "right": {
+              "kind": "mul",
+              "left": {
+                "kind": "mul",
+                "left": {
+                  "kind": "int",
+                  "value": 6
+                },
+                "right": {
+                  "kind": "var",
+                  "id": "x"
+                }
+              },
+              "right": {
+                "kind": "add",
+                "left": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "int",
+                    "value": 2
+                  },
+                  "right": {
+                    "kind": "var",
+                    "id": "x"
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "ring_identity"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      },
+      "proof_state": {
+        "status": "ready_for_kernel",
+        "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+        "preview": "Variables: x (real). Goal: ((12 * (x)^2) + (18 * x)) = ((6 * x) * ((2 * x) + 3))",
+        "goal": "((12 * (x)^2) + (18 * x)) = ((6 * x) * ((2 * x) + 3))",
+        "request_hash": "755c5eb433417c30ef4c8a7cf587054b3823600cb82aac364d8f38f73ba6982a",
+        "goal_established": true,
+        "kernel_ready": true,
+        "context": [],
+        "steps": [
+          {
+            "step_id": "reference_step_1",
+            "status": "candidate_ready",
+            "rule": "ring_identity",
+            "claim": "((12 * (x)^2) + (18 * x)) = ((6 * x) * ((2 * x) + 3))",
+            "message": "Exact polynomial normalization confirms this candidate identity.",
+            "obligations": [],
+            "scope": "root",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "obligations": [],
+        "suggestions": [],
+        "counterexample": null
+      },
+      "checked_steps": [
+        {
+          "step": {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 12
+                    },
+                    "right": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 18
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 6
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 2
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          },
+          "proof_state": {
+            "status": "ready_for_kernel",
+            "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+            "preview": "Variables: x (real). Goal: ((12 * (x)^2) + (18 * x)) = ((6 * x) * ((2 * x) + 3))",
+            "goal": "((12 * (x)^2) + (18 * x)) = ((6 * x) * ((2 * x) + 3))",
+            "request_hash": "755c5eb433417c30ef4c8a7cf587054b3823600cb82aac364d8f38f73ba6982a",
+            "goal_established": true,
+            "kernel_ready": true,
+            "context": [],
+            "steps": [
+              {
+                "step_id": "reference_step_1",
+                "status": "candidate_ready",
+                "rule": "ring_identity",
+                "claim": "((12 * (x)^2) + (18 * x)) = ((6 * x) * ((2 * x) + 3))",
+                "message": "Exact polynomial normalization confirms this candidate identity.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [],
+                "parameters": {}
+              }
+            ],
+            "obligations": [],
+            "suggestions": [],
+            "counterexample": null
+          }
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "message": "Lean kernel accepted the exact generated statement and proof artifact.",
+        "request_hash": "755c5eb433417c30ef4c8a7cf587054b3823600cb82aac364d8f38f73ba6982a",
+        "statement_hash": "5b789d95877ad3d8e75869fb8ab8b18a35c31be933f3c61746678f32e3aee914",
+        "obligations": [],
+        "lean_source": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : ((12 * (x ^ 2)) + (18 * x)) = ((6 * x) * ((2 * x) + 3)) := by\n  have reference_step_1 : ((12 * (x ^ 2)) + (18 * x)) = ((6 * x) * ((2 * x) + 3)) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+        "stdout": "'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "stderr": "",
+        "elapsed_ms": 80,
+        "certificate": {
+          "certificate_version": "0.2",
+          "verifier_version": "phase1.0",
+          "verified_at": "2026-09-19T15:58:50.924999+00:00",
+          "request_hash": "755c5eb433417c30ef4c8a7cf587054b3823600cb82aac364d8f38f73ba6982a",
+          "statement_hash": "5b789d95877ad3d8e75869fb8ab8b18a35c31be933f3c61746678f32e3aee914",
+          "submission_hash": "adc967f34fc0717d5a8444cc88527e395a95003855adfcee2d9d8c74d76fc9c3",
+          "lean_source_hash": "faf128162fb947081c235d6183a4c7ba118287be9ac5f4d16793c001ddc45e56",
+          "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : ((12 * (x ^ 2)) + (18 * x)) = ((6 * x) * ((2 * x) + 3)) := by\n  have reference_step_1 : ((12 * (x ^ 2)) + (18 * x)) = ((6 * x) * ((2 * x) + 3)) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+          "proof_mode": "reference",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "environment": {
+            "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+            "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+          },
+          "elapsed_ms": 80,
+          "certificate_digest": "5e1a0c7a501bbe0eb2132c78756c486063eb76ac370f4b91c406ab92e2e2c220"
+        },
+        "proof_mode": "reference",
+        "counterexample": null,
+        "resolved_request": {
+          "version": "0.1",
+          "request_id": "rollout:MATH_POLY_003",
+          "variables": [
+            {
+              "id": "x",
+              "type": "real"
+            }
+          ],
+          "scopes": [
+            {
+              "id": "root",
+              "parent": null,
+              "binders": []
+            }
+          ],
+          "assumptions": [],
+          "steps": [
+            {
+              "id": "reference_step_1",
+              "scope": "root",
+              "claim": {
+                "kind": "proposition",
+                "proposition": {
+                  "kind": "eq",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 12
+                      },
+                      "right": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      }
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 18
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 6
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    },
+                    "right": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 2
+                        },
+                        "right": {
+                          "kind": "var",
+                          "id": "x"
+                        }
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 3
+                      }
+                    }
+                  }
+                }
+              },
+              "rule": "ring_identity",
+              "premises": [],
+              "parameters": {}
+            }
+          ],
+          "goal": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "eq",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "int",
+                    "value": 12
+                  },
+                  "right": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 2
+                  }
+                },
+                "right": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "int",
+                    "value": 18
+                  },
+                  "right": {
+                    "kind": "var",
+                    "id": "x"
+                  }
+                }
+              },
+              "right": {
+                "kind": "mul",
+                "left": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "int",
+                    "value": 6
+                  },
+                  "right": {
+                    "kind": "var",
+                    "id": "x"
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 2
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                }
+              }
+            }
+          },
+          "policy": {
+            "allowed_rules": [
+              "ring_identity"
+            ],
+            "max_seconds": 60,
+            "accepted_axioms": [
+              "propext",
+              "Classical.choice",
+              "Quot.sound"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "MATH_POLY_004",
+    "result": {
+      "request": {
+        "version": "0.1",
+        "request_id": "rollout:MATH_POLY_004",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [],
+        "steps": [
+          {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 5
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 6
+                  }
+                },
+                "right": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "eq",
+            "left": {
+              "kind": "add",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 2
+                },
+                "right": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "int",
+                    "value": 5
+                  },
+                  "right": {
+                    "kind": "var",
+                    "id": "x"
+                  }
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 6
+              }
+            },
+            "right": {
+              "kind": "mul",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 2
+                }
+              },
+              "right": {
+                "kind": "add",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "ring_identity"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      },
+      "proof_state": {
+        "status": "ready_for_kernel",
+        "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+        "preview": "Variables: x (real). Goal: (((x)^2 + (5 * x)) + 6) = ((x + 2) * (x + 3))",
+        "goal": "(((x)^2 + (5 * x)) + 6) = ((x + 2) * (x + 3))",
+        "request_hash": "f24a89c638dc0d4e95bf2351bf9c55c60ba5aefb3e5c46b3b4824a9e42c684ee",
+        "goal_established": true,
+        "kernel_ready": true,
+        "context": [],
+        "steps": [
+          {
+            "step_id": "reference_step_1",
+            "status": "candidate_ready",
+            "rule": "ring_identity",
+            "claim": "(((x)^2 + (5 * x)) + 6) = ((x + 2) * (x + 3))",
+            "message": "Exact polynomial normalization confirms this candidate identity.",
+            "obligations": [],
+            "scope": "root",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "obligations": [],
+        "suggestions": [],
+        "counterexample": null
+      },
+      "checked_steps": [
+        {
+          "step": {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 5
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 6
+                  }
+                },
+                "right": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 2
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          },
+          "proof_state": {
+            "status": "ready_for_kernel",
+            "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+            "preview": "Variables: x (real). Goal: (((x)^2 + (5 * x)) + 6) = ((x + 2) * (x + 3))",
+            "goal": "(((x)^2 + (5 * x)) + 6) = ((x + 2) * (x + 3))",
+            "request_hash": "f24a89c638dc0d4e95bf2351bf9c55c60ba5aefb3e5c46b3b4824a9e42c684ee",
+            "goal_established": true,
+            "kernel_ready": true,
+            "context": [],
+            "steps": [
+              {
+                "step_id": "reference_step_1",
+                "status": "candidate_ready",
+                "rule": "ring_identity",
+                "claim": "(((x)^2 + (5 * x)) + 6) = ((x + 2) * (x + 3))",
+                "message": "Exact polynomial normalization confirms this candidate identity.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [],
+                "parameters": {}
+              }
+            ],
+            "obligations": [],
+            "suggestions": [],
+            "counterexample": null
+          }
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "message": "Lean kernel accepted the exact generated statement and proof artifact.",
+        "request_hash": "f24a89c638dc0d4e95bf2351bf9c55c60ba5aefb3e5c46b3b4824a9e42c684ee",
+        "statement_hash": "92984ea1f2af5a9208fa709100b48f9db664aa0efb6584d61b3112bcb26165fc",
+        "obligations": [],
+        "lean_source": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : (((x ^ 2) + (5 * x)) + 6) = ((x + 2) * (x + 3)) := by\n  have reference_step_1 : (((x ^ 2) + (5 * x)) + 6) = ((x + 2) * (x + 3)) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+        "stdout": "'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "stderr": "",
+        "elapsed_ms": 85,
+        "certificate": {
+          "certificate_version": "0.2",
+          "verifier_version": "phase1.0",
+          "verified_at": "2026-09-19T15:58:51.056000+00:00",
+          "request_hash": "f24a89c638dc0d4e95bf2351bf9c55c60ba5aefb3e5c46b3b4824a9e42c684ee",
+          "statement_hash": "92984ea1f2af5a9208fa709100b48f9db664aa0efb6584d61b3112bcb26165fc",
+          "submission_hash": "c7a1696af2864722be23a2f150f7e0e1bad441d3f39b0ff17a2256a342affa33",
+          "lean_source_hash": "185e403c63c2bdd58b15b96eba616ad351dfefd2e25e07f2e0480aa83034fc1c",
+          "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : (((x ^ 2) + (5 * x)) + 6) = ((x + 2) * (x + 3)) := by\n  have reference_step_1 : (((x ^ 2) + (5 * x)) + 6) = ((x + 2) * (x + 3)) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+          "proof_mode": "reference",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "environment": {
+            "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+            "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+          },
+          "elapsed_ms": 85,
+          "certificate_digest": "894282c43f0f399d3afc2bb53f9e5b1f35fc443e6ba2a281528e11467b98de80"
+        },
+        "proof_mode": "reference",
+        "counterexample": null,
+        "resolved_request": {
+          "version": "0.1",
+          "request_id": "rollout:MATH_POLY_004",
+          "variables": [
+            {
+              "id": "x",
+              "type": "real"
+            }
+          ],
+          "scopes": [
+            {
+              "id": "root",
+              "parent": null,
+              "binders": []
+            }
+          ],
+          "assumptions": [],
+          "steps": [
+            {
+              "id": "reference_step_1",
+              "scope": "root",
+              "claim": {
+                "kind": "proposition",
+                "proposition": {
+                  "kind": "eq",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      },
+                      "right": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 5
+                        },
+                        "right": {
+                          "kind": "var",
+                          "id": "x"
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 6
+                    }
+                  },
+                  "right": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 2
+                      }
+                    },
+                    "right": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 3
+                      }
+                    }
+                  }
+                }
+              },
+              "rule": "ring_identity",
+              "premises": [],
+              "parameters": {}
+            }
+          ],
+          "goal": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "eq",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 2
+                  },
+                  "right": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 5
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 6
+                }
+              },
+              "right": {
+                "kind": "mul",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 2
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                }
+              }
+            }
+          },
+          "policy": {
+            "allowed_rules": [
+              "ring_identity"
+            ],
+            "max_seconds": 60,
+            "accepted_axioms": [
+              "propext",
+              "Classical.choice",
+              "Quot.sound"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "MATH_EXP_001",
+    "result": {
+      "request": {
+        "version": "0.1",
+        "request_id": "rollout:MATH_EXP_001",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [],
+        "steps": [
+          {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 2
+                  },
+                  "right": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 3
+                  }
+                },
+                "right": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 5
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "eq",
+            "left": {
+              "kind": "mul",
+              "left": {
+                "kind": "pow",
+                "base": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "exponent": 2
+              },
+              "right": {
+                "kind": "pow",
+                "base": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "exponent": 3
+              }
+            },
+            "right": {
+              "kind": "pow",
+              "base": {
+                "kind": "var",
+                "id": "x"
+              },
+              "exponent": 5
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "ring_identity"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      },
+      "proof_state": {
+        "status": "ready_for_kernel",
+        "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+        "preview": "Variables: x (real). Goal: ((x)^2 * (x)^3) = (x)^5",
+        "goal": "((x)^2 * (x)^3) = (x)^5",
+        "request_hash": "bcd99b4c323b659ab203fc34429e7110005e1faf33431c68af86b922b28f2478",
+        "goal_established": true,
+        "kernel_ready": true,
+        "context": [],
+        "steps": [
+          {
+            "step_id": "reference_step_1",
+            "status": "candidate_ready",
+            "rule": "ring_identity",
+            "claim": "((x)^2 * (x)^3) = (x)^5",
+            "message": "Exact polynomial normalization confirms this candidate identity.",
+            "obligations": [],
+            "scope": "root",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "obligations": [],
+        "suggestions": [],
+        "counterexample": null
+      },
+      "checked_steps": [
+        {
+          "step": {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 2
+                  },
+                  "right": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 3
+                  }
+                },
+                "right": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 5
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          },
+          "proof_state": {
+            "status": "ready_for_kernel",
+            "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+            "preview": "Variables: x (real). Goal: ((x)^2 * (x)^3) = (x)^5",
+            "goal": "((x)^2 * (x)^3) = (x)^5",
+            "request_hash": "bcd99b4c323b659ab203fc34429e7110005e1faf33431c68af86b922b28f2478",
+            "goal_established": true,
+            "kernel_ready": true,
+            "context": [],
+            "steps": [
+              {
+                "step_id": "reference_step_1",
+                "status": "candidate_ready",
+                "rule": "ring_identity",
+                "claim": "((x)^2 * (x)^3) = (x)^5",
+                "message": "Exact polynomial normalization confirms this candidate identity.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [],
+                "parameters": {}
+              }
+            ],
+            "obligations": [],
+            "suggestions": [],
+            "counterexample": null
+          }
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "message": "Lean kernel accepted the exact generated statement and proof artifact.",
+        "request_hash": "bcd99b4c323b659ab203fc34429e7110005e1faf33431c68af86b922b28f2478",
+        "statement_hash": "57625febff791b17837f0fe4291454c0209770e0e520a59a519d4c04d6a73f66",
+        "obligations": [],
+        "lean_source": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : ((x ^ 2) * (x ^ 3)) = (x ^ 5) := by\n  have reference_step_1 : ((x ^ 2) * (x ^ 3)) = (x ^ 5) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+        "stdout": "'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "stderr": "",
+        "elapsed_ms": 77,
+        "certificate": {
+          "certificate_version": "0.2",
+          "verifier_version": "phase1.0",
+          "verified_at": "2026-09-19T15:58:51.153999+00:00",
+          "request_hash": "bcd99b4c323b659ab203fc34429e7110005e1faf33431c68af86b922b28f2478",
+          "statement_hash": "57625febff791b17837f0fe4291454c0209770e0e520a59a519d4c04d6a73f66",
+          "submission_hash": "d93b9ae1016a0cd9deb6e979f30d8dd8f424e037ebb0eab89a8a5a9ee92b0701",
+          "lean_source_hash": "3169c9f2a2f268b58129f0cbcba1845aae1dbe2f79924e4e1249f321b407da2e",
+          "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : ((x ^ 2) * (x ^ 3)) = (x ^ 5) := by\n  have reference_step_1 : ((x ^ 2) * (x ^ 3)) = (x ^ 5) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+          "proof_mode": "reference",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "environment": {
+            "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+            "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+          },
+          "elapsed_ms": 77,
+          "certificate_digest": "c1e5ea27ecf2144f9b4a8bd5175bc24bf56d197d841b00d28c4d44768e502440"
+        },
+        "proof_mode": "reference",
+        "counterexample": null,
+        "resolved_request": {
+          "version": "0.1",
+          "request_id": "rollout:MATH_EXP_001",
+          "variables": [
+            {
+              "id": "x",
+              "type": "real"
+            }
+          ],
+          "scopes": [
+            {
+              "id": "root",
+              "parent": null,
+              "binders": []
+            }
+          ],
+          "assumptions": [],
+          "steps": [
+            {
+              "id": "reference_step_1",
+              "scope": "root",
+              "claim": {
+                "kind": "proposition",
+                "proposition": {
+                  "kind": "eq",
+                  "left": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 3
+                    }
+                  },
+                  "right": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 5
+                  }
+                }
+              },
+              "rule": "ring_identity",
+              "premises": [],
+              "parameters": {}
+            }
+          ],
+          "goal": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "eq",
+              "left": {
+                "kind": "mul",
+                "left": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 2
+                },
+                "right": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 3
+                }
+              },
+              "right": {
+                "kind": "pow",
+                "base": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "exponent": 5
+              }
+            }
+          },
+          "policy": {
+            "allowed_rules": [
+              "ring_identity"
+            ],
+            "max_seconds": 60,
+            "accepted_axioms": [
+              "propext",
+              "Classical.choice",
+              "Quot.sound"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "MATH_QUAD_002",
+    "result": {
+      "request": {
+        "version": "0.1",
+        "request_id": "rollout:MATH_QUAD_002",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [],
+        "steps": [
+          {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 6
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 9
+                  }
+                },
+                "right": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  },
+                  "exponent": 2
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "eq",
+            "left": {
+              "kind": "add",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 2
+                },
+                "right": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "int",
+                    "value": 6
+                  },
+                  "right": {
+                    "kind": "var",
+                    "id": "x"
+                  }
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 9
+              }
+            },
+            "right": {
+              "kind": "pow",
+              "base": {
+                "kind": "add",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              },
+              "exponent": 2
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "ring_identity"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      },
+      "proof_state": {
+        "status": "ready_for_kernel",
+        "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+        "preview": "Variables: x (real). Goal: (((x)^2 + (6 * x)) + 9) = ((x + 3))^2",
+        "goal": "(((x)^2 + (6 * x)) + 9) = ((x + 3))^2",
+        "request_hash": "7e1ba6da933403f5e174595764172402a1ff3e3e044593587702fa00a2e8a572",
+        "goal_established": true,
+        "kernel_ready": true,
+        "context": [],
+        "steps": [
+          {
+            "step_id": "reference_step_1",
+            "status": "candidate_ready",
+            "rule": "ring_identity",
+            "claim": "(((x)^2 + (6 * x)) + 9) = ((x + 3))^2",
+            "message": "Exact polynomial normalization confirms this candidate identity.",
+            "obligations": [],
+            "scope": "root",
+            "premises": [],
+            "parameters": {}
+          }
+        ],
+        "obligations": [],
+        "suggestions": [],
+        "counterexample": null
+      },
+      "checked_steps": [
+        {
+          "step": {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "mul",
+                      "left": {
+                        "kind": "int",
+                        "value": 6
+                      },
+                      "right": {
+                        "kind": "var",
+                        "id": "x"
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 9
+                  }
+                },
+                "right": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  },
+                  "exponent": 2
+                }
+              }
+            },
+            "rule": "ring_identity",
+            "premises": [],
+            "parameters": {}
+          },
+          "proof_state": {
+            "status": "ready_for_kernel",
+            "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+            "preview": "Variables: x (real). Goal: (((x)^2 + (6 * x)) + 9) = ((x + 3))^2",
+            "goal": "(((x)^2 + (6 * x)) + 9) = ((x + 3))^2",
+            "request_hash": "7e1ba6da933403f5e174595764172402a1ff3e3e044593587702fa00a2e8a572",
+            "goal_established": true,
+            "kernel_ready": true,
+            "context": [],
+            "steps": [
+              {
+                "step_id": "reference_step_1",
+                "status": "candidate_ready",
+                "rule": "ring_identity",
+                "claim": "(((x)^2 + (6 * x)) + 9) = ((x + 3))^2",
+                "message": "Exact polynomial normalization confirms this candidate identity.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [],
+                "parameters": {}
+              }
+            ],
+            "obligations": [],
+            "suggestions": [],
+            "counterexample": null
+          }
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "message": "Lean kernel accepted the exact generated statement and proof artifact.",
+        "request_hash": "7e1ba6da933403f5e174595764172402a1ff3e3e044593587702fa00a2e8a572",
+        "statement_hash": "ac8a2bcb961673170854db4d044416cb9edad7895a1c082085de9ebbce3deb96",
+        "obligations": [],
+        "lean_source": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : (((x ^ 2) + (6 * x)) + 9) = ((x + 3) ^ 2) := by\n  have reference_step_1 : (((x ^ 2) + (6 * x)) + 9) = ((x + 3) ^ 2) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+        "stdout": "'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "stderr": "",
+        "elapsed_ms": 83,
+        "certificate": {
+          "certificate_version": "0.2",
+          "verifier_version": "phase1.0",
+          "verified_at": "2026-09-19T15:58:51.273999+00:00",
+          "request_hash": "7e1ba6da933403f5e174595764172402a1ff3e3e044593587702fa00a2e8a572",
+          "statement_hash": "ac8a2bcb961673170854db4d044416cb9edad7895a1c082085de9ebbce3deb96",
+          "submission_hash": "8d1a40dfa622ace6856cd733e18773a2aa17e747642980336e29686e5982f232",
+          "lean_source_hash": "06ff8d9dfc68c17f28e9a787f3f7f18525ed94de34217282fa0f89ba8f1ca1b6",
+          "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : (((x ^ 2) + (6 * x)) + 9) = ((x + 3) ^ 2) := by\n  have reference_step_1 : (((x ^ 2) + (6 * x)) + 9) = ((x + 3) ^ 2) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+          "proof_mode": "reference",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "environment": {
+            "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+            "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+          },
+          "elapsed_ms": 83,
+          "certificate_digest": "474618cd66b960aed86ce247a62e4a5df13ef0db4a86bc3555d4e62e497801c8"
+        },
+        "proof_mode": "reference",
+        "counterexample": null,
+        "resolved_request": {
+          "version": "0.1",
+          "request_id": "rollout:MATH_QUAD_002",
+          "variables": [
+            {
+              "id": "x",
+              "type": "real"
+            }
+          ],
+          "scopes": [
+            {
+              "id": "root",
+              "parent": null,
+              "binders": []
+            }
+          ],
+          "assumptions": [],
+          "steps": [
+            {
+              "id": "reference_step_1",
+              "scope": "root",
+              "claim": {
+                "kind": "proposition",
+                "proposition": {
+                  "kind": "eq",
+                  "left": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      },
+                      "right": {
+                        "kind": "mul",
+                        "left": {
+                          "kind": "int",
+                          "value": 6
+                        },
+                        "right": {
+                          "kind": "var",
+                          "id": "x"
+                        }
+                      }
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 9
+                    }
+                  },
+                  "right": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "add",
+                      "left": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 3
+                      }
+                    },
+                    "exponent": 2
+                  }
+                }
+              },
+              "rule": "ring_identity",
+              "premises": [],
+              "parameters": {}
+            }
+          ],
+          "goal": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "eq",
+              "left": {
+                "kind": "add",
+                "left": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 2
+                  },
+                  "right": {
+                    "kind": "mul",
+                    "left": {
+                      "kind": "int",
+                      "value": 6
+                    },
+                    "right": {
+                      "kind": "var",
+                      "id": "x"
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 9
+                }
+              },
+              "right": {
+                "kind": "pow",
+                "base": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                },
+                "exponent": 2
+              }
+            }
+          },
+          "policy": {
+            "allowed_rules": [
+              "ring_identity"
+            ],
+            "max_seconds": 60,
+            "accepted_axioms": [
+              "propext",
+              "Classical.choice",
+              "Quot.sound"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "MATH_ALG_007",
+    "result": {
+      "request": {
+        "version": "0.1",
+        "request_id": "rollout:MATH_ALG_007",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [
+          {
+            "id": "h1",
+            "scope": "root",
+            "claim": {
+              "kind": "lt",
+              "left": {
+                "kind": "mul",
+                "left": {
+                  "kind": "neg",
+                  "arg": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                },
+                "right": {
+                  "kind": "var",
+                  "id": "x"
+                }
+              },
+              "right": {
+                "kind": "int",
+                "value": 6
+              }
+            }
+          }
+        ],
+        "steps": [
+          {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "gt",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "neg",
+                  "arg": {
+                    "kind": "int",
+                    "value": 2
+                  }
+                }
+              }
+            },
+            "rule": "linarith",
+            "premises": [
+              "h1"
+            ],
+            "parameters": {}
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "gt",
+            "left": {
+              "kind": "var",
+              "id": "x"
+            },
+            "right": {
+              "kind": "neg",
+              "arg": {
+                "kind": "int",
+                "value": 2
+              }
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "linarith"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      },
+      "proof_state": {
+        "status": "ready_for_kernel",
+        "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+        "preview": "Variables: x (real). Assume (-3 * x) < 6. Goal: x > -2",
+        "goal": "x > -2",
+        "request_hash": "a5e19752306e5156062f02974752c829b6682f38f0727a0939367f8530762a9b",
+        "goal_established": true,
+        "kernel_ready": true,
+        "context": [
+          {
+            "id": "h1",
+            "scope": "root",
+            "claim": "(-3 * x) < 6"
+          }
+        ],
+        "steps": [
+          {
+            "step_id": "reference_step_1",
+            "status": "kernel_required",
+            "rule": "linarith",
+            "claim": "x > -2",
+            "message": "linarith is delegated to the pinned formal backend; local search does not certify it.",
+            "obligations": [],
+            "scope": "root",
+            "premises": [
+              "h1"
+            ],
+            "parameters": {}
+          }
+        ],
+        "obligations": [],
+        "suggestions": [],
+        "counterexample": null
+      },
+      "checked_steps": [
+        {
+          "step": {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "gt",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "neg",
+                  "arg": {
+                    "kind": "int",
+                    "value": 2
+                  }
+                }
+              }
+            },
+            "rule": "linarith",
+            "premises": [
+              "h1"
+            ],
+            "parameters": {}
+          },
+          "proof_state": {
+            "status": "ready_for_kernel",
+            "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+            "preview": "Variables: x (real). Assume (-3 * x) < 6. Goal: x > -2",
+            "goal": "x > -2",
+            "request_hash": "a5e19752306e5156062f02974752c829b6682f38f0727a0939367f8530762a9b",
+            "goal_established": true,
+            "kernel_ready": true,
+            "context": [
+              {
+                "id": "h1",
+                "scope": "root",
+                "claim": "(-3 * x) < 6"
+              }
+            ],
+            "steps": [
+              {
+                "step_id": "reference_step_1",
+                "status": "kernel_required",
+                "rule": "linarith",
+                "claim": "x > -2",
+                "message": "linarith is delegated to the pinned formal backend; local search does not certify it.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [
+                  "h1"
+                ],
+                "parameters": {}
+              }
+            ],
+            "obligations": [],
+            "suggestions": [],
+            "counterexample": null
+          }
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "message": "Lean kernel accepted the exact generated statement and proof artifact.",
+        "request_hash": "a5e19752306e5156062f02974752c829b6682f38f0727a0939367f8530762a9b",
+        "statement_hash": "814bac75fee4690b3c0aca800a8a45e9a5e4f59d628a1a9686992e0e1cd834d7",
+        "obligations": [],
+        "lean_source": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) (h1 : ((-3) * x) < 6) : x > (-2) := by\n  have reference_step_1 : x > (-2) := by\n    linarith\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+        "stdout": "'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "stderr": "",
+        "elapsed_ms": 94,
+        "certificate": {
+          "certificate_version": "0.2",
+          "verifier_version": "phase1.0",
+          "verified_at": "2026-09-19T15:58:51.403000+00:00",
+          "request_hash": "a5e19752306e5156062f02974752c829b6682f38f0727a0939367f8530762a9b",
+          "statement_hash": "814bac75fee4690b3c0aca800a8a45e9a5e4f59d628a1a9686992e0e1cd834d7",
+          "submission_hash": "822bf5e2f4fc29694c7937fade42fc370180538f2d41c6a61b90c31910ca2452",
+          "lean_source_hash": "06639bfc9058fe40fbc734e67f1fcfb6a5cfcbca1b220a1f5618a6b779060085",
+          "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) (h1 : ((-3) * x) < 6) : x > (-2) := by\n  have reference_step_1 : x > (-2) := by\n    linarith\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+          "proof_mode": "reference",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "environment": {
+            "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+            "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+          },
+          "elapsed_ms": 94,
+          "certificate_digest": "eaaa0ed60defe1a4101e948f9e4169330ccef130042b3d75a31ae015415e6ef2"
+        },
+        "proof_mode": "reference",
+        "counterexample": null,
+        "resolved_request": {
+          "version": "0.1",
+          "request_id": "rollout:MATH_ALG_007",
+          "variables": [
+            {
+              "id": "x",
+              "type": "real"
+            }
+          ],
+          "scopes": [
+            {
+              "id": "root",
+              "parent": null,
+              "binders": []
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "h1",
+              "scope": "root",
+              "claim": {
+                "kind": "lt",
+                "left": {
+                  "kind": "mul",
+                  "left": {
+                    "kind": "neg",
+                    "arg": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  },
+                  "right": {
+                    "kind": "var",
+                    "id": "x"
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 6
+                }
+              }
+            }
+          ],
+          "steps": [
+            {
+              "id": "reference_step_1",
+              "scope": "root",
+              "claim": {
+                "kind": "proposition",
+                "proposition": {
+                  "kind": "gt",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "neg",
+                    "arg": {
+                      "kind": "int",
+                      "value": 2
+                    }
+                  }
+                }
+              },
+              "rule": "linarith",
+              "premises": [
+                "h1"
+              ],
+              "parameters": {}
+            }
+          ],
+          "goal": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "gt",
+              "left": {
+                "kind": "var",
+                "id": "x"
+              },
+              "right": {
+                "kind": "neg",
+                "arg": {
+                  "kind": "int",
+                  "value": 2
+                }
+              }
+            }
+          },
+          "policy": {
+            "allowed_rules": [
+              "linarith"
+            ],
+            "max_seconds": 60,
+            "accepted_axioms": [
+              "propext",
+              "Classical.choice",
+              "Quot.sound"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "MATH_RAT_001",
+    "result": {
+      "request": {
+        "version": "0.1",
+        "request_id": "rollout:MATH_RAT_001",
+        "variables": [
+          {
+            "id": "x",
+            "type": "real"
+          }
+        ],
+        "scopes": [
+          {
+            "id": "root",
+            "parent": null,
+            "binders": []
+          }
+        ],
+        "assumptions": [
+          {
+            "id": "h1",
+            "scope": "root",
+            "claim": {
+              "kind": "ne",
+              "left": {
+                "kind": "var",
+                "id": "x"
+              },
+              "right": {
+                "kind": "int",
+                "value": 3
+              }
+            }
+          }
+        ],
+        "steps": [
+          {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "ne",
+                "left": {
+                  "kind": "sub",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 0
+                }
+              }
+            },
+            "rule": "sub_ne_zero_from_ne",
+            "premises": [
+              "h1"
+            ],
+            "parameters": {}
+          },
+          {
+            "id": "reference_step_2",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "div",
+                  "left": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 9
+                    }
+                  },
+                  "right": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                }
+              }
+            },
+            "rule": "field_identity",
+            "premises": [
+              "reference_step_1"
+            ],
+            "parameters": {}
+          }
+        ],
+        "goal": {
+          "kind": "proposition",
+          "proposition": {
+            "kind": "eq",
+            "left": {
+              "kind": "div",
+              "left": {
+                "kind": "sub",
+                "left": {
+                  "kind": "pow",
+                  "base": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "exponent": 2
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 9
+                }
+              },
+              "right": {
+                "kind": "sub",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            },
+            "right": {
+              "kind": "add",
+              "left": {
+                "kind": "var",
+                "id": "x"
+              },
+              "right": {
+                "kind": "int",
+                "value": 3
+              }
+            }
+          }
+        },
+        "policy": {
+          "allowed_rules": [
+            "sub_ne_zero_from_ne",
+            "field_identity"
+          ],
+          "max_seconds": 60,
+          "accepted_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        }
+      },
+      "proof_state": {
+        "status": "ready_for_kernel",
+        "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+        "preview": "Variables: x (real). Assume x \u2260 3. Goal: (((x)^2 - 9) / (x - 3)) = (x + 3)",
+        "goal": "(((x)^2 - 9) / (x - 3)) = (x + 3)",
+        "request_hash": "6b549ec943d9c969e0382ecb776dba92aa028d91ca37b2c1fe7937a365bad47f",
+        "goal_established": true,
+        "kernel_ready": true,
+        "context": [
+          {
+            "id": "h1",
+            "scope": "root",
+            "claim": "x \u2260 3"
+          }
+        ],
+        "steps": [
+          {
+            "step_id": "reference_step_1",
+            "status": "candidate_ready",
+            "rule": "sub_ne_zero_from_ne",
+            "claim": "(x - 3) \u2260 0",
+            "message": "The nonzero difference follows from the cited unequal terms.",
+            "obligations": [],
+            "scope": "root",
+            "premises": [
+              "h1"
+            ],
+            "parameters": {}
+          },
+          {
+            "step_id": "reference_step_2",
+            "status": "candidate_ready",
+            "rule": "field_identity",
+            "claim": "(((x)^2 - 9) / (x - 3)) = (x + 3)",
+            "message": "Rational normalization agrees with the claimed cancellation; domain evidence remains separately required.",
+            "obligations": [],
+            "scope": "root",
+            "premises": [
+              "reference_step_1"
+            ],
+            "parameters": {}
+          }
+        ],
+        "obligations": [],
+        "suggestions": [],
+        "counterexample": null
+      },
+      "checked_steps": [
+        {
+          "step": {
+            "id": "reference_step_1",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "ne",
+                "left": {
+                  "kind": "sub",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 0
+                }
+              }
+            },
+            "rule": "sub_ne_zero_from_ne",
+            "premises": [
+              "h1"
+            ],
+            "parameters": {}
+          },
+          "proof_state": {
+            "status": "needs_justification",
+            "message": "No submitted root proof step establishes the final goal.",
+            "preview": "Variables: x (real). Assume x \u2260 3. Goal: (((x)^2 - 9) / (x - 3)) = (x + 3)",
+            "goal": "(((x)^2 - 9) / (x - 3)) = (x + 3)",
+            "request_hash": "fc80fc8cf39ab8d51f671b185d93cc97bc655b3e47b62203754828f7e13f8425",
+            "goal_established": false,
+            "kernel_ready": false,
+            "context": [
+              {
+                "id": "h1",
+                "scope": "root",
+                "claim": "x \u2260 3"
+              }
+            ],
+            "steps": [
+              {
+                "step_id": "reference_step_1",
+                "status": "candidate_ready",
+                "rule": "sub_ne_zero_from_ne",
+                "claim": "(x - 3) \u2260 0",
+                "message": "The nonzero difference follows from the cited unequal terms.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [
+                  "h1"
+                ],
+                "parameters": {}
+              }
+            ],
+            "obligations": [
+              {
+                "step_id": "goal",
+                "code": "final_goal_unestablished",
+                "message": "No submitted root proof step establishes the final goal.",
+                "expected_claim": null
+              }
+            ],
+            "suggestions": [
+              {
+                "step_id": "goal",
+                "code": "final_goal_unestablished",
+                "message": "No submitted root proof step establishes the final goal.",
+                "action": "establish_final_goal"
+              }
+            ],
+            "counterexample": null
+          }
+        },
+        {
+          "step": {
+            "id": "reference_step_2",
+            "scope": "root",
+            "claim": {
+              "kind": "proposition",
+              "proposition": {
+                "kind": "eq",
+                "left": {
+                  "kind": "div",
+                  "left": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "pow",
+                      "base": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "exponent": 2
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 9
+                    }
+                  },
+                  "right": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                },
+                "right": {
+                  "kind": "add",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                }
+              }
+            },
+            "rule": "field_identity",
+            "premises": [
+              "reference_step_1"
+            ],
+            "parameters": {}
+          },
+          "proof_state": {
+            "status": "ready_for_kernel",
+            "message": "All declared proof obligations are satisfied at the educational/local boundary; send the deterministic artifact to the kernel verifier.",
+            "preview": "Variables: x (real). Assume x \u2260 3. Goal: (((x)^2 - 9) / (x - 3)) = (x + 3)",
+            "goal": "(((x)^2 - 9) / (x - 3)) = (x + 3)",
+            "request_hash": "6b549ec943d9c969e0382ecb776dba92aa028d91ca37b2c1fe7937a365bad47f",
+            "goal_established": true,
+            "kernel_ready": true,
+            "context": [
+              {
+                "id": "h1",
+                "scope": "root",
+                "claim": "x \u2260 3"
+              }
+            ],
+            "steps": [
+              {
+                "step_id": "reference_step_1",
+                "status": "candidate_ready",
+                "rule": "sub_ne_zero_from_ne",
+                "claim": "(x - 3) \u2260 0",
+                "message": "The nonzero difference follows from the cited unequal terms.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [
+                  "h1"
+                ],
+                "parameters": {}
+              },
+              {
+                "step_id": "reference_step_2",
+                "status": "candidate_ready",
+                "rule": "field_identity",
+                "claim": "(((x)^2 - 9) / (x - 3)) = (x + 3)",
+                "message": "Rational normalization agrees with the claimed cancellation; domain evidence remains separately required.",
+                "obligations": [],
+                "scope": "root",
+                "premises": [
+                  "reference_step_1"
+                ],
+                "parameters": {}
+              }
+            ],
+            "obligations": [],
+            "suggestions": [],
+            "counterexample": null
+          }
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "message": "Lean kernel accepted the exact generated statement and proof artifact.",
+        "request_hash": "6b549ec943d9c969e0382ecb776dba92aa028d91ca37b2c1fe7937a365bad47f",
+        "statement_hash": "61773d4b23dd84ee4015571ef579adf2e25337e0ae1cb0a8415d0a1e2d477dc1",
+        "obligations": [],
+        "lean_source": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) (h1 : x \u2260 3) : (((x ^ 2) - 9) / (x - 3)) = (x + 3) := by\n  have reference_step_1 : (x - 3) \u2260 0 := by\n    exact sub_ne_zero.mpr h1\n  have reference_step_2 : (((x ^ 2) - 9) / (x - 3)) = (x + 3) := by\n    clear h1\n    field_simp [reference_step_1] <;> ring\n  exact reference_step_2\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+        "stdout": "Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice\n\nNote: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`\n'QuickMathsGenerated.result' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "stderr": "",
+        "elapsed_ms": 136,
+        "certificate": {
+          "certificate_version": "0.2",
+          "verifier_version": "phase1.0",
+          "verified_at": "2026-09-19T15:58:51.611000+00:00",
+          "request_hash": "6b549ec943d9c969e0382ecb776dba92aa028d91ca37b2c1fe7937a365bad47f",
+          "statement_hash": "61773d4b23dd84ee4015571ef579adf2e25337e0ae1cb0a8415d0a1e2d477dc1",
+          "submission_hash": "2351d10bb0d155b822e1f56b1f0c366aaaf8d8e928af9bee95aeba67f0ef1d0a",
+          "lean_source_hash": "cbf9cc940f29ef376927828e89d2e095582eb957b30c67f7dc48fc4b6618e5ff",
+          "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) (h1 : x \u2260 3) : (((x ^ 2) - 9) / (x - 3)) = (x + 3) := by\n  have reference_step_1 : (x - 3) \u2260 0 := by\n    exact sub_ne_zero.mpr h1\n  have reference_step_2 : (((x ^ 2) - 9) / (x - 3)) = (x + 3) := by\n    clear h1\n    field_simp [reference_step_1] <;> ring\n  exact reference_step_2\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+          "proof_mode": "reference",
+          "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "environment": {
+            "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+            "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+          },
+          "elapsed_ms": 136,
+          "certificate_digest": "83ce62faf098bd551c4f69d1433d900bbc8c2f06631c23bb9c27dbdf04f11b16"
+        },
+        "proof_mode": "reference",
+        "counterexample": null,
+        "resolved_request": {
+          "version": "0.1",
+          "request_id": "rollout:MATH_RAT_001",
+          "variables": [
+            {
+              "id": "x",
+              "type": "real"
+            }
+          ],
+          "scopes": [
+            {
+              "id": "root",
+              "parent": null,
+              "binders": []
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "h1",
+              "scope": "root",
+              "claim": {
+                "kind": "ne",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            }
+          ],
+          "steps": [
+            {
+              "id": "reference_step_1",
+              "scope": "root",
+              "claim": {
+                "kind": "proposition",
+                "proposition": {
+                  "kind": "ne",
+                  "left": {
+                    "kind": "sub",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 0
+                  }
+                }
+              },
+              "rule": "sub_ne_zero_from_ne",
+              "premises": [
+                "h1"
+              ],
+              "parameters": {}
+            },
+            {
+              "id": "reference_step_2",
+              "scope": "root",
+              "claim": {
+                "kind": "proposition",
+                "proposition": {
+                  "kind": "eq",
+                  "left": {
+                    "kind": "div",
+                    "left": {
+                      "kind": "sub",
+                      "left": {
+                        "kind": "pow",
+                        "base": {
+                          "kind": "var",
+                          "id": "x"
+                        },
+                        "exponent": 2
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 9
+                      }
+                    },
+                    "right": {
+                      "kind": "sub",
+                      "left": {
+                        "kind": "var",
+                        "id": "x"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "value": 3
+                      }
+                    }
+                  },
+                  "right": {
+                    "kind": "add",
+                    "left": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "right": {
+                      "kind": "int",
+                      "value": 3
+                    }
+                  }
+                }
+              },
+              "rule": "field_identity",
+              "premises": [
+                "reference_step_1"
+              ],
+              "parameters": {}
+            }
+          ],
+          "goal": {
+            "kind": "proposition",
+            "proposition": {
+              "kind": "eq",
+              "left": {
+                "kind": "div",
+                "left": {
+                  "kind": "sub",
+                  "left": {
+                    "kind": "pow",
+                    "base": {
+                      "kind": "var",
+                      "id": "x"
+                    },
+                    "exponent": 2
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 9
+                  }
+                },
+                "right": {
+                  "kind": "sub",
+                  "left": {
+                    "kind": "var",
+                    "id": "x"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "value": 3
+                  }
+                }
+              },
+              "right": {
+                "kind": "add",
+                "left": {
+                  "kind": "var",
+                  "id": "x"
+                },
+                "right": {
+                  "kind": "int",
+                  "value": 3
+                }
+              }
+            }
+          },
+          "policy": {
+            "allowed_rules": [
+              "sub_ne_zero_from_ne",
+              "field_identity"
+            ],
+            "max_seconds": 60,
+            "accepted_axioms": [
+              "propext",
+              "Classical.choice",
+              "Quot.sound"
+            ]
+          }
+        }
+      }
+    }
+  }
+]

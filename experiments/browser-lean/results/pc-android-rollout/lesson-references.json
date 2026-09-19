@@ -1,0 +1,282 @@
+[
+  {
+    "skill": "MATH_POLY_001",
+    "spec": {
+      "version": "0.1",
+      "statement": {
+        "declarations": [
+          "x:real"
+        ],
+        "assumptions": [],
+        "goal": "(x^2 + 3*x + 2) + (2*x^2 - x + 4) = 3*x^2 + 2*x + 6"
+      },
+      "allowed_rules": [
+        "ring_identity"
+      ],
+      "assessment_policy": {},
+      "reference_proof": {
+        "mode": "steps",
+        "steps": [
+          {
+            "claim": "(x^2 + 3*x + 2) + (2*x^2 - x + 4) = 3*x^2 + 2*x + 6",
+            "rule": "ring_identity",
+            "premises": []
+          }
+        ]
+      },
+      "environment": {
+        "backend": "lean4",
+        "toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "library": "mathlib",
+        "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      }
+    }
+  },
+  {
+    "skill": "MATH_POLY_002",
+    "spec": {
+      "version": "0.1",
+      "statement": {
+        "declarations": [
+          "x:real"
+        ],
+        "assumptions": [],
+        "goal": "(x + 2)*(x + 3) = x^2 + 5*x + 6"
+      },
+      "allowed_rules": [
+        "ring_identity"
+      ],
+      "assessment_policy": {},
+      "reference_proof": {
+        "mode": "steps",
+        "steps": [
+          {
+            "claim": "(x + 2)*(x + 3) = x^2 + 5*x + 6",
+            "rule": "ring_identity",
+            "premises": []
+          }
+        ]
+      },
+      "environment": {
+        "backend": "lean4",
+        "toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "library": "mathlib",
+        "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      }
+    }
+  },
+  {
+    "skill": "MATH_POLY_003",
+    "spec": {
+      "version": "0.1",
+      "statement": {
+        "declarations": [
+          "x:real"
+        ],
+        "assumptions": [],
+        "goal": "12*x^2 + 18*x = 6*x*(2*x + 3)"
+      },
+      "allowed_rules": [
+        "ring_identity"
+      ],
+      "assessment_policy": {},
+      "reference_proof": {
+        "mode": "steps",
+        "steps": [
+          {
+            "claim": "12*x^2 + 18*x = 6*x*(2*x + 3)",
+            "rule": "ring_identity",
+            "premises": []
+          }
+        ]
+      },
+      "environment": {
+        "backend": "lean4",
+        "toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "library": "mathlib",
+        "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      }
+    }
+  },
+  {
+    "skill": "MATH_POLY_004",
+    "spec": {
+      "version": "0.1",
+      "statement": {
+        "declarations": [
+          "x:real"
+        ],
+        "assumptions": [],
+        "goal": "x^2 + 5*x + 6 = (x + 2)*(x + 3)"
+      },
+      "allowed_rules": [
+        "ring_identity"
+      ],
+      "assessment_policy": {},
+      "reference_proof": {
+        "mode": "steps",
+        "steps": [
+          {
+            "claim": "x^2 + 5*x + 6 = (x + 2)*(x + 3)",
+            "rule": "ring_identity",
+            "premises": []
+          }
+        ]
+      },
+      "environment": {
+        "backend": "lean4",
+        "toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "library": "mathlib",
+        "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      }
+    }
+  },
+  {
+    "skill": "MATH_EXP_001",
+    "spec": {
+      "version": "0.1",
+      "statement": {
+        "declarations": [
+          "x:real"
+        ],
+        "assumptions": [],
+        "goal": "x^2*x^3 = x^5"
+      },
+      "allowed_rules": [
+        "ring_identity"
+      ],
+      "assessment_policy": {},
+      "reference_proof": {
+        "mode": "steps",
+        "steps": [
+          {
+            "claim": "x^2*x^3 = x^5",
+            "rule": "ring_identity",
+            "premises": []
+          }
+        ]
+      },
+      "environment": {
+        "backend": "lean4",
+        "toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "library": "mathlib",
+        "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      }
+    }
+  },
+  {
+    "skill": "MATH_QUAD_002",
+    "spec": {
+      "version": "0.1",
+      "statement": {
+        "declarations": [
+          "x:real"
+        ],
+        "assumptions": [],
+        "goal": "x^2 + 6*x + 9 = (x + 3)^2"
+      },
+      "allowed_rules": [
+        "ring_identity"
+      ],
+      "assessment_policy": {},
+      "reference_proof": {
+        "mode": "steps",
+        "steps": [
+          {
+            "claim": "x^2 + 6*x + 9 = (x + 3)^2",
+            "rule": "ring_identity",
+            "premises": []
+          }
+        ]
+      },
+      "environment": {
+        "backend": "lean4",
+        "toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "library": "mathlib",
+        "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      }
+    }
+  },
+  {
+    "skill": "MATH_ALG_007",
+    "spec": {
+      "version": "0.1",
+      "statement": {
+        "declarations": [
+          "x:real"
+        ],
+        "assumptions": [
+          "-3*x < 6"
+        ],
+        "goal": "x > -2"
+      },
+      "allowed_rules": [
+        "linarith"
+      ],
+      "assessment_policy": {},
+      "reference_proof": {
+        "mode": "steps",
+        "steps": [
+          {
+            "claim": "x > -2",
+            "rule": "linarith",
+            "premises": [
+              "h1"
+            ]
+          }
+        ]
+      },
+      "environment": {
+        "backend": "lean4",
+        "toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "library": "mathlib",
+        "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      }
+    }
+  },
+  {
+    "skill": "MATH_RAT_001",
+    "spec": {
+      "version": "0.1",
+      "statement": {
+        "declarations": [
+          "x:real"
+        ],
+        "assumptions": [
+          "x != 3"
+        ],
+        "goal": "(x^2 - 9)/(x - 3) = x + 3"
+      },
+      "allowed_rules": [
+        "sub_ne_zero_from_ne",
+        "field_identity"
+      ],
+      "assessment_policy": {},
+      "reference_proof": {
+        "mode": "steps",
+        "steps": [
+          {
+            "claim": "x - 3 != 0",
+            "rule": "sub_ne_zero_from_ne",
+            "premises": [
+              "h1"
+            ]
+          },
+          {
+            "claim": "(x^2 - 9)/(x - 3) = x + 3",
+            "rule": "field_identity",
+            "premises": [
+              "reference_step_1"
+            ]
+          }
+        ]
+      },
+      "environment": {
+        "backend": "lean4",
+        "toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "library": "mathlib",
+        "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      }
+    }
+  }
+]

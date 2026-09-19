@@ -19,6 +19,8 @@ from .rules import Obligation, preflight
 from .search import build_auto_plan, search_proof
 
 VERIFIER_VERSION = "phase1.0"
+# Installed only by the bundled browser host, never by a protocol message.
+_browser_kernel = None
 MATHLIB_REV = "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
 LEAN_TOOLCHAIN = "leanprover/lean4:v4.34.0-rc2"
 _AX_RE = re.compile(
@@ -214,8 +216,8 @@ def verify_request(
         )
 
     project = Path(project_dir) if project_dir is not None else Path(__file__).resolve().parents[2]
-    command = _lake_command(project)
-    environment_error = _environment_error(project, command) if command else "Lean/Lake is not installed in this runtime."
+    command = _lake_command(project) if _browser_kernel is None else []
+    environment_error = (_environment_error(project, command) if command else "Lean/Lake is not installed in this runtime.") if _browser_kernel is None else None
     if environment_error:
         message = environment_error + " The exact Lean artifact was generated but not certified."
         if proof_mode == "assisted":
@@ -235,7 +237,7 @@ def verify_request(
         handle.write(source)
         artifact_path = Path(handle.name)
     try:
-        completed = subprocess.run(
+        completed = _browser_kernel(source, request["policy"]["max_seconds"]) if _browser_kernel is not None else subprocess.run(
             [*command, str(artifact_path)],
             cwd=project,
             env=_safe_environment(),
@@ -268,7 +270,7 @@ def verify_request(
     finally:
         artifact_path.unlink(missing_ok=True)
 
-    elapsed = int((time.perf_counter() - started) * 1000)
+    elapsed = getattr(completed, "elapsed_ms", int((time.perf_counter() - started) * 1000))
     if completed.returncode != 0:
         return VerificationResult(
             "needs_justification",

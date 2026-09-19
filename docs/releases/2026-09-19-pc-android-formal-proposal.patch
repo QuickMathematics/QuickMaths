@@ -1,0 +1,420 @@
+--- /dev/null
++++ b/docs/formal-browser.js
+@@ -0,0 +1,32 @@
++// Fresh browser proof requests; archived evidence still requires replay.
++import {browserRpc,dispose} from './formal-runtime/host.js';
++const ENV={backend:'lean4',lean_toolchain:'leanprover/lean4:v4.34.0-rc2',library:'mathlib',mathlib_revision:'42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c'};
++let idle;
++function status(text){for(const el of document.querySelectorAll('[data-formal-runtime-status]'))el.textContent=text||'Proof verification may take up to a minute. Your draft is preserved.';}
++export function browserFormalAvailable(){return typeof window!=='undefined'&&typeof location!=='undefined'&&location.protocol!=='file:';}
++async function ensure(){
++ if(/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1))throw Error('Browser proof checking on iPhone and iPad is not available yet. Your proof stays saved.');
++ if(!/Chrome\/|Chromium\/|Edg\//.test(navigator.userAgent))throw Error('Browser proof checking currently supports Chrome and Edge on PC, and Chrome on Android.');
++ if(!isSecureContext||!navigator.serviceWorker||!navigator.storage?.getDirectory||!navigator.locks)throw Error('This browser lacks the secure storage features needed for proof checking.');
++ const scope=new URL('./formal-runtime/',import.meta.url);
++ if(!location.pathname.startsWith(scope.pathname)){
++  scope.hash=location.hash;setTimeout(()=>location.assign(scope.href),500);
++  throw Error('Opening the protected proof workspace. Your saved test will reopen; select Start my proof again there.');
++ }
++ if(!crossOriginIsolated){
++  await navigator.serviceWorker.register(new URL('coi-sw.js',scope),{scope:scope.pathname,updateViaCache:'none'});
++  if(sessionStorage.getItem('qm-formal-isolation-reload'))throw Error('Proof workspace isolation could not start. Close this tab and reopen QuickMaths.');
++  sessionStorage.setItem('qm-formal-isolation-reload','1');setTimeout(()=>location.reload(),500);
++  throw Error('Enabling the protected proof workspace. The page will reload once; your draft is saved.');
++ }
++ sessionStorage.removeItem('qm-formal-isolation-reload');
++}
++export async function browserFormalHealth(){await ensure();return {service:'quickmaths-formal',protocol_version:'0.1',lean_available:true,environment:ENV};}
++export async function browserFormalRpc(message){
++ await ensure();clearTimeout(idle);
++ try{return await navigator.locks.request('qm-browser-lean-phone-test',{ifAvailable:true},lock=>{
++ if(!lock)throw Error('Another proof-checking tab is active. Finish there first.');
++ status('Preparing local proof checking. First download and setup can take longer than a minute.');
++ return browserRpc(message,phase=>status(phase==='proof'?'Checking your proof…':'Preparing the verified math environment…'));
++ });}finally{status('');idle=setTimeout(()=>void dispose(),60000);}
++}
+--- a/docs/formal-proof-client.js
++++ b/docs/formal-proof-client.js
+@@ -1,3 +1,4 @@
++import {browserFormalAvailable,browserFormalHealth,browserFormalRpc} from './formal-browser.js';
+ import { assertFormalCertificate, formalRequestHash, validateFormalProgress } from "./formal-proof-trust.js?v=20260913-formal-kernel-v1";
+ import { normalizeFormalEvidenceRecord } from "./formal-evidence.js?v=20260913-formal-kernel-v1";
+ const DEFAULT_BASE_URL = "http://127.0.0.1:8765";
+@@ -85,14 +86,18 @@
+   } finally { clearTimeout(timer); }
+ }
+ 
+-export async function getFormalHealth({ fetchImpl = fetch, baseUrl = DEFAULT_BASE_URL, timeoutMs = 5_000 } = {}) {
++export async function getFormalHealth(options = {}) {
++  if (!options.fetchImpl && !options.baseUrl && browserFormalAvailable()) return browserFormalHealth();
++  const {fetchImpl=fetch,baseUrl=DEFAULT_BASE_URL,timeoutMs=5000}=options;
+   return jsonFetch(fetchImpl, `${cleanBaseUrl(baseUrl)}/health`, { method: "GET", cache: "no-store", timeoutMs });
+ }
+ 
+-export async function callFormalRpc(rpc, { fetchImpl = fetch, baseUrl = DEFAULT_BASE_URL, timeoutMs } = {}) {
++export async function callFormalRpc(rpc, options = {}) {
++  const {fetchImpl=fetch,baseUrl=DEFAULT_BASE_URL,timeoutMs}=options;
+   if (!rpc || typeof rpc !== "object" || Array.isArray(rpc)) throw new Error("Formal RPC must be an object.");
+   const body = JSON.stringify(rpc);
+   if (new TextEncoder().encode(body).length > MAX_RPC_BYTES) throw new Error("Formal RPC exceeds the 1 MB request limit.");
++  if (!options.fetchImpl && !options.baseUrl && browserFormalAvailable()) return browserFormalRpc(rpc);
+   const seconds = Number(rpc.request?.policy?.max_seconds ?? rpc.max_seconds ?? 60);
+   const budget = Number.isFinite(seconds) ? Math.max(15_000, Math.min(75_000, seconds * 1000 + 5_000)) : 15_000;
+   const payload = await jsonFetch(fetchImpl, `${cleanBaseUrl(baseUrl)}/v1/rpc`, {
+--- a/docs/formal-proof-workspace.js
++++ b/docs/formal-proof-workspace.js
+@@ -49,7 +49,7 @@
+   }).join("");
+   return `<section class="formal-proof-panel proof-workspace ${certified ? "verified" : "pending"}" data-formal-proof-panel aria-busy="${busy}">
+     <header><div><p class="eyebrow">Proof workspace</p><h3>Build the argument. Justify every step.</h3></div><span class="formal-proof-status" role="status" aria-live="polite">${escape(status)}</span></header>
+-    <p class="formal-proof-runtime-note">Proof verification may take up to a minute, especially on phones. Initial setup can take longer. Keep this page open while checking.</p>
++    <p class="formal-proof-runtime-note" data-formal-runtime-status aria-live="polite">Proof verification may take up to a minute, especially on phones. Initial setup can take longer. Keep this page open while checking.</p>
+     <div class="proof-theorem"><span class="eyebrow">Your goal</span><p>${escape(spec.statement.goal)}</p><div class="proof-domain-chips">${(spec.statement.declarations ?? []).map((text) => `<span>${escape(text)}</span>`).join("")}</div></div>
+     <div class="proof-workspace-columns"><div class="proof-reasoning"><h4>Your reasoning</h4>
+       ${steps.length ? `<ol class="proof-step-list">${rows}</ol>` : '<p class="proof-empty">Start with what you know. Add a claim and explain why it follows. You do not need to write Lean.</p>'}
+--- a/docs/formal-runtime/index.html
++++ b/docs/formal-runtime/index.html
+@@ -1 +1,219 @@
+-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Formal backend validation</title><h1>Formal backend validation</h1><p>Development only. This page cannot award mastery or save assessment results.</p><pre id="status">Ready</pre><script type="module" src="./validation.js"></script></html>
+\ No newline at end of file
++<!doctype html>
++<html lang="en">
++  <head>
++    <base href="../">
++    <meta charset="utf-8">
++    <meta name="viewport" content="width=device-width, initial-scale=1">
++    <meta name="description" content="QuickMaths is a local-first mastery map and agent-guided learning workspace.">
++    <meta name="theme-color" content="#f3eee3">
++    <meta name="referrer" content="no-referrer">
++    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' blob: 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src blob:; connect-src 'self' http://127.0.0.1:8765 https://api.github.com https://raw.githubusercontent.com https://*.github.io https://quickmaths-community-auth.quickmaths-community-auth.workers.dev; object-src 'none'; base-uri 'none'; form-action 'self'">
++    <title>QuickMaths — Map your mastery</title>
++    <link rel="icon" href="./quickmaths-logo.png">
++    <link rel="alternate" type="application/json" href="./agent-manifest.json" title="QuickMaths agent guide">
++    <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
++    <link rel="help" href="./QuickMaths-Student-Guide.pdf" title="QuickMaths Student Guide">
++    <link rel="help" href="./QuickMaths-Educator-Guide.pdf" title="QuickMaths Educator Guide">
++    <link rel="stylesheet" href="./challenge.css?v=20260913-formal-kernel-v1">
++    <script type="module" src="./challenge.js?v=20260913-formal-kernel-v1"></script>
++  </head>
++  <body>
++    <a class="skip-link" href="#view-root">Skip to learning workspace</a>
++
++    <div id="loading-screen" class="loading-screen" role="status">
++      <img src="./quickmaths-logo.png" alt="" width="88" height="82">
++      <p>Opening QuickMaths…</p>
++    </div>
++
++    <section id="welcome-screen" class="welcome-screen" hidden aria-labelledby="welcome-title">
++      <div class="welcome-art" aria-hidden="true">
++        <div class="math-scribble scribble-one">x²</div>
++        <div class="math-scribble scribble-two">∑</div>
++        <div class="math-scribble scribble-three">y = mx + b</div>
++      </div>
++      <header class="welcome-header">
++        <a class="welcome-brand" href="#/welcome" aria-label="QuickMaths home">
++          <img src="./quickmaths-logo.png" alt="" width="68" height="64">
++          <span>QuickMaths</span>
++        </a>
++        <span class="local-pill"><i></i> Free · local-first · no account</span>
++      </header>
++
++      <main class="welcome-main">
++        <section class="welcome-copy">
++          <p class="eyebrow">Local-first mastery learning</p>
++          <h1 id="welcome-title">Master what you know.<br><em>Conquer what comes next.</em></h1>
++          <p class="welcome-lede">QuickMaths turns lessons into living mastery maps. Explore connected fields and branches, practice, reflect, save your progress, and let a browser agent tutor from the work actually on screen.</p>
++          <div class="welcome-proof">
++            <span><strong id="welcome-lesson-count">…</strong> connected lessons</span>
++            <span><strong id="welcome-question-count">…</strong> varied mastery questions</span>
++            <span><strong id="welcome-tool-count">…</strong> agent actions</span>
++          </div>
++          <aside id="welcome-agent-boundary" class="welcome-agent-boundary"><strong>Using an agent?</strong><span>QuickMaths will show the right handoff for this browser.</span></aside>
++        </section>
++
++        <section class="profile-panel welcome-path-panel" aria-labelledby="profiles-title">
++          <div class="welcome-path-switch" role="tablist" aria-label="Choose QuickMaths workspace">
++            <button id="welcome-student-path" class="is-active" type="button" role="tab" aria-selected="true" aria-controls="student-path-body">I’m learning</button>
++            <button id="welcome-educator-path" type="button" role="tab" aria-selected="false" aria-controls="educator-path-body">I’m designing a curriculum</button>
++          </div>
++          <div class="panel-heading">
++            <div>
++              <p class="eyebrow">This browser</p>
++              <h2 id="profiles-title">Choose a learner</h2>
++            </div>
++            <button id="welcome-load" class="quiet-button" type="button">Load backup</button>
++          </div>
++
++          <div id="student-path-body" class="welcome-path-body" role="tabpanel">
++            <div id="profile-list" class="profile-list"></div>
++
++            <form id="create-profile-form" class="create-profile-form">
++              <label for="profile-name">New learner profile</label>
++              <div class="input-action">
++                <input id="profile-name" name="profile-name" maxlength="60" placeholder="Learner name" autocomplete="off" required>
++                <button class="button button-primary" type="submit">Create profile</button>
++              </div>
++              <p id="profile-error" class="form-message" aria-live="polite"></p>
++            </form>
++
++            <section class="welcome-curriculum-loader" aria-labelledby="welcome-curriculum-title">
++              <p class="eyebrow">Learning from an educator?</p>
++              <h3 id="welcome-curriculum-title">Load a curriculum <button class="studio-help" type="button" data-studio-help aria-expanded="false" aria-label="How curriculum progress is separated" data-tooltip="Curricula start in a blank assignment profile. Existing mastery is reused only when the curriculum student name matches the profile you select.">?</button></h3>
++              <p>Import a curriculum file or a public GitHub link. Its lesson packs, map, and learning policy travel together without mixing unrelated learner progress.</p>
++              <div class="welcome-loader-actions">
++                <button id="welcome-curriculum-file-button" class="quiet-button" type="button">Choose file</button>
++                <form id="welcome-curriculum-url-form" class="welcome-curriculum-url-form">
++                  <label class="sr-only" for="welcome-curriculum-url">GitHub curriculum link</label>
++                  <input id="welcome-curriculum-url" type="url" placeholder="github.com/…/curriculum.json" autocomplete="off">
++                  <button class="quiet-button" type="submit">Load link</button>
++                </form>
++              </div>
++              <p id="welcome-curriculum-status" class="form-message" aria-live="polite"></p>
++            </section>
++
++            <div class="profile-panel-footer">
++              <button id="create-demo" class="text-button" type="button">Explore with sample progress →</button>
++              <p>Progress autosaves here. Download a backup anytime to move it elsewhere.</p>
++            </div>
++            <a class="welcome-student-guide" href="./QuickMaths-Student-Guide.pdf" target="_blank" rel="noopener">Read the complete student guide PDF ↗</a>
++          </div>
++
++          <div id="educator-path-body" class="welcome-path-body" role="tabpanel" hidden>
++            <div class="educator-welcome-note">
++              <strong>Build a serious learning plan.</strong>
++              <p>Compose curricula, choose Depot packs, arrange a personalized map, and set the rules an in-app agent must follow.</p>
++            </div>
++            <div id="educator-profile-list" class="profile-list"></div>
++            <form id="create-educator-form" class="create-profile-form">
++              <label for="educator-name">New educator profile</label>
++              <div class="input-action">
++                <input id="educator-name" maxlength="60" placeholder="Educator name" autocomplete="off" required>
++                <button class="button button-primary" type="submit">Open designer</button>
++              </div>
++              <p id="educator-error" class="form-message" aria-live="polite"></p>
++            </form>
++            <p class="welcome-educator-storage">Educator work is local-first and supports the same GitHub storage token in Settings.</p>
++            <a class="welcome-educator-guide" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Read the educator guide PDF ↗</a>
++          </div>
++
++          <div id="welcome-storage-restore"></div>
++        </section>
++      </main>
++      <footer class="welcome-footer">Open source · MIT licensed · Built from the original QuickMaths curriculum</footer>
++    </section>
++
++    <div id="app-shell" class="app-shell agent-collapsed" hidden>
++      <aside class="sidebar" aria-label="QuickMaths navigation">
++        <div class="sidebar-brand">
++          <img src="./quickmaths-logo.png" alt="" width="54" height="51">
++          <span><strong>QuickMaths</strong><small>Learning workspace</small></span>
++        </div>
++
++        <div class="clock-card">
++          <svg id="analog-clock" class="analog-clock" viewBox="0 0 120 120" role="img" aria-label="Current local time">
++            <circle class="clock-face" cx="60" cy="60" r="54"></circle>
++            <g id="clock-minute-marks"></g>
++            <g id="clock-hour-marks"></g>
++            <line id="clock-hour" class="clock-hand clock-hour" x1="60" y1="60" x2="60" y2="34"></line>
++            <line id="clock-minute" class="clock-hand clock-minute" x1="60" y1="60" x2="60" y2="23"></line>
++            <line id="clock-second" class="clock-hand clock-second" x1="60" y1="66" x2="60" y2="17"></line>
++            <circle class="clock-center" cx="60" cy="60" r="4"></circle>
++          </svg>
++          <div class="timer-grid">
++            <span>Session<strong id="session-time">0s</strong></span>
++            <span>Profile total<strong id="profile-time">0s</strong></span>
++          </div>
++        </div>
++
++        <nav class="main-nav">
++          <button type="button" data-route="home"><span aria-hidden="true">⌂</span> <span data-nav-label>Dashboard</span></button>
++          <button type="button" data-route="map" data-nav-role="learner"><span aria-hidden="true">⌘</span> Mastery map</button>
++          <button type="button" data-route="curriculum" data-nav-role="educator"><span aria-hidden="true">⌘</span> Curriculum designer</button>
++          <button type="button" data-route="lesson" data-nav-role="learner"><span aria-hidden="true">◫</span> Lessons</button>
++          <button type="button" data-route="test" data-nav-role="learner"><span aria-hidden="true">✓</span> Mastery test</button>
++          <button type="button" data-route="results" data-nav-role="learner"><span aria-hidden="true">↗</span> Results</button>
++          <button type="button" data-route="depot"><span aria-hidden="true">◇</span> Lesson depot</button>
++          <button type="button" data-route="creator"><span aria-hidden="true">✎</span> Lesson studio</button>
++          <button type="button" data-route="settings"><span aria-hidden="true">⚙</span> Settings</button>
++        </nav>
++
++        <div class="sidebar-profile">
++          <button class="profile-dashboard-button" type="button" data-route="home" aria-label="Open learner dashboard" title="Open dashboard">
++            <span class="avatar" id="profile-avatar" aria-hidden="true">Q</span>
++            <span class="profile-copy"><strong id="sidebar-profile-name">Learner</strong><small>Saved in this browser</small></span>
++          </button>
++          <button id="global-storage-status" class="global-storage-status" type="button" data-action="open-storage-setup" data-tone="idle"><i aria-hidden="true"></i><span><strong>Local only</strong><small>No GitHub save yet</small></span></button>
++          <button id="logout-button" type="button" aria-label="Change learner" title="Change learner">↪</button>
++        </div>
++      </aside>
++
++      <main id="view-root" class="view-root" tabindex="-1"></main>
++
++      <aside id="agent-dock" class="agent-dock is-closed" aria-labelledby="agent-dock-title" tabindex="-1">
++        <div class="agent-dock-header">
++          <div>
++            <p class="eyebrow">Agent studio</p>
++            <h2 id="agent-dock-title">Tutor in the loop</h2>
++          </div>
++          <button id="agent-close" class="agent-close" type="button" aria-label="Close agent studio">×</button>
++        </div>
++        <div class="bridge-card">
++          <div><span id="bridge-status">Checking WebMCP…</span><i></i></div>
++          <p id="bridge-detail">Looking for browser agent support.</p>
++        </div>
++        <div id="agent-handoff-root"></div>
++        <details class="agent-tools">
++          <summary><span>Available tools</span><strong id="tool-count">21</strong></summary>
++          <div id="tool-list"></div>
++        </details>
++        <section class="agent-activity" aria-labelledby="activity-title">
++          <div class="mini-heading"><span id="activity-title">Agent activity</span><small>Tool actions only</small></div>
++          <p id="activity-empty">Agent actions will appear here as they change the learning workspace.</p>
++          <ol id="activity-list" aria-live="polite"></ol>
++        </section>
++      </aside>
++
++      <button id="agent-toggle" class="agent-toggle" type="button" aria-label="Open agent studio" aria-controls="agent-dock" aria-expanded="false">✦</button>
++      <nav class="mobile-nav" aria-label="Mobile navigation">
++        <button type="button" data-route="home">Home</button>
++        <button type="button" data-route="map" data-nav-role="learner">Map</button>
++        <button type="button" data-route="curriculum" data-nav-role="educator">Designer</button>
++        <button type="button" data-route="lesson" data-nav-role="learner">Learn</button>
++        <button type="button" data-route="test" data-nav-role="learner">Test</button>
++        <button type="button" data-route="depot">Depot</button>
++        <button type="button" data-route="settings">Settings</button>
++      </nav>
++    </div>
++
++    <input id="backup-file" type="file" accept="application/json,.json" hidden>
++    <input id="lesson-set-file" type="file" accept="application/json,.json" hidden>
++    <input id="creator-file" type="file" accept="application/json,.json" hidden>
++    <input id="creator-folder" type="file" webkitdirectory multiple hidden>
++    <input id="creator-media" type="file" accept="image/*,video/webm,video/mp4,video/ogg,audio/*" hidden>
++    <input id="curriculum-file" type="file" accept="application/json,.json" hidden>
++    <div id="agent-welcome-root"></div>
++    <div id="educator-welcome-root"></div>
++    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
++  </body>
++</html>
+--- /dev/null
++++ b/docs/formal-runtime/coi-sw.js
+@@ -0,0 +1,15 @@
++// Isolation shim scoped ONLY to the opt-in formal-runtime app entry.
++self.addEventListener('install', () => self.skipWaiting());
++self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
++self.addEventListener('fetch', event => {
++  if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
++  event.respondWith((async () => {
++    const response = await fetch(event.request);
++    if (response.status === 0) return response;
++    const headers = new Headers(response.headers);
++    headers.set('Cross-Origin-Opener-Policy', 'same-origin');
++    headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
++    headers.set('Cross-Origin-Resource-Policy', 'same-origin');
++    return new Response(response.body, {status: response.status, statusText: response.statusText, headers});
++  })());
++});
+--- a/docs/STUDENT_GUIDE.md
++++ b/docs/STUDENT_GUIDE.md
+@@ -732,3 +732,18 @@
+ 
+ The reusable engineering workflow is documented in
+ [Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).
++
++### PC and Android browser proof checking
++
++Chrome/Edge on PC and Chrome on Android can check supported formal proofs locally.
++Start a formal question to open the protected proof workspace; on first use it
++reopens the saved test and enables isolation. Select **Start my proof** again
++after the reload. Initial setup downloads shared verified assets (hundreds of
++megabytes); use Wi-Fi. Cached environments are reused. Each proof check allows
++up to a minute; initial setup can take longer. Your draft survives a failed check.
++
++Only a fresh Lean certificate for the exact submitted proof can award formal
++credit. Author reference checks remain separate from learner submissions. iPhone
++and iPad browser support is deferred; drafts can still be saved. Existing imported
++formal lessons use the same backend when their declared capabilities are supported.
++The local desktop companion remains available through explicit client options.
+--- a/docs/EDUCATOR_GUIDE.md
++++ b/docs/EDUCATOR_GUIDE.md
+@@ -803,3 +803,18 @@
+ 
+ The reusable engineering workflow is documented in
+ [Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).
++
++### PC and Android browser proof checking
++
++Chrome/Edge on PC and Chrome on Android can check supported formal proofs locally.
++Start a formal question to open the protected proof workspace; on first use it
++reopens the saved test and enables isolation. Select **Start my proof** again
++after the reload. Initial setup downloads shared verified assets (hundreds of
++megabytes); use Wi-Fi. Cached environments are reused. Each proof check allows
++up to a minute; initial setup can take longer. Your draft survives a failed check.
++
++Only a fresh Lean certificate for the exact submitted proof can award formal
++credit. Author reference checks remain separate from learner submissions. iPhone
++and iPad browser support is deferred; drafts can still be saved. Existing imported
++formal lessons use the same backend when their declared capabilities are supported.
++The local desktop companion remains available through explicit client options.
+--- a/docs/FORMAL_LEARNING.md
++++ b/docs/FORMAL_LEARNING.md
+@@ -154,3 +154,18 @@
+ 
+ The reusable engineering workflow is documented in
+ [Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).
++
++### PC and Android browser proof checking
++
++Chrome/Edge on PC and Chrome on Android can check supported formal proofs locally.
++Start a formal question to open the protected proof workspace; on first use it
++reopens the saved test and enables isolation. Select **Start my proof** again
++after the reload. Initial setup downloads shared verified assets (hundreds of
++megabytes); use Wi-Fi. Cached environments are reused. Each proof check allows
++up to a minute; initial setup can take longer. Your draft survives a failed check.
++
++Only a fresh Lean certificate for the exact submitted proof can award formal
++credit. Author reference checks remain separate from learner submissions. iPhone
++and iPad browser support is deferred; drafts can still be saved. Existing imported
++formal lessons use the same backend when their declared capabilities are supported.
++The local desktop companion remains available through explicit client options.
+--- a/docs/CUSTOM_LESSON_SETS.md
++++ b/docs/CUSTOM_LESSON_SETS.md
+@@ -750,3 +750,18 @@
+ 
+ The reusable engineering workflow is documented in
+ [Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).
++
++### PC and Android browser proof checking
++
++Chrome/Edge on PC and Chrome on Android can check supported formal proofs locally.
++Start a formal question to open the protected proof workspace; on first use it
++reopens the saved test and enables isolation. Select **Start my proof** again
++after the reload. Initial setup downloads shared verified assets (hundreds of
++megabytes); use Wi-Fi. Cached environments are reused. Each proof check allows
++up to a minute; initial setup can take longer. Your draft survives a failed check.
++
++Only a fresh Lean certificate for the exact submitted proof can award formal
++credit. Author reference checks remain separate from learner submissions. iPhone
++and iPad browser support is deferred; drafts can still be saved. Existing imported
++formal lessons use the same backend when their declared capabilities are supported.
++The local desktop companion remains available through explicit client options.
+--- a/docs/lesson-creator.js
++++ b/docs/lesson-creator.js
+@@ -480,7 +480,7 @@
+       <section class="studio-formal-reference"><div class="studio-section-title"><div><p class="eyebrow">Author reference proof</p><h3>Prove the exercise before publishing it</h3></div><button type="button" class="quiet-button" data-creator-action="apply-formal-example" data-index="${index}">Load algebra example</button></div>
+         ${indexed(select("Reference proof source", "problem.formalReferenceMode", problem.formalReferenceMode ?? "none", [["none","No reference proof yet"],["steps","Submitted declarative steps"],["auto","Bounded prover search"]], "A reference proof is an author candidate until the pinned Lean kernel accepts it."))}
+         ${problem.formalReferenceMode === "steps" ? `<div class="studio-repeat">${rows || `<p class="studio-field-intro">Add the first declarative proof step. The verifier will expose any remaining obligation rather than guessing.</p>`}<button type="button" class="button button-outline" data-creator-action="add-formal-reference-step" data-index="${index}">＋ Add reference step</button></div>` : problem.formalReferenceMode === "auto" ? `<p class="studio-field-intro">The verifier will run bounded deterministic search using only the allowed rule registry. Search success is still not a certificate until Lean accepts the generated artifact.</p>` : ""}
+-        ${problem.formalReferenceMode !== "none" ? `<button type="button" class="button button-secondary" data-creator-action="check-formal-reference" data-index="${index}" ${problem.formalReferenceCheck?.state === "checking" ? "disabled" : ""}>Check reference proof with companion verifier</button>` : ""}
++        ${problem.formalReferenceMode !== "none" ? `<button type="button" class="button button-secondary" data-creator-action="check-formal-reference" data-index="${index}" ${problem.formalReferenceCheck?.state === "checking" ? "disabled" : ""}>Check reference proof</button>` : ""}
+         ${renderFormalReferenceStatus(problem.formalReferenceCheck)}
+       </section>
+     ` : ""}
+@@ -1063,7 +1063,7 @@
+             const count = Array.isArray(checked.proofState.obligations) ? checked.proofState.obligations.length : 0;
+             problem.formalReferenceCheck = { state: "incomplete", message: checked.proofState.message || `The reference proof still has ${count} unresolved obligation${count === 1 ? "" : "s"}.` };
+           } else if (checked.verification?.status === "verification_unavailable") {
+-            problem.formalReferenceCheck = { state: "unavailable", message: "The declarative reference proof is ready for kernel checking, but Lean is not available in the companion service." };
++            problem.formalReferenceCheck = { state: "unavailable", message: "The declarative reference proof is ready for kernel checking, but Lean is not available in this verifier." };
+           } else {
+             problem.formalReferenceCheck = { state: "invalid", message: checked.verification?.message || `Verifier returned ${checked.verification?.status ?? "an unresolved result"}.` };
+           }

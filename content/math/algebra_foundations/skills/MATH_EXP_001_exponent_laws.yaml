@@ -531,3 +531,41 @@ test:
         - rule_selection_error
         - operation_error
       difficulty: hard
+
+    - id: MATH_EXP_001_FORMAL_IDENTITY_001
+      type: fixed
+      prompt: 'Prove this product law for nonnegative integer powers for every real x. Statement: x^2*x^3 = x^5'
+      difficulty: hard
+      answer_mode: final_only
+      answer:
+        type: text
+        value: Complete Lean-verified proof
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      proof_spec:
+        version: '0.1'
+        statement:
+          declarations:
+          - x:real
+          assumptions: []
+          goal: x^2*x^3 = x^5
+        allowed_rules:
+        - ring_identity
+        assessment_policy: {}
+        reference_proof:
+          mode: steps
+          steps:
+          - claim: x^2*x^3 = x^5
+            rule: ring_identity
+            premises: []
+        environment:
+          backend: lean4
+          toolchain: leanprover/lean4:v4.34.0-rc2
+          library: mathlib
+          library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c
+      explanation_template: The exact statement and your submitted reasons must be accepted by Lean. A matching final-answer
+        phrase is not a proof.
+      mistake_tags:
+      - proof_justification

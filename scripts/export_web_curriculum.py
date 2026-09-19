@@ -90,7 +90,7 @@ def build_payload(*, native_media_budget: int = DEFAULT_NATIVE_MEDIA_BUDGET, med
             )
     for skill_id in track.skills:
         skill = skills[skill_id]
-        question_count = len(skill.test.questions)
+        question_count = skill.test.question_count if any(t.proof_spec for t in skill.test.questions) else len(skill.test.questions)
         target_bank_size = min(question_count * 2, 100)
         source_template_ids = {template.id for template in skill.test.questions}
         problems = []
@@ -156,7 +156,7 @@ def build_payload(*, native_media_budget: int = DEFAULT_NATIVE_MEDIA_BUDGET, med
                 "applications": skill.applications,
                 "question_count": question_count,
                 "native_randomize_order": skill.test.randomize_order,
-                "native_templates": [{key: value for key, value in asdict(template).items() if key not in {"media", "diagram", "math_blocks"} or value} for template in skill.test.questions],
+                "native_templates": [{key: value for key, value in asdict(template).items() if key not in {"media", "diagram", "math_blocks", "proof_spec"} or value} for template in skill.test.questions],
                 "problems": problems,
             }
         )

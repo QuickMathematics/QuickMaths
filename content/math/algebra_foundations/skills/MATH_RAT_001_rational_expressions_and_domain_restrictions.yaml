@@ -578,3 +578,49 @@ test:
     - cancellation_error
     - domain_restriction_error
     difficulty: hard
+
+  - id: MATH_RAT_001_FORMAL_IDENTITY_001
+    type: fixed
+    prompt: 'For real x with x != 3, prove the simplification. Explicitly establish that the cancelled denominator
+      is nonzero. Statement: (x^2 - 9)/(x - 3) = x + 3'
+    difficulty: hard
+    answer_mode: final_only
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations:
+        - x:real
+        assumptions:
+        - x != 3
+        goal: (x^2 - 9)/(x - 3) = x + 3
+      allowed_rules:
+      - sub_ne_zero_from_ne
+      - field_identity
+      assessment_policy: {}
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: x - 3 != 0
+          rule: sub_ne_zero_from_ne
+          premises:
+          - h1
+        - claim: (x^2 - 9)/(x - 3) = x + 3
+          rule: field_identity
+          premises:
+          - reference_step_1
+      environment:
+        backend: lean4
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library: mathlib
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c
+    explanation_template: The exact statement and your submitted reasons must be accepted by Lean. A matching final-answer
+      phrase is not a proof.
+    mistake_tags:
+    - proof_justification

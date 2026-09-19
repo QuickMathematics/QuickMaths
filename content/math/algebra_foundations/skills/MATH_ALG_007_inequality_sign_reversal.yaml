@@ -414,3 +414,44 @@ test:
         - negative_divisor
         - multiplication_error
       difficulty: hard
+
+    - id: MATH_ALG_007_FORMAL_IDENTITY_001
+      type: fixed
+      prompt: 'Given -3x < 6, prove x > -2. Cite the assumption when justifying why the direction reverses. Statement:
+        x > -2'
+      difficulty: hard
+      answer_mode: final_only
+      answer:
+        type: text
+        value: Complete Lean-verified proof
+      grading:
+        method: exact_text
+      work:
+        mode: none
+      proof_spec:
+        version: '0.1'
+        statement:
+          declarations:
+          - x:real
+          assumptions:
+          - -3*x < 6
+          goal: x > -2
+        allowed_rules:
+        - linarith
+        assessment_policy: {}
+        reference_proof:
+          mode: steps
+          steps:
+          - claim: x > -2
+            rule: linarith
+            premises:
+            - h1
+        environment:
+          backend: lean4
+          toolchain: leanprover/lean4:v4.34.0-rc2
+          library: mathlib
+          library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c
+      explanation_template: The exact statement and your submitted reasons must be accepted by Lean. A matching final-answer
+        phrase is not a proof.
+      mistake_tags:
+      - proof_justification
