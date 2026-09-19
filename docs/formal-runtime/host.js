@@ -1,4 +1,4 @@
-// Private development host; not connected to lesson grading.
+// Private browser host: native protocol and certificate checks remain authoritative.
 import {runKernel,releaseKernel} from './kernel.js';
 let python,seq=0,queue=Promise.resolve();
 function pythonCall(message,replies){

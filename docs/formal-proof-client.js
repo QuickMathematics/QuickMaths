@@ -1,3 +1,4 @@
+import {browserFormalAvailable,browserFormalHealth,browserFormalRpc} from './formal-browser.js';
 import { assertFormalCertificate, formalRequestHash, validateFormalProgress } from "./formal-proof-trust.js?v=20260913-formal-kernel-v1";
 import { normalizeFormalEvidenceRecord } from "./formal-evidence.js?v=20260913-formal-kernel-v1";
 const DEFAULT_BASE_URL = "http://127.0.0.1:8765";
@@ -85,14 +86,18 @@ async function jsonFetch(fetchImpl, url, { timeoutMs = 15_000, ...options } = {}
   } finally { clearTimeout(timer); }
 }
 
-export async function getFormalHealth({ fetchImpl = fetch, baseUrl = DEFAULT_BASE_URL, timeoutMs = 5_000 } = {}) {
+export async function getFormalHealth(options = {}) {
+  if (!options.fetchImpl && !options.baseUrl && browserFormalAvailable()) return browserFormalHealth();
+  const {fetchImpl=fetch,baseUrl=DEFAULT_BASE_URL,timeoutMs=5000}=options;
   return jsonFetch(fetchImpl, `${cleanBaseUrl(baseUrl)}/health`, { method: "GET", cache: "no-store", timeoutMs });
 }
 
-export async function callFormalRpc(rpc, { fetchImpl = fetch, baseUrl = DEFAULT_BASE_URL, timeoutMs } = {}) {
+export async function callFormalRpc(rpc, options = {}) {
+  const {fetchImpl=fetch,baseUrl=DEFAULT_BASE_URL,timeoutMs}=options;
   if (!rpc || typeof rpc !== "object" || Array.isArray(rpc)) throw new Error("Formal RPC must be an object.");
   const body = JSON.stringify(rpc);
   if (new TextEncoder().encode(body).length > MAX_RPC_BYTES) throw new Error("Formal RPC exceeds the 1 MB request limit.");
+  if (!options.fetchImpl && !options.baseUrl && browserFormalAvailable()) return browserFormalRpc(rpc);
   const seconds = Number(rpc.request?.policy?.max_seconds ?? rpc.max_seconds ?? 60);
   const budget = Number.isFinite(seconds) ? Math.max(15_000, Math.min(75_000, seconds * 1000 + 5_000)) : 15_000;
   const payload = await jsonFetch(fetchImpl, `${cleanBaseUrl(baseUrl)}/v1/rpc`, {

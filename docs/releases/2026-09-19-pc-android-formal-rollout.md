@@ -1,10 +1,10 @@
-# PC + Android formal verifier rollout — prepared, not activated
+# PC + Android formal verifier rollout
 
-The browser backend and eight lesson updates are prepared and tested locally.
-The production lesson client and main app CSP are unchanged. Nothing from this
-update has been published to main. Automatic approval review blocked activation.
+The browser backend is connected to the lesson client after explicit rollout
+approval. Eight existing lessons gain formal exercises. The ordinary app CSP
+remains unchanged; the protected `/formal-runtime/` entry enables scoped isolation.
 
-## Prepared implementation
+## Implementation
 
 - Reuses the pinned Lean/Mathlib runtime, shared artifact cache and bounded OPFS
   module staging. Imported staging is released before timed proof execution.
@@ -48,23 +48,26 @@ are reference-mode evidence, never learner assessment credit.
 - Export comparison confirms eight changed lessons and unchanged test lengths.
 
 [Evidence](../../experiments/browser-lean/results/pc-android-rollout/).
-No long phone suite was rerun. The final production UI connection still needs
-its focused live smoke test after approval to apply it.
+No long phone suite was rerun. A focused Chromium smoke test exercised the
+actual production client with a plain HTTP server, the scoped service worker,
+first-use isolation reload, profile creation, and a real submitted lesson proof.
+It passed with a verified submitted-mode certificate. The 30 focused JS tests
+also passed after integration.
 
-## Blocked activation step
+## Activation and documentation
 
-The [review-only integration patch](2026-09-19-pc-android-formal-proposal.patch)
-is prepared and passes `git apply --check`; it has NOT been applied. It connects
-the tested backend to the lesson client and updates Studio and user/authoring
-guides. Chrome/Edge on PC and Chrome on Android are its initial targets;
-iPhone/iPad browser verification is deferred.
+- Connects the native browser backend to lesson proof checking and Studio.
+- Keeps the separate experimental parity harness assessment-ineligible.
+- Supports Chrome/Edge on PC and Chrome on Android; iPhone/iPad remain deferred.
+- Reopens saved tests on the protected route. On first use, select Start my proof
+  again after the isolation reload. Setup downloads hundreds of megabytes;
+  proof execution allows one minute and idle workers are released.
+- Fixes hash navigation so the shared app stays on the protected entry.
+- Retains the development-only validation page as `formal-runtime/validation.html`.
+- Updates authoring, student, educator and formal-learning guides, guide PDFs,
+  Studio wording and the agent manifest.
+- Preserves certificate hashes, modes, axiom checks and replay requirements.
 
-The revised design leaves `docs/index.html` and its CSP unchanged. Isolation and
-its necessary WASM/worker policy apply only to a dedicated `/formal-runtime/`
-app entry. First use reopens the saved test there. Proofs allow one minute;
-initial download/setup can take longer. Idle workers are released.
-
-Automatic approval review rejected the production connection as a CSP and
-assessment trust-boundary change. Approval is needed to apply the final patch,
-validate the learner flow, and publish the update to main. This report does not
-claim that the new production route is online or assessment-enabled.
+The earlier proposal patch is retained as historical review material; it is
+already integrated with the navigation/startup corrections above and must not
+be applied again. No mathematical coverage or iPhone support was added.

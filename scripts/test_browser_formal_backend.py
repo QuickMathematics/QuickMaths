@@ -13,7 +13,7 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 with sync_playwright() as p:
  c=p.chromium.launch_persistent_context(str(BASE/'profile'),headless=True)
  page=c.new_page();page.on('pageerror',lambda e:print('Page error:',e,flush=True));page.on('console',lambda m:print(m.text[:250],flush=True) if m.type=='error' else None)
- page.goto(f'http://127.0.0.1:{server.server_port}/formal-runtime/');page.wait_for_function('typeof browserRpc==="function"')
+ page.goto(f'http://127.0.0.1:{server.server_port}/formal-runtime/validation.html');page.wait_for_function('typeof browserRpc==="function"')
  if '--preflight' in sys.argv:
   sys.path.insert(0,str(ROOT/'formal-verifier/src'))
   from quickmaths_formal.lean import render_request

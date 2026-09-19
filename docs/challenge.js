@@ -2351,7 +2351,7 @@ function render(snapshot) {
     mediaRenderer.dispose();
     renderProfiles(snapshot);
     renderWelcomeStorageRestore(snapshot);
-    if (location.hash !== "#/welcome") history.replaceState(null, "", "#/welcome");
+    if (location.hash !== "#/welcome") history.replaceState(null, "", `${location.pathname}${location.search}#/welcome`);
     routeHistoryReady = true;
     return;
   }
@@ -2388,8 +2388,8 @@ function render(snapshot) {
     ? `#/${snapshot.ui.route}/${snapshot.ui.selectedSkillId}`
     : `#/${snapshot.ui.route}`;
   if (location.hash !== nextHash) {
-    if (routeHistoryReady && !applyingHistory) history.pushState(null, "", nextHash);
-    else history.replaceState(null, "", nextHash);
+    if (routeHistoryReady && !applyingHistory) history.pushState(null, "", `${location.pathname}${location.search}${nextHash}`);
+    else history.replaceState(null, "", `${location.pathname}${location.search}${nextHash}`);
   }
   routeHistoryReady = true;
   mediaRenderer.hydrate(elements.view);

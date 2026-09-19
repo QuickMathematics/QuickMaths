@@ -495,8 +495,8 @@
   },
   "formal_proof_authoring": {
     "schema": "../schemas/formal-proof-spec.schema.json",
-    "capabilities": "Optional proof_spec.capabilities lists algebra, radicals, limits, derivatives, or sequences-series. Include algebra and every capability inferred from the statement and allowed rules; leave the Studio field blank for automatic inference. These are loading hints, not permission to import modules or grant proof rules. The curated browser runtime remains an assessment-ineligible experiment; certificate requirements are unchanged.",
-    "status": "Local learner integration: proof_spec questions use the native proof workspace and require a fresh complete Lean certificate or replay for assessment. No Lean kernel is bundled; pending/unavailable verification is explicit. Reference proofs must be checked with the pinned companion before publication.",
+    "capabilities": "Optional proof_spec.capabilities lists algebra, radicals, limits, derivatives, or sequences-series. Include algebra and every capability inferred from the statement and allowed rules; leave the Studio field blank for automatic inference. These are loading hints, not permission to import modules or grant proof rules. The pinned browser backend lazy-loads shared curated environments on PC Chrome/Edge and Android Chrome; certificate requirements are unchanged. The separate experiment route remains assessment-ineligible.",
+    "status": "Local learner integration: proof_spec questions use the native proof workspace and require a fresh complete Lean certificate or replay for assessment. The protected formal-runtime route loads the pinned browser Lean kernel; pending/unavailable verification is explicit. Reference proofs must be checked with the pinned browser verifier or companion before publication. iPhone/iPad support is deferred. Checks allow up to 60 seconds, excluding first-use setup.",
     "parameter_binding": "Generated proof specifications resolve only from exact named values visible in the learner prompt; hidden derived generator values are rejected.",
     "trusted_boundary": "Lesson packages provide declarative statements and policy metadata only. Lean source, tactics, imports, macros and executable package code are not accepted.",
     "assessment_policy": "Nonempty method-specific assessment policies are not implemented by the learner assessment path and explicitly block credit. Leave assessment_policy empty for this build."
@@ -508,6 +508,6 @@
     "guidance_boundary": "Choose one offered guidance_id for the exact proof_revision. Free text, verdicts, certificates, supplied proof steps and obligation verdicts are rejected. Guidance has no assessment effect.",
     "assessment_boundary": "The app alone requests verification. Fresh complete submitted-proof certificates enable submission and reflection. Prefix/reference/assisted certificates, imported JSON and tutor opinions cannot do so.",
     "persistence_boundary": "Backup, assignment import, sync and Agent Bridge transport archive data only. Edits invalidate live verification; restore requires replay. Historical scores are records, not current certificates.",
-    "threat_model": "The loopback companion and local app origin are trusted. Digest consistency is binding, not cryptographic server authentication or high-stakes anti-cheating security."
+    "threat_model": "The pinned browser backend, loopback companion and local app origin are trusted. Digest consistency is binding, not cryptographic server authentication or high-stakes anti-cheating security."
   }
 }

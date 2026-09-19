@@ -442,7 +442,7 @@ function renderMediaEditor(items = [], scope, sectionIndex, assets = [], owner =
 }
 
 function renderFormalReferenceStatus(check) {
-  if (!check) return `<div class="studio-validation"><strong>Reference proof not checked</strong><p>Use the local companion verifier before publishing a formal exercise. <a href="./FORMAL_LEARNING.md" target="_blank" rel="noopener">Companion setup and proof guide</a></p></div>`;
+  if (!check) return `<div class="studio-validation"><strong>Reference proof not checked</strong><p>Use the browser verifier before publishing a formal exercise. <a href="./FORMAL_LEARNING.md" target="_blank" rel="noopener">Browser support and proof guide</a></p></div>`;
   const labels = {
     verified: ["is-valid", "✓ Kernel-certified reference proof"],
     ready: ["is-valid", "Ready for kernel verification"],
@@ -480,7 +480,7 @@ function renderFormalProofAuthoring(problem, index) {
       <section class="studio-formal-reference"><div class="studio-section-title"><div><p class="eyebrow">Author reference proof</p><h3>Prove the exercise before publishing it</h3></div><button type="button" class="quiet-button" data-creator-action="apply-formal-example" data-index="${index}">Load algebra example</button></div>
         ${indexed(select("Reference proof source", "problem.formalReferenceMode", problem.formalReferenceMode ?? "none", [["none","No reference proof yet"],["steps","Submitted declarative steps"],["auto","Bounded prover search"]], "A reference proof is an author candidate until the pinned Lean kernel accepts it."))}
         ${problem.formalReferenceMode === "steps" ? `<div class="studio-repeat">${rows || `<p class="studio-field-intro">Add the first declarative proof step. The verifier will expose any remaining obligation rather than guessing.</p>`}<button type="button" class="button button-outline" data-creator-action="add-formal-reference-step" data-index="${index}">＋ Add reference step</button></div>` : problem.formalReferenceMode === "auto" ? `<p class="studio-field-intro">The verifier will run bounded deterministic search using only the allowed rule registry. Search success is still not a certificate until Lean accepts the generated artifact.</p>` : ""}
-        ${problem.formalReferenceMode !== "none" ? `<button type="button" class="button button-secondary" data-creator-action="check-formal-reference" data-index="${index}" ${problem.formalReferenceCheck?.state === "checking" ? "disabled" : ""}>Check reference proof with companion verifier</button>` : ""}
+        ${problem.formalReferenceMode !== "none" ? `<button type="button" class="button button-secondary" data-creator-action="check-formal-reference" data-index="${index}" ${problem.formalReferenceCheck?.state === "checking" ? "disabled" : ""}>Check reference proof</button>` : ""}
         ${renderFormalReferenceStatus(problem.formalReferenceCheck)}
       </section>
     ` : ""}
@@ -1052,7 +1052,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     if (action === "check-formal-reference") {
       const skill = currentSkill();
       const problem = skill.problems[Number(target.dataset.index)];
-      problem.formalReferenceCheck = { state: "checking", message: "Submitting the exact authored theorem and reference proof to the local companion verifier." };
+      problem.formalReferenceCheck = { state: "checking", message: "Submitting the exact authored theorem and reference proof to the pinned verifier." };
       save();
       return (async () => {
         try {
@@ -1063,7 +1063,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
             const count = Array.isArray(checked.proofState.obligations) ? checked.proofState.obligations.length : 0;
             problem.formalReferenceCheck = { state: "incomplete", message: checked.proofState.message || `The reference proof still has ${count} unresolved obligation${count === 1 ? "" : "s"}.` };
           } else if (checked.verification?.status === "verification_unavailable") {
-            problem.formalReferenceCheck = { state: "unavailable", message: "The declarative reference proof is ready for kernel checking, but Lean is not available in the companion service." };
+            problem.formalReferenceCheck = { state: "unavailable", message: "The declarative reference proof is ready for kernel checking, but Lean is not available in this verifier." };
           } else {
             problem.formalReferenceCheck = { state: "invalid", message: checked.verification?.message || `Verifier returned ${checked.verification?.status ?? "an unresolved result"}.` };
           }

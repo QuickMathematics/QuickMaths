@@ -1,1 +1,219 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Formal backend validation</title><h1>Formal backend validation</h1><p>Development only. This page cannot award mastery or save assessment results.</p><pre id="status">Ready</pre><script type="module" src="./validation.js"></script></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <base href="../">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="QuickMaths is a local-first mastery map and agent-guided learning workspace.">
+    <meta name="theme-color" content="#f3eee3">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' blob: 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src blob:; connect-src 'self' http://127.0.0.1:8765 https://api.github.com https://raw.githubusercontent.com https://*.github.io https://quickmaths-community-auth.quickmaths-community-auth.workers.dev; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <title>QuickMaths — Map your mastery</title>
+    <link rel="icon" href="./quickmaths-logo.png">
+    <link rel="alternate" type="application/json" href="./agent-manifest.json" title="QuickMaths agent guide">
+    <link rel="help" href="./CUSTOM_LESSON_SETS.md" title="Agent Lesson Authoring Guide">
+    <link rel="help" href="./QuickMaths-Student-Guide.pdf" title="QuickMaths Student Guide">
+    <link rel="help" href="./QuickMaths-Educator-Guide.pdf" title="QuickMaths Educator Guide">
+    <link rel="stylesheet" href="./challenge.css?v=20260913-formal-kernel-v1">
+    <script type="module" src="./challenge.js?v=20260913-formal-kernel-v1"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#view-root">Skip to learning workspace</a>
+
+    <div id="loading-screen" class="loading-screen" role="status">
+      <img src="./quickmaths-logo.png" alt="" width="88" height="82">
+      <p>Opening QuickMaths…</p>
+    </div>
+
+    <section id="welcome-screen" class="welcome-screen" hidden aria-labelledby="welcome-title">
+      <div class="welcome-art" aria-hidden="true">
+        <div class="math-scribble scribble-one">x²</div>
+        <div class="math-scribble scribble-two">∑</div>
+        <div class="math-scribble scribble-three">y = mx + b</div>
+      </div>
+      <header class="welcome-header">
+        <a class="welcome-brand" href="#/welcome" aria-label="QuickMaths home">
+          <img src="./quickmaths-logo.png" alt="" width="68" height="64">
+          <span>QuickMaths</span>
+        </a>
+        <span class="local-pill"><i></i> Free · local-first · no account</span>
+      </header>
+
+      <main class="welcome-main">
+        <section class="welcome-copy">
+          <p class="eyebrow">Local-first mastery learning</p>
+          <h1 id="welcome-title">Master what you know.<br><em>Conquer what comes next.</em></h1>
+          <p class="welcome-lede">QuickMaths turns lessons into living mastery maps. Explore connected fields and branches, practice, reflect, save your progress, and let a browser agent tutor from the work actually on screen.</p>
+          <div class="welcome-proof">
+            <span><strong id="welcome-lesson-count">…</strong> connected lessons</span>
+            <span><strong id="welcome-question-count">…</strong> varied mastery questions</span>
+            <span><strong id="welcome-tool-count">…</strong> agent actions</span>
+          </div>
+          <aside id="welcome-agent-boundary" class="welcome-agent-boundary"><strong>Using an agent?</strong><span>QuickMaths will show the right handoff for this browser.</span></aside>
+        </section>
+
+        <section class="profile-panel welcome-path-panel" aria-labelledby="profiles-title">
+          <div class="welcome-path-switch" role="tablist" aria-label="Choose QuickMaths workspace">
+            <button id="welcome-student-path" class="is-active" type="button" role="tab" aria-selected="true" aria-controls="student-path-body">I’m learning</button>
+            <button id="welcome-educator-path" type="button" role="tab" aria-selected="false" aria-controls="educator-path-body">I’m designing a curriculum</button>
+          </div>
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">This browser</p>
+              <h2 id="profiles-title">Choose a learner</h2>
+            </div>
+            <button id="welcome-load" class="quiet-button" type="button">Load backup</button>
+          </div>
+
+          <div id="student-path-body" class="welcome-path-body" role="tabpanel">
+            <div id="profile-list" class="profile-list"></div>
+
+            <form id="create-profile-form" class="create-profile-form">
+              <label for="profile-name">New learner profile</label>
+              <div class="input-action">
+                <input id="profile-name" name="profile-name" maxlength="60" placeholder="Learner name" autocomplete="off" required>
+                <button class="button button-primary" type="submit">Create profile</button>
+              </div>
+              <p id="profile-error" class="form-message" aria-live="polite"></p>
+            </form>
+
+            <section class="welcome-curriculum-loader" aria-labelledby="welcome-curriculum-title">
+              <p class="eyebrow">Learning from an educator?</p>
+              <h3 id="welcome-curriculum-title">Load a curriculum <button class="studio-help" type="button" data-studio-help aria-expanded="false" aria-label="How curriculum progress is separated" data-tooltip="Curricula start in a blank assignment profile. Existing mastery is reused only when the curriculum student name matches the profile you select.">?</button></h3>
+              <p>Import a curriculum file or a public GitHub link. Its lesson packs, map, and learning policy travel together without mixing unrelated learner progress.</p>
+              <div class="welcome-loader-actions">
+                <button id="welcome-curriculum-file-button" class="quiet-button" type="button">Choose file</button>
+                <form id="welcome-curriculum-url-form" class="welcome-curriculum-url-form">
+                  <label class="sr-only" for="welcome-curriculum-url">GitHub curriculum link</label>
+                  <input id="welcome-curriculum-url" type="url" placeholder="github.com/…/curriculum.json" autocomplete="off">
+                  <button class="quiet-button" type="submit">Load link</button>
+                </form>
+              </div>
+              <p id="welcome-curriculum-status" class="form-message" aria-live="polite"></p>
+            </section>
+
+            <div class="profile-panel-footer">
+              <button id="create-demo" class="text-button" type="button">Explore with sample progress →</button>
+              <p>Progress autosaves here. Download a backup anytime to move it elsewhere.</p>
+            </div>
+            <a class="welcome-student-guide" href="./QuickMaths-Student-Guide.pdf" target="_blank" rel="noopener">Read the complete student guide PDF ↗</a>
+          </div>
+
+          <div id="educator-path-body" class="welcome-path-body" role="tabpanel" hidden>
+            <div class="educator-welcome-note">
+              <strong>Build a serious learning plan.</strong>
+              <p>Compose curricula, choose Depot packs, arrange a personalized map, and set the rules an in-app agent must follow.</p>
+            </div>
+            <div id="educator-profile-list" class="profile-list"></div>
+            <form id="create-educator-form" class="create-profile-form">
+              <label for="educator-name">New educator profile</label>
+              <div class="input-action">
+                <input id="educator-name" maxlength="60" placeholder="Educator name" autocomplete="off" required>
+                <button class="button button-primary" type="submit">Open designer</button>
+              </div>
+              <p id="educator-error" class="form-message" aria-live="polite"></p>
+            </form>
+            <p class="welcome-educator-storage">Educator work is local-first and supports the same GitHub storage token in Settings.</p>
+            <a class="welcome-educator-guide" href="./QuickMaths-Educator-Guide.pdf" target="_blank" rel="noopener">Read the educator guide PDF ↗</a>
+          </div>
+
+          <div id="welcome-storage-restore"></div>
+        </section>
+      </main>
+      <footer class="welcome-footer">Open source · MIT licensed · Built from the original QuickMaths curriculum</footer>
+    </section>
+
+    <div id="app-shell" class="app-shell agent-collapsed" hidden>
+      <aside class="sidebar" aria-label="QuickMaths navigation">
+        <div class="sidebar-brand">
+          <img src="./quickmaths-logo.png" alt="" width="54" height="51">
+          <span><strong>QuickMaths</strong><small>Learning workspace</small></span>
+        </div>
+
+        <div class="clock-card">
+          <svg id="analog-clock" class="analog-clock" viewBox="0 0 120 120" role="img" aria-label="Current local time">
+            <circle class="clock-face" cx="60" cy="60" r="54"></circle>
+            <g id="clock-minute-marks"></g>
+            <g id="clock-hour-marks"></g>
+            <line id="clock-hour" class="clock-hand clock-hour" x1="60" y1="60" x2="60" y2="34"></line>
+            <line id="clock-minute" class="clock-hand clock-minute" x1="60" y1="60" x2="60" y2="23"></line>
+            <line id="clock-second" class="clock-hand clock-second" x1="60" y1="66" x2="60" y2="17"></line>
+            <circle class="clock-center" cx="60" cy="60" r="4"></circle>
+          </svg>
+          <div class="timer-grid">
+            <span>Session<strong id="session-time">0s</strong></span>
+            <span>Profile total<strong id="profile-time">0s</strong></span>
+          </div>
+        </div>
+
+        <nav class="main-nav">
+          <button type="button" data-route="home"><span aria-hidden="true">⌂</span> <span data-nav-label>Dashboard</span></button>
+          <button type="button" data-route="map" data-nav-role="learner"><span aria-hidden="true">⌘</span> Mastery map</button>
+          <button type="button" data-route="curriculum" data-nav-role="educator"><span aria-hidden="true">⌘</span> Curriculum designer</button>
+          <button type="button" data-route="lesson" data-nav-role="learner"><span aria-hidden="true">◫</span> Lessons</button>
+          <button type="button" data-route="test" data-nav-role="learner"><span aria-hidden="true">✓</span> Mastery test</button>
+          <button type="button" data-route="results" data-nav-role="learner"><span aria-hidden="true">↗</span> Results</button>
+          <button type="button" data-route="depot"><span aria-hidden="true">◇</span> Lesson depot</button>
+          <button type="button" data-route="creator"><span aria-hidden="true">✎</span> Lesson studio</button>
+          <button type="button" data-route="settings"><span aria-hidden="true">⚙</span> Settings</button>
+        </nav>
+
+        <div class="sidebar-profile">
+          <button class="profile-dashboard-button" type="button" data-route="home" aria-label="Open learner dashboard" title="Open dashboard">
+            <span class="avatar" id="profile-avatar" aria-hidden="true">Q</span>
+            <span class="profile-copy"><strong id="sidebar-profile-name">Learner</strong><small>Saved in this browser</small></span>
+          </button>
+          <button id="global-storage-status" class="global-storage-status" type="button" data-action="open-storage-setup" data-tone="idle"><i aria-hidden="true"></i><span><strong>Local only</strong><small>No GitHub save yet</small></span></button>
+          <button id="logout-button" type="button" aria-label="Change learner" title="Change learner">↪</button>
+        </div>
+      </aside>
+
+      <main id="view-root" class="view-root" tabindex="-1"></main>
+
+      <aside id="agent-dock" class="agent-dock is-closed" aria-labelledby="agent-dock-title" tabindex="-1">
+        <div class="agent-dock-header">
+          <div>
+            <p class="eyebrow">Agent studio</p>
+            <h2 id="agent-dock-title">Tutor in the loop</h2>
+          </div>
+          <button id="agent-close" class="agent-close" type="button" aria-label="Close agent studio">×</button>
+        </div>
+        <div class="bridge-card">
+          <div><span id="bridge-status">Checking WebMCP…</span><i></i></div>
+          <p id="bridge-detail">Looking for browser agent support.</p>
+        </div>
+        <div id="agent-handoff-root"></div>
+        <details class="agent-tools">
+          <summary><span>Available tools</span><strong id="tool-count">21</strong></summary>
+          <div id="tool-list"></div>
+        </details>
+        <section class="agent-activity" aria-labelledby="activity-title">
+          <div class="mini-heading"><span id="activity-title">Agent activity</span><small>Tool actions only</small></div>
+          <p id="activity-empty">Agent actions will appear here as they change the learning workspace.</p>
+          <ol id="activity-list" aria-live="polite"></ol>
+        </section>
+      </aside>
+
+      <button id="agent-toggle" class="agent-toggle" type="button" aria-label="Open agent studio" aria-controls="agent-dock" aria-expanded="false">✦</button>
+      <nav class="mobile-nav" aria-label="Mobile navigation">
+        <button type="button" data-route="home">Home</button>
+        <button type="button" data-route="map" data-nav-role="learner">Map</button>
+        <button type="button" data-route="curriculum" data-nav-role="educator">Designer</button>
+        <button type="button" data-route="lesson" data-nav-role="learner">Learn</button>
+        <button type="button" data-route="test" data-nav-role="learner">Test</button>
+        <button type="button" data-route="depot">Depot</button>
+        <button type="button" data-route="settings">Settings</button>
+      </nav>
+    </div>
+
+    <input id="backup-file" type="file" accept="application/json,.json" hidden>
+    <input id="lesson-set-file" type="file" accept="application/json,.json" hidden>
+    <input id="creator-file" type="file" accept="application/json,.json" hidden>
+    <input id="creator-folder" type="file" webkitdirectory multiple hidden>
+    <input id="creator-media" type="file" accept="image/*,video/webm,video/mp4,video/ogg,audio/*" hidden>
+    <input id="curriculum-file" type="file" accept="application/json,.json" hidden>
+    <div id="agent-welcome-root"></div>
+    <div id="educator-welcome-root"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>

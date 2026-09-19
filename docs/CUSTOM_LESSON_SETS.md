@@ -750,3 +750,18 @@ this update does not silently rewrite old evidence or enable browser grading.
 
 The reusable engineering workflow is documented in
 [Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).
+
+### PC and Android browser proof checking
+
+Chrome/Edge on PC and Chrome on Android can check supported formal proofs locally.
+Start a formal question to open the protected proof workspace; on first use it
+reopens the saved test and enables isolation. Select **Start my proof** again
+after the reload. Initial setup downloads shared verified assets (hundreds of
+megabytes); use Wi-Fi. Cached environments are reused. Each proof check allows
+up to a minute; initial setup can take longer. Your draft survives a failed check.
+
+Only a fresh Lean certificate for the exact submitted proof can award formal
+credit. Author reference checks remain separate from learner submissions. iPhone
+and iPad browser support is deferred; drafts can still be saved. Existing imported
+formal lessons use the same backend when their declared capabilities are supported.
+The local desktop companion remains available through explicit client options.

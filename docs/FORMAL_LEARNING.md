@@ -1,15 +1,14 @@
 # Formal learning in QuickMaths
 
-Local implementation: 13 September 2026. This integrates the existing Lean/mathlib engine; it does not replace it. The current delivery is source, not a deployed service or a bundled Lean installation.
+PC Chrome/Edge and Android Chrome now use the pinned browser-local Lean backend
+through the protected `/formal-runtime/` app entry. No companion installation is
+required for supported proofs. iPhone/iPad support is deferred. The separate
+`/experiments/browser-lean/` test harness remains assessment-ineligible.
 
-Browser-local verification is being evaluated before choosing a hosted verifier
-or mandatory companion. See the [measured browser Lean investigation](releases/2026-09-13-browser-local-lean.md),
-the [runtime-sizing follow-up](releases/2026-09-13-browser-lean-runtime-sizing.md),
-and [reproducible experiment](../experiments/browser-lean/README.md). The prototype
-runs real Lean locally in a browser but does not issue production certificates;
-the runtime and Mathlib must first match the pinned environment below.
+See the [rollout report](releases/2026-09-19-pc-android-formal-rollout.md) for
+validation, lesson changes and the preserved certificate boundary.
 
-## Try the learner loop
+## Optional desktop companion
 
 Install the ordinary application and companion dependencies in an environment with package access:
 
@@ -154,3 +153,18 @@ this update does not silently rewrite old evidence or enable browser grading.
 
 The reusable engineering workflow is documented in
 [Formal proof optimization procedure](FORMAL_PROOF_OPTIMIZATION_PROCEDURE.md).
+
+### PC and Android browser proof checking
+
+Chrome/Edge on PC and Chrome on Android can check supported formal proofs locally.
+Start a formal question to open the protected proof workspace; on first use it
+reopens the saved test and enables isolation. Select **Start my proof** again
+after the reload. Initial setup downloads shared verified assets (hundreds of
+megabytes); use Wi-Fi. Cached environments are reused. Each proof check allows
+up to a minute; initial setup can take longer. Your draft survives a failed check.
+
+Only a fresh Lean certificate for the exact submitted proof can award formal
+credit. Author reference checks remain separate from learner submissions. iPhone
+and iPad browser support is deferred; drafts can still be saved. Existing imported
+formal lessons use the same backend when their declared capabilities are supported.
+The local desktop companion remains available through explicit client options.
