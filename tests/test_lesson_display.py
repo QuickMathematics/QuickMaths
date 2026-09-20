@@ -65,3 +65,22 @@ def test_hidden_values_are_not_public_display_inputs():
 def test_math_schema_preserves_multiline_derivation_steps():
     blocks = normalize_math_blocks([{"type": "derivation", "steps": ["line one\nline two"], "alt": "Derivation", "linear_text": "Two lines"}])
     assert blocks[0]["steps"] == ["line one\nline two"]
+
+
+def test_elementary_graph_domains_and_interval_bounds():
+    import math
+    from quickmaths.lesson_display import graph_expression
+    assert graph_expression('sin(x)')(0, 2*math.pi) == (-1, 1)
+    assert graph_expression('cos(x)')(-.1, .1) == (math.cos(.1), 1)
+    assert graph_expression('log(x)')(-1, 1) is None
+    assert graph_expression('log(x)')(0) is None
+    assert graph_expression('exp(x)')(1000) is None
+    assert graph_expression('x**0')(-1, 1) == (1, 1)
+    for i in range(100):
+        for name in ('sin', 'cos', 'exp', 'log'):
+            lo = .1 + i/20
+            hi = lo + .17
+            lower, upper = graph_expression(f'{name}(x)')(lo, hi)
+            for j in range(11):
+                y = getattr(math, name)(lo + (hi-lo)*j/10)
+                assert lower-1e-12 <= y <= upper+1e-12

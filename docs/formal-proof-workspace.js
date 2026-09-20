@@ -14,6 +14,15 @@ const RULES = {
 };
 const ruleLabel = (rule) => RULES[rule] ?? String(rule).replaceAll("_", " ");
 
+export function selectableFormalFacts(state, pending = null) {
+  const steps = records(state?.steps);
+  const editIndex = pending?.step_id ? steps.findIndex(row => row.step_id === pending.step_id) : steps.length;
+  const preceding = editIndex < 0 ? [] : steps.slice(0, editIndex);
+  return [...records(state?.context).filter(row => row.scope === 'root'),
+    ...preceding.filter(row => row.scope === 'root').map(row => ({id:row.step_id,claim:row.claim}))]
+    .filter((row,index,rows) => row.id && rows.findIndex(other => other.id === row.id) === index);
+}
+
 export function renderFormalWorkspace({ problem, evidence = null, progress = null, tutor = null, busy = false }) {
   const spec = problem.proof_spec;
   if (!spec) return "";
@@ -59,6 +68,7 @@ export function renderFormalWorkspace({ problem, evidence = null, progress = nul
           <label>Mathematical claim<textarea rows="2" maxlength="2000" data-formal-field="claim" placeholder="For example: x - 3 != 0" spellcheck="false">${escape(pending?.claim)}</textarea></label>
           <label>Why does it follow?<select data-formal-field="rule"><option value="">Choose a justification…</option>${rules.map((rule) => `<option value="${escape(rule)}" ${pending?.rule === rule ? "selected" : ""}>${escape(ruleLabel(rule))}</option>`).join("")}</select></label>
           <label>Facts used <small>(IDs above, separated by commas)</small><input maxlength="2000" data-formal-field="premises" value="${escape(list(pending?.premises).join(", "))}" placeholder="h1, user_step_1" spellcheck="false"></label>
+          <details class="proof-fact-picker"><summary>Select facts to cite</summary><p>These are available premises, not a verification result.</p>${selectableFormalFacts(state,pending).map(fact => action('formal-use-fact', `${escape(fact.id)}: ${escape(fact.claim)}`, `data-fact-id="${escape(fact.id)}"`)).join('') || '<p>No earlier root facts are available.</p>'}</details>
           <label>Quantity used <small>(only when the rule needs one)</small><input maxlength="2000" data-formal-field="parameter" value="${escape(pending?.parameter)}" placeholder="For example: the divisor x - 3" spellcheck="false"></label>
           <div class="formal-proof-actions">${action("formal-add-step", editing ? "Save repaired step" : "Add step")}${pending ? action("formal-cancel-edit", "Cancel edit") : ""}</div>
         </fieldset>

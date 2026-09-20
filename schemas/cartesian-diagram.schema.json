@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "QuickMaths Cartesian diagram",
+  "description": "Bounded real graph expressions: arithmetic, integer powers, sqrt, abs, sin, cos, exp and natural log. Trigonometry uses radians. Undefined domains and nonfinite samples create gaps; no executable code.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

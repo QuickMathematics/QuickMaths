@@ -8,7 +8,7 @@ const pair = v => { const p = list(v, 2, number); if (p.length !== 2) fail(); re
 const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 // Interval evaluation prevents joining samples across a pole, including a pole
-// between samples. Deliberately limited to arithmetic, integer powers, sqrt/abs.
+// between samples. Deliberately limited to arithmetic, integer powers and allowlisted real elementary functions.
 export function graphExpression(source) {
   source = text(source, 300);
   const tokens = source.match(/(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?|\*\*|[()+*/-]|[A-Za-z_]+/gi) ?? [];
@@ -20,7 +20,7 @@ export function graphExpression(source) {
     if (token === '+' || token === '-') node = [token === '-' ? 'neg' : 'pos', parse(3, depth + 1)];
     else if (token === '(') { node = parse(0, depth + 1); if (tokens[i++] !== ')') fail(); }
     else if (token === 'x') node = ['x'];
-    else if (['sqrt', 'abs'].includes(token)) { if (tokens[i++] !== '(') fail(); node = [token, parse(0, depth + 1)]; if (tokens[i++] !== ')') fail(); }
+    else if (['sqrt', 'abs', 'sin', 'cos', 'exp', 'log'].includes(token)) { if (tokens[i++] !== '(') fail(); node = [token, parse(0, depth + 1)]; if (tokens[i++] !== ')') fail(); }
     else if (token && /^\d|^\./.test(token)) node = ['n', number(Number(token))];
     else fail();
     while (i < tokens.length) {
@@ -42,6 +42,15 @@ export function graphExpression(source) {
     if (node[0] === 'pos') return a;
     if (node[0] === 'sqrt') return a[0] < 0 ? null : a.map(Math.sqrt);
     if (node[0] === 'abs') return [a[0] <= 0 && a[1] >= 0 ? 0 : Math.min(...a.map(Math.abs)), Math.max(...a.map(Math.abs))];
+    if (node[0] === 'log') return a[0] <= 0 ? null : a.map(Math.log);
+    if (node[0] === 'exp') { const v=a.map(Math.exp); return v.every(Number.isFinite) ? v : null; }
+    if (node[0] === 'sin' || node[0] === 'cos') {
+      if (!a.every(Number.isFinite) || Math.max(...a.map(Math.abs)) > 1e12) return null;
+      if (a[1]-a[0] >= 2*Math.PI) return [-1,1];
+      const f=node[0]==='sin'?Math.sin:Math.cos, phase=node[0]==='sin'?Math.PI/2:0;
+      const contains=t=>Math.ceil((a[0]-t)/(2*Math.PI)) <= Math.floor((a[1]-t)/(2*Math.PI));
+      return [contains(phase+Math.PI)?-1:Math.min(...a.map(f)), contains(phase)?1:Math.max(...a.map(f))];
+    }
     const b = evaluate(node[2], domain); if (!b) return null;
     if (node[0] === '+') return [a[0]+b[0], a[1]+b[1]];
     if (node[0] === '-') return [a[0]-b[1], a[1]-b[0]];
@@ -53,7 +62,7 @@ export function graphExpression(source) {
     const values = a.flatMap(x => b.map(y => node[0] === '*' ? x*y : x/y));
     return values.every(Number.isFinite) ? [Math.min(...values), Math.max(...values)] : null;
   };
-  return (lo, hi = lo) => evaluate(tree, [lo, hi]);
+  return (lo, hi = lo) => { const v=evaluate(tree,[lo,hi]); return v?.every(Number.isFinite) ? v : null; };
 }
 
 export function normalizeCartesianDiagram(v) {

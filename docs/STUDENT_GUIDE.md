@@ -698,17 +698,18 @@ proof** checks your entire argument against the exact question with Lean.
 Only that complete check permits formal assessment. A tutor's guidance question
 or a checked lesson-author reference does not count as your proof. Editing a step
 withdraws verification; an offline edit stays saved and must be checked again.
-Restored proofs and certificates also require replay. An unavailable companion
+Restored proofs and certificates also require replay. An unavailable verifier
 leaves the exercise pending without penalizing mastery.
 
-This feature needs the local Lean companion on the computer running the browser;
-opening GitHub Pages alone does not install it on a phone. Ordinary lessons
-continue to work without it. Setup guide:
-https://quickmathematics.github.io/QuickMaths/FORMAL_LEARNING.md
+PC Chrome/Edge and Android Chrome use browser-local Lean through the protected
+proof workspace. First-use setup downloads the verified runtime; use Wi-Fi and
+keep the tab open. Proof checks allow up to a minute after setup. iPhone/iPad
+support is deferred. Ordinary lessons continue to work if verification is unavailable.
+See the [formal learning guide](FORMAL_LEARNING.md).
 
-Browser-local Lean is an ongoing experiment, not yet an option for completing
-formal assessments on your phone. Your proof stays saved while verification
-is unavailable.
+Use **Select facts to cite** to insert given facts or earlier root steps into
+Facts used. A listed fact is not automatically verified. Local assumptions,
+cases and subproof-closing controls are not yet available in this learner editor.
 
 For voluntary device testing, the separate
 [experimental phone runner](experiments/browser-lean/?candidate=monomial-direct-v1)

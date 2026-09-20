@@ -161,7 +161,7 @@ def graph_expression(source: str) -> Callable[[float, float | None], tuple[float
             if index >= len(tokens) or tokens[index] != ")": raise LessonDisplayError("invalid graph expression")
             index += 1
         elif token == "x": node = ("x",)
-        elif token in {"sqrt", "abs"}:
+        elif token in {"sqrt", "abs", "sin", "cos", "exp", "log"}:
             if index >= len(tokens) or tokens[index] != "(": raise LessonDisplayError("invalid graph expression")
             index += 1; node = (token, parse(0, depth + 1))
             if index >= len(tokens) or tokens[index] != ")": raise LessonDisplayError("invalid graph expression")
@@ -187,6 +187,15 @@ def graph_expression(source: str) -> Callable[[float, float | None], tuple[float
         if kind == "pos": return a
         if kind == "sqrt": return None if a[0] < 0 else (math.sqrt(a[0]), math.sqrt(a[1]))
         if kind == "abs": return (0 if a[0] <= 0 <= a[1] else min(abs(a[0]), abs(a[1])), max(abs(a[0]), abs(a[1])))
+        if kind == "log": return None if a[0] <= 0 else (math.log(a[0]), math.log(a[1]))
+        if kind == "exp": return (math.exp(a[0]), math.exp(a[1]))
+        if kind in {"sin", "cos"}:
+            if not all(math.isfinite(v) for v in a) or max(map(abs, a)) > 1e12: return None
+            if a[1] - a[0] >= 2 * math.pi: return (-1, 1)
+            f = math.sin if kind == "sin" else math.cos
+            phase = math.pi / 2 if kind == "sin" else 0
+            def contains(t): return math.ceil((a[0] - t) / (2 * math.pi)) <= math.floor((a[1] - t) / (2 * math.pi))
+            return (-1 if contains(phase + math.pi) else min(map(f, a)), 1 if contains(phase) else max(map(f, a)))
         b = evaluate(node[2], domain)
         if b is None: return None
         if kind == "+": return (a[0] + b[0], a[1] + b[1])
@@ -194,11 +203,13 @@ def graph_expression(source: str) -> Callable[[float, float | None], tuple[float
         if kind == "/" and b[0] <= 0 <= b[1]: return None
         if kind == "**":
             exponent = int(b[0]); ends = [a[0] ** exponent, a[1] ** exponent]
-            return (0 if exponent % 2 == 0 and a[0] <= 0 <= a[1] else min(ends), max(ends))
+            return (0 if exponent and exponent % 2 == 0 and a[0] <= 0 <= a[1] else min(ends), max(ends))
         values = [x * y if kind == "*" else x / y for x in a for y in b]
         return (min(values), max(values)) if all(math.isfinite(v) for v in values) else None
     def evaluate_at(lo: float, hi: float | None = None):
-        try: return evaluate(tree, (lo, lo if hi is None else hi))
+        try:
+            result = evaluate(tree, (lo, lo if hi is None else hi))
+            return result if result is not None and all(math.isfinite(v) for v in result) else None
         except (ArithmeticError, ValueError, OverflowError): return None
     return evaluate_at
 

@@ -2856,6 +2856,17 @@ document.addEventListener("click", async (event) => {
     const card = document.querySelector(`#question-${CSS.escape(questionId)}`);
     if (!card || formalBusyQuestionIds.has(questionId)) return;
     const actionName = formalAction.dataset.action;
+    if (actionName === "formal-use-fact") {
+      const field = card.querySelector('[data-formal-field="premises"]');
+      if (!field || field.disabled) return;
+      const ids = field.value.split(/[,;\s]+/).filter(Boolean);
+      if (!ids.includes(formalAction.dataset.factId)) {
+        field.value = [...ids, formalAction.dataset.factId].join(', ');
+        field.dispatchEvent(new Event('input', {bubbles:true}));
+      }
+      field.focus();
+      return;
+    }
     if (actionName === "formal-guidance") {
       try {
         store.recordFormalGuidance({ questionId, proofRevision: formalAction.dataset.proofRevision,

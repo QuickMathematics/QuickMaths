@@ -761,14 +761,14 @@ Native media builds now report current bytes, remaining budget and optional grow
 
 Studio's formal proof settings define the exact public statement, variable
 domains, assumptions, allowed rules, optional curated capability loading guidance
-and optional reference steps. Capability guidance is experimental: leave the
+and optional reference steps. Capability guidance controls lazy loading: leave the
 comma-separated field blank for automatic inference, or choose from `algebra`,
 `limits`, `derivatives`, `sequences-series`, and `radicals`. A `sqrt` expression
 or a rule containing `sqrt` or `conjugate` infers `radicals`. It only guides curated loading
-and does not enable browser certification or alter the proof contract. Run **Check
-reference proof with companion verifier** after editing, before publishing. The
+and does not alter the proof contract. Run **Check
+reference proof** after editing, before publishing. The
 reference is checked in its own mode and cannot pass a learner's assessment.
-Only a fresh complete learner proof accepted by the pinned Lean companion can
+Only a fresh complete learner proof accepted by the pinned Lean verifier can
 do that. Existing rubric and limit-argument review modes remain distinct.
 
 The optional Proof Lab pack contains three kernel-checked reference examples.
@@ -776,10 +776,9 @@ Tutors can inspect public proof state and offer bounded guidance questions;
 their tools cannot expose references, insert proof steps or grade formal work.
 Backups preserve proof data but restored verification needs replay.
 
-Browser-local Lean is being evaluated separately. Desktop corpus results do
-not make it an assessment provider; Studio's capability guidance and the
-companion reference-check workflow remain unchanged. Technical progress is
-recorded in the [browser Lean update](releases/2026-09-13-browser-lean-parity.md).
+Production browser-local Lean supports PC Chrome/Edge and Android Chrome. The
+separate experimental harness still cannot award assessment credit. See the
+[browser rollout](releases/2026-09-19-pc-android-formal-rollout.md).
 
 The [A17 initialization update](releases/2026-09-13-a17-initialization-peak.md)
 adds temporary disk-backed module delivery to the isolated phone test. It

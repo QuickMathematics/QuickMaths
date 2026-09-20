@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { assertFormalCertificate, formalRequestHash, formalWorkspaceIdentity, validateFormalProgress } from "./formal-proof-trust.js";
 import { assertFormalSessionForJob, beginFormalStepEdit, checkFormalProgress, formalDraftEvidence, replaceFormalStep, verifyFormalProof } from "./formal-proof-client.js";
-import { renderFormalWorkspace } from "./formal-proof-workspace.js";
+import { renderFormalWorkspace, selectableFormalFacts } from "./formal-proof-workspace.js";
 import { buildFormalEvidenceRecord } from "./formal-evidence.js";
 import { requestFixture, mockVerification, mockProgress } from "./test-support/formal-fixtures.js";
 
@@ -173,4 +173,14 @@ test("authored-context comparison preserves legitimate local proof scopes", asyn
     rpc: { protocol_version: "0.1", op: "new_text_request", request_id: original.request_id } };
   assert.equal(await assertFormalSessionForJob({ ...session(), request }, job,
     { fetchImpl: async () => reply({ request: original }) }), true);
+});
+
+test('fact picker excludes local facts, edited step and later steps',()=>{
+ const state={context:[{id:'h1',scope:'root',claim:'x>0'},{id:'local',scope:'case',claim:'x=0'}],steps:[
+ {step_id:'s1',scope:'root',claim:'x=x'},{step_id:'s2',scope:'root',claim:'x=x'},{step_id:'s3',scope:'root',claim:'x=x'},
+ {step_id:'s4',scope:'case',claim:'x=0'}]};
+ assert.deepEqual(selectableFormalFacts(state,{step_id:'s2'}).map(x=>x.id),['h1','s1']);
+ assert.deepEqual(selectableFormalFacts(state).map(x=>x.id),['h1','s1','s2','s3']);
+ const html=renderFormalWorkspace({problem,evidence:{proof_state:state}});
+ assert.match(html,/formal-use-fact/);assert.doesNotMatch(html,/data-fact-id="local"/);
 });

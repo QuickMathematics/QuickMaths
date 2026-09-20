@@ -499,9 +499,10 @@
     "status": "Local learner integration: proof_spec questions use the native proof workspace and require a fresh complete Lean certificate or replay for assessment. The protected formal-runtime route loads the pinned browser Lean kernel; pending/unavailable verification is explicit. Reference proofs must be checked with the pinned browser verifier or companion before publication. iPhone/iPad support is deferred. Checks allow up to 60 seconds, excluding first-use setup.",
     "parameter_binding": "Generated proof specifications resolve only from exact named values visible in the learner prompt; hidden derived generator values are rejected.",
     "trusted_boundary": "Lesson packages provide declarative statements and policy metadata only. Lean source, tactics, imports, macros and executable package code are not accepted.",
-    "assessment_policy": "Nonempty method-specific assessment policies are not implemented by the learner assessment path and explicitly block credit. Leave assessment_policy empty for this build."
+    "assessment_policy": "Nonempty method-specific assessment policies are not implemented by the learner assessment path and explicitly block credit. Leave assessment_policy empty for this build. Allowed-rule restrictions constrain rule use but do not establish a requested teaching method."
   },
   "formal_proof_learning": {
+    "learner_controls": "The proof editor offers selectable root assumptions and earlier root steps for citations. It does not yet provide controls to introduce assumptions, split cases or close subproofs. Offered facts are not automatically verified.",
     "inspect_tool": "inspect_formal_proof",
     "guidance_tool": "record_formal_guidance",
     "reference_boundary": "Public theorem, learner claims, scopes, verified root-step IDs and obligations only. No reference proof, answer key, generated Lean or solver strategy.",

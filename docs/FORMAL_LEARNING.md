@@ -49,13 +49,13 @@ Open `http://127.0.0.1:8080`. In Settings, load `examples/formal-proof-lab.lesso
 | Two equations, one conclusion | Derive a linear consequence from explicitly cited equations. |
 | A square is a reason | Use a nonnegative square to develop a polynomial inequality argument. |
 
-All three reference candidates passed the pinned Lean kernel during integration, using `python scripts/check_formal_references.py`. That script also replays a real certificate and rejects a tampered reference-to-submission promotion. Run the pinned companion's reference check in Studio after editing an exercise. Reference verification never grades a learner's submission; no pre-populated learner proof or green badge is shipped.
+All three reference candidates passed the pinned Lean kernel during integration, using `python scripts/check_formal_references.py`. That script also replays a real certificate and rejects a tampered reference-to-submission promotion. Run the pinned verifier reference check in Studio after editing an exercise. Reference verification never grades a learner's submission; no pre-populated learner proof or green badge is shipped.
 
 A formal question opens a proof workspace instead of the old answer/work form. State a claim, select a justification, and name the facts it uses. `h1`, `h2`, and so on are assumption IDs; earlier learner lines have visible step IDs. There is no Lean code editor in this path.
 
 `Check my reasoning` checks bounded root prefixes through the existing verifier. `Verify complete proof` checks the exact exercise goal and complete submission. A prefix, a reference, an assisted search result, a candidate-ready flag and an AI opinion are all insufficient for formal assessment.
 
-The one-line cancellation demonstration deliberately begins with an unjustified fraction simplification. The real companion exposes `(x - 3) ≠ 0`. After editing that line to establish the nonzero condition and adding a properly cited simplification, the candidate is ready for the kernel. Without Lean, it remains `verification_unavailable`; QuickMaths records no failed attempt or new mastery.
+The one-line cancellation demonstration deliberately begins with an unjustified fraction simplification. The verifier exposes `(x - 3) ≠ 0`. After editing that line to establish the nonzero condition and adding a properly cited simplification, the candidate is ready for the kernel. Without Lean, it remains `verification_unavailable`; QuickMaths records no failed attempt or new mastery.
 
 ## The tutor contract
 
@@ -75,15 +75,15 @@ The tutor must distinguish a preflight obligation from a kernel proof. No verifi
 
 ## Assessment and persistence
 
-`docs/formal-learning.js` owns transient verification authority in a private runtime closure. The native UI and assessment store share that controller. Only a fresh successful companion check or replay can populate its complete-submission receipt. The existing client still checks exact request, statement, proof mode, source hash, allowed axioms, certificate digest and pinned environment.
+`docs/formal-learning.js` owns transient verification authority in a private runtime closure. The native UI and assessment store share that controller. Only a fresh successful verifier check or replay can populate its complete-submission receipt. The existing client still checks exact request, statement, proof mode, source hash, allowed axioms, certificate digest and pinned environment.
 
-Before checking or replaying a saved submission, the app freshly parses the authored theorem through the companion and compares immutable root domains, assumptions, goal and policy. Keeping an old request ID cannot hide a changed theorem.
+Before checking or replaying a saved submission, the app freshly parses the authored theorem through the pinned verifier and compares immutable root domains, assumptions, goal and policy. Keeping an old request ID cannot hide a changed theorem.
 
 The ordinary JavaScript and Python short-answer graders now return verification-required for `proof_spec` questions. Matching an answer string, inserting `status: verified`, adding a tutor review, or directly archiving consistently hashed certificate JSON cannot grant live formal assessment eligibility.
 
-The complete learner proof must remain unchanged through submission and reflection. Both gates require the exact live receipt. Edits, including unsuccessful oversized edit attempts, withdraw authority. Requests are bound to the current profile, draft, question and revision; a late response is discarded after edit-and-undo or profile-away-and-back. Per-proof concurrency and a four-operation runtime cap bound application-side requests. Health and RPC timeouts prevent a hung companion from permanently locking the editor.
+The complete learner proof must remain unchanged through submission and reflection. Both gates require the exact live receipt. Edits, including unsuccessful oversized edit attempts, withdraw authority. Requests are bound to the current profile, draft, question and revision; a late response is discarded after edit-and-undo or profile-away-and-back. Per-proof concurrency and a four-operation runtime cap bound application-side requests. Health and RPC timeouts prevent a hung verifier from permanently locking the editor.
 
-Backups, sync, assignment imports and Agent Bridge checkpoints carry data, not the private runtime closure. Restored certificates and formal assessment receipts are marked replay-required. Imported progress cannot hydrate verified-step badges. Historical mastery scores remain historical local records, not newly authenticated mathematical evidence. Historical formal results are labelled archived rather than displayed to the tutor as live correctness. Ordinary lessons remain usable when the companion is missing.
+Backups, sync, assignment imports and Agent Bridge checkpoints carry data, not the private runtime closure. Restored certificates and formal assessment receipts are marked replay-required. Imported progress cannot hydrate verified-step badges. Historical mastery scores remain historical local records, not newly authenticated mathematical evidence. Historical formal results are labelled archived rather than displayed to the tutor as live correctness. Ordinary lessons remain usable when verification is unavailable.
 
 ## Curated browser environment experiment
 
@@ -109,7 +109,7 @@ uses the pinned native verifier and existing fresh-receipt/replay checks.
 
 The Lean kernel and permitted foundational axioms remain the mathematical authority. Python, JavaScript, parser reports, preflight and the tutor do not confer verification. No axiom allowlist, sorry/admit protection, Lean-injection restriction, source binding or environment pin was relaxed.
 
-The local app origin and companion are trusted execution components. Digest consistency binds content; it does **not** authenticate a malicious process impersonating the companion or protect a browser owner who rewrites application code. This is not a remote high-stakes examination system. The reference-free tool interface is an access boundary for tutoring tools, not encryption of author data from someone with full filesystem/browser access.
+The local app origin, pinned browser backend and optional companion are trusted execution components. Digest consistency binds content; it does **not** authenticate a malicious process impersonating the companion or protect a browser owner who rewrites application code. This is not a remote high-stakes examination system. The reference-free tool interface is an access boundary for tutoring tools, not encryption of author data from someone with full filesystem/browser access.
 
 Method-specific `assessment_policy` metadata is not implemented by this learner-assessment path. A nonempty policy explicitly blocks final assessment instead of being silently ignored. Leave it empty for the demo lessons. Method teaching in a prompt is not itself an automatically enforced proof-strategy requirement.
 

@@ -17,7 +17,7 @@ test('bounded Cartesian fixtures preserve endpoint inclusion, holes and poles',(
  for(const path of cartesianSegments(c,[-5,5],[-1000,1000])) assert.ok(!path.some(p=>p[0]<.123)||!path.some(p=>p[0]>.123),'never bridge a pole between samples');
  const hole=normalizeCartesianDiagram(fixtures[2]);for(const path of cartesianSegments(hole.curves[0],hole.x_range,hole.y_range))assert.ok(!path.some(p=>p[0]<3)||!path.some(p=>p[0]>3));
  assert.equal(graphExpression('sqrt(x-1)')(0),null);
- for(const expression of ['fetch(1)','x.constructor','x**999','__proto__','<script>','sin(x)','1;alert(1)'])assert.throws(()=>graphExpression(expression));
+ for(const expression of ['fetch(1)','x.constructor','x**999','__proto__','<script>','tan(x)','1;alert(1)'])assert.throws(()=>graphExpression(expression));
  assert.throws(()=>normalizeCartesianDiagram({...base,html:'unsafe'}));
 });
 const math=[{type:'fraction',numerator:'f(x+h)-f(x)',denominator:'h',alt:'Difference quotient for h not zero.',linear_text:'(f(x+h)-f(x))/h, h != 0'}];
@@ -70,3 +70,21 @@ test('Studio edits display data and preserves required limit review policy',()=>
  const pack=studio.buildPack(),p=pack.skills[0].problems[0];assert.deepEqual(p.diagram,normalizeCartesianDiagram(fixtures[1]));assert.deepEqual(p.math_blocks,math);assert.equal(p.work.mode,'limit_steps');assert.deepEqual(p.review_policy,{work_review:'tutor_required',mastery_requires_review_pass:true,allow_self_review:false});store.previewLessonPack(pack);
  edit('diagramJson','{');assert.throws(()=>studio.buildPack());assert.doesNotThrow(()=>studio.render(store.snapshot()));
 });
+
+ test('elementary graphs preserve domains and bound interior trig extrema',()=>{
+ assert.deepEqual(graphExpression('sin(x)')(0,2*Math.PI),[-1,1]);
+ assert.deepEqual(graphExpression('cos(x)')(-.1,.1),[Math.cos(.1),1]);
+ assert.equal(graphExpression('log(x)')(-1,1),null);
+ assert.equal(graphExpression('log(x)')(0),null);
+ assert.deepEqual(graphExpression('log(x)')(1),[0,0]);
+ assert.equal(graphExpression('exp(x)')(1000),null);
+ assert.deepEqual(graphExpression('x**0')(-1,1),[1,1]);
+ const c={expression:'1/sin(x)',interval:[-1,1],exclude:[]};
+ for(const path of cartesianSegments(c,[-1,1],[-1000,1000]))assert.ok(!path.some(p=>p[0]<0)||!path.some(p=>p[0]>0));
+ const log={expression:'log(x)',interval:[-2,2],exclude:[]};
+ for(const path of cartesianSegments(log,[-2,2],[-10,10]))assert.ok(path.every(p=>p[0]>0));
+ for(let i=0;i<100;i++)for(const name of ['sin','cos','exp','log']){
+ const lo=.1+i/20,hi=lo+.17,range=graphExpression(`${name}(x)`)(lo,hi);
+ for(let j=0;j<=10;j++){const y=Math[name](lo+(hi-lo)*j/10);assert.ok(y>=range[0]-1e-12&&y<=range[1]+1e-12);}
+ }
+ });

@@ -11,7 +11,7 @@
 
 Use `kind: cartesian`, increasing numeric `x_range` and `y_range`, and a nonempty `alt` description. Up to eight curves each have an arithmetic `expression`, an independent `interval`, optional `endpoints` (`open`, `closed` or `none` for each end), and `exclude` values. Several curves express piecewise functions or disconnected intervals. Isolated points use `at`, an optional `label` and `endpoint` (`closed` by default, `open` for a hole). An open curve endpoint and an independently filled value at the same input are separate objects.
 
-`segments` contain `from` and `to` coordinates; `asymptotes` contain `axis` (`x` for vertical, `y` for horizontal) and `value`; `labels` contain `at` and `text`. Declare excluded inputs explicitly even if a reduced expression is continuous there. Undefined square roots and denominator intervals containing zero break paths; samples never join across a declared exclusion. Supported expression syntax is numbers, x, parentheses, +, -, *, /, nonnegative literal integer powers through **8, sqrt and abs. No code, macros, markup, URLs or imported plotting libraries run.
+`segments` contain `from` and `to` coordinates; `asymptotes` contain `axis` (`x` for vertical, `y` for horizontal) and `value`; `labels` contain `at` and `text`. Declare excluded inputs explicitly even if a reduced expression is continuous there. Undefined square roots and denominator intervals containing zero break paths; samples never join across a declared exclusion. Supported expression syntax is numbers, x, parentheses, +, -, *, /, nonnegative literal integer powers through **8, sqrt, abs, sin, cos, exp and natural log. No code, macros, markup, URLs or imported plotting libraries run.
 
 A native template can bind only names explicitly present as `{name}` placeholders in its `prompt_template`. Do not reference hidden answers, derived roots or proof conclusions in labels or descriptions. Literal authored displays must likewise contain only stated givens. Numeric slots also accept bounded constant arithmetic after substitution, such as `{a}**2`; resolved portable questions use numbers, not unresolved placeholders.
 
@@ -59,3 +59,17 @@ python scripts/export_web_curriculum.py --media-report tmp/next-batch.json --pre
 ```
 
 Reports include raw bytes, remaining budget, asset count and deduplicated attribution by branch/subdomain/source folder. With a prior report, `growth_bytes` shows the added batch cost. Shared files are attributed to their first source, not counted repeatedly. Use `--native-media-budget BYTES` only for a deliberate native build decision; it does not relax imported media validation or guarantee that larger lesson-set exports fit portable limits. Existing hash/size checks still apply. No new offline promise or network dependency is introduced.
+
+
+### Elementary-function graphs
+
+Curve expressions now allow `sin(x)`, `cos(x)`, `exp(x)` and `log(x)` alongside
+arithmetic, bounded integer powers, `sqrt` and `abs`. Angles are radians and
+`log` is natural logarithm. For example, `log(x-2)` is drawn only for `x > 2`.
+Sampling uses interval bounds to avoid bridging undefined regions and poles,
+including poles in compositions such as `1/sin(x)`. Exponential overflow and
+trigonometric arguments above 1e12 in magnitude are omitted. These bounded
+illustrations are not mathematical proof or a way to reveal hidden answers.
+
+Existing parameter binding, saved diagrams, Studio round trips and descriptions
+use the same schema. Keep explicit curve intervals/exclusions for intended gaps.
