@@ -127,6 +127,7 @@ function formalDraftKey(questionId) {
 const formalBusyQuestionIds = new Set();
 const formalScopeSelection = new Map();
 const FORMAL_RULE_PARAMETER_KEYS = {
+  rational_hole_limit: "simplified",
   add_both_sides: "term", subtract_both_sides: "term", multiply_both_sides: "term", divide_both_sides: "term", add_inequality: "term",
   scale_inequality_positive: "factor", scale_inequality_negative: "factor", guarded_cancel: "divisor",
   sqrt_square_nonnegative: "argument", conjugate_identity: "radicand", exists_intro: "witness", forall_elim: "witness",

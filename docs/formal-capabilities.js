@@ -29,6 +29,7 @@ export function inferFormalCapabilities(statement = {}, allowedRules = []) {
   if (goalCapability) inferred.push(goalCapability);
   const ruleCapabilities = new Set();
   for (const rule of rules) {
+    if (rule === "derivative_from_limit") ruleCapabilities.add("limits");
     if (/(?:sequence_|series_)/.test(rule)) ruleCapabilities.add("sequences-series");
     else if (/derivative/.test(rule)) ruleCapabilities.add("derivatives");
     else if (/(?:limit|continuity|continuous|ivt)/.test(rule)) ruleCapabilities.add("limits");

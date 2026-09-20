@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from .derivative_definition import matches_derivative_definition
 from .contract import canonical_hash
 from .calculus import (
     abs_argument_exact_sign,
@@ -70,6 +71,7 @@ SUPPORTED_RULES = {
     "ivt_exists",
     "continuous_ivt_exists",
     "ivt_unique",
+    "derivative_from_limit",
     "polynomial_derivative",
     "quotient_derivative",
     "sqrt_derivative",
@@ -563,6 +565,10 @@ def preflight(request: dict[str, Any]) -> list[Obligation]:
             obligations.append(
                 Obligation(step["id"], "ivt_does_not_prove_uniqueness", "IVT establishes existence under its hypotheses; uniqueness needs a separate argument such as strict monotonicity.")
             )
+
+        if rule == "derivative_from_limit":
+            if len(premises) != 1 or not matches_derivative_definition(step["claim"], premises[0]):
+                obligations.append(Obligation(step["id"], "derivative_definition_limit", "Cite exactly the finite two-sided punctured limit at zero of (f(a+h)-f(a))/h, with the same result and no additional domain restrictions."))
 
         if rule == "polynomial_derivative":
             if match_polynomial_derivative(step["claim"]) is None:

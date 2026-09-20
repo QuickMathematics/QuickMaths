@@ -1,0 +1,154 @@
+{
+  "version": "0.1",
+  "request_id": "definition-square",
+  "variables": [
+    {
+      "id": "x",
+      "type": "real"
+    },
+    {
+      "id": "h",
+      "type": "real"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "root",
+      "parent": null,
+      "binders": []
+    }
+  ],
+  "assumptions": [],
+  "steps": [
+    {
+      "id": "quotient_limit",
+      "scope": "root",
+      "claim": {
+        "kind": "limit",
+        "variable": "h",
+        "expression": {
+          "kind": "div",
+          "left": {
+            "kind": "sub",
+            "left": {
+              "kind": "pow",
+              "base": {
+                "kind": "add",
+                "left": {
+                  "kind": "int",
+                  "value": 3
+                },
+                "right": {
+                  "kind": "var",
+                  "id": "h"
+                }
+              },
+              "exponent": 2
+            },
+            "right": {
+              "kind": "pow",
+              "base": {
+                "kind": "int",
+                "value": 3
+              },
+              "exponent": 2
+            }
+          },
+          "right": {
+            "kind": "var",
+            "id": "h"
+          }
+        },
+        "point": {
+          "kind": "int",
+          "value": 0
+        },
+        "direction": "both",
+        "domain": [],
+        "result": {
+          "kind": "finite",
+          "value": {
+            "kind": "int",
+            "value": 6
+          }
+        }
+      },
+      "rule": "rational_hole_limit",
+      "premises": [],
+      "parameters": {
+        "simplified": {
+          "kind": "add",
+          "left": {
+            "kind": "var",
+            "id": "h"
+          },
+          "right": {
+            "kind": "int",
+            "value": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "derivative",
+      "scope": "root",
+      "claim": {
+        "kind": "derivative",
+        "variable": "x",
+        "expression": {
+          "kind": "pow",
+          "base": {
+            "kind": "var",
+            "id": "x"
+          },
+          "exponent": 2
+        },
+        "point": {
+          "kind": "int",
+          "value": 3
+        },
+        "result": {
+          "kind": "int",
+          "value": 6
+        }
+      },
+      "rule": "derivative_from_limit",
+      "premises": [
+        "quotient_limit"
+      ],
+      "parameters": {}
+    }
+  ],
+  "goal": {
+    "kind": "derivative",
+    "variable": "x",
+    "expression": {
+      "kind": "pow",
+      "base": {
+        "kind": "var",
+        "id": "x"
+      },
+      "exponent": 2
+    },
+    "point": {
+      "kind": "int",
+      "value": 3
+    },
+    "result": {
+      "kind": "int",
+      "value": 6
+    }
+  },
+  "policy": {
+    "allowed_rules": [
+      "rational_hole_limit",
+      "derivative_from_limit"
+    ],
+    "max_seconds": 60,
+    "accepted_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

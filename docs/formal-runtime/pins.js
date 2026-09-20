@@ -1,11 +1,11 @@
 export default {
   "catalog.json": {
-    "sha256": "c46391a43b1b0467a6f995ce354a2496f1f547909306d543c56de5046667504a",
-    "bytes": 4541386
+    "sha256": "6f40a564df5b84a2dbe417ec90d0bac44acc988e11ce2d414a5b53fcd96a0fc5",
+    "bytes": 5423499
   },
   "native-verifier.zip": {
-    "sha256": "ef561673bd2a54bf29029a5d1f776a954cff201ce68edc3bdf6d0616d3c3276b",
-    "bytes": 176442
+    "sha256": "bfeacff3828530feeaeb31fb64865490eb5baf5cc789737d03cc666deca119b9",
+    "bytes": 177543
   },
   "worker": {
     "sha256": "f900a67feac37a5a0b45d13915233da40cbcc5875ac3119db09ea8b9fea702a4",

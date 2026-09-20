@@ -45,3 +45,7 @@ test("legacy proof specs omit capability metadata byte-for-byte", () => {
     environment: {},
   });
 });
+
+test("derivative definition loads both proof capabilities", () => {
+  assert.deepEqual(inferFormalCapabilities({goal:"The derivative of x^2 with respect to x at 3 is 6."}, ["derivative_from_limit"]), ["algebra", "derivatives", "limits"]);
+});

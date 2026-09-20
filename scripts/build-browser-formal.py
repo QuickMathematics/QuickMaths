@@ -11,6 +11,25 @@ with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
 source=ROOT/'docs/experiments/browser-lean/assets'
 c=json.loads((source/'viability.json').read_text())
 c={k:c[k] for k in ('profiles','packs','runtime','environment','importBudgetMs')}
+# The derivative-definition bridge needs the union of two already shipped closures.
+# Reuse content-addressed packs; never substitute generated imports.
+import sys
+sys.path.insert(0,str(ROOT/'formal-verifier/src'))
+from quickmaths_formal.environments import environment_for
+combined=environment_for(['limits','derivatives'])
+sources=[p for p in c['profiles'].values() if p['capabilities'] in
+         [['algebra','limits','radicals'],['algebra','derivatives','radicals']]]
+assert len(sources)==2
+arts={}
+for profile in sources:
+ for module,paths in profile['setup']['importArts'].items():
+  assert module not in arts or arts[module]==paths, module
+  arts[module]=paths
+setup={**sources[0]['setup'],'importArts':dict(sorted(arts.items()))}
+c['profiles'][combined['id']]={**combined,'modules':sorted(set().union(*(set(p['modules']) for p in sources))),
+                             'fixtures':[],'setup':setup}
+for pack in c['packs']:
+ if any(p['id'] in pack['profiles'] for p in sources):pack['profiles'].append(combined['id'])
 (OUT/'catalog.json').write_bytes((json.dumps(c,separators=(',',':'))+'\n').encode())
 paths={'catalog.json':OUT/'catalog.json','native-verifier.zip':archive,'worker':source/'viability-worker.js'}
 for path in OUT.glob('*.whl'): paths[path.name]=path

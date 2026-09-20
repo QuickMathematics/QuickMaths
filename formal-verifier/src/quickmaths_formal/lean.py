@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 from fractions import Fraction
 
+from .derivative_definition import matches_derivative_definition
 from .contract import canonical_hash
 from .environments import request_environment
 from .calculus import (
@@ -4248,6 +4249,13 @@ def render_rule(step: dict[str, Any], request: dict[str, Any]) -> list[str]:
         else:
             lines.append(f"convert! {proof_term} using 1 <;> (solve | (norm_num <;> ring) | (ext x <;> norm_num <;> ring))")
         return lines
+    if rule == "derivative_from_limit":
+        claims = _proof_claim_map(request)
+        if len(step["premises"]) != 1 or not matches_derivative_definition(step["claim"], claims[step["premises"][0]]):
+            raise ValueError("derivative_from_limit requires the exact difference-quotient limit")
+        return ["apply hasDerivAt_iff_tendsto_slope_zero.mpr",
+                f"simpa only [smul_eq_mul, div_eq_mul_inv, mul_comm] using {step['premises'][0]}"]
+
     if rule == "polynomial_derivative":
         pattern = match_polynomial_derivative(step["claim"])
         if pattern is None:

@@ -1,0 +1,36 @@
+{
+  "nativeSourceBrowserPositive": {
+    "status": "verified",
+    "elapsedSeconds": 22.375,
+    "certificate": {
+      "certificate_version": "0.2",
+      "verifier_version": "phase1.0",
+      "verified_at": "2026-09-20T13:03:23.857999+00:00",
+      "request_hash": "bf285ca0bf1e63c37677f0d9deb31f6084dcc42d2c44fc02cb20aaecdd2dbb09",
+      "statement_hash": "0adbed0d50ea2b18a41dd9c0cee8c8794f891c385fca55855ccd84bbf300029e",
+      "submission_hash": "1526fe4e5b49961a54169a419b6767e5fee89e357c889c7d1de69ac86b703873",
+      "lean_source_hash": "8f62fce6058a6742980fbadd8e083587f6ac740f99e3d3693b0342419efa5a7d",
+      "proof_artifact": "module\npublic import Lean.Elab.Tactic.NormCast\npublic import Lean.Elab.Tactic.Omega\npublic import Mathlib.Analysis.Calculus.Deriv.Abs\npublic import Mathlib.Analysis.Calculus.Deriv.Inv\npublic import Mathlib.Analysis.Calculus.Deriv.Pow\npublic import Mathlib.Analysis.Real.Sqrt\npublic import Mathlib.Analysis.SpecialFunctions.Exp\npublic import Mathlib.Analysis.SpecialFunctions.ExpDeriv\npublic import Mathlib.Analysis.SpecialFunctions.Log.Basic\npublic import Mathlib.Analysis.SpecialFunctions.Log.Deriv\npublic import Mathlib.Analysis.SpecialFunctions.Sqrt\npublic import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic\npublic import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.Continuity\npublic import Mathlib.Tactic.Convert\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.FunProp\npublic import Mathlib.Tactic.GCongr\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.NormNum.RealSqrt\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\npublic import Mathlib.Topology.Algebra.Order.Field\npublic import Mathlib.Topology.Order.IntermediateValue\n\nopen Filter Topology Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (h : \u211d) : HasDerivAt (fun (x : \u211d) => ((x ^ 2) : \u211d)) (6 : \u211d) (3 : \u211d) := by\n  have quotient_limit : Filter.Tendsto (fun (h : \u211d) => (((((3 + h) ^ 2) - (3 ^ 2)) / h) : \u211d)) (\ud835\udcdd[\u2260] 0) (\ud835\udcdd 6) := by\n    have hs : Filter.Tendsto (fun (h : \u211d) => (h + 6)) (\ud835\udcdd[\u2260] 0) (\ud835\udcdd (6 : \u211d)) := by\n      have hc : ContinuousAt (fun (h : \u211d) => (h + 6)) 0 := by fun_prop\n      exact tendsto_nhdsWithin_of_tendsto_nhds (by convert! hc.tendsto using 1 <;> norm_num)\n    refine hs.congr' ?_\n    filter_upwards [self_mem_nhdsWithin] with h hx\n    simp only [Set.mem_compl_iff, Set.mem_singleton_iff] at hx\n    have hden : h - 0 \u2260 0 := sub_ne_zero.mpr hx\n    field_simp [hden] <;> ring\n  have derivative : HasDerivAt (fun (x : \u211d) => ((x ^ 2) : \u211d)) (6 : \u211d) (3 : \u211d) := by\n    apply hasDerivAt_iff_tendsto_slope_zero.mpr\n    simpa only [smul_eq_mul, div_eq_mul_inv, mul_comm] using quotient_limit\n  exact derivative\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+      "proof_mode": "submitted",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "environment": {
+        "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      },
+      "elapsed_ms": 375,
+      "certificate_digest": "fd32ce493a645e564d4ec37d446ccbcaa1220c46d6411a9b5d894aac1e36a206"
+    }
+  },
+  "falseLimitRejected": {
+    "status": "needs_justification",
+    "certificate": null
+  },
+  "learnerFlow": {
+    "shortcutBlocked": true,
+    "definitionEligible": true
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "format": "quickmaths.lesson-set",
+  "schema_version": "2.0",
+  "id": "PACK_DERIVATIVE_DEFINITION",
+  "name": "Derivative from its definition",
+  "description": "A checked difference-quotient proof of the derivative of x squared at 3.",
+  "author": "QuickMaths",
+  "version": "0.1.0",
+  "subject": {
+    "id": "SUBJECT_MATH",
+    "name": "Mathematics",
+    "short_name": "Maths",
+    "icon": "∑",
+    "description": "The built-in Mathematics curriculum. Its existing theme is preserved."
+  },
+  "track": {
+    "id": "TRACK_DERIVATIVE_DEFINITION",
+    "name": "Derivative definition",
+    "domain": "Math",
+    "description": "A checked difference-quotient proof of the derivative of x squared at 3.",
+    "entry_skills": [
+      "CUSTOM_DERIVATIVE_DEFINITION"
+    ],
+    "exit_skills": [
+      "CUSTOM_DERIVATIVE_DEFINITION"
+    ],
+    "skills": [
+      "CUSTOM_DERIVATIVE_DEFINITION"
+    ]
+  },
+  "skills": [
+    {
+      "id": "CUSTOM_DERIVATIVE_DEFINITION",
+      "name": "Derivative from its definition",
+      "domain": "Math",
+      "subdomain": "Calculus",
+      "topic": "Difference quotients",
+      "description": "A checked difference-quotient proof of the derivative of x squared at 3.",
+      "prerequisites": [],
+      "unlocks": [],
+      "tags": [
+        "formal-proof",
+        "proof-lab",
+        "demo"
+      ],
+      "mastery": {
+        "passing_score": 1,
+        "minimum_confidence": 3,
+        "max_guessing_allowed": "no",
+        "review_after_days_if_mastered": 7,
+        "review_after_days_if_learning": 2
+      },
+      "theory": "For f(x) = x² at a = 3, the difference quotient is ((3+h)²−3²)/h. For h ≠ 0 it equals h+6. Its two-sided limit as h approaches 0 is 6, so the derivative is 6. The puncture h ≠ 0 is retained during cancellation. Prove the limit first, then cite it with the difference-quotient rule. A direct polynomial derivative rule does not demonstrate this requested method.",
+      "examples": [
+        {
+          "prompt": "Why is substituting h = 0 into the original quotient insufficient?",
+          "solution": "The denominator is zero there.",
+          "explanation": "The definition uses a punctured limit: simplify for h ≠ 0, then take the limit."
+        }
+      ],
+      "applications": [],
+      "question_count": 1,
+      "problems": [
+        {
+          "template_id": "CUSTOM_DERIVATIVE_DEFINITION_Q01",
+          "skill_id": "CUSTOM_DERIVATIVE_DEFINITION",
+          "difficulty": "medium",
+          "prompt": "Use the definition of the derivative to prove that f(x) = x² has derivative 6 at x = 3.",
+          "expected_answer": "Complete Lean-verified proof",
+          "answer_type": "text",
+          "grading_method": "exact_text",
+          "solution_steps": [
+            "Author reference candidate is stored in proof_spec and is not a learner grading key."
+          ],
+          "mistake_tags": [
+            "proof_dependencies"
+          ],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "proof_spec": {
+            "version": "0.1",
+            "statement": {
+              "declarations": [
+                "x:real",
+                "h:real"
+              ],
+              "assumptions": [],
+              "goal": "The derivative of x^2 with respect to x at 3 is 6."
+            },
+            "allowed_rules": [
+              "rational_hole_limit",
+              "derivative_from_limit"
+            ],
+            "assessment_policy": {
+              "required_method": "derivative_definition"
+            },
+            "reference_proof": {
+              "mode": "steps",
+              "steps": [
+                {
+                  "claim": "As h approaches 0 from both sides, ((3+h)^2-3^2)/h approaches 6.",
+                  "rule": "rational_hole_limit",
+                  "premises": [],
+                  "parameters": {
+                    "simplified": "h+6"
+                  }
+                },
+                {
+                  "claim": "The derivative of x^2 with respect to x at 3 is 6.",
+                  "rule": "derivative_from_limit",
+                  "premises": [
+                    "reference_step_1"
+                  ]
+                }
+              ]
+            },
+            "environment": {
+              "backend": "lean4",
+              "library": "mathlib",
+              "toolchain": "leanprover/lean4:v4.34.0-rc2",
+              "library_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

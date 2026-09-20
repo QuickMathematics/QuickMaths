@@ -106,9 +106,9 @@ def test_polynomial_derivative_at_declared_point_is_ready_and_searchable():
     state = build_proof_state(raw)
     assert state.status == "ready_for_kernel"
     source = render_request(normalize_request(raw))
-    theorem_line = next(line for line in source.splitlines() if line.startswith("theorem result"))
-    assert theorem_line.startswith("theorem result (a : ℝ) :")
-    assert not theorem_line.startswith("theorem result (x : ℝ)")
+    theorem_line = next(line for line in source.splitlines() if line.startswith("public theorem result"))
+    assert theorem_line.startswith("public theorem result (a : ℝ) :")
+    assert not theorem_line.startswith("public theorem result (x : ℝ)")
     assert "HasDerivAt" in source
     assert "hasDerivAt_id'" in source
     assert ".fun_pow 2" in source

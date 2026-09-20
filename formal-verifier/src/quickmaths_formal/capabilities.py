@@ -24,7 +24,7 @@ _RULE_GROUPS = {
         "sub_ne_zero_from_ne", "sqrt_square_nonnegative", "conjugate_identity",
     ],
     "series": ["series_geometric", "series_p_series", "series_comparison", "series_ratio_test", "series_ratio_limit_test", "series_root_test"],
-    "calculus": ["inverse_one_sided_limit", "rational_hole_limit", "conjugate_limit", "piecewise_jump", "continuity_limit", "limit_algebra", "sequence_nat_at_top", "sequence_algebra", "sequence_affine_ratio", "sequence_quadratic_ratio", "sequence_polynomial_degree_ratio", "sequence_rational_shift", "sequence_squeeze", "sequence_monotone_bounded", "sequence_elementary_divergence", "ivt_exists", "continuous_ivt_exists", "polynomial_derivative", "quotient_derivative", "sqrt_derivative", "abs_derivative", "exp_derivative", "log_derivative", "sin_derivative", "cos_derivative", "recursive_derivative"],
+    "calculus": ["inverse_one_sided_limit", "rational_hole_limit", "conjugate_limit", "piecewise_jump", "continuity_limit", "limit_algebra", "sequence_nat_at_top", "sequence_algebra", "sequence_affine_ratio", "sequence_quadratic_ratio", "sequence_polynomial_degree_ratio", "sequence_rational_shift", "sequence_squeeze", "sequence_monotone_bounded", "sequence_elementary_divergence", "ivt_exists", "continuous_ivt_exists", "derivative_from_limit", "polynomial_derivative", "quotient_derivative", "sqrt_derivative", "abs_derivative", "exp_derivative", "log_derivative", "sin_derivative", "cos_derivative", "recursive_derivative"],
 }
 
 

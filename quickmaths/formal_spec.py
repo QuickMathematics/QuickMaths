@@ -147,6 +147,7 @@ def infer_capabilities(statement: dict[str, Any] | None = None, allowed_rules: l
             rule_capabilities.add("sequences-series")
         elif "derivative" in lowered:
             rule_capabilities.add("derivatives")
+            if lowered == "derivative_from_limit": rule_capabilities.add("limits")
         elif any(token in lowered for token in ("limit", "continuity", "continuous", "ivt")):
             rule_capabilities.add("limits")
     for capability in ("derivatives", "limits", "sequences-series"):

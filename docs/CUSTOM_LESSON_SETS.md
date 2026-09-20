@@ -519,18 +519,21 @@ Generated formal statements resolve from the **same public parameter snapshot as
 
 The authoring layer accepts only declarative data: declarations, assumptions, a goal, an optional public-parameter contract, allowed rule names, optional curated capability loading guidance, assessment metadata, a reference-proof candidate, and pinned-environment metadata. Capability IDs are `algebra`, `limits`, `derivatives`, `sequences-series`, and `radicals`. If supplied, the array must include the capabilities inferred from the statement and allowed rules; unknown or duplicate IDs fail closed. A `sqrt` expression or a rule containing `sqrt` or `conjugate` infers `radicals`; for example, `sqrt_derivative` infers both `derivatives` and `radicals`, while `conjugate_limit` infers both `limits` and `radicals`. If omitted, the persisted specification remains unchanged and the loader may infer guidance automatically. This metadata only guides curated capability loading; it does not change rules, environments, certificates or trust checks. It does not accept Lean source, tactics, imports, macros or executable package code. Reference proofs remain candidates until independently checked by the isolated verifier.
 
-Use an empty `assessment_policy` for unrestricted formal assessment, or exactly
-`{required_method: induction}` (YAML) for a supported final-goal method. Studio
-lists the supported choices: induction, cases, contradiction (negation),
-universal introduction, implication and existential elimination. The final root
-step for the exact goal must use the corresponding closing rule; decorative
-method steps do not count. A fresh submitted Lean certificate is still required.
-Unknown policies remain blocked. In particular, derivative-definition grading
-is not supported: rule restrictions alone do not enforce that strategy. See
-[method and subproof details](FORMAL_LEARNING.md#constructing-scoped-proofs).
+Use an empty `assessment_policy` for unrestricted formal assessment, or one of the
+supported required methods: induction, cases, contradiction (negation),
+universal introduction, implication, existential elimination, or
+`derivative_definition`. The derivative-definition policy requires
+`derivative_from_limit` to cite one previously proved finite two-sided punctured
+limit at `0`, with no extra domain restriction, exact `(f(a+h)-f(a))/h` form,
+and a matching derivative target; `h` cannot be free in `f`, `a`, or the result.
+For `f(x)=x^2` at `a=3`, prove `((3+h)^2-3^2)/h -> 6` using
+`rational_hole_limit` simplified to `h+6` while retaining the kernel-checked
+`h != 0` puncture, then cite it with `derivative_from_limit`. This is not
+general epsilon-delta or automatic derivative-definition reasoning. The final
+root step must use the selected method, and unknown methods or extra fields stay
+blocked. See [method and subproof details](FORMAL_LEARNING.md#constructing-scoped-proofs).
 Reference candidates must still be checked before publication and never award
 learner credit.
-
 The [browser Lean corpus-parity and memory experiment](releases/2026-09-13-browser-lean-parity.md)
 does not introduce new authoring fields or Studio controls. Continue declaring
 capabilities rather than module names, runtime URLs or worker settings.

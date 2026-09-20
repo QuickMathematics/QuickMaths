@@ -825,8 +825,7 @@ Studio's Required final proof method selector supports natural induction,
 cases, negation by contradiction, arbitrary-variable introduction, implication
 and existential elimination. This checks the actual final goal-closing rule,
 not the presence of a method somewhere in the submission. Lean still checks the
-complete proof. Unknown policy fields/methods and derivative-definition grading
-remain blocked. Keep the policy empty for other accepted proof styles.
+complete proof. The supported `derivative_definition` policy is a strict native bridge: use `derivative_from_limit` with one previously proved finite two-sided punctured limit at `0`, no extra domain restriction, exact `(f(a+h)-f(a))/h` form, matching derivative target, and no free `h` in `f`, `a`, or the result. For `f(x)=x^2` at `a=3`, teach `((3+h)^2-3^2)/h -> 6` via `rational_hole_limit` simplified to `h+6`, retaining the kernel-checked `h != 0` puncture, then cite it with `derivative_from_limit`. This does not provide general epsilon-delta or automatic definition proofs. Unknown methods remain blocked; keep the policy empty for other accepted proof styles.
 
 The learner can create nested scopes, local assumptions and binders, split a
 disjunction, and close subproofs with cited conclusions. No author reference is

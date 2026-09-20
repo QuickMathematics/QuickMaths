@@ -6,6 +6,7 @@ from typing import Any
 import sympy as sp
 
 from .contract import canonical_hash
+from .derivative_definition import matches_derivative_definition
 from .calculus import match_abs_derivative, match_conjugate_limit, match_continuity_limit, match_continuous_ivt_existence, match_elementary_derivative, match_ivt_existence, match_piecewise_jump, match_polynomial_derivative, match_quotient_derivative, match_recursive_derivative, quotient_denominator_is_exact_nonzero, match_sqrt_derivative
 from .limits import match_limit_algebra
 from .series import match_geometric_series, match_p_series, match_series_comparison, match_series_ratio_test, match_series_ratio_limit_test, match_series_root_test
@@ -309,6 +310,11 @@ def check_step(step: dict[str, Any], request: dict[str, Any]) -> CandidateCheck:
         if match_continuous_ivt_existence(claim) is not None:
             return CandidateCheck(ESTABLISHED, "The target has the supported IVT existence shape and a structural interval-continuity plan; endpoint bracketing is checked separately and Lean remains authoritative.")
         return REJECTED_CHECK("The claim does not match the continuity-powered IVT family.")
+
+    if rule == "derivative_from_limit":
+        if len(premises) == 1 and matches_derivative_definition(claim, premises[0]):
+            return CandidateCheck(KERNEL_REQUIRED, "The exact difference-quotient limit matches; Lean must establish the cited limit and derivative bridge.")
+        return REJECTED_CHECK("The cited limit is not the exact derivative-definition limit.")
 
     if rule == "polynomial_derivative":
         if match_polynomial_derivative(claim) is not None:

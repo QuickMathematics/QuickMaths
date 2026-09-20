@@ -710,7 +710,16 @@ See the [formal learning guide](FORMAL_LEARNING.md).
 Use **Select facts to cite** to insert given facts or earlier root steps into
 Facts used. A listed fact is not automatically verified. Use Working scope and Open a subproof or cases to construct local arguments.
 Close each argument with the appropriate rule before verifying the complete
-proof. A displayed required method applies to the final goal, not an unused
+proof. A displayed `derivative_definition` method is a strict native bridge: prove one
+finite two-sided punctured limit at `0` in the exact form `(f(a+h)-f(a))/h`,
+with no extra domain restriction and matching derivative target, then cite it
+with `derivative_from_limit`. The increment `h` cannot be free in `f`, `a`, or
+the result. For `f(x)=x^2` at `a=3`, the intermediate limit is
+`((3+h)^2-3^2)/h -> 6`; use `rational_hole_limit` with simplification `h+6`
+and retain the kernel-checked `h != 0` puncture. This does not automate general
+epsilon-delta reasoning; unknown method policies remain blocked.
+
+A displayed required method applies to the final goal, not an unused
 step. The [proof guide](FORMAL_LEARNING.md#constructing-scoped-proofs) explains
 which facts each closing rule needs.
 

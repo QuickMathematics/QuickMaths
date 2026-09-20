@@ -2,6 +2,7 @@ import {formalRequestHash} from './formal-proof-trust.js';
 // Structural teaching requirements, applied in addition to a fresh Lean verdict.
 // Match the terminal goal step exactly as the native generator does.
 export const FORMAL_METHODS = Object.freeze({
+  derivative_definition: {rule:'derivative_from_limit',label:'Definition of the derivative'},
   induction: {rule:'nat_induction',label:'Natural-number induction'},
   cases: {rule:'or_elim',label:'Proof by cases'},
   contradiction: {rule:'not_intro',label:'Negation by contradiction'},

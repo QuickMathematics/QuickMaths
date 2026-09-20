@@ -11,6 +11,6 @@ for(const [method,{rule}] of Object.entries(FORMAL_METHODS))test(`method ${metho
  assert.throws(()=>assertFormalMethod(policy,{...request,steps:[{...request.steps[0],claim:{kind:'other'}}]}),/final goal/);
 });
 test('unknown policies remain fail closed',()=>{
- for(const policy of [{required_method:'derivative_definition'},{required_method:'induction',ignore:true},{required_method:'__proto__'}])assert.throws(()=>assertFormalMethod(policy,{goal,steps:[]}),/not supported/);
+ for(const policy of [{required_method:'arbitrary_strategy'},{required_method:'induction',ignore:true},{required_method:'__proto__'}])assert.throws(()=>assertFormalMethod(policy,{goal,steps:[]}),/not supported/);
  assert.doesNotThrow(()=>assertFormalMethod({},null));
 });

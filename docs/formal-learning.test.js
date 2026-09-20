@@ -292,7 +292,7 @@ for (const field of ["assessment_policy", "environment", "parameter_contract"]) 
 test("method-specific assessment policy cannot be silently bypassed", async () => {
   const curriculum = (await import("./test-support/formal-learning-fixtures.js")).formalCurriculum();
   const problem = curriculum.skills.find((s) => s.id === SKILL).problems[0];
-  problem.proof_spec.assessment_policy = { required_method: "derivative_definition" };
+  problem.proof_spec.assessment_policy = { required_method: "arbitrary_strategy" };
   problem.formal_job = (await import("./formal-binding.js")).buildBoundFormalJob(problem);
   const f = makeFormalStore({ curriculum }); await candidate(f);
   await assert.rejects(f.store.runFormalProof(f.questionId, "verify"), /not supported yet/);

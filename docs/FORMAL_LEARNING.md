@@ -118,11 +118,18 @@ negation), `universal_introduction` (`forall_intro`), `implication` (`imp_intro`
 and `existential_elimination` (`exists_elim`). The last root step establishing the
 exact goal must use that rule. A method elsewhere in the proof does not count;
 an extra final `exact` step is also rejected under this strict policy.
-Unknown methods, extra policy fields and derivative-definition requirements
-remain blocked. This is structural method assessment, not a general strategy or
-proof-quality rubric. Certificate format and mathematical checking are unchanged.
+The supported `required_method: derivative_definition` policy is a strict native
+bridge: the proof must use `derivative_from_limit` with one previously proved
+finite two-sided punctured limit at `0`, no extra domain restriction, exact
+`(f(a+h)-f(a))/h` form, and a matching derivative target. The increment `h` may
+not be free in `f`, `a`, or the result. For `f(x)=x^2` at `a=3`, prove
+`((3+h)^2-3^2)/h -> 6` with `rational_hole_limit`, simplified to `h+6` while
+the kernel checks `h != 0`, then cite that limit with `derivative_from_limit`.
+This does not add general epsilon-delta reasoning or automatic definition proofs;
+unknown methods and extra policy fields remain blocked. Certificate format and
+mathematical checking are unchanged.
 
-The human-facing editor currently focuses on ordered root claims and in-place repair. The existing engine retains quantifiers, scopes, induction and other deeper mathematics. Rich subproof construction, a polished fact picker, method-policy enforcement, smoother failed-check diagnostics and public-demo kernel acceptance are follow-on work, not claims of this slice.
+The learner editor supports ordered claims, visible fact selection, nested scopes, local assumptions and binders, disjunction cases, and native subproof-closing controls. These controls expose existing engine rules and do not generate proof steps or certify facts. The pinned verifier and fresh certificate remain the mathematical authority.
 
 ## Validation and reproduction
 
