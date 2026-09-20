@@ -111,7 +111,16 @@ The Lean kernel and permitted foundational axioms remain the mathematical author
 
 The local app origin, pinned browser backend and optional companion are trusted execution components. Digest consistency binds content; it does **not** authenticate a malicious process impersonating the companion or protect a browser owner who rewrites application code. This is not a remote high-stakes examination system. The reference-free tool interface is an access boundary for tutoring tools, not encryption of author data from someone with full filesystem/browser access.
 
-Method-specific `assessment_policy` metadata is not implemented by this learner-assessment path. A nonempty policy explicitly blocks final assessment instead of being silently ignored. Leave it empty for the demo lessons. Method teaching in a prompt is not itself an automatically enforced proof-strategy requirement.
+Supported `assessment_policy.required_method` values require a specific final-goal
+closing rule, in addition to a fresh submitted Lean certificate: `induction`
+(`nat_induction`), `cases` (`or_elim`), `contradiction` (`not_intro`, proving a
+negation), `universal_introduction` (`forall_intro`), `implication` (`imp_intro`)
+and `existential_elimination` (`exists_elim`). The last root step establishing the
+exact goal must use that rule. A method elsewhere in the proof does not count;
+an extra final `exact` step is also rejected under this strict policy.
+Unknown methods, extra policy fields and derivative-definition requirements
+remain blocked. This is structural method assessment, not a general strategy or
+proof-quality rubric. Certificate format and mathematical checking are unchanged.
 
 The human-facing editor currently focuses on ordered root claims and in-place repair. The existing engine retains quantifiers, scopes, induction and other deeper mathematics. Rich subproof construction, a polished fact picker, method-policy enforcement, smoother failed-check diagnostics and public-demo kernel acceptance are follow-on work, not claims of this slice.
 
@@ -168,3 +177,46 @@ credit. Author reference checks remain separate from learner submissions. iPhone
 and iPad browser support is deferred; drafts can still be saved. Existing imported
 formal lessons use the same backend when their declared capabilities are supported.
 The local desktop companion remains available through explicit client options.
+
+
+## Constructing scoped proofs
+
+After Start my proof, choose a Working scope. Open a subproof with a temporary
+assumption, or introduce local declarations such as `k:nat` (optionally with a
+local assumption). Split a visible disjunction by selecting Cases and entering
+its fact ID. The two branches appear as separate scopes. No proof is filled in.
+
+Add steps in the selected scope. Select facts to cite shows its assumptions,
+ancestor facts and earlier steps; sibling facts cannot justify an ordinary step.
+To close a scope, enter the conclusion in its parent context, choose the native
+closing rule and cite the relevant facts in Close this subproof. The engine
+rejects missing assumptions, incomplete cases, wrong witnesses and mismatched
+induction hypotheses. Closing does not certify the proof; Verify complete proof
+must still succeed. Scopes persist in saved requests; restored certificates need
+replay. You can return to a scope to repair steps, which withdraws verification.
+
+Examples of closing citations:
+
+- Implication: local assumption and the local conclusion (`imp_intro`). For
+  `(x = 0) implies (x = 0)`, the assumption alone is sufficient.
+- Negation: local assumed proposition and a derived `false` (`not_intro`).
+- Cases: the parent disjunction, both local assumptions and both branch
+  conclusions (`or_elim`). Both branches must establish the parent conclusion.
+- Universal statement: introduce its arbitrary binder, derive the body there,
+  and cite the conclusion (`forall_intro`).
+- Existential elimination: cite the existential fact, local witness assumption
+  and a conclusion independent of that witness (`exists_elim`).
+- Natural induction: derive the base in the parent; introduce a fresh natural
+  binder and the exact induction hypothesis in a child; derive the successor.
+  Cite base, hypothesis and successor conclusion when closing (`nat_induction`).
+
+These controls expose existing engine rules. They do not add mathematical
+coverage, executable package syntax or automatic learner proof generation.
+
+
+Studio reference checks apply the same method requirement after kernel checking.
+The existing reference-step authoring schema does not declare local scopes;
+for scoped references, use bounded prover search where it supports the theorem,
+or validate the learner construction directly. Search may choose another valid
+method, which does not satisfy a different required-method policy. Do not turn a
+reference or search result into learner assessment credit.

@@ -817,3 +817,17 @@ credit. Author reference checks remain separate from learner submissions. iPhone
 and iPad browser support is deferred; drafts can still be saved. Existing imported
 formal lessons use the same backend when their declared capabilities are supported.
 The local desktop companion remains available through explicit client options.
+
+
+### Required methods and scoped learner work
+
+Studio's Required final proof method selector supports natural induction,
+cases, negation by contradiction, arbitrary-variable introduction, implication
+and existential elimination. This checks the actual final goal-closing rule,
+not the presence of a method somewhere in the submission. Lean still checks the
+complete proof. Unknown policy fields/methods and derivative-definition grading
+remain blocked. Keep the policy empty for other accepted proof styles.
+
+The learner can create nested scopes, local assumptions and binders, split a
+disjunction, and close subproofs with cited conclusions. No author reference is
+inserted into the learner proof. See the [proof guide](FORMAL_LEARNING.md).

@@ -1894,3 +1894,10 @@ body:has(.educator-welcome-backdrop), body:has(.agent-welcome-backdrop), body:ha
 .proof-tutor-guidance small { display: block; margin-top: .7rem; line-height: 1.5; }
 .proof-tutor-status, .proof-assessment-note { font-size: .88rem; line-height: 1.6; overflow-wrap: anywhere; }
 .proof-assessment-note { padding: .8rem 1rem; border-radius: 10px; background: var(--paper-light, #fffdf8); }
+
+/* Scoped proof construction stays readable on narrow screens. */
+.proof-subproof-controls,.proof-fact-picker { margin:.8rem 0; padding:.7rem; border:1px solid var(--proof-line); border-radius:10px; }
+.proof-subproof-controls label,.proof-reasoning > label { display:grid; gap:.35rem; margin:.65rem 0; }
+.proof-subproof-controls input,.proof-subproof-controls select,.proof-subproof-controls textarea { width:100%; min-width:0; }
+.proof-fact-picker button,.proof-reasoning details button { margin:.25rem; max-width:100%; white-space:normal; overflow-wrap:anywhere; text-align:left; }
+.proof-method-requirement { font-weight:600; }

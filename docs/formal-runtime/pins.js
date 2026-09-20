@@ -4,8 +4,8 @@ export default {
     "bytes": 4541386
   },
   "native-verifier.zip": {
-    "sha256": "57c6227e912fffe5e6bea58c5d2dd87fff2575f90fc61bd5c93b89c12d2e89f1",
-    "bytes": 175215
+    "sha256": "ef561673bd2a54bf29029a5d1f776a954cff201ce68edc3bdf6d0616d3c3276b",
+    "bytes": 176442
   },
   "worker": {
     "sha256": "f900a67feac37a5a0b45d13915233da40cbcc5875ac3119db09ea8b9fea702a4",

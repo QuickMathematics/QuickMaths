@@ -125,6 +125,7 @@ function formalDraftKey(questionId) {
   return JSON.stringify([snapshot.activeProfile?.id, snapshot.activeTest?.draftId, questionId]);
 }
 const formalBusyQuestionIds = new Set();
+const formalScopeSelection = new Map();
 const FORMAL_RULE_PARAMETER_KEYS = {
   add_both_sides: "term", subtract_both_sides: "term", multiply_both_sides: "term", divide_both_sides: "term", add_inequality: "term",
   scale_inequality_positive: "factor", scale_inequality_negative: "factor", guarded_cancel: "divisor",
@@ -1615,6 +1616,7 @@ function renderFormalProofPanel(problem) {
   const evidence = formalEvidenceFor(problem);
   const view = store.getFormalWorkspace(problem.template_id);
   return renderFormalWorkspace({ problem, evidence, progress: view.progress, tutor: view.tutor,
+    activeScope: formalScopeSelection.get(formalDraftKey(problem.template_id)) ?? 'root',
     busy: view.busy || formalBusyQuestionIds.has(problem.template_id) });
 }
 
@@ -2875,13 +2877,14 @@ document.addEventListener("click", async (event) => {
       return;
     }
     const actions = { "formal-start": "start", "formal-add-step": "append", "formal-verify": "verify",
-      "formal-replay": "replay", "formal-check-progress": "progress", "formal-edit-step": "edit", "formal-cancel-edit": "cancel" };
+      "formal-replay": "replay", "formal-check-progress": "progress", "formal-edit-step": "edit", "formal-cancel-edit": "cancel", "formal-open-scope": "open_scope", "formal-close-scope": "close_scope" };
     const action = actions[actionName];
     if (!action) return;
     const rule = card.querySelector('[data-formal-field="rule"]')?.value.trim() ?? "";
     const parameter = card.querySelector('[data-formal-field="parameter"]')?.value.trim() ?? "";
     const parameterKey = FORMAL_RULE_PARAMETER_KEYS[rule];
-    const input = { stepId: formalAction.dataset.stepId,
+    const subfield=name=>card.querySelector(`[data-subproof-field="${name}"]`)?.value ?? '';
+    const input = { scope:card.querySelector('[data-formal-scope]')?.value ?? 'root',kind:subfield('kind'),assumption:subfield('assumption'),declarations:subfield('declarations').split(/\n/).map(s=>s.trim()).filter(Boolean),premiseId:subfield('premise'),stepId: formalAction.dataset.stepId,
       claim: card.querySelector('[data-formal-field="claim"]')?.value ?? "", rule,
       premises: (card.querySelector('[data-formal-field="premises"]')?.value ?? "").split(/[,;\s]+/).filter(Boolean),
       parameters: parameter && parameterKey ? { [parameterKey]: parameter } : {} };
@@ -2889,6 +2892,7 @@ document.addEventListener("click", async (event) => {
     card.querySelectorAll("[data-formal-field], [data-formal-proof-panel] button").forEach((field) => { field.disabled = true; });
     try {
       const result = await store.runFormalProof(questionId, action, input);
+      if (result.selected_scope) formalScopeSelection.set(formalDraftKey(questionId),result.selected_scope);
       if (result.assessment_eligible) showToast("Lean accepted the exact learner proof. This question is ready for assessment.");
       else if (result.verification_status === "verification_unavailable") showToast("Lean is unavailable. Your reasoning is saved; no incorrect assessment was recorded.");
     } catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
@@ -3895,7 +3899,7 @@ document.addEventListener("input", (event) => {
   try {
     persistFormalEvidence(card, {
       ...evidence, verification: null,
-      pending_edit: { step_id: evidence.pending_edit?.step_id ?? null, claim: field("claim"), rule: field("rule"),
+      pending_edit: { step_id: evidence.pending_edit?.step_id ?? null, scope: card.querySelector('[data-formal-scope]')?.value ?? "root", claim: field("claim"), rule: field("rule"),
         premises: field("premises").split(/[,;\s]+/).filter(Boolean), parameter: field("parameter") },
     });
   } catch (error) {
@@ -3913,4 +3917,13 @@ document.addEventListener("input", (event) => {
   });
   panel?.querySelectorAll('[data-action="formal-check-progress"], [data-action="formal-verify"], [data-action="formal-replay"]').forEach((button) => { button.disabled = true; });
   panel?.querySelectorAll(".proof-certificate, .formal-proof-certified, .proof-tutor-guidance").forEach((item) => { item.hidden = true; });
+});
+
+// Scope selection changes editor context only; claims still pass native validation.
+document.addEventListener('change',event=>{
+ if(!event.target.matches('[data-formal-scope]'))return;
+ const card=event.target.closest('[id^="question-"]');
+ const id=card?.querySelector('[data-question-id]')?.dataset.questionId;
+ if(!id)return;
+ formalScopeSelection.set(formalDraftKey(id),event.target.value);render(store.snapshot());
 });

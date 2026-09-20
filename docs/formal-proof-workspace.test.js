@@ -184,3 +184,12 @@ test('fact picker excludes local facts, edited step and later steps',()=>{
  const html=renderFormalWorkspace({problem,evidence:{proof_state:state}});
  assert.match(html,/formal-use-fact/);assert.doesNotMatch(html,/data-fact-id="local"/);
 });
+
+test('scope picker shows ancestor facts while isolating siblings',()=>{
+ const scopes=[{id:'root',parent:null},{id:'a',parent:'root'},{id:'b',parent:'root'},{id:'nested',parent:'a'}];
+ const state={context:[{id:'h1',scope:'root',claim:'x=x'},{id:'ha',scope:'a',claim:'x=0'},{id:'hb',scope:'b',claim:'x=1'}],steps:[]};
+ assert.deepEqual(selectableFormalFacts(state,null,'nested',scopes).map(r=>r.id),['h1','ha']);
+ const html=renderFormalWorkspace({problem,evidence:{request:{scopes},proof_state:state},activeScope:'a'});
+ assert.match(html,/formal-open-scope/);assert.match(html,/formal-close-scope/);assert.match(html,/Working scope/);
+ assert.match(html,/value="a" selected/);
+});

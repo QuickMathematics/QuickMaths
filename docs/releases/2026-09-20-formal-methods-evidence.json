@@ -1,0 +1,32 @@
+[
+  {
+    "method": "implication",
+    "verified": true,
+    "steps": 1
+  },
+  {
+    "method": "universal_introduction",
+    "verified": true,
+    "steps": 2
+  },
+  {
+    "method": "cases",
+    "verified": true,
+    "steps": 3
+  },
+  {
+    "method": "induction",
+    "verified": true,
+    "steps": 3
+  },
+  {
+    "method": "contradiction",
+    "verified": true,
+    "steps": 2
+  },
+  {
+    "method": "existential_elimination",
+    "verified": true,
+    "steps": 2
+  }
+]

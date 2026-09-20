@@ -83,6 +83,7 @@
       }
     },
     "assessment_policy": {
+      "description": "Empty or required_method with induction, cases, contradiction, universal_introduction, implication, existential_elimination. The final goal rule must match. Unknown fields/methods are preserved but block assessment.",
       "type": "object"
     },
     "reference_proof": {

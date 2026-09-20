@@ -211,6 +211,17 @@ async function freshFormalState(request, options) {
   return state;
 }
 
+export async function changeFormalSubproof(session, input, close = false, options = {}) {
+  if (!session?.request) throw new Error('Start the proof first.');
+  if (session.pendingEdit?.step_id) throw new Error('Save or cancel the edited step before closing a subproof.');
+  const rpc = close ? {op:'close_text_subproof',scope:input.scope,claim:input.claim,rule:input.rule,premises:input.premises ?? [],parameters:input.parameters ?? {}}
+    : {op:'open_text_subproof',parent_scope:input.scope ?? 'root',kind:input.kind,assumption:input.assumption || undefined,declarations:input.declarations ?? [],premise_id:input.premiseId || undefined};
+  const result=await callFormalRpc({protocol_version:PROTOCOL_VERSION,...rpc,request:session.request},options);
+  if(!result?.request || !result?.proof_state)throw new Error('Verifier returned an incomplete subproof.');
+  return {...session,request:result.request,proofState:result.proof_state,verification:null,kernelVerified:false,progress:null,pendingEdit:null,
+    selectedScope:close ? session.request.scopes.find(s=>s.id===input.scope)?.parent ?? 'root' : result.opened_scope};
+}
+
 export async function checkFormalProgress(session, options = {}) {
   if (!session?.request) throw new Error("Start the formal proof session first.");
   if (session.pendingEdit) throw new Error("Save the edited step before checking its reasoning.");
@@ -225,7 +236,7 @@ export function beginFormalStepEdit(session, stepId) {
   if (!step || !report) throw new Error("This proof step is no longer available to edit.");
   return {
     ...session, verification: null, kernelVerified: false, progress: null,
-    pendingEdit: { step_id: stepId, claim: report.claim, rule: step.rule, premises: [...step.premises],
+    pendingEdit: { step_id: stepId, scope: step.scope, claim: report.claim, rule: step.rule, premises: [...step.premises],
       parameter: String(Object.values(report.parameters ?? {})[0] ?? "") },
   };
 }

@@ -292,7 +292,7 @@ for (const field of ["assessment_policy", "environment", "parameter_contract"]) 
 test("method-specific assessment policy cannot be silently bypassed", async () => {
   const curriculum = (await import("./test-support/formal-learning-fixtures.js")).formalCurriculum();
   const problem = curriculum.skills.find((s) => s.id === SKILL).problems[0];
-  problem.proof_spec.assessment_policy = { required_method: "induction" };
+  problem.proof_spec.assessment_policy = { required_method: "derivative_definition" };
   problem.formal_job = (await import("./formal-binding.js")).buildBoundFormalJob(problem);
   const f = makeFormalStore({ curriculum }); await candidate(f);
   await assert.rejects(f.store.runFormalProof(f.questionId, "verify"), /not supported yet/);
@@ -390,4 +390,31 @@ test("restored historical formal scores are not presented to the tutor as live c
   const context = await toolsFor(restored).get_learning_context.execute({});
   assert.equal(context.active_attempt.questions[0].final_answer_status, "archived_requires_replay");
   assert.equal(restored.inspectStudentWork({ questionId: f.questionId }).proof_status, "archived_replay_required");
+});
+
+test('supported method rejects a wrong final rule before certification', async()=>{
+ const {formalCurriculum}=await import('./test-support/formal-learning-fixtures.js');
+ const c=formalCurriculum(),p=c.skills.find(s=>s.id===SKILL).problems[0];
+ p.proof_spec.assessment_policy={required_method:'induction'};
+ p.formal_job=(await import('./formal-binding.js')).buildBoundFormalJob(p);
+ const f=makeFormalStore({curriculum:c});await candidate(f);
+ await assert.rejects(f.store.runFormalProof(f.questionId,'verify'),/Required method/);
+ assert.equal(f.companion.calls.filter(r=>r.op==='check').length,0);
+ assert.equal(f.store.getFormalWorkspace(f.questionId).assessmentEligible,false);
+});
+
+test('mock transport: supported method still needs live kernel certificate and edit invalidates it',async()=>{
+ const {formalCurriculum}=await import('./test-support/formal-learning-fixtures.js');
+ const c=formalCurriculum(),p=c.skills.find(s=>s.id===SKILL).problems[0];
+ p.proof_spec.assessment_policy={required_method:'induction'};
+ p.proof_spec.allowed_rules=['nat_induction'];
+ p.formal_job=(await import('./formal-binding.js')).buildBoundFormalJob(p);
+ const f=makeFormalStore({curriculum:c});await f.store.runFormalProof(f.questionId,'start');
+ // Transport mock checks the application gate only; actual validity is tested by Lean separately.
+ await f.store.runFormalProof(f.questionId,'append',{claim:'x=x',rule:'nat_induction',premises:[]});
+ assert.equal(f.store.getFormalWorkspace(f.questionId).assessmentEligible,false);
+ await f.store.runFormalProof(f.questionId,'verify');
+ assert.equal(f.store.getFormalWorkspace(f.questionId).assessmentEligible,true);
+ await f.store.runFormalProof(f.questionId,'edit',{stepId:'user_step_1'});
+ assert.equal(f.store.getFormalWorkspace(f.questionId).assessmentEligible,false);
 });

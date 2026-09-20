@@ -1,3 +1,4 @@
+import {FORMAL_METHODS,assertFormalMethod} from './formal-method-policy.js';
 import { normalizeLimitSpec } from "./limit-work.js?v=20260909-calculus-v1";
 import { normalizeMathBlocks, renderMathBlocks } from "./math-display.js?v=20260909-calculus-v1";
 import { normalizeCartesianDiagram, renderCartesianDiagram } from "./cartesian-diagrams.js?v=20260909-calculus-v1";
@@ -475,7 +476,7 @@ function renderFormalProofAuthoring(problem, index) {
       ${indexed(area("Formal goal", "problem.formalGoal", problem.formalGoal, { rows:3, hint:"The exact theorem that the certificate must establish. Enabling this bypasses the short-answer grader; only a fresh complete Lean certificate can earn assessment credit." }))}
       <div class="studio-two">${indexed(area("Allowed proof rules — one per line", "problem.formalAllowedRules", problem.formalAllowedRules, { rows:7, hint:"Curated rule names only; this limits the learner and reference prover interface." }))}${indexed(area("Public generator parameters — one per line", "problem.formalRequiredPublic", problem.formalRequiredPublic, { rows:4, hint:"For parameterized native questions, every name here must also be visible in the learner prompt." }))}</div>
       ${indexed(field("Capability bundles (optional)", "problem.formalCapabilities", problem.formalCapabilities, { hint:"Comma-separated: algebra, limits, derivatives, sequences-series, radicals. Leave blank for automatic inference; loading guidance only, not browser certification." }))}
-      ${indexed(field("Required method (optional)", "problem.formalRequiredMethod", problem.formalRequiredMethod, { hint:"Reserved for method-specific policy. Leave blank for assessable exercises in this build; unsupported method policies block credit rather than being silently ignored." }))}
+      ${indexed(select("Required final proof method", "problem.formalRequiredMethod", problem.formalRequiredMethod, [["","Any supported method"], ...Object.entries(FORMAL_METHODS).map(([id,value])=>[id,value.label]), ...(!problem.formalRequiredMethod || Object.hasOwn(FORMAL_METHODS,problem.formalRequiredMethod) ? [] : [[problem.formalRequiredMethod, "Unsupported: " + problem.formalRequiredMethod]])], "The final goal must be closed using this method. Unused steps do not count. Lean acceptance is still required. Derivative-definition and arbitrary strategy policies remain unsupported."))}
       <div class="studio-runtime-preview"><header><div><span>Pinned formal environment</span><strong>${esc(environment.backend ?? "lean4")} · ${esc(environment.library ?? "mathlib")}</strong></div></header><div><dl><div><dt>Lean</dt><dd>${esc(environment.toolchain ?? "")}</dd></div><div><dt>mathlib</dt><dd>${esc(environment.library_revision ?? "")}</dd></div></dl></div><footer>Changing the formal environment creates a new verification provenance; old certificates remain attached to their original environment.</footer></div>
       <section class="studio-formal-reference"><div class="studio-section-title"><div><p class="eyebrow">Author reference proof</p><h3>Prove the exercise before publishing it</h3></div><button type="button" class="quiet-button" data-creator-action="apply-formal-example" data-index="${index}">Load algebra example</button></div>
         ${indexed(select("Reference proof source", "problem.formalReferenceMode", problem.formalReferenceMode ?? "none", [["none","No reference proof yet"],["steps","Submitted declarative steps"],["auto","Bounded prover search"]], "A reference proof is an author candidate until the pinned Lean kernel accepts it."))}
@@ -1058,6 +1059,7 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
         try {
           const checked = await checkFormalReferenceProof(buildFormalReferenceJob(problem));
           if (checked.kernelVerified) {
+            assertFormalMethod(buildFormalProofSpec(problem).assessment_policy, checked.verification?.resolved_request ?? checked.request);
             problem.formalReferenceCheck = { state: "verified", message: "The pinned Lean kernel accepted the exact reference proof and theorem." };
           } else if (checked.proofState && checked.proofState.status !== "ready_for_kernel") {
             const count = Array.isArray(checked.proofState.obligations) ? checked.proofState.obligations.length : 0;

@@ -7,7 +7,7 @@ from typing import Any
 from .authoring import build_text_request, parse_variable_declarations
 from .capabilities import capability_matrix
 from .contract import ContractError, normalize_request
-from .interactive import append_text_step, new_text_request, replace_text_step
+from .interactive import append_text_step, close_text_subproof, new_text_request, open_text_subproof, replace_text_step
 from .progress import check_progress
 from .parser import parse_expression_text, parse_goal_text, parse_proposition_text, render_expression_text, render_goal_text, render_proposition_text
 from .preview import request_preview
@@ -44,6 +44,10 @@ def handle_message(message: Any, *, project_dir: str | Path | None = None) -> di
             return {"protocol_version": PROTOCOL_VERSION, "ok": True, "result": append_text_step(message)}
         if operation == "replace_text_step":
             return {"protocol_version": PROTOCOL_VERSION, "ok": True, "result": replace_text_step(message)}
+        if operation == "open_text_subproof":
+            return {"protocol_version": PROTOCOL_VERSION, "ok": True, "result": open_text_subproof(message)}
+        if operation == "close_text_subproof":
+            return {"protocol_version": PROTOCOL_VERSION, "ok": True, "result": close_text_subproof(message)}
         if operation == "check_progress":
             return {"protocol_version": PROTOCOL_VERSION, "ok": True, "result": check_progress(message.get("request"), project_dir=project_dir)}
         if operation == "check_reference_text":

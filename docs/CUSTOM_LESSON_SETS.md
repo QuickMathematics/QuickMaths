@@ -519,7 +519,17 @@ Generated formal statements resolve from the **same public parameter snapshot as
 
 The authoring layer accepts only declarative data: declarations, assumptions, a goal, an optional public-parameter contract, allowed rule names, optional curated capability loading guidance, assessment metadata, a reference-proof candidate, and pinned-environment metadata. Capability IDs are `algebra`, `limits`, `derivatives`, `sequences-series`, and `radicals`. If supplied, the array must include the capabilities inferred from the statement and allowed rules; unknown or duplicate IDs fail closed. A `sqrt` expression or a rule containing `sqrt` or `conjugate` infers `radicals`; for example, `sqrt_derivative` infers both `derivatives` and `radicals`, while `conjugate_limit` infers both `limits` and `radicals`. If omitted, the persisted specification remains unchanged and the loader may infer guidance automatically. This metadata only guides curated capability loading; it does not change rules, environments, certificates or trust checks. It does not accept Lean source, tactics, imports, macros or executable package code. Reference proofs remain candidates until independently checked by the isolated verifier.
 
-Leave method-specific `assessment_policy` metadata empty for this build. Unsupported method policies explicitly block final assessment rather than being ignored. For a method-specific prompt such as "use the definition of the derivative", restrict `allowed_rules` to the supported steps intended for the exercise and use explicit human review for the method requirement. An allowlist limits admitted rules; it does not prove that the requested strategy was demonstrated. Do not label this automatic method enforcement. Reference candidates must be checked with the pinned verifier before publication. The fields used by the legacy short-answer schema are compatibility data only when `proof_spec` is present; neither matching those fields nor a tutor review can pass the formal question.
+Use an empty `assessment_policy` for unrestricted formal assessment, or exactly
+`{required_method: induction}` (YAML) for a supported final-goal method. Studio
+lists the supported choices: induction, cases, contradiction (negation),
+universal introduction, implication and existential elimination. The final root
+step for the exact goal must use the corresponding closing rule; decorative
+method steps do not count. A fresh submitted Lean certificate is still required.
+Unknown policies remain blocked. In particular, derivative-definition grading
+is not supported: rule restrictions alone do not enforce that strategy. See
+[method and subproof details](FORMAL_LEARNING.md#constructing-scoped-proofs).
+Reference candidates must still be checked before publication and never award
+learner credit.
 
 The [browser Lean corpus-parity and memory experiment](releases/2026-09-13-browser-lean-parity.md)
 does not introduce new authoring fields or Studio controls. Continue declaring

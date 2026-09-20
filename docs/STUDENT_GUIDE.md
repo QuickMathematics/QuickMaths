@@ -708,8 +708,11 @@ support is deferred. Ordinary lessons continue to work if verification is unavai
 See the [formal learning guide](FORMAL_LEARNING.md).
 
 Use **Select facts to cite** to insert given facts or earlier root steps into
-Facts used. A listed fact is not automatically verified. Local assumptions,
-cases and subproof-closing controls are not yet available in this learner editor.
+Facts used. A listed fact is not automatically verified. Use Working scope and Open a subproof or cases to construct local arguments.
+Close each argument with the appropriate rule before verifying the complete
+proof. A displayed required method applies to the final goal, not an unused
+step. The [proof guide](FORMAL_LEARNING.md#constructing-scoped-proofs) explains
+which facts each closing rule needs.
 
 For voluntary device testing, the separate
 [experimental phone runner](experiments/browser-lean/?candidate=monomial-direct-v1)
