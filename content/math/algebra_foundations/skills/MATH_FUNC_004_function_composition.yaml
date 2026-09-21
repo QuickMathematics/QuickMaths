@@ -157,7 +157,7 @@ applications:
   description: Inverse verification uses composition identities. Later, rates of change of composite models
     rely on knowing the same inner and outer structure.
 test:
-  question_count: 20
+  question_count: 21
   randomize_order: true
   questions:
   - id: FUNC_COMP_AFFINE_AFTER_SQUARE_001

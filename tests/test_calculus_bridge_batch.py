@@ -39,7 +39,7 @@ def test_native_source_and_review_preview_agree():
         built=by_id[source['id']]
         for key,value in source.items():
             if key not in ('test','schema_version'):assert value==built[key],(source['id'],key)
-        assert source['test']['question_count']==built['question_count']==20
+        assert source['test']['question_count']==built['question_count']==(21 if source['id'] in {'MATH_FUNC_004','MATH_FUNC_007','MATH_CALC_001','MATH_CALC_002'} else 20)
         assert source['test']['randomize_order'] is built['native_randomize_order'] is True
         assert source['test']['questions']==built['native_templates']
 

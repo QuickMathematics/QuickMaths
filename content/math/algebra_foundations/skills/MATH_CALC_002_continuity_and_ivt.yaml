@@ -141,7 +141,7 @@ applications:
   description: A target-value guarantee does not by itself establish a unique solution, a midpoint solution,
     or an exact formula.
 test:
-  question_count: 20
+  question_count: 21
   randomize_order: true
   questions:
   - id: BRIDGE_CONT_VALUE

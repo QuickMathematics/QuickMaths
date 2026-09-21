@@ -143,7 +143,7 @@ applications:
 - title: Threshold behavior
   description: One-sided limits reveal whether a rule change is a harmless join or a genuine jump.
 test:
-  question_count: 20
+  question_count: 21
   randomize_order: true
   questions:
   - id: BRIDGE_LIM_POLYNOMIAL

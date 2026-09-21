@@ -19,7 +19,7 @@ Added six fixed formal exercises, bringing native lessons with formal assessment
 | MATH_CALC_001 | Punctured rational limit at 3 equals 6 | Does not assert the function is defined at 3 |
 | MATH_CALC_002 | IVT gives a real c in [0,2] with c²=2 | No claim of uniqueness |
 
-Existing numerical questions, conceptual capstones, review requirements and configured test lengths remain intact. The added templates participate in existing test rotation. Geography, programming and estimation retain their appropriate assessment types; no blanket Lean conversion or mandatory capstone was imposed. Pack question counts are catalog sizes, not a requirement that every assessment contain the whole catalog.
+Existing numerical questions, conceptual capstones and review requirements remain intact. Follow-up correction: Composition, Rates and difference quotients, Limits, and Continuity/IVT now use 21 questions, preserving both the original capstone and the formal exercise in every new attempt. Other lessons retain their existing lengths and rotation. Geography, programming and estimation retain their appropriate assessment types; no blanket Lean conversion or mandatory capstone was imposed. Pack question counts are catalog sizes, not a requirement that every assessment contain the whole catalog.
 
 ## Authoring and tooling
 

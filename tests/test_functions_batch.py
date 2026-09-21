@@ -37,7 +37,7 @@ def test_unique_native_source_metadata_matches_browser_content():
         for key in ['name','domain','subdomain','topic','description','prerequisites','unlocks','tags','mastery','theory','examples','applications','media']:
             assert source[key]==built[key],(source['id'],key)
         assert str(source['schema_version'])=='0.2'
-        assert source['test']['question_count']==built['question_count']==20
+        assert source['test']['question_count']==built['question_count']==(21 if source['id'] in {'MATH_FUNC_004','MATH_FUNC_007','MATH_CALC_001','MATH_CALC_002'} else 20)
         assert source['test']['randomize_order']==built['native_randomize_order'] is True
         for original,exported in zip(source['test']['questions'],built['native_templates'],strict=True):
             for key,value in original.items():

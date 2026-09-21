@@ -110,7 +110,7 @@ test('four native function lessons have complete teaching, metadata, scenarios, 
   for(const s of additions){
     assert.equal(s.subdomain,'Algebra');assert.equal(s.topic,'Functions');
     assert.equal(s.examples.length,10);assert.equal(s.applications.length,4);assert.ok(s.theory.split(/\s+/).length>=750);
-    assert.equal(s.question_count,20);assert.equal(s.native_templates.filter(t=>!t.proof_spec).length,20);
+    assert.equal(s.question_count,['MATH_FUNC_004','MATH_FUNC_007','MATH_CALC_001','MATH_CALC_002'].includes(s.id)?21:20);assert.equal(s.native_templates.filter(t=>!t.proof_spec).length,20);
     assert.equal(new Set(s.native_templates.map(t=>t.id)).size,s.native_templates.length);
     assert.equal(new Set(s.problems.map(p=>p.source_template_id)).size,s.native_templates.length);
     assert.ok(s.problems.length>=40 && s.problems.length<=100);
@@ -123,7 +123,7 @@ test('all 80 scenarios pass independent mathematical oracles across 100 fresh re
   const store=storeFor();const seen=new Set();const diversity=new Map();
   assert.equal(Object.keys(answers).length+Object.keys(choices).length,80);
   for(let n=0;n<100;n++)for(const s of additions){
-    const draft=store.previewNativeAssessment(s.id,n);assert.equal(draft.problems.length,20);
+    const draft=store.previewNativeAssessment(s.id,n);assert.equal(draft.problems.length,s.question_count);
     for(const p of draft.problems){
       if(p.proof_spec){assert.equal(gradeProblem(p,p.expected_answer).correct,false);continue;}
       seen.add(key(p));assert.match(p.template_id,/__RUNTIME_/);
@@ -154,9 +154,9 @@ test('endpoint, missing-hole, root-sign, and transformation-order traps reject p
   }
 });
 
-test('each full-score test remains Learning until its authored proof or rubric review passes',()=>{
+test('ordinary review fixture remains Learning until its authored proof or rubric review passes',()=>{
   for(const s of additions){
-    const store=storeFor();store.createProfile('Functions review regression');store.setLearningPreferences({progressionMode:'soft'});
+    const store=storeFor(ordinaryReviewCurriculum());store.createProfile('Functions review regression');store.setLearningPreferences({progressionMode:'soft'});
     const draft=store.startTest(s.id);const reviewed=draft.problems.find(p=>p.review_policy.mastery_requires_review_pass);
     for(const p of draft.problems)store.updateResponse(p.template_id,{finalAnswer:oracle(p),work:workFor(p)});
     assert.equal(store.submitTest().ok,true,s.id);const attempt=store.saveReflection({confidenceRating:4,guessed:'no'});
@@ -205,4 +205,44 @@ test('all twelve new figures match source bytes and load offline with complete a
     assert.equal(source.length,asset.bytes);assert.equal(createHash('sha256').update(source).digest('hex'),asset.sha256);
     const loaded=await loadLessonAsset(asset,'',{fetchImpl(){throw new Error('Unexpected network request');}});assert.deepEqual(Buffer.from(loaded),source);
   }
+});
+
+// Every-attempt teaching contract: neither formal additions nor rotation may omit the capstone.
+test('every retake retains the original reviewed capstone alongside formal work',()=>{
+ const store=storeFor();
+ for(const s of additions){
+  const required=s.native_templates.filter(t=>t.review_policy.mastery_requires_review_pass || t.proof_spec);
+  for(let attempt=0;attempt<100;attempt++){
+   const problems=store.previewNativeAssessment(s.id,attempt).problems;
+   for(const t of required){
+    const p=problems.find(p=>p.source_template_id===t.id);
+    assert.ok(p,`${s.id} attempt ${attempt} omitted ${t.id}`);
+    if(t.review_policy.mastery_requires_review_pass)assert.equal(p.review_policy.mastery_requires_review_pass,true);
+    if(t.proof_spec)assert.equal(gradeProblem(p,p.expected_answer).correct,false);
+   }
+  }
+ }
+});
+
+// Isolate the pre-existing ordinary review lifecycle; full-catalog retention and
+// formal rejection are tested independently without manufacturing certificates.
+function ordinaryReviewCurriculum(){
+ const data=structuredClone(curriculum);
+ for(const skill of data.skills){
+  skill.native_templates=skill.native_templates?.filter(t=>!t.proof_spec);
+  skill.problems=skill.problems.filter(p=>!p.proof_spec);
+  if(skill.native_templates?.length)skill.question_count=Math.min(skill.question_count,skill.native_templates.length);
+ }
+ return data;
+}
+
+test('full assessments reject ordinary answers in place of formal verification',()=>{
+ for(const s of additions.filter(s=>s.native_templates.some(t=>t.proof_spec))){
+  const store=storeFor();store.createProfile('Unverified formal work');store.setLearningPreferences({progressionMode:'soft'});
+  const draft=store.startTest(s.id);
+  assert.ok(draft.problems.some(p=>p.proof_spec));
+  assert.ok(draft.problems.some(p=>p.review_policy.mastery_requires_review_pass));
+  for(const p of draft.problems)store.updateResponse(p.template_id,{finalAnswer:p.proof_spec?p.expected_answer:oracle(p),work:p.proof_spec?'':workFor(p)});
+  assert.equal(store.submitTest().ok,false,s.id);
+ }
 });

@@ -111,7 +111,7 @@ test('four lessons add a coherent graph and an explicit Calculus branch without 
  all.forEach(s=>visit(s.id));
  for(const s of additions){
   assert.equal(s.examples.length,10);assert.equal(s.applications.length,4);assert.ok(s.theory.split(/\s+/).length>=750);
-  assert.equal(s.question_count,20);assert.equal(s.native_templates.filter(t=>!t.proof_spec).length,20);
+  assert.equal(s.question_count,['MATH_FUNC_004','MATH_FUNC_007','MATH_CALC_001','MATH_CALC_002'].includes(s.id)?21:20);assert.equal(s.native_templates.filter(t=>!t.proof_spec).length,20);
   assert.equal(new Set(s.problems.map(p=>p.source_template_id)).size,s.native_templates.length);
   assert.ok(s.problems.length>=40 && s.problems.length<=100);
   assert.equal(s.native_templates.filter(t=>t.review_policy.mastery_requires_review_pass).length,1);
@@ -124,7 +124,7 @@ test('four lessons add a coherent graph and an explicit Calculus branch without 
 test('all 80 scenarios satisfy independent oracles over 100 retakes each, with no generator fallback',()=>{
  const store=makeStore();const seen=new Set(),diversity=new Map();
  for(let variation=0;variation<100;variation++)for(const s of additions){
-  const problems=store.previewNativeAssessment(s.id,variation).problems;assert.equal(problems.length,20);
+  const problems=store.previewNativeAssessment(s.id,variation).problems;assert.equal(problems.length,s.question_count);
   for(const p of problems){
    if(p.proof_spec){assert.equal(gradeProblem(p,p.expected_answer).correct,false);continue;}
    seen.add(key(p));assert.match(p.template_id,/__RUNTIME_/);assert.doesNotMatch(p.prompt,/\{[^}]+\}/);
@@ -171,9 +171,9 @@ test('equivalent algebra is accepted, while missing or invalid procedural work i
  assert.equal(gradeProblem(q,String(1/(2*vals(q).r))).correct,true);
 });
 
-test('every perfect-score attempt stays Learning until the required argument passes a permitted review',()=>{
+test('ordinary review fixture stays Learning until the required argument passes a permitted review',()=>{
  for(const s of additions){
-  const store=makeStore();store.createProfile('Calculus bridge review');store.setLearningPreferences({progressionMode:'soft'});
+  const store=makeStore(ordinaryReviewCurriculum());store.createProfile('Calculus bridge review');store.setLearningPreferences({progressionMode:'soft'});
   const draft=store.startTest(s.id);const reviewed=draft.problems.find(p=>p.review_policy.mastery_requires_review_pass);
   for(const p of draft.problems)store.updateResponse(p.template_id,{finalAnswer:oracle(p),work:workFor(p)});
   assert.equal(store.submitTest().ok,true,s.id);const attempt=store.saveReflection({confidenceRating:4,guessed:'no'});
@@ -231,7 +231,7 @@ test('the twelve new SVGs are byte-verified, accessible, fixed to assessment giv
 });
 
 test('restored native test drafts and saved results retain their original illustrated question data',()=>{
- const store=makeStore();store.createProfile('Diagram restoration');store.setLearningPreferences({progressionMode:'soft'});
+ const store=makeStore(ordinaryReviewCurriculum());store.createProfile('Diagram restoration');store.setLearningPreferences({progressionMode:'soft'});
  const draft=store.startTest('MATH_CALC_001');const picture=draft.problems.find(p=>key(p)==='LIM_GRAPH');
  store.updateResponse(picture.template_id,{finalAnswer:'2',work:'Both sides approach height 2.'});
  const restored=makeStore(curriculum,store.exportSyncState());
@@ -242,4 +242,44 @@ test('restored native test drafts and saved results retain their original illust
  const result=restored.getAttempt(attempt.attemptId);
  // The exact question object, not a newly generated graph, travels in the attempt.
  assert.ok(JSON.stringify(result).includes('media/native-calculus-bridge/limit-hole.svg'));
+});
+
+// Every-attempt teaching contract: neither formal additions nor rotation may omit the capstone.
+test('every retake retains the original reviewed capstone alongside formal work',()=>{
+ const store=makeStore();
+ for(const s of additions){
+  const required=s.native_templates.filter(t=>t.review_policy.mastery_requires_review_pass || t.proof_spec);
+  for(let attempt=0;attempt<100;attempt++){
+   const problems=store.previewNativeAssessment(s.id,attempt).problems;
+   for(const t of required){
+    const p=problems.find(p=>p.source_template_id===t.id);
+    assert.ok(p,`${s.id} attempt ${attempt} omitted ${t.id}`);
+    if(t.review_policy.mastery_requires_review_pass)assert.equal(p.review_policy.mastery_requires_review_pass,true);
+    if(t.proof_spec)assert.equal(gradeProblem(p,p.expected_answer).correct,false);
+   }
+  }
+ }
+});
+
+// Isolate the pre-existing ordinary review lifecycle; full-catalog retention and
+// formal rejection are tested independently without manufacturing certificates.
+function ordinaryReviewCurriculum(){
+ const data=structuredClone(curriculum);
+ for(const skill of data.skills){
+  skill.native_templates=skill.native_templates?.filter(t=>!t.proof_spec);
+  skill.problems=skill.problems.filter(p=>!p.proof_spec);
+  if(skill.native_templates?.length)skill.question_count=Math.min(skill.question_count,skill.native_templates.length);
+ }
+ return data;
+}
+
+test('full assessments reject ordinary answers in place of formal verification',()=>{
+ for(const s of additions.filter(s=>s.native_templates.some(t=>t.proof_spec))){
+  const store=makeStore();store.createProfile('Unverified formal work');store.setLearningPreferences({progressionMode:'soft'});
+  const draft=store.startTest(s.id);
+  assert.ok(draft.problems.some(p=>p.proof_spec));
+  assert.ok(draft.problems.some(p=>p.review_policy.mastery_requires_review_pass));
+  for(const p of draft.problems)store.updateResponse(p.template_id,{finalAnswer:p.proof_spec?p.expected_answer:oracle(p),work:p.proof_spec?'':workFor(p)});
+  assert.equal(store.submitTest().ok,false,s.id);
+ }
 });

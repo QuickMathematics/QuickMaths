@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Unified Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 35,
+  "app_version": 36,
   "description": "The single operating guide for routing fresh visitors, tutoring learners, and helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -524,6 +524,16 @@
     "native_formal_lessons": 14,
     "added_formal_exercises": 6,
     "reference_check": "python scripts/check_native_formal_references.py --skill MATH_CALC_001",
-    "trust_contract": "unchanged; reference checks do not grant learner credit"
+    "trust_contract": "unchanged; reference checks do not grant learner credit",
+    "mandatory_capstones": {
+      "assessment_length": 21,
+      "skills": [
+        "MATH_FUNC_004",
+        "MATH_FUNC_007",
+        "MATH_CALC_001",
+        "MATH_CALC_002"
+      ],
+      "policy": "Every new assessment includes the original review-required capstone and the formal exercise; saved drafts retain their original questions."
+    }
   }
 }

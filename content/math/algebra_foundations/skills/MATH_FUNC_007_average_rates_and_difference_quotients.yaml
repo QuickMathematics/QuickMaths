@@ -140,7 +140,7 @@ applications:
   description: Difference quotients make the algebra of nearby-input rates explicit before a limit is
     taken.
 test:
-  question_count: 20
+  question_count: 21
   randomize_order: true
   questions:
   - id: BRIDGE_RATE_LINEAR

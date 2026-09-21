@@ -206818,7 +206818,7 @@
           "description": "Inverse verification uses composition identities. Later, rates of change of composite models rely on knowing the same inner and outer structure."
         }
       ],
-      "question_count": 20,
+      "question_count": 21,
       "native_randomize_order": true,
       "native_templates": [
         {
@@ -208950,7 +208950,49 @@
           "work_required": false
         },
         {
-          "template_id": "FUNC_COMP_THREE_STAGES_001__21",
+          "template_id": "FUNC_COMP_PRICE_ORDER_001__21",
+          "skill_id": "MATH_FUNC_004",
+          "seed": 1930921747,
+          "difficulty": "medium",
+          "values": {},
+          "prompt": "A shop first discounts a 50-unit price by 20%, then adds a fixed 5-unit service fee. What is the final price? Enter a number.",
+          "expected_answer": "45",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "The discount function sends 50 to 0.8*50 = 40.",
+            "The fee function then sends 40 to 40 + 5 = 45.",
+            "Applying the fee first would produce 0.8*(50 + 5) = 44, a different transaction."
+          ],
+          "mistake_tags": [
+            "composition_context",
+            "composition_order"
+          ],
+          "variable": null,
+          "tolerance": null,
+          "options": [],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "accepted_forms": [],
+          "answer_metadata": {
+            "type": "numeric",
+            "value": "45"
+          },
+          "grading_metadata": {
+            "method": "exact_numeric"
+          },
+          "source_template_id": "FUNC_COMP_PRICE_ORDER_001",
+          "work_required": false
+        },
+        {
+          "template_id": "FUNC_COMP_THREE_STAGES_001__22",
           "skill_id": "MATH_FUNC_004",
           "seed": 940148531,
           "difficulty": "medium",
@@ -209001,7 +209043,7 @@
           "work_required": true
         },
         {
-          "template_id": "FUNC_COMP_AFFINE_AFTER_SQUARE_001__22",
+          "template_id": "FUNC_COMP_AFFINE_AFTER_SQUARE_001__23",
           "skill_id": "MATH_FUNC_004",
           "seed": 765544266,
           "difficulty": "easy",
@@ -209053,7 +209095,7 @@
           "work_required": true
         },
         {
-          "template_id": "FUNC_COMP_TWO_DOMAIN_RESTRICTIONS_001__23",
+          "template_id": "FUNC_COMP_TWO_DOMAIN_RESTRICTIONS_001__24",
           "skill_id": "MATH_FUNC_004",
           "seed": 1090701637,
           "difficulty": "hard",
@@ -209101,7 +209143,7 @@
           "work_required": false
         },
         {
-          "template_id": "FUNC_COMP_AFFINE_FORMULA_001__24",
+          "template_id": "FUNC_COMP_AFFINE_FORMULA_001__25",
           "skill_id": "MATH_FUNC_004",
           "seed": 175064902,
           "difficulty": "medium",
@@ -209153,48 +209195,6 @@
           },
           "source_template_id": "FUNC_COMP_AFFINE_FORMULA_001",
           "work_required": true
-        },
-        {
-          "template_id": "FUNC_COMP_PRICE_ORDER_001__25",
-          "skill_id": "MATH_FUNC_004",
-          "seed": 1153905506,
-          "difficulty": "medium",
-          "values": {},
-          "prompt": "A shop first discounts a 50-unit price by 20%, then adds a fixed 5-unit service fee. What is the final price? Enter a number.",
-          "expected_answer": "45",
-          "answer_type": "numeric",
-          "grading_method": "exact_numeric",
-          "solution_steps": [
-            "The discount function sends 50 to 0.8*50 = 40.",
-            "The fee function then sends 40 to 40 + 5 = 45.",
-            "Applying the fee first would produce 0.8*(50 + 5) = 44, a different transaction."
-          ],
-          "mistake_tags": [
-            "composition_context",
-            "composition_order"
-          ],
-          "variable": null,
-          "tolerance": null,
-          "options": [],
-          "answer_mode": "final_only",
-          "work": {
-            "mode": "none"
-          },
-          "review_policy": {
-            "work_review": "none",
-            "mastery_requires_review_pass": false,
-            "allow_self_review": true
-          },
-          "accepted_forms": [],
-          "answer_metadata": {
-            "type": "numeric",
-            "value": "45"
-          },
-          "grading_metadata": {
-            "method": "exact_numeric"
-          },
-          "source_template_id": "FUNC_COMP_PRICE_ORDER_001",
-          "work_required": false
         },
         {
           "template_id": "FUNC_COMP_SOLVE_LINEAR_001__26",
@@ -216739,7 +216739,7 @@
           "description": "Difference quotients make the algebra of nearby-input rates explicit before a limit is taken."
         }
       ],
-      "question_count": 20,
+      "question_count": 21,
       "native_randomize_order": true,
       "native_templates": [
         {
@@ -218910,7 +218910,58 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_QUADRATIC__21",
+          "template_id": "BRIDGE_RATE_POSITION__21",
+          "skill_id": "MATH_FUNC_007",
+          "seed": 1275546138,
+          "difficulty": "medium",
+          "values": {
+            "a": "2",
+            "gap": "1",
+            "b": "3",
+            "ans": "5"
+          },
+          "prompt": "A position model is s(t) = t^2 metres, with t in seconds. Find average velocity from t = 2 to t = 3. Enter the value in metres per second.",
+          "expected_answer": "5",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "Average velocity is displacement divided by elapsed time.",
+            "(3^2 - 2^2)/(3 - 2) = 2 + 3 = 5 m/s."
+          ],
+          "mistake_tags": [
+            "change_versus_value",
+            "input_interval",
+            "rate_units"
+          ],
+          "variable": null,
+          "tolerance": null,
+          "options": [],
+          "answer_mode": "final_plus_required_work",
+          "work": {
+            "mode": "procedural_steps",
+            "prompt": "Show one equivalent expression per line, ending with the requested result.",
+            "line_type": "expression",
+            "minimum_steps": 2,
+            "require_final_answer_match": true
+          },
+          "review_policy": {
+            "work_review": "auto",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "accepted_forms": [],
+          "answer_metadata": {
+            "type": "numeric",
+            "value": "5"
+          },
+          "grading_metadata": {
+            "method": "exact_numeric"
+          },
+          "source_template_id": "BRIDGE_RATE_POSITION",
+          "work_required": true
+        },
+        {
+          "template_id": "BRIDGE_RATE_DQ_QUADRATIC__22",
           "skill_id": "MATH_FUNC_007",
           "seed": 607735020,
           "difficulty": "hard",
@@ -218964,7 +219015,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_AT_A__22",
+          "template_id": "BRIDGE_RATE_DQ_AT_A__23",
           "skill_id": "MATH_FUNC_007",
           "seed": 1633596102,
           "difficulty": "hard",
@@ -219019,7 +219070,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_SECANT_LINE__23",
+          "template_id": "BRIDGE_RATE_SECANT_LINE__24",
           "skill_id": "MATH_FUNC_007",
           "seed": 372848830,
           "difficulty": "hard",
@@ -219074,7 +219125,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_DOMAIN__24",
+          "template_id": "BRIDGE_RATE_DQ_DOMAIN__25",
           "skill_id": "MATH_FUNC_007",
           "seed": 1510432128,
           "difficulty": "hard",
@@ -219120,7 +219171,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_LINEAR__25",
+          "template_id": "BRIDGE_RATE_LINEAR__26",
           "skill_id": "MATH_FUNC_007",
           "seed": 424506039,
           "difficulty": "easy",
@@ -219168,7 +219219,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_RECIPROCAL__26",
+          "template_id": "BRIDGE_RATE_DQ_RECIPROCAL__27",
           "skill_id": "MATH_FUNC_007",
           "seed": 1415856111,
           "difficulty": "hard",
@@ -219215,7 +219266,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_LINEAR__27",
+          "template_id": "BRIDGE_RATE_DQ_LINEAR__28",
           "skill_id": "MATH_FUNC_007",
           "seed": 1649941581,
           "difficulty": "medium",
@@ -219261,7 +219312,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_POSITION__28",
+          "template_id": "BRIDGE_RATE_POSITION__29",
           "skill_id": "MATH_FUNC_007",
           "seed": 337797156,
           "difficulty": "medium",
@@ -219312,7 +219363,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_QUADRATIC__29",
+          "template_id": "BRIDGE_RATE_QUADRATIC__30",
           "skill_id": "MATH_FUNC_007",
           "seed": 1390851571,
           "difficulty": "medium",
@@ -219366,7 +219417,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_TEMPERATURE__30",
+          "template_id": "BRIDGE_RATE_TEMPERATURE__31",
           "skill_id": "MATH_FUNC_007",
           "seed": 1097765844,
           "difficulty": "easy",
@@ -219415,7 +219466,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_TEMPERATURE__31",
+          "template_id": "BRIDGE_RATE_TEMPERATURE__32",
           "skill_id": "MATH_FUNC_007",
           "seed": 967276977,
           "difficulty": "easy",
@@ -219464,7 +219515,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_DOMAIN__32",
+          "template_id": "BRIDGE_RATE_DQ_DOMAIN__33",
           "skill_id": "MATH_FUNC_007",
           "seed": 350226232,
           "difficulty": "hard",
@@ -219510,7 +219561,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_AT_A__33",
+          "template_id": "BRIDGE_RATE_DQ_AT_A__34",
           "skill_id": "MATH_FUNC_007",
           "seed": 1943497171,
           "difficulty": "hard",
@@ -219565,7 +219616,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_CUBIC__34",
+          "template_id": "BRIDGE_RATE_CUBIC__35",
           "skill_id": "MATH_FUNC_007",
           "seed": 1602853557,
           "difficulty": "medium",
@@ -219611,7 +219662,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_QUADRATIC__35",
+          "template_id": "BRIDGE_RATE_QUADRATIC__36",
           "skill_id": "MATH_FUNC_007",
           "seed": 861182675,
           "difficulty": "medium",
@@ -219665,7 +219716,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_LINEAR__36",
+          "template_id": "BRIDGE_RATE_LINEAR__37",
           "skill_id": "MATH_FUNC_007",
           "seed": 668850166,
           "difficulty": "easy",
@@ -219713,7 +219764,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_POSITION__37",
+          "template_id": "BRIDGE_RATE_POSITION__38",
           "skill_id": "MATH_FUNC_007",
           "seed": 1722658511,
           "difficulty": "medium",
@@ -219764,7 +219815,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_QUADRATIC__38",
+          "template_id": "BRIDGE_RATE_DQ_QUADRATIC__39",
           "skill_id": "MATH_FUNC_007",
           "seed": 1848037174,
           "difficulty": "hard",
@@ -219818,7 +219869,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_LINEAR__39",
+          "template_id": "BRIDGE_RATE_DQ_LINEAR__40",
           "skill_id": "MATH_FUNC_007",
           "seed": 792085701,
           "difficulty": "medium",
@@ -219864,7 +219915,62 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_LINEAR__40",
+          "template_id": "BRIDGE_RATE_SECANT_LINE__41",
+          "skill_id": "MATH_FUNC_007",
+          "seed": 1165875389,
+          "difficulty": "hard",
+          "values": {
+            "a": "-3",
+            "gap": "1",
+            "b": "-2",
+            "m": "-5",
+            "c": "-6"
+          },
+          "prompt": "Find the equation of the secant line to f(x) = x^2 through inputs -3 and -2. Enter only the expression for y in terms of x.",
+          "expected_answer": "-5*x + (-6)",
+          "answer_type": "symbolic_expression",
+          "grading_method": "symbolic_expression",
+          "solution_steps": [
+            "The slope is (-2^2 - (-3)^2)/(-2 - (-3)) = -5.",
+            "Use y - (-3)^2 = -5(x - (-3)).",
+            "Simplification gives y = -5x + (-6)."
+          ],
+          "mistake_tags": [
+            "change_versus_value",
+            "input_interval",
+            "rate_units"
+          ],
+          "variable": "x",
+          "tolerance": null,
+          "options": [],
+          "answer_mode": "final_plus_required_work",
+          "work": {
+            "mode": "procedural_steps",
+            "prompt": "Show one equivalent expression per line, ending with the requested result.",
+            "line_type": "expression",
+            "target_variable": "x",
+            "minimum_steps": 2,
+            "require_final_answer_match": true
+          },
+          "review_policy": {
+            "work_review": "auto",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "accepted_forms": [],
+          "answer_metadata": {
+            "type": "symbolic_expression",
+            "value": "-5*x + (-6)",
+            "variable": "x"
+          },
+          "grading_metadata": {
+            "method": "symbolic_expression"
+          },
+          "source_template_id": "BRIDGE_RATE_SECANT_LINE",
+          "work_required": true
+        },
+        {
+          "template_id": "BRIDGE_RATE_LINEAR__42",
           "skill_id": "MATH_FUNC_007",
           "seed": 1612612687,
           "difficulty": "easy",
@@ -219912,7 +220018,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_CUBIC__41",
+          "template_id": "BRIDGE_RATE_CUBIC__43",
           "skill_id": "MATH_FUNC_007",
           "seed": 1041971010,
           "difficulty": "medium",
@@ -219958,7 +220064,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_LINEAR__42",
+          "template_id": "BRIDGE_RATE_DQ_LINEAR__44",
           "skill_id": "MATH_FUNC_007",
           "seed": 1708150121,
           "difficulty": "medium",
@@ -220004,7 +220110,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_TEMPERATURE__43",
+          "template_id": "BRIDGE_RATE_TEMPERATURE__45",
           "skill_id": "MATH_FUNC_007",
           "seed": 94123098,
           "difficulty": "easy",
@@ -220053,7 +220159,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_QUADRATIC__44",
+          "template_id": "BRIDGE_RATE_DQ_QUADRATIC__46",
           "skill_id": "MATH_FUNC_007",
           "seed": 1403716192,
           "difficulty": "hard",
@@ -220107,7 +220213,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_AT_A__45",
+          "template_id": "BRIDGE_RATE_DQ_AT_A__47",
           "skill_id": "MATH_FUNC_007",
           "seed": 387569308,
           "difficulty": "hard",
@@ -220162,7 +220268,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_SECANT_LINE__46",
+          "template_id": "BRIDGE_RATE_SECANT_LINE__48",
           "skill_id": "MATH_FUNC_007",
           "seed": 936988739,
           "difficulty": "hard",
@@ -220217,7 +220323,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_DQ_DOMAIN__47",
+          "template_id": "BRIDGE_RATE_DQ_DOMAIN__49",
           "skill_id": "MATH_FUNC_007",
           "seed": 643074759,
           "difficulty": "hard",
@@ -220263,7 +220369,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_RATE_QUADRATIC__48",
+          "template_id": "BRIDGE_RATE_QUADRATIC__50",
           "skill_id": "MATH_FUNC_007",
           "seed": 1482747208,
           "difficulty": "medium",
@@ -220317,7 +220423,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_RATE_POSITION__49",
+          "template_id": "BRIDGE_RATE_POSITION__51",
           "skill_id": "MATH_FUNC_007",
           "seed": 705309751,
           "difficulty": "medium",
@@ -220517,7 +220623,7 @@
           "description": "One-sided limits reveal whether a rule change is a harmless join or a genuine jump."
         }
       ],
-      "question_count": 20,
+      "question_count": 21,
       "native_randomize_order": true,
       "native_templates": [
         {
@@ -222639,7 +222745,58 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_RATIONAL__21",
+          "template_id": "BRIDGE_LIM_INFINITE_LEFT__21",
+          "skill_id": "MATH_CALC_001",
+          "seed": 719881019,
+          "difficulty": "medium",
+          "values": {
+            "a": "0"
+          },
+          "prompt": "Describe the limit of 1/(x - (0)) as x -> 0- using +inf, -inf, or DNE.",
+          "expected_answer": "-inf",
+          "answer_type": "text",
+          "grading_method": "exact_text",
+          "solution_steps": [
+            "The denominator is negative and approaches zero.",
+            "Its reciprocal becomes negative with unbounded magnitude, so the behavior is -inf."
+          ],
+          "mistake_tags": [
+            "side_of_approach",
+            "denominator_sign",
+            "infinity_not_real_value"
+          ],
+          "variable": null,
+          "tolerance": null,
+          "options": [],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "accepted_forms": [
+            "-infinity",
+            "-∞"
+          ],
+          "answer_metadata": {
+            "type": "text",
+            "value": "-inf",
+            "accepted_forms": [
+              "-infinity",
+              "-∞"
+            ]
+          },
+          "grading_metadata": {
+            "method": "exact_text"
+          },
+          "source_template_id": "BRIDGE_LIM_INFINITE_LEFT",
+          "work_required": false
+        },
+        {
+          "template_id": "BRIDGE_LIM_RATIONAL__22",
           "skill_id": "MATH_CALC_001",
           "seed": 596423431,
           "difficulty": "medium",
@@ -222687,7 +222844,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_POLYNOMIAL__22",
+          "template_id": "BRIDGE_LIM_POLYNOMIAL__23",
           "skill_id": "MATH_CALC_001",
           "seed": 1581096005,
           "difficulty": "easy",
@@ -222734,7 +222891,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_LEFT__23",
+          "template_id": "BRIDGE_LIM_LEFT__24",
           "skill_id": "MATH_CALC_001",
           "seed": 884359055,
           "difficulty": "medium",
@@ -222781,7 +222938,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_LOCAL_PRODUCT__24",
+          "template_id": "BRIDGE_LIM_LOCAL_PRODUCT__25",
           "skill_id": "MATH_CALC_001",
           "seed": 388952846,
           "difficulty": "medium",
@@ -222828,7 +222985,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_FACTOR__25",
+          "template_id": "BRIDGE_LIM_FACTOR__26",
           "skill_id": "MATH_CALC_001",
           "seed": 147959024,
           "difficulty": "medium",
@@ -222876,7 +223033,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_INFINITE_LEFT__26",
+          "template_id": "BRIDGE_LIM_INFINITE_LEFT__27",
           "skill_id": "MATH_CALC_001",
           "seed": 1284964021,
           "difficulty": "medium",
@@ -222927,7 +223084,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_DQ__27",
+          "template_id": "BRIDGE_LIM_DQ__28",
           "skill_id": "MATH_CALC_001",
           "seed": 1147331668,
           "difficulty": "medium",
@@ -222975,7 +223132,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_INFINITE_SQUARE__28",
+          "template_id": "BRIDGE_LIM_INFINITE_SQUARE__29",
           "skill_id": "MATH_CALC_001",
           "seed": 976924408,
           "difficulty": "medium",
@@ -223033,7 +223190,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_MATCHED__29",
+          "template_id": "BRIDGE_LIM_MATCHED__30",
           "skill_id": "MATH_CALC_001",
           "seed": 1637434583,
           "difficulty": "medium",
@@ -223079,7 +223236,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_INFINITE_RIGHT__30",
+          "template_id": "BRIDGE_LIM_INFINITE_RIGHT__31",
           "skill_id": "MATH_CALC_001",
           "seed": 1316469754,
           "difficulty": "medium",
@@ -223137,7 +223294,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_CONJUGATE__31",
+          "template_id": "BRIDGE_LIM_CONJUGATE__32",
           "skill_id": "MATH_CALC_001",
           "seed": 1949493547,
           "difficulty": "hard",
@@ -223185,7 +223342,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_RIGHT__32",
+          "template_id": "BRIDGE_LIM_RIGHT__33",
           "skill_id": "MATH_CALC_001",
           "seed": 1461681741,
           "difficulty": "medium",
@@ -223232,7 +223389,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_CONJUGATE__33",
+          "template_id": "BRIDGE_LIM_CONJUGATE__34",
           "skill_id": "MATH_CALC_001",
           "seed": 1856321464,
           "difficulty": "hard",
@@ -223280,7 +223437,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_LOCAL_PRODUCT__34",
+          "template_id": "BRIDGE_LIM_LOCAL_PRODUCT__35",
           "skill_id": "MATH_CALC_001",
           "seed": 146796791,
           "difficulty": "medium",
@@ -223327,7 +223484,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_FACTOR__35",
+          "template_id": "BRIDGE_LIM_FACTOR__36",
           "skill_id": "MATH_CALC_001",
           "seed": 990719241,
           "difficulty": "medium",
@@ -223375,7 +223532,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_DQ__36",
+          "template_id": "BRIDGE_LIM_DQ__37",
           "skill_id": "MATH_CALC_001",
           "seed": 116607299,
           "difficulty": "medium",
@@ -223423,7 +223580,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_INFINITE_SQUARE__37",
+          "template_id": "BRIDGE_LIM_INFINITE_SQUARE__38",
           "skill_id": "MATH_CALC_001",
           "seed": 1587015855,
           "difficulty": "medium",
@@ -223481,7 +223638,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_RIGHT__38",
+          "template_id": "BRIDGE_LIM_RIGHT__39",
           "skill_id": "MATH_CALC_001",
           "seed": 1818832991,
           "difficulty": "medium",
@@ -223528,7 +223685,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_MATCHED__39",
+          "template_id": "BRIDGE_LIM_MATCHED__40",
           "skill_id": "MATH_CALC_001",
           "seed": 1411168146,
           "difficulty": "medium",
@@ -223574,7 +223731,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_INFINITE_RIGHT__40",
+          "template_id": "BRIDGE_LIM_INFINITE_RIGHT__41",
           "skill_id": "MATH_CALC_001",
           "seed": 1789763728,
           "difficulty": "medium",
@@ -223632,7 +223789,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_LEFT__41",
+          "template_id": "BRIDGE_LIM_LEFT__42",
           "skill_id": "MATH_CALC_001",
           "seed": 1149644571,
           "difficulty": "medium",
@@ -223679,7 +223836,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_LIM_RATIONAL__42",
+          "template_id": "BRIDGE_LIM_RATIONAL__43",
           "skill_id": "MATH_CALC_001",
           "seed": 958785298,
           "difficulty": "medium",
@@ -223724,6 +223881,53 @@
             "method": "exact_numeric"
           },
           "source_template_id": "BRIDGE_LIM_RATIONAL",
+          "work_required": false
+        },
+        {
+          "template_id": "BRIDGE_LIM_POLYNOMIAL__44",
+          "skill_id": "MATH_CALC_001",
+          "seed": 1192612628,
+          "difficulty": "easy",
+          "values": {
+            "p": "3",
+            "b": "-2",
+            "a": "-2",
+            "ans": "10"
+          },
+          "prompt": "Find the limit of 3x^2 + (-2) as x -> -2.",
+          "expected_answer": "10",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "Polynomial limits are found by substitution.",
+            "3*(-2)^2 + (-2) = 10."
+          ],
+          "mistake_tags": [
+            "point_value_versus_limit",
+            "one_sided_behavior",
+            "limit_law_conditions"
+          ],
+          "variable": null,
+          "tolerance": null,
+          "options": [],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "accepted_forms": [],
+          "answer_metadata": {
+            "type": "numeric",
+            "value": "10"
+          },
+          "grading_metadata": {
+            "method": "exact_numeric"
+          },
+          "source_template_id": "BRIDGE_LIM_POLYNOMIAL",
           "work_required": false
         }
       ]
@@ -223872,7 +224076,7 @@
           "description": "A target-value guarantee does not by itself establish a unique solution, a midpoint solution, or an exact formula."
         }
       ],
-      "question_count": 20,
+      "question_count": 21,
       "native_randomize_order": true,
       "native_templates": [
         {
@@ -226250,6 +226454,55 @@
         {
           "template_id": "BRIDGE_CONT_BISECT__21",
           "skill_id": "MATH_CALC_002",
+          "seed": 500255498,
+          "difficulty": "hard",
+          "values": {
+            "a": "4",
+            "b": "5",
+            "n": "20",
+            "mid": "4.5"
+          },
+          "prompt": "For f(x) = x^2 - 20, a root is bracketed in [4, 5]. The midpoint is 4.5. After one bisection step, which closed half-interval still brackets a root? Enter an interval.",
+          "expected_answer": "[4, 4.5]",
+          "answer_type": "interval_set",
+          "grading_method": "interval_set",
+          "solution_steps": [
+            "The left endpoint value is -4, which is negative.",
+            "At the midpoint the value is 1/4, which is positive.",
+            "Continuity keeps a root in [4, 4.5]. The midpoint is not itself a root."
+          ],
+          "mistake_tags": [
+            "midpoint_evaluation",
+            "retained_sign_change",
+            "approximation_not_exact_root"
+          ],
+          "variable": "x",
+          "tolerance": null,
+          "options": [],
+          "answer_mode": "final_only",
+          "work": {
+            "mode": "none"
+          },
+          "review_policy": {
+            "work_review": "none",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "accepted_forms": [],
+          "answer_metadata": {
+            "type": "interval_set",
+            "value": "[4, 4.5]",
+            "variable": "x"
+          },
+          "grading_metadata": {
+            "method": "interval_set"
+          },
+          "source_template_id": "BRIDGE_CONT_BISECT",
+          "work_required": false
+        },
+        {
+          "template_id": "BRIDGE_CONT_BISECT__22",
+          "skill_id": "MATH_CALC_002",
           "seed": 186007891,
           "difficulty": "hard",
           "values": {
@@ -226297,7 +226550,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_RATIONAL_DOMAIN__22",
+          "template_id": "BRIDGE_CONT_RATIONAL_DOMAIN__23",
           "skill_id": "MATH_CALC_002",
           "seed": 1247428470,
           "difficulty": "medium",
@@ -226344,7 +226597,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_VALUE__23",
+          "template_id": "BRIDGE_CONT_VALUE__24",
           "skill_id": "MATH_CALC_002",
           "seed": 1372235495,
           "difficulty": "easy",
@@ -226390,7 +226643,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_FILL__24",
+          "template_id": "BRIDGE_CONT_FILL__25",
           "skill_id": "MATH_CALC_002",
           "seed": 5585825,
           "difficulty": "medium",
@@ -226437,7 +226690,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_CANCELLED_DOMAIN__25",
+          "template_id": "BRIDGE_CONT_CANCELLED_DOMAIN__26",
           "skill_id": "MATH_CALC_002",
           "seed": 1893104398,
           "difficulty": "medium",
@@ -226485,7 +226738,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_ROOT_DOMAIN__26",
+          "template_id": "BRIDGE_CONT_ROOT_DOMAIN__27",
           "skill_id": "MATH_CALC_002",
           "seed": 156942056,
           "difficulty": "medium",
@@ -226530,7 +226783,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_IVT_ROOT__27",
+          "template_id": "BRIDGE_CONT_IVT_ROOT__28",
           "skill_id": "MATH_CALC_002",
           "seed": 211118248,
           "difficulty": "medium",
@@ -226595,7 +226848,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_IVT_TARGET__28",
+          "template_id": "BRIDGE_CONT_IVT_TARGET__29",
           "skill_id": "MATH_CALC_002",
           "seed": 514750311,
           "difficulty": "medium",
@@ -226661,7 +226914,58 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_ROOT_DOMAIN__29",
+          "template_id": "BRIDGE_CONT_LINEAR_JOIN__30",
+          "skill_id": "MATH_CALC_002",
+          "seed": 1899808059,
+          "difficulty": "medium",
+          "values": {
+            "h": "5",
+            "m": "1",
+            "b": "4",
+            "k": "4"
+          },
+          "prompt": "Let f(x) = x + (4) for x < 5, and f(x) = x + k for x >= 5. Find k for continuity at 5.",
+          "expected_answer": "4",
+          "answer_type": "numeric",
+          "grading_method": "exact_numeric",
+          "solution_steps": [
+            "The left limit is 1*5 + (4); the right limit and point value are 5 + k.",
+            "Match them and subtract 5, giving k = 4."
+          ],
+          "mistake_tags": [
+            "continuity_hypotheses",
+            "domain_preservation",
+            "existence_versus_uniqueness"
+          ],
+          "variable": null,
+          "tolerance": null,
+          "options": [],
+          "answer_mode": "final_plus_required_work",
+          "work": {
+            "mode": "procedural_steps",
+            "prompt": "Show one equivalent expression per line, ending with the requested result.",
+            "line_type": "expression",
+            "minimum_steps": 2,
+            "require_final_answer_match": true
+          },
+          "review_policy": {
+            "work_review": "auto",
+            "mastery_requires_review_pass": false,
+            "allow_self_review": true
+          },
+          "accepted_forms": [],
+          "answer_metadata": {
+            "type": "numeric",
+            "value": "4"
+          },
+          "grading_metadata": {
+            "method": "exact_numeric"
+          },
+          "source_template_id": "BRIDGE_CONT_LINEAR_JOIN",
+          "work_required": true
+        },
+        {
+          "template_id": "BRIDGE_CONT_ROOT_DOMAIN__31",
           "skill_id": "MATH_CALC_002",
           "seed": 1362501347,
           "difficulty": "medium",
@@ -226706,7 +227010,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_PRODUCT_JOIN__30",
+          "template_id": "BRIDGE_CONT_PRODUCT_JOIN__32",
           "skill_id": "MATH_CALC_002",
           "seed": 1471915276,
           "difficulty": "medium",
@@ -226755,7 +227059,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_CONT_RATIONAL_DOMAIN__31",
+          "template_id": "BRIDGE_CONT_RATIONAL_DOMAIN__33",
           "skill_id": "MATH_CALC_002",
           "seed": 1725272092,
           "difficulty": "medium",
@@ -226802,7 +227106,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_IVT_ROOT__32",
+          "template_id": "BRIDGE_CONT_IVT_ROOT__34",
           "skill_id": "MATH_CALC_002",
           "seed": 763091035,
           "difficulty": "medium",
@@ -226867,7 +227171,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_LINEAR_JOIN__33",
+          "template_id": "BRIDGE_CONT_LINEAR_JOIN__35",
           "skill_id": "MATH_CALC_002",
           "seed": 1895634912,
           "difficulty": "medium",
@@ -226918,7 +227222,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_CONT_FILL__34",
+          "template_id": "BRIDGE_CONT_FILL__36",
           "skill_id": "MATH_CALC_002",
           "seed": 497858141,
           "difficulty": "medium",
@@ -226965,7 +227269,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_CANCELLED_DOMAIN__35",
+          "template_id": "BRIDGE_CONT_CANCELLED_DOMAIN__37",
           "skill_id": "MATH_CALC_002",
           "seed": 894565314,
           "difficulty": "medium",
@@ -227013,7 +227317,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_VALUE__36",
+          "template_id": "BRIDGE_CONT_VALUE__38",
           "skill_id": "MATH_CALC_002",
           "seed": 269614136,
           "difficulty": "easy",
@@ -227059,7 +227363,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_IVT_TARGET__37",
+          "template_id": "BRIDGE_CONT_IVT_TARGET__39",
           "skill_id": "MATH_CALC_002",
           "seed": 482829808,
           "difficulty": "medium",
@@ -227125,7 +227429,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_BISECT__38",
+          "template_id": "BRIDGE_CONT_BISECT__40",
           "skill_id": "MATH_CALC_002",
           "seed": 615168034,
           "difficulty": "hard",
@@ -227174,7 +227478,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_RATIONAL_DOMAIN__39",
+          "template_id": "BRIDGE_CONT_RATIONAL_DOMAIN__41",
           "skill_id": "MATH_CALC_002",
           "seed": 1945360296,
           "difficulty": "medium",
@@ -227221,7 +227525,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_FILL__40",
+          "template_id": "BRIDGE_CONT_FILL__42",
           "skill_id": "MATH_CALC_002",
           "seed": 197351013,
           "difficulty": "medium",
@@ -227268,7 +227572,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_VALUE__41",
+          "template_id": "BRIDGE_CONT_VALUE__43",
           "skill_id": "MATH_CALC_002",
           "seed": 149762664,
           "difficulty": "easy",
@@ -227314,7 +227618,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_IVT_TARGET__42",
+          "template_id": "BRIDGE_CONT_IVT_TARGET__44",
           "skill_id": "MATH_CALC_002",
           "seed": 1123038124,
           "difficulty": "medium",
@@ -227380,7 +227684,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_ROOT_DOMAIN__43",
+          "template_id": "BRIDGE_CONT_ROOT_DOMAIN__45",
           "skill_id": "MATH_CALC_002",
           "seed": 710740934,
           "difficulty": "medium",
@@ -227425,7 +227729,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_BISECT__44",
+          "template_id": "BRIDGE_CONT_BISECT__46",
           "skill_id": "MATH_CALC_002",
           "seed": 113823892,
           "difficulty": "hard",
@@ -227474,7 +227778,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_IVT_ROOT__45",
+          "template_id": "BRIDGE_CONT_IVT_ROOT__47",
           "skill_id": "MATH_CALC_002",
           "seed": 1633351589,
           "difficulty": "medium",
@@ -227539,7 +227843,7 @@
           "work_required": false
         },
         {
-          "template_id": "BRIDGE_CONT_LINEAR_JOIN__46",
+          "template_id": "BRIDGE_CONT_LINEAR_JOIN__48",
           "skill_id": "MATH_CALC_002",
           "seed": 500977819,
           "difficulty": "medium",
@@ -227590,7 +227894,7 @@
           "work_required": true
         },
         {
-          "template_id": "BRIDGE_CONT_PRODUCT_JOIN__47",
+          "template_id": "BRIDGE_CONT_PRODUCT_JOIN__49",
           "skill_id": "MATH_CALC_002",
           "seed": 410527845,
           "difficulty": "medium",
