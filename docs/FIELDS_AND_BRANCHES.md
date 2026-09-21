@@ -1,6 +1,6 @@
 # Fields and branches
 
-The shipped library contains 128 lessons. Field IDs and lesson IDs are unchanged. `subdomain` stores the broad branch; optional `topic` preserves the previous focused category.
+The shipped library contains 136 lessons. Field IDs and lesson IDs are unchanged. `subdomain` stores the broad branch; optional `topic` preserves the previous focused category.
 
 Canonical maps group lessons inside branch bands within each field. Existing saved coordinates remain in Plan view; **Plan mode → Plan details → Group by field & branch** adopts the canonical positions while retaining notes and paths.
 
@@ -17,12 +17,18 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Decimals, percents, and conversions | Arithmetic Foundations | `MATH_ARITH_005` |
 | Estimate before calculating | Number Sense | `CUSTOM_ESTIMATION_SANITY` |
 
-### Algebra (42 lessons)
+### Algebra (48 lessons)
 
 | Lesson | Topic | Stable lesson ID |
 | --- | --- | --- |
 | Variables and substitution | Pre-Algebra | `MATH_PREALG_001` |
 | Function notation and representations | Functions | `MATH_FUNC_001` |
+| Domain and range of real functions | Functions | `MATH_FUNC_002` |
+| Transformations of functions and graphs | Functions | `MATH_FUNC_003` |
+| Composition of functions and composite domains | Functions | `MATH_FUNC_004` |
+| Inverse functions and domain restrictions | Functions | `MATH_FUNC_005` |
+| Piecewise functions and boundary values | Piecewise Functions | `MATH_FUNC_006` |
+| Average rates of change and difference quotients | Rates of Change | `MATH_FUNC_007` |
 | Combining like terms | Pre-Algebra | `MATH_PREALG_002` |
 | Distributive property | Pre-Algebra | `MATH_PREALG_003` |
 | Exponent laws | Exponents and Polynomials | `MATH_EXP_001` |
@@ -115,6 +121,17 @@ Canonical maps group lessons inside branch bands within each field. Existing sav
 | Angles, bearings, and degree measure | Coordinate Geometry | `MATH_GEOM_001` |
 | Circles, arcs, and angular distance | Coordinate Geometry | `MATH_GEOM_002` |
 | Spherical coordinates and great-circle models | Coordinate Geometry | `MATH_GEOM_003` |
+
+Two Algebra lessons above introduce piecewise rules and average rates. The new
+Calculus branch begins with the following two native lessons. Both batches are included
+in one combined patch; stable IDs and existing progress are retained.
+
+### Calculus (2 lessons)
+
+| Lesson | Topic | Stable lesson ID |
+| --- | --- | --- |
+| Limits from graphs, tables, and formulas | Limits | `MATH_CALC_001` |
+| Continuity and the intermediate value theorem | Continuity | `MATH_CALC_002` |
 
 ## Geography
 

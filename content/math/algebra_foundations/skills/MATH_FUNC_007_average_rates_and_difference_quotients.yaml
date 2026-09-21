@@ -1,0 +1,930 @@
+id: MATH_FUNC_007
+schema_version: '0.2'
+name: Average rates of change and difference quotients
+domain: Math
+subdomain: Algebra
+topic: Rates of Change
+description: Calculate and interpret interval rates, construct secants, and simplify difference quotients
+  without losing their original domains.
+prerequisites:
+- MATH_FUNC_002
+- MATH_GRAPH_002
+- MATH_POLY_002
+unlocks:
+- MATH_CALC_001
+tags:
+- rates_of_change
+- functions
+- reasoning
+- graph_interpretation
+- modeling
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  An average rate of change compares a change in output with the input interval over which that change occurs. If f is defined at distinct inputs a and b, the average rate is [f(b) - f(a)]/(b - a). The numerator is an output difference, the denominator is an input difference, and their ratio tells us the average output change per unit of input.
+
+  What you will learn:
+  Calculate rates from formulas, graphs, and tables; interpret signs and units; distinguish net change from total variation; find a secant line; and simplify difference quotients while preserving their restrictions. These are the algebraic foundations for a later definition of instantaneous rate.
+
+  Use corresponding differences:
+  Subtract outputs and inputs in the same order. Replacing [f(b) - f(a)]/(b - a) by [f(a) - f(b)]/(a - b) changes both signs, so the rate stays the same. Reversing only one subtraction gives the wrong sign. The denominator must not be zero: there is no average rate over a zero-width interval using this formula.
+
+  For f(x) = x^2 from x = 1 to x = 3, the output change is 9 - 1 = 8 and the input change is 3 - 1 = 2. The average rate is 4. It is neither the change 8 nor the average of the endpoint outputs, (1 + 9)/2 = 5. Those three quantities answer different questions. Always write the two differences before dividing when the notation is unfamiliar.
+
+  Interpretation and units:
+  If outputs are metres and inputs are seconds, rates are metres per second. If population is recorded in thousands of people, a rate of 2 means two thousand people per input time unit, not two people. A negative rate means the ending output is below the starting output. It does not by itself mean the quantity decreases throughout the interval.
+
+  The secant picture:
+  Plot the two endpoint points (a, f(a)) and (b, f(b)). The line through them is a secant line, and its slope is the average rate. Once its slope m is known, its equation is y - f(a) = m(x - a). A secant is determined by the endpoint data; it is not generally the graph of f between the endpoints. For a linear function mx + c the rate is always m, but nonlinear functions can give different rates on different intervals.
+
+  Equal-width intervals can still give different rates:
+  For f(x) = x^2, the rate on [0, 1] is 1, whereas the rate on [2, 3] is 5. In fact, factoring b^2 - a^2 gives (b - a)(b + a), so the rate is a + b whenever a != b. For a quadratic px^2 + qx + r, the corresponding rate is p(a + b) + q. The constant term cancels because vertical shifts change both endpoint outputs equally.
+
+  Average velocity is not average speed:
+  For a position function s(t), average velocity is displacement divided by elapsed time. Average speed uses total distance travelled instead. Let s(t) = t^2 - 4t on [0, 4]. The position starts at 0, reaches -4 at t = 2, and returns to 0. The turning point follows from s(t) = (t - 2)^2 - 4. Displacement is zero, so average velocity is zero. Distance is 4 + 4 = 8, so average speed is 2 distance units per time unit. An endpoint formula alone does not reveal all intermediate travel.
+
+  Difference quotients:
+  Instead of calling the second input b, write it as x + h. The input change is then h, and the average rate becomes [f(x + h) - f(x)]/h for h != 0. The symbol f(x + h) means evaluate the entire function at the new input. It does not mean f(x) + h and does not usually mean f(x) + f(h).
+
+  For f(x) = x^2, expand (x + h)^2 - x^2 = 2xh + h^2. Factor out h, then divide by h to obtain 2x + h. The equality of these two quotient expressions is asserted only for h != 0. The simplified expression happens to be defined at h = 0, but that does not retroactively define the original quotient there. Looking at what happens as nonzero h approaches zero is a separate limit question.
+
+  A fixed starting input can reduce the algebra:
+  For f(x) = x^2 at starting input 2, the quotient [f(2 + h) - f(2)]/h simplifies to 4 + h. With h = 1 it gives 5; with h = 0.5 it gives 4.5; with h = 0.1 it gives 4.1. These are different secant rates, not three inconsistent answers to the same fixed-interval question.
+
+  Domain restrictions survive simplification:
+  For f(x) = 1/x at a nonzero input a, both a and a + h must belong to the original domain. Combining the fractions gives [1/(a + h) - 1/a]/h = -1/[a(a + h)], but the quotient still requires h != 0 and h != -a. Cancellation removes an algebraic factor, not the history of which inputs were permitted.
+
+  Self-check:
+  Did I use the actual input spacing in a table? Have I kept units and subtraction order consistent? Is a zero average hiding a changing function? Did I expand f(x + h) completely? Which original denominators must remain nonzero? Answer these before interpreting a rate as evidence about motion or change.
+media:
+- &id001
+  src: media/native-calculus-bridge/rate-secant.svg
+  alt: The curve y = x^2/4 + 1 passes through (0, 1) and (4, 5). The secant line joins these points; horizontal
+    change is 4 and vertical change is 4.
+  caption: An average rate belongs to an interval, not to one point.
+  width: 800
+  height: 500
+  fit: contain
+- &id002
+  src: media/native-calculus-bridge/rate-nearby.svg
+  alt: The curve y = x^2 is shown with secant segments from (2, 4) to (3, 9) and to (2.5, 6.25). Their
+    slopes are 5 and 4.5.
+  caption: Shorter intervals give different average rates; a limiting rate is a further question.
+  width: 800
+  height: 500
+  fit: contain
+examples:
+- prompt: Find the average rate of x^2 from 1 to 3.
+  solution: '4'
+  explanation: Output change is 9 - 1 = 8, while input change is 2. Divide 8 by 2; the endpoint-output
+    average 5 is not the requested rate.
+- prompt: Find the rate of 3x - 7 on [-2, 5].
+  solution: '3'
+  explanation: The endpoint outputs are -13 and 8. Their difference 21 divided by the input difference
+    7 gives the line slope 3.
+- prompt: A table has f(0) = 1, f(2) = 7 and f(5) = 4. Find the rate from 2 to 5.
+  solution: -1 output unit per input unit
+  explanation: The output drops by 3 over an input increase of 3. Unequal table spacing makes counting
+    rows an invalid denominator.
+- prompt: Find the secant line to y = x^2 through x = 1 and x = 3.
+  solution: y = 4x - 3
+  explanation: Its slope is 4. Use point-slope form y - 1 = 4(x - 1), then expand.
+- prompt: Read the average rate of x^2/4 + 1 on [0, 4].
+  solution: '1'
+  explanation: The displayed endpoints are (0, 1) and (4, 5); rise and run are both 4. The secant is not
+    the curved function.
+  media:
+  - *id001
+- prompt: Simplify the difference quotient of x^2 for h != 0.
+  solution: 2x + h
+  explanation: Expand (x + h)^2, subtract x^2, factor h, and cancel only on the nonzero-h domain.
+- prompt: Simplify the difference quotient of 2x^2 - 3x + 7.
+  solution: 4x + 2h - 3 for h != 0
+  explanation: The constant 7 cancels. The squared term gives 4xh + 2h^2 and the linear term gives -3h;
+    divide their sum by h.
+- prompt: For f(x) = x^2, compare rates from 2 to 3 and from 2 to 2.5.
+  solution: 5 and 4.5 respectively
+  explanation: At starting input 2 the quotient is 4 + h. The intervals have h = 1 and h = 0.5, so their
+    average rates differ.
+  media:
+  - *id002
+- prompt: For f(x) = 1/x, simplify [f(2+h) - f(2)]/h and state the restrictions.
+  solution: -1/[2(2+h)], with h != 0 and h != -2
+  explanation: Combining fractions gives -h/[2(2+h)] before dividing by h. The original input and denominator
+    restrictions remain in force.
+- prompt: Position is t^2 - 4t on [0, 4]. Compare average velocity with average speed.
+  solution: 'Average velocity: 0. Average speed: 2.'
+  explanation: Completing the square shows a turn at t=2. The object travels 4 units out and 4 back in
+    4 time units, even though its net displacement is zero.
+  media:
+  - src: media/native-calculus-bridge/rate-position.svg
+    alt: On 0 <= t <= 4, position s(t) = t^2 - 4t starts at 0, reaches -4 at t = 2, and returns to 0 at
+      t = 4.
+    caption: Net displacement is zero, but the total distance travelled is eight units.
+    width: 800
+    height: 500
+    fit: contain
+applications:
+- title: Motion
+  description: Distinguish displacement per time from distance per time when a journey reverses direction.
+- title: Population and measurements
+  description: Compare changes over unequal time intervals with clearly stated units and scale factors.
+- title: Economics
+  description: Average cost or revenue change over an interval is a secant rate, not automatically a marginal
+    value at one point.
+- title: Calculus preparation
+  description: Difference quotients make the algebra of nearby-input rates explicit before a limit is
+    taken.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: BRIDGE_RATE_LINEAR
+    type: generated
+    prompt_template: For f(x) = {m}x + {b}, find the average rate of change from x = {a} to x = {end}.
+    variables:
+      m:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -5
+        max: 5
+      a:
+        type: int
+        min: -3
+        max: 3
+      gap:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      end: a+gap
+    constraints: []
+    answer:
+      type: numeric
+      value: '{m}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The output change is {m} times the input change.
+      Dividing by {gap} gives {m}; the vertical offset cancels.
+    solution_steps: []
+    mistake_tags: &id003
+    - change_versus_value
+    - input_interval
+    - rate_units
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_QUADRATIC
+    type: generated
+    prompt_template: For f(x) = {p}x^2 + ({q})x + ({c}), find its average rate on [{a}, {b}].
+    variables:
+      p:
+        type: int
+        min: 1
+        max: 4
+      q:
+        type: int
+        min: -4
+        max: 4
+      c:
+        type: int
+        min: -5
+        max: 5
+      a:
+        type: int
+        min: -3
+        max: 3
+      gap:
+        type: int
+        min: 1
+        max: 4
+    derived:
+      b: a+gap
+      ans: p*(a+b)+q
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Use [f({b}) - f({a})]/({b} - ({a})).
+      Factoring the difference gives {p}*({a} + {b}) + ({q}) = {ans}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show one equivalent expression per line, ending with the requested result.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_CUBIC
+    type: generated
+    prompt_template: For f(x) = x^3, find the average rate on [-{a}, {a}].
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      ans: a*a
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The output change is {a}^3 - (-{a})^3 = 2*{a}^3.
+      The input change is 2*{a}.
+      Their quotient is {a}^2 = {ans}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_TABLE
+    type: fixed
+    prompt_template: A table gives f(0) = 1, f(2) = 7, and f(5) = 4. Find the average rate from input
+      2 to input 5.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '-1'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Use the endpoints of the requested interval, not all three rows.
+      (4 - 7)/(5 - 2) = -3/3 = -1.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_POSITION
+    type: generated
+    prompt_template: A position model is s(t) = t^2 metres, with t in seconds. Find average velocity from
+      t = {a} to t = {b}. Enter the value in metres per second.
+    variables:
+      a:
+        type: int
+        min: 0
+        max: 5
+      gap:
+        type: int
+        min: 1
+        max: 4
+    derived:
+      b: a+gap
+      ans: a+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Average velocity is displacement divided by elapsed time.
+      ({b}^2 - {a}^2)/({b} - {a}) = {a} + {b} = {ans} m/s.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show one equivalent expression per line, ending with the requested result.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_TEMPERATURE
+    type: generated
+    prompt_template: At hour {a}, temperature is {start} degrees C; at hour {b}, it is {finish} degrees
+      C. Find the average temperature change per hour.
+    variables:
+      a:
+        type: int
+        min: 0
+        max: 8
+      gap:
+        type: int
+        min: 2
+        max: 5
+      start:
+        type: int
+        min: -10
+        max: 20
+      v:
+        type: int
+        min: -4
+        max: 4
+        exclude:
+        - 0
+    derived:
+      b: a+gap
+      finish: start+v*gap
+    constraints: []
+    answer:
+      type: numeric
+      value: '{v}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Temperature change is {finish} - ({start}).
+      Divide by the {gap}-hour interval to get {v} degrees C per hour.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_REVERSE
+    type: fixed
+    prompt_template: What happens to an average rate when both endpoint subtractions are reversed?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Multiply the numerator and denominator by -1.
+      The ratio is unchanged.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: It becomes zero.
+    - id: B
+      label: It stays the same because both numerator and denominator change sign.
+    - id: C
+      label: It always changes sign.
+    - id: D
+      label: It becomes the reciprocal.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_ZERO
+    type: fixed
+    prompt_template: For f(x) = x^2 on [-2, 2], the average rate is zero. What does this establish?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Both endpoint values are 4, but f(0) = 0.
+      Zero net change can hide substantial intermediate change.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: The function has no values between the endpoints.
+    - id: B
+      label: The endpoint outputs are equal; it does not establish that f is constant inside the interval.
+    - id: C
+      label: The function equals zero at every input.
+    - id: D
+      label: The graph is horizontal throughout the interval.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_SECANT_LINE
+    type: generated
+    prompt_template: Find the equation of the secant line to f(x) = x^2 through inputs {a} and {b}. Enter
+      only the expression for y in terms of x.
+    variables:
+      a:
+        type: int
+        min: -3
+        max: 3
+      gap:
+        type: int
+        min: 1
+        max: 4
+    derived:
+      b: a+gap
+      m: a+b
+      c: -a*b
+    constraints: []
+    answer:
+      type: symbolic_expression
+      value: '{m}*x + ({c})'
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: |-
+      The slope is ({b}^2 - ({a})^2)/({b} - ({a})) = {m}.
+      Use y - ({a})^2 = {m}(x - ({a})).
+      Simplification gives y = {m}x + ({c}).
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show one equivalent expression per line, ending with the requested result.
+      line_type: expression
+      target_variable: x
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_DQ_LINEAR
+    type: generated
+    prompt_template: For f(x) = {m}x + ({b}), simplify [f(x + h) - f(x)]/h for h != 0.
+    variables:
+      m:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -5
+        max: 5
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{m}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Expand the numerator: {m}(x + h) + ({b}) - [{m}x + ({b})] = {m}h.
+      Divide by nonzero h to obtain {m}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_optional_work
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the applicable condition, calculation, or reason.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_DQ_QUADRATIC
+    type: generated
+    prompt_template: For f(x) = {p}x^2 + ({q})x + ({c}), simplify [f(x + h) - f(x)]/h for h != 0. Enter
+      an expression in x and h.
+    variables:
+      p:
+        type: int
+        min: 1
+        max: 4
+      q:
+        type: int
+        min: -4
+        max: 4
+      c:
+        type: int
+        min: -5
+        max: 5
+    derived:
+      twop: 2*p
+    constraints: []
+    answer:
+      type: symbolic_expression
+      value: '{twop}*x + {p}*h + ({q})'
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: |-
+      Expand the squared binomial and subtract the entire f(x).
+      The numerator is {twop}xh + {p}h^2 + ({q})h.
+      Cancel h only under h != 0, leaving {twop}x + {p}h + ({q}).
+    solution_steps: []
+    mistake_tags:
+    - binomial_expansion
+    - whole_expression_subtraction
+    - cancelled_domain_restriction
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show one equivalent expression per line, ending with the requested result.
+      line_type: expression
+      target_variable: x
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_DQ_AT_A
+    type: generated
+    prompt_template: For f(x) = {p}x^2 + ({q})x + ({c}), simplify [f({a} + h) - f({a})]/h for h != 0.
+      Enter an expression in h.
+    variables:
+      p:
+        type: int
+        min: 1
+        max: 4
+      q:
+        type: int
+        min: -4
+        max: 4
+      c:
+        type: int
+        min: -3
+        max: 3
+      a:
+        type: int
+        min: -3
+        max: 3
+    derived:
+      base: 2*p*a+q
+    constraints: []
+    answer:
+      type: symbolic_expression
+      value: '{p}*h + ({base})'
+      variable: h
+    grading:
+      method: symbolic_expression
+    explanation_template: |-
+      Expand at the fixed starting input {a}.
+      The numerator factors as h*({p}h + ({base})).
+      For nonzero h the quotient is {p}h + ({base}).
+    solution_steps: []
+    mistake_tags:
+    - binomial_expansion
+    - fixed_input
+    - cancelled_domain_restriction
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show one equivalent expression per line, ending with the requested result.
+      line_type: expression
+      target_variable: h
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_DQ_CUBIC
+    type: fixed
+    prompt_template: For f(x) = x^3, simplify [f(x + h) - f(x)]/h for h != 0. Enter an expression in x
+      and h.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: symbolic_expression
+      value: 3*x^2 + 3*x*h + h^2
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: |-
+      Expand (x + h)^3 = x^3 + 3x^2h + 3xh^2 + h^3.
+      Subtract x^3, then divide the remaining terms by nonzero h.
+      The result is 3x^2 + 3xh + h^2.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_optional_work
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the applicable condition, calculation, or reason.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_DQ_RECIPROCAL
+    type: generated
+    prompt_template: For f(x) = 1/x, simplify [f({a} + h) - f({a})]/h. Work only where h != 0 and h !=
+      -{a}; enter an expression in h.
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: symbolic_expression
+      value: -1/({a}*({a}+h))
+      variable: h
+    grading:
+      method: symbolic_expression
+    explanation_template: |-
+      Combine the numerator fractions: [1/({a}+h) - 1/{a}] = -h/[{a}({a}+h)].
+      Divide by nonzero h.
+      The result is -1/[{a}({a}+h)], with both stated restrictions retained.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_optional_work
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the applicable condition, calculation, or reason.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_DQ_DOMAIN
+    type: generated
+    prompt_template: For f(x) = 1/x, give all allowed h for the original quotient [f({a} + h) - f({a})]/h.
+      Use interval notation.
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, -{a}) U (-{a}, 0) U (0, inf)
+      variable: h
+    grading:
+      method: interval_set
+    explanation_template: |-
+      {a} is nonzero, but the new input {a}+h must also be nonzero.
+      The quotient denominator h must be nonzero.
+      Exclude h = -{a} and h = 0 even after cancellation.
+    solution_steps: []
+    mistake_tags:
+    - original_denominator
+    - cancelled_hole
+    - intersection_of_restrictions
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_SPEED
+    type: fixed
+    prompt_template: Position is s(t) = t^2 - 4t metres for 0 <= t <= 4 seconds. The object moves from
+      s(0) = 0 to s(2) = -4 and then to s(4) = 0. Find average speed, in metres per second.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '2'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Total distance is 4 + 4 = 8 metres.
+      Elapsed time is 4 seconds, so average speed is 8/4 = 2 m/s.
+      Average velocity would be zero because net displacement is zero.
+    solution_steps: []
+    mistake_tags:
+    - distance_versus_displacement
+    - average_speed
+    - turning_point
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/rate-position.svg
+      alt: On 0 <= t <= 4, position s(t) = t^2 - 4t starts at 0, reaches -4 at t = 2, and returns to 0
+        at t = 4.
+      caption: The displayed position curve is restricted to 0 <= t <= 4 seconds.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_RATE_GRAPH
+    type: fixed
+    prompt_template: The graph of y = x^2/4 + 1 includes points (0, 1) and (4, 5). Find the average rate
+      on [0, 4].
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '1'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The secant rise is 5 - 1 = 4 and its run is 4 - 0 = 4.
+      The ratio is 1, even though the curve is not a straight line.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/rate-secant.svg
+      alt: The curve y = x^2/4 + 1 passes through (0, 1) and (4, 5). The secant line joins these points;
+        horizontal change is 4 and vertical change is 4.
+      caption: The marked points and connecting secant are the givens for this question.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_RATE_NEARBY
+    type: fixed
+    prompt_template: For f(x) = x^2, the rate from 2 to 2 + h is 4 + h for h != 0. What follows when h
+      = 0.1 and h = 0.01?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Substitute each nonzero interval width into 4 + h.
+      A limiting value can be investigated without treating the original 0/0 quotient as defined.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: The rates are 4.1 and 4.01; these are rates on two different intervals.
+    - id: B
+      label: Both rates must equal 4 because the starting input is fixed.
+    - id: C
+      label: The original quotient is defined at h = 0 by direct substitution.
+    - id: D
+      label: The two values contradict each other.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_UNITS
+    type: fixed
+    prompt_template: A city population is measured in thousands of residents, and time is measured in
+      years. A calculated average rate is -1.5. Interpret it.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Rate units are output units divided by input units.
+      An interval average does not specify the change during every smaller interval.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: The population itself is negative.
+    - id: B
+      label: A total decrease of 1.5 thousand residents, regardless of interval length.
+    - id: C
+      label: A net decrease averaging 1.5 thousand residents per year over the chosen interval.
+    - id: D
+      label: Exactly 1.5 residents left on each individual day.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_RATE_PROOF
+    type: fixed
+    prompt_template: For f(x) = x^2, give the simplified expression for [f(x + h) - f(x)]/h and justify
+      it for h != 0. Explain why the original quotient is still undefined at h = 0.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: symbolic_expression
+      value: 2*x + h
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: |-
+      Expand the whole square: (x+h)^2 - x^2 = 2xh + h^2.
+      Factor h(2x+h), then divide by h under the stated nonzero restriction.
+      The simplified expression is 2x+h on that domain.
+      At h=0 the original denominator is zero, so simplification does not supply an original quotient value.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: proof_obligations
+      prompt: Give a complete argument. Address every listed obligation; a correct short answer alone
+        is not enough.
+      proof_policy:
+        obligations:
+        - Expands f(x+h) as (x+h)^2 rather than f(x)+h.
+        - Subtracts f(x) and factors the numerator as h(2x+h).
+        - Cancels h only under h != 0.
+        - Distinguishes the simplified expression from the original undefined quotient at h = 0.
+        accepted_strategies:
+        - algebraic expansion and factorization
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false

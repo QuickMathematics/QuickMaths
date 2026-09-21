@@ -4,7 +4,7 @@ import { normalizeMathBlocks, renderMathBlocks } from "./math-display.js?v=20260
 import { normalizeCartesianDiagram, renderCartesianDiagram } from "./cartesian-diagrams.js?v=20260909-calculus-v1";
 import { normalizeLessonMedia, renderLessonMedia, mediaPath, mediaDigest, encodeMediaData, MEDIA_TYPES, MAX_EMBEDDED_MEDIA_BYTES } from "./lesson-media.js?v=20260906-media-v1";
 import { includeLessonIllustrations } from "./lesson-illustrations.js?v=20260908-statistics-v1";
-import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260908-statistics-v1";
+import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260921-native-compat-v1";
 import { checkFormalReferenceProof } from "./formal-proof-client.js?v=20260913-formal-kernel-v1";
 import { normalizeFormalCapabilities } from "./formal-capabilities.js?v=20260913-formal-capabilities-v1";
 const DRAFT_KEY = "quickmaths.lesson-creator.v1";
@@ -34,7 +34,7 @@ const WORK_MODE_GUIDES = {
   none: {
     title: "Final answer only",
     summary: "QuickMaths shows one final-answer field and grades it locally.",
-    syntax: "Best for numbers, equations, multiple choice, or short conclusions.",
+    syntax: "Best for numbers, equations, multiple choice, or short conclusions. Expression answers support sqrt, abs, sin, cos, exp and natural log; sampled comparison is not formal proof.",
     flow: "Student answers → app grades → mastery updates after reflection.",
   },
   capture_only: {

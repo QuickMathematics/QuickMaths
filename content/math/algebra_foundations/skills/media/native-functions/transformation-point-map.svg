@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="576pt" height="360pt" viewBox="0 0 576 360" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 360
+L 576 360
+L 576 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="text_1">
+    <!-- $g(x)=-2f(3(x-1))+4$ -->
+    <g transform="translate(172.2 72.018782)">
+     <text>
+      <tspan x="0" y="-0.796875" style="font-style: oblique; font-size: 20px; font-family: 'DejaVu Sans'">g</tspan>
+      <tspan x="20.498047" y="-0.796875" style="font-style: oblique; font-size: 20px; font-family: 'DejaVu Sans'">x</tspan>
+      <tspan x="94.169922" y="-0.796875" style="font-style: oblique; font-size: 20px; font-family: 'DejaVu Sans'">f</tspan>
+      <tspan x="129.541016" y="-0.796875" style="font-style: oblique; font-size: 20px; font-family: 'DejaVu Sans'">x</tspan>
+      <tspan x="12.695312" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">(</tspan>
+      <tspan x="32.333984" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">)</tspan>
+      <tspan x="44.033203" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">=</tspan>
+      <tspan x="64.6875" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">−</tspan>
+      <tspan x="81.445312" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">2</tspan>
+      <tspan x="101.210938" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">(</tspan>
+      <tspan x="109.013672" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">3</tspan>
+      <tspan x="121.738281" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">(</tspan>
+      <tspan x="145.273438" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">−</tspan>
+      <tspan x="165.927734" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">1</tspan>
+      <tspan x="178.652344" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">)</tspan>
+      <tspan x="186.455078" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">)</tspan>
+      <tspan x="198.154297" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">+</tspan>
+      <tspan x="218.808594" y="-0.796875" style="font-size: 20px; font-family: 'DejaVu Sans'">4</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(36.559538 154.628925)">Original point</text>
+    <text style="font-size: 17px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(71.348444 173.665206)">(6, 2)</text>
+   </g>
+   <g id="patch_2">
+    <path d="M 176.000087 159.456128
+Q 302.250018 159.456128 426.263882 159.456128
+" style="fill: none; stroke: #000000; stroke-width: 2; stroke-linecap: round"/>
+    <path d="M 421.863882 157.256128
+L 426.263882 159.456128
+L 421.863882 161.656128
+" style="fill: none; stroke: #000000; stroke-width: 2; stroke-linecap: round"/>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 17px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(438.880149 154.628925)">New point</text>
+    <text style="font-size: 17px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(458.948118 173.665206)">(3, 0)</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 14px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle" x="288" y="230.701372" transform="rotate(-0 288 230.701372)">Input: 3(x - 1) = 6  gives  x = 3</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 14px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle" x="288" y="279.277675" transform="rotate(-0 288 279.277675)">Output: -2(2) + 4 = 0</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle" x="288" y="331.092398" transform="rotate(-0 288 331.092398)">Solve the inner input condition; apply the outer output rule.</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 16px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle" x="288" y="15.15774" transform="rotate(-0 288 15.15774)">Track input and output separately</text>
+   </g>
+  </g>
+ </g>
+</svg>

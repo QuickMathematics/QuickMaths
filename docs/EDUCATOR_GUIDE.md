@@ -830,3 +830,9 @@ complete proof. The supported `derivative_definition` policy is a strict native 
 The learner can create nested scopes, local assumptions and binders, split a
 disjunction, and close subproofs with cited conclusions. No author reference is
 inserted into the learner proof. See the [proof guide](FORMAL_LEARNING.md).
+
+## Functions and calculus bridge update
+
+Eight native lessons extend the curriculum through domain/range, transformations, composition, inverses, piecewise functions, average rates/difference quotients, limits, and continuity/IVT. Their reasoning capstones retain explicit tutor-review requirements. These are reviewed mathematical arguments, not new Lean-certified proof modes.
+
+Saved assessments preserve their resolved questions through reload, backup and sync; editing a lesson does not reinterpret an existing draft. Invalid saved snapshots are retained for recovery and cannot produce a new assessment result. Export a backup before repairing a recovery warning. Formal verification authority is never restored from a snapshot checksum.

@@ -1,4 +1,4 @@
-import { branchId, lessonClassification } from "./learning-fields.js?v=20260908-statistics-v1";
+import { branchId, lessonClassification } from "./learning-fields.js?v=20260921-native-compat-v1";
 
 export const COLLAPSED_NODE_WIDTH = 356;
 export const COLLAPSED_NODE_HEIGHT = 140;

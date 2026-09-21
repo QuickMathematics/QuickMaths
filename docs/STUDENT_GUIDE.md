@@ -760,3 +760,9 @@ credit. Author reference checks remain separate from learner submissions. iPhone
 and iPad browser support is deferred; drafts can still be saved. Existing imported
 formal lessons use the same backend when their declared capabilities are supported.
 The local desktop companion remains available through explicit client options.
+
+## Saved assessments and new function lessons
+
+The native curriculum includes domain/range, transformations, composition, inverses, piecewise functions, rates of change, limits, and continuity/IVT. Each has illustrations and worked examples. Reasoning capstones still need tutor review where marked; a correct final answer alone does not complete that review.
+
+A saved test keeps its original questions, order, numbers and working when you reload or sync. New retakes draw fresh variants. If a saved question cannot be safely restored, the app keeps its data in your backup and blocks submission rather than grading a replacement question. Export a backup from Settings before repair. Restored formal proofs need a fresh verification or replay before earning new credit.

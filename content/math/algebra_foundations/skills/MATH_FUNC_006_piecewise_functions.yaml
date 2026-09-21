@@ -1,0 +1,902 @@
+id: MATH_FUNC_006
+schema_version: '0.2'
+name: Piecewise functions and boundary values
+domain: Math
+subdomain: Algebra
+topic: Piecewise Functions
+description: Read, evaluate, graph, and solve conditional function rules while respecting boundaries,
+  domain restrictions, and threshold models.
+prerequisites:
+- MATH_FUNC_002
+- MATH_FUNC_005
+- MATH_ALG_003
+unlocks:
+- MATH_CALC_001
+tags:
+- piecewise_functions
+- functions
+- reasoning
+- graph_interpretation
+- modeling
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A piecewise function uses different formulas on different parts of its domain. It is still one function: every allowed input must determine exactly one output. The word piecewise describes how the rule is written, not a license to choose whichever formula seems convenient. The condition beside a formula is part of that formula's instruction.
+
+  What you will learn:
+  Evaluate a conditional rule, read included and excluded endpoints, find domains and ranges, solve equations branch by branch, and build a model whose rate changes at a threshold. You will also distinguish a valid overlapping description from two rules that assign conflicting outputs.
+
+  Read the condition before calculating:
+  Suppose f(x) = 2x + 1 when x < 2, and f(x) = x^2 when x >= 2. To find f(1), first check that 1 < 2; then compute 2(1) + 1 = 3. To find f(2), use the second rule because 2 >= 2, giving 4. Do not average the two possible formula values at the boundary. The first formula would give 5 there, but its condition does not permit that substitution as a value of f.
+
+  A reliable evaluation method is to identify the input, test it against all conditions, select the applicable rule, substitute with parentheses, and simplify. Keep a negative input negative during the condition check. For example, |-2| = 2 does not mean that an input of -2 belongs to a branch whose condition is x >= 0. The condition concerns the input before the function is evaluated.
+
+  Domains are unions of allowed pieces:
+  If a rule is given for x < -1 and another for x >= 2, with no other inputs allowed, the domain is (-inf, -1) U [2, inf). A gap in the domain is not automatically an error. It means the function is not defined on that gap. Formula restrictions still apply inside each branch: a denominator cannot be zero, and a real square root requires a nonnegative radicand. Intersect a branch condition with its formula's restrictions before joining the branch domains.
+
+  Open and closed endpoints:
+  At an open circle the displayed endpoint is excluded from that branch. At a filled circle it is included. Two branches may approach different heights at the same boundary input; only the filled point determines the function value. If both conditions include that input, the two outputs must agree. The descriptions x^2 for x <= 0 and x for x >= 0 overlap at zero but both give zero, so they define a function. The descriptions x + 1 for x <= 1 and x + 2 for x >= 1 give conflicting outputs at 1 and therefore do not.
+
+  Ranges must come from actual outputs:
+  For f(x) = x + 2 on [-2, 0) and f(x) = 3 on [0, 2], the first branch produces [0, 2) and the second produces only the single value 3. Their union is [0, 2) U [3, 3]. The singleton interval [3, 3] is another notation for the set containing 3. The range is not [0, 3]: outputs strictly between 2 and 3 never occur. An excluded endpoint can still be present in the overall range when another branch produces the same output.
+
+  Absolute value as a conditional rule:
+  Distance is nonnegative. For |x - 3|, inputs below 3 give 3 - x, and inputs at or above 3 give x - 3. Both formulas meet at the vertex (3, 0). The switch occurs at 3, not at zero, because the sign being tested is the sign of x - 3. This connects transformed graphs with their piecewise descriptions.
+
+  Solving an equation:
+  To solve f(x) = y, solve the equation from each branch and then test every candidate against that branch's condition. For f(x) = x^2 when x < 0 and f(x) = 2x when x >= 0, solving f(x) = 4 gives candidates -2 and 2 from the first equation, but only -2 belongs to that branch. The second equation gives 2, which is allowed. The complete solution set is {-2, 2}. Never retain a root merely because it solves a formula outside that formula's assigned region.
+
+  Threshold models:
+  Suppose the first ten items cost 3 euros each and additional items cost 2 euros each. For integer counts n from 0 through 10, the total is 3n. Above ten it is 30 + 2(n - 10). At fifteen items this gives 40 euros. Charging 2n above ten would incorrectly reprice the first ten items. Counts remain discrete even when a graphing tool can draw connecting lines.
+
+  Self-check:
+  Which condition contains the input? Have I handled equality at the boundary exactly once, or shown agreement in an overlap? Are there missing inputs or outputs? Did I filter every equation candidate by its own branch? Does the model describe a total, a marginal charge, or a flat fee? State these decisions explicitly before trusting the arithmetic.
+media:
+- &id001
+  src: media/native-calculus-bridge/piecewise-branches.svg
+  alt: The graph is y = x + 2 on -2 <= x < 0, with a filled point at (-2, 0) and an open point at (0,
+    2); it is y = 3 on 0 <= x <= 2 with filled endpoints.
+  caption: The condition selects the rule; the filled point gives the value at the boundary.
+  width: 800
+  height: 500
+  fit: contain
+- &id002
+  src: media/native-calculus-bridge/piecewise-absolute.svg
+  alt: The V-shaped graph y = |x - 3| has vertex (3, 0). Its left branch is y = 3 - x and its right branch
+    is y = x - 3.
+  caption: A single absolute-value formula can be written using two conditional rules.
+  width: 800
+  height: 500
+  fit: contain
+examples:
+- prompt: Evaluate f(1) and f(2) when f(x) = 2x + 1 for x < 2 and x^2 for x >= 2.
+  solution: f(1) = 3; f(2) = 4.
+  explanation: Check the input condition before substituting. Equality at 2 belongs only to the square
+    branch.
+- prompt: Evaluate f(-1) for f(x) = -x if x < -1, 2 - x if -1 <= x < 2, and x^2 if x >= 2.
+  solution: '3'
+  explanation: The middle condition includes -1. Substitution gives 2 - (-1), not the left branch value
+    1.
+- prompt: Find the domain when the only branch conditions are x < -1 and x >= 2.
+  solution: (-inf, -1) U [2, inf)
+  explanation: Use the union, not the interval between the endpoints. The function is simply not defined
+    on [-1, 2).
+- prompt: Read the domain and range of x + 2 on [-2, 0), followed by the constant 3 on [0, 2].
+  solution: 'Domain: [-2, 2]. Range: [0, 2) U [3, 3].'
+  explanation: The pieces cover every input from -2 through 2. They do not produce outputs between 2 and
+    3.
+  media:
+  - *id001
+- prompt: Write |x - 3| using conditional formulas.
+  solution: 3 - x for x < 3; x - 3 for x >= 3.
+  explanation: The sign changes where x - 3 = 0. Negate the whole inner expression on the negative side.
+  media:
+  - *id002
+- prompt: Solve f(x) = 4 for f(x) = x^2 when x < 0 and 2x when x >= 0.
+  solution: '{-2, 2}'
+  explanation: The square equation produces two candidates, but its own region keeps only -2. The linear
+    equation separately supplies the allowed input 2.
+- prompt: Match the boundary formulas 3x + 1 and x + k at x = 2.
+  solution: k = 5
+  explanation: Set 3(2) + 1 = 2 + k. The required adjustment is 7 - 2 = 5. Matching boundary values anticipates
+    continuity.
+- prompt: Can two branch conditions both include zero?
+  solution: Yes, provided their prescribed outputs agree there.
+  explanation: For x^2 on x <= 0 and x on x >= 0, both outputs at zero are zero. Overlap itself is not
+    the problem; conflicting values are.
+- prompt: The first ten items cost 3 euros each and extra items cost 2 euros each. Find the total for
+    fifteen.
+  solution: 40 euros
+  explanation: Pay 30 euros for the first ten and 2(15 - 10) = 10 euros for the extras. Whole-number inputs
+    are shown as discrete points.
+  media:
+  - src: media/native-calculus-bridge/piecewise-tariff.svg
+    alt: Discrete points show a price of 3 euros per item for the first ten items, then 2 euros per additional
+      item. Highlighted totals are 30 euros at ten items and 40 euros at fifteen items.
+    caption: A marginal price changes the cost of extra items, not the price of every earlier item.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: Find the domain of f(x) = 1/(x + 2) for x < 0 and sqrt(x - 1) for x >= 0.
+  solution: (-inf, -2) U (-2, 0) U [1, inf)
+  explanation: Exclude -2 inside the left region. The right formula additionally requires x >= 1, so the
+    stated condition x >= 0 does not make inputs from 0 to 1 valid.
+applications:
+- title: Tiered pricing
+  description: Separate the price of additional units from the total already accumulated; keep counts
+    discrete.
+- title: Measurement systems
+  description: A sensor can use different calibrated rules in different operating ranges. Boundary conditions
+    prevent ambiguous reported values.
+- title: Software conditions
+  description: 'A mathematical branch condition behaves like a guarded rule: test the input before evaluating
+    its formula.'
+- title: Preparation for limits
+  description: Comparing nearby branch behavior with the actual boundary value prepares the distinction
+    between a limit and a function value.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: BRIDGE_PW_LEFT
+    type: generated
+    prompt_template: Let f(x) = {m}x + {b} for x < {h}, and f(x) = x^2 for x >= {h}. Find f({u}).
+    variables:
+      m:
+        type: int
+        min: 2
+        max: 5
+      b:
+        type: int
+        min: -3
+        max: 5
+      h:
+        type: int
+        min: 2
+        max: 5
+      d:
+        type: int
+        min: 1
+        max: 3
+    derived:
+      u: h-d
+      ans: m*u+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The input {u} is below {h}, so use the linear branch.
+      Substitute: {m}*({u}) + ({b}) = {ans}.
+    solution_steps: []
+    mistake_tags: &id003
+    - branch_condition
+    - endpoint_inclusion
+    - input_output_confusion
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_optional_work
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the applicable condition, calculation, or reason.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_BOUNDARY
+    type: generated
+    prompt_template: Let f(x) = x^2 for x < {h}, and f(x) = 2x + {b} for x >= {h}. Find f({h}).
+    variables:
+      h:
+        type: int
+        min: 1
+        max: 5
+      b:
+        type: int
+        min: 0
+        max: 4
+    derived:
+      ans: 2*h+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Equality belongs to x >= {h}.
+      Use 2*{h} + {b}, not the first branch and not an average.
+      The value is {ans}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_RIGHT
+    type: generated
+    prompt_template: Let f(x) = x + 5 for x <= {h}, and f(x) = (x - ({h}))^2 + {c} for x > {h}. Find f({u}).
+    variables:
+      h:
+        type: int
+        min: -2
+        max: 2
+      d:
+        type: int
+        min: 1
+        max: 4
+      c:
+        type: int
+        min: 1
+        max: 3
+    derived:
+      u: h+d
+      ans: d*d+c
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      {u} > {h}, so the second branch applies.
+      Its square is ({u} - ({h}))^2 = {d}^2.
+      The result is {ans}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_optional_work
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the applicable condition, calculation, or reason.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_THREE
+    type: fixed
+    prompt_template: Let f(x) = -x for x < -1, f(x) = 2 - x for -1 <= x < 2, and f(x) = x^2 for x >= 2.
+      Find f(-1).
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '3'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      -1 belongs to the middle interval because its left endpoint is included.
+      Compute 2 - (-1) = 3.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_GAP
+    type: generated
+    prompt_template: The only rules are f(x) = x for x < {a}, and f(x) = x^2 for x >= {b}. Give the domain
+      in interval notation.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: -2
+      gap:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      b: a+gap
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {a}) U [{b}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    explanation_template: |-
+      Neither polynomial adds a restriction within its assigned region.
+      Join the two allowed input regions and leave the gap excluded.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_ENDPOINTS
+    type: fixed
+    prompt_template: The only rules are f(x) = x on 0 <= x < 2, and f(x) = x + 1 on 2 < x <= 4. Give the
+      domain.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[0, 2) U (2, 4]'
+      variable: x
+    grading:
+      method: interval_set
+    explanation_template: |-
+      Both 0 and 4 are allowed.
+      Neither branch includes 2, so keep it excluded from the union.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_ABSOLUTE
+    type: generated
+    prompt_template: Write |x - {h}| as {h} - x for x < {h}, or x - {h} for x >= {h}. Evaluate it at x
+      = {u}.
+    variables:
+      h:
+        type: int
+        min: 2
+        max: 6
+      d:
+        type: int
+        min: 1
+        max: 4
+    derived:
+      u: h-d
+    constraints: []
+    answer:
+      type: numeric
+      value: '{d}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      {u} < {h}; use {h} - ({u}).
+      The value is the positive distance {d}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_ABS_RULE
+    type: fixed
+    prompt_template: Which formula represents |x - 3| on the branch x < 3?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      On x < 3, x - 3 is negative.
+      Its absolute value is -(x - 3) = 3 - x.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: -x - 3
+    - id: B
+      label: 3 - x
+    - id: C
+      label: x - 3
+    - id: D
+      label: x + 3
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/piecewise-absolute.svg
+      alt: The V-shaped graph y = |x - 3| has vertex (3, 0) and passes through (-1, 4) and (7, 4). The
+        branch regions x < 3 and x >= 3 are marked.
+      caption: The graph of |x - 3|, with its vertex and branch intervals marked.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_PW_SOLUTIONS
+    type: generated
+    prompt_template: Let f(x) = x^2 for x < 0, and f(x) = x + ({b}) for x >= 0. Solve f(x) = {target};
+      enter the complete finite solution set.
+    variables:
+      r:
+        type: int
+        min: 1
+        max: 5
+      s:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      target: r*r
+      b: r*r-s
+      neg_r: -r
+    constraints: []
+    answer:
+      type: finite_set
+      values:
+      - '{neg_r}'
+      - '{s}'
+    grading:
+      method: finite_set
+    explanation_template: |-
+      The square branch gives candidates -{r} and {r}; only -{r} is negative.
+      The linear branch gives {s}, which is nonnegative.
+      The complete set contains -{r} and {s}.
+    solution_steps: []
+    mistake_tags:
+    - branch_filtering
+    - extraneous_candidate
+    - complete_solution_set
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_optional_work
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the applicable condition, calculation, or reason.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_FILTER
+    type: fixed
+    prompt_template: Let f(x) = x + 3 for x < 0, and f(x) = x^2 for x >= 0. Solve f(x) = 1; enter a finite
+      set.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: finite_set
+      values:
+      - '-2'
+      - '1'
+    grading:
+      method: finite_set
+    explanation_template: |-
+      The left equation gives x = -2, which satisfies x < 0.
+      The right equation gives -1 and 1; only 1 satisfies x >= 0.
+      The complete set contains -2 and 1.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_MATCH
+    type: generated
+    prompt_template: Let f(x) = {m}x + {b} for x < {h}, and f(x) = x + k for x >= {h}. Find k so that
+      the two branch formulas have the same value at x = {h}.
+    variables:
+      h:
+        type: int
+        min: 1
+        max: 5
+      m:
+        type: int
+        min: 1
+        max: 4
+      b:
+        type: int
+        min: 0
+        max: 4
+    derived:
+      k: (m-1)*h+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{k}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Match {m}*{h} + {b} = {h} + k.
+      Subtract {h}: k = ({m}*{h} + {b}) - {h} = {k}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show one equivalent expression per line, ending with the requested result.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_CONFLICT
+    type: fixed
+    prompt_template: The proposed rules are x + 1 for x <= 1 and x + 2 for x >= 1. Why do they fail to
+      define one function on all real inputs?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      The shared input 1 satisfies both conditions.
+      A function must assign exactly one output, but these formulas disagree.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: At x = 1 the rules assign two different outputs, 2 and 3.
+    - id: B
+      label: Any overlap is forbidden, even when outputs agree.
+    - id: C
+      label: A function cannot use two formulas.
+    - id: D
+      label: Both branches must be quadratic.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_AGREE
+    type: fixed
+    prompt_template: Do x^2 for x <= 0 and x for x >= 0 define a function on all real inputs?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Every real input is covered.
+      The only shared input is zero, where the two prescribed outputs agree.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: 'No: the branches have different degrees.'
+    - id: B
+      label: Yes, but the value at 0 must be their sum.
+    - id: C
+      label: 'Yes: the only overlap is at 0 and both rules give 0.'
+    - id: D
+      label: 'No: any overlap makes a function invalid.'
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_RANGE_GRAPH
+    type: fixed
+    prompt_template: The graph shows f(x) = x + 2 on [-2, 0) and f(x) = 3 on [0, 2]. Give its range, using
+      [3, 3] for the singleton output 3.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[0, 2) U [3, 3]'
+      variable: x
+    grading:
+      method: interval_set
+    explanation_template: |-
+      The slanted branch gives every output in [0, 2).
+      The horizontal branch adds only 3.
+      Outputs from 2 up to but not including 3 are absent.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/piecewise-branches.svg
+      alt: The graph is y = x + 2 on -2 <= x < 0, with a filled point at (-2, 0) and an open point at
+        (0, 2); it is y = 3 on 0 <= x <= 2 with filled endpoints.
+      caption: The two branch intervals and open or included endpoints are marked.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_PW_VALUE_GRAPH
+    type: fixed
+    prompt_template: The graph shows f(x) = x + 2 on [-2, 0) and f(x) = 3 on [0, 2]. Find f(0).
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '3'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      At input zero the slanted endpoint is open.
+      The filled point (0, 3) supplies the actual value.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/piecewise-branches.svg
+      alt: The graph is y = x + 2 on -2 <= x < 0, with a filled point at (-2, 0) and an open point at
+        (0, 2); it is y = 3 on 0 <= x <= 2 with filled endpoints.
+      caption: The two branch intervals and open or included endpoints are marked.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_PW_TARIFF
+    type: generated
+    prompt_template: Items are counted in whole numbers. The first {k} items cost {r} euros each; every
+      additional item costs {q} euros. Find the total price for {n} items, in euros.
+    variables:
+      k:
+        type: int
+        min: 5
+        max: 10
+      r:
+        type: int
+        min: 3
+        max: 6
+      q:
+        type: int
+        min: 1
+        max: 2
+      d:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      n: k+d
+      base: k*r
+      total: k*r+q*d
+    constraints: []
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The first block costs {r}*{k} = {base}.
+      There are {d} additional items, costing {q}*{d}.
+      Add the two charges to get {total} euros; do not reprice the first block.
+    solution_steps: []
+    mistake_tags:
+    - marginal_versus_total
+    - threshold_offset
+    - discrete_domain
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show one equivalent expression per line, ending with the requested result.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_NOT_INJECTIVE
+    type: fixed
+    prompt_template: Let f(x) = -x for x < 0 and f(x) = x for x >= 0. Does the function have an inverse
+      function on its whole real domain?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      This function is |x|.
+      Two distinct inputs can have the same output; a suitable domain restriction would be needed for an inverse function.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: 'Yes: its inverse is always 1/f(x).'
+    - id: B
+      label: 'No: inputs -2 and 2 both give 2, so an inverse would have two outputs there.'
+    - id: C
+      label: 'Yes: each branch is a line, so the whole function is one-to-one.'
+    - id: D
+      label: 'No: a piecewise function can never be inverted.'
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_NO_AVERAGE
+    type: fixed
+    prompt_template: Let f(x) = x + 1 for x < 0 and f(x) = x + 5 for x >= 0. A learner averages 1 and
+      5 to get f(0) = 3. What is correct?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Only the second branch includes zero.
+      An excluded branch value is not a second value of the function.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: f(0) = 3 because endpoints are always averaged.
+    - id: B
+      label: f(0) = 1 because the left branch comes first.
+    - id: C
+      label: f(0) is undefined because the two formula values differ.
+    - id: D
+      label: f(0) = 5 because the second condition includes 0.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_INPUT_SIGN
+    type: fixed
+    prompt_template: For f(x) = -x on x < 0 and f(x) = x + 2 on x >= 0, which calculation correctly evaluates
+      f(-2)?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Select the branch using the original input.
+      A negative input can produce a positive output.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: Use both rules and average their outputs.
+    - id: B
+      label: The negative branch forces every output to be negative.
+    - id: C
+      label: The input -2 is negative, so f(-2) = -(-2) = 2.
+    - id: D
+      label: First replace -2 by its magnitude, then use the nonnegative branch to get 4.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_PW_PROOF
+    type: fixed
+    prompt_template: Let f(x) = x^2 for x < 1, and f(x) = x + 3 for x >= 1. Solve f(x) = 4 as a finite
+      set, and prove that your set contains all and only the permitted solutions.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: finite_set
+      values:
+      - '-2'
+      - '1'
+    grading:
+      method: finite_set
+    explanation_template: |-
+      The first equation gives candidates -2 and 2; only -2 satisfies x < 1.
+      The second equation gives 1, which satisfies x >= 1.
+      The two branch regions cover the domain, so no other solutions remain.
+      Both retained inputs give 4 in their applicable branch.
+    solution_steps: []
+    mistake_tags:
+    - branch_filtering
+    - exhaustive_cases
+    - complete_solution_set
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: proof_obligations
+      prompt: Give a complete argument. Address every listed obligation; a correct short answer alone
+        is not enough.
+      proof_policy:
+        obligations:
+        - Solves x^2 = 4 and lists both algebraic candidates.
+        - Rejects 2 and retains -2 using the first branch condition x < 1.
+        - Solves x + 3 = 4 and accepts 1 using x >= 1.
+        - Explains completeness from the two branch regions and checks both retained outputs.
+        accepted_strategies:
+        - branch-by-branch case analysis
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false

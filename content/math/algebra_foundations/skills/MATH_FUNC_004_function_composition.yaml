@@ -1,0 +1,929 @@
+id: MATH_FUNC_004
+schema_version: '0.2'
+name: Composition of functions and composite domains
+domain: Math
+subdomain: Algebra
+topic: Functions
+description: Build and evaluate functions in sequence, distinguish composition from multiplication, and
+  determine exactly where a composite is defined.
+prerequisites:
+- MATH_FUNC_002
+- MATH_POLY_002
+unlocks:
+- MATH_FUNC_005
+tags:
+- functions
+- composition
+- composite_domain
+- substitution
+- domain_restrictions
+- function_tables
+- modeling
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Composition uses the output of one function as the input of another. The notation (f o g)(x) means f(g(x)): first apply g, then apply f. Reading from the innermost expression outward is essential. The letter nearest the original input is the first operation performed, not the last.
+
+  What you will learn:
+  Evaluate composites from formulas and tables, construct and simplify a composite formula, compare different orders, and preserve both inner and outer domain restrictions. The goal is to understand a sequence of operations, not merely substitute symbols mechanically.
+
+  A two-stage calculation:
+  Let g(x) = 2x - 1 and f(t) = t^2. To calculate f(g(3)), first obtain g(3) = 5, then calculate f(5) = 25. To build the entire composite formula, substitute the whole inner expression into the outer input: f(g(x)) = (2x - 1)^2. Parentheses matter. The expression 2x^2 - 1 squares only part of the input and describes a different function.
+
+  Composition is not multiplication:
+  f(g(x)) passes a value through two rules. The product f(x)g(x) evaluates each rule at the original input and multiplies the two outputs. With the functions above and x = 3, the composite is 25 but the product is f(3)g(3) = 9*5 = 45. An ordinary multiplication sign and the composition symbol represent different operations.
+
+  The order usually matters:
+  For f(x) = x + 1 and g(x) = 2x, f(g(x)) = 2x + 1 but g(f(x)) = 2x + 2. The graphs are different parallel lines. A discount followed by a fixed fee likewise need not produce the same price as a fee followed by a discount. Some specially chosen functions do commute, but that is something to establish for those functions, not a general rule.
+
+  From tables or descriptions:
+  Find the inner output first, then look for that value among the outer function's allowed inputs. If a table describes the entire domain and the required intermediate input is absent, the composite is undefined. If a table is only a sample of a larger unspecified function, the missing entry means there is not enough information; it does not prove the function is undefined. Pay attention to what the table claims to represent.
+  For three functions, work from the inside out: f(g(h(x))) applies h, then g, then f. Grouping the composition differently does not change that order. In contrast, exchanging the functions usually does.
+
+  The composite-domain rule:
+  An input x belongs to the domain of f o g exactly when both conditions hold:
+  1. x belongs to the domain of g, so the first stage exists.
+  2. g(x) belongs to the domain of f, so the second stage accepts the intermediate output.
+  The second condition is a restriction on g(x), not automatically the same restriction on x. For example, sqrt(x^2) is defined for every real x because the intermediate output x^2 is nonnegative, even when x itself is negative.
+
+  A reliable domain method:
+  Write down the original domain of the inner function before simplifying. Translate each outer restriction into a condition on the inner output. Solve those conditions, then intersect them with the original inner domain. Finally simplify the formula, keeping the resulting domain attached to it. A neat formula without its restrictions is not a complete description of the composite.
+
+  A rational example with two exclusions:
+  Take g(x) = 1/(x - 2) and f(t) = 1/(t - 1). The inner stage requires x != 2. The outer stage requires g(x) != 1; solving 1/(x - 2) = 1 shows that x = 3 is also forbidden. Therefore the composite domain excludes both 2 and 3. Algebra gives (x - 2)/(3 - x), but that simplified expression alone hides the original exclusion at 2. The two-stage definition still forbids it.
+
+  Square roots expose order and domain together:
+  Squaring sqrt(x - 2) gives x - 2 only on x >= 2. The square root stage cannot be performed below 2, so the later square cannot repair those inputs. In the opposite order, sqrt(x^2) exists for every real x but equals |x|, not x for negative inputs. Thus neither formula simplification nor reversing apparent inverse operations is enough to establish equality of functions; their domains matter too.
+
+  Stated domains take priority:
+  Suppose g(x) = x^2 - 4 is explicitly restricted to x >= 0 and f(t) = sqrt(t). The outer restriction yields x <= -2 or x >= 2. Intersecting with x >= 0 leaves [2, inf). Keeping the negative branch would silently change the inner function's definition. Likewise, modeling contexts can restrict time, distance, or counts before any algebra begins.
+
+  Self-check:
+  Did I apply the innermost function first? Did I substitute the entire expression with parentheses? Did I confuse a product with a composite? Can every intermediate stage actually be performed? Did cancellation erase a restriction from my written answer? A valid composite must pass all of these checks.
+media:
+- src: media/native-functions/composition-machine.svg
+  alt: Input 3 enters g(x) = 2x - 1 and becomes 5. That output enters f(t) = t^2 and becomes 25. The diagram
+    labels the result as f(g(3)).
+  caption: Composition passes an output into the next input; it does not multiply two function values.
+  width: 800
+  height: 500
+  fit: contain
+- src: media/native-functions/composition-order.svg
+  alt: For f(x) = x + 1 and g(x) = 2x, the two lines f(g(x)) = 2x + 1 and g(f(x)) = 2x + 2 are parallel
+    and distinct.
+  caption: Reversing the order of two functions generally changes the result.
+  width: 800
+  height: 500
+  fit: contain
+examples:
+- prompt: Let g(x) = 2x - 1 and f(t) = t^2. Calculate f(g(3)).
+  solution: '25'
+  explanation: The inner output is g(3) = 5, then f(5) = 25. The intermediate result becomes an input,
+    not a factor in a product.
+  media:
+  - src: media/native-functions/composition-machine.svg
+    alt: Input 3 enters g(x) = 2x - 1 and becomes 5. That output enters f(t) = t^2 and becomes 25. The
+      diagram labels the result as f(g(3)).
+    caption: Composition passes an output into the next input; it does not multiply two function values.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: With the same functions, calculate g(f(3)).
+  solution: '17'
+  explanation: 'Apply f first: f(3) = 9. Then g(9) = 18 - 1 = 17. This differs from f(g(3)).'
+- prompt: Let f(t) = 3t + 2 and g(x) = 2x - 5. Find f(g(x)).
+  solution: 6x - 13
+  explanation: 'Substitute the entire inner expression: 3(2x - 5) + 2. Distribute to get 6x - 15 + 2,
+    then combine constants.'
+- prompt: Let f(t) = t^2 + 1 and g(x) = 2x - 3. Find f(g(x)).
+  solution: (2x - 3)^2 + 1, or 4x^2 - 12x + 10.
+  explanation: The outer rule squares its entire input. Parentheses retain the middle term when the square
+    is expanded.
+- prompt: For f(x) = x + 1 and g(x) = 2x, compare f o g and g o f.
+  solution: f(g(x)) = 2x + 1; g(f(x)) = 2x + 2.
+  explanation: Adding 1 after doubling is different from doubling after adding 1. The difference is 1
+    for every input.
+  media:
+  - src: media/native-functions/composition-order.svg
+    alt: For f(x) = x + 1 and g(x) = 2x, the two lines f(g(x)) = 2x + 1 and g(f(x)) = 2x + 2 are parallel
+      and distinct.
+    caption: Reversing the order of two functions generally changes the result.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: Let f(t) = sqrt(t - 1) and g(x) = 2x + 3. Find the composite domain.
+  solution: '[-1, inf)'
+  explanation: The inner affine function accepts all real inputs. The outer function needs 2x + 3 >= 1,
+    so x >= -1. At x = -1 the outer radicand is zero and is allowed.
+- prompt: Let f(t) = 1/(t - 1) and g(x) = 1/(x - 2). Find the composite domain.
+  solution: (-inf, 2) U (2, 3) U (3, inf)
+  explanation: The inner denominator excludes 2. The outer denominator excludes intermediate output 1,
+    reached at x = 3. Keep both exclusions even after the expression simplifies.
+- prompt: Let f(t) = 1/t and g(x) = 1/(x - 3). Does f(g(x)) = x - 3 hold for all real x?
+  solution: No. The equality holds only for x != 3.
+  explanation: The inner stage is undefined at 3. At every other input it is nonzero, so the outer stage
+    works and the result simplifies to x - 3.
+  media:
+  - src: media/native-functions/composition-hole.svg
+    alt: The composite f(g(x)), with f(t) = 1/t and g(x) = 1/(x - 3), follows the line y = x - 3 but has
+      an open point at (3, 0).
+    caption: A simplified composite retains every restriction needed to perform the original two-stage
+      calculation.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: Compare sqrt(x^2) and (sqrt(x))^2 as real functions.
+  solution: sqrt(x^2) = |x| on R; (sqrt(x))^2 = x on [0, inf).
+  explanation: The first squares before taking the nonnegative root and therefore accepts negative inputs.
+    The second must take a real square root first and cannot accept them.
+- prompt: Let h(x) = x - 3, g(t) = t^2, and f(u) = 2u + 1. Find f(g(h(5))).
+  solution: '9'
+  explanation: Compute h(5) = 2, then g(2) = 4, then f(4) = 9. Write the stages to keep the order explicit.
+applications:
+- title: Pricing pipelines
+  description: Discounts, taxes, and fees form ordered rules. Their sequence determines the final amount
+    and the meaning of each intermediate quantity.
+- title: Measurement conversion
+  description: A raw reading may be calibrated, converted to another unit, and passed to a physical model.
+    Each stage must accept the previous stage's output.
+- title: Program design
+  description: A function pipeline is valid only when intermediate values meet the next function's input
+    requirements. Composite-domain reasoning is a mathematical version of that check.
+- title: Inverse functions and later calculus
+  description: Inverse verification uses composition identities. Later, rates of change of composite models
+    rely on knowing the same inner and outer structure.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: FUNC_COMP_AFFINE_AFTER_SQUARE_001
+    type: generated
+    prompt_template: Let f(t) = {a}t + {b} and g(x) = x^2 + {c}. Find f(g({r})).
+    difficulty: easy
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 5
+      b:
+        type: int
+        min: -6
+        max: 6
+      c:
+        type: int
+        min: -6
+        max: 6
+      r:
+        type: int
+        min: -5
+        max: 5
+    derived:
+      inner: r*r+c
+      out: a*inner+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{out}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write one equivalent expression per line. Substitute the given values before simplifying;
+        do not include f(...) notation in the work lines.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      First apply the inner function: g({r}) = ({r})^2 + {c} = {inner}.
+      Then apply f to that entire output: {a}*({inner}) + {b} = {out}.
+    mistake_tags:
+    - composition_order
+    - substitution_error
+  - id: FUNC_COMP_SQUARE_AFTER_AFFINE_001
+    type: generated
+    prompt_template: Let f(x) = {a}x + {b} and g(t) = t^2 + {c}. Find g(f({r})).
+    difficulty: medium
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 4
+      b:
+        type: int
+        min: -6
+        max: 6
+      c:
+        type: int
+        min: -6
+        max: 6
+      r:
+        type: int
+        min: -4
+        max: 4
+    derived:
+      inner: a*r+b
+      out: inner*inner+c
+    constraints: []
+    answer:
+      type: numeric
+      value: '{out}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write one equivalent expression per line. Substitute the given values before simplifying;
+        do not include f(...) notation in the work lines.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      First f({r}) = {a}*({r}) + {b} = {inner}.
+      Then square that entire output and add {c}: ({inner})^2 + {c} = {out}.
+    mistake_tags:
+    - composition_order
+    - substitution_parentheses
+  - id: FUNC_COMP_TABLE_CHAIN_001
+    type: fixed
+    prompt_template: A table gives g(1) = 3, g(2) = 1, g(3) = 2, and f(1) = 5, f(2) = 7, f(3) = 9. Find
+      f(g(2)).
+    difficulty: easy
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '5'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Read the inner lookup first: g(2) = 1.
+      Use that output as the next input: f(1) = 5.
+    mistake_tags:
+    - table_composition
+    - composition_order
+  - id: FUNC_COMP_AFFINE_FORMULA_001
+    type: generated
+    prompt_template: Let f(t) = {a}t + {b} and g(x) = {m}x + {n}. Give only an expression in x for f(g(x)).
+    difficulty: medium
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 5
+      b:
+        type: int
+        min: -6
+        max: 6
+      m:
+        type: int
+        min: -4
+        max: 4
+        exclude:
+        - 0
+      n:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      am: a*m
+      constant: a*n+b
+    constraints: []
+    answer:
+      type: expression
+      value: '{am}*x + {constant}'
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: procedural_steps
+      prompt: Write one equivalent expression per line. Substitute the given values before simplifying;
+        do not include f(...) notation in the work lines.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Substitute the whole expression {m}x + {n} for the input of f.
+      f(g(x)) = {a}*({m}x + {n}) + {b}.
+      Distribute and collect terms to obtain {am}x + {constant}.
+    mistake_tags:
+    - composition_substitution
+    - distributive_error
+  - id: FUNC_COMP_QUADRATIC_FORMULA_001
+    type: generated
+    prompt_template: Let f(t) = t^2 + {k} and g(x) = {m}x + {n}. Give only an expression in x for f(g(x)).
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      m:
+        type: int
+        min: 2
+        max: 5
+      n:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: ({m}*x + {n})^2 + {k}
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Replace every occurrence of the input t by the whole expression {m}x + {n}.
+      The entire inner output is squared: ({m}x + {n})^2 + {k}.
+      Squaring only {m}x would omit part of the substitution.
+    mistake_tags:
+    - substitution_parentheses
+    - square_of_sum
+  - id: FUNC_COMP_LINEAR_OF_QUADRATIC_001
+    type: generated
+    prompt_template: Let f(t) = {a}t + {b} and g(x) = x^2 + {k}. Give only an expression in x for f(g(x)).
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -4
+        max: 4
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      constant: a*k+b
+    constraints: []
+    answer:
+      type: expression
+      value: '{a}*x^2 + {constant}'
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Substitute x^2 + {k} into f: {a}(x^2 + {k}) + {b}.
+      Distribute {a} across both terms before adding {b}.
+      The result is {a}x^2 + {constant}.
+    mistake_tags:
+    - composition_substitution
+    - distributive_error
+  - id: FUNC_COMP_SOLVE_LINEAR_001
+    type: generated
+    prompt_template: Let f(t) = {a}t + {b} and g(x) = {m}x + {n}. Solve f(g(x)) = {target} for x.
+    difficulty: medium
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 5
+      m:
+        type: int
+        min: 2
+        max: 4
+      b:
+        type: int
+        min: -6
+        max: 6
+      n:
+        type: int
+        min: -6
+        max: 6
+      r:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      am: a*m
+      offset: a*n+b
+      target: am*r+offset
+    constraints: []
+    answer:
+      type: equation_solution
+      value: '{r}'
+      variable: x
+    grading:
+      method: equation_solution
+    work:
+      mode: procedural_steps
+      prompt: Write one equivalent equation per line, ending with x = your answer.
+      line_type: equation
+      minimum_steps: 2
+      require_final_answer_match: true
+      target_variable: x
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Substitute the inner function: {a}({m}x + {n}) + {b} = {target}.
+      Expand to {am}x + {offset} = {target}.
+      Subtract {offset} and divide by the nonzero coefficient {am}; x = {r}.
+    mistake_tags:
+    - composition_equation
+    - inverse_operations
+  - id: FUNC_COMP_NOT_MULTIPLICATION_001
+    type: fixed
+    prompt_template: What does (f o g)(x), also written f(g(x)), mean?
+    difficulty: easy
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The small composition symbol names a two-stage input-output process. Multiplication
+      would be written f(x)g(x) and is a different operation.
+    mistake_tags:
+    - composition_product_confusion
+    options:
+    - id: A
+      label: Add the rules f and g before substituting x
+    - id: B
+      label: Evaluate g at x, then use that output as the input to f
+    - id: C
+      label: Multiply f(x) by g(x)
+    - id: D
+      label: Evaluate f at x, then use that output as the input to g
+  - id: FUNC_COMP_RATIONAL_OUTER_DOMAIN_001
+    type: generated
+    prompt_template: Let f(t) = 1/(t - {c}) and g(x) = x + {b}, each on its natural real domain. Find
+      the domain of f(g(x)) in interval notation.
+    difficulty: medium
+    answer_mode: final_plus_optional_work
+    variables:
+      c:
+        type: int
+        min: -6
+        max: 6
+      b:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      hole: c-b
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {hole}) U ({hole}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The inner affine function accepts every real x.
+      Its output must avoid the outer forbidden input {c}: x + {b} != {c}.
+      Therefore x != {hole}.
+    mistake_tags:
+    - outer_domain_preimage
+    - composition_domain
+  - id: FUNC_COMP_SQRT_OUTER_POSITIVE_001
+    type: generated
+    prompt_template: Let f(t) = sqrt(t - {h}) and g(x) = {m}x + {b}, each on its natural real domain.
+      Find the domain of f(g(x)) in interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+      m:
+        type: int
+        min: 2
+        max: 5
+      r:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      b: h-m*r
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{r}, inf)'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The outer function needs g(x) >= {h}.
+      Thus {m}x + {b} >= {h}.
+      Since {m} is positive, this is x >= {r}, including the point where the radicand is zero.
+    mistake_tags:
+    - outer_domain_preimage
+    - radicand_nonnegative
+  - id: FUNC_COMP_SQRT_OUTER_NEGATIVE_001
+    type: generated
+    prompt_template: Let f(t) = sqrt(t - {h}) and g(x) = -{m}x + {b}, each on its natural real domain.
+      Find the domain of f(g(x)) in interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+      m:
+        type: int
+        min: 2
+        max: 5
+      r:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      b: h+m*r
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {r}]
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Require -{m}x + {b} >= {h}.
+      The coefficient of x is negative, so dividing reverses the inequality.
+      The allowed inputs are x <= {r}.
+    mistake_tags:
+    - outer_domain_preimage
+    - inequality_direction
+  - id: FUNC_COMP_SQUARE_OF_ROOT_DOMAIN_001
+    type: fixed
+    prompt_template: Let f(t) = t^2 on R and g(x) = sqrt(x - 2) on [2, inf). The composite simplifies
+      to x - 2. What is its domain in interval notation?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[2, inf)'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The first operation is still sqrt(x - 2), so x must be at least 2.
+      Squaring the result does not make the earlier undefined inputs valid.
+      The simplified formula must retain the original composite domain.
+    mistake_tags:
+    - inner_domain_lost
+    - simplification_domain
+  - id: FUNC_COMP_RECIPROCAL_CANCELLATION_001
+    type: fixed
+    prompt_template: Let f(t) = 1/t and g(x) = 1/(x - 3), each on its natural real domain. Find the domain
+      of f(g(x)), even though its formula simplifies to x - 3.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, 3) U (3, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The inner function is undefined at x = 3.
+      For every other x, g(x) is nonzero, so the outer reciprocal is allowed.
+      The domain is all real numbers except 3; cancellation does not fill the hole.
+    mistake_tags:
+    - inner_domain_lost
+    - cancelled_domain_restriction
+    media:
+    - src: media/native-functions/composition-hole.svg
+      alt: The composite f(g(x)), with f(t) = 1/t and g(x) = 1/(x - 3), follows the line y = x - 3 but
+        has an open point at (3, 0).
+      caption: A simplified composite retains every restriction needed to perform the original two-stage
+        calculation.
+      width: 800
+      height: 500
+      fit: contain
+  - id: FUNC_COMP_TWO_DOMAIN_RESTRICTIONS_001
+    type: generated
+    prompt_template: Let f(t) = 1/(t - 1) and g(x) = 1/(x - {b}), each on its natural real domain. Find
+      the domain of f(g(x)) in interval notation.
+    difficulty: hard
+    answer_mode: final_plus_optional_work
+    variables:
+      b:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      other: b+1
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {b}) U ({b}, {other}) U ({other}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      First require x != {b} so the inner function exists.
+      Next require 1/(x - {b}) != 1 so the outer denominator is nonzero.
+      The second condition excludes x = {other}.
+      Both original restrictions must be kept.
+    mistake_tags:
+    - inner_domain_lost
+    - outer_domain_preimage
+  - id: FUNC_COMP_ROOT_OF_SQUARE_DOMAIN_001
+    type: fixed
+    prompt_template: Let f(t) = sqrt(t) on [0, inf) and g(x) = x^2 on R. Find the domain of f(g(x)) in
+      interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Every real input can be squared.
+      The resulting x^2 is nonnegative, so it is always allowed as an input to sqrt.
+      Negative original inputs are allowed too; the outer restriction applies to g(x), not directly to x.
+    mistake_tags:
+    - outer_domain_preimage
+    - input_output_domain_mixup
+  - id: FUNC_COMP_ROOT_OF_SQUARE_VALUE_001
+    type: fixed
+    prompt_template: For real x, which statement correctly describes sqrt(x^2)?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The square root symbol returns the nonnegative root. For example, sqrt((-3)^2)
+      = 3, not -3. Therefore the composite is |x|.
+    mistake_tags:
+    - principal_square_root
+    - composition_order
+    options:
+    - id: A
+      label: It equals x for every real x
+    - id: B
+      label: It is undefined whenever x is negative
+    - id: C
+      label: It equals -x for every real x
+    - id: D
+      label: It equals |x| for every real x
+  - id: FUNC_COMP_PRICE_ORDER_001
+    type: fixed
+    prompt_template: A shop first discounts a 50-unit price by 20%, then adds a fixed 5-unit service fee.
+      What is the final price? Enter a number.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '45'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The discount function sends 50 to 0.8*50 = 40.
+      The fee function then sends 40 to 40 + 5 = 45.
+      Applying the fee first would produce 0.8*(50 + 5) = 44, a different transaction.
+    mistake_tags:
+    - composition_context
+    - composition_order
+  - id: FUNC_COMP_THREE_STAGES_001
+    type: generated
+    prompt_template: Let h(x) = x - 3, g(t) = t^2, and f(u) = 2u + 1. Find f(g(h({r}))).
+    difficulty: medium
+    answer_mode: final_plus_required_work
+    variables:
+      r:
+        type: int
+        min: -4
+        max: 8
+    derived:
+      inner: r-3
+      squared: inner*inner
+      out: 2*squared+1
+    constraints: []
+    answer:
+      type: numeric
+      value: '{out}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write one equivalent expression per line. Substitute the given values before simplifying;
+        do not include f(...) notation in the work lines.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Start at the innermost function: h({r}) = {inner}.
+      Next g({inner}) = {squared}.
+      Finally f({squared}) = 2*{squared} + 1 = {out}.
+    mistake_tags:
+    - nested_composition
+    - composition_order
+  - id: FUNC_COMP_NONCOMMUTATIVE_001
+    type: fixed
+    prompt_template: Let f(x) = x + 1 and g(x) = 2x on R. Which statement is correct?
+    difficulty: hard
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Substitution gives f(g(x)) = 2x + 1 and g(f(x)) = 2(x + 1). Their outputs differ
+      by 1 for every input.
+    mistake_tags:
+    - composition_commutativity
+    options:
+    - id: A
+      label: Both composites equal 2x + 2
+    - id: B
+      label: The composites are equal only at x = 0
+    - id: C
+      label: f(g(x)) = 2x + 1, while g(f(x)) = 2x + 2, so they differ for every x
+    - id: D
+      label: Both composites equal 2x + 1
+  - id: FUNC_COMP_DOMAIN_REASONING_001
+    type: fixed
+    prompt_template: Let g(x) = x^2 - 4 with the stated domain [0, inf), and let f(t) = sqrt(t) with domain
+      [0, inf). Find the domain of f(g(x)) in interval notation and justify it.
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[2, inf)'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: rubric_check
+      prompt: Explain your conclusion using the visible criteria; a correct short answer alone is not
+        sufficient.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Preserves the declared inner domain x >= 0.
+          weight: 2
+        - id: criterion_2
+          description: Translates the outer restriction into x^2 - 4 >= 0.
+          weight: 2
+        - id: criterion_3
+          description: Finds both algebraic branches before intersecting the restrictions.
+          weight: 2
+        - id: criterion_4
+          description: Justifies [2, inf), including the endpoint 2 and rejecting the negative branch.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: |-
+      The inner function's declared domain requires x >= 0.
+      The outer function requires x^2 - 4 >= 0, giving x <= -2 or x >= 2.
+      Intersect these sets to get [2, inf).
+      The candidate branch x <= -2 is not allowed by the original inner domain.
+    mistake_tags:
+    - declared_domain_ignored
+    - domain_intersection

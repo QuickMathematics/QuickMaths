@@ -469,6 +469,9 @@ def _sign_chart_test_value(lower, upper):
 def _proof_obligation_ids(instance: ProblemInstance) -> list[str]:
     policy = instance.work.get("proof_policy", {})
     obligations: list[str] = []
+    if "obligations" in policy:
+        return [str(item.get("id") or f"obligation_{index + 1}") if isinstance(item, dict)
+                else f"obligation_{index + 1}" for index, item in enumerate(policy["obligations"])]
     for strategy in policy.get("accepted_strategies", []):
         for item in strategy.get("assumptions_required", []):
             obligations.append(item["id"])

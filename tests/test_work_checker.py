@@ -330,3 +330,17 @@ def _problem(expected: str, work: dict, variable: str | None = None, grading_met
         work=work,
         review_policy={"work_review": "auto"},
     )
+
+
+def test_web_style_proof_obligations_keep_ids_and_require_review():
+    problem = _problem("done", {"mode": "proof_obligations", "proof_policy": {
+        "accepted_strategies": ["direct argument"],
+        "obligations": ["State the domain", {"id": "conclude", "description": "Conclude"}],
+    }}, grading_method="theorem_conclusion")
+    problem = ProblemInstance(**{**problem.__dict__, "answer_mode": "final_plus_required_work",
+        "review_policy": {"work_review": "tutor_required", "mastery_requires_review_pass": True}})
+    response = UserResponse(final_answer="done", work="[obligation_1] Domain stated.")
+    result = grade_answer(problem, response)
+    assert result.work_review_status == "submitted_for_tutor_review"
+    assert result.work_check_result.detected_obligations == ["obligation_1"]
+    assert result.work_check_result.missing_obligations == ["conclude"]

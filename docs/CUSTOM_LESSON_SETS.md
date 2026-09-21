@@ -779,3 +779,11 @@ credit. Author reference checks remain separate from learner submissions. iPhone
 and iPad browser support is deferred; drafts can still be saved. Existing imported
 formal lessons use the same backend when their declared capabilities are supported.
 The local desktop companion remains available through explicit client options.
+
+## Native compatibility and reviewed capstones
+
+Native source validation accepts both structured legacy proof strategies and the web format: `proof_policy.accepted_strategies` as descriptive strings with a separate `obligations` list. String obligations receive stable positional IDs such as `obligation_1`; use explicit IDs when later edits may reorder obligations. Native rubric validation accepts `weight` as an alias for `points`; values must remain positive. These fields describe review criteria, not automatic semantic proof grading.
+
+Ordinary expression answers support `sqrt`, `abs`, `sin`, `cos`, `exp` and natural `log` (`ln` is a browser alias). Comparison is bounded numerical checking, not a theorem certificate. Use explicit multiplication for ambiguous multi-letter products. Formal generated statements may resolve only prompt-visible public parameters; invalid formal generation fails instead of falling back to ordinary grading.
+
+Existing drafts preserve complete resolved snapshots. Changes to generation defaults or scenario order apply to new draws, not already saved answers. See [native compatibility details](NATIVE_COMPATIBILITY_FIXES.md).

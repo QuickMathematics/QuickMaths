@@ -10,7 +10,7 @@ def test_loads_valid_default_skills():
     assert track.id == "TRACK_MATH_ALGEBRA_FOUNDATIONS"
     assert track.schema_version == "0.2"
     assert "MATH_ALG_001" in skills
-    assert len(track.skills) == 81
+    assert len(track.skills) == 89
     assert skills["MATH_ALG_001"].test.question_count >= 1
     assert len(skills["MATH_ALG_001"].test.questions) >= skills["MATH_ALG_001"].test.question_count
     assert warnings == []
@@ -35,9 +35,14 @@ def test_default_content_uses_procedural_work_only_where_auto_checking_is_suppor
                 else:
                     assert method in {"exact_text", "inequality_solution"}
             elif mode == "capture_only":
-                assert question.answer_mode == "final_plus_required_work"
+                assert question.answer_mode in {"final_plus_required_work", "final_plus_optional_work"}
                 assert question.work.get("prompt", "").strip()
                 assert question.review_policy["mastery_requires_review_pass"] is False
+            elif mode in {"proof_obligations", "rubric_check"}:
+                assert question.answer_mode == "final_plus_required_work"
+                assert question.review_policy["work_review"] == "tutor_required"
+                assert question.review_policy["mastery_requires_review_pass"] is True
+                assert question.review_policy["allow_self_review"] is False
             elif mode == "rational_equation_steps":
                 assert question.answer_mode == "final_plus_required_work"
                 assert method == "finite_set"

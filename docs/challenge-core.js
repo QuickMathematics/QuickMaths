@@ -1,18 +1,19 @@
 import { normalizeLimitSpec, validateLimitWork } from "./limit-work.js?v=20260909-calculus-v1";
 import { normalizeCartesianDiagram, resolveCartesianDiagram, publicDiagramValues } from "./cartesian-diagrams.js?v=20260909-calculus-v1";
 import { normalizeMathBlocks, resolveMathBlocks } from "./math-display.js?v=20260909-calculus-v1";
-import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260908-statistics-v1";
+import { learningFields, normalizeLessonTaxonomy } from "./learning-fields.js?v=20260921-native-compat-v1";
 import { normalizeLessonAssets, normalizeLessonMedia, validateMediaReferences, mediaBaseUrl } from "./lesson-media.js?v=20260906-media-v1";
 import { chi_square_cdf, chi_square_sf, f_sf, inverse_normal_cdf, normal_cdf, t_cdf } from "./distributions.js?v=20260908-statistics-v1";
 import { buildFormalEvidenceRecord, formalEvidenceReceipt, normalizeFormalEvidenceRecord } from "./formal-evidence.js?v=20260913-formal-kernel-v1";
 import { createFormalLearning } from "./formal-learning.js?v=20260913-formal-kernel-v1";
 import { assertFormalCertificate } from "./formal-proof-trust.js?v=20260913-formal-kernel-v1";
-import { buildBoundFormalJob } from "./formal-binding.js?v=20260913-formal-kernel-v1";
+import { buildBoundFormalJob, formalProblemBinding, canonicalFormalJson, sha256Hex } from "./formal-binding.js?v=20260913-formal-kernel-v1";
 import { normalizeFormalCapabilities } from "./formal-capabilities.js?v=20260913-formal-capabilities-v1";
 
 export const STORAGE_KEY = "quickmaths.web.v2";
 export const LEGACY_STORAGE_KEY = "quickmaths.webmcp.challenge.v1";
-export const APP_VERSION = 17;
+export const APP_VERSION = 18;
+const DRAFT_SNAPSHOT_VERSION = 1;
 export const BUNDLED_LESSON_MIGRATION_VERSION = 16;
 export const LESSON_SET_FORMAT = "quickmaths.lesson-set";
 export const LESSON_SET_SCHEMA_VERSION = "2.1";
@@ -80,7 +81,11 @@ const WORK_MODES = new Set([
 ]);
 const PYTHON_BUILTINS = new Set(["abs", "all", "any", "bool", "dict", "enumerate", "float", "int", "len", "list", "max", "min", "range", "round", "set", "sorted", "str", "sum", "tuple", "zip"]);
 const PYTHON_VALUE_TYPES = new Set(["json", "int", "float", "str", "bool", "list", "dict"]);
-const EXPRESSION_FUNCTIONS = new Set(["sqrt"]);
+const EXPRESSION_FUNCTION_VALUES = Object.freeze({
+  sqrt: Math.sqrt, abs: Math.abs, sin: Math.sin, cos: Math.cos,
+  exp: Math.exp, log: Math.log, ln: Math.log,
+});
+const EXPRESSION_FUNCTIONS = new Set(Object.keys(EXPRESSION_FUNCTION_VALUES));
 const NATIVE_TEMPLATE_FUNCTIONS = Object.freeze({ normal_cdf, inverse_normal_cdf, t_cdf, chi_square_cdf, chi_square_sf, f_sf });
 const NATIVE_TEMPLATE_BUILTINS = Object.freeze({ abs: Math.abs, min: Math.min, max: Math.max, round: Math.round });
 const EXPRESSION_CONSTANTS = Object.freeze({ pi: Math.PI, e: Math.E });
@@ -246,8 +251,108 @@ function renderNativeValue(value, values) {
   return clone(value);
 }
 
+// New draws depend on stable scenario identity, never the current selection/order.
+// Old attempts are restored from immutable snapshots, not this generator.
+class NativeFormalGenerationError extends Error {}
+
+export function resolveNativeProofSpec(candidate, publicValues, templateId = "formal problem") {
+  try {
+    const spec = normalizeFormalProofSpec(candidate, templateId);
+    if (!spec) throw new Error("A declared formal template needs a proof specification.");
+    for (const name of spec.parameter_contract.required_public) {
+      if (!Object.hasOwn(publicValues, name)) throw new Error(`Required formal parameter ${name} is not public.`);
+    }
+    // The same safe native renderer is used, but its environment is ONLY the
+    // exact named givens in the displayed prompt, not hidden derived values.
+    return normalizeFormalProofSpec(renderNativeValue(spec, publicValues), templateId);
+  } catch (error) {
+    throw new NativeFormalGenerationError(`${templateId}: invalid formal generation: ${error.message}`);
+  }
+}
+
+// Native Python exports complete rational-equation work contracts. Browser
+// draws must do the same. This bounded parser collects original denominator
+// zeros BEFORE cancellation; it never evaluates authored code.
+function enrichNativeRationalWork(work, prompt) {
+  if (work?.mode !== "rational_equation_steps") return work;
+  if (Array.isArray(work.expected_restrictions) && work.expected_restrictions.length && work.original_equation) return work;
+  const variable = work.target_variable ?? "x";
+  const source = String(work.original_equation ?? prompt);
+  // Compatibility for the shipped work-rate story, whose historical exporter
+  // stored the whole sentence as the equation. Do not infer arbitrary prose.
+  const rateEquation = source.match(/\bTheir combined time x satisfies (.+?)\. Solve for x\.?\s*$/);
+  const equation = (rateEquation ? rateEquation[1] : source)
+    .replace(/^[^:]*:\s*/, "").replace(/[.?\s]+$/, "").replace(/\[/g,"(").replace(/\]/g,")");
+  const sides = equation.split("=");
+  if (sides.length !== 2) throw new Error("A rational work contract needs one original equation.");
+  const restrictions = new Set();
+  const trim = p => {
+    if (!p) return null;
+    while (p.length > 1 && p.at(-1) === 0) p.pop();
+    if (p.length > 9 || p.some(c => !Number.isFinite(c) || Math.abs(c) > 1e12)) throw new Error("Rational work polynomial is outside the supported bounds.");
+    return p;
+  };
+  const add = (a,b,sign=1) => a && b ? trim(Array.from({length:Math.max(a.length,b.length)},(_,i)=>(a[i]??0)+sign*(b[i]??0))) : null;
+  const multiply = (a,b) => {
+    if (!a || !b) return null;
+    const out = Array(a.length+b.length-1).fill(0);
+    a.forEach((x,i)=>b.forEach((y,j)=>out[i+j]+=x*y)); return trim(out);
+  };
+  const excludeZeros = p => {
+    if (!p || p.length > 3) throw new Error("Author explicit restrictions for non-quadratic or nested rational denominators.");
+    const [c,b=0,a=0]=p;
+    if (!a && !b) { if (!c) throw new Error("Zero denominator in original equation."); return; }
+    if (!a) { restrictions.add(String(-c/b)); return; }
+    const discriminant=b*b-4*a*c;
+    if (discriminant < 0) return;
+    const root=Math.sqrt(discriminant);
+    if (Number.isInteger(root)) {
+      restrictions.add(String((-b-root)/(2*a))); restrictions.add(String((-b+root)/(2*a)));
+    } else {
+      restrictions.add(`(${-b}-sqrt(${discriminant}))/(${2*a})`);
+      restrictions.add(`(${-b}+sqrt(${discriminant}))/(${2*a})`);
+    }
+  };
+  for (const side of sides) {
+    const tokens=expressionTokens(side); if (!tokens) throw new Error("Unsupported original rational equation.");
+    let i=0;
+    const peek=v=>tokens[i]?.value===v, take=()=>tokens[i++];
+    const primary=()=>{
+      const t=take(); if(!t)throw new Error("Incomplete rational expression.");
+      if(t.type==="number")return [t.value];
+      if(t.type==="identifier" && t.value===variable)return [0,1];
+      if(t.value==="("){const p=sum();if(!peek(")"))throw new Error("Unclosed rational expression.");take();return p;}
+      throw new Error("Only univariate rational polynomials have inferred work restrictions.");
+    };
+    const power=()=>{
+      let p=primary();
+      if(peek("^")){
+        take();const e=unary();if(!e || e.length!==1 || !Number.isInteger(e[0]) || Math.abs(e[0])>8)throw new Error("Unsupported rational power.");
+        if(e[0]<0){excludeZeros(p);return null;}
+        let out=[1];for(let n=0;n<e[0];n++)out=multiply(out,p);p=out;
+      }
+      return p;
+    };
+    const unary=()=>{if(peek("+")){take();return unary();}if(peek("-")){take();const p=unary();return p?.map(x=>-x)??null;}return power();};
+    const product=()=>{
+      let p=unary();
+      while(peek("*")||peek("/")){
+        const op=take().value,q=unary();
+        if(op==="/"){excludeZeros(q);p=q.length===1 && p ? trim(p.map(x=>x/q[0])) : null;}
+        else p=multiply(p,q);
+      }
+      return p;
+    };
+    const sum=()=>{let p=product();while(peek("+")||peek("-")){const op=take().value;p=add(p,product(),op==="+"?1:-1);}return p;};
+    sum();if(i!==tokens.length)throw new Error("Unexpected token in rational equation.");
+  }
+  return { ...work, original_equation: equation,
+    expected_restrictions: work.expected_restrictions?.length ? work.expected_restrictions : [...restrictions],
+  };
+}
+
 function generateNativeProblem(skill, template, attemptCount, templateIndex) {
-  const seed = (stableTextSeed(`${skill.id}:${template.id}`) + Math.imul(attemptCount + 1, 104729) + Math.imul(templateIndex + 1, 8191)) >>> 0;
+  const seed = (stableTextSeed(`${skill.id}:${template.id}`) + Math.imul(attemptCount + 1, 104729)) >>> 0;
   const random = seededRandom(seed);
   const tries = Math.max(1, Math.min(500, Number(template.max_attempts ?? 100)));
   for (let attempt = 0; attempt < tries; attempt += 1) {
@@ -278,12 +383,12 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
       const explanation = template.explanation_template ? String(template.explanation_template).split(/\r?\n/).map(line => renderNativeTemplate(line, values)).filter(Boolean) : clone(template.solution_steps ?? []);
       const publicValues = publicDiagramValues(template.prompt_template, values);
       const answerMode = template.work?.mode === "limit_steps" ? "final_plus_required_work" : template.answer_mode ?? "final_only";
-      const work = renderNativeValue(template.work ?? {}, values);
+      const work = enrichNativeRationalWork(renderNativeValue(template.work ?? {}, values), renderNativeTemplate(template.prompt_template, values));
       if (work.mode === "limit_steps") work.limit = normalizeLimitSpec(work.limit);
       const expectedAnswer = answer.value == null && answer.type === "finite_set"
         ? `{${(answer.values ?? []).join(", ")}}`
         : String(answer.value ?? "");
-      return {
+      const problem = {
         template_id: `${template.id}__RUNTIME_${attemptCount + 1}`,
         source_template_id: template.id,
         skill_id: skill.id,
@@ -310,7 +415,14 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
         grading_metadata: renderNativeValue(template.grading ?? {}, values),
         work_required: ["final_plus_required_work", "structured_steps", "proof_required"].includes(answerMode) || ["required", "procedural_steps", "proof_obligations", "rubric_check", "rational_equation_steps", "sign_chart_steps", "limit_steps"].includes(work.mode ?? "none"),
       };
-    } catch {
+      if (template.proof_spec != null) {
+        // Formal errors are authoring errors, not a reason to try an ordinary bank.
+        problem.proof_spec = resolveNativeProofSpec(template.proof_spec, publicValues, template.id);
+        problem.formal_job = buildBoundFormalJob(problem);
+      }
+      return problem;
+    } catch (error) {
+      if (error instanceof NativeFormalGenerationError) throw error;
       // Try a fresh variable draw. Exported native templates are trusted, but every expression still uses the allowlisted parser above.
     }
   }
@@ -334,10 +446,26 @@ function generateNativeAssessment(skill, attemptCount) {
   return templates.map((template, index) => {
     if (template.type === "fixed") {
       const fixed = skill.problems.find((problem) => assessmentGroupKey(problem) === template.id);
-      if (fixed) return { ...clone(fixed), template_id: `${template.id}__RUNTIME_${attemptCount + 1}` };
+      if (fixed) {
+        const problem = { ...clone(fixed), template_id: `${template.id}__RUNTIME_${attemptCount + 1}` };
+        if (template.proof_spec != null) {
+          const spec = resolveNativeProofSpec(template.proof_spec, {}, template.id);
+          const bankSpec = normalizeFormalProofSpec(fixed.proof_spec, fixed.template_id);
+          if (!bankSpec || canonicalFormalJson(bankSpec) !== canonicalFormalJson(spec)) {
+            throw new NativeFormalGenerationError(`${template.id}: fixed formal bank and template disagree; rebuild the curriculum.`);
+          }
+          problem.proof_spec = spec;
+          problem.formal_job = buildBoundFormalJob(problem, { maxSeconds: fixed.formal_job?.rpc?.max_seconds ?? 60 });
+        } else if (problem.proof_spec) {
+          problem.proof_spec = normalizeFormalProofSpec(problem.proof_spec, problem.template_id);
+          problem.formal_job = buildBoundFormalJob(problem);
+        }
+        return problem;
+      }
     }
     try { return generateNativeProblem(skill, template, attemptCount, index); }
-    catch {
+    catch (error) {
+      if (template.proof_spec != null || error instanceof NativeFormalGenerationError) throw error;
       const variants = skill.problems.filter((problem) => assessmentGroupKey(problem) === template.id);
       if (!variants.length) throw new Error(`Native assessment scenario ${template.id} is unavailable.`);
       return clone(variants[attemptCount % variants.length]);
@@ -859,7 +987,7 @@ function normalizeProblem(candidate, skillId, questionIds) {
     const pointKeys = signChart.critical_points.map((point) => `${point.value}`.trim());
     if (new Set(pointKeys).size !== pointKeys.length) throw new Error(`${templateId} sign chart critical points must not be duplicated.`);
   }
-  const seed = Math.floor(cleanNumber(Number(candidate.seed), 1, 0, 2_000_000_000));
+  const seed = Math.floor(cleanNumber(Number(candidate.seed), 1, 0, 0xffff_ffff));
   const prompt = requiredText(candidate.prompt, `${templateId} prompt`, 2000);
   const problemValues = candidate.values && typeof candidate.values === "object" && !Array.isArray(candidate.values) ? clone(candidate.values) : {};
   const proofSpec = normalizeFormalProofSpec(candidate.proof_spec, templateId);
@@ -1737,9 +1865,85 @@ function sanitizeReview(candidate, profileIds) {
   };
 }
 
-function sanitizeDrafts(candidate, profileIds, curriculum) {
+function draftSnapshotMetadata(problems, variation = null) {
+  return {
+    snapshot_version: DRAFT_SNAPSHOT_VERSION,
+    snapshot_sha256: sha256Hex(canonicalFormalJson(problems)),
+    assessment_variation: Number.isInteger(variation) && variation >= 0 ? variation : null,
+  };
+}
+
+function assertSnapshotData(value, depth = 0) {
+  if (depth > 40) throw new Error("Saved question nesting is too deep.");
+  if (value === null || ["string", "boolean"].includes(typeof value)) return;
+  if (typeof value === "number" && Number.isFinite(value)) return;
+  if (!value || typeof value !== "object") throw new Error("Saved question contains invalid data.");
+  for (const [key, item] of Object.entries(value)) {
+    if (RESERVED_OBJECT_KEYS.has(key)) throw new Error("Saved question contains a reserved key.");
+    assertSnapshotData(item, depth + 1);
+  }
+}
+
+function restoreQuestionSnapshot(raw, skill, { legacy = false } = {}) {
+  assertSnapshotData(raw);
+  if (utf8ByteLength(JSON.stringify(raw)) > 120_000) throw new Error("Saved question is too large.");
+  if (!Number.isInteger(raw.seed ?? 1) || (raw.seed ?? 1) < 0 || (raw.seed ?? 1) > 0xffff_ffff) throw new Error("Saved question has an invalid seed.");
+  const candidate = clone(raw);
+  const source = skill.native_templates?.find(t => t.id === assessmentGroupKey(candidate));
+  if (source?.proof_spec && !candidate.proof_spec) throw new Error("A saved formal question is missing its proof specification.");
+  let migratedBinding = null;
+  if (candidate.proof_spec && candidate.formal_job) {
+    const spec = normalizeFormalProofSpec(candidate.proof_spec, candidate.template_id);
+    const expected = formalProblemBinding(candidate);
+    const job = candidate.formal_job;
+    if (job.problem_binding_sha256 !== expected && legacy) {
+      // Narrow migration for the shipped fixed-question clone bug. Prove the
+      // old job binds this EXACT snapshot under its recorded bank ID first.
+      // No changed goal, seed, parameters, policy or environment is repaired.
+      const bankId = job.template_id;
+      const prefix = `${candidate.source_template_id}__`;
+      if (source?.type !== "fixed" || job.skill_id !== skill.id || typeof bankId !== "string"
+          || !bankId.startsWith(prefix) || !/^\d+$/.test(bankId.slice(prefix.length))) {
+        throw new Error("Saved formal binding is not a recognized legacy bank binding.");
+      }
+      const bankBinding = formalProblemBinding({ ...candidate, template_id: bankId });
+      normalizeFormalJob(job, spec, bankId, bankBinding);
+      if (job.seed !== candidate.seed) throw new Error("Legacy formal seed does not match its snapshot.");
+      const rebound = buildBoundFormalJob(candidate, { maxSeconds: job.rpc.max_seconds });
+      migratedBinding = { from: job.problem_binding_sha256, to: rebound.problem_binding_sha256 };
+      candidate.formal_job = rebound;
+    }
+  }
+  const validationCandidate = candidate.work?.mode === "rational_equation_steps"
+    ? { ...candidate, work: enrichNativeRationalWork(candidate.work, candidate.prompt) } : candidate;
+  const normalized = normalizeProblem(validationCandidate, skill.id, new Set());
+  // Validate the complete snapshot, but retain its established representation
+  // (including work contracts and answer metadata) rather than replacing it
+  // with today's defaults. Unknown top-level authority flags are not retained.
+  const problem = Object.fromEntries(Object.entries(candidate).filter(([key]) => Object.hasOwn(normalized, key)));
+  if (candidate.proof_spec && !candidate.formal_job) problem.formal_job = normalized.formal_job;
+  return { problem, migratedBinding };
+}
+
+function migrateDraftProofBinding(structured, migration) {
+  if (!migration || !structured?.formal) return structured;
+  const evidence = structured.formal;
+  if (evidence.problem_binding_sha256 !== migration.from || evidence.request?.request_id !== `quickmaths:${migration.from}`) return structured;
+  // Retarget only this in-progress request label. Preserve all mathematical
+  // content, steps, scopes and unsaved edits; never rewrite archived evidence.
+  evidence.problem_binding_sha256 = migration.to;
+  evidence.request.request_id = `quickmaths:${migration.to}`;
+  evidence.verification = null;
+  evidence.kernel_available = false;
+  delete evidence.guidance;
+  if (evidence.proof_state) delete evidence.proof_state.request_hash;
+  evidence.binding_migration = { ...migration, requires_fresh_verification: true };
+  return structured;
+}
+
+function sanitizeDrafts(candidate, profileIds, curriculum, sourceVersion = APP_VERSION) {
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return {};
-  const skillsById = Object.fromEntries(curriculum.skills.map((skill) => [skill.id, skill]));
+  const skillsById = Object.fromEntries(curriculum.skills.map(skill => [skill.id, skill]));
   const output = {};
   for (const profileId of profileIds) {
     const profileDrafts = candidate[profileId];
@@ -1747,57 +1951,79 @@ function sanitizeDrafts(candidate, profileIds, curriculum) {
     output[profileId] = {};
     for (const [skillId, rawDraft] of Object.entries(profileDrafts)) {
       const skill = skillsById[skillId];
-      if (!skill || !rawDraft || typeof rawDraft !== "object" || Array.isArray(rawDraft)) continue;
-      const canonical = Object.fromEntries(skill.problems.map((problem) => [problem.template_id, problem]));
-      const safeProblems = new Map(Object.entries(canonical));
-      const nativeTemplateIds = new Set((skill.native_templates ?? []).map((template) => template.id));
-      if (Array.isArray(rawDraft.problems) && nativeTemplateIds.size) {
-        const generatedByVariation = new Map();
-        for (const rawProblem of rawDraft.problems) {
-          const id = cleanText(rawProblem?.template_id, 120);
-          const sourceId = cleanText(rawProblem?.source_template_id, 120);
-          if (!id || safeProblems.has(id) || !nativeTemplateIds.has(sourceId) || !id.startsWith(`${sourceId}__RUNTIME_`)) continue;
-          const variation = Number(id.slice(`${sourceId}__RUNTIME_`.length)) - 1;
-          if (!Number.isInteger(variation) || variation < 0 || variation > 10_000) continue;
+      if (!skill || !rawDraft || typeof rawDraft !== "object" || !Array.isArray(rawDraft.problems)) continue;
+      const rawProblems = rawDraft.problems.slice(0, MAX_PROBLEMS_PER_SKILL);
+      const problems = [], responses = {}, seen = new Set();
+      const recoveryProblems = Array.isArray(rawDraft.recoveryProblems) ? rawDraft.recoveryProblems.slice(0, MAX_PROBLEMS_PER_SKILL).filter(row =>
+        row && typeof row.serialized === "string" && row.serialized.length <= 200_000
+      ).map(row => ({ serialized: row.serialized, reason: cleanText(row.reason, 500) })) : [];
+      let checksumError = null;
+      if (rawDraft.snapshot_version != null) {
+        if (rawDraft.snapshot_version !== DRAFT_SNAPSHOT_VERSION) checksumError = "Unsupported saved question snapshot version.";
+        else {
           try {
-            if (!generatedByVariation.has(variation)) generatedByVariation.set(variation, generateNativeAssessment(skill, variation));
-            const regenerated = generatedByVariation.get(variation).find((problem) => problem.template_id === id && assessmentGroupKey(problem) === sourceId);
-            if (regenerated) safeProblems.set(id, regenerated);
-          } catch { /* Discard malformed or non-reproducible runtime problems. */ }
+            if (rawDraft.snapshot_sha256 !== sha256Hex(canonicalFormalJson(rawDraft.problems))) checksumError = "Saved question snapshot checksum mismatch.";
+          } catch { checksumError = "Saved question snapshot is malformed."; }
         }
       }
-      // Visual questions are immutable resolved snapshots. Never pair an old
-      // response or graph with newly generated givens after a template update.
-      for (const rawProblem of (Array.isArray(rawDraft.problems) ? rawDraft.problems : []).slice(0, MAX_PROBLEMS_PER_SKILL)) {
-        if (!rawProblem?.diagram && !rawProblem?.math_blocks?.length) continue;
-        const id = rawProblem.template_id;
-        if (!safeProblems.has(id) && !nativeTemplateIds.has(rawProblem.source_template_id)) continue;
-        try { safeProblems.set(id, normalizeProblem(rawProblem, skillId, new Set())); }
-        catch { safeProblems.delete(id); } // Invalid saved visual data is never silently regenerated.
+      const isLegacy = rawDraft.snapshot_version == null;
+      // Only the explicitly old five-question release may expand a draft. A
+      // v17 rotated assessment (or any v1 snapshot) must NEVER be expanded.
+      const expandLegacy = isLegacy && Number(sourceVersion) < 16 && rawProblems.length === 5
+        && !rawProblems.some(row => row?.proof_spec || row?.diagram || row?.math_blocks?.length)
+        && !skill.native_templates?.some(t => t.proof_spec);
+      const legacyRegenerated = new Map();
+      for (const rawProblem of rawProblems) {
+        const rawResponse = rawDraft.responses?.[rawProblem?.template_id] ?? {};
+        try {
+          if (checksumError) throw new Error(checksumError);
+          let saved = rawProblem;
+          if (expandLegacy) {
+            const match = String(rawProblem?.template_id ?? "").match(/__RUNTIME_(\d+)$/);
+            const variation = match ? Number(match[1]) - 1 : null;
+            let canonical = skill.problems.find(p => p.template_id === rawProblem?.template_id);
+            if (!canonical && Number.isInteger(variation) && variation >= 0 && variation <= 10_000) {
+              if (!legacyRegenerated.has(variation)) legacyRegenerated.set(variation, generateNativeAssessment(skill, variation));
+              canonical = legacyRegenerated.get(variation).find(p => p.template_id === rawProblem.template_id);
+            }
+            // Repair an old answer key only when the displayed givens are
+            // unchanged. Otherwise preserve the old snapshot, never re-pair it.
+            if (canonical?.prompt === rawProblem?.prompt) saved = canonical;
+          }
+          const { problem, migratedBinding } = restoreQuestionSnapshot(saved, skill, { legacy: isLegacy });
+          if (seen.has(problem.template_id)) throw new Error("Duplicate saved question identity.");
+          seen.add(problem.template_id);
+          problems.push(problem);
+          responses[problem.template_id] = {
+            finalAnswer: cleanText(rawResponse.finalAnswer, problem.grading_method === "python_program" ? 12_000 : 300),
+            work: cleanText(rawResponse.work, MAX_LONG_WORK_CHARS),
+            structuredWorkJson: migrateDraftProofBinding(sanitizeStructuredWork(rawResponse.structuredWorkJson), migratedBinding),
+          };
+        } catch (error) {
+          // Keep malformed data as inert backup text, not an active question or
+          // a new grade. The remaining valid questions and responses survive.
+          const serialized = JSON.stringify({ problem: rawProblem, response: rawResponse });
+          if (serialized.length <= 200_000 && recoveryProblems.length < MAX_PROBLEMS_PER_SKILL) recoveryProblems.push({ serialized, reason: cleanText(error.message, 500) });
+        }
       }
-      const problemIds = Array.isArray(rawDraft.problems)
-        ? rawDraft.problems.map((problem) => cleanText(problem?.template_id, 120)).filter((id) => safeProblems.has(id)).slice(0, MAX_PROBLEMS_PER_SKILL)
-        : [];
-      if (!problemIds.length) continue;
-      const included = new Set(problemIds.map((id) => assessmentGroupKey(safeProblems.get(id))));
-      for (const problem of selectAssessmentProblems(skill)) {
-        const groupKey = assessmentGroupKey(problem);
-        if (included.has(groupKey)) continue;
-        safeProblems.set(problem.template_id, problem);
-        problemIds.push(problem.template_id);
-        included.add(groupKey);
+      if (expandLegacy && !recoveryProblems.length && problems.length === 5) {
+        const included = new Set(problems.map(assessmentGroupKey));
+        for (const candidate of selectAssessmentProblems(skill)) {
+          if (included.has(assessmentGroupKey(candidate))) continue;
+          const { problem } = restoreQuestionSnapshot(candidate, skill);
+          problems.push(problem);
+          responses[problem.template_id] = { finalAnswer: "", work: "", structuredWorkJson: null };
+          included.add(assessmentGroupKey(problem));
+        }
       }
-      const responses = rawDraft.responses && typeof rawDraft.responses === "object" ? rawDraft.responses : {};
+      if (!problems.length && !recoveryProblems.length) continue;
       output[profileId][skillId] = {
         draftId: cleanText(rawDraft.draftId, 120) || `draft-imported-${profileId}-${skillId}`,
         skillId,
         startedAt: cleanText(rawDraft.startedAt, 40) || new Date().toISOString(),
-        problems: problemIds.map((id) => clone(safeProblems.get(id))),
-        responses: Object.fromEntries(problemIds.map((id) => [id, {
-          finalAnswer: cleanText(responses[id]?.finalAnswer, safeProblems.get(id)?.grading_method === "python_program" ? 12_000 : 300),
-          work: cleanText(responses[id]?.work, MAX_LONG_WORK_CHARS),
-          structuredWorkJson: sanitizeStructuredWork(responses[id]?.structuredWorkJson),
-        }])),
+        ...draftSnapshotMetadata(problems, rawDraft.assessment_variation),
+        problems, responses,
+        ...(recoveryProblems.length ? { recoveryProblems } : {}),
       };
     }
   }
@@ -1924,7 +2150,7 @@ function sanitizeState(candidate, curriculum, { strictPacks = false } = {}) {
     attempts,
     reviews,
     formalEvidence,
-    drafts: sanitizeDrafts(candidate.drafts, profileIds, catalog),
+    drafts: sanitizeDrafts(candidate.drafts, profileIds, catalog, candidate.version ?? 0),
     mapPlans: sanitizeMapPlans(candidate.mapPlans, profileIds, skills, subjects),
     lessonPacks,
     stagedLessonPacks: sanitizeStagedLessonPacks(candidate.stagedLessonPacks, curriculum, { strict: strictPacks }),
@@ -2089,6 +2315,7 @@ function expressionTokens(value) {
       index += number[0].length;
     } else if (identifier) {
       const value = identifier[0].toLowerCase();
+      if (value.length > 1 && source[index + identifier[0].length] === "(" && !EXPRESSION_FUNCTIONS.has(value) && !(value in EXPRESSION_CONSTANTS)) return null;
       const conventionalProduct = /^[a-z]+$/.test(value) && value.length > 1 && !EXPRESSION_FUNCTIONS.has(value) && !(value in EXPRESSION_CONSTANTS);
       raw.push(...(conventionalProduct ? [...value].map((letter) => ({ type: "identifier", value: letter })) : [{ type: "identifier", value }]));
       index += identifier[0].length;
@@ -2127,7 +2354,9 @@ function evaluateExpression(tokens, variables) {
         const argument = addSubtract();
         if (!peek(")")) throw new Error("Missing closing parenthesis.");
         take();
-        return token.value === "sqrt" ? Math.sqrt(argument) : Number.NaN;
+        const value = EXPRESSION_FUNCTION_VALUES[token.value](argument);
+        if (!Number.isFinite(value)) return Number.NaN;
+        return value;
       }
       if (token.value in EXPRESSION_CONSTANTS) return EXPRESSION_CONSTANTS[token.value];
       if (!(token.value in variables)) throw new Error("Unknown variable.");
@@ -2286,19 +2515,33 @@ function symbolicEquivalent(left, right) {
   if (!leftTokens || !rightTokens) return false;
   const names = expressionVariableNames(leftTokens, rightTokens);
   if (names.length > 12) return false;
+  const hasFunctions = [...leftTokens, ...rightTokens].some(token => token.type === "identifier" && EXPRESSION_FUNCTIONS.has(token.value));
+  const probes = Array.from({ length: 8 }, (_, sample) => sampledVariables(names, sample));
+  if (hasFunctions) {
+    // Integer-only samples alias sin(pi*x) to zero and miss local sign/domain
+    // changes. These are still bounded numerical checks, NOT theorem proofs.
+    const anchors = [-4, -1, -0.5, 0, 0.25, 0.5, 1, 2, 4];
+    const constants = [...new Set([...leftTokens, ...rightTokens].filter(t => t.type === "number" && Math.abs(t.value) <= 1e6).map(t => t.value))].slice(0, 12);
+    for (const c of constants) {
+      for (const d of [0.125, 0.5, 1, 2]) anchors.push(c + d, c - d, -c + d, -c - d);
+      anchors.push(c / 4, c / 2, -c / 4, -c / 2);
+    }
+    for (const x of anchors) probes.push(Object.fromEntries(names.map((name, i) => [name, x + i / 7])));
+    for (let i = 0; i < 16; i++) probes.push(Object.fromEntries(names.map((name, j) => [name, sampledVariables([name], i + j + 17)[name] / (i % 3 + 2.37)])));
+  }
   let successfulSamples = 0;
-  for (let sample = 0; sample < 8; sample += 1) {
-    const variables = sampledVariables(names, sample);
+  for (const variables of probes) {
     try {
       const leftValue = evaluateExpression(leftTokens, variables);
       const rightValue = evaluateExpression(rightTokens, variables);
+      // A submitted function expression cannot remove points at which the
+      // expected expression is defined (e.g. 2*log(x) versus log(x^2)).
+      if (hasFunctions && Number.isFinite(rightValue) && !Number.isFinite(leftValue)) return false;
       if (!Number.isFinite(leftValue) || !Number.isFinite(rightValue)) continue;
       const scale = Math.max(1, Math.abs(leftValue), Math.abs(rightValue));
       if (Math.abs(leftValue - rightValue) > 1e-8 * scale) return false;
       successfulSamples += 1;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   }
   return successfulSamples >= 3;
 }
@@ -2588,6 +2831,8 @@ export function validateProceduralWork(problem, work, structuredWork = null, fin
     return trace.ok ? null : trace.diagnostics[0]?.message ?? "Complete the trace table.";
   }
   if (mode === "rational_equation_steps") {
+    try { problem = { ...problem, work: enrichNativeRationalWork(problem.work, problem.prompt) }; }
+    catch { return "The original rational-equation work contract needs author review. Your saved work is preserved."; }
     const data = structuredWork && typeof structuredWork === "object" ? structuredWork : {};
     const restrictions = Array.isArray(data.restrictions) ? data.restrictions.filter((item) => String(item).trim()) : [];
     const steps = Array.isArray(data.steps) ? data.steps.filter((item) => String(item).trim()) : String(data.steps ?? "").split(/\r?\n/).filter((item) => item.trim());
@@ -4112,6 +4357,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
         draftId: makeId("draft"),
         skillId,
         startedAt: isoNow(),
+        ...draftSnapshotMetadata(problems, attemptCount),
         problems: clone(problems),
         responses: Object.fromEntries(problems.map((problem) => [problem.template_id, { finalAnswer: "", work: "", structuredWorkJson: null }])),
       };
@@ -4250,6 +4496,10 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
   const submitTest = () => {
     const draft = state.drafts[state.activeProfileId]?.[state.ui.selectedSkillId];
     if (!draft) throw new Error("No active test.");
+    if (draft.recoveryProblems?.length) return {
+      ok: false, recoveryRequired: true,
+      workIssues: [{ questionId: "snapshot-recovery", message: "This draft contains saved questions that need recovery. Export a backup from Settings before repairing it. No result or mastery was recorded." }],
+    };
     const workIssues = draft.problems.map((problem) => ({
       questionId: problem.template_id,
       message: problem.proof_spec
@@ -4319,6 +4569,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     if (!pending) throw new Error("No result is waiting to be saved.");
     const skill = skillsById[pending.skillId];
     const draft = state.drafts[state.activeProfileId]?.[pending.skillId];
+    if (draft?.recoveryProblems?.length) throw new Error("Recover the saved question snapshots before recording mastery. Export a backup from Settings; your work is preserved.");
     const formalQuestions = draft?.problems.filter((problem) => problem.proof_spec) ?? [];
     if (formalQuestions.length || pending.results.some((result) => result.gradingMethod === "formal_proof" || result.structuredWorkJson?.formal)) {
       if (!draft || draft.draftId !== pending.draftId || state.ui.selectedSkillId !== pending.skillId) throw new Error("Reopen and verify the formal draft before recording mastery.");
@@ -4679,6 +4930,7 @@ export function createQuickMathsStore({ storage, curriculum, bundledLessonPacks 
     const liveDraft = state.drafts[state.activeProfileId]?.[skillId];
     if (liveDraft && matching) {
       liveDraft.problems = [matching, ...liveDraft.problems.filter((problem) => problem.template_id !== matching.template_id)];
+      Object.assign(liveDraft, draftSnapshotMetadata(liveDraft.problems, liveDraft.assessment_variation));
     }
     state.ui.route = "test";
     addActivity("create_followup_problem", `Prepared ${matching.template_id} for targeted practice.`, undefined, activityActor);

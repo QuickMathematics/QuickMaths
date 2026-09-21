@@ -1,11 +1,12 @@
 id: TRACK_MATH_ALGEBRA_FOUNDATIONS
 schema_version: 0.2
-name: Algebra, Statistics, and Probability Foundations
+name: 'Mathematics Foundations: Algebra, Calculus, Statistics, and Probability'
 domain: Math
-description: A rigorous path through arithmetic, pre-algebra, functions, exponents, sequences, polynomials, radicals, rational
-  expressions and equations, rational functions and inequalities, interval notation, polynomial inequalities, quadratics,
-  coordinate graphing, triangle area and measurement, linear equations, systems, logarithms, trigonometry, descriptive and
-  inferential statistics, and probability.
+description: A rigorous path through arithmetic, pre-algebra, functions, domains and ranges, transformations, composition
+  and inverses, exponents, sequences, polynomials, radicals, rational expressions and equations, rational functions and inequalities,
+  interval notation, polynomial inequalities, quadratics, coordinate graphing, triangle area and measurement, linear equations,
+  systems, logarithms, trigonometry, descriptive and inferential statistics, and probability, piecewise functions, average
+  rates of change, limits, continuity, and the intermediate value theorem.
 entry_skills:
 - MATH_ARITH_001
 exit_skills:
@@ -21,6 +22,8 @@ exit_skills:
 - MATH_TRIG_006
 - MATH_STAT_016
 - MATH_PROB_005
+- MATH_FUNC_005
+- MATH_CALC_002
 skills:
 - MATH_ARITH_001
 - MATH_ARITH_002
@@ -103,3 +106,11 @@ skills:
 - MATH_PROB_003
 - MATH_PROB_004
 - MATH_PROB_005
+- MATH_FUNC_002
+- MATH_FUNC_003
+- MATH_FUNC_004
+- MATH_FUNC_005
+- MATH_FUNC_006
+- MATH_FUNC_007
+- MATH_CALC_001
+- MATH_CALC_002

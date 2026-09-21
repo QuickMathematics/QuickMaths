@@ -1,0 +1,14 @@
+{
+  "legacyProofVerified": true,
+  "legacyStepsPreserved": true,
+  "reloadRequiresReplay": true,
+  "fixedRuntimeProofVerified": true,
+  "formalSubmissionAccepted": true,
+  "package_sha256": "48018f285f175dcad7fe825d06b9836b47fe44ac2ca398673623fac6dc913179",
+  "base_commit": "02098c478b7ee542b2594e34bad16218456ac58c",
+  "native_lessons": 92,
+  "existing_lesson_objects_unchanged": 84,
+  "javascript_tests": 604,
+  "focused_python_tests": 47,
+  "physical_device_tested": false
+}

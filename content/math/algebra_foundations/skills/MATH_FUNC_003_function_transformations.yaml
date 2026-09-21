@@ -1,0 +1,941 @@
+id: MATH_FUNC_003
+schema_version: '0.2'
+name: Transformations of functions and graphs
+domain: Math
+subdomain: Algebra
+topic: Functions
+description: Translate, reflect, and scale functions by tracking how input-output pairs, domains, and
+  ranges change.
+prerequisites:
+- MATH_FUNC_002
+- MATH_QUAD_004
+unlocks:
+- MATH_FUNC_005
+tags:
+- functions
+- transformations
+- translations
+- reflections
+- scaling
+- domain
+- range
+- point_mapping
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A graph transformation changes a function in a predictable way. The safest approach is to follow a point rather than memorize disconnected rules. If f(u) = v, then (u, v) lies on the original graph. Ask two questions: which new input sends u into f, and what happens to the resulting output v?
+
+  What you will learn:
+  Distinguish inside from outside changes, map points through combined transformations, factor inside expressions correctly, and transform domain and range sets without losing endpoint information.
+
+  Outside changes act on outputs:
+  For g(x) = f(x) + k, every output increases by k. A positive k shifts the graph upward; a negative k shifts it downward. The point (u, v) becomes (u, v + k).
+  For g(x) = a f(x), the point becomes (u, av). If |a| > 1, vertical distances from the x-axis are stretched. If 0 < |a| < 1, they are compressed. A negative a also reflects the graph across the x-axis. In g(x) = a f(x) + k, scale and reflect the original output first, then translate it. This differs from a(f(x) + k).
+
+  Inside changes act on inputs:
+  For g(x) = f(x - h), the old input u occurs where x - h = u, so the new input is u + h. Thus positive h shifts the graph right, and negative h shifts it left. The apparently reversed sign is a consequence of solving for the new input, not an arbitrary convention.
+  For g(x) = f(bx), the old input u appears at x = u/b. Horizontal distances from the y-axis are multiplied by 1/|b|. A negative b additionally reflects the graph across the y-axis. For example, f(2x) compresses the graph horizontally by factor 1/2; it does not double the graph's horizontal coordinates.
+
+  One combined point rule:
+  For g(x) = a f(b(x - h)) + k, with a != 0 and b != 0,
+  (u, v) -> (h + u/b, av + k).
+  Derive it by solving b(x - h) = u and then computing a f(u) + k. This rule works for negative scales as well as positive ones. It also gives an immediate numerical check: substitute the new x-coordinate into the inside expression and make sure you recover u.
+
+  Factor before reading a horizontal shift:
+  In f(2x - 6), the inside expression is 2(x - 3). The new point is (u/2 + 3, v): compress horizontally first, then shift right by 3. Reading the -6 as a shift of 6 produces the wrong graph. Similarly, f(-2x + 4) = f(-2(x - 2)); its point rule is (2 - u/2, v). When descriptions specify a sequence of transformations, preserve that sequence rather than silently reordering it.
+
+  Working from a parent function:
+  The parent quadratic x^2 has vertex (0, 0). The function -0.5(x - 2)^2 + 3 shifts it right by 2, compresses it vertically by factor 1/2, reflects it across the x-axis, and shifts it up by 3. Its vertex is (2, 3), its domain remains all real numbers, and its range is (-inf, 3]. A second point checks the scale: the old point (2, 4) becomes (4, 1).
+  The same input-output reasoning applies to |x| and sqrt(x), even though their graph shapes differ. A shifted square root still has a starting point and a restricted domain; a horizontal reflection can make it extend left instead of right.
+
+  Transforming domain and range:
+  A new input x is allowed exactly when b(x - h) belongs to the domain of f. Solve this membership condition rather than moving endpoints by intuition. If the domain of f is [0, 4), then g(x) = f(-2(x - 1)) needs 0 <= -2(x - 1) < 4. Dividing by -2 reverses the inequalities, giving -1 < x <= 1, or (-1, 1]. The excluded old upper endpoint becomes the excluded new lower endpoint.
+  For the range, transform old outputs by y -> ay + k. If the old range is [-1, 3] and g = -2f + 4, the new extreme outputs are 6 and -2. Write them in increasing order: [-2, 6]. Closed endpoints remain attained. If a is negative, the order reverses, but membership does not disappear.
+
+  What the usual rules assume:
+  The combined point rule requires b != 0. If b = 0, the inside input is fixed and the result is a constant wherever the definition is meaningful. The usual non-degenerate scaling descriptions also assume a != 0. This lesson's combined-transformation problems state or build in those assumptions.
+
+  Common mistakes to catch:
+  Do not confuse -f(x) with f(-x): the first changes outputs, the second changes inputs. Do not multiply horizontal coordinates by b when the graph uses f(bx). Do not read a shift from an unfactored expression. Do not leave reflected interval endpoints in decreasing order. Finally, test one transformed point in the actual formula; a diagram and an algebraic substitution should tell the same story.
+media:
+- src: media/native-functions/transformation-overview.svg
+  alt: The parent parabola y = x^2 and the transformed parabola y = -0.5(x - 2)^2 + 3 are plotted. Their
+    vertices are (0, 0) and (2, 3).
+  caption: A horizontal shift acts on inputs; reflection, vertical scaling, and vertical translation act
+    on outputs.
+  width: 800
+  height: 500
+  fit: contain
+- src: media/native-functions/transformation-point-map.svg
+  alt: An original point (6, 2) is mapped to (3, 0) for g(x) = -2 f(3(x - 1)) + 4. The input rule solves
+    3(x - 1) = 6 and the output rule computes -2 times 2 plus 4.
+  caption: Solve for the new input instead of guessing the direction of a horizontal change.
+  width: 800
+  height: 500
+  fit: contain
+examples:
+- prompt: Given f(2) = 5, find g(2) when g(x) = f(x) - 3.
+  solution: '2'
+  explanation: The same input is used, and the old output 5 is reduced by 3.
+- prompt: Given f(-1) = 4, find g(-1) when g(x) = -2f(x) + 1.
+  solution: '-7'
+  explanation: 'Apply the outside operations in order: -2*4 + 1 = -7. Reflection and scaling occur before
+    the upward translation.'
+- prompt: Where does (2, 5) move under g(x) = f(x - 3)?
+  solution: (5, 5)
+  explanation: Solve x - 3 = 2 to obtain x = 5. The output stays 5 because f still receives input 2.
+- prompt: Where does (6, 2) move under g(x) = f(3x)?
+  solution: (2, 2)
+  explanation: The inside expression must equal 6. Solve 3x = 6. A horizontal compression divides the
+    old x-coordinate by 3.
+- prompt: Where does (6, 2) move under g(x) = -2f(3(x - 1)) + 4?
+  solution: (3, 0)
+  explanation: The new input is 1 + 6/3 = 3. The new output is -2*2 + 4 = 0. Substitution checks that
+    3(3 - 1) = 6.
+  media:
+  - src: media/native-functions/transformation-point-map.svg
+    alt: An original point (6, 2) is mapped to (3, 0) for g(x) = -2 f(3(x - 1)) + 4. The input rule solves
+      3(x - 1) = 6 and the output rule computes -2 times 2 plus 4.
+    caption: Solve for the new input instead of guessing the direction of a horizontal change.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: Read the transformation in g(x) = f(2x - 6).
+  solution: Horizontal compression by 1/2, followed by a shift right of 3.
+  explanation: Factor 2x - 6 as 2(x - 3). The point rule is (u, v) -> (u/2 + 3, v), not (u/2 + 6, v).
+- prompt: Find the vertex and range of g(x) = -0.5(x - 2)^2 + 3.
+  solution: 'Vertex: (2, 3). Range: (-inf, 3].'
+  explanation: The squared expression is least at x = 2. Its negative multiple is at most zero, so adding
+    3 gives an attained maximum of 3.
+  media:
+  - src: media/native-functions/transformation-overview.svg
+    alt: The parent parabola y = x^2 and the transformed parabola y = -0.5(x - 2)^2 + 3 are plotted. Their
+      vertices are (0, 0) and (2, 3).
+    caption: A horizontal shift acts on inputs; reflection, vertical scaling, and vertical translation
+      act on outputs.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: The domain of f is [0, 4). Find the domain of f(-2(x - 1)).
+  solution: (-1, 1]
+  explanation: Solve 0 <= -2(x - 1) < 4. After division by -2 and rearranging, -1 < x <= 1. The endpoint
+    order and the open/closed roles reverse.
+- prompt: The range of f is [-1, 3]. Find the range of -2f + 4.
+  solution: '[-2, 6]'
+  explanation: The largest old output 3 gives the smallest new output -2. The smallest old output -1 gives
+    the largest new output 6. Both endpoints occur.
+- prompt: Compare “shift up by 3 then stretch vertically by 2” with “stretch by 2 then shift up by 3.”
+  solution: The formulas are 2(f(x) + 3) and 2f(x) + 3, respectively.
+  explanation: The first is 2f(x) + 6. Translation and scaling need not commute, so the order stated in
+    the problem is mathematical information.
+applications:
+- title: Sensor calibration
+  description: A scale factor and offset transform raw instrument outputs into calibrated measurements;
+    reversing their order generally changes the result.
+- title: Signal timing and amplitude
+  description: Input changes shift or compress when a signal occurs, while output changes alter its height.
+    The distinction is useful before studying periodic models.
+- title: Graph-based problem solving
+  description: Known parent graphs provide a reference for locating vertices, endpoints, zeros, and possible
+    outputs without plotting many arbitrary values.
+- title: Model comparison
+  description: Two formulas may describe translated or rescaled versions of the same response. Point mapping
+    explains exactly which features change and which remain.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: FUNC_TRANS_VERTICAL_SHIFT_001
+    type: generated
+    prompt_template: Suppose f({u}) = {v} and g(x) = f(x) + {k}. Find g({u}).
+    difficulty: easy
+    answer_mode: final_only
+    variables:
+      u:
+        type: int
+        min: -6
+        max: 6
+      v:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -7
+        max: 7
+        exclude:
+        - 0
+    derived:
+      out: v+k
+    constraints: []
+    answer:
+      type: numeric
+      value: '{out}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The input remains {u}.
+      Add {k} to the old output {v}: {v} + {k} = {out}.
+    mistake_tags:
+    - input_output_transformation
+  - id: FUNC_TRANS_OUTPUT_SCALE_001
+    type: generated
+    prompt_template: Suppose f({u}) = {v} and g(x) = -{a}f(x) + {k}. Find g({u}).
+    difficulty: medium
+    answer_mode: final_plus_required_work
+    variables:
+      u:
+        type: int
+        min: -6
+        max: 6
+      v:
+        type: int
+        min: -6
+        max: 6
+      a:
+        type: int
+        min: 2
+        max: 5
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      out: -a*v+k
+    constraints: []
+    answer:
+      type: numeric
+      value: '{out}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write one equivalent expression per line. Substitute the given values before simplifying;
+        do not include f(...) notation in the work lines.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The input has not changed.
+      Multiply the old output by -{a}, then add {k}.
+      -{a}*({v}) + {k} = {out}.
+    mistake_tags:
+    - vertical_reflection
+    - order_of_transformations
+  - id: FUNC_TRANS_HORIZONTAL_SHIFT_001
+    type: generated
+    prompt_template: The point ({u}, {v}) lies on y = f(x). For g(x) = f(x - {h}), find the x-coordinate
+      of the corresponding point.
+    difficulty: easy
+    answer_mode: final_only
+    variables:
+      u:
+        type: int
+        min: -6
+        max: 6
+      v:
+        type: int
+        min: -6
+        max: 6
+      h:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+    derived:
+      out: u+h
+    constraints: []
+    answer:
+      type: numeric
+      value: '{out}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The original input must still be {u} inside f.
+      Solve x - {h} = {u}.
+      The new x-coordinate is {out}; the output remains {v}.
+    mistake_tags:
+    - horizontal_shift_sign
+  - id: FUNC_TRANS_HORIZONTAL_SCALE_001
+    type: generated
+    prompt_template: The point ({u}, {v}) lies on y = f(x). For g(x) = f({b}x), find the x-coordinate
+      of the corresponding point.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      b:
+        type: int
+        min: 2
+        max: 5
+      r:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      v:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      u: b*r
+    constraints: []
+    answer:
+      type: numeric
+      value: '{r}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Solve {b}x = {u}, not x = {b}*{u}.
+      The new coordinate is {u}/{b} = {r}.
+      Horizontal distances from the y-axis are divided by {b}.
+    mistake_tags:
+    - horizontal_scale_reciprocal
+  - id: FUNC_TRANS_COMBINED_INPUT_001
+    type: generated
+    prompt_template: The point ({u}, {v}) lies on y = f(x). Let g(x) = -2 f({b}(x - {h})) + 4. Find the
+      corresponding x-coordinate.
+    difficulty: medium
+    answer_mode: final_plus_optional_work
+    variables:
+      b:
+        type: choice
+        values:
+        - -3
+        - -2
+        - 2
+        - 3
+      r:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      h:
+        type: int
+        min: -6
+        max: 6
+      v:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      u: b*r
+      out: h+r
+    constraints: []
+    answer:
+      type: numeric
+      value: '{out}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Solve {b}(x - {h}) = {u}.
+      Then x = {h} + {u}/{b} = {out}.
+      The outside operations do not change this input coordinate.
+    mistake_tags:
+    - point_mapping
+    - horizontal_reflection
+  - id: FUNC_TRANS_COMBINED_OUTPUT_001
+    type: generated
+    prompt_template: The point ({u}, {v}) lies on y = f(x). Let g(x) = -{a} f(2(x - 3)) + {k}. Find the
+      corresponding y-coordinate.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      u:
+        type: int
+        min: -6
+        max: 6
+      v:
+        type: int
+        min: -6
+        max: 6
+      a:
+        type: int
+        min: 1
+        max: 5
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      out: -a*v+k
+    constraints: []
+    answer:
+      type: numeric
+      value: '{out}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The new input is chosen so the inside expression equals {u}.
+      That preserves the old function output {v} before the outside changes.
+      The new y-coordinate is -{a}*({v}) + {k} = {out}.
+    mistake_tags:
+    - point_mapping
+    - input_output_transformation
+  - id: FUNC_TRANS_QUADRATIC_FORMULA_001
+    type: generated
+    prompt_template: Let f(x) = x^2. Write only an expression in x for g(x) = {a} f(x - {h}) + {k}.
+    difficulty: medium
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: choice
+        values:
+        - -3
+        - -2
+        - 2
+        - 3
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: '{a}*(x - {h})^2 + {k}'
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: procedural_steps
+      prompt: Write one equivalent expression per line. Substitute the given values before simplifying;
+        do not include f(...) notation in the work lines.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Replace the entire input of f by x - {h}.
+      Since f squares its input, f(x - {h}) = (x - {h})^2.
+      Apply the outside multiplication and addition after squaring.
+    mistake_tags:
+    - substitution_parentheses
+    - transformation_formula
+  - id: FUNC_TRANS_ABSOLUTE_FORMULA_001
+    type: fixed
+    prompt_template: Starting from f(x) = |x|, shift its graph 3 units left, stretch vertically by a factor
+      of 2, reflect across the x-axis, and shift 1 unit up, in that order. Give only the expression, using
+      abs(...) for absolute value.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: -2*abs(x + 3) + 1
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      A left shift replaces x by x + 3.
+      The vertical stretch and x-axis reflection multiply the output by -2.
+      The last upward shift adds 1, giving -2*abs(x + 3) + 1.
+    mistake_tags:
+    - horizontal_shift_sign
+    - absolute_value_transformation
+  - id: FUNC_TRANS_SQRT_DOMAIN_001
+    type: generated
+    prompt_template: Find the real domain of g(x) = sqrt(-{b}(x - {h})). Give interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      b:
+        type: int
+        min: 1
+        max: 4
+      h:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {h}]
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Require -{b}(x - {h}) >= 0.
+      Dividing by a negative reverses the inequality, so x <= {h}.
+      The endpoint is included because sqrt(0) is defined.
+    mistake_tags:
+    - horizontal_reflection
+    - inequality_direction
+  - id: FUNC_TRANS_DOMAIN_SHIFT_001
+    type: generated
+    prompt_template: The domain of f is [{l}, {u}). Find the domain of g(x) = f(x - {h}) in interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      l:
+        type: int
+        min: -6
+        max: 0
+      gap:
+        type: int
+        min: 1
+        max: 7
+      h:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      u: l+gap
+      left: l+h
+      right: u+h
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{left}, {right})'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The input x - {h} must belong to [{l}, {u}).
+      Add {h} to both boundaries.
+      The left boundary remains included and the right remains excluded.
+    mistake_tags:
+    - domain_transformation
+    - endpoint_attainment
+  - id: FUNC_TRANS_DOMAIN_REFLECTION_001
+    type: generated
+    prompt_template: The domain of f is [{l}, {u}). Find the domain of g(x) = f(-2(x - {h})) in interval
+      notation.
+    difficulty: hard
+    answer_mode: final_plus_optional_work
+    variables:
+      p:
+        type: int
+        min: -5
+        max: 0
+      gap:
+        type: int
+        min: 1
+        max: 5
+      h:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      l: 2*p
+      u: 2*(p+gap)
+      left: h - p - gap
+      right: h - p
+    constraints: []
+    answer:
+      type: interval_set
+      value: ({left}, {right}]
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Require {l} <= -2(x - {h}) < {u}.
+      Dividing by -2 reverses both inequality directions.
+      The image of the excluded upper input becomes the open lower boundary; the included lower input becomes the closed upper boundary.
+      The new domain is ({left}, {right}].
+    mistake_tags:
+    - negative_horizontal_scale
+    - endpoint_reversal
+  - id: FUNC_TRANS_RANGE_NEGATIVE_001
+    type: generated
+    prompt_template: The range of f is [{l}, {u}]. Find the range of g(x) = -{a}f(x) + {k} in interval
+      notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      l:
+        type: int
+        min: -5
+        max: 0
+      gap:
+        type: int
+        min: 1
+        max: 6
+      a:
+        type: int
+        min: 1
+        max: 4
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived:
+      u: l+gap
+      low: k-a*u
+      high: k-a*l
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{low}, {high}]'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The smallest new output comes from the largest old output because the scale is negative.
+      The new endpoints are -{a}*{u} + {k} = {low} and -{a}*{l} + {k} = {high}.
+      Both endpoints remain attained.
+    mistake_tags:
+    - range_transformation
+    - endpoint_reversal
+  - id: FUNC_TRANS_INSIDE_OUTSIDE_001
+    type: fixed
+    prompt_template: Which change always shifts the graph of y = f(x) upward by 3 units?
+    difficulty: easy
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Adding outside the function changes every output by 3 while preserving its input.
+      An inside addition changes which input is used instead.
+    mistake_tags:
+    - input_output_transformation
+    options:
+    - id: A
+      label: g(x) = f(x - 3)
+    - id: B
+      label: g(x) = 3f(x)
+    - id: C
+      label: g(x) = f(x) + 3
+    - id: D
+      label: g(x) = f(x + 3)
+  - id: FUNC_TRANS_REFLECTION_AXIS_001
+    type: fixed
+    prompt_template: For an arbitrary real function f, which expression reflects its graph across the
+      y-axis?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Reflection across the y-axis changes the sign of the horizontal coordinate and
+      preserves the vertical coordinate. Replacing x by -x accomplishes this; negating f(x) reflects across
+      the x-axis.
+    mistake_tags:
+    - reflection_axis
+    options:
+    - id: A
+      label: -f(x)
+    - id: B
+      label: f(x) - 1
+    - id: C
+      label: -f(-x)
+    - id: D
+      label: f(-x)
+  - id: FUNC_TRANS_FACTOR_INSIDE_001
+    type: fixed
+    prompt_template: Relative to y = f(x), how should g(x) = f(2x - 6) be interpreted?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'Factor the inside expression: 2x - 6 = 2(x - 3). An old input u appears at
+      new input u/2 + 3. The order and the factorization matter.'
+    mistake_tags:
+    - unfactored_horizontal_shift
+    - horizontal_scale_reciprocal
+    options:
+    - id: A
+      label: Compress horizontally by factor 1/2, then shift right by 3
+    - id: B
+      label: Compress horizontally by factor 1/2, then shift right by 6
+    - id: C
+      label: Stretch horizontally by factor 2, then shift right by 3
+    - id: D
+      label: Shift left by 3, then stretch vertically by 2
+  - id: FUNC_TRANS_OPERATION_ORDER_001
+    type: fixed
+    prompt_template: Suppose f(2) = 4. A transformation first shifts outputs up by 3, then multiplies
+      every resulting output by 2. What is the new output at x = 2?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '14'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Apply the operations in their stated order: 2*(4 + 3) = 14.
+      The formula is 2(f(x) + 3), not 2f(x) + 3.
+    mistake_tags:
+    - order_of_transformations
+  - id: FUNC_TRANS_GRAPH_FORMULA_001
+    type: fixed
+    prompt_template: A parabola opens downward, has vertex (-1, 4), and passes through (1, 0) and (0,
+      3). Which formula matches?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Vertex form gives a(x + 1)^2 + 4. Substituting (1, 0) gives 4a + 4 = 0, so a
+      = -1; (0, 3) confirms the result.
+    mistake_tags:
+    - graph_transformation
+    - vertical_scale
+    options:
+    - id: A
+      label: g(x) = -(x - 1)^2 + 4
+    - id: B
+      label: g(x) = (x + 1)^2 + 4
+    - id: C
+      label: g(x) = -2(x + 1)^2 + 4
+    - id: D
+      label: g(x) = -(x + 1)^2 + 4
+    media:
+    - src: media/native-functions/transformation-test.svg
+      alt: The graph is a downward-opening parabola with vertex (-1, 4), passing through (-3, 0), (1,
+        0), and (0, 3). It continues downward on both sides.
+      caption: Use the vertex, opening direction, and a second point to identify the transformation.
+      width: 800
+      height: 500
+      fit: contain
+  - id: FUNC_TRANS_GRAPH_RANGE_001
+    type: fixed
+    prompt_template: A downward-opening parabola has vertex (-1, 4) and continues without bound on both
+      sides. Find its range in interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, 4]
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The vertex is the attained maximum output 4.
+      The horizontal coordinate -1 affects the position, not the range endpoint.
+      The range is (-inf, 4].
+    mistake_tags:
+    - vertex_input_output_mixup
+    - range_transformation
+    media:
+    - src: media/native-functions/transformation-test.svg
+      alt: The graph is a downward-opening parabola with vertex (-1, 4), passing through (-3, 0), (1,
+        0), and (0, 3). It continues downward on both sides.
+      caption: Use the vertex, opening direction, and a second point to identify the transformation.
+      width: 800
+      height: 500
+      fit: contain
+  - id: FUNC_TRANS_POINT_CHECK_001
+    type: fixed
+    prompt_template: A learner says that a point (2, 5) on f moves to (4, 5) on g(x) = f(2x). What is
+      the correct diagnosis?
+    difficulty: hard
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'Check the input passed to f: at x = 1, g(1) = f(2) = 5. The old input must
+      be reproduced inside the function, so the new horizontal coordinate is divided by 2.'
+    mistake_tags:
+    - horizontal_scale_reciprocal
+    - point_mapping
+    options:
+    - id: A
+      label: The learner is correct because the input was multiplied by 2
+    - id: B
+      label: The new point is (2, 10), because outputs double
+    - id: C
+      label: The new point is (4, 10), because both coordinates double
+    - id: D
+      label: The new point is (1, 5), because 2*1 reproduces the original input 2
+  - id: FUNC_TRANS_MAPPING_PROOF_001
+    type: fixed
+    prompt_template: Let f(u) = v, a != 0, b != 0, and g(x) = a f(b(x - h)) + k. Which point corresponds
+      to (u, v)? Justify the mapping.
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: proof_obligations
+      prompt: Give a complete argument. Your short answer alone is not a proof.
+      proof_policy:
+        obligations:
+        - Sets the inside expression b(x - h) equal to the old input u.
+        - Uses b != 0 to solve for the new input h + u/b.
+        - Substitutes that new input into g and uses f(u) = v.
+        - Obtains the new output a*v + k and explains why a negative b reverses horizontal orientation.
+        accepted_strategies:
+        - direct algebraic argument
+        - point mapping with explicit domain checks
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: To use the old function value v, require b(x - h) = u. Solving gives x = h +
+      u/b. Substituting into g gives a*f(u) + k = a*v + k.
+    mistake_tags:
+    - point_mapping
+    - transformation_proof
+    options:
+    - id: A
+      label: (u/b - h, a*(v + k))
+    - id: B
+      label: (h + u/b, a*v + k)
+    - id: C
+      label: (b*(u - h), a*v + k)
+    - id: D
+      label: (h + b*u, v/a + k)

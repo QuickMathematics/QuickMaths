@@ -6,15 +6,15 @@ import { renderQuestionDiagram } from "./question-diagrams.js?v=20260909-calculu
 import { renderLessonMedia } from "./lesson-media.js?v=20260906-media-v1";
 import { lessonIllustrations, illustrationAssets } from "./lesson-illustrations.js?v=20260908-statistics-v1";
 import { createLessonMediaRenderer } from "./lesson-media-renderer.js?v=20260906-media-v1";
-import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260908-statistics-v1";
-import { buildGroupedMasteryMap, COLLAPSED_NODE_HEIGHT, COLLAPSED_NODE_WIDTH } from "./map-groups.js?v=20260908-branches-v1";
-import { learningFields, branchName } from "./learning-fields.js?v=20260908-statistics-v1";
+import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260921-native-compat-v1";
+import { buildGroupedMasteryMap, COLLAPSED_NODE_HEIGHT, COLLAPSED_NODE_WIDTH } from "./map-groups.js?v=20260921-native-compat-v1";
+import { learningFields, branchName } from "./learning-fields.js?v=20260921-native-compat-v1";
 import { storageStatus } from "./storage-status.js?v=20260906-optimization-v1";
 import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260908-profile-sync-v1";
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
-import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260913-formal-kernel-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260913-formal-kernel-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260913-formal-kernel-v1";
+import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260921-native-compat-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260921-native-compat-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260921-native-compat-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -1731,10 +1731,11 @@ function renderTest(snapshot) {
   const latestReview = snapshot.reviews.find((review) => questionIds.has(review.questionId));
   elements.view.innerHTML = `
     <header class="page-head">
-      <div><p class="eyebrow">Mastery test · autosaved</p><h1>${escapeHtml(skill.name)}</h1><p>All ${draft.problems.length} authored scenarios are included. Retakes rotate available variants; shown work stays available for tutor or self review.</p></div>
+      <div><p class="eyebrow">Mastery test · autosaved</p><h1>${escapeHtml(skill.name)}</h1><p>This saved assessment contains ${draft.problems.length} scenarios. Retakes rotate the catalog; your original questions and working are preserved.</p></div>
       <div><div class="test-progress"><span>${answered} / ${draft.problems.length} scenarios answered</span><i><b style="width:${draft.problems.length ? answered / draft.problems.length * 100 : 0}%"></b></i></div>${hasIllustrations ? `<button class="button button-outline" type="button" data-route="lesson" data-skill-id="${escapeHtml(skill.id)}">View illustrated lesson</button>` : ""}</div>
     </header>
     ${latestReview ? `<aside class="inline-feedback"><span aria-hidden="true">✦</span><div><p class="eyebrow">Latest tutor note</p><strong>${escapeHtml(latestReview.feedback)}</strong><p>${escapeHtml(latestReview.nextStep)}</p></div></aside>` : ""}
+    ${draft.recoveryProblems?.length ? `<aside class="inline-feedback" role="alert"><div><strong>Saved questions need recovery</strong><p>${draft.recoveryProblems.length} question snapshot(s) could not be safely restored. Their original data and responses are retained in your backup. Export a backup from Settings before repair. Submission is blocked; no failed attempt or mastery change has been recorded.</p><button type="button" class="button button-secondary" data-route="settings">Open Settings</button></div></aside>` : ""}
     <form id="test-form" class="test-form">
       ${draft.problems.map((problem, index) => {
         const response = draft.responses[problem.template_id] ?? { finalAnswer: "", work: "" };
@@ -3737,7 +3738,7 @@ async function boot() {
   const communityConfigPromise = fetch("./github-community-config.json", { cache: "no-store" })
     .then(response => response.ok ? response.json() : { enabled: false })
     .catch(() => ({ enabled: false }));
-  const response = await fetch("./curriculum-data.json?v=20260909-calculus-v1");
+  const response = await fetch("./curriculum-data.json?v=20260921-native-compat-v1");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];

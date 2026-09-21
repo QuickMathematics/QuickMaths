@@ -1,0 +1,922 @@
+id: MATH_FUNC_005
+schema_version: '0.2'
+name: Inverse functions and domain restrictions
+domain: Math
+subdomain: Algebra
+topic: Functions
+description: Reverse one-to-one functions, swap domains and ranges, choose valid inverse branches, and
+  verify inverse claims by composition.
+prerequisites:
+- MATH_FUNC_003
+- MATH_FUNC_004
+- MATH_ALG_005
+unlocks: []
+tags:
+- functions
+- inverse_functions
+- one_to_one
+- domain_range
+- composition
+- principal_roots
+- proof
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  An inverse function reverses a function's input-output relationship. If f sends an allowed input a to output b, its inverse sends b back to a. Thus f(a) = b means f^(-1)(b) = a, provided the original function can be reversed uniquely. This idea connects solving equations, interpreting graphs, and recovering an original quantity from a transformed measurement.
+
+  What you will learn:
+  Recognize when an inverse function exists, find inverse formulas, exchange domains and ranges, choose the correct branch for a restricted quadratic, and verify both directions of the reversal. A formula alone is not enough: an inverse must use the right domain.
+
+  A function need not be one-to-one:
+  Every allowed input of a function has exactly one output. Different inputs are nevertheless allowed to share an output. A function is one-to-one, or injective, when distinct inputs always have distinct outputs. Only then can each output identify one original input. The function f(x) = x^2 on R is not one-to-one because f(-2) = f(2) = 4. Its inverse relation would send 4 to both -2 and 2, so that relation is not a function.
+
+  Graph and table checks:
+  The vertical line test checks whether a graph represents a function. The horizontal line test checks whether that function is one-to-one: a horizontal line must meet the graph at most once. For a complete finite table, repeated outputs signal failure of one-to-one behavior. For an incomplete sample, finding a repeated output proves failure, but finding no repetition does not prove that an unseen part of the function has none.
+
+  Notation warning:
+  f^(-1)(x) means the inverse function evaluated at x. It does not mean 1/f(x), and it does not mean -f(x). For f(x) = 2x + 1, the inverse is (x - 1)/2, while the reciprocal is 1/(2x + 1). These operations answer entirely different questions.
+
+  Domain and range exchange:
+  The domain of f^(-1) is the range of f. The range of f^(-1) is the domain of f. An inverse is naturally defined on outputs actually attained by the original function, not automatically on every value in a stated codomain. For example, x^2 restricted to [0, inf) has range [0, inf), so its inverse sqrt(x) is defined on [0, inf), not on all real numbers.
+
+  How to find a formula:
+  Write y = f(x). Solve for the original input x in terms of y, keeping all domain conditions. Rename the inverse input x only after the rearrangement is complete. For y = 3x - 4, add 4, then divide by 3: x = (y + 4)/3. Therefore f^(-1)(x) = (x + 4)/3. Undo operations in reverse order. A negative nonzero slope is also one-to-one; decreasing does not mean noninvertible.
+
+  Verify both directions:
+  For a proposed inverse g, check f(g(t)) = t for every t in the range of f, and g(f(x)) = x for every x in the domain of f. State these domains and check that intermediate inputs are allowed. Checking one numerical example is a useful sanity check, but not a proof for infinitely many inputs. An algebraic composition identity, together with its domain conditions, explains why the reversal always works.
+
+  Quadratic branches:
+  Consider f(x) = (x - h)^2 + k. On the full real line it repeats outputs and has no inverse function. Restricting to x >= h selects the right-hand branch. Since x - h is then nonnegative, solving gives f^(-1)(x) = h + sqrt(x - k), with inverse domain [k, inf) and range [h, inf).
+  Restricting instead to x <= h selects the left-hand branch and gives h - sqrt(x - k), with the same inverse domain but range (-inf, h]. Writing a plus-or-minus sign does not define one inverse function; it describes two branches without selecting one.
+
+  Why principal roots matter:
+  sqrt(u^2) equals |u|, not always u. For the right-hand branch, u = x - h is nonnegative, so the absolute value becomes u and the composition returns the original input. On the left-hand branch, u is nonpositive, so the negative root is needed. The domain restriction is the reason the proof works, not an optional note added after the algebra.
+
+  Inverting a square root:
+  For f(x) = sqrt(x - 2) + 3, the original domain is [2, inf) and range is [3, inf). Solving gives f^(-1)(x) = (x - 3)^2 + 2, but only for x >= 3. Although the polynomial expression can be evaluated below 3, those extra inputs were never outputs of the original function and do not belong to this inverse.
+
+  Rational inverses and excluded values:
+  For f(x) = a/(x - h) + k with a != 0, the original domain excludes h and its range excludes k. Solving yields f^(-1)(x) = h + a/(x - k). The excluded input and output exchange places. A correct inverse statement should preserve both restrictions and should not mistake an unreachable value for an attainable endpoint.
+
+  Graphs and applications:
+  Swapping (a, b) to (b, a) reflects a graph in the line y = x, not in either coordinate axis. In a measurement model, the inverse recovers a possible original quantity from an observed output. Context can narrow the allowed domain further. To undo a composite f(g(x)), undo the last stage f first, then undo g; the inverse order is reversed, with matching domains at every stage.
+
+  Self-check:
+  Is the original function one-to-one on the stated domain? Have I distinguished an inverse from a reciprocal? Are the domain and range exchanged? Does a square root have the correct branch and sign? Do both composition identities hold exactly where claimed? These checks turn an inverse formula into a complete mathematical answer.
+media:
+- src: media/native-functions/inverse-linear.svg
+  alt: The lines y = 2x + 1 and y = (x - 1)/2 are reflections in y = x. The points (1, 3) and (3, 1) correspond.
+  caption: An inverse swaps an allowed input and its output; it does not take the reciprocal of the output.
+  width: 800
+  height: 500
+  fit: contain
+- src: media/native-functions/inverse-restricted-quadratic.svg
+  alt: The right-hand branch y = (x - 1)^2 + 2, x >= 1, and its inverse y = 1 + sqrt(x - 2), x >= 2, are
+    reflected in y = x. The points (3, 6) and (6, 3) correspond.
+  caption: A domain restriction selects one branch and makes the inverse single-valued.
+  width: 800
+  height: 500
+  fit: contain
+examples:
+- prompt: Let f(x) = 2x + 1 on R. Find and check its inverse.
+  solution: f^(-1)(x) = (x - 1)/2 on R.
+  explanation: From y = 2x + 1, solve x = (y - 1)/2. Both 2((x - 1)/2) + 1 and ((2x + 1) - 1)/2 simplify
+    to x.
+  media:
+  - src: media/native-functions/inverse-linear.svg
+    alt: The lines y = 2x + 1 and y = (x - 1)/2 are reflections in y = x. The points (1, 3) and (3, 1)
+      correspond.
+    caption: An inverse swaps an allowed input and its output; it does not take the reciprocal of the
+      output.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: A one-to-one function has f(5) = 12. What is f^(-1)(12)?
+  solution: '5'
+  explanation: The inverse returns the input that produced 12. It does not return 1/12 and does not evaluate
+    the original f at 12.
+- prompt: Find the inverse of f(x) = -3x + 6 on R.
+  solution: f^(-1)(x) = (6 - x)/3.
+  explanation: From y = -3x + 6, obtain 3x = 6 - y. A strictly decreasing line with a nonzero slope is
+    one-to-one.
+- prompt: Does f(x) = x^2 on R have an inverse function?
+  solution: No. It must be restricted before it can have an inverse function.
+  explanation: The inputs -2 and 2 both produce 4. The horizontal line y = 4 meets the graph twice, although
+    the graph still passes the vertical line test.
+  media:
+  - src: media/native-functions/inverse-horizontal-test.svg
+    alt: The full parabola y = x^2 meets the horizontal line y = 4 at both (-2, 4) and (2, 4).
+    caption: Two different inputs share an output, so this function cannot be reversed uniquely on all
+      real inputs.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: Let f(x) = (x - 1)^2 + 2 for x >= 1. Find its inverse, domain, and range.
+  solution: f^(-1)(x) = 1 + sqrt(x - 2); domain [2, inf), range [1, inf).
+  explanation: The restriction makes x - 1 nonnegative, selecting the positive root. The original endpoint
+    (1, 2) becomes the inverse endpoint (2, 1).
+  media:
+  - src: media/native-functions/inverse-restricted-quadratic.svg
+    alt: The right-hand branch y = (x - 1)^2 + 2, x >= 1, and its inverse y = 1 + sqrt(x - 2), x >= 2,
+      are reflected in y = x. The points (3, 6) and (6, 3) correspond.
+    caption: A domain restriction selects one branch and makes the inverse single-valued.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: Let f(x) = (x - 1)^2 + 2 for x <= 1 instead. Find its inverse.
+  solution: f^(-1)(x) = 1 - sqrt(x - 2), with domain [2, inf) and range (-inf, 1].
+  explanation: The original x - 1 is nonpositive. The negative root is therefore required to recover the
+    left-hand branch.
+- prompt: Find the inverse of f(x) = sqrt(x - 2) + 3 on its natural domain.
+  solution: f^(-1)(x) = (x - 3)^2 + 2, restricted to x >= 3.
+  explanation: The original output is at least 3. Subtract 3 and square, but retain this restriction on
+    the inverse input even though the polynomial formula itself allows more inputs.
+- prompt: Find the inverse of f(x) = 4/(x - 2) + 3, x != 2.
+  solution: f^(-1)(x) = 2 + 4/(x - 3), x != 3; inverse range R excluding 2.
+  explanation: From y - 3 = 4/(x - 2), solve x = 2 + 4/(y - 3). The original excluded output 3 becomes
+    the inverse excluded input.
+- prompt: Let f(x) = 2x + 1 only for x in [-1, 3). Find the inverse domain and range.
+  solution: Inverse domain [-1, 7); inverse range [-1, 3).
+  explanation: The original increasing function sends its included left endpoint to -1 and approaches
+    but never reaches 7. Those original outputs become the allowed inverse inputs.
+- prompt: Verify g(t) = 2 + sqrt(t - 1) as the inverse of f(x) = (x - 2)^2 + 1 for x >= 2.
+  solution: f(g(t)) = t for t >= 1, and g(f(x)) = x for x >= 2.
+  explanation: The first composition squares a nonnegative root. The second gives 2 + |x - 2|, which equals
+    x because the original domain requires x >= 2. Both domain conditions are essential.
+applications:
+- title: Calibration and measurement
+  description: An invertible calibration rule lets a reported reading be converted back to a possible
+    original quantity, with units and physical limits retained.
+- title: Solving equations
+  description: Inverse operations explain how to recover an unknown input from an output. Domain restrictions
+    distinguish valid solutions from extraneous algebraic candidates.
+- title: Reversible transformations
+  description: A sequence of reversible operations is undone in reverse order. Losing information, such
+    as squaring without recording a sign, prevents a unique reversal.
+- title: Logarithms and later analysis
+  description: Exponential and logarithmic functions are an important inverse pair. General inverse reasoning
+    clarifies their domain restrictions and provides a foundation for later study of inverse rates of
+    change.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: FUNC_INV_TABLE_001
+    type: fixed
+    prompt_template: A one-to-one function has the complete table f(2) = 7, f(5) = 11, f(8) = 16. Find
+      f^(-1)(11). Enter a number.
+    difficulty: easy
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '5'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The inverse asks which original input produced 11.
+      The table gives f(5) = 11, so f^(-1)(11) = 5.
+    mistake_tags:
+    - inverse_input_output_swap
+  - id: FUNC_INV_NOT_RECIPROCAL_001
+    type: fixed
+    prompt_template: For an invertible function f, what does f^(-1)(x) mean?
+    difficulty: easy
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: An inverse undoes the input-output rule. The notation f^(-1) is not the reciprocal
+      1/f.
+    mistake_tags:
+    - inverse_reciprocal_confusion
+    options:
+    - id: A
+      label: The square of f(x)
+    - id: B
+      label: The input that f sends to x
+    - id: C
+      label: The number 1/f(x)
+    - id: D
+      label: The negative of f(x)
+  - id: FUNC_INV_AFFINE_FORMULA_001
+    type: generated
+    prompt_template: Let f(x) = {a}x + {b} on R. Give a formula for f^(-1)(x), writing only the expression.
+    difficulty: medium
+    answer_mode: final_plus_optional_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 7
+      b:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: (x - {b})/{a}
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Write y = {a}x + {b}.
+      Solve for the original input: x = (y - {b})/{a}.
+      Rename the inverse input x to get (x - {b})/{a}. Both domains are R.
+    mistake_tags:
+    - inverse_operation_order
+  - id: FUNC_INV_AFFINE_VALUE_001
+    type: generated
+    prompt_template: Let f(x) = {a}x + {b} on R. Find f^(-1)({target}). Enter a number.
+    difficulty: medium
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: choice
+        values:
+        - -5
+        - -3
+        - -2
+        - 2
+        - 3
+        - 5
+      b:
+        type: int
+        min: -6
+        max: 6
+      r:
+        type: int
+        min: -8
+        max: 8
+    derived:
+      target: a*r+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{r}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write one equivalent expression per line. Substitute the given values before simplifying;
+        do not include f(...) notation in the work lines.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Find the original input whose output is {target}.
+      Undo the addition, then the multiplication: ({target} - {b})/{a} = {r}.
+      Check that f({r}) = {target}.
+    mistake_tags:
+    - inverse_evaluation
+  - id: FUNC_INV_DECREASING_AFFINE_001
+    type: generated
+    prompt_template: Let f(x) = -{a}x + {b} on R. Give a formula for f^(-1)(x), writing only the expression.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 6
+      b:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: ({b} - x)/{a}
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      From y = -{a}x + {b}, obtain {a}x = {b} - y.
+      Divide by {a}, then rename the inverse input x.
+      The inverse is ({b} - x)/{a}; a negative slope does not prevent invertibility.
+    mistake_tags:
+    - inverse_negative_slope
+    - inverse_operation_order
+  - id: FUNC_INV_VERIFY_BOTH_001
+    type: fixed
+    prompt_template: Let f(x) = 3x - 4 and g(x) = (x + 4)/3 on R. Which check establishes that g is the
+      inverse of f?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Substitute to get 3((x + 4)/3) - 4 = x and ((3x - 4) + 4)/3 = x. Both compositions
+      are defined on R.
+    mistake_tags:
+    - inverse_verification
+    - composition_identity
+    options:
+    - id: A
+      label: Both f(g(x)) = x and g(f(x)) = x for every real x
+    - id: B
+      label: f(x) + g(x) = x at one input
+    - id: C
+      label: f(x)g(x) = 1 for every real x
+    - id: D
+      label: The graphs intersect at least once
+  - id: FUNC_INV_WRONG_SIGN_001
+    type: fixed
+    prompt_template: A learner claims that the inverse of f(x) = 3x - 4 is g(x) = (x - 4)/3. Which response
+      identifies the error?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The proposed formula gives f(g(x)) = x - 8, not x. The correct inverse is (x
+      + 4)/3.
+    mistake_tags:
+    - inverse_operation_order
+    - inverse_verification
+    options:
+    - id: A
+      label: Undoing subtraction of 4 requires adding 4 before dividing by 3
+    - id: B
+      label: The claim is correct because both formulas contain 3 and 4
+    - id: C
+      label: The inverse should be 1/(3x - 4)
+    - id: D
+      label: No nonconstant linear function can have an inverse
+  - id: FUNC_INV_RECIPROCAL_FORMULA_001
+    type: generated
+    prompt_template: Let f(x) = {a}/(x - {h}) + {k} on its natural real domain. Give a formula for f^(-1)(x),
+      writing only the expression.
+    difficulty: hard
+    answer_mode: final_plus_optional_work
+    variables:
+      a:
+        type: choice
+        values:
+        - -4
+        - -2
+        - 2
+        - 4
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: '{h} + {a}/(x - {k})'
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Start from y - {k} = {a}/(x - {h}).
+      Because {a} is nonzero, solve x - {h} = {a}/(y - {k}).
+      The inverse formula is {h} + {a}/(x - {k}); its input cannot equal {k}.
+    mistake_tags:
+    - rational_inverse
+    - inverse_operation_order
+  - id: FUNC_INV_RECIPROCAL_DOMAIN_001
+    type: generated
+    prompt_template: Let f(x) = {a}/(x - {h}) + {k} on its natural real domain. Find the domain of f^(-1)
+      in interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 6
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {k}) U ({k}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The reciprocal term is never zero, so the original output is never {k}.
+      Every other real output is attained by x = {h} + {a}/(y - {k}).
+      The inverse domain is the original range: R excluding {k}.
+    mistake_tags:
+    - inverse_domain_range_swap
+    - unattainable_output
+  - id: FUNC_INV_RECIPROCAL_RANGE_001
+    type: generated
+    prompt_template: Let f(x) = {a}/(x - {h}) + {k} on its natural real domain. Find the range of f^(-1)
+      in interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 6
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {h}) U ({h}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The original domain excludes {h}, where its denominator is zero.
+      The inverse range is precisely that original domain.
+      Do not confuse this excluded output with the inverse excluded input {k}.
+    mistake_tags:
+    - inverse_domain_range_swap
+  - id: FUNC_INV_QUADRATIC_RIGHT_001
+    type: generated
+    prompt_template: Let f(x) = (x - {h})^2 + {k}, restricted to x >= {h}. Give a formula for f^(-1)(x),
+      writing only the expression.
+    difficulty: hard
+    answer_mode: final_plus_optional_work
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 4
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: '{h} + sqrt(x - {k})'
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      From y - {k} = (x - {h})^2 and x >= {h}, the quantity x - {h} is nonnegative.
+      Therefore x - {h} = sqrt(y - {k}).
+      The inverse is {h} + sqrt(x - {k}), defined for inverse inputs x >= {k}.
+    mistake_tags:
+    - inverse_branch_selection
+    - principal_square_root
+  - id: FUNC_INV_QUADRATIC_LEFT_001
+    type: generated
+    prompt_template: Let f(x) = (x - {h})^2 + {k}, restricted to x <= {h}. Give a formula for f^(-1)(x),
+      writing only the expression.
+    difficulty: hard
+    answer_mode: final_plus_optional_work
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 4
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: '{h} - sqrt(x - {k})'
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      On the stated domain, x - {h} is nonpositive.
+      Thus x - {h} = -sqrt(y - {k}).
+      The inverse is {h} - sqrt(x - {k}), with domain [{k}, inf) and range (-inf, {h}].
+    mistake_tags:
+    - inverse_branch_selection
+    - principal_square_root
+  - id: FUNC_INV_ROOT_FORMULA_001
+    type: generated
+    prompt_template: Let f(x) = sqrt(x - {h}) + {k} on its natural real domain. Give a formula for f^(-1)(x),
+      writing only the expression.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: (x - {k})^2 + {h}
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The original output satisfies y >= {k}.
+      Subtract {k} and square to get x = (y - {k})^2 + {h}.
+      The inverse formula is (x - {k})^2 + {h}, but its domain remains [{k}, inf), not all of R.
+    mistake_tags:
+    - inverse_domain_restriction
+    - inverse_operation_order
+  - id: FUNC_INV_ROOT_DOMAIN_001
+    type: generated
+    prompt_template: Let f(x) = sqrt(x - {h}) + {k} on its natural real domain. Find the domain of f^(-1)
+      in interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{k}, inf)'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      A principal square root is nonnegative, so the original range is [{k}, inf).
+      This becomes the inverse domain.
+      Squaring to obtain the inverse formula does not expand that domain.
+    mistake_tags:
+    - inverse_domain_range_swap
+    - squaring_domain_loss
+  - id: FUNC_INV_GRAPH_POINT_001
+    type: fixed
+    prompt_template: The graph shows f(x) = (x - 1)^2 + 2 restricted to x >= 1. It contains (3, 6). What
+      is f^(-1)(6)? Enter a number.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '3'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      An inverse swaps the coordinates of each allowed point.
+      The original point (3, 6) gives the inverse point (6, 3).
+      Thus f^(-1)(6) = 3.
+    mistake_tags:
+    - inverse_graph_reflection
+    media:
+    - src: media/native-functions/inverse-restricted-quadratic.svg
+      alt: The right-hand branch y = (x - 1)^2 + 2, x >= 1, and its inverse y = 1 + sqrt(x - 2), x >=
+        2, are reflected in y = x. The points (3, 6) and (6, 3) correspond.
+      caption: A domain restriction selects one branch and makes the inverse single-valued.
+      width: 800
+      height: 500
+      fit: contain
+  - id: FUNC_INV_HORIZONTAL_LINE_001
+    type: fixed
+    prompt_template: The graph of f(x) = x^2 on R meets y = 4 at two points. What does this show?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The different inputs -2 and 2 both produce 4. Reversing that output would require
+      two outputs, violating the definition of a function. Restricting the original domain can resolve
+      this.
+    mistake_tags:
+    - one_to_one_vs_function
+    - horizontal_line_test
+    options:
+    - id: A
+      label: f is a function but is not one-to-one, so it has no inverse function on its full domain
+    - id: B
+      label: f is not a function because some outputs repeat
+    - id: C
+      label: f has inverse 1/x^2 on R
+    - id: D
+      label: f has inverse sqrt(x) on the full original domain
+    media:
+    - src: media/native-functions/inverse-horizontal-test.svg
+      alt: The full parabola y = x^2 meets the horizontal line y = 4 at both (-2, 4) and (2, 4).
+      caption: Two different inputs share an output, so this function cannot be reversed uniquely on all
+        real inputs.
+      width: 800
+      height: 500
+      fit: contain
+  - id: FUNC_INV_RESTRICTED_AFFINE_DOMAIN_001
+    type: generated
+    prompt_template: Let f(x) = {a}x + {b}, restricted to [{l}, {u}). Find the domain of f^(-1) in interval
+      notation.
+    difficulty: hard
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 5
+      b:
+        type: int
+        min: -6
+        max: 6
+      l:
+        type: int
+        min: -5
+        max: 1
+      gap:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      u: l+gap
+      low: a*l+b
+      high: a*u+b
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{low}, {high})'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The positive slope makes f strictly increasing.
+      The original range is [{low}, {high}), preserving the included left and excluded right endpoints.
+      That range is the inverse domain.
+    mistake_tags:
+    - inverse_domain_range_swap
+    - inverse_endpoint_inclusion
+  - id: FUNC_INV_CALIBRATION_001
+    type: generated
+    prompt_template: A sensor reports C(t) = {a}t + {b}, where t is the true temperature. The reported
+      value is {reported}. What true temperature produced it? Enter a number.
+    difficulty: medium
+    answer_mode: final_plus_required_work
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 4
+      b:
+        type: int
+        min: -5
+        max: 5
+      t:
+        type: int
+        min: -10
+        max: 25
+    derived:
+      reported: a*t+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{t}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: procedural_steps
+      prompt: Write one equivalent expression per line. Substitute the given values before simplifying;
+        do not include f(...) notation in the work lines.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Invert the calibration by subtracting {b} and dividing by {a}.
+      The true temperature is ({reported} - {b})/{a} = {t}.
+      Substitution into C checks that this temperature produces the stated reading.
+    mistake_tags:
+    - inverse_model_interpretation
+  - id: FUNC_INV_COMPOSITION_ORDER_001
+    type: fixed
+    prompt_template: Suppose f and g are invertible and their domains and ranges match so that both stages
+      can be reversed. How do you undo f(g(x))?
+    difficulty: hard
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The last operation performed was f, so its inverse must be applied first. The
+      remaining g is then undone by g^(-1). The range/domain assumptions ensure both inverse stages are
+      defined.
+    mistake_tags:
+    - inverse_composition_order
+    options:
+    - id: A
+      label: Multiply f^(-1)(x) by g^(-1)(x)
+    - id: B
+      label: Take 1/(f(g(x)))
+    - id: C
+      label: Apply f^(-1) first, then g^(-1), giving g^(-1)(f^(-1)(x))
+    - id: D
+      label: Apply g^(-1) first, then f^(-1), giving f^(-1)(g^(-1)(x))
+  - id: FUNC_INV_BRANCH_PROOF_001
+    type: fixed
+    prompt_template: Let f(x) = (x - 2)^2 + 1 with domain [2, inf). Give an expression for its inverse
+      and justify that it really reverses f on the appropriate domains.
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: 2 + sqrt(x - 1)
+      variable: x
+    grading:
+      method: symbolic_expression
+    work:
+      mode: proof_obligations
+      prompt: Give a complete argument. Your short answer alone is not a proof.
+      proof_policy:
+        obligations:
+        - Explains why the restriction x >= 2 makes the original function one-to-one.
+        - Identifies the original range and inverse domain as [1, inf), with the endpoint included.
+        - Derives the positive-root branch rather than a plus-or-minus relation.
+        - Verifies both composition identities on their stated domains, using sqrt((x - 2)^2) = x - 2
+          only when x >= 2.
+        accepted_strategies:
+        - direct algebraic argument
+        - point mapping with explicit domain checks
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: |-
+      On x >= 2, x - 2 is nonnegative and its square increases strictly, so f is one-to-one.
+      The original range is [1, inf), hence the inverse domain is [1, inf).
+      Solving y = (x - 2)^2 + 1 on this branch gives x = 2 + sqrt(y - 1).
+      For t >= 1, f(2 + sqrt(t - 1)) = t.
+      For x >= 2, 2 + sqrt((x - 2)^2) = 2 + |x - 2| = x.
+    mistake_tags:
+    - inverse_proof
+    - inverse_domain_restriction
+    - principal_square_root

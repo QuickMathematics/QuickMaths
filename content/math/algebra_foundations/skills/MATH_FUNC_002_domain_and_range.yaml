@@ -1,0 +1,875 @@
+id: MATH_FUNC_002
+schema_version: '0.2'
+name: Domain and range of real functions
+domain: Math
+subdomain: Algebra
+topic: Functions
+description: Determine allowed inputs and attainable outputs from formulas, graphs, finite data, and context;
+  preserve restrictions when simplifying.
+prerequisites:
+- MATH_FUNC_001
+- MATH_INEQ_001
+- MATH_RAD_001
+- MATH_RAT_001
+- MATH_ALG_008
+unlocks:
+- MATH_FUNC_003
+- MATH_FUNC_004
+tags:
+- functions
+- domain
+- range
+- interval_notation
+- restricted_domain
+- real_functions
+- graph_interpretation
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A function is a rule together with a domain: a specified set of inputs. Each allowed input has exactly one output. The domain answers “What may go in?” The range answers “What actually comes out?” Keeping those questions separate prevents many errors later in composition, inverse functions, and modeling.
+
+  What you will learn:
+  Identify real-domain restrictions; express input and output sets precisely; read domains and ranges from graphs and finite data; and explain why simplifying a formula does not automatically change the function's domain.
+
+  Domain, codomain, and range:
+  In f: A -> B, A is the domain and B is the codomain, the declared destination for outputs. The range consists of the values f(x) actually attained for x in A. It may be smaller than B. For f: R -> R with f(x) = x^2, the domain and codomain are both R, but the range is [0, inf). Negative inputs are allowed; negative outputs are not produced.
+
+  A real-domain checklist:
+  1. Begin with any domain explicitly stated in the question or imposed by its context.
+  2. Exclude every input that makes an original denominator zero.
+  3. Require the expression inside each even root to be nonnegative. A square root itself can equal zero.
+  4. When a square root is in a denominator, require its radicand to be strictly positive: the root must exist and must not be zero.
+  5. Intersect all the restrictions. A valid input must satisfy every condition at once.
+
+  Polynomials have all real inputs unless a smaller domain is stated. The formula sqrt(x - 1) needs x >= 1. The formula 1/sqrt(x - 1) needs x > 1. For sqrt(x - 1)/(x - 4), combine x >= 1 with x != 4 to obtain [1, 4) U (4, inf). Removing an input from an already allowed ray may split that ray into two intervals.
+
+  Interval notation and finite sets:
+  A square bracket includes a finite endpoint; a parenthesis excludes it. Infinity and negative infinity are directions, not endpoints that can be included, so they always use parentheses. A union joins separate pieces. Finite collections of inputs or outputs should be written as sets, not filled-in intervals. If the only inputs are 1, 3, and 5, the domain is the set containing those three numbers, not [1, 5]. Repeated outputs appear only once in a range set.
+
+  Reading a graph:
+  Project the graph horizontally onto the x-axis to find the domain. Project it vertically onto the y-axis to find the range. An open circle does not belong to the graph; a filled circle does. An arrow indicates continuation rather than an endpoint. Do not assume a drawing's viewing window is the whole function. An open point removes an output from the range only when no other allowed input produces that same output.
+
+  Finding a range from a formula:
+  Ask which outputs are possible, not merely which outputs you happened to calculate. A square is nonnegative and can attain zero. Thus (x - 3)^2 - 2 has range [-2, inf) on all real inputs: the vertex output -2 is reached at x = 3. Negating the square gives -(x - 3)^2 - 2 with range (-inf, -2]. Similarly, |x - 3| + 1 has least value 1.
+
+  A restricted domain can change the range. For f(x) = x^2 on [-1, 2), the smallest value is 0 because the vertex input is included, while outputs approach but do not attain 4. The range is [0, 4), not [1, 4). Checking only the endpoints misses the interior minimum. On [-2, 2), however, the range is [0, 4] because the included input -2 produces 4 even though 2 is excluded.
+
+  Cancellation does not restore missing inputs:
+  The original formula (x^2 - 4)/(x - 2) is undefined at 2. It equals x + 2 only when x != 2. Its graph is the line with (2, 4) removed, so its range also excludes 4. To prove that no other outputs are missing, take any y != 4 and choose x = y - 2. This input is allowed and produces y. A complete range argument explains both why forbidden outputs cannot occur and why all claimed outputs do occur.
+
+  Context is part of the function:
+  A formula for a ticket price might accept real numbers algebraically, but a number of tickets must be a nonnegative integer and may be limited by capacity. A time model may apply only from launch until landing. Report the mathematical restriction and the contextual restriction together rather than extending a model beyond what it describes.
+
+  Self-check:
+  Have I confused an input with an output? Did I preserve the original denominator exclusions? Is a zero radicand allowed here? Is every claimed endpoint actually attained? Have I treated a discrete count as a continuous interval? These checks are more reliable than memorizing one domain or range for every formula shape.
+media:
+- src: media/native-functions/domain-hole.svg
+  alt: The line y = x + 2 has a missing point at (2, 4). The point is shown as an open circle.
+  caption: A cancelled factor leaves an excluded input, and here it also leaves an excluded output.
+  width: 800
+  height: 500
+  fit: contain
+- src: media/native-functions/domain-square-root.svg
+  alt: The curve y = sqrt(x - 1) - 2 starts at the included point (1, -2) and continues to the right and
+    upward.
+  caption: Read inputs horizontally and outputs vertically. The starting point belongs to both sets.
+  width: 800
+  height: 500
+  fit: contain
+examples:
+- prompt: Distinguish the domain and range of f(x) = x^2 on all real inputs.
+  solution: 'Domain: (-inf, inf). Range: [0, inf).'
+  explanation: Any real input can be squared. Squares are nonnegative, 0 occurs at x = 0, and every y
+    >= 0 is obtained from x = sqrt(y).
+- prompt: Find the domain of 5/(x + 2).
+  solution: (-inf, -2) U (-2, inf)
+  explanation: The denominator x + 2 must not vanish. Only x = -2 is excluded; the numerator imposes no
+    additional restriction.
+- prompt: Find the domain and range of sqrt(x - 1) - 2.
+  solution: 'Domain: [1, inf). Range: [-2, inf).'
+  explanation: Require x - 1 >= 0. The root is nonnegative, so subtracting 2 gives a minimum output of
+    -2 at x = 1. Every larger output occurs.
+  media:
+  - src: media/native-functions/domain-square-root.svg
+    alt: The curve y = sqrt(x - 1) - 2 starts at the included point (1, -2) and continues to the right
+      and upward.
+    caption: Read inputs horizontally and outputs vertically. The starting point belongs to both sets.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: Find the domain of 1/sqrt(7 - x).
+  solution: (-inf, 7)
+  explanation: The radicand must be nonnegative, and the denominator must be nonzero. Together these require
+    7 - x > 0, hence x < 7.
+- prompt: Find the domain of sqrt(x - 1)/(x - 4).
+  solution: '[1, 4) U (4, inf)'
+  explanation: Intersect x >= 1 with x != 4. The left endpoint is allowed because the denominator is nonzero
+    there.
+- prompt: Find the range of -3(x + 2)^2 + 5 on all real inputs.
+  solution: (-inf, 5]
+  explanation: The square is smallest at x = -2. Multiplication by -3 turns that minimum into the maximum
+    output 5, which is attained.
+- prompt: Find the range of x^2 on [-1, 2), and compare it with the range on [-2, 2).
+  solution: 'On [-1, 2): [0, 4). On [-2, 2): [0, 4].'
+  explanation: Both domains contain 0, so the least output is 0. In the first domain neither input producing
+    4 is allowed. In the second, -2 is allowed and produces 4.
+- prompt: Find the domain and range of the three-point function (1, 4), (3, 4), (5, -2).
+  solution: 'Domain: {1, 3, 5}. Range: {-2, 4}.'
+  explanation: Read first coordinates for inputs and second coordinates for outputs. Repeated outputs
+    are listed once. Do not fill the gaps between these isolated points.
+- prompt: Does simplifying (x^2 - 4)/(x - 2) make its domain all real numbers?
+  solution: No. Its domain excludes 2 and its range excludes 4.
+  explanation: Factoring gives (x - 2)(x + 2)/(x - 2). Cancellation is valid only for x != 2. Output 4
+    would require the excluded input 2, while every other output has an allowed preimage.
+  media:
+  - src: media/native-functions/domain-hole.svg
+    alt: The line y = x + 2 has a missing point at (2, 4). The point is shown as an open circle.
+    caption: A cancelled factor leaves an excluded input, and here it also leaves an excluded output.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: A bus has 40 seats. What inputs are appropriate for a function whose input n counts occupied
+    seats?
+  solution: The integers 0, 1, 2, ..., 40.
+  explanation: Capacity supplies an upper bound and counting supplies discreteness. The interval [0, 40]
+    would incorrectly include inputs such as 2.5 seats.
+applications:
+- title: Model validity
+  description: Domain restrictions state where a pricing, population, or physical model is meaningful
+    rather than merely where a calculator returns a value.
+- title: Inverse functions
+  description: The original range becomes the inverse domain. Missing outputs therefore matter as much
+    as missing inputs.
+- title: Software input validation
+  description: A function that divides or takes an even root must check its allowable inputs. Algebraic
+    simplification does not justify accepting inputs the original definition forbids.
+- title: Reading scientific graphs
+  description: Axis projections and endpoint conventions reveal which times, temperatures, or other measured
+    quantities a graph actually represents.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: FUNC_DOMAIN_POLYNOMIAL_001
+    type: generated
+    prompt_template: Find the real domain of f(x) = {a}x^3 + {b}x - 7. Give interval notation.
+    difficulty: easy
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      b:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Integer powers, multiplication, addition, and subtraction are defined for every real input.
+      There is no denominator or even root imposing a restriction.
+      The domain is (-inf, inf).
+    mistake_tags:
+    - unnecessary_domain_restriction
+  - id: FUNC_DOMAIN_RATIONAL_001
+    type: generated
+    prompt_template: Find the real domain of f(x) = {a}/(x - {h}). Give interval notation.
+    difficulty: medium
+    answer_mode: final_plus_optional_work
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 9
+      h:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {h}) U ({h}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The denominator must not equal zero.
+      x - {h} = 0 only at x = {h}.
+      Exclude that input: (-inf, {h}) U ({h}, inf).
+    mistake_tags:
+    - denominator_zero
+    - excluded_endpoint
+  - id: FUNC_DOMAIN_TWO_POLES_001
+    type: generated
+    prompt_template: Find the real domain of f(x) = 1/((x - {a})(x - {b})). Give interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: -7
+        max: 2
+      gap:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      b: a + gap
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {a}) U ({a}, {b}) U ({b}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      A product is zero if either factor is zero.
+      The forbidden inputs are {a} and {b}, in increasing order.
+      Both are excluded from the domain.
+    mistake_tags:
+    - missing_domain_restriction
+    - denominator_zero
+  - id: FUNC_DOMAIN_SQRT_LOWER_001
+    type: generated
+    prompt_template: Find the real domain of f(x) = sqrt(x - {h}). Give interval notation.
+    difficulty: easy
+    answer_mode: final_only
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{h}, inf)'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      A real square root needs a nonnegative radicand.
+      x - {h} >= 0 means x >= {h}.
+      Zero is allowed inside a square root, so the finite endpoint is included.
+    mistake_tags:
+    - radicand_nonnegative
+    - open_endpoint_error
+  - id: FUNC_DOMAIN_SQRT_UPPER_001
+    type: generated
+    prompt_template: Find the real domain of f(x) = sqrt({h} - x). Give interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {h}]
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Require {h} - x >= 0.
+      This gives x <= {h}, not x >= {h}.
+      The endpoint is allowed because sqrt(0) exists.
+    mistake_tags:
+    - inequality_direction
+    - radicand_nonnegative
+  - id: FUNC_DOMAIN_RECIPROCAL_SQRT_001
+    type: generated
+    prompt_template: Find the real domain of f(x) = 1/sqrt(x - {h}). Give interval notation.
+    difficulty: medium
+    answer_mode: final_plus_optional_work
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: ({h}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The square root must be real and its value must not be zero.
+      Together these conditions require x - {h} > 0.
+      The domain is ({h}, inf), with an open finite endpoint.
+    mistake_tags:
+    - denominator_zero
+    - strict_radicand
+  - id: FUNC_DOMAIN_INTERSECTION_001
+    type: generated
+    prompt_template: Find the real domain of f(x) = sqrt(x - {h})/(x - {b}). Give interval notation.
+    difficulty: hard
+    answer_mode: final_plus_optional_work
+    variables:
+      h:
+        type: int
+        min: -5
+        max: 4
+      gap:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      b: h + gap
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{h}, {b}) U ({b}, inf)'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The square root requires x >= {h}.
+      The denominator requires x != {b}.
+      Since {b} is greater than {h}, remove that single input from the allowed ray.
+    mistake_tags:
+    - domain_intersection
+    - missing_domain_restriction
+  - id: FUNC_DOMAIN_CANCELLED_FACTOR_001
+    type: fixed
+    prompt_template: For the original formula f(x) = (x^2 - 9)/(x - 3), find the real domain in interval
+      notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, 3) U (3, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Factor the numerator as (x - 3)(x + 3).
+      Cancellation produces x + 3 only for x != 3.
+      The original formula still has no value at x = 3.
+    mistake_tags:
+    - cancelled_domain_restriction
+  - id: FUNC_RANGE_QUADRATIC_UP_001
+    type: generated
+    prompt_template: Find the range of f(x) = {a}(x - {h})^2 + {k} for all real x. Give interval notation.
+    difficulty: easy
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 4
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{k}, inf)'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      A square is nonnegative and {a} is positive.
+      The minimum value is {k}, attained at x = {h}.
+      Every larger output is possible, giving [{k}, inf).
+    mistake_tags:
+    - domain_range_mixup
+    - minimum_endpoint
+  - id: FUNC_RANGE_QUADRATIC_DOWN_001
+    type: generated
+    prompt_template: Find the range of f(x) = -{a}(x - {h})^2 + {k} for all real x. Give interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 4
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {k}]
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The squared term is nonnegative, so its negative multiple is nonpositive.
+      The largest output is {k}, attained at x = {h}.
+      Outputs have no lower bound.
+    mistake_tags:
+    - opening_direction
+    - maximum_endpoint
+  - id: FUNC_RANGE_ABSOLUTE_001
+    type: generated
+    prompt_template: Find the range of f(x) = {a}|x - {h}| + {k} for all real x. Give interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 4
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{k}, inf)'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Absolute value is nonnegative.
+      The positive multiple is zero at x = {h}, so the least output is {k}.
+      Every output at or above {k} occurs.
+    mistake_tags:
+    - absolute_value_range
+    - domain_range_mixup
+  - id: FUNC_RANGE_RESTRICTED_LINEAR_001
+    type: generated
+    prompt_template: Let f(x) = {m}x + {b}, with domain [{l}, {u}). Find its range in interval notation.
+    difficulty: medium
+    answer_mode: final_plus_optional_work
+    variables:
+      m:
+        type: int
+        min: 1
+        max: 5
+      b:
+        type: int
+        min: -6
+        max: 6
+      l:
+        type: int
+        min: -5
+        max: 2
+      gap:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      u: l + gap
+      low: m*l + b
+      high: m*u + b
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{low}, {high})'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The slope {m} is positive, so outputs increase with inputs.
+      f({l}) = {low} is attained at the included left endpoint.
+      The output approaches {high} as x approaches the excluded right endpoint {u}, but never reaches it.
+    mistake_tags:
+    - restricted_domain
+    - endpoint_attainment
+  - id: FUNC_RANGE_RESTRICTED_QUADRATIC_001
+    type: generated
+    prompt_template: Let f(x) = (x - {h})^2 + {k}, with domain [{left}, {right}). Find the range in interval
+      notation.
+    difficulty: hard
+    answer_mode: final_plus_optional_work
+    variables:
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+      p:
+        type: int
+        min: 1
+        max: 3
+      extra:
+        type: int
+        min: 1
+        max: 3
+    derived:
+      q: p + extra
+      left: h - p
+      right: h + q
+      top: k + q*q
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{k}, {top})'
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the restrictions, substitution, or reasoning that supports your answer.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The vertex input {h} lies inside the domain, so the minimum {k} is attained.
+      The left endpoint is {p} units from the vertex; the right endpoint is {q} units away.
+      Since {q} > {p}, outputs approach {top} only at the excluded right endpoint.
+      The range is [{k}, {top}).
+    mistake_tags:
+    - vertex_inside_domain
+    - endpoint_attainment
+  - id: FUNC_DOMAIN_FINITE_RELATION_001
+    type: fixed
+    prompt_template: A function consists exactly of the ordered pairs (-2, 5), (0, 1), (3, 5). Give its
+      domain as a finite set.
+    difficulty: easy
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: finite_set
+      values:
+      - '-2'
+      - '0'
+      - '3'
+      variable: x
+    grading:
+      method: finite_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The domain contains the first coordinate of each pair.
+      List each input once: -2, 0, and 3.
+    mistake_tags:
+    - domain_range_mixup
+  - id: FUNC_RANGE_FINITE_RELATION_001
+    type: fixed
+    prompt_template: A function consists exactly of the ordered pairs (-2, 5), (0, 1), (3, 5). Give its
+      range as a finite set.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: finite_set
+      values:
+      - '1'
+      - '5'
+      variable: x
+    grading:
+      method: finite_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      The range contains outputs, the second coordinates.
+      The output 5 occurs twice but is listed only once in a set.
+      The range contains 1 and 5.
+    mistake_tags:
+    - duplicate_set_member
+    - domain_range_mixup
+  - id: FUNC_DOMAIN_SEGMENT_GRAPH_001
+    type: fixed
+    prompt_template: The graph consists only of a straight segment from the open point (-2, 1) to the
+      closed point (3, 4). Find its domain in interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-2, 3]
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Project the segment onto the horizontal axis.
+      Inputs run from -2 to 3, excluding -2 and including 3.
+      Do not use the vertical coordinates for the domain.
+    mistake_tags:
+    - graph_domain
+    - open_endpoint_error
+    media:
+    - src: media/native-functions/domain-segment-test.svg
+      alt: A straight line segment starts at an open point (-2, 1) and ends at a closed point (3, 4).
+        There are no other points or extensions.
+      caption: An open endpoint is excluded; a filled endpoint is included.
+      width: 800
+      height: 500
+      fit: contain
+  - id: FUNC_RANGE_SEGMENT_GRAPH_001
+    type: fixed
+    prompt_template: The graph consists only of a straight segment from the open point (-2, 1) to the
+      closed point (3, 4). Find its range in interval notation.
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (1, 4]
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: |-
+      Project the segment onto the vertical axis.
+      Outputs run from 1 to 4. The lower endpoint is excluded and the upper endpoint is included.
+    mistake_tags:
+    - graph_range
+    - endpoint_attainment
+    media:
+    - src: media/native-functions/domain-segment-test.svg
+      alt: A straight line segment starts at an open point (-2, 1) and ends at a closed point (3, 4).
+        There are no other points or extensions.
+      caption: An open endpoint is excluded; a filled endpoint is included.
+      width: 800
+      height: 500
+      fit: contain
+  - id: FUNC_DOMAIN_DISCRETE_CONTEXT_001
+    type: fixed
+    prompt_template: A room has 24 seats. C(n) is the cost of reserving n seats in this room. Which domain
+      matches the context?
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Seats are counted, so fractional inputs are not admissible. The room also sets
+      an upper limit of 24; zero reservations is allowed.
+    mistake_tags:
+    - discrete_domain
+    - context_restriction
+    options:
+    - id: A
+      label: Every real number in [0, 24]
+    - id: B
+      label: Every positive real number
+    - id: C
+      label: All real numbers except 24
+    - id: D
+      label: The integers from 0 through 24, inclusive
+  - id: FUNC_RANGE_CODOMAIN_001
+    type: fixed
+    prompt_template: 'The function f: R -> R is defined by f(x) = x^2. Which statement is correct?'
+    difficulty: medium
+    answer_mode: final_only
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: D
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The domain and codomain are declared input and output sets. The range is the
+      subset of the codomain actually attained; a real square never produces a negative output.
+    mistake_tags:
+    - codomain_range_confusion
+    options:
+    - id: A
+      label: Its range is R because the declared codomain is R
+    - id: B
+      label: Its domain is [0, inf) because squares are nonnegative
+    - id: C
+      label: The output 0 is excluded from its range
+    - id: D
+      label: The codomain is R, but the range is [0, inf)
+  - id: FUNC_RANGE_HOLE_REASONING_001
+    type: fixed
+    prompt_template: For the original real function f(x) = (x^2 - 4)/(x - 2), give its range in interval
+      notation and justify every excluded output.
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, 4) U (4, inf)
+      variable: x
+    grading:
+      method: interval_set
+    work:
+      mode: rubric_check
+      prompt: Explain your conclusion using the visible criteria; a correct short answer alone is not
+        sufficient.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Identifies x = 2 as excluded by the original denominator before cancellation.
+          weight: 2
+        - id: criterion_2
+          description: Derives f(x) = x + 2 only on the original domain.
+          weight: 2
+        - id: criterion_3
+          description: Explains why output 4 has no allowed preimage.
+          weight: 2
+        - id: criterion_4
+          description: Shows that every output other than 4 is attained, for example using x = y - 2.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: |-
+      For x != 2 the formula equals x + 2.
+      The value 4 would require x = 2, which is forbidden by the original denominator.
+      Every other real output y comes from the allowed input x = y - 2.
+      Thus the range is all real numbers except 4.
+    mistake_tags:
+    - cancelled_domain_restriction
+    - range_surjectivity

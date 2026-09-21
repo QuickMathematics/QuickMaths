@@ -198,3 +198,25 @@ test:
         work_review: {work_review}
         mastery_requires_review_pass: true
 """
+
+
+def test_web_style_review_policies_validate_without_weakening_obligations(tmp_path):
+    import yaml
+    _write_track(tmp_path, _proof_skill_yaml())
+    path = tmp_path / "skills" / "S.yaml"
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    work = data["test"]["questions"][0]["work"]
+    work["proof_policy"] = {"accepted_strategies": ["direct argument"],
+                            "obligations": ["State the domain", {"id": "conclude", "description": "Conclude"}]}
+    path.write_text(yaml.safe_dump(data), encoding="utf-8")
+    assert validate_curriculum(tmp_path).ok
+    work["proof_policy"]["obligations"] = []
+    path.write_text(yaml.safe_dump(data), encoding="utf-8")
+    assert any("obligations must not be empty" in issue.message for issue in validate_curriculum(tmp_path).errors)
+    work["mode"] = "rubric_check"
+    work["rubric"] = {"criteria": [{"id": "reason", "description": "Justify", "weight": 2}]}
+    path.write_text(yaml.safe_dump(data), encoding="utf-8")
+    assert validate_curriculum(tmp_path).ok
+    work["rubric"]["criteria"][0]["weight"] = 0
+    path.write_text(yaml.safe_dump(data), encoding="utf-8")
+    assert any("points must be positive" in issue.message for issue in validate_curriculum(tmp_path).errors)

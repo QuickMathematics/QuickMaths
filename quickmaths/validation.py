@@ -312,7 +312,26 @@ def _validate_proof_obligations(skill: Skill, question: ProblemTemplate, report:
     if not strategies:
         report.add_error("proof_policy.accepted_strategies must not be empty", skill, question)
         return
+    if all(isinstance(strategy, str) for strategy in strategies):
+        if any(not strategy.strip() for strategy in strategies):
+            report.add_error("Proof strategies must not be blank", skill, question)
+        obligations = proof_policy.get("obligations", [])
+        if not isinstance(obligations, list) or not obligations:
+            report.add_error("proof_policy.obligations must not be empty", skill, question)
+            return
+        normalized = []
+        for index, item in enumerate(obligations):
+            if isinstance(item, str) and item.strip():
+                normalized.append({"id": f"obligation_{index + 1}", "label": item})
+            elif isinstance(item, dict) and str(item.get("description", item.get("label", ""))).strip():
+                normalized.append({**item, "id": item.get("id") or f"obligation_{index + 1}"})
+            else:
+                report.add_error("Each proof obligation needs a description", skill, question)
+        strategies = [{"required_obligations": normalized}]
     for strategy in strategies:
+        if not isinstance(strategy, dict):
+            report.add_error("Proof strategies must consistently use labels or structured strategies", skill, question)
+            continue
         ids: set[str] = set()
         dependency_edges: dict[str, list[str]] = {}
         for section in ("assumptions_required", "required_obligations"):
@@ -353,7 +372,7 @@ def _validate_rubric(skill: Skill, question: ProblemTemplate, report: Validation
         if criterion_id:
             ids.add(str(criterion_id))
         try:
-            points = float(criterion.get("points", 0))
+            points = float(criterion.get("points", criterion.get("weight", 0)))
         except (TypeError, ValueError):
             report.add_error("Rubric criterion points must be numeric", skill, question)
             continue

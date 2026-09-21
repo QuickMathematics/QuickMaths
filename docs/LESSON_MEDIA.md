@@ -17,7 +17,7 @@ python scripts/export_web_curriculum.py
 
 The figure builder also accepts `--preview-dir tmp/geometry-previews` to save PNG previews. Diagrams in generated assessments use fixed dimensions so the image and question always agree.
 
-All 128 shipped lesson pages have teaching figures. The app also supplies a library of 130 Matplotlib SVGs across 118 known Math, Programming, Geography and Estimation lessons, matching their ID and teaching content. This adds illustrations to already installed packs without rewriting them or changing learner progress. Native overrides keep their own media. These additional figures load from the published site as they approach the viewport; they require their hosting files to remain available and are not guaranteed offline.
+All 136 shipped lesson pages have teaching figures. The app also supplies a library of 130 Matplotlib SVGs across 118 known Math, Programming, Geography and Estimation lessons, matching their ID and teaching content. This adds illustrations to already installed packs without rewriting them or changing learner progress. Native overrides keep their own media. These additional figures load from the published site as they approach the viewport; they require their hosting files to remain available and are not guaranteed offline.
 
 The native Statistics and Probability assessments also include nine embedded SVG figures reused across 18 fixed questions: dot plots, five-number and comparison box plots, histograms, scatter patterns, an additional-point comparison, and residual diagnostics. Rebuild them with `python scripts/build_statistics_assessment_media.py`; use `--preview-dir tmp/statistics-assessment-previews` for a visual review. Fixed diagrams must retain the exact values described by their question.
 
@@ -124,3 +124,23 @@ Built manifests use an `assets` array:
 ```
 
 Portable assets also contain `data_base64`. Installed hosted packs contain `asset_base_url`, derived from the downloaded manifest's folder. Supported hosts are raw GitHub and GitHub Pages (plus localhost for development). Media downloads carry no GitHub token, reject redirects, and must match the declared size and digest before display. Do not hand-edit a digest to silence an unexpected mismatch; verify the file and rebuild from the intended source.
+
+
+## Native Functions batch
+
+The Algebra → Functions additions (`MATH_FUNC_002`–`MATH_FUNC_005`) include twelve embedded SVG figures and seven fixed diagram-based assessment scenarios. Rebuild with `python scripts/build_function_figures.py`, then `python scripts/export_web_curriculum.py`. The figures cover graph endpoints, missing points, transformations, composition order, and restricted inverses. See [Functions batch provenance and validation](FUNCTIONS_BATCH_1.md).
+
+
+## Calculus bridge batch 2
+
+The four native lessons `MATH_FUNC_006`, `MATH_FUNC_007`, `MATH_CALC_001` and
+`MATH_CALC_002` include twelve embedded Matplotlib SVGs. Rebuild with
+`python scripts/build_calculus_bridge_figures.py`, then run the canonical
+`python scripts/export_web_curriculum.py`. Add `--preview-dir tmp/calculus-bridge`
+to the figure command for PNG review images. These are native assets, separate
+from the ID-matched hosted illustration library. Assessment diagrams are attached
+only to fixed scenarios so that labels and original givens stay consistent.
+
+See [the batch notes](CALCULUS_BRIDGE_BATCH_2.md) for coverage and
+[the compatibility integration notes](NATIVE_COMPATIBILITY_FIXES.md) for the
+current rebase, migration checks and validation limits.

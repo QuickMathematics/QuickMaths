@@ -1,4 +1,4 @@
-import { learningFields } from "./learning-fields.js?v=20260908-statistics-v1";
+import { learningFields } from "./learning-fields.js?v=20260921-native-compat-v1";
 export const TOOL_NAMES = Object.freeze([
   "get_agent_guide",
   "get_quickmaths_manual",

@@ -42,6 +42,12 @@ export const FIELD_TAXONOMY = {
           "Coordinate Geometry",
           "Linear Functions",
           "Trigonometry"
+        ],
+        "Calculus": [
+          "Limits",
+          "Continuity",
+          "Differential Calculus",
+          "Integral Calculus"
         ]
       }
     },

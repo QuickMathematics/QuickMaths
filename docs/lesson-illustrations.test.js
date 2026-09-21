@@ -18,9 +18,9 @@ const packs = readdirSync(folder).map(name => {
 });
 const storeFor = () => createQuickMathsStore({ curriculum, now: () => new Date("2026-09-06T12:00:00Z"), storage: { getItem: () => null, setItem() {} } });
 
-test("all 128 shipped lessons have teaching figures, including the new statistics and probability lessons", async () => {
+test("all 136 shipped lessons have teaching figures, including the new statistics and probability lessons", async () => {
   const lessons = [...curriculum.skills, ...packs.flatMap(p => p.skills)];
-  assert.equal(lessons.length, 128);
+  assert.equal(lessons.length, 136);
   assert.equal(Object.keys(LESSON_ILLUSTRATIONS).length, 118);
   let count = 0;
   for (const skill of lessons) {

@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Unified Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 33,
+  "app_version": 34,
   "description": "The single operating guide for routing fresh visitors, tutoring learners, and helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -510,5 +510,11 @@
     "assessment_boundary": "The app alone requests verification. Fresh complete submitted-proof certificates enable submission and reflection. Prefix/reference/assisted certificates, imported JSON and tutor opinions cannot do so.",
     "persistence_boundary": "Backup, assignment import, sync and Agent Bridge transport archive data only. Edits invalidate live verification; restore requires replay. Historical scores are records, not current certificates.",
     "threat_model": "The pinned browser backend, loopback companion and local app origin are trusted. Digest consistency is binding, not cryptographic server authentication or high-stakes anti-cheating security."
+  },
+  "native_compatibility": {
+    "state_version": 18,
+    "native_lessons": 92,
+    "drafts": "Preserve resolved question snapshots, order and responses across reload/backup/sync. Recovery-needed drafts block grading; retain a backup before repair. Checksums are not verification authority.",
+    "review": "Functions and calculus bridge capstones retain required tutor review. Formal proofs separately require fresh exact Lean verification or replay."
   }
 }

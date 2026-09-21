@@ -1,8 +1,8 @@
 # Lesson illustration coverage
 
-Updated 8 September 2026 for the Statistics and Probability batches, following the illustration release in `0cd757e`.
+Updated 21 September 2026 for the combined Functions and Calculus bridge integration. The integrated library contains 136 lessons, including 92 native Mathematics lessons. The historical baseline and individual source additions are recorded below.
 
-## Lesson pages
+## Lesson pages (8 September baseline)
 
 | Library | Lessons | Illustrated before | Illustrated now |
 | --- | ---: | ---: | ---: |
@@ -42,3 +42,19 @@ Rebuild with `python -m scripts.build_lesson_illustrations`. For local visual re
 ## Verification
 
 Automated checks cover all 128 lessons, source compatibility, asset sizes/digests, imports/exports/backups, duplicate suppression and 100 randomized retakes for every spatial trigonometry scenario. Figures receive a rendered layout review, with browser checks for image loading, narrow widths and assessment labels.
+
+
+## Functions batch 1 (9 September 2026)
+
+Four native Algebra lessons add twelve authored, embedded SVG figures. They are separate from the unchanged 118-lesson hosted illustration library. With this batch, the shipped library contains 132 lessons; the four additions all have teaching figures. Seven fixed assessment scenarios reuse content-matched figures. The pre-existing coverage table above records the 8 September baseline. See `FUNCTIONS_BATCH_1.md` for validation details.
+
+
+## Calculus bridge batch 2
+
+This sequential source addition contributes four illustrated native lessons and
+twelve new embedded SVGs under `media/native-calculus-bridge/`, taking the native
+Mathematics total from 88 to 92 and the combined shipped lesson total to 136.
+The separate hosted illustration-library count is unchanged. New figures were
+checked visually in PNG previews, validated against their declared bytes and
+digests, and loaded offline by the actual media loader. Generated assessment
+scenarios do not receive fixed, potentially mismatched diagram attachments.

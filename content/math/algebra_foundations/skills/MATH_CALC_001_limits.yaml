@@ -1,0 +1,900 @@
+id: MATH_CALC_001
+schema_version: '0.2'
+name: Limits from graphs, tables, and formulas
+domain: Math
+subdomain: Calculus
+topic: Limits
+description: Distinguish point values from one-sided and two-sided behavior; evaluate basic limits with
+  justified algebra and recognize the limits of numerical evidence.
+prerequisites:
+- MATH_FUNC_006
+- MATH_FUNC_007
+- MATH_POLY_004
+unlocks:
+- MATH_CALC_002
+tags:
+- limits
+- functions
+- reasoning
+- graph_interpretation
+- modeling
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A limit describes what function outputs approach as inputs approach a specified value. It is a statement about nearby inputs, not necessarily about the value at the specified input itself. The notation lim as x -> a of f(x) = L means that f(x) can be made arbitrarily close to L by taking allowed x sufficiently close to a, with x != a.
+
+  What you will learn:
+  Separate a function value from a limit, compare one-sided behavior, use valid algebra to evaluate finite limits, recognize infinite behavior, and explain the limitations of graphical or tabular evidence. All limits here use real inputs and outputs; infinity describes unbounded behavior rather than a real function value.
+
+  Three questions at one input:
+  For the function that equals x + 1 when x != 1 but is assigned f(1) = 5, ask three separate questions. What is f(1)? It is 5 by definition. What do nearby outputs approach from the left? They approach 2. What do nearby outputs approach from the right? They also approach 2. Therefore the two-sided limit is 2, even though the actual function value is 5. Leaving f(1) undefined would not change that nearby behavior.
+
+  One-sided limits:
+  The notation x -> a- means approach a from inputs less than a; x -> a+ means approach from inputs greater than a. The minus and plus indicate the side of the input, not the sign of the output. When both sides of a are available, a finite two-sided limit exists exactly when the two one-sided limits exist and agree. A left limit of 1 and a right limit of 3 cannot be averaged into a two-sided limit of 2.
+
+  Read the behavior, not a plotting accident:
+  An open circle can show a missing function value while the surrounding curve clearly approaches its height. A filled point can show the actual value without controlling the limit. Arrows, breaks, and the scale of the display matter. In an assessment, use the stated function rule or the explicit graph description rather than assuming an unlabeled screenshot resolves arbitrary precision.
+
+  Limits from tables:
+  A table of outputs at 0.9, 0.99, and 0.999 may suggest behavior near 1, but it samples only finitely many inputs and only one side. Other values could behave differently. A table can support a conjecture or illustrate a limit already justified from a formula; it cannot alone prove the general assertion that all sufficiently nearby allowed inputs behave as claimed. This distinction prevents numerical agreement from being mistaken for a proof.
+
+  Substitution and limit laws:
+  Polynomial expressions have limits found by substituting the approaching input. Sums, differences, products, and constant multiples preserve finite limits. For a quotient, divide the numerator limit by the denominator limit only when that denominator limit is nonzero. Square-root substitution is valid at allowed inputs where the root expression has the relevant limiting behavior. These rules explain why direct substitution works in ordinary cases, rather than making substitution an unconditional instruction.
+
+  A zero-over-zero result is a signal, not an answer:
+  For (x^2 - 9)/(x - 3) as x -> 3, direct substitution gives 0/0. This is indeterminate: it does not equal zero, one, or infinity. Factor the numerator to get (x - 3)(x + 3). When x != 3, cancellation gives x + 3. Since a limit ignores the value at the single input 3, the simplified expression has the same limit, namely 6. The original function remains undefined at 3 unless a separate value is assigned.
+
+  Local equality is enough:
+  Two formulas need not agree everywhere to have the same limit at a. Agreement for all sufficiently nearby allowed inputs other than a is enough. This is the logical justification for cancellation in a limit argument. State the restriction under which the simplification is valid, then use the limiting behavior of the simpler expression. Do not claim that cancellation made the original denominator nonzero.
+
+  Rationalizing a root difference:
+  For [sqrt(x) - 2]/(x - 4) as x -> 4, multiply numerator and denominator by sqrt(x) + 2. On nearby inputs with x != 4, the quotient becomes 1/[sqrt(x) + 2]. Its denominator approaches 4, so the limit is 1/4. The conjugate removes the indeterminate form without changing the function on the punctured neighborhood where the algebra is valid.
+
+  Infinite behavior:
+  As x approaches zero from the right, 1/x grows beyond every positive bound; write the one-sided limit as +inf. From the left, 1/x decreases below every negative bound; write -inf. Because the directions disagree, the two-sided limit of 1/x does not exist, even as a common signed infinite limit. In contrast, 1/x^2 grows without bound from both sides, so its two-sided behavior is +inf. This is not a finite real limit and does not mean the function takes an infinite value at zero.
+
+  Endpoints and scope:
+  For sqrt(x) at zero, the real domain has inputs only on the right. We explicitly ask for x -> 0+ to avoid implying a nonexistent real left-side neighborhood. More advanced treatments describe limits relative to a domain; keep the requested direction clear here. In this lesson, enter DNE when no common two-sided behavior exists, and enter +inf or -inf only when the problem asks for that signed unbounded behavior.
+
+  Self-check:
+  Am I evaluating f(a), a one-sided limit, or a two-sided limit? Do both sides agree? Did I divide by a limiting zero without justification? Which excluded input must survive cancellation? Does my table merely suggest the answer? A sound limit argument connects nearby behavior to an exact rule or a stated theorem.
+media:
+- &id001
+  src: media/native-calculus-bridge/limit-hole.svg
+  alt: The line y = x + 1 has an open point at (1, 2) and a separate filled point at (1, 5). All other
+    points follow the line.
+  caption: Nearby values approach 2 although the value at x = 1 is 5.
+  width: 800
+  height: 500
+  fit: contain
+- &id002
+  src: media/native-calculus-bridge/limit-jump.svg
+  alt: For x < 0 the graph follows y = x + 1, approaching an open point at (0, 1). For x >= 0 it follows
+    y = x + 3, starting at a filled point (0, 3).
+  caption: The left and right limiting values disagree.
+  width: 800
+  height: 500
+  fit: contain
+examples:
+- prompt: Find lim as x -> -2 of 3x^2 + 1.
+  solution: '13'
+  explanation: 'A polynomial has the substitution limit: 3(-2)^2 + 1 = 13.'
+- prompt: Find lim as x -> 1 of (x+2)/(x+4).
+  solution: 3/5
+  explanation: The denominator limit is 5, not zero, so the quotient law applies.
+- prompt: Find lim as x -> 3 of (x^2 - 9)/(x - 3).
+  solution: '6'
+  explanation: Direct substitution is indeterminate. For x != 3, factor and cancel to obtain x+3, whose
+    limit is 6.
+- prompt: The function equals x+1 except that f(1)=5. Compare f(1) with the limit at 1.
+  solution: f(1)=5, but the limit is 2.
+  explanation: Nearby values follow the line toward the open-circle height. The separate filled point
+    does not alter that approach.
+  media:
+  - *id001
+- prompt: Compare the sides of x+1 for x<0 and x+3 for x>=0 at zero.
+  solution: 'Left limit: 1. Right limit: 3. Two-sided limit: DNE.'
+  explanation: The condition selects each nearby branch. Unequal one-sided values cannot be combined by
+    averaging.
+  media:
+  - *id002
+- prompt: Find lim as x -> 4 of [sqrt(x)-2]/(x-4).
+  solution: 1/4
+  explanation: Multiply by the conjugate. Away from 4 the expression equals 1/[sqrt(x)+2], and its denominator
+    approaches 4.
+- prompt: Find lim as h -> 0 of [(2+h)^2 - 4]/h.
+  solution: '4'
+  explanation: For h != 0 the quotient equals 4+h. Taking its limit is not the same as assigning a value
+    to the original quotient at h=0.
+- prompt: Describe 1/x near zero from both sides.
+  solution: 'Left: -inf. Right: +inf. Two-sided: DNE.'
+  explanation: The denominator has opposite signs on the two sides. Unbounded magnitude alone does not
+    determine a common signed limit.
+  media:
+  - src: media/native-calculus-bridge/limit-reciprocal.svg
+    alt: The graph y = 1/x is negative for x < 0 and positive for x > 0. It decreases without bound as
+      x approaches 0 from the left and increases without bound from the right.
+    caption: Opposite one-sided infinite behavior does not give a common two-sided limit.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: Describe 1/x^2 near zero.
+  solution: +inf from both sides; no finite real limit.
+  explanation: The squared denominator is positive and shrinks toward zero on either side. The output
+    is never an actual real number called infinity.
+- prompt: A finite table approaches height 2 from the left. Does it prove a two-sided limit of 2?
+  solution: No. It suggests a conjecture, not a complete proof.
+  explanation: Finitely many samples do not control every sufficiently close input, and the table gives
+    no right-side information.
+applications:
+- title: Instantaneous change
+  description: A difference quotient describes a secant rate; its limit can describe a local rate without
+    dividing by zero.
+- title: Removable model defects
+  description: A formula can fail at one input while nearby outputs still determine a useful continuous
+    extension.
+- title: Numerical computation
+  description: Tables and plots provide evidence, but finite resolution cannot replace a mathematical
+    guarantee about all nearby inputs.
+- title: Threshold behavior
+  description: One-sided limits reveal whether a rule change is a harmless join or a genuine jump.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: BRIDGE_LIM_POLYNOMIAL
+    type: generated
+    prompt_template: Find the limit of {p}x^2 + ({b}) as x -> {a}.
+    variables:
+      p:
+        type: int
+        min: 1
+        max: 5
+      b:
+        type: int
+        min: -5
+        max: 5
+      a:
+        type: int
+        min: -4
+        max: 4
+    derived:
+      ans: p*a*a+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Polynomial limits are found by substitution.
+      {p}*({a})^2 + ({b}) = {ans}.
+    solution_steps: []
+    mistake_tags: &id003
+    - point_value_versus_limit
+    - one_sided_behavior
+    - limit_law_conditions
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_RATIONAL
+    type: generated
+    prompt_template: Find the limit of (x + ({c}))/(x + ({d})) as x -> {a}. Give an exact number or fraction.
+    variables:
+      a:
+        type: int
+        min: -4
+        max: 4
+      c:
+        type: int
+        min: -4
+        max: 4
+      d:
+        type: int
+        min: -4
+        max: 4
+    derived:
+      num: a+c
+      den: a+d
+    constraints:
+    - den != 0
+    answer:
+      type: numeric
+      value: '{num}/{den}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The denominator approaches {den}, which is nonzero.
+      The quotient law therefore gives {num}/{den}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_FACTOR
+    type: generated
+    prompt_template: Find the limit of (x^2 - {sq})/(x - ({a})) as x -> {a}.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+    derived:
+      sq: a*a
+      ans: 2*a
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Factor x^2 - {sq} as (x - ({a}))(x + ({a})).
+      For x != {a}, cancel the common factor.
+      The remaining expression approaches {a} + ({a}) = {ans}; the original value at {a} remains undefined.
+    solution_steps: []
+    mistake_tags:
+    - difference_of_squares
+    - local_equality
+    - indeterminate_form
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_optional_work
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the applicable condition, calculation, or reason.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_LOCAL_PRODUCT
+    type: generated
+    prompt_template: Find the limit of [(x - ({a}))({m}x + ({b}))]/(x - ({a})) as x -> {a}.
+    variables:
+      a:
+        type: int
+        min: -4
+        max: 4
+      m:
+        type: int
+        min: 1
+        max: 5
+      b:
+        type: int
+        min: -5
+        max: 5
+    derived:
+      ans: m*a+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      For x != {a}, the displayed quotient equals {m}x + ({b}).
+      These locally equal expressions have the same limit, {ans}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_DQ
+    type: generated
+    prompt_template: Find the limit of [({a} + h)^2 - {sq}]/h as h -> 0.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+    derived:
+      sq: a*a
+      ans: 2*a
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      For nonzero h, expand and cancel to obtain {ans} + h.
+      As h approaches zero, this expression approaches {ans}.
+      The original quotient is not evaluated at h = 0.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_optional_work
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the applicable condition, calculation, or reason.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_CONJUGATE
+    type: generated
+    prompt_template: Find the limit of [sqrt(x) - {r}]/(x - {sq}) as x -> {sq}. Give an exact fraction.
+    variables:
+      r:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      sq: r*r
+      den: 2*r
+    constraints: []
+    answer:
+      type: numeric
+      value: 1/{den}
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Multiply by the conjugate sqrt(x) + {r}.
+      For x != {sq}, cancellation gives 1/[sqrt(x) + {r}].
+      The nonzero denominator approaches {den}, so the limit is 1/{den}.
+    solution_steps: []
+    mistake_tags:
+    - conjugate_multiplication
+    - local_equality
+    - indeterminate_form
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_optional_work
+    work:
+      mode: capture_only
+      prompt: 'Optional: record the applicable condition, calculation, or reason.'
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_LEFT
+    type: generated
+    prompt_template: Let f(x) = {m}x + ({b}) for x < {a}, and f(x) = x^2 + 20 for x >= {a}. Find the left-hand
+      limit as x -> {a}-.
+    variables:
+      m:
+        type: int
+        min: 1
+        max: 4
+      b:
+        type: int
+        min: -5
+        max: 5
+      a:
+        type: int
+        min: -3
+        max: 3
+    derived:
+      ans: m*a+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Approach using inputs below {a}, so only the first formula describes nearby values.
+      Its limit is {m}*({a}) + ({b}) = {ans}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_RIGHT
+    type: generated
+    prompt_template: Let f(x) = x^2 - 20 for x <= {a}, and f(x) = {m}x + ({b}) for x > {a}. Find the right-hand
+      limit as x -> {a}+.
+    variables:
+      m:
+        type: int
+        min: 1
+        max: 4
+      b:
+        type: int
+        min: -5
+        max: 5
+      a:
+        type: int
+        min: -3
+        max: 3
+    derived:
+      ans: m*a+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Inputs greater than {a} use the second rule, even though that rule excludes the boundary itself.
+      Its approaching value is {m}*({a}) + ({b}) = {ans}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_MATCHED
+    type: generated
+    prompt_template: Let f(x) = x + ({a}) for x < {a}, f({a}) = 100, and f(x) = 2x for x > {a}. Find the
+      two-sided limit at {a}.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+    derived:
+      ans: 2*a
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      From the left, x + ({a}) approaches {ans}.
+      From the right, 2x also approaches {ans}.
+      The two-sided limit is their common value, regardless of the isolated value 100.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_JUMP
+    type: fixed
+    prompt_template: Let f(x) = x + 1 for x < 0 and f(x) = x + 3 for x >= 0. Find the two-sided limit
+      at 0, or enter DNE when no common limit exists.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: DNE
+      accepted_forms:
+      - dne
+      - does not exist
+      - no limit
+    grading:
+      method: exact_text
+    explanation_template: |-
+      The left-hand limit is 1; the right-hand limit is 3.
+      They do not agree, so the two-sided limit does not exist.
+      Averaging the two heights is not a limit rule.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/limit-jump.svg
+      alt: For x < 0 the graph follows y = x + 1, approaching an open point at (0, 1). For x >= 0 it follows
+        y = x + 3, starting at a filled point (0, 3).
+      caption: Both branch rules and their open or included endpoints are shown.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_LIM_GRAPH
+    type: fixed
+    prompt_template: The graph equals x + 1 for x != 1, but f(1) = 5. Find the limit as x -> 1.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '2'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Both sides follow the line toward height 2.
+      The filled point at height 5 is the function value, not the limit.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/limit-hole.svg
+      alt: The line y = x + 1 has an open point at (1, 2) and a separate filled point at (1, 5). All other
+        points follow the line.
+      caption: Open and included points are marked; use the stated rule and assigned point value.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_LIM_TABLE
+    type: fixed
+    prompt_template: A finite table shows values close to 2 at x = 0.9, 0.99 and 0.999. What can it establish
+      by itself about a two-sided limit at 1?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      There are only finitely many observations, all on one side.
+      A proof needs control of the relevant nearby behavior, not just these samples.
+    solution_steps: []
+    mistake_tags:
+    - finite_evidence
+    - one_sided_evidence
+    - conjecture_versus_proof
+    difficulty: medium
+    options:
+    - id: A
+      label: It proves that f(1) = 2.
+    - id: B
+      label: It proves all sufficiently nearby values on both sides approach 2.
+    - id: C
+      label: It proves the right-hand limit does not exist.
+    - id: D
+      label: It suggests a left-side trend but cannot by itself prove the two-sided limit.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_INFINITE_RIGHT
+    type: generated
+    prompt_template: Describe the limit of 1/(x - ({a})) as x -> {a}+ using +inf, -inf, or DNE.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: +inf
+      accepted_forms:
+      - inf
+      - +infinity
+      - infinity
+      - +∞
+      - ∞
+    grading:
+      method: exact_text
+    explanation_template: |-
+      The denominator is positive and approaches zero.
+      The reciprocal grows beyond every positive bound.
+      This is +inf behavior, not a finite value at the boundary.
+    solution_steps: []
+    mistake_tags:
+    - side_of_approach
+    - denominator_sign
+    - infinity_not_real_value
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_INFINITE_LEFT
+    type: generated
+    prompt_template: Describe the limit of 1/(x - ({a})) as x -> {a}- using +inf, -inf, or DNE.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: -inf
+      accepted_forms:
+      - -infinity
+      - -∞
+    grading:
+      method: exact_text
+    explanation_template: |-
+      The denominator is negative and approaches zero.
+      Its reciprocal becomes negative with unbounded magnitude, so the behavior is -inf.
+    solution_steps: []
+    mistake_tags:
+    - side_of_approach
+    - denominator_sign
+    - infinity_not_real_value
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_INFINITE_SQUARE
+    type: generated
+    prompt_template: Describe the two-sided behavior of 1/(x - ({a}))^2 as x -> {a}, using +inf, -inf,
+      or DNE.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: +inf
+      accepted_forms:
+      - inf
+      - +infinity
+      - infinity
+      - +∞
+      - ∞
+    grading:
+      method: exact_text
+    explanation_template: |-
+      The squared denominator is positive on both punctured sides and approaches zero.
+      Both sides grow beyond every positive bound.
+      The notation +inf records unbounded behavior rather than a finite real limit.
+    solution_steps: []
+    mistake_tags:
+    - even_power_sign
+    - common_infinite_behavior
+    - infinity_not_real_value
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_OPPOSITE_INFINITY
+    type: fixed
+    prompt_template: For 1/x as x -> 0, the left-hand behavior is -inf and the right-hand behavior is
+      +inf. Enter +inf, -inf, or DNE for the two-sided limit.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: DNE
+      accepted_forms:
+      - dne
+      - does not exist
+      - no limit
+    grading:
+      method: exact_text
+    explanation_template: |-
+      The two sides do not approach a common finite value or a common signed infinity.
+      The appropriate two-sided answer is DNE.
+    solution_steps: []
+    mistake_tags:
+    - opposite_one_sided_limits
+    - unbounded_not_common_limit
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/limit-reciprocal.svg
+      alt: The graph y = 1/x is negative for x < 0 and positive for x > 0. It decreases without bound
+        as x approaches 0 from the left and increases without bound from the right.
+      caption: The curve y = 1/x is shown separately on the two sides of zero.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_LIM_INDETERMINATE
+    type: fixed
+    prompt_template: Substituting the approaching input into a quotient produces 0/0. What is justified?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Different quotients producing 0/0 can have different limiting behaviors.
+      Factorization, rationalization, or another justified argument is needed.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: The limit is one because zero cancels zero.
+    - id: B
+      label: The limit must be positive infinity.
+    - id: C
+      label: The form is indeterminate; further analysis of nearby values is needed.
+    - id: D
+      label: The limit is zero.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_POINT_CHANGE
+    type: fixed
+    prompt_template: Two functions agree at every x near 2 except possibly at x = 2 itself. One has limit
+      7 there. What follows?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      A limit concerns nearby inputs different from the target.
+      Changing that single point does not alter the shared local behavior.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: The other has the same limit 7, regardless of its assigned value at 2.
+    - id: B
+      label: Their values at 2 must be equal.
+    - id: C
+      label: The second limit must be zero.
+    - id: D
+      label: No conclusion is possible because every point value affects a limit.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_ENDPOINT
+    type: fixed
+    prompt_template: Find the explicitly right-hand real limit of sqrt(x) as x -> 0+.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '0'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Nonnegative inputs approaching zero have square roots approaching zero.
+      No real left-side neighborhood is required for this explicitly one-sided question.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_LIM_PROOF
+    type: fixed
+    prompt_template: Define f(x) = (x^2 - 9)/(x - 3) for x != 3 and f(3) = 100. Give its limit at 3 and
+      justify why the assigned value 100 does not control that limit.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '6'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      Factor the numerator as (x-3)(x+3).
+      For every nearby x != 3, f(x) = x+3.
+      As x approaches 3, these values approach 6.
+      The limit ignores the single input x=3, so assigning 100 there does not change the limit.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: proof_obligations
+      prompt: Give a complete argument. Address every listed obligation; a correct short answer alone
+        is not enough.
+      proof_policy:
+        obligations:
+        - Factors the numerator as (x-3)(x+3).
+        - States that cancellation is valid for x != 3, not at the removed input.
+        - Uses the locally equal expression x+3 to justify approaching 6 from both sides.
+        - Distinguishes the isolated function value 100 from nearby limiting behavior.
+        accepted_strategies:
+        - local equality on a punctured neighborhood
+        - factorization followed by a finite-limit law
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false

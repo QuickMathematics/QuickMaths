@@ -1,12 +1,12 @@
-import { createQuickMathsStore } from "./challenge-core.js?v=20260909-calculus-v1";
-import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260908-statistics-v1";
+import { createQuickMathsStore } from "./challenge-core.js?v=20260921-native-compat-v1";
+import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260921-native-compat-v1";
 import { createLessonDepot, DEFAULT_DEPOT_FEDERATION } from "./lesson-depot.js?v=20260906-media-v1";
 import {
   createGitHubContentsClient,
   createGitHubCredentialStore,
   createGitHubSyncController,
 } from "./github-sync.js?v=20260908-profile-sync-v1";
-import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js?v=20260906-media-v1";
+import { BRIDGE_TOOL_NAMES, registerBridgeWebMcpTools } from "./bridge-webmcp-tools.js?v=20260921-native-compat-v1";
 import {
   createLocalBridgeCredentialStore,
   createLocalGitContentsClient,
@@ -118,10 +118,10 @@ async function connectFromForm(event) {
 
 async function boot() {
   const [curriculumResponse, geographyResponse, manifestResponse, authoringGuideResponse, learnerManualResponse, educatorManualResponse] = await Promise.all([
-    fetch("./curriculum-data.json?v=20260909-calculus-v1"),
+    fetch("./curriculum-data.json?v=20260921-native-compat-v1"),
     fetch("./lesson-depot/lessons/geography/1.0.0/lesson-set.json?v=20260906-optimization-v1"),
-    fetch("./agent-manifest.json?v=20260909-calculus-v1").catch(() => null),
-    fetch("./CUSTOM_LESSON_SETS.md?v=20260909-calculus-v1").catch(() => null),
+    fetch("./agent-manifest.json?v=20260921-native-compat-v1").catch(() => null),
+    fetch("./CUSTOM_LESSON_SETS.md?v=20260921-native-compat-v1").catch(() => null),
     fetch("./STUDENT_GUIDE.md?v=20260909-calculus-v1").catch(() => null),
     fetch("./EDUCATOR_GUIDE.md?v=20260909-calculus-v1").catch(() => null),
   ]);

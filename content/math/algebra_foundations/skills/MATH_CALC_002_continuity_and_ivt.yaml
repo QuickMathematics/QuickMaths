@@ -1,0 +1,958 @@
+id: MATH_CALC_002
+schema_version: '0.2'
+name: Continuity and the intermediate value theorem
+domain: Math
+subdomain: Calculus
+topic: Continuity
+description: Check continuity with all three conditions, repair removable holes, and justify root or target-value
+  existence using the intermediate value theorem.
+prerequisites:
+- MATH_CALC_001
+unlocks: []
+tags:
+- continuity
+- functions
+- reasoning
+- graph_interpretation
+- modeling
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Continuity connects a function's value to its nearby behavior. At an interior input a, a function is continuous when f(a) exists, the finite two-sided limit as x approaches a exists, and that limit equals f(a). These are three distinct checks. Knowing just the value, just a limit, or just one side is not enough.
+
+  What you will learn:
+  Test continuity at a point and across an interval, repair removable holes, distinguish jumps from unbounded behavior, handle endpoints relative to a domain, and apply the intermediate value theorem with all its hypotheses. You will separate an existence guarantee from a claim of uniqueness or an exact solution.
+
+  Apply the three checks:
+  If f(x) = x+1 away from x=1 but f(1)=5, the point value exists and the limit exists, but 5 is not the limit 2. The function is not continuous at 1. Redefining f(1)=2 repairs that mismatch. If no value was assigned at 1, the original function was undefined there; the repaired function is a continuous extension, not evidence that the original missing value was already present.
+
+  A removable hole:
+  The expression (x^2-4)/(x-2) equals x+2 for x != 2. Its nearby values approach 4. Defining the formerly missing value to be 4 produces a continuous function at that input. Any other finite assignment leaves a mismatch. The algebra determines a unique possible repair, because continuity requires equality with the existing limit.
+
+  Joining piecewise rules:
+  Suppose f(x) = 3x+1 for x<2 and f(x)=x+k for x>=2. The left-hand limit is 7; the right-hand limit and the actual value at 2 are 2+k. Set 2+k=7 to get k=5. This reasoning checks both the neighboring formulas and which rule defines the boundary value. If there were a separate third assignment at the boundary, it would also have to equal the common limit.
+
+  Not every break can be repaired at one point:
+  For x+1 below zero and x+3 above zero, the one-sided limits are 1 and 3. No choice of the single value f(0) can make the unequal sides agree. This is a jump discontinuity. Similarly, 1/x^2 becomes unbounded near zero; no finite value placed at zero can make it continuous there. A removable mismatch, a jump, and an infinite discontinuity require different diagnoses, not the same instruction to fill a dot.
+
+  Continuity on a domain:
+  Polynomials are continuous at every real input. A rational function is continuous wherever its original denominator is nonzero. A square-root function is continuous on its real domain in the domain-relative sense. For sqrt(x), continuity at the endpoint 0 uses the right-hand limit, because there are no negative real inputs in the domain. On a closed interval [a,b], continuity means ordinary continuity inside and the appropriate one-sided continuity at each endpoint.
+
+  Keep domain language precise:
+  A missing input is not a point in the function's domain. We can say 1/x is continuous on its domain, (-inf,0) U (0,inf), while also saying it cannot be used as a continuous function on [-1,1]. A cancelled factor preserves the excluded input in the original function. When a question asks for the domain on which a formula is continuous, retain that hole unless an extension is explicitly defined.
+
+  The intermediate value theorem:
+  Suppose f is continuous on the entire closed interval [a,b]. If a target height N lies between f(a) and f(b), then f(c)=N for at least one c in [a,b]. When N lies strictly between the endpoint values, at least one such c lies in the open interval (a,b). The theorem is about reaching every intermediate output height, not about taking every possible input or having a straight graph.
+
+  A root-existence argument:
+  For f(x)=x^3+x-1 on [0,1], polynomial continuity supplies the first hypothesis. The endpoint values are f(0)=-1 and f(1)=1. Zero lies strictly between them, so the theorem guarantees at least one root in (0,1). It does not say that the root is 1/2, and it does not itself establish that there is only one root. A graph may suggest a location, but the theorem supplies an existence statement even without an exact formula for the root.
+
+  Why the assumptions matter:
+  The function 1/x takes values -1 and 1 at the endpoints of [-1,1] but never equals zero. There is no contradiction because it is not continuous or even defined on the whole interval. Conversely, equal positive endpoint values do not establish that there is no root inside: x^2 has value 1 at both -1 and 1 but has a zero at 0. Failure of a sign-change test means that this particular existence test is inconclusive, not that roots are impossible.
+
+  Bisection as a consequence:
+  For a continuous function with opposite nonzero signs at interval endpoints, evaluate the midpoint. If its value is zero, a root has been found. Otherwise, keep the half whose endpoint values have opposite signs. Continuity and the theorem guarantee a root in that retained half. For x^2-6 on [2,3], the midpoint is 2.5 and its value is 0.25, while f(2)=-2. Keep [2,2.5]. Repeating the process narrows a guaranteed bracket; a midpoint is an approximation, not automatically an exact root.
+
+  Self-check:
+  Does the point value exist and equal a common finite limit? Have I checked the whole interval rather than only its endpoints? Is the target strictly between the endpoint heights? Does the theorem prove at least one solution, not a unique one? A continuous corner such as |x| is allowed: continuity does not require a visually smooth curve.
+media:
+- &id001
+  src: media/native-calculus-bridge/continuity-fill.svg
+  alt: The line y = x + 2 has an open point at (2, 4). An annotation asks which value at x = 2 would fill
+    the hole without changing nearby values.
+  caption: A removable hole can be repaired only by assigning the limiting value.
+  width: 800
+  height: 500
+  fit: contain
+- &id002
+  src: media/native-calculus-bridge/continuity-corner.svg
+  alt: The V-shaped graph y = |x| passes through the included point (0, 0). Both branches approach that
+    same point.
+  caption: Continuity does not require a rounded or smooth-looking graph.
+  width: 800
+  height: 500
+  fit: contain
+examples:
+- prompt: At x=1, a function has value 5 but a two-sided limit of 2. Is it continuous?
+  solution: No.
+  explanation: The value and limit both exist but are unequal. The third continuity check fails.
+- prompt: Fill the missing value of (x^2-4)/(x-2) to obtain continuity at 2.
+  solution: Assign f(2)=4.
+  explanation: Away from 2 the formula equals x+2. Its limit at the hole is 4, which is the only possible
+    continuous repair.
+  media:
+  - *id001
+- prompt: Join 3x+1 for x<2 with x+k for x>=2 continuously.
+  solution: k=5
+  explanation: The left limit is 7. The other branch gives both the right limit and the actual value 2+k,
+    so require 2+k=7.
+- prompt: Can changing f(0) repair left and right limits of 1 and 3?
+  solution: No.
+  explanation: The two side limits must agree before any point assignment can make continuity possible.
+    A jump is not removable.
+- prompt: Where is 1/[(x-1)(x+2)] continuous?
+  solution: 'On its domain: (-inf,-2) U (-2,1) U (1,inf).'
+  explanation: Rational functions are continuous at inputs where the original denominator is nonzero.
+    Do not include either excluded input.
+- prompt: Explain continuity of sqrt(x-3) at its left domain endpoint.
+  solution: It is continuous at 3 from the right, relative to [3,inf).
+  explanation: The endpoint value is zero, and the values from allowed inputs above 3 approach zero. No
+    left-side real inputs exist.
+- prompt: Does a corner in |x| prevent continuity at zero?
+  solution: No.
+  explanation: The common finite side limit and the actual value are all zero. Smoothness is a different
+    question.
+  media:
+  - *id002
+- prompt: Prove that x^3+x-1 has a zero between 0 and 1.
+  solution: At least one root lies in (0,1).
+  explanation: Polynomial continuity and endpoint values -1 and 1 satisfy the intermediate value theorem.
+    This argument alone does not identify an exact root or prove uniqueness.
+  media:
+  - src: media/native-calculus-bridge/continuity-ivt.svg
+    alt: The continuous curve y = x^3 + x - 1 is shown on [0, 1], with endpoint values -1 and 1 and a
+      horizontal line at height zero.
+    caption: The intermediate value theorem guarantees a zero between the endpoint inputs.
+    width: 800
+    height: 500
+    fit: contain
+- prompt: Why does 1/x on [-1,1] not provide an IVT guarantee of a zero?
+  solution: It is not continuous or even defined on the whole interval.
+  explanation: Endpoint signs cannot replace the missing continuity hypothesis at zero.
+- prompt: Bisect the root bracket for x^2-6 on [2,3] once.
+  solution: Retain [2,2.5].
+  explanation: The midpoint value is 2.5^2-6 = 0.25, while the left endpoint value is -2. The retained
+    endpoints have opposite signs, and continuity supplies a root between them.
+applications:
+- title: Reliable models
+  description: A continuity check determines whether small input changes near a threshold can produce
+    a sudden output jump.
+- title: Root finding
+  description: Bisection maintains a mathematically justified bracket when continuity and endpoint sign
+    conditions hold.
+- title: Calibration joins
+  description: Matching piecewise formulas and the assigned endpoint value avoids artificial breaks between
+    calibration ranges.
+- title: Existence versus uniqueness
+  description: A target-value guarantee does not by itself establish a unique solution, a midpoint solution,
+    or an exact formula.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: BRIDGE_CONT_VALUE
+    type: generated
+    prompt_template: Let f(x) = x^2 + ({b}) for x != {a}, and f({a}) = k. Find k that makes f continuous
+      at {a}.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+      b:
+        type: int
+        min: -5
+        max: 5
+    derived:
+      ans: a*a+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The nearby polynomial values approach ({a})^2 + ({b}) = {ans}.
+      Continuity requires the assigned point value k to equal this limit.
+    solution_steps: []
+    mistake_tags: &id003
+    - continuity_hypotheses
+    - domain_preservation
+    - existence_versus_uniqueness
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_FILL
+    type: generated
+    prompt_template: For x != {a}, let f(x) = (x^2 - {sq})/(x - ({a})). Assign f({a}) = k. Find the unique
+      k making the extension continuous.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+    derived:
+      sq: a*a
+      ans: 2*a
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      For x != {a}, the quotient equals x + ({a}).
+      Its limit is {ans}.
+      Assign exactly that value at the removed input.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_LINEAR_JOIN
+    type: generated
+    prompt_template: Let f(x) = {m}x + ({b}) for x < {h}, and f(x) = x + k for x >= {h}. Find k for continuity
+      at {h}.
+    variables:
+      h:
+        type: int
+        min: 1
+        max: 5
+      m:
+        type: int
+        min: 1
+        max: 4
+      b:
+        type: int
+        min: -4
+        max: 4
+    derived:
+      k: (m-1)*h+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{k}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The left limit is {m}*{h} + ({b}); the right limit and point value are {h} + k.
+      Match them and subtract {h}, giving k = {k}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show one equivalent expression per line, ending with the requested result.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_PRODUCT_JOIN
+    type: generated
+    prompt_template: Let f(x) = x^2 for x <= {h}, and f(x) = kx for x > {h}. Find k for continuity at
+      the positive input {h}.
+    variables:
+      h:
+        type: int
+        min: 1
+        max: 6
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{h}'
+    grading:
+      method: exact_numeric
+    explanation_template: |-
+      The left limit and value are {h}^2.
+      The right limit is k*{h}.
+      Since {h} is positive, divide by {h} to obtain k = {h}.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: procedural_steps
+      prompt: Show one equivalent expression per line, ending with the requested result.
+      line_type: expression
+      minimum_steps: 2
+      require_final_answer_match: true
+    review_policy:
+      work_review: auto
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_JUMP_REPAIR
+    type: fixed
+    prompt_template: At x = 0 a function has left-hand limit 1 and right-hand limit 3. Can changing only
+      f(0) make it continuous there?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Continuity requires one common finite limit.
+      A change at one input does not alter either one-sided limit.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: 'Yes: set f(0) = 2, the average.'
+    - id: B
+      label: 'Yes: set f(0) = 1, the left value.'
+    - id: C
+      label: 'Yes: remove both side conditions from the definition.'
+    - id: D
+      label: 'No: the unequal one-sided limits cannot be changed by assigning a single point value.'
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/limit-jump.svg
+      alt: For x < 0 the graph follows y = x + 1, approaching an open point at (0, 1). For x >= 0 it follows
+        y = x + 3, starting at a filled point (0, 3).
+      caption: Both branch rules and their open or included endpoints are shown.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_CONT_INFINITE_REPAIR
+    type: fixed
+    prompt_template: For f(x) = 1/x^2 when x != 0, can a finite assignment f(0) = k make the function
+      continuous at 0?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      No finite k can match values that exceed every bound near zero.
+      An infinite discontinuity is not a removable hole.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: 'Yes: cancellation always removes every discontinuity.'
+    - id: B
+      label: 'No: the nearby values are unbounded, so there is no finite limit to match.'
+    - id: C
+      label: 'Yes: set k = 0.'
+    - id: D
+      label: 'Yes: use a sufficiently large real number.'
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_RATIONAL_DOMAIN
+    type: generated
+    prompt_template: For f(x) = 1/[(x - ({a}))(x - ({b}))], give the real domain on which this rational
+      function is continuous.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 0
+      gap:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      b: a+gap
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {a}) U ({a}, {b}) U ({b}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    explanation_template: |-
+      The only original denominator zeros are {a} and {b}.
+      A rational function is continuous at all its other real inputs.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_ROOT_DOMAIN
+    type: generated
+    prompt_template: Give the real domain of sqrt(x - ({h})) on which it is continuous, including endpoint
+      continuity from the allowed side.
+    variables:
+      h:
+        type: int
+        min: -5
+        max: 5
+    derived: {}
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{h}, inf)'
+      variable: x
+    grading:
+      method: interval_set
+    explanation_template: |-
+      The radicand requires x >= {h}.
+      The square root is continuous there; at {h}, use the right-hand limit within the domain.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_CANCELLED_DOMAIN
+    type: generated
+    prompt_template: The original function is f(x) = [(x - ({a}))(x - ({b}))]/(x - ({a})), with no added
+      point value. Give its domain, on which it is continuous.
+    variables:
+      a:
+        type: int
+        min: -4
+        max: 4
+      gap:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      b: a+gap
+    constraints: []
+    answer:
+      type: interval_set
+      value: (-inf, {a}) U ({a}, inf)
+      variable: x
+    grading:
+      method: interval_set
+    explanation_template: |-
+      The original denominator excludes {a}.
+      Elsewhere the function equals x - ({b}) and is continuous.
+      Cancellation does not insert the missing input into the original domain.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_GRAPH_TYPE
+    type: fixed
+    prompt_template: The graph follows x + 1 for x < 0 and x + 3 for x >= 0. Which diagnosis at zero is
+      correct?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      The side heights approach 1 and 3.
+      Existence of a point value alone is not continuity.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: 'An infinite discontinuity: every jump is infinite.'
+    - id: B
+      label: 'Continuity: a filled point exists at zero.'
+    - id: C
+      label: 'A jump: the finite one-sided limits exist but are unequal.'
+    - id: D
+      label: 'A removable hole: only the point value needs changing.'
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/limit-jump.svg
+      alt: For x < 0 the graph follows y = x + 1, approaching an open point at (0, 1). For x >= 0 it follows
+        y = x + 3, starting at a filled point (0, 3).
+      caption: Both branch rules and their open or included endpoints are shown.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_CONT_IVT_ROOT
+    type: generated
+    prompt_template: A continuous f on [{a}, {b}] has f({a}) = -{p} and f({b}) = {q}, where both displayed
+      magnitudes are positive. What does the intermediate value theorem guarantee?
+    variables:
+      a:
+        type: int
+        min: -4
+        max: 2
+      gap:
+        type: int
+        min: 2
+        max: 6
+      p:
+        type: int
+        min: 1
+        max: 6
+      q:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      b: a+gap
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Continuity holds on the whole closed interval.
+      Zero lies strictly between the negative and positive endpoint values, so some interior input produces zero.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: Exactly one zero, with no further argument.
+    - id: B
+      label: A zero at the midpoint specifically.
+    - id: C
+      label: No zero because the endpoint values are nonzero.
+    - id: D
+      label: At least one zero at an input strictly between the endpoints.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_IVT_TARGET
+    type: generated
+    prompt_template: A continuous f on [0, {b}] has endpoint values {u} and {v}. The target is {target}.
+      Which conclusion is guaranteed?
+    variables:
+      b:
+        type: int
+        min: 2
+        max: 8
+      u:
+        type: int
+        min: -5
+        max: 5
+      d:
+        type: int
+        min: 1
+        max: 4
+      extra:
+        type: int
+        min: 1
+        max: 4
+    derived:
+      target: u+d
+      v: u+d+extra
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      The target {target} is strictly between {u} and {v}.
+      Continuity guarantees at least one matching input inside the interval, but gives no uniqueness or midpoint claim.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: At least one interior input has output equal to the stated target.
+    - id: B
+      label: Every interior input has that output.
+    - id: C
+      label: The target output occurs exactly once.
+    - id: D
+      label: The target must occur at the midpoint.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_BISECT
+    type: generated
+    prompt_template: For f(x) = x^2 - {n}, a root is bracketed in [{a}, {b}]. The midpoint is {mid}. After
+      one bisection step, which closed half-interval still brackets a root? Enter an interval.
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 7
+    derived:
+      b: a+1
+      n: a*a+a
+      mid: a+0.5
+    constraints: []
+    answer:
+      type: interval_set
+      value: '[{a}, {mid}]'
+      variable: x
+    grading:
+      method: interval_set
+    explanation_template: |-
+      The left endpoint value is -{a}, which is negative.
+      At the midpoint the value is 1/4, which is positive.
+      Continuity keeps a root in [{a}, {mid}]. The midpoint is not itself a root.
+    solution_steps: []
+    mistake_tags:
+    - midpoint_evaluation
+    - retained_sign_change
+    - approximation_not_exact_root
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_NOT_UNIQUE
+    type: fixed
+    prompt_template: For f(x) = x^3 - x on [-2, 2], the endpoint values have opposite signs. Does the
+      intermediate value theorem prove that there is exactly one root?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Factor x^3 - x as x(x-1)(x+1).
+      The example demonstrates why an existence theorem alone is not a uniqueness theorem.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: 'No: the theorem never applies to cubics.'
+    - id: B
+      label: 'Yes: only the midpoint can be a root.'
+    - id: C
+      label: 'No: it guarantees at least one, and this polynomial actually has roots -1, 0, and 1.'
+    - id: D
+      label: 'Yes: a sign change always means exactly one root.'
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_MISSING_HYPOTHESIS
+    type: fixed
+    prompt_template: The endpoint values of 1/x on [-1, 1] are -1 and 1, but it never equals zero. Why
+      does this not contradict the intermediate value theorem?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Continuity across the whole closed interval is essential.
+      An interior hole or asymptote invalidates that hypothesis.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: The function is not defined and continuous on the entire interval because 0 is excluded.
+    - id: B
+      label: The theorem requires equal endpoint values.
+    - id: C
+      label: Negative endpoint values are forbidden.
+    - id: D
+      label: The theorem guarantees a root only for straight lines.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_NO_SIGN_CHANGE
+    type: fixed
+    prompt_template: The values of x^2 at -1 and 1 are both positive. What can be concluded about zeros
+      inside that interval?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Opposite endpoint signs are sufficient for an IVT zero guarantee, not necessary for a zero to exist.
+      Check x = 0 as a counterexample to the no-root claim.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: There are no zeros inside.
+    - id: B
+      label: There must be exactly two zeros.
+    - id: C
+      label: The function must be discontinuous.
+    - id: D
+      label: The sign-change test is inconclusive; x^2 still has a zero at 0.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_ENDPOINT
+    type: fixed
+    prompt_template: Is sqrt(x) continuous at 0 relative to its real domain [0, inf)?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      At a boundary of the domain, continuity uses approach from allowed inputs.
+      The square root tends to its endpoint value from the right.
+    solution_steps: []
+    mistake_tags:
+    - domain_relative_continuity
+    - one_sided_endpoint
+    difficulty: medium
+    options:
+    - id: A
+      label: 'Yes: its right-hand limit is 0, equal to its defined endpoint value.'
+    - id: B
+      label: 'No: every function must have negative inputs to be continuous at 0.'
+    - id: C
+      label: 'No: an endpoint can never be continuous.'
+    - id: D
+      label: Yes, because its left-hand real limit is -1.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: BRIDGE_CONT_EXTENSION
+    type: fixed
+    prompt_template: The original formula (x^2 - 4)/(x - 2) has no value at 2. Assigning the new value
+      4 there creates what?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      The original domain excludes 2.
+      The extension changes only the missing point by assigning its limit.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: A continuous extension; it does not mean the original function was defined at 2.
+    - id: B
+      label: Proof that cancellation had already restored the original input.
+    - id: C
+      label: A jump discontinuity.
+    - id: D
+      label: A new function that changes all nearby outputs.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/continuity-fill.svg
+      alt: The line y = x + 2 has an open point at (2, 4). An annotation asks which value at x = 2 would
+        fill the hole without changing nearby values.
+      caption: The original rational graph has an excluded input at x = 2.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_CONT_CORNER
+    type: fixed
+    prompt_template: The graph of |x| has a sharp corner at zero. Is it continuous there?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      Continuity checks values and limits, not whether the graph looks smoothly rounded.
+      A corner does not create a missing value or a jump.
+    solution_steps: []
+    mistake_tags: *id003
+    difficulty: medium
+    options:
+    - id: A
+      label: 'Yes: both one-sided limits are 0 and the function value is 0.'
+    - id: B
+      label: 'No: all corners are discontinuities.'
+    - id: C
+      label: 'No: the left branch has a negative slope.'
+    - id: D
+      label: Only if the corner is replaced by a curve.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    media:
+    - src: media/native-calculus-bridge/continuity-corner.svg
+      alt: The V-shaped graph y = |x| consists of two line segments meeting at the included point (0,
+        0).
+      caption: The absolute-value graph and its included vertex are shown.
+      width: 800
+      height: 500
+      fit: contain
+  - id: BRIDGE_CONT_IVT_PROOF
+    type: fixed
+    prompt_template: Use the intermediate value theorem for f(x) = x^3 + x - 1 on [0, 1]. Select the justified
+      conclusion and give a complete proof.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: |-
+      A polynomial is continuous on the whole interval [0,1].
+      f(0)=-1 and f(1)=1, so zero lies strictly between the endpoint values.
+      The intermediate value theorem gives at least one c in (0,1) with f(c)=0.
+      This invocation supplies existence, not an exact value or a uniqueness proof.
+    solution_steps: []
+    mistake_tags:
+    - closed_interval_continuity
+    - strict_between_condition
+    - existence_not_uniqueness
+    difficulty: hard
+    options:
+    - id: A
+      label: The function has a root at every interior input.
+    - id: B
+      label: There is at least one real root in (0, 1).
+    - id: C
+      label: There is exactly one root at x = 1/2.
+    - id: D
+      label: There are no roots because neither endpoint is a root.
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: proof_obligations
+      prompt: Give a complete argument. Address every listed obligation; a correct short answer alone
+        is not enough.
+      proof_policy:
+        obligations:
+        - Justifies continuity on the whole closed interval because f is a polynomial.
+        - Computes f(0) = -1 and f(1) = 1.
+        - States that zero lies strictly between those endpoint values.
+        - Applies the intermediate value theorem to conclude at least one interior root, without claiming
+          uniqueness from that theorem alone.
+        accepted_strategies:
+        - intermediate value theorem with explicit hypotheses
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    media:
+    - src: media/native-calculus-bridge/continuity-ivt.svg
+      alt: The graph of y = x^3 + x - 1 is shown on [0, 1], with endpoint values -1 and 1 and a horizontal
+        target line at height zero.
+      caption: Use the function, interval, endpoint values, and target output stated in the question.
+      width: 800
+      height: 500
+      fit: contain
