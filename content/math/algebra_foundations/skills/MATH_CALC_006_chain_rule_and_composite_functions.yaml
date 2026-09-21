@@ -1,0 +1,1068 @@
+id: MATH_CALC_006
+schema_version: '0.2'
+name: The chain rule and composite functions
+domain: Math
+subdomain: Calculus
+topic: Differentiation
+description: Differentiate nested power, reciprocal, and square-root functions; combine rules, match outer derivative
+  inputs, and preserve function and derivative domains.
+prerequisites:
+- MATH_CALC_004
+- MATH_CALC_005
+- MATH_FUNC_004
+- MATH_RAD_001
+unlocks: []
+tags:
+- calculus
+- derivatives
+- reasoning
+- graph_interpretation
+- domain_restrictions
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'A composite function applies one operation to the result of another. Its derivative is therefore a rate
+  through two linked stages. This lesson connects the function-composition work you already know to differentiation.
+  We start with powers of affine and polynomial expressions, then include reciprocals and explicitly explained
+  square roots. Exponential, logarithmic, and trigonometric derivative rules are not assumed here.
+
+
+  Inner and outer functions:
+
+  For y=(3x+2)^4, choose u=g(x)=3x+2 and f(u)=u^4. The outer derivative is f''(u)=4u^3 and the inner derivative
+  is g''(x)=3. The chain rule gives (f composed with g)''(x)=f''(g(x))*g''(x)=12(3x+2)^3. Evaluate the outer derivative
+  at the inner output, not at x by default. Forgetting the factor 3 changes the rate.
+
+
+  Hypotheses:
+
+  At an input a, g must be differentiable at a and f must be differentiable at g(a). The composition must also
+  be meaningful on the relevant nearby inputs. The formula is a sufficient-condition rule; failure of one hypothesis
+  means this route does not apply automatically, not that no specially simplified composite can ever be differentiable.
+  Check the point at which each component is evaluated.
+
+
+  Why rates multiply:
+
+  A small input change delta x produces approximately g''(a)*delta x change in the inner output. Near g(a), the
+  outer function converts a small inner-output change into approximately f''(g(a)) times that change. Combining
+  the local linear approximations gives f''(g(a))*g''(a)*delta x. This is the intuitive reason for multiplication.
+  It is not an instruction to cancel derivative symbols without hypotheses, and a full proof must handle zero
+  inner changes as well.
+
+
+  Power composites:
+
+  For [g(x)]^n with positive integer n, the derivative is n*[g(x)]^(n-1)*g''(x). For (x^2+4)^3 it is 3(x^2+4)^2*(2x)=6x(x^2+4)^2.
+  Do not replace the exponent by n-1 and forget either multiplier. Factored answers are often clearer than a long
+  expansion. A small polynomial example can be checked by expansion as an independent calculation, but expansion
+  becomes inefficient for a high outer power.
+
+
+  More than two layers:
+
+  For [(2x+1)^2+3]^2, work from outside inward. The derivative is 2[(2x+1)^2+3] times 2(2x+1) times 2. Each stage
+  has its own input. Keep the original inner expressions in place while differentiating one layer at a time. A
+  dependency sketch with named intermediate quantities can prevent evaluating a derivative at the wrong point.
+
+
+  The square-root outer rule:
+
+  For positive u, the derivative of sqrt(u) is 1/[2sqrt(u)], as the conjugate difference-quotient calculation
+  shows. Thus sqrt(g(x)) has derivative g''(x)/[2sqrt(g(x))] wherever g is differentiable and g(x)>0. For sqrt(3x+1),
+  the function is defined for x>=-1/3, but this rule gives a finite ordinary derivative only for x>-1/3. At x=1
+  the derivative is 3/4. A function domain and a derivative domain need not be identical.
+
+
+  Special boundary behavior:
+
+  The requirement g(x)>0 belongs to this sufficient formula. At a zero of g, analyze the particular function rather
+  than declare every possibility identical. For example, sqrt(x^2)=abs(x), which has a corner at zero. In contrast,
+  sqrt(x^4)=x^2 is differentiable there. Do not divide by sqrt(0) in either case. This distinction prevents a
+  formal-looking formula from being used outside its hypotheses.
+
+
+  Reciprocal composites:
+
+  The derivative of 1/g(x) is -g''(x)/[g(x)]^2 where g(x)!=0 and g is differentiable. It follows either from the
+  quotient rule with numerator 1 or from the chain rule using the reciprocal outer function. For 1/(2x+5), the
+  derivative is -2/(2x+5)^2 for x!=-5/2. The original pole remains excluded even when later algebra cancels a
+  factor in a larger expression.
+
+
+  Combining rules:
+
+  For x*(x^2+1)^3, the top-level operation is multiplication, so start with the product rule. The derivative is
+  (x^2+1)^3+x*3(x^2+1)^2*(2x). Chain-rule work occurs inside the second product term. For a quotient whose denominator
+  is a composite power, use the quotient rule at the top level and the chain rule to differentiate that denominator.
+  Naming the top-level operation is often the most useful first step.
+
+
+  Tables and contexts:
+
+  Suppose g(2)=5, g''(2)=3, f''(5)=7, and f''(2)=11. The derivative of f(g(x)) at 2 is 7*3=21, not 11*3. The value
+  5 tells us where to look up the outer derivative. If depth changes in metres per second and temperature changes
+  in degrees per metre at that depth, multiplying the rates gives degrees per second. Units make the input-output
+  link visible, but the rates must refer to the same location and instant.
+
+
+  Graphs, interpretation, and self-check:
+
+  A graph of the composite can help check the sign and approximate scale of a derivative. It cannot justify an
+  unstated domain extension. Keep the derivative function distinct from its value at a point, and the function''s
+  value distinct from both. Explain the inner and outer functions, check where the rule applies, form the derivative,
+  then substitute. The formal reference uses a nested square-root composite with an exact positive radicand. Its
+  certificate verifies the mathematical conclusion, while the separate reviewed task assesses your explicit chain-rule
+  explanation and domain reasoning. There is no claim that a generic certificate enforces an unrestricted teaching-method
+  rubric.'
+math_blocks:
+- type: notation
+  text: (f composed with g)'(x) = f'(g(x))*g'(x)
+  alt: Chain rule with the outer derivative evaluated at the inner output
+  linear_text: (f composed with g)'(x) = f'(g(x))*g'(x)
+- type: fraction
+  numerator: g'(x)
+  denominator: 2*sqrt(g(x))
+  alt: Square-root composite derivative where g(x) is positive
+  linear_text: (g'(x))/(2*sqrt(g(x)))
+examples:
+- prompt: Differentiate (3x+2)^4.
+  solution: 12(3x+2)^3
+  explanation: 'Outer derivative: 4u^3. Inner derivative: 3. Substitute u=3x+2 and multiply.'
+- prompt: Differentiate (x^2+4)^3.
+  solution: 6x(x^2+4)^2
+  explanation: Differentiate the outer cube, retain its inner expression, then multiply by 2x.
+- prompt: Differentiate [(2x+1)^2+3]^2.
+  solution: 8(2x+1)*[(2x+1)^2+3]
+  explanation: The three factors are 2[(2x+1)^2+3], 2(2x+1), and 2. All stages contribute.
+- prompt: Differentiate 1/(2x+5).
+  solution: -2/(2x+5)^2, x!=-5/2
+  explanation: The reciprocal outer derivative supplies the minus sign and squared denominator; the inner derivative
+    supplies 2.
+- prompt: Differentiate sqrt(3x+1) and evaluate at 1.
+  solution: 3/[2sqrt(3x+1)] for x>-1/3; value 3/4
+  explanation: The inner derivative is 3. The positive radicand condition gives the derivative domain; the function
+    itself also includes the endpoint -1/3.
+- prompt: Differentiate sqrt(x^2+5).
+  solution: x/sqrt(x^2+5)
+  explanation: The inner derivative is 2x. Divide by 2sqrt(x^2+5). The radicand is positive for every real x,
+    so this derivative has no real-domain gap.
+- prompt: Given g(2)=5, g'(2)=3, f'(5)=7, f'(2)=11, find (f composed with g)'(2).
+  solution: '21'
+  explanation: 'Use the outer derivative at g(2)=5: 7*3. The listed f''(2) is a distractor.'
+- prompt: Differentiate x*(x^2+1)^3.
+  solution: (x^2+1)^3+6x^2(x^2+1)^2
+  explanation: The outermost operation is a product. Differentiate its second factor by the chain rule inside
+    the second product term.
+- prompt: Differentiate (x^2+1)/(x^2+4)^2.
+  solution: '[2x(x^2+4)^2-4x(x^2+1)(x^2+4)]/(x^2+4)^4'
+  explanation: The denominator derivative is 4x(x^2+4). The original denominator is positive on all reals. Simplification
+    is optional, but parentheses are essential.
+- prompt: Depth increases at 2 m/s, and temperature changes at -0.5 degrees per metre at that depth. Find the
+    temperature rate.
+  solution: -1 degree per second
+  explanation: Compose temperature with depth and multiply the two matching local rates. A negative result means
+    temperature decreases as time increases.
+applications:
+- title: Linked measurements
+  description: Compose a physical quantity with a changing position or time-dependent input. Multiply matching
+    local rates and check units.
+- title: Calibration chains
+  description: An input conversion followed by a nonlinear calibration has two derivative factors, evaluated at
+    the correct stages.
+- title: Nested geometric models
+  description: A dimension depending on an input can sit inside an area or other power model. Identify the nested
+    structure before differentiating.
+- title: Domain-aware prediction
+  description: A square-root composite may include an endpoint in its function domain but exclude it from its
+    finite derivative domain. Local models must respect this distinction.
+test:
+  question_count: 21
+  randomize_order: true
+  questions:
+  - id: D6_CHAIN_AFFINE_POWER
+    type: generated
+    prompt_template: Differentiate f(x)=(({a})*x+({b}))^{n}. Enter an expression in x.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -6
+        max: 6
+        exclude: []
+      n:
+        type: int
+        min: 2
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: ({n*a})*(({a})*x+({b}))^{n-1}
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'Take the derivative of the outer {n}th power and evaluate it at ({a})*x+({b}).
+
+      Multiply by the inner derivative {a}.
+
+      The result is ({n*a})*(({a})*x+({b}))^{n-1}.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - slope_vs_intercept
+    - inner_derivative_factor
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Name the inner and outer functions and show both derivative factors. This records your working;
+        the separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_CHAIN_QUADRATIC_CUBE
+    type: generated
+    prompt_template: Differentiate f(x)=(x^2+{b})^3. Enter an expression in x.
+    variables:
+      b:
+        type: int
+        min: 1
+        max: 8
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: 6*x*(x^2+{b})^2
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'The outer derivative is 3*(x^2+{b})^2.
+
+      The inner derivative is 2*x. Multiply to obtain 6*x*(x^2+{b})^2.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_RECIPROCAL
+    type: generated
+    prompt_template: Differentiate f(x)=1/(({a})*x+({b})). Enter the derivative formula and excluded real input.
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+        exclude: []
+      b:
+        type: int
+        min: -7
+        max: 7
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: rational_expression
+      value: -({a})/(({a})*x+({b}))^2
+      variable: x
+      excluded_values:
+      - -({b})/({a})
+    grading:
+      method: rational_expression
+      require_reduced_form: false
+    explanation_template: 'The reciprocal outer derivative supplies the minus sign and squared denominator.
+
+      Multiply by inner derivative {a}.
+
+      The original denominator vanishes at x=-({b})/({a}), which remains excluded.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - denominator_restriction
+    - derivative_sign
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_ROOT_AT
+    type: generated
+    prompt_template: For f(x)=sqrt(({a})*x+({b})), find f'({p}). Enter an exact number.
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 6
+        exclude: []
+      p:
+        type: int
+        min: -2
+        max: 4
+        exclude: []
+      r:
+        type: int
+        min: 1
+        max: 5
+        exclude: []
+    derived:
+      b: r*r-a*p
+    constraints: []
+    answer:
+      type: numeric
+      value: '{a}/({2*r})'
+    grading:
+      method: exact_numeric
+    explanation_template: 'At x={p}, the radicand is {r*r}>0.
+
+      f''(x)=({a})/[2*sqrt(({a})*x+({b}))] on the positive-radicand domain.
+
+      The required value is {a}/({2*r}).'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - principal_root
+    - derivative_domain
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Check the radicand, then apply and evaluate the root chain rule. This records your working; the
+        separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+    diagram:
+      kind: cartesian
+      x_range:
+      - (-({b}))/{a}
+      - '{p}+2'
+      y_range:
+      - -1
+      - 7
+      alt: The stated square-root function with inner expression ({a})*x+({b}).
+      curves:
+      - expression: sqrt(({a})*x+({b}))
+        interval:
+        - (-({b}))/{a}
+        - '{p}+2'
+  - id: D6_CHAIN_NESTED_AT
+    type: generated
+    prompt_template: For f(x)=(x^3+{b})^2, find f'({a}).
+    variables:
+      a:
+        type: int
+        min: -3
+        max: 3
+        exclude: []
+      b:
+        type: int
+        min: 1
+        max: 6
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{6*a*a*(a*a*a+b)}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'The derivative is 2*(x^3+{b})*(3*x^2).
+
+      At {a}, this is {6*a*a*(a*a*a+b)}.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - evaluate_after_differentiating
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_MATCHED_DATA
+    type: generated
+    prompt_template: At a, g(a)={r}, g'(a)={v}, and f'({r})={u}. Find (f composed with g)'(a).
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 8
+        exclude: []
+      v:
+        type: int
+        min: -6
+        max: 6
+        exclude: []
+      u:
+        type: int
+        min: -7
+        max: 7
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{u*v}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Use the derivative of the outer function at the inner output g(a)={r}.
+
+      Multiply the matching rates {u} and {v} to obtain {u*v}.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - outer_derivative_at_inner_output
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_WRONG_INPUT
+    type: fixed
+    prompt_template: Given g(2)=5, g'(2)=3, f'(5)=7, and f'(2)=11, what is (f composed with g)'(2)? Select one
+      option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: The outer derivative is evaluated at g(2)=5, so use 7*3 rather than 11*3.
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - outer_derivative_at_inner_output
+    difficulty: easy
+    options:
+    - id: A
+      label: '33'
+    - id: B
+      label: '15'
+    - id: C
+      label: '21'
+    - id: D
+      label: '77'
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_THREE_LAYERS
+    type: generated
+    prompt_template: Differentiate f(x)=((({a})*x+1)^2+{b})^2. Enter an expression in x.
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 4
+        exclude: []
+      b:
+        type: int
+        min: 1
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: ({4*a})*(({a})*x+1)*((({a})*x+1)^2+{b})
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'From outside inward, the factors are 2*((({a})*x+1)^2+{b}), 2*(({a})*x+1), and {a}.
+
+      Multiplying gives the stated three-layer derivative.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - nested_chain_factors
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Write the derivative factor from each of the three layers. This records your working; the separate
+        capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_CHAIN_PRODUCT
+    type: generated
+    prompt_template: Differentiate f(x)=x*(({a})*x+({b}))^3. Enter an expression in x.
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 4
+        exclude: []
+      b:
+        type: int
+        min: -4
+        max: 4
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: (({a})*x+({b}))^3+({3*a})*x*(({a})*x+({b}))^2
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'The top-level operation is a product.
+
+      The first term is 1*(({a})*x+({b}))^3.
+
+      The second is x*3*(({a})*x+({b}))^2*({a}).'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - two_product_terms
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Use the product rule first and the chain rule within the second term. This records your working;
+        the separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_CHAIN_QUOTIENT
+    type: generated
+    prompt_template: Differentiate f(x)=(x^2+1)/(x^2+{b})^2. Enter an expression in x. The original denominator
+      is positive for all real x.
+    variables:
+      b:
+        type: int
+        min: 2
+        max: 6
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: (2*x*(x^2+{b})-4*x*(x^2+1))/(x^2+{b})^3
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'The denominator derivative is 4*x*(x^2+{b}).
+
+      The quotient rule gives [2*x*(x^2+{b})^2-(x^2+1)*4*x*(x^2+{b})]/(x^2+{b})^4.
+
+      Cancel one nonzero factor x^2+{b} to obtain the displayed derivative.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - quotient_setup
+    - domain_restriction
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Show the derivative of the composite denominator before the quotient-rule simplification. This records
+        your working; the separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_CHAIN_ROOT_FORMULA
+    type: generated
+    prompt_template: Differentiate f(x)=sqrt(x^2+{b}) on the real line. Enter an expression in x.
+    variables:
+      b:
+        type: int
+        min: 1
+        max: 9
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: x/sqrt(x^2+{b})
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'The radicand x^2+{b} is strictly positive for every real x.
+
+      The derivative is (2*x)/[2*sqrt(x^2+{b})]=x/sqrt(x^2+{b}).'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - principal_root
+    - derivative_domain
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_RATE_UNITS
+    type: fixed
+    prompt_template: Depth changes at 2 metres per second. Temperature changes at -0.5 degrees per metre at that
+      depth. What is the corresponding temperature rate? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: Compose temperature with depth. Multiplying the two matching rates gives -0.5*2=-1,
+      and the metre units cancel.
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - derivative_units
+    difficulty: easy
+    options:
+    - id: A
+      label: -0.25 degrees per second
+    - id: B
+      label: 1 degree per second
+    - id: C
+      label: -1 metre per degree
+    - id: D
+      label: -1 degree per second
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_DOUBLE_ROOT_AT
+    type: fixed
+    prompt_template: For f(x)=(sqrt(x+1)+1)^2, find f'(3). Enter an exact number.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: 3/2
+    grading:
+      method: exact_numeric
+    explanation_template: 'At 3, sqrt(x+1)=2.
+
+      The derivative is 2*(sqrt(x+1)+1)*1/[2*sqrt(x+1)].
+
+      Its value is 2*3/4=3/2.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - principal_root
+    - derivative_domain
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_ROOT_DOMAIN
+    type: fixed
+    prompt_template: For f(x)=sqrt(4x+1), where is the finite ordinary two-sided derivative defined? Select one
+      option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: The derivative formula is 2/sqrt(4x+1), valid for a positive radicand. At the endpoint
+      the ordinary two-sided derivative is not available, and the right slope is unbounded.
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - principal_root
+    - derivative_domain
+    - function_vs_derivative_domain
+    difficulty: medium
+    options:
+    - id: A
+      label: x>-1/4
+    - id: B
+      label: x>=-1/4
+    - id: C
+      label: All real x
+    - id: D
+      label: x<-1/4
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_ZERO_INNER
+    type: fixed
+    prompt_template: If g(a)=0, does the formula g'(a)/(2sqrt(g(a))) automatically determine the derivative of
+      sqrt(g(x)) at a? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: The formula requires g(a)>0. For example sqrt(x^2) has a corner at zero, while sqrt(x^4)=x^2
+      is differentiable there.
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - sufficient_not_necessary_condition
+    difficulty: hard
+    options:
+    - id: A
+      label: Yes; always report derivative zero.
+    - id: B
+      label: No; that formula is outside its hypotheses and the particular composite needs analysis.
+    - id: C
+      label: Yes; always report an infinite ordinary derivative.
+    - id: D
+      label: Yes; cancel sqrt(0) from numerator and denominator.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_ROOT_GRAPH
+    type: fixed
+    prompt_template: For f(x)=sqrt(x+2), find f'(2). Enter an exact number.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: 1/4
+    grading:
+      method: exact_numeric
+    explanation_template: 'The inner derivative is 1.
+
+      f''(x)=1/[2*sqrt(x+2)] for x>-2.
+
+      At x=2 the radicand is 4 and the slope is 1/4.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - principal_root
+    - derivative_domain
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    diagram:
+      kind: cartesian
+      x_range:
+      - -2
+      - 6
+      y_range:
+      - -1
+      - 4
+      alt: Graph of f(x)=square root of x+2, with the point at input 2 marked.
+      curves:
+      - expression: sqrt(x+2)
+        interval:
+        - -2
+        - 6
+      points:
+      - at:
+        - 2
+        - 2
+        label: x=2
+  - id: D6_CHAIN_MISSING_INNER
+    type: fixed
+    prompt_template: A learner differentiates (5x-1)^3 as 3(5x-1)^2. What is missing? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: The derivative of 5x-1 is 5. The full derivative is 15(5x-1)^2.
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - inner_derivative_factor
+    difficulty: medium
+    options:
+    - id: A
+      label: An additional factor x
+    - id: B
+      label: The function value at zero
+    - id: C
+      label: The inner derivative factor 5
+    - id: D
+      label: A negative sign because the inner constant is negative
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_SUM_COMPOSITE
+    type: generated
+    prompt_template: Differentiate f(x)=(2*x+{b})^3+x^2. Enter an expression in x.
+    variables:
+      b:
+        type: int
+        min: 1
+        max: 6
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: 6*(2*x+{b})^2+2*x
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'The top-level operation is a sum.
+
+      Differentiate the composite cube using 3*(2*x+{b})^2*2, then add 2*x.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - linearity
+    - inner_derivative_factor
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_OUTERMOST
+    type: fixed
+    prompt_template: Which first step is most useful for differentiating x^2*(x+1)^4? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: 'Differentiation follows the expression structure: product outside, power composition
+      inside.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - operation_order
+    difficulty: medium
+    options:
+    - id: A
+      label: Multiply the derivative of x^2 by the derivative of (x+1)^4.
+    - id: B
+      label: Treat the entire expression as a sum.
+    - id: C
+      label: Evaluate at x=0 before differentiating.
+    - id: D
+      label: Recognize a top-level product, then use the chain rule for the second factor.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_CHAIN_REVIEW
+    type: fixed
+    prompt_template: For f(x)=sqrt(3x+1), find f'(1). Enter the exact value, then explain the inner/outer derivatives
+      and distinguish the function domain from its ordinary derivative domain.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: 3/4
+    grading:
+      method: exact_numeric
+    explanation_template: 'Use u=3x+1 and the outer square-root derivative 1/(2sqrt(u)) for u>0.
+
+      Multiply by du/dx=3, then substitute x=1.
+
+      The result is 3/4.
+
+      The function domain is x>=-1/3; the ordinary derivative domain is x>-1/3.'
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - reasoning_review
+    - explicit_hypotheses
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Explain the reasoning, not only the answer. Address each criterion below.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Identifies the inner function 3x+1 and outer function sqrt(u).
+          weight: 1
+        - id: criterion_2
+          description: Forms the outer derivative at the inner output and includes the factor 3.
+          weight: 1
+        - id: criterion_3
+          description: Evaluates the formula at 1 to obtain 3/4.
+          weight: 1
+        - id: criterion_4
+          description: States the function and derivative domains separately and explains why the endpoint is
+            excluded from the ordinary derivative.
+          weight: 1
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+  - id: D6_CHAIN_FORMAL
+    type: fixed
+    prompt_template: Prove the derivative value of (sqrt(x+1)+1)^2 at x=3. Use recursive_derivative to check the
+      nested composition and its positive-radicand condition. The separate reviewed capstone requires an explicit
+      inner/outer explanation.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    explanation_template: The author reference is a candidate, not learner evidence. Only a fresh complete submitted-proof
+      certificate earns formal credit.
+    solution_steps: []
+    mistake_tags:
+    - chain_rule
+    - formal_proof
+    - fresh_certificate_required
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations:
+        - x:real
+        assumptions: []
+        goal: The derivative of (sqrt(x+1)+1)^2 with respect to x at 3 is 3/2.
+      parameter_contract:
+        required_public: []
+      allowed_rules:
+      - recursive_derivative
+      assessment_policy: {}
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: The derivative of (sqrt(x+1)+1)^2 with respect to x at 3 is 3/2.
+          rule: recursive_derivative
+          premises: []
+          parameters: {}
+          scope: root
+      environment:
+        backend: lean4
+        library: mathlib
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c
+media:
+- type: image
+  src: media/native-derivatives-batch6/chain-shifted-square.svg
+  alt: The composite (2x+1) squared has a tangent slope 4 at x=0, showing the inner-rate factor.
+  caption: The composite (2x+1) squared has a tangent slope 4 at x=0, showing the inner-rate factor.
+  width: 900
+  height: 580
+  fit: contain
+- type: image
+  src: media/native-derivatives-batch6/chain-root.svg
+  alt: The square-root composite sqrt(3x+1) includes its left endpoint but has a finite ordinary derivative only
+    to its right.
+  caption: The square-root composite sqrt(3x+1) includes its left endpoint but has a finite ordinary derivative
+    only to its right.
+  width: 900
+  height: 580
+  fit: contain

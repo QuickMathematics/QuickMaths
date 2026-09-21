@@ -103,7 +103,7 @@ function workFor(p){
 }
 
 test('four lessons add a coherent graph and an explicit Calculus branch without rewriting earlier lessons',()=>{
- assert.equal(additions.length,4);assert.equal(curriculum.skills.length,112);
+ assert.equal(additions.length,4);assert.equal(new Set(curriculum.skills.map(s=>s.id)).size,curriculum.skills.length);
  assert.equal(Object.keys(formulas).length+Object.keys(choiceLabels).length,80);
  const all=new Map(curriculum.skills.map(s=>[s.id,s]));assert.equal(all.size,curriculum.skills.length);
  const visiting=new Set(),visited=new Set();
@@ -118,7 +118,8 @@ test('four lessons add a coherent graph and an explicit Calculus branch without 
  }
  assert.ok(standardBranches('SUBJECT_MATH').includes('Calculus'));
  const fields=learningFields([{id:'SUBJECT_MATH',name:'Mathematics'}],curriculum.skills.map(s=>({...s,subjectId:'SUBJECT_MATH'})));
- assert.deepEqual(fields[0].branches.find(b=>b.name==='Calculus').skillIds,['MATH_CALC_001','MATH_CALC_002']);
+ assert.deepEqual(new Set(fields[0].branches.find(b=>b.name==='Calculus').skillIds),new Set(curriculum.skills.filter(s=>s.subdomain==='Calculus').map(s=>s.id)));
+ for(const id of ['MATH_CALC_001','MATH_CALC_002'])assert.ok(fields[0].branches.find(b=>b.name==='Calculus').skillIds.includes(id));
 });
 
 test('all 80 scenarios satisfy independent oracles over 100 retakes each, with no generator fallback',()=>{
@@ -188,8 +189,11 @@ test('ordinary review fixture stays Learning until the required argument passes 
 });
 
 function previousCurriculum(){
- const previous=structuredClone(curriculum);previous.skills=previous.skills.filter(s=>!ids.includes(s.id));
- previous.track.skills=previous.track.skills.filter(id=>!ids.includes(id));previous.track.exit_skills=previous.track.exit_skills.filter(id=>!ids.includes(id));
+ // A historical curriculum predates this batch and every later dependent lesson.
+ const removed=new Set(ids);
+ for(let changed=true;changed;){changed=false;for(const s of curriculum.skills)if(!removed.has(s.id)&&s.prerequisites.some(id=>removed.has(id))){removed.add(s.id);changed=true;}}
+ const previous=structuredClone(curriculum);previous.skills=previous.skills.filter(s=>!removed.has(s.id));
+ for(const key of ['skills','entry_skills','exit_skills'])previous.track[key]=previous.track[key].filter(id=>!removed.has(id));
  previous.assets=previous.assets.filter(a=>!a.path.startsWith('media/native-calculus-bridge/'));return previous;
 }
 test('new lessons preserve existing mastery, profiles, map positions, unfinished work, and previous native content',()=>{

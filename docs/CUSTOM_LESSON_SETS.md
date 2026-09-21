@@ -790,7 +790,7 @@ Existing drafts preserve complete resolved snapshots. Changes to generation defa
 
 ## Native lesson standards audit (September 21, 2026)
 
-The shipped catalog contains 156 lessons; 14 native Mathematics lessons now include a formal exercise. Use formal tasks for precise statements supported by the current rules, alongside ordinary practice and explicit tutor review for explanations. Do not convert a conceptual capstone into answer-string grading or claim that an empty assessment policy enforces a requested method.
+The shipped catalog contains 160 lessons; 18 native Mathematics lessons now include a formal exercise. Use formal tasks for precise statements supported by the current rules, alongside ordinary practice and explicit tutor review for explanations. Do not convert a conceptual capstone into answer-string grading or claim that an empty assessment policy enforces a requested method.
 
 For `sqrt_square_nonnegative`, author the cited guard as `0 <= x`. Difference-quotient cancellation retains `h != 0`; its algebraic identity alone is not a derivative proof. A punctured limit is separate from the assigned function value, and IVT existence does not establish uniqueness. The native composition, difference-quotient, radicals, systems, limits and continuity lessons provide current examples.
 
@@ -803,3 +803,9 @@ The twenty-lesson foundation expansion supplies examples of elementary reasoning
 Known native Mathematics IDs in theory text are rendered as internal lesson links after escaping the text; unknown IDs remain text. These references are recommendations, not prerequisite locks. Native Studio copies retain the diagrams, mathematical displays and review rules. Portable exports contain resolved questions. Significance/precision checks must assess notation or reasoning explicitly: numeric equality alone cannot distinguish 2.4 from 2.40. Do not use ordinary floating powers to assert real odd roots of negative numbers.
 
 Run the focused foundation source/oracle tests and docs/foundations-roadmap.test.js after content changes. The latter checks one hundred generated assessments per lesson, every-attempt capstones, review boundaries, original-draft restoration, Studio copies and media integrity. See FOUNDATIONS_ROADMAP.md and the release report for the exact scope.
+
+## Derivatives Batch 6 authoring examples
+
+See [Derivatives Batch 6](DERIVATIVES_BATCH6.md) for MATH_CALC_003–006: each has twenty ordinary scenarios plus one formal question and `question_count: 21`. Preserve the conceptual capstone and formal exercise on every attempt. `derivative_definition` requires the exact supported closing rule and cited limit; polynomial, quotient and recursive derivative exercises use their existing allowed rules. A reference certificate validates authored content only and must never become learner credit.
+
+Twelve assessment scenarios use public-parameter Cartesian graphs, while eight static teaching figures illustrate secants, corners, rules, changing area, holes and composition. Preserve excluded inputs even after cancellation; distinguish a formula's derivative from a cancelled function's extension. Run the focused Batch 6 tests and `scripts/check_derivatives_batch6_references.py --output <report.json>` using the pinned formal environment before publication. Preflight-only output is insufficient.

@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Unified Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 37,
+  "app_version": 38,
   "description": "The single operating guide for routing fresh visitors, tutoring learners, and helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -489,7 +489,7 @@
         "flac",
         "opus"
       ],
-      "illustration_library": "All 156 shipped lesson pages have teaching figures. A content-matched library adds 130 hosted Matplotlib SVGs across 118 library lessons without reinstalling packs or rewriting saved work. Native overrides keep their own media. Studio copies include matching assets under normal media limits. Hosted figures load near the viewport and are not guaranteed offline. Spatial tests include 73 trigonometry scenarios and eleven additional triangle-area scenarios, derived only from displayed givens; six abstract identity scenarios remain text-only."
+      "illustration_library": "All 160 shipped lesson pages have teaching figures. A content-matched library adds 130 hosted Matplotlib SVGs across 118 library lessons without reinstalling packs or rewriting saved work. Native overrides keep their own media. Studio copies include matching assets under normal media limits. Hosted figures load near the viewport and are not guaranteed offline. Spatial tests include 73 trigonometry scenarios and eleven additional triangle-area scenarios, derived only from displayed givens; six abstract identity scenarios remain text-only."
     },
     "native_authoring_function_allowlist": "Trusted native authoring may use normal_cdf(z), inverse_normal_cdf(p), t_cdf(t, df), chi_square_cdf(x, df), chi_square_sf(x, df), and f_sf(x, df1, df2), with finite/domain-checked inputs. These helpers are first-party native functions only; uploaded, Depot, and community lesson packages remain fixed data and cannot execute generator or helper code."
   },
@@ -513,7 +513,7 @@
   },
   "native_compatibility": {
     "state_version": 18,
-    "native_lessons": 112,
+    "native_lessons": 116,
     "drafts": "Preserve resolved question snapshots, order and responses across reload/backup/sync. Recovery-needed drafts block grading; retain a backup before repair. Checksums are not verification authority.",
     "review": "Functions and calculus bridge capstones retain required tutor review. Formal proofs separately require fresh exact Lean verification or replay."
   },
@@ -569,5 +569,23 @@
     "guide": "FOUNDATIONS_ROADMAP.md",
     "trust_contract": "unchanged; conceptual review is separate from kernel-certified formal work",
     "report": "releases/2026-09-21-foundation-expansion.md"
+  },
+  "derivatives_batch6": {
+    "lesson_ids": [
+      "MATH_CALC_003",
+      "MATH_CALC_004",
+      "MATH_CALC_005",
+      "MATH_CALC_006"
+    ],
+    "native_lessons": 116,
+    "shipped_lessons": 160,
+    "ordinary_scenarios_added": 80,
+    "formal_scenarios_added": 4,
+    "assessment_length_per_lesson": 21,
+    "required_capstone_and_formal_per_attempt": true,
+    "definition_method": "MATH_CALC_003 requires derivative_definition with an exact difference-quotient limit and derivative_from_limit closing step.",
+    "guide": "DERIVATIVES_BATCH6.md",
+    "report": "releases/2026-09-21-derivatives-batch6-integration.md",
+    "trust_contract": "Unchanged; fresh kernel verification and separate conceptual tutor review are both required."
   }
 }

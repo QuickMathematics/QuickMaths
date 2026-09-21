@@ -1,0 +1,205 @@
+{
+  "package": "quickmaths-derivatives-batch6.zip",
+  "package_sha256": "0064dc4969ae4a3e3796c959de3c4729b1c5bd3c697f2a0edfa454740b2c927a",
+  "previous_native_lessons_unchanged": 112,
+  "native_lessons": 116,
+  "media": {
+    "budget_bytes": 1000000,
+    "total_bytes": 983771,
+    "remaining_bytes": 16229,
+    "asset_count": 103,
+    "by_subdomain": {
+      "Algebra": {
+        "bytes": 349177,
+        "asset_count": 23
+      },
+      "Arithmetic": {
+        "bytes": 17237,
+        "asset_count": 18
+      },
+      "Calculus": {
+        "bytes": 247877,
+        "asset_count": 14
+      },
+      "Geometry": {
+        "bytes": 251914,
+        "asset_count": 39
+      },
+      "Statistics": {
+        "bytes": 117566,
+        "asset_count": 9
+      }
+    },
+    "by_branch": {
+      "core": {
+        "bytes": 912023,
+        "asset_count": 99
+      },
+      "math_bridge": {
+        "bytes": 71748,
+        "asset_count": 4
+      }
+    },
+    "by_source_folder": {
+      "content/geography/foundations": {
+        "bytes": 71748,
+        "asset_count": 4
+      },
+      "content/math/algebra_foundations/skills": {
+        "bytes": 912023,
+        "asset_count": 99
+      }
+    }
+  },
+  "reference_checks": [
+    {
+      "skill": "MATH_CALC_003",
+      "verified": true,
+      "method_policy_passed": true,
+      "proof_mode": "reference",
+      "elapsed_ms": 12807,
+      "request_hash": "542079b6e2c6c666bc744db4f48520c034b5481f11d5828fc0d4f0bc78cb20da",
+      "lean_source_hash": "a15bef1581b8f31c9ee1e9839deb5d09767522c6bc829ed12e8cd832c4d6792e",
+      "verified_at": "2026-09-21T20:02:37.588943+00:00"
+    },
+    {
+      "skill": "MATH_CALC_004",
+      "verified": true,
+      "method_policy_passed": true,
+      "proof_mode": "reference",
+      "elapsed_ms": 12238,
+      "request_hash": "46f6272deffb7adfe2b1f5dc4764d913d0badf89e2126557801a514576bf7e84",
+      "lean_source_hash": "4bde858e7b58e6a56f80ebde432db9f0d8a85135cf99c58fdd5df589fcd7996c",
+      "verified_at": "2026-09-21T20:00:02.881304+00:00"
+    },
+    {
+      "skill": "MATH_CALC_005",
+      "verified": true,
+      "method_policy_passed": true,
+      "proof_mode": "reference",
+      "elapsed_ms": 12347,
+      "request_hash": "51c9d03277a783429836e5ccc74f49a11ebfe38d427b73ca181285b8c114a44b",
+      "lean_source_hash": "9d26848864e56e79e4b9cd66c77fd8e0b34236867004faa65920cef2489eb366",
+      "verified_at": "2026-09-21T20:00:17.406895+00:00"
+    },
+    {
+      "skill": "MATH_CALC_006",
+      "verified": true,
+      "method_policy_passed": true,
+      "proof_mode": "reference",
+      "elapsed_ms": 12718,
+      "request_hash": "9efb499c9fa4b4eb55af0982a9daaa27cf57ad5c2befed17cb4071dbe737100d",
+      "lean_source_hash": "813aa492f87d64e36038580d98bf417ade94c3198177cfd53868bc63ea9ac240",
+      "verified_at": "2026-09-21T20:00:32.288980+00:00"
+    }
+  ],
+  "real_application_checks": [
+    {
+      "skill": "MATH_CALC_003",
+      "status": "passed",
+      "submitted_kernel_verified": true,
+      "restore_replay_checked": true,
+      "capstone_still_pending": true
+    },
+    {
+      "skill": "MATH_CALC_004",
+      "status": "passed",
+      "submitted_kernel_verified": true,
+      "restore_replay_checked": false,
+      "capstone_still_pending": true
+    },
+    {
+      "skill": "MATH_CALC_005",
+      "status": "passed",
+      "submitted_kernel_verified": true,
+      "restore_replay_checked": false,
+      "capstone_still_pending": true
+    },
+    {
+      "skill": "MATH_CALC_006",
+      "status": "passed",
+      "submitted_kernel_verified": true,
+      "restore_replay_checked": false,
+      "capstone_still_pending": true
+    }
+  ],
+  "browser_layout_checks": [
+    {
+      "layout": "desktop",
+      "skill": "MATH_CALC_003",
+      "teaching_figures": 2,
+      "questions": 21,
+      "graphs": 5,
+      "formal_panels": 1,
+      "errors": []
+    },
+    {
+      "layout": "desktop",
+      "skill": "MATH_CALC_004",
+      "teaching_figures": 2,
+      "questions": 21,
+      "graphs": 2,
+      "formal_panels": 1,
+      "errors": []
+    },
+    {
+      "layout": "desktop",
+      "skill": "MATH_CALC_005",
+      "teaching_figures": 2,
+      "questions": 21,
+      "graphs": 3,
+      "formal_panels": 1,
+      "errors": []
+    },
+    {
+      "layout": "desktop",
+      "skill": "MATH_CALC_006",
+      "teaching_figures": 2,
+      "questions": 21,
+      "graphs": 2,
+      "formal_panels": 1,
+      "errors": []
+    },
+    {
+      "layout": "mobile",
+      "skill": "MATH_CALC_003",
+      "teaching_figures": 2,
+      "questions": 21,
+      "graphs": 5,
+      "formal_panels": 1,
+      "errors": []
+    },
+    {
+      "layout": "mobile",
+      "skill": "MATH_CALC_004",
+      "teaching_figures": 2,
+      "questions": 21,
+      "graphs": 2,
+      "formal_panels": 1,
+      "errors": []
+    },
+    {
+      "layout": "mobile",
+      "skill": "MATH_CALC_005",
+      "teaching_figures": 2,
+      "questions": 21,
+      "graphs": 3,
+      "formal_panels": 1,
+      "errors": []
+    },
+    {
+      "layout": "mobile",
+      "skill": "MATH_CALC_006",
+      "teaching_figures": 2,
+      "questions": 21,
+      "graphs": 2,
+      "formal_panels": 1,
+      "errors": []
+    }
+  ],
+  "scope_notes": [
+    "Native pinned Lean kernel certificates; no new physical Android/iPhone test or browser-WASM parity run.",
+    "Initial Elan-shim startup timed out; direct installed pinned toolchain passed its normal provenance check.",
+    "Definition reference cold attempt timed out; retry verified in 12807 ms. Existing 60-second policy retained."
+  ]
+}

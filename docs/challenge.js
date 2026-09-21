@@ -15,7 +15,7 @@ import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260908-profile-s
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
 import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260921-native-compat-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260921-native-compat-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260921-foundations-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260921-derivatives-batch6-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
 import {
   buildDepotSubmissionPrompt,

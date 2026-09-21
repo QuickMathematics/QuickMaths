@@ -46,12 +46,12 @@ def test_native_source_and_review_preview_agree():
 
 def test_metadata_graph_and_taxonomy_are_complete():
     track=yaml.load((ROOT/'content/math/algebra_foundations/track.yaml').read_text(),Loader=UniqueLoader)
-    assert len(track['skills'])==len(set(track['skills']))==109
+    assert len(track['skills'])==len(set(track['skills']))==113
     assert set(IDS)<=set(track['skills'])
     assert set(track['entry_skills']+track['exit_skills'])<=set(track['skills'])
     assert 'MATH_CALC_002' in track['exit_skills']
     all_skills={s['id']:s for s in DATA['skills']}
-    assert len(all_skills)==112
+    assert len(all_skills)==116
     active=set();done=set()
     def visit(id):
         assert id in all_skills,id

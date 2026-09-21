@@ -9,7 +9,7 @@ IDS=json.loads((ROOT/'docs/test-support/foundations-roadmap.json').read_text())[
 def test_new_sources_export_without_losing_teaching_or_review():
  exported=json.loads((ROOT/'docs/curriculum-data.json').read_text(encoding='utf-8'))
  by_id={s['id']:s for s in exported['skills']}
- assert len(by_id)==112
+ assert len(by_id)==116
  for id in IDS:
   paths=list((ROOT/'content/math/algebra_foundations/skills').glob(id+'_*.yaml'))
   assert len(paths)==1,id

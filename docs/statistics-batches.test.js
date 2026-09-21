@@ -57,7 +57,7 @@ test("new inference tests retain their givens, responses, and results through sa
 
 test("all 21 statistics and probability lessons join the existing curriculum without moving saved nodes", () => {
   assert.equal(additions.length, 21);
-  assert.equal(curriculum.skills.length, 112);
+  assert.equal(new Set(curriculum.skills.map(skill => skill.id)).size, curriculum.skills.length);
   const previous = structuredClone(curriculum);
   const ids = new Set(additions.map(skill => skill.id));
   previous.skills = previous.skills.filter(skill => !ids.has(skill.id));

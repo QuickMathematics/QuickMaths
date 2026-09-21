@@ -776,3 +776,9 @@ Selected composition, difference-quotient, radical, systems, limits and continui
 Whole-number calculation (MATH_ARITH_006) is an additional beginner entry point. The new pathway covers factors, fraction and decimal operations, estimation, ratios, everyday percentages and measurement before extending plane and solid geometry. Existing lessons remain unlocked under their previous prerequisite rules. Optional lesson references in the explanations open the related lesson.
 
 Each of the twenty new lessons includes twenty questions on every fresh assessment, including its reasoning capstone. Give both the final answer and the requested explanation. Tutor review remains necessary for that capstone even when the numerical score is perfect. Exact fractions, stated units and domain restrictions matter; follow each question's requested answer format. Existing saved tests keep their original questions.
+
+## Derivatives: meaning before rules
+
+The four new Calculus lessons cover derivatives as local rates, polynomial rules, product/quotient rules and the chain rule. Each assessment has 21 questions: twenty ordinary scenarios including a tutor-reviewed explanation, and one formal proof. Both appear on every attempt. The first lesson's formal task uses the derivative definition and its difference-quotient limit; a final answer alone cannot replace the proof. Later lessons retain domain exclusions and distinguish an instantaneous rate from a function value.
+
+Illustrations and randomized graphs accompany the stated givens. Proof verification on supported PC and Android browsers can take up to a minute after initial setup. A pending check remains pending; it does not grant credit.

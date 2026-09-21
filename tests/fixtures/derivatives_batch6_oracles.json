@@ -1,0 +1,407 @@
+{
+  "D6_DEF_SECANT": {
+    "kind": "formula",
+    "expression": "a+b"
+  },
+  "D6_DEF_QUOTIENT": {
+    "kind": "literal",
+    "value": "h+6"
+  },
+  "D6_DEF_SQUARE_AT": {
+    "kind": "derivative",
+    "function": "x**2",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_DEF_CUBE_AT": {
+    "kind": "derivative",
+    "function": "x**3",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_DEF_AFFINE": {
+    "kind": "derivative",
+    "function": "m*x+b",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_DEF_CONSTANT": {
+    "kind": "derivative",
+    "function": "c",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_DEF_TANGENT": {
+    "kind": "formula",
+    "expression": "2*a*x-a**2"
+  },
+  "D6_DEF_MOTION": {
+    "kind": "derivative",
+    "function": "k*x**2+b",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_DEF_ABS_LEFT": {
+    "kind": "formula",
+    "expression": "-1"
+  },
+  "D6_DEF_ABS_RIGHT": {
+    "kind": "formula",
+    "expression": "1"
+  },
+  "D6_DEF_ABS_EXISTENCE": {
+    "kind": "literal",
+    "value": "B"
+  },
+  "D6_DEF_ROOT_AT4": {
+    "kind": "derivative",
+    "function": "sqrt(x)",
+    "at": "4"
+  },
+  "D6_DEF_RECIPROCAL": {
+    "kind": "derivative",
+    "function": "1/x",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_DEF_CHANGED_VALUE": {
+    "kind": "literal",
+    "value": "C"
+  },
+  "D6_DEF_UNITS": {
+    "kind": "literal",
+    "value": "D"
+  },
+  "D6_DEF_LOCAL_LINEAR": {
+    "kind": "formula",
+    "expression": "v+m*d"
+  },
+  "D6_DEF_TABLE_EVIDENCE": {
+    "kind": "literal",
+    "value": "A"
+  },
+  "D6_DEF_TANGENT_CROSSING": {
+    "kind": "literal",
+    "value": "B"
+  },
+  "D6_DEF_VALUE_VS_RATE": {
+    "kind": "literal",
+    "value": "C"
+  },
+  "D6_DEF_REVIEW": {
+    "kind": "derivative",
+    "function": "x**2",
+    "at": "-2"
+  },
+  "D6_RULE_CONSTANT": {
+    "kind": "derivative",
+    "function": "c",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_RULE_MONOMIAL": {
+    "kind": "derivative",
+    "function": "c*x**n",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_RULE_QUADRATIC": {
+    "kind": "derivative",
+    "function": "a*x**2+b*x",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_RULE_CUBIC_AT": {
+    "kind": "derivative",
+    "function": "a*x**3+b*x**2+c*x",
+    "at": "r",
+    "variable": "x"
+  },
+  "D6_RULE_NEGATIVE_SIGN": {
+    "kind": "literal",
+    "value": "A"
+  },
+  "D6_RULE_FRACTION": {
+    "kind": "derivative",
+    "function": "x**3/d",
+    "at": "r",
+    "variable": "x"
+  },
+  "D6_RULE_SUM_DATA": {
+    "kind": "formula",
+    "expression": "u+v"
+  },
+  "D6_RULE_LINEAR_COMBINATION": {
+    "kind": "formula",
+    "expression": "p*u-q*v"
+  },
+  "D6_RULE_EXPAND_SQUARE": {
+    "kind": "derivative",
+    "function": "(x+b)**2",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_RULE_LINEAR_TERM": {
+    "kind": "derivative",
+    "function": "m*x+b",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_RULE_PARAMETER": {
+    "kind": "formula",
+    "expression": "target/12"
+  },
+  "D6_RULE_STATIONARY_INPUT": {
+    "kind": "formula",
+    "expression": "a"
+  },
+  "D6_RULE_ZERO_AT_POINT": {
+    "kind": "literal",
+    "value": "B"
+  },
+  "D6_RULE_VERTICAL_SHIFT": {
+    "kind": "literal",
+    "value": "C"
+  },
+  "D6_RULE_EXPONENT_ERROR": {
+    "kind": "literal",
+    "value": "D"
+  },
+  "D6_RULE_CONSTANT_PARAMETER": {
+    "kind": "literal",
+    "value": "A"
+  },
+  "D6_RULE_GRAPH_SLOPE": {
+    "kind": "derivative",
+    "function": "x**2-4*x+1",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_RULE_EVALUATE_ORDER": {
+    "kind": "literal",
+    "value": "B"
+  },
+  "D6_RULE_UNITS": {
+    "kind": "literal",
+    "value": "C"
+  },
+  "D6_RULE_REVIEW": {
+    "kind": "derivative",
+    "function": "2*x**3-3*x**2+5",
+    "at": "-1"
+  },
+  "D6_PQ_TWO_LINES": {
+    "kind": "derivative",
+    "function": "(x+a)*(x+b)",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_PQ_SQUARE_LINE": {
+    "kind": "derivative",
+    "function": "x**2*(a*x+b)",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_PQ_PRODUCT_DATA": {
+    "kind": "formula",
+    "expression": "du*v+u*dv"
+  },
+  "D6_PQ_PRODUCT_AT": {
+    "kind": "derivative",
+    "function": "x*(x**2+b)",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_PQ_X_OVER_LINE": {
+    "kind": "derivative",
+    "function": "x/(x+b)",
+    "at": null,
+    "variable": "x",
+    "exclusions": [
+      "-b"
+    ]
+  },
+  "D6_PQ_QUOTIENT_DATA": {
+    "kind": "formula",
+    "expression": "(du*v-u*dv)/v**2"
+  },
+  "D6_PQ_SQUARE_OVER_LINE": {
+    "kind": "derivative",
+    "function": "x**2/(x+b)",
+    "at": null,
+    "variable": "x",
+    "exclusions": [
+      "-b"
+    ]
+  },
+  "D6_PQ_RECIPROCAL": {
+    "kind": "derivative",
+    "function": "c/(x-a)",
+    "at": null,
+    "variable": "x",
+    "exclusions": [
+      "a"
+    ]
+  },
+  "D6_PQ_AT_ONE": {
+    "kind": "derivative",
+    "function": "(x**2+k)/(x+1)",
+    "at": "1",
+    "variable": "x"
+  },
+  "D6_PQ_SUBTRACTION_ORDER": {
+    "kind": "literal",
+    "value": "D"
+  },
+  "D6_PQ_HOLE_AT": {
+    "kind": "literal",
+    "value": "A"
+  },
+  "D6_PQ_HOLE_AWAY": {
+    "kind": "derivative",
+    "function": "(x**2-4)/(x-2)",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_PQ_PRODUCT_ERROR": {
+    "kind": "literal",
+    "value": "B"
+  },
+  "D6_PQ_DOMAIN": {
+    "kind": "literal",
+    "value": "C"
+  },
+  "D6_PQ_AREA_RATE": {
+    "kind": "formula",
+    "expression": "dl*w+l*dw"
+  },
+  "D6_PQ_AVERAGE_COST": {
+    "kind": "derivative",
+    "function": "(x**2+k)/x",
+    "at": "r",
+    "variable": "x"
+  },
+  "D6_PQ_RATE_UNITS": {
+    "kind": "literal",
+    "value": "D"
+  },
+  "D6_PQ_SIMPLER_METHOD": {
+    "kind": "literal",
+    "value": "A"
+  },
+  "D6_PQ_COMPONENT_HYPOTHESIS": {
+    "kind": "literal",
+    "value": "B"
+  },
+  "D6_PQ_REVIEW": {
+    "kind": "derivative",
+    "function": "(x**2-4)/(x-2)",
+    "at": "3"
+  },
+  "D6_CHAIN_AFFINE_POWER": {
+    "kind": "derivative",
+    "function": "(a*x+b)**n",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_CHAIN_QUADRATIC_CUBE": {
+    "kind": "derivative",
+    "function": "(x**2+b)**3",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_CHAIN_RECIPROCAL": {
+    "kind": "derivative",
+    "function": "1/(a*x+b)",
+    "at": null,
+    "variable": "x",
+    "exclusions": [
+      "-b/a"
+    ]
+  },
+  "D6_CHAIN_ROOT_AT": {
+    "kind": "derivative",
+    "function": "sqrt(a*x+b)",
+    "at": "p",
+    "variable": "x"
+  },
+  "D6_CHAIN_NESTED_AT": {
+    "kind": "derivative",
+    "function": "(x**3+b)**2",
+    "at": "a",
+    "variable": "x"
+  },
+  "D6_CHAIN_MATCHED_DATA": {
+    "kind": "formula",
+    "expression": "u*v"
+  },
+  "D6_CHAIN_WRONG_INPUT": {
+    "kind": "literal",
+    "value": "C"
+  },
+  "D6_CHAIN_THREE_LAYERS": {
+    "kind": "derivative",
+    "function": "((a*x+1)**2+b)**2",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_CHAIN_PRODUCT": {
+    "kind": "derivative",
+    "function": "x*(a*x+b)**3",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_CHAIN_QUOTIENT": {
+    "kind": "derivative",
+    "function": "(x**2+1)/(x**2+b)**2",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_CHAIN_ROOT_FORMULA": {
+    "kind": "derivative",
+    "function": "sqrt(x**2+b)",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_CHAIN_RATE_UNITS": {
+    "kind": "literal",
+    "value": "D"
+  },
+  "D6_CHAIN_DOUBLE_ROOT_AT": {
+    "kind": "derivative",
+    "function": "(sqrt(x+1)+1)**2",
+    "at": "3"
+  },
+  "D6_CHAIN_ROOT_DOMAIN": {
+    "kind": "literal",
+    "value": "A"
+  },
+  "D6_CHAIN_ZERO_INNER": {
+    "kind": "literal",
+    "value": "B"
+  },
+  "D6_CHAIN_ROOT_GRAPH": {
+    "kind": "derivative",
+    "function": "sqrt(x+2)",
+    "at": "2"
+  },
+  "D6_CHAIN_MISSING_INNER": {
+    "kind": "literal",
+    "value": "C"
+  },
+  "D6_CHAIN_SUM_COMPOSITE": {
+    "kind": "derivative",
+    "function": "(2*x+b)**3+x**2",
+    "at": null,
+    "variable": "x"
+  },
+  "D6_CHAIN_OUTERMOST": {
+    "kind": "literal",
+    "value": "D"
+  },
+  "D6_CHAIN_REVIEW": {
+    "kind": "derivative",
+    "function": "sqrt(3*x+1)",
+    "at": "1"
+  }
+}

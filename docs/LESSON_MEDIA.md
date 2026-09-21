@@ -144,3 +144,5 @@ only to fixed scenarios so that labels and original givens stay consistent.
 See [the batch notes](CALCULUS_BRIDGE_BATCH_2.md) for coverage and
 [the compatibility integration notes](NATIVE_COMPATIBILITY_FIXES.md) for the
 current rebase, migration checks and validation limits.
+
+The integrated derivative batch adds eight reproducible Matplotlib SVGs and twelve declarative assessment graph scenarios. Its static figures are author-side output; no Python runs from a lesson package. Combined native embedded media is 983,771 bytes of the existing 1,000,000-byte budget. Future illustrated batches must inspect the export report before adding assets.

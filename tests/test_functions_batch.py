@@ -46,7 +46,7 @@ def test_unique_native_source_metadata_matches_browser_content():
 
 def test_native_track_contains_each_addition_once_and_retains_valid_exits():
     track=yaml.load((ROOT/'content/math/algebra_foundations/track.yaml').read_text(encoding='utf-8'),Loader=UniqueLoader)
-    assert len(track['skills'])==109
+    assert len(track['skills'])==113
     for id in IDS:
         assert track['skills'].count(id)==1
     assert set(track['exit_skills'])<=set(track['skills'])

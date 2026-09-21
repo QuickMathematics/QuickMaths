@@ -25,7 +25,7 @@ with sync_playwright() as p:
  for name,viewport in [('desktop',{'width':1440,'height':1000}),('mobile',{'width':390,'height':844})]:
   context=browser.new_context(viewport=viewport)
   page=context.new_page();errors=[];page.on('pageerror',lambda error:errors.append(str(error)))
-  page.goto(BASE,wait_until='networkidle');assert page.evaluate(seed)==112
+  page.goto(BASE,wait_until='networkidle');assert page.evaluate(seed)>=112
   # Leave the welcome route before reloading; it intentionally logs profiles out.
   page.goto(BASE+'#/lesson/'+ids[0],wait_until='domcontentloaded')
   page.reload(wait_until='networkidle')

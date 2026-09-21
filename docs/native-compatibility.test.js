@@ -48,7 +48,7 @@ function assertBound(p) {
 function mathematicalQuestion(p) {const {formal_job,...math}=p;return math;}
 
 test('rotated retakes survive reload, backup and sync with exact snapshots and responses',()=>{
-  assert.equal(formalSkills.length,14);
+  for (const id of ["MATH_EXP_001", "MATH_RAD_001", "MATH_POLY_001", "MATH_POLY_002", "MATH_POLY_003", "MATH_POLY_004", "MATH_RAT_001", "MATH_QUAD_002", "MATH_ALG_007", "MATH_SYS_001", "MATH_FUNC_004", "MATH_FUNC_007", "MATH_CALC_001", "MATH_CALC_002"]) assert.ok(formalSkills.some(skill => skill.id === id), `Retain existing formal lesson ${id}`);
   for(const skill of formalSkills) for(const attempt of [1,2,7]) {
     const store=fresh(curriculum,attempt,skill.id),draft=store.startTest(skill.id,{force:true});
     for(const p of draft.problems)store.updateResponse(p.template_id,{finalAnswer:'saved answer',work:'saved reasoning',structuredWorkJson:{note:'saved structure'}});

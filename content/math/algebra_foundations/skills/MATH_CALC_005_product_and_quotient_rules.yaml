@@ -1,0 +1,1126 @@
+id: MATH_CALC_005
+schema_version: '0.2'
+name: Product and quotient rules
+domain: Math
+subdomain: Calculus
+topic: Differentiation
+description: Differentiate products and quotients with explicit hypotheses, retain original domains after cancellation,
+  and interpret product and quotient rates in context.
+prerequisites:
+- MATH_CALC_004
+- MATH_RAT_001
+- MATH_RAT_002
+- MATH_RAT_003
+unlocks:
+- MATH_CALC_006
+tags:
+- calculus
+- derivatives
+- reasoning
+- graph_interpretation
+- domain_restrictions
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'Products and quotients describe interacting quantities. Area can be length times width, and an average
+  cost is total cost divided by output. When both components change, a derivative must account for both changes.
+  The sum rule does not extend by simply multiplying or dividing derivatives. This lesson uses polynomials and
+  rational functions, with the original real domain kept visible throughout.
+
+
+  The product rule:
+
+  If u and v are differentiable at an interior point, then (uv)''=u''v+uv''. One term describes change in u while
+  retaining the current value of v; the other describes change in v while retaining the current value of u. Both
+  original functions still appear. For (x+2)(x+5), the derivative is 1*(x+5)+(x+2)*1=2x+7. Multiplying the two
+  derivatives would give 1, which misses almost all the change.
+
+
+  Why there are two terms:
+
+  Consider a rectangle of dimensions u and v whose side changes are du and dv. Its area change is v*du+u*dv+du*dv.
+  Dividing by the input change gives two main contributions and a small cross term. For differentiable side functions,
+  the cross term tends to zero in the limiting calculation. Equivalently, add and subtract u(a+h)*v(a) in the
+  difference quotient and use continuity of differentiable functions. This explanation needs differentiability;
+  it is not a rule for arbitrary discontinuous quantities.
+
+
+  An organized product calculation:
+
+  For f(x)=x^2(3x-4), choose u=x^2 and v=3x-4. Then u''=2x and v''=3. Apply the product rule before simplifying:
+  f''=2x(3x-4)+3x^2=9x^2-8x. Expanding f to 3x^3-4x^2 first gives the same derivative by the power and sum rules.
+  Either route is legitimate when the problem does not prescribe a method. The explicit two-term setup is useful
+  evidence that you understand the product rule.
+
+
+  The quotient rule:
+
+  If u and v are differentiable at a and v(a)!=0, then the derivative of u/v at a is [u''(a)*v(a)-u(a)*v''(a)]/[v(a)]^2.
+  For a derivative function, use the same formula wherever the hypotheses hold. The order of subtraction matters.
+  The denominator is the original denominator squared, not the derivative of that denominator. Write the numerator
+  in parentheses before reducing it.
+
+
+  A quotient example:
+
+  For f(x)=(x^2+1)/(x+1), the original domain excludes -1. Set u=x^2+1 and v=x+1. The derivative is [2x(x+1)-(x^2+1)]/(x+1)^2=(x^2+2x-1)/(x+1)^2,
+  still for x!=-1. At x=1 the derivative equals (1+2-1)/4=1/2. The function value there is 1. Those two numbers
+  have different roles in a tangent equation: y=1+(1/2)(x-1).
+
+
+  A way to remember the quotient structure:
+
+  The identity u=(u/v)*v holds where v is nonzero. Applying the product rule there gives u''=(u/v)''*v+(u/v)*v''.
+  Rearranging yields the quotient formula. This is a useful consistency check once differentiability of the reciprocal
+  has been established; it should not be presented as a circular existence proof. The reciprocal limit calculation
+  from the first derivative lesson provides the missing foundation.
+
+
+  Simple special cases:
+
+  For c/(x+b), where c and b are constants, the derivative is -c/(x+b)^2 on x!=-b. For x/(x+b), it is b/(x+b)^2.
+  A fixed numerical denominator such as x^3/5 is better viewed as (1/5)*x^3 and differentiated by constant multiplication.
+  Select the simplest valid representation rather than mechanically use the longest available rule.
+
+
+  Original domains survive simplification:
+
+  The function (x^2-4)/(x-2) agrees with x+2 only where x!=2. It therefore has derivative 1 at every allowed input,
+  but has no derivative at 2 because its value is undefined there. The extended function x+2 does have derivative
+  1 at 2; that is a different function. A cancelled factor in a derivative formula cannot restore a missing point
+  in the original domain. Record restrictions before reducing either the function or its derivative.
+
+
+  Data without formulas:
+
+  Suppose u(a)=2, u''(a)=3, v(a)=5, and v''(a)=7. Then (uv)''(a)=3*5+2*7=29, while (u/v)''(a)=(3*5-2*7)/25=1/25.
+  All four values are needed in general. The expression u''(a)/v''(a)=3/7 is neither the quotient derivative nor
+  a substitute for it. When v(a)=0 the quotient is not defined at a, regardless of whether a simplified expression
+  has a limit.
+
+
+  Applications and units:
+
+  If L(t) and W(t) are lengths in metres with t in seconds, A''(t)=L''(t)W(t)+L(t)W''(t) has units square metres
+  per second. One side can grow while the other shrinks, so the signs of both contributions matter. If C(q) is
+  total cost and q is output quantity, the average cost C(q)/q has derivative [q*C''(q)-C(q)]/q^2 for q>0 in the
+  model. This is not the same quantity as the marginal total cost C''(q).
+
+
+  Limits of the rules:
+
+  A nonzero denominator alone is not sufficient; differentiability of the components must also be established.
+  For example, abs(x-1)/(x+1) is defined at 1 but has unequal one-sided slopes there. Conversely, a particular
+  product can be differentiable even if the usual rule''s component hypotheses fail, so do not infer a converse.
+  The lesson focuses on applying sufficient hypotheses correctly.
+
+
+  Self-check and proof:
+
+  Before calculating, identify u, v, their derivatives, and the original domain. After calculating, check signs,
+  parentheses, units, and a simple sample value. A graph may reveal a sign error but is not a proof. The formal
+  exercise checks one exact quotient derivative with its nonzero denominator; the reviewed capstone separately
+  asks you to distinguish an original rational function from a continuous extension. Neither task replaces the
+  other.'
+math_blocks:
+- type: notation
+  text: (u*v)' = u'*v + u*v'
+  alt: Product differentiation rule
+  linear_text: (u*v)' = u'*v + u*v'
+- type: fraction
+  numerator: u'*v-u*v'
+  denominator: v^2
+  alt: Quotient derivative; u and v differentiable and v nonzero
+  linear_text: (u'*v-u*v')/(v^2)
+examples:
+- prompt: Differentiate (x+2)(x+5).
+  solution: 2x+7
+  explanation: The product rule gives 1*(x+5)+(x+2)*1. Expand-and-differentiate confirms the answer.
+- prompt: Differentiate x^2(3x-4).
+  solution: 9x^2-8x
+  explanation: Use 2x(3x-4)+x^2*3, then combine terms. The product of the derivatives is not the derivative of
+    the product.
+- prompt: At a, u=2, u'=3, v=5, v'=7. Find (uv)'(a).
+  solution: '29'
+  explanation: Compute 3*5+2*7. Both the current values and the rates contribute.
+- prompt: Differentiate x/(x+4).
+  solution: 4/(x+4)^2, x!=-4
+  explanation: The numerator is 1*(x+4)-x*1=4. Retain the original excluded input -4.
+- prompt: Differentiate (x^2+1)/(x+1).
+  solution: (x^2+2x-1)/(x+1)^2, x!=-1
+  explanation: Form [2x(x+1)-(x^2+1)]/(x+1)^2 before simplifying. Parentheses preserve the subtraction of both
+    numerator terms.
+- prompt: Differentiate 5/(x-2).
+  solution: -5/(x-2)^2, x!=2
+  explanation: The constant numerator has derivative zero. The quotient numerator is 0*(x-2)-5*1=-5.
+- prompt: At a, u=2, u'=3, v=5, v'=7. Find (u/v)'(a).
+  solution: 1/25
+  explanation: The numerator is 3*5-2*7=1 and the denominator is 5^2. The condition v(a)!=0 holds.
+- prompt: For f(x)=(x^2-4)/(x-2), find f'(3) and explain x=2.
+  solution: f'(3)=1; no derivative at 2
+  explanation: For x!=2, f=x+2 and f'=1. At 2 the original function has no value, so its derivative is not defined
+    there.
+- prompt: A rectangle has L=6 m, W=4 m, L'=0.5 m/s, W'=-0.2 m/s. Find A'.
+  solution: 0.8 square metres per second
+  explanation: A'=L'W+LW'=0.5*4+6*(-0.2)=0.8. One side's growth outweighs the other side's shrinkage.
+- prompt: Total cost is C(q)=q^2+100 for q>0. Find the rate of average cost at q=20.
+  solution: 3/4 cost-units per output-unit squared
+  explanation: Average cost is C/q=q+100/q. Its derivative is 1-100/q^2, so at 20 it is 3/4. This is not C'(20)=40.
+applications:
+- title: Changing area
+  description: Changing rectangle sides make two first-order contributions to area rate; include both with their
+    signed rates and square-length-per-time units.
+- title: Average quantities
+  description: Differentiate average cost or another quotient model rather than accidentally differentiate its
+    numerator alone.
+- title: Concentration and density
+  description: A numerator and denominator that both change contribute separately to the rate of their ratio;
+    check the denominator and units.
+- title: Models with excluded inputs
+  description: A simplified formula may hide a hole. Preserve the original model domain when reporting a derivative
+    or interpreting a graph.
+test:
+  question_count: 21
+  randomize_order: true
+  questions:
+  - id: D6_PQ_TWO_LINES
+    type: generated
+    prompt_template: Differentiate f(x)=(x+({a}))*(x+({b})). Enter an expression in x.
+    variables:
+      a:
+        type: int
+        min: -6
+        max: 6
+        exclude: []
+      b:
+        type: int
+        min: -6
+        max: 6
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: 2*x+({a+b})
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'Use 1*(x+({b}))+(x+({a}))*1.
+
+      Combining terms gives 2*x+({a+b}).'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - two_product_terms
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Name the two factors and show both product-rule terms. This records your working; the separate capstone
+        requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_PQ_SQUARE_LINE
+    type: generated
+    prompt_template: Differentiate x^2*(({a})*x+({b})). Enter an expression in x.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -6
+        max: 6
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: ({3*a})*x^2+({2*b})*x
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'The product rule gives 2*x*(({a})*x+({b}))+x^2*({a}).
+
+      Collect terms to obtain ({3*a})*x^2+({2*b})*x.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - product_rule
+    - power_rule
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Show the unsimplified product-rule setup. This records your working; the separate capstone requires
+        a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_PQ_PRODUCT_DATA
+    type: generated
+    prompt_template: At an input a, u(a)={u}, u'(a)={du}, v(a)={v}, and v'(a)={dv}. Find (u*v)'(a).
+    variables:
+      u:
+        type: int
+        min: -7
+        max: 7
+        exclude: []
+      du:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+      v:
+        type: int
+        min: -7
+        max: 7
+        exclude: []
+      dv:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{du*v+u*dv}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Use u''(a)*v(a)+u(a)*v''(a).
+
+      The two contributions sum to {du*v+u*dv}.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - two_product_terms
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_PRODUCT_AT
+    type: generated
+    prompt_template: Find the tangent slope for f(x)=x*(x^2+({b})) at x={a}.
+    variables:
+      a:
+        type: int
+        min: -3
+        max: 3
+        exclude: []
+      b:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{3*a*a+b}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'The product rule gives f''(x)=x^2+({b})+x*(2*x)=3*x^2+({b}).
+
+      At {a} the tangent slope is {3*a*a+b}.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - two_product_terms
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_X_OVER_LINE
+    type: generated
+    prompt_template: Differentiate f(x)=x/(x+{b}). Enter the derivative formula and all real inputs excluded from
+      the derivative of this original function.
+    variables:
+      b:
+        type: int
+        min: 1
+        max: 6
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: rational_expression
+      value: '{b}/(x+{b})^2'
+      variable: x
+      excluded_values:
+      - '{-b}'
+    grading:
+      method: rational_expression
+      require_reduced_form: false
+    explanation_template: 'The original denominator excludes x=-{b}.
+
+      The quotient numerator is (x+{b})-x={b}.
+
+      The denominator is (x+{b})^2, retaining that same exclusion.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - quotient_numerator_order
+    - original_domain
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Show the quotient-rule numerator before simplifying. This records your working; the separate capstone
+        requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+    diagram:
+      kind: cartesian
+      x_range:
+      - -8
+      - 4
+      y_range:
+      - -5
+      - 5
+      alt: The stated quotient x divided by x+{b}, with input -{b} excluded.
+      curves:
+      - expression: x/(x+{b})
+        interval:
+        - -8
+        - 4
+        exclude:
+        - -{b}
+  - id: D6_PQ_QUOTIENT_DATA
+    type: generated
+    prompt_template: At a, u(a)={u}, u'(a)={du}, v(a)={v}, and v'(a)={dv}. Both functions are differentiable there.
+      Find (u/v)'(a) exactly.
+    variables:
+      u:
+        type: int
+        min: -6
+        max: 6
+        exclude: []
+      du:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+      v:
+        type: int
+        min: 1
+        max: 7
+        exclude: []
+      dv:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: ({du*v-u*dv})/({v*v})
+    grading:
+      method: exact_numeric
+    explanation_template: 'The given denominator value {v} is nonzero.
+
+      Use [u''(a)*v(a)-u(a)*v''(a)]/[v(a)]^2.
+
+      The value is ({du*v-u*dv})/({v*v}).'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - quotient_setup
+    - domain_restriction
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_SQUARE_OVER_LINE
+    type: generated
+    prompt_template: Differentiate f(x)=x^2/(x+{b}). Enter the derivative formula and every excluded real input.
+    variables:
+      b:
+        type: int
+        min: 1
+        max: 3
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: rational_expression
+      value: x*(x+{2*b})/(x+{b})^2
+      variable: x
+      excluded_values:
+      - '{-b}'
+    grading:
+      method: rational_expression
+      require_reduced_form: false
+    explanation_template: 'The original domain excludes -{b}.
+
+      The numerator is 2*x*(x+{b})-x^2=x^2+{2*b}*x.
+
+      Divide by (x+{b})^2 and retain x!=-{b}.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - quotient_numerator_order
+    - original_domain
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Identify the original domain and both quotient-rule numerator terms. This records your working;
+        the separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+    diagram:
+      kind: cartesian
+      x_range:
+      - -5
+      - 5
+      y_range:
+      - -12
+      - 12
+      alt: The stated rational function with input -{b} excluded; no derivative curve is shown.
+      curves:
+      - expression: x**2/(x+{b})
+        interval:
+        - -5
+        - 5
+        exclude:
+        - -{b}
+  - id: D6_PQ_RECIPROCAL
+    type: generated
+    prompt_template: Differentiate f(x)={c}/(x-({a})). Enter the derivative formula and the excluded input.
+    variables:
+      c:
+        type: int
+        min: 1
+        max: 9
+        exclude: []
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: rational_expression
+      value: -{c}/(x-({a}))^2
+      variable: x
+      excluded_values:
+      - '{a}'
+    grading:
+      method: rational_expression
+      require_reduced_form: false
+    explanation_template: 'The numerator derivative is zero.
+
+      The quotient numerator is -{c}; the denominator is (x-({a}))^2.
+
+      The input {a} remains excluded.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - denominator_restriction
+    - derivative_sign
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_AT_ONE
+    type: generated
+    prompt_template: For f(x)=(x^2+({k}))/(x+1), find f'(1). Enter an exact number.
+    variables:
+      k:
+        type: int
+        min: -5
+        max: 8
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: ({3-k})/4
+    grading:
+      method: exact_numeric
+    explanation_template: 'At 1, the quotient numerator is 2*2-(1+({k})).
+
+      The denominator is 2^2=4.
+
+      The derivative is ({3-k})/4.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - quotient_numerator_order
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_SUBTRACTION_ORDER
+    type: fixed
+    prompt_template: For differentiable u and v with v nonzero, which expression is the derivative of u/v? Select
+      one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: Differentiate the numerator times the denominator, subtract the numerator times the
+      denominator derivative, then divide by the original denominator squared.
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - quotient_numerator_order
+    difficulty: medium
+    options:
+    - id: A
+      label: (uv'-u'v)/v^2
+    - id: B
+      label: u'/v'
+    - id: C
+      label: (u'v+uv')/v^2
+    - id: D
+      label: (u'v-uv')/v^2
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_HOLE_AT
+    type: fixed
+    prompt_template: The function f(x)=(x^2-4)/(x-2) is not extended at x=2. What is f'(2)? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: The formula x+2 agrees only on x!=2. A derivative of the original function at 2 cannot
+      exist without a function value there.
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - cancellation_does_not_extend_domain
+    difficulty: medium
+    options:
+    - id: A
+      label: It does not exist because f(2) is undefined.
+    - id: B
+      label: 1, because the factors cancel
+    - id: C
+      label: 4, because that is the limiting function value
+    - id: D
+      label: 0, because the missing point has no height
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    diagram:
+      kind: cartesian
+      x_range:
+      - -1
+      - 4
+      y_range:
+      - -1
+      - 7
+      alt: The stated quotient, with its original input 2 excluded.
+      curves:
+      - expression: (x**2-4)/(x-2)
+        interval:
+        - -1
+        - 4
+        exclude:
+        - 2
+      points:
+      - at:
+        - 2
+        - 4
+        endpoint: open
+  - id: D6_PQ_HOLE_AWAY
+    type: generated
+    prompt_template: Let f(x)=(x^2-4)/(x-2) for x!=2. Find f'({a}).
+    variables:
+      a:
+        type: int
+        min: -4
+        max: 6
+        exclude:
+        - 2
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '1'
+    grading:
+      method: exact_numeric
+    explanation_template: 'The point {a} is not the excluded input 2.
+
+      In a neighborhood of this point, f equals x+2 and therefore has derivative 1.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - cancellation_does_not_extend_domain
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_PRODUCT_ERROR
+    type: fixed
+    prompt_template: A learner claims the derivative of x*x at x=3 is 1*1=1. What is the actual derivative value?
+      Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: 'Differentiate the product correctly: 1*x+x*1=2x. At 3 this is 6.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - two_product_terms
+    difficulty: medium
+    options:
+    - id: A
+      label: '1'
+    - id: B
+      label: '6'
+    - id: C
+      label: '3'
+    - id: D
+      label: '9'
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_DOMAIN
+    type: fixed
+    prompt_template: Where can the ordinary derivative of 1/(x-5) be defined on the real line? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: A reciprocal of an affine function is differentiable wherever the original denominator
+      is nonzero.
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - function_vs_derivative_domain
+    difficulty: easy
+    options:
+    - id: A
+      label: At every real input, including 5
+    - id: B
+      label: Only at positive inputs
+    - id: C
+      label: At every real input except 5
+    - id: D
+      label: At every real input except 0
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_AREA_RATE
+    type: generated
+    prompt_template: A rectangle has L={l} m and W={w} m. At that instant L'={dl} m/s and W'={dw} m/s. Find its
+      area rate in square metres per second.
+    variables:
+      l:
+        type: int
+        min: 2
+        max: 12
+        exclude: []
+      w:
+        type: int
+        min: 2
+        max: 12
+        exclude: []
+      dl:
+        type: choice
+        values:
+        - 0.5
+        - 1
+        - -0.5
+      dw:
+        type: choice
+        values:
+        - 0.25
+        - 0.5
+        - -0.25
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{dl*w+l*dw}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'A=L*W, so A''=L''*W+L*W''.
+
+      The area rate is ({dl})*{w}+{l}*({dw})={dl*w+l*dw} square metres per second.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - product_rate
+    - squared_units
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_AVERAGE_COST
+    type: generated
+    prompt_template: Total cost is C(q)=q^2+{k} for q>0. Find the derivative of average cost A(q)=C(q)/q at q={r}.
+      Enter an exact number.
+    variables:
+      k:
+        type: int
+        min: 10
+        max: 100
+        exclude: []
+      r:
+        type: int
+        min: 2
+        max: 10
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: 1-{k}/({r*r})
+    grading:
+      method: exact_numeric
+    explanation_template: 'A(q)=q+{k}/q, so A''(q)=1-{k}/q^2 for q>0.
+
+      At q={r}, the rate is 1-{k}/({r*r}).
+
+      This differs from the derivative 2q of total cost.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - average_vs_total_rate
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Differentiate the average-cost model, not the total-cost model. This records your working; the separate
+        capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_PQ_RATE_UNITS
+    type: fixed
+    prompt_template: Mass m(t) is in kilograms and volume V(t) is in cubic metres, with t in seconds. What are
+      the units of the time derivative of m(t)/V(t)? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: The quotient is density in kilograms per cubic metre. Differentiating it with respect
+      to time adds a per-second factor.
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - derivative_units
+    difficulty: medium
+    options:
+    - id: A
+      label: Kilograms per second
+    - id: B
+      label: Cubic metres per kilogram
+    - id: C
+      label: Kilograms per cubic metre
+    - id: D
+      label: Kilograms per cubic metre per second
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_SIMPLER_METHOD
+    type: fixed
+    prompt_template: Which is the simplest rule combination for differentiating x^3/5? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: The factor 1/5 is constant. The derivative is (1/5)*3x^2.
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - rule_selection
+    difficulty: easy
+    options:
+    - id: A
+      label: Constant-multiple and power rules
+    - id: B
+      label: Differentiate numerator and denominator separately, then divide
+    - id: C
+      label: Use the reciprocal of the derivative of x^3
+    - id: D
+      label: Treat the denominator as an unknown function with derivative 5
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_COMPONENT_HYPOTHESIS
+    type: fixed
+    prompt_template: At x=1 the denominator of abs(x-1)/(x+1) is nonzero. Does that fact alone justify applying
+      the quotient rule there? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: The numerator abs(x-1) has a corner at 1. In fact the quotient has unequal one-sided
+      slopes at that point.
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - differentiability_hypotheses
+    difficulty: hard
+    options:
+    - id: A
+      label: Yes; a nonzero denominator is the only hypothesis.
+    - id: B
+      label: No; differentiability of the numerator and denominator is also required.
+    - id: C
+      label: Yes; absolute value is everywhere nonnegative.
+    - id: D
+      label: No; quotients never have derivatives.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_PQ_REVIEW
+    type: fixed
+    prompt_template: For f(x)=(x^2-4)/(x-2), find f'(3). Enter the value, then compare the derivative domain of
+      f with that of the extension g(x)=x+2.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '1'
+    grading:
+      method: exact_numeric
+    explanation_template: 'For x!=2, f(x)=x+2 and f''(x)=1.
+
+      At 3 the derivative is 1.
+
+      f has neither a value nor a derivative at 2.
+
+      g is a different function, defined and differentiable at 2.'
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - reasoning_review
+    - explicit_hypotheses
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Explain the reasoning, not only the answer. Address each criterion below.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Records x!=2 before cancelling the common factor.
+          weight: 1
+        - id: criterion_2
+          description: Shows valid simplification or quotient-rule differentiation and obtains f'(3)=1.
+          weight: 1
+        - id: criterion_3
+          description: Explains why the missing original point does not regain a derivative after cancellation.
+          weight: 1
+        - id: criterion_4
+          description: Distinguishes f from its extension g, whose derivative at 2 is 1.
+          weight: 1
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+  - id: D6_PQ_FORMAL
+    type: fixed
+    prompt_template: Prove the derivative value of (x^2+1)/(x+1) at x=1 using quotient_derivative. Its denominator
+      at this point is 2, not zero. The separately reviewed question checks your understanding of cancelled holes.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    explanation_template: The author reference is a candidate, not learner evidence. Only a fresh complete submitted-proof
+      certificate earns formal credit.
+    solution_steps: []
+    mistake_tags:
+    - product_quotient_rules
+    - formal_proof
+    - fresh_certificate_required
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations:
+        - x:real
+        assumptions: []
+        goal: The derivative of (x^2+1)/(x+1) with respect to x at 1 is 1/2.
+      parameter_contract:
+        required_public: []
+      allowed_rules:
+      - quotient_derivative
+      assessment_policy: {}
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: The derivative of (x^2+1)/(x+1) with respect to x at 1 is 1/2.
+          rule: quotient_derivative
+          premises: []
+          parameters: {}
+          scope: root
+      environment:
+        backend: lean4
+        library: mathlib
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c
+media:
+- type: image
+  src: media/native-derivatives-batch6/product-area.svg
+  alt: A rectangle decomposes into original area uv, strips v times delta u and u times delta v, and a corner
+    delta u times delta v.
+  caption: A rectangle decomposes into original area uv, strips v times delta u and u times delta v, and a corner
+    delta u times delta v.
+  width: 900
+  height: 580
+  fit: contain
+- type: image
+  src: media/native-derivatives-batch6/quotient-hole.svg
+  alt: The rational function (x squared minus 4)/(x minus 2) follows the line x+2 but retains an open hole at
+    (2,4).
+  caption: The rational function (x squared minus 4)/(x minus 2) follows the line x+2 but retains an open hole
+    at (2,4).
+  width: 900
+  height: 580
+  fit: contain

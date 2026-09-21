@@ -1,0 +1,1136 @@
+id: MATH_CALC_003
+schema_version: '0.2'
+name: Derivatives as local rates and limits
+domain: Math
+subdomain: Calculus
+topic: Differentiation
+description: Connect secant slopes, difference quotients, finite two-sided limits, tangent lines, and instantaneous
+  rates; distinguish point values, approximation, and failure of differentiability.
+prerequisites:
+- MATH_FUNC_007
+- MATH_CALC_001
+- MATH_CALC_002
+unlocks:
+- MATH_CALC_004
+tags:
+- calculus
+- derivatives
+- reasoning
+- graph_interpretation
+- domain_restrictions
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'A derivative describes local change. An average rate uses two distinct inputs; a derivative asks what
+  those rates approach as the second input moves toward the first. This lesson connects the difference quotients
+  and limits you already know. All functions and derivatives here are real. An ordinary derivative means a finite,
+  two-sided derivative at an interior point unless a question explicitly asks about one-sided behavior.
+
+
+
+  From a secant to a local rate:
+
+  For a function f and distinct inputs a and a+h, the average rate is [f(a+h)-f(a)]/h. The numerator is a change
+  in output, not the output itself. The denominator is a change in input and may be positive or negative, but
+  it is not zero. On a graph this quotient is the slope of a secant through two points. As h approaches zero,
+  the points approach each other. If the quotients approach one common finite value, that value is f''(a).
+
+
+
+  The definition:
+
+  f''(a) = lim as h -> 0 of [f(a+h)-f(a)]/h.
+
+  A prime does not mean multiplication, an inverse function, or a reciprocal. If y=f(x), dy/dx is another notation
+  for the derivative. At this stage treat it as derivative notation, not permission to cancel arbitrary symbols.
+  A derivative at a point is a number. The derivative function f''(x) assigns that number at each input where
+  it exists.
+
+
+
+  A complete first-principles calculation:
+
+  Let f(x)=x^2 and a=3. Then f(3+h)=(3+h)^2 and f(3)=9. The quotient is [(3+h)^2-9]/h. Expanding the numerator
+  gives 6h+h^2. For h!=0, division gives 6+h. Only now take the limit: f''(3)=6. The excluded increment remains
+  excluded from the original quotient. A limit of 6 does not turn division by zero into a valid operation.
+
+
+
+  The same calculation at a general input gives [(a+h)^2-a^2]/h=2a+h for h!=0, so the derivative function of x^2
+  is 2x. At a=-2 it is -4; at zero it is zero. The graph can have a horizontal tangent at one point without being
+  a constant function. A tangent need not touch the graph only once or stay entirely on one side of it: y=0 is
+  tangent to y=x^3 at zero and the curve crosses it there.
+
+
+
+  Other definitions-based examples:
+
+  For f(x)=mx+b, the output change is mh, so every nonzero-increment quotient equals m. A constant output has
+  zero output change and derivative zero. For x^3, expansion gives [ (a+h)^3-a^3 ]/h=3a^2+3ah+h^2 for h!=0, hence
+  the derivative at a is 3a^2. These results are consequences of the definition, not rules that should be invoked
+  when an exercise specifically asks for first principles.
+
+
+
+  Roots and reciprocals:
+
+  For sqrt(x) at a=4, multiply the difference quotient by the conjugate. On nearby allowed inputs, [sqrt(4+h)-2]/h
+  becomes 1/[sqrt(4+h)+2], whose limit is 1/4. At a general positive a the corresponding result is 1/[2sqrt(a)].
+  For 1/x at a!=0, combine the numerator fractions to obtain -1/[a(a+h)] for h!=0 and a+h!=0. The limit is -1/a^2.
+  State the function''s original domain as well as the increment restriction.
+
+
+
+  When the derivative fails:
+
+  For f(x)=abs(x) at zero, the difference quotient is abs(h)/h. It equals -1 to the left and 1 to the right. The
+  two-sided derivative does not exist because the sides disagree. Continuity alone therefore does not guarantee
+  differentiability. Conversely, differentiability at an interior point implies continuity there. A jump, an unfilled
+  hole, or a reassigned point value can prevent differentiability even when a nearby simplified curve looks smooth.
+
+
+
+  At an endpoint such as zero for sqrt(x), this lesson does not invent a missing real left neighborhood. Even
+  the right-hand quotient equals 1/sqrt(h) for h>0 and grows without bound. That is not a finite ordinary derivative.
+  Keep a finite slope, unequal one-sided slopes, an undefined function value, and unbounded one-sided slope conceptually
+  separate.
+
+
+
+  Interpretation and approximation:
+
+  If s measures position in metres and t measures time in seconds, s''(a) has units metres per second. Its sign
+  indicates direction in that coordinate, not whether the position itself is positive. A negative temperature
+  derivative means cooling; it does not imply a negative temperature. For small delta, f(a+delta) is approximately
+  f(a)+f''(a)*delta when the local linear model is appropriate. This is an approximation, not a claim that every
+  curved graph is a line.
+
+
+
+  The tangent through (a,f(a)) has equation y=f(a)+f''(a)(x-a). The point value locates the line and the derivative
+  controls its slope. Do not substitute f(a) for the slope. Numerical tables and graphs help form and check conjectures,
+  but finitely many samples alone do not establish a limit. In the formal exercise, prove the exact punctured
+  limit first, then cite it with derivative_from_limit. A shortcut polynomial derivative is not evidence that
+  you used the requested definition.
+
+
+  Before calculating, identify the original function, evaluation point, and increment separately.'
+math_blocks:
+- type: limit
+  variable: h
+  to: '0'
+  direction: both
+  expression: (f(a+h)-f(a))/h
+  alt: Two-sided limit as h approaches 0
+  linear_text: lim as h -> 0 of (f(a+h)-f(a))/h
+- type: notation
+  text: f'(a) = lim_{h -> 0} (f(a+h)-f(a))/h; h != 0 in the quotient
+  alt: Definition of the derivative at an interior point
+  linear_text: f'(a) = lim_{h -> 0} (f(a+h)-f(a))/h; h != 0 in the quotient
+- type: notation
+  text: y = f(a) + f'(a)*(x-a)
+  alt: Tangent line using the point value and the derivative slope
+  linear_text: y = f(a) + f'(a)*(x-a)
+examples:
+- prompt: For f(x)=x^2, find the secant slope from x=3 to x=3.2.
+  solution: '6.2'
+  explanation: The output change is 10.24-9=1.24 and the input change is 0.2. Divide to obtain 6.2; this is an
+    average rate, not exactly f'(3).
+- prompt: Use the definition to find the derivative of x^2 at 3.
+  solution: '6'
+  explanation: For h!=0, [(3+h)^2-9]/h=(6h+h^2)/h=6+h. Its two-sided limit is 6. The original quotient remains
+    undefined at h=0.
+- prompt: Find the derivative function of f(x)=x^2 using the definition.
+  solution: f'(x)=2x
+  explanation: At a general input x, [(x+h)^2-x^2]/h=2x+h for h!=0. Let h tend to zero with x held fixed.
+- prompt: Use the definition for f(x)=-4x+7.
+  solution: f'(x)=-4
+  explanation: f(x+h)-f(x)=-4h. Dividing by h!=0 gives -4 on both sides; the intercept does not affect the rate.
+- prompt: Find the derivative of f(x)=x^3 at -1 using first principles.
+  solution: '3'
+  explanation: '[(-1+h)^3-(-1)^3]/h=3-3h+h^2 for h!=0. The limit is 3, although f(-1)=-1.'
+- prompt: Find the derivative of sqrt(x) at 4 by a conjugate.
+  solution: 1/4
+  explanation: For h!=0 near 0, [sqrt(4+h)-2]/h=1/[sqrt(4+h)+2]. The denominator approaches 4; nearby radicands
+    are positive.
+- prompt: Find the derivative of 1/x at 2 from the quotient.
+  solution: -1/4
+  explanation: '[1/(2+h)-1/2]/h=-1/[2(2+h)] for h!=0 and h!=-2. The limit at h=0 is -1/4.'
+- prompt: Does abs(x) have a derivative at zero?
+  solution: No finite two-sided derivative
+  explanation: The quotient abs(h)/h equals -1 for h<0 and 1 for h>0. Continuity at zero does not make those limits
+    equal.
+- prompt: Find the tangent to y=x^2 at x=-2.
+  solution: y=4-4(x+2), or y=-4x-4
+  explanation: The point is (-2,4) and the derivative there is -4. Use y=f(a)+f'(a)(x-a); the output 4 is not
+    the slope.
+- prompt: If f(5)=12 and f'(5)=-3, use the local linear model to estimate f(5.02).
+  solution: Approximately 11.94
+  explanation: The input change is 0.02. The model predicts output change -3*0.02=-0.06, so 12-0.06=11.94. It
+    is not an exact equality for an arbitrary f.
+applications:
+- title: Motion
+  description: Position changes over intervals give average velocity; their local limit gives signed instantaneous
+    velocity. State metres, seconds, and the coordinate direction.
+- title: Sensor response
+  description: A calibration curve can change slowly or quickly near an operating point. Its derivative describes
+    local sensitivity, not the sensor reading itself.
+- title: Local estimates
+  description: Use the tangent model to estimate a nearby value while keeping the approximation sign and a sensible
+    input range.
+- title: Model boundaries
+  description: Corners, jumps, holes, and endpoints distinguish a defined output from a finite ordinary derivative.
+    Explain the failure instead of forcing a number.
+test:
+  question_count: 21
+  randomize_order: true
+  questions:
+  - id: D6_DEF_SECANT
+    type: generated
+    prompt_template: For f(x)=x^2, find the secant slope from input {a} to input {b}. Enter a number.
+    variables:
+      a:
+        type: int
+        min: -3
+        max: 2
+        exclude: []
+      gap:
+        type: int
+        min: 1
+        max: 3
+        exclude: []
+    derived:
+      b: a+gap
+    constraints: []
+    answer:
+      type: numeric
+      value: '{a+b}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Divide the output change {b*b-a*a} by the nonzero input change {b-a}.
+
+      Factoring gives the slope a+b={a+b}. This is an average rate.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - average_vs_instantaneous
+    - difference_quotient
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    diagram:
+      kind: cartesian
+      x_range:
+      - -4
+      - 6
+      y_range:
+      - -2
+      - 38
+      alt: The graph y=x squared and the secant through inputs {a} and {b}.
+      curves:
+      - expression: x**2
+        interval:
+        - -4
+        - 6
+      segments:
+      - from:
+        - '{a}'
+        - ({a})**2
+        to:
+        - '{b}'
+        - ({b})**2
+  - id: D6_DEF_QUOTIENT
+    type: fixed
+    prompt_template: For f(x)=x^2 at input 3, simplify [(3+h)^2-9]/h for h!=0. Enter an expression in h.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: h+6
+      variable: h
+    grading:
+      method: symbolic_expression
+    explanation_template: 'Expand (3+h)^2=9+6h+h^2.
+
+      Subtract 9, factor h, and divide only for h!=0.
+
+      The simplified expression is h+6; the original quotient remains undefined at zero.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - quotient_setup
+    - domain_restriction
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Expand the numerator and state where cancellation is valid. This records your working; the separate
+        capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+    math_blocks:
+    - type: fraction
+      numerator: (3+h)^2-9
+      denominator: h
+      alt: Difference quotient at input 3; h must be nonzero
+      linear_text: ((3+h)^2-9)/(h)
+  - id: D6_DEF_SQUARE_AT
+    type: generated
+    prompt_template: Use a difference quotient to find f'({a}) for f(x)=x^2. Enter a number.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{2*a}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'For h!=0, [({a}+h)^2-({a})^2]/h=2*({a})+h.
+
+      The common two-sided limit is {2*a}.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - nonzero_increment
+    - limit_after_simplification
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Write the original quotient, simplify for h!=0, and take the limit. This records your working; the
+        separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+    math_blocks:
+    - type: limit
+      variable: h
+      to: '0'
+      direction: both
+      expression: (({a}+h)^2-({a})^2)/h
+      alt: Two-sided limit as h approaches 0
+      linear_text: lim as h -> 0 of (({a}+h)^2-({a})^2)/h
+  - id: D6_DEF_CUBE_AT
+    type: generated
+    prompt_template: Use a difference quotient to find f'({a}) for f(x)=x^3. Enter a number.
+    variables:
+      a:
+        type: int
+        min: -3
+        max: 3
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{3*a*a}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Expand ({a}+h)^3 before subtracting ({a})^3.
+
+      For h!=0 the quotient is 3*({a})^2+3*({a})*h+h^2.
+
+      Its limit is {3*a*a}.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - binomial_expansion
+    - nonzero_increment
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Show the cancelled quotient before evaluating its limit. This records your working; the separate
+        capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_DEF_AFFINE
+    type: generated
+    prompt_template: For f(x)=({m})*x+({b}), find the derivative at input {a}. Enter a number.
+    variables:
+      m:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -9
+        max: 9
+        exclude: []
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{m}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'The output change is ({m})*h.
+
+      For h!=0 the quotient is {m}, independent of the point and intercept.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - slope_vs_intercept
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    diagram:
+      kind: cartesian
+      x_range:
+      - -2
+      - 2
+      y_range:
+      - -25
+      - 25
+      alt: The stated affine function with coefficient {m} and intercept {b}; no slope answer is labelled.
+      curves:
+      - expression: ({m})*x+({b})
+        interval:
+        - -2
+        - 2
+  - id: D6_DEF_CONSTANT
+    type: generated
+    prompt_template: A function has f(x)={c} for every real x. What is f'({a})?
+    variables:
+      c:
+        type: int
+        min: -20
+        max: 20
+        exclude: []
+      a:
+        type: int
+        min: -6
+        max: 6
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '0'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Both nearby outputs equal {c}; their difference is zero.
+
+      Every nonzero-increment quotient is zero, so its limit is zero.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - constant_derivative
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    diagram:
+      kind: cartesian
+      x_range:
+      - -2
+      - 2
+      y_range:
+      - '{c}-2'
+      - '{c}+2'
+      alt: The constant function with output {c}.
+      curves:
+      - expression: '{c}'
+        interval:
+        - -2
+        - 2
+  - id: D6_DEF_TANGENT
+    type: generated
+    prompt_template: Find the tangent to y=x^2 at x={a}. Enter only the right-hand side of y=... in x.
+    variables:
+      a:
+        type: int
+        min: -4
+        max: 4
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: ({2*a})*x-({a*a})
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'The point is ({a},{a*a}) and the derivative slope is {2*a}.
+
+      y={a*a}+({2*a})*(x-({a})).
+
+      Expanding gives ({2*a})*x-({a*a}).'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - point_value_vs_slope
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Identify the point value and slope separately, then form the line. This records your working; the
+        separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_DEF_MOTION
+    type: generated
+    prompt_template: Position is s(t)=({k})*t^2+({b}) metres, with t in seconds. Find instantaneous velocity at
+      t={a} seconds. Enter metres per second.
+    variables:
+      k:
+        type: int
+        min: -4
+        max: 4
+        exclude:
+        - 0
+      b:
+        type: int
+        min: 0
+        max: 20
+        exclude: []
+      a:
+        type: int
+        min: 1
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{2*k*a}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'A difference quotient gives s''(t)=2*({k})*t.
+
+      At {a} seconds this is {2*k*a} metres per second; the position offset contributes no change.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - velocity_vs_position
+    - units
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_DEF_ABS_LEFT
+    type: fixed
+    prompt_template: For f(x)=abs(x), what is the left-hand limit of [f(h)-f(0)]/h as h approaches 0?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '-1'
+    grading:
+      method: exact_numeric
+    explanation_template: 'For h<0, abs(h)=-h.
+
+      The quotient equals -1 throughout the left punctured neighborhood.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - one_sided_derivatives
+    - continuity_vs_differentiability
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    diagram:
+      kind: cartesian
+      x_range:
+      - -3
+      - 3
+      y_range:
+      - -1
+      - 4
+      alt: The V-shaped graph y=absolute value of x; the question asks about approach from negative inputs.
+      curves:
+      - expression: abs(x)
+        interval:
+        - -3
+        - 3
+  - id: D6_DEF_ABS_RIGHT
+    type: fixed
+    prompt_template: For f(x)=abs(x), what is the right-hand limit of [f(h)-f(0)]/h as h approaches 0?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '1'
+    grading:
+      method: exact_numeric
+    explanation_template: 'For h>0, abs(h)=h.
+
+      The quotient is 1 on the right punctured neighborhood.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - one_sided_derivatives
+    - continuity_vs_differentiability
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_DEF_ABS_EXISTENCE
+    type: fixed
+    prompt_template: At zero, abs(x) has left-hand derivative -1 and right-hand derivative 1. What follows? Select
+      one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: A two-sided derivative requires a single common finite limit. Unequal sides cannot be
+      averaged into one.
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - one_sided_derivatives
+    - continuity_vs_differentiability
+    difficulty: medium
+    options:
+    - id: A
+      label: Its derivative is 0, the average of the two sides.
+    - id: B
+      label: Its finite two-sided derivative does not exist.
+    - id: C
+      label: Its derivative is 1 because absolute value is nonnegative.
+    - id: D
+      label: Its derivative is -1 because negative increments are allowed.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_DEF_ROOT_AT4
+    type: fixed
+    prompt_template: Use a conjugate difference quotient to find the derivative of sqrt(x) at 4. Enter an exact
+      number.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: 1/4
+    grading:
+      method: exact_numeric
+    explanation_template: 'Multiply by [sqrt(4+h)+2]/[sqrt(4+h)+2].
+
+      For h!=0 near zero, the quotient becomes 1/[sqrt(4+h)+2].
+
+      Its limit is 1/4.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - principal_root
+    - derivative_domain
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: State the nearby domain, show the conjugate, and retain the h!=0 puncture. This records your working;
+        the separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_DEF_RECIPROCAL
+    type: generated
+    prompt_template: For f(x)=1/x, find f'({a}) using the difference quotient. Enter an exact number.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: -1/(({a})^2)
+    grading:
+      method: exact_numeric
+    explanation_template: 'The original function requires x!=0.
+
+      Near {a}, the quotient simplifies to -1/[({a})*({a}+h)] for h!=0 and {a}+h!=0.
+
+      The limit is -1/({a}^2).'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - denominator_restriction
+    - derivative_sign
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Combine the numerator fractions before cancelling the increment. This records your working; the
+        separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_DEF_CHANGED_VALUE
+    type: fixed
+    prompt_template: Let f(x)=x^2 for x!=1, but f(1)=5. Is f differentiable at 1? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: The surrounding values approach 1 but f(1)=5. Differentiability at an interior point
+      implies continuity; the changed function fails that necessary condition.
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - point_value_vs_limit
+    - continuity_vs_differentiability
+    difficulty: medium
+    options:
+    - id: A
+      label: 'Yes: the surrounding curve has slope 2.'
+    - id: B
+      label: 'Yes: f''(1)=5 because that is the assigned value.'
+    - id: C
+      label: 'No: f is not continuous at 1, so it is not differentiable there.'
+    - id: D
+      label: 'Yes: changing one point never affects a derivative.'
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    diagram:
+      kind: cartesian
+      x_range:
+      - -1
+      - 2
+      y_range:
+      - -1
+      - 6
+      alt: The curve y=x squared with input 1 removed and a filled point at (1,5).
+      curves:
+      - expression: x**2
+        interval:
+        - -1
+        - 2
+        exclude:
+        - 1
+      points:
+      - at:
+        - 1
+        - 1
+        endpoint: open
+      - at:
+        - 1
+        - 5
+        endpoint: closed
+  - id: D6_DEF_UNITS
+    type: fixed
+    prompt_template: A tank model V(t) records volume in litres and time in minutes. What are the units of V'(t)?
+      Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: The difference quotient divides a change in litres by a change in minutes.
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - derivative_units
+    difficulty: easy
+    options:
+    - id: A
+      label: Litres
+    - id: B
+      label: Minutes per litre
+    - id: C
+      label: Litres per minute squared
+    - id: D
+      label: Litres per minute
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_DEF_LOCAL_LINEAR
+    type: generated
+    prompt_template: Use the local linear approximation when f({a})={v} and f'({a})={m}. Estimate f({target}),
+      where the input change is {d}.
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 8
+        exclude: []
+      v:
+        type: int
+        min: 5
+        max: 20
+        exclude: []
+      m:
+        type: int
+        min: -5
+        max: 5
+        exclude:
+        - 0
+      d:
+        type: choice
+        values:
+        - 0.01
+        - 0.02
+        - -0.01
+        - -0.02
+    derived:
+      target: a+d
+    constraints: []
+    answer:
+      type: numeric
+      value: '{v+m*d}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Approximate output change by slope times input change: ({m})*({d}).
+
+      Add that change to {v}, giving {v+m*d}.
+
+      This is a local model, not a claim of exact equality.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - approximation_vs_equality
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_DEF_TABLE_EVIDENCE
+    type: fixed
+    prompt_template: Several small positive and negative increments give secant slopes close to 6. What does this
+      evidence establish on its own? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: Finitely many samples cannot determine every nearby value of an unspecified function.
+      A mathematical limit argument is still needed.
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - finite_samples_vs_proof
+    difficulty: medium
+    options:
+    - id: A
+      label: It supports a conjecture of derivative 6 but does not prove the limit.
+    - id: B
+      label: It proves the derivative is exactly 6 for every function fitting the samples.
+    - id: C
+      label: It proves the original quotient is defined at zero.
+    - id: D
+      label: It proves the whole graph is a straight line of slope 6.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_DEF_TANGENT_CROSSING
+    type: fixed
+    prompt_template: The graph y=x^3 has derivative 0 at zero and crosses y=0 there. Which statement is correct?
+      Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: The difference quotient at zero is h^2, whose limit is zero. The curve takes opposite
+      signs on the two sides and is not constant.
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - point_value_vs_slope
+    difficulty: medium
+    options:
+    - id: A
+      label: A tangent is forbidden to cross a curve.
+    - id: B
+      label: A tangent can cross the curve, and a horizontal tangent need not be an extremum.
+    - id: C
+      label: A derivative of zero makes the entire function constant.
+    - id: D
+      label: Crossing proves the derivative does not exist.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_DEF_VALUE_VS_RATE
+    type: fixed
+    prompt_template: For f(x)=x^2 at x=3, what are f(3) and f'(3), respectively? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: The function value is 3^2=9. The definition-based derivative at 3 is 2*3=6.
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - point_value_vs_slope
+    difficulty: easy
+    options:
+    - id: A
+      label: 6 and 9
+    - id: B
+      label: 9 and 9
+    - id: C
+      label: 9 and 6
+    - id: D
+      label: 3 and 2
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_DEF_REVIEW
+    type: fixed
+    prompt_template: For f(x)=x^2 at a=-2, use first principles to find f'(-2). Enter the derivative value, then
+      explain why the quotient can be simplified without assigning h=0 to it.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '-4'
+    grading:
+      method: exact_numeric
+    explanation_template: 'The quotient is [(-2+h)^2-4]/h.
+
+      For h!=0 it equals -4+h.
+
+      Both sides approach -4.
+
+      The original quotient is not defined at zero; its limit is.'
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - reasoning_review
+    - explicit_hypotheses
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Explain the reasoning, not only the answer. Address each criterion below.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Writes [(-2+h)^2-4]/h rather than a function value or reversed change.
+          weight: 1
+        - id: criterion_2
+          description: Expands correctly and cancels h only under h!=0.
+          weight: 1
+        - id: criterion_3
+          description: Establishes the same finite limit from both sides and identifies it as the derivative.
+          weight: 1
+        - id: criterion_4
+          description: Distinguishes the point value f(-2)=4, secant slopes -4+h, and limiting slope -4.
+          weight: 1
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+  - id: D6_DEF_FORMAL
+    type: fixed
+    prompt_template: Use the definition of the derivative to prove that x^2 has derivative 6 at x=3. First establish
+      the limit of ((3+h)^2-3^2)/h as h approaches 0 from both sides, then cite that limit with derivative_from_limit.
+      Keep the original quotient structure in the limit claim; simplification belongs in the limit step parameters.
+      A shortcut differentiation rule does not meet this method requirement.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    explanation_template: The author reference is a candidate, not learner evidence. Only a fresh complete submitted-proof
+      certificate earns formal credit.
+    solution_steps: []
+    mistake_tags:
+    - derivative_definition
+    - formal_proof
+    - fresh_certificate_required
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations:
+        - x:real
+        - h:real
+        assumptions: []
+        goal: The derivative of x^2 with respect to x at 3 is 6.
+      parameter_contract:
+        required_public: []
+      allowed_rules:
+      - rational_hole_limit
+      - derivative_from_limit
+      assessment_policy:
+        required_method: derivative_definition
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: As h approaches 0 from both sides, ((3+h)^2-3^2)/h approaches 6.
+          rule: rational_hole_limit
+          premises: []
+          parameters:
+            simplified: h+6
+          scope: root
+        - claim: The derivative of x^2 with respect to x at 3 is 6.
+          rule: derivative_from_limit
+          premises:
+          - reference_step_1
+          parameters: {}
+          scope: root
+      environment:
+        backend: lean4
+        library: mathlib
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c
+media:
+- type: image
+  src: media/native-derivatives-batch6/definition-secants.svg
+  alt: For y=x squared, secants with increments 1, 0.5, and 0.2 at input 1 approach the tangent y=2x-1.
+  caption: For y=x squared, secants with increments 1, 0.5, and 0.2 at input 1 approach the tangent y=2x-1.
+  width: 900
+  height: 580
+  fit: contain
+- type: image
+  src: media/native-derivatives-batch6/definition-corner.svg
+  alt: Absolute value is continuous at zero but has left-hand slope -1 and right-hand slope 1.
+  caption: Absolute value is continuous at zero but has left-hand slope -1 and right-hand slope 1.
+  width: 900
+  height: 580
+  fit: contain

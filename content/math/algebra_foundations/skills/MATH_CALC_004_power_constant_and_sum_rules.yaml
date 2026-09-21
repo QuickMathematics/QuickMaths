@@ -1,0 +1,1073 @@
+id: MATH_CALC_004
+schema_version: '0.2'
+name: Power, constant, and sum rules
+domain: Math
+subdomain: Calculus
+topic: Differentiation
+description: Differentiate real polynomials using justified elementary rules, evaluate rates and tangents, and
+  distinguish stationary inputs from roots and extrema.
+prerequisites:
+- MATH_CALC_003
+- MATH_POLY_001
+- MATH_POLY_002
+unlocks:
+- MATH_CALC_005
+- MATH_CALC_006
+tags:
+- calculus
+- derivatives
+- reasoning
+- graph_interpretation
+- domain_restrictions
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'The derivative definition explains what a derivative means. Differentiation rules let us calculate efficiently
+  once that meaning is established. This lesson develops constant, constant-multiple, sum, difference, and nonnegative
+  integer-power rules. Its functions are polynomials, so their domains and derivative domains are all real numbers.
+  Products of nonconstant functions, quotients with variable denominators, and unexpanded nested functions belong
+  to later lessons.
+
+
+
+  Constants and identity:
+
+  A constant function f(x)=c has derivative zero because f(a+h)-f(a)=c-c=0 for every permitted increment. The
+  identity function f(x)=x has derivative one because its output change equals its input change. Consequently
+  an affine function mx+b has derivative m. Here m and b are constant with respect to x. Saying that a letter
+  is constant must be part of the problem, not a guess based on its appearance.
+
+
+
+  The power rule:
+
+  For a positive integer n, the derivative of x^n is n*x^(n-1). The exponent becomes a coefficient and then decreases
+  by one. For x^5 this produces 5x^4, not x^4, 5x^5, or x^6. For n=1 the result is one. Handle an explicitly constant
+  function separately rather than mechanically writing 0*x^(-1) and creating an artificial exception at zero.
+  The constant-one function has derivative zero at every real input.
+
+
+
+  Why the rule is reasonable:
+
+  The definition for x^n starts with [(a+h)^n-a^n]/h. In the binomial expansion, the a^n terms cancel. The next
+  term is n*a^(n-1)*h; every remaining term contains at least h^2. Dividing for h!=0 leaves n*a^(n-1) plus terms
+  containing h, which approach zero. This explains both the coefficient n and the reduced exponent. The rules
+  are connected to limits, not a new meaning of equality.
+
+
+
+  Constant multiples and addition:
+
+  The derivative of c*f(x) is c*f''(x) when c is constant. The derivative of f(x)+g(x) is f''(x)+g''(x), and subtraction
+  works similarly, provided the component derivatives exist at the point. These statements follow by distributing
+  the difference quotient and applying finite-limit laws. Preserve coefficients and signs before simplifying.
+  For 4x^3-5x+8, the derivative is 12x^2-5. The constant 8 disappears, but the coefficient 4 does not.
+
+
+
+  An organized calculation:
+
+  Identify the variable first. Split a polynomial into terms with their signs. Differentiate each term using a
+  stated rule. Combine the derivative terms, then evaluate at a point if requested. For p(t)=2t^4-3t^2+7, p''(t)=8t^3-6t.
+  At t=-1, this is -8+6=-2. Substituting into p itself gives a position or output, not a rate. Substituting too
+  early can erase the variable and lead to differentiating an already evaluated constant.
+
+
+
+  Representation matters:
+
+  Some expressions become polynomials after a justified expansion. To differentiate (x+3)^2 without a chain rule,
+  first expand it to x^2+6x+9, then differentiate to 2x+6. Likewise x^2/4 is (1/4)*x^2, so its derivative is x/2.
+  Division by a nonzero numerical constant is only constant multiplication. This does not license differentiating
+  x^2/(x+4) by ignoring the variable denominator.
+
+
+
+  Derivative values and tangent lines:
+
+  Once a derivative function is known, evaluate it at the required input. For f(x)=x^3 at x=2, f(2)=8 and f''(2)=12,
+  so the tangent is y=8+12(x-2). Its intercept is not obtained by confusing the input, output, and slope. A tangent
+  formula should pass through the original point and use the derivative slope. Equivalent expanded and point-slope
+  expressions describe the same line.
+
+
+
+  Graphs and stationary points:
+
+  Where a smooth graph slopes upward its derivative is positive, and where it slopes downward its derivative is
+  negative. A stationary point has derivative zero. Solve f''(x)=0 to find candidates, not f(x)=0. For x^2-4x+1
+  the stationary input is 2, while the function''s roots are different. A zero derivative at one point does not
+  prove that the function is constant or that a maximum or minimum occurs there. The function x^3 has derivative
+  zero at zero but keeps increasing through it. Classifying extrema rigorously is a later lesson.
+
+
+
+  Parameter and data problems:
+
+  Differentiation can determine an unknown constant. If f(x)=k*x^3 and f''(2)=36, then 12k=36 and k=3. When only
+  derivative data are given, use the linearity rules directly: if f''(a)=u and g''(a)=v, then the derivative of
+  2f-3g at a is 2u-3v. No formula for f or g is needed. However, function values cannot substitute for derivative
+  values.
+
+
+
+  Units and communication:
+
+  If a model gives distance in metres at time t seconds, its derivative is in metres per second. A constant offset
+  changes the position graph but not the velocity. Multiplying every output by a constant multiplies its derivative
+  by that same constant. Explain the operation being used rather than writing f=f'', which is generally false.
+  Algebraic equalities connect equivalent derivative expressions only after the differentiation step has been
+  justified.
+
+
+
+  Scope and self-check:
+
+  Ask whether every exponent is an allowed integer, whether coefficients are constant, whether signs survived,
+  and whether the question wants a function, a value, or a tangent. General rational powers and transcendental
+  functions require additional hypotheses or rules. The formal polynomial exercise checks the stated derivative
+  mathematically; the separately reviewed capstone checks your explanation and interpretation. Neither an answer-key
+  phrase nor unexplained working establishes those objectives.'
+math_blocks:
+- type: notation
+  text: d(x^n)/dx = n*x^(n-1) for integers n >= 1; d(c)/dx = 0
+  alt: Integer power and constant differentiation rules
+  linear_text: d(x^n)/dx = n*x^(n-1) for integers n >= 1; d(c)/dx = 0
+- type: notation
+  text: (a*f+b*g)' = a*f' + b*g' for constants a,b
+  alt: Constant-multiple and sum rules
+  linear_text: (a*f+b*g)' = a*f' + b*g' for constants a,b
+examples:
+- prompt: Differentiate f(x)=9.
+  solution: '0'
+  explanation: The output change is zero for every input change. The derivative of a constant is not the constant
+    itself.
+- prompt: Differentiate f(x)=x^5.
+  solution: 5x^4
+  explanation: 'Use the positive-integer power rule: multiply by 5 and reduce the exponent to 4.'
+- prompt: Differentiate f(x)=-3x^4+2x-8.
+  solution: -12x^3+2
+  explanation: Keep each term's sign. Differentiate -3x^4, 2x, and -8 separately; the last term contributes zero.
+- prompt: Differentiate p(t)=t^3/4-2t^2.
+  solution: p'(t)=3t^2/4-4t
+  explanation: The denominator 4 is a fixed coefficient. The variable is t, and both terms retain their numerical
+    multipliers.
+- prompt: For f(x)=2x^3-x^2+7, find f'(-2).
+  solution: '28'
+  explanation: 'First obtain f''(x)=6x^2-2x. Substitute -2 afterward: 6*4+4=28. Evaluating f(-2) answers a different
+    question.'
+- prompt: Differentiate (x+3)^2 without using the chain rule.
+  solution: 2x+6
+  explanation: Expand to x^2+6x+9, then apply the power, sum, and constant rules. This works because expansion
+    preserves the polynomial on all real inputs.
+- prompt: At a point a, f'(a)=4 and g'(a)=-2. Find the derivative of 3f-5g at a.
+  solution: '22'
+  explanation: Linearity gives 3*4-5*(-2)=22. The values f(a) and g(a) are not needed for this sum.
+- prompt: For f(x)=kx^3 with constant k, f'(2)=36. Find k.
+  solution: '3'
+  explanation: f'(x)=3kx^2, so f'(2)=12k. Solve 12k=36.
+- prompt: Find the stationary input of x^2-4x+1.
+  solution: x=2
+  explanation: Its derivative is 2x-4. Set that derivative equal to zero. The equation f(x)=0 would instead find
+    intercepts.
+- prompt: Find the tangent to y=x^3 at x=2.
+  solution: y=8+12(x-2)
+  explanation: Use the point value f(2)=8 and slope f'(2)=12. A zero derivative elsewhere would not make the entire
+    curve constant.
+applications:
+- title: Polynomial motion
+  description: Differentiate a polynomial position model without confusing an output offset with a velocity contribution.
+- title: Superposed effects
+  description: For a sum of differentiable components, their local rates add. Constant multipliers retain their
+    units and signs.
+- title: Sensitivity to input
+  description: Evaluate a derivative at the actual operating input before interpreting how rapidly the output
+    changes.
+- title: Stationary candidates
+  description: Solve a derivative equation to locate horizontal-tangent candidates. Reserve classification and
+    global comparisons for the later optimization lesson.
+test:
+  question_count: 21
+  randomize_order: true
+  questions:
+  - id: D6_RULE_CONSTANT
+    type: generated
+    prompt_template: Differentiate f(x)={c} with respect to x.
+    variables:
+      c:
+        type: int
+        min: -30
+        max: 30
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '0'
+    grading:
+      method: exact_numeric
+    explanation_template: A constant output has zero change, so its derivative is zero.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - constant_derivative
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_MONOMIAL
+    type: generated
+    prompt_template: Differentiate f(x)=({c})*x^{n}. Enter an expression in x.
+    variables:
+      c:
+        type: int
+        min: -7
+        max: 7
+        exclude:
+        - 0
+      n:
+        type: int
+        min: 2
+        max: 6
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: ({c*n})*x^{n-1}
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'Multiply the constant coefficient by the positive integer exponent.
+
+      Decrease the exponent by one, giving ({c*n})*x^{n-1}.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - power_rule
+    - coefficient_preservation
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    diagram:
+      kind: cartesian
+      x_range:
+      - -1
+      - 1
+      y_range:
+      - -8
+      - 8
+      alt: The stated monomial ({c}) times x to the power {n}.
+      curves:
+      - expression: ({c})*x**{n}
+        interval:
+        - -1
+        - 1
+  - id: D6_RULE_QUADRATIC
+    type: generated
+    prompt_template: Differentiate f(x)=({a})*x^2+({b})*x+({c}). Enter an expression in x.
+    variables:
+      a:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -9
+        max: 9
+        exclude: []
+      c:
+        type: int
+        min: -12
+        max: 12
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: ({2*a})*x+({b})
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'The quadratic term contributes ({2*a})*x, the linear term contributes {b}, and the
+      constant contributes zero.
+
+      Retain each coefficient and sign.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Show the derivative contribution of each term. This records your working; the separate capstone
+        requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_RULE_CUBIC_AT
+    type: generated
+    prompt_template: For f(x)=({a})*x^3+({b})*x^2+({c})*x, find f'({r}).
+    variables:
+      a:
+        type: int
+        min: -4
+        max: 4
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+      c:
+        type: int
+        min: -8
+        max: 8
+        exclude: []
+      r:
+        type: int
+        min: -3
+        max: 3
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{3*a*r*r+2*b*r+c}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'First differentiate: f''(x)=({3*a})*x^2+({2*b})*x+({c}).
+
+      Then substitute x={r}, giving {3*a*r*r+2*b*r+c}.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_NEGATIVE_SIGN
+    type: fixed
+    prompt_template: A learner differentiates -5x^4 as 20x^3. What is the correction? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: The constant-multiple rule preserves -5 and the power rule multiplies it by 4.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - sign_error
+    difficulty: easy
+    options:
+    - id: A
+      label: 'Keep the negative coefficient: the derivative is -20x^3.'
+    - id: B
+      label: 'Keep the power: the derivative is -20x^4.'
+    - id: C
+      label: 'Only reduce the exponent: the derivative is -5x^3.'
+    - id: D
+      label: A negative function has no real derivative.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_FRACTION
+    type: generated
+    prompt_template: For p(t)=t^3/{d}, find p'({r}). Enter an exact number.
+    variables:
+      d:
+        type: int
+        min: 2
+        max: 8
+        exclude: []
+      r:
+        type: int
+        min: -4
+        max: 4
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{3*r*r}/{d}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'The nonzero denominator {d} is a constant coefficient.
+
+      p''(t)=3t^2/{d}, so at {r} the result is {3*r*r}/{d}.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - constant_multiple
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_SUM_DATA
+    type: generated
+    prompt_template: At an input a, f'(a)={u} and g'(a)={v}. Find (f+g)'(a).
+    variables:
+      u:
+        type: int
+        min: -12
+        max: 12
+        exclude: []
+      v:
+        type: int
+        min: -12
+        max: 12
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{u+v}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Both derivatives exist, so the sum rule applies.
+
+      Add the rates: {u}+({v})={u+v}.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - linearity
+    - value_vs_rate
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_LINEAR_COMBINATION
+    type: generated
+    prompt_template: At a, f'(a)={u} and g'(a)={v}. Find the derivative of {p}*f-{q}*g at a.
+    variables:
+      u:
+        type: int
+        min: -8
+        max: 8
+        exclude: []
+      v:
+        type: int
+        min: -8
+        max: 8
+        exclude: []
+      p:
+        type: int
+        min: 2
+        max: 5
+        exclude: []
+      q:
+        type: int
+        min: 2
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{p*u-q*v}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Use constant multiplication and subtraction.
+
+      The rate is {p}*({u})-{q}*({v})={p*u-q*v}.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - linearity
+    - sign_error
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_EXPAND_SQUARE
+    type: generated
+    prompt_template: Differentiate (x+({b}))^2 by expanding before applying the power and sum rules. Enter an
+      expression in x.
+    variables:
+      b:
+        type: int
+        min: -6
+        max: 6
+        exclude:
+        - 0
+    derived: {}
+    constraints: []
+    answer:
+      type: expression
+      value: 2*x+({2*b})
+      variable: x
+    grading:
+      method: symbolic_expression
+    explanation_template: 'Expand to x^2+({2*b})*x+({b*b}).
+
+      Differentiate the terms to obtain 2*x+({2*b}).'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - expand_before_differentiating
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Show the expanded polynomial and its term-by-term derivative. This records your working; the separate
+        capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_RULE_LINEAR_TERM
+    type: generated
+    prompt_template: For f(x)=({m})*x+({b}), what is f'(x)? Enter a number.
+    variables:
+      m:
+        type: int
+        min: -9
+        max: 9
+        exclude:
+        - 0
+      b:
+        type: int
+        min: -15
+        max: 15
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{m}'
+    grading:
+      method: exact_numeric
+    explanation_template: The derivative of x is 1, so the linear term contributes {m}. The constant contributes
+      zero.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    difficulty: easy
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_PARAMETER
+    type: generated
+    prompt_template: Let f(x)=k*x^3 with constant k. Given f'(2)={target}, find k.
+    variables:
+      k:
+        type: int
+        min: -7
+        max: 7
+        exclude:
+        - 0
+    derived:
+      target: 12*k
+    constraints: []
+    answer:
+      type: numeric
+      value: '{k}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Differentiate to get 3*k*x^2.
+
+      At x=2 the derivative is 12*k.
+
+      Solve 12*k={target}, obtaining k={k}.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - constant_vs_variable
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: capture_only
+      prompt: Differentiate before substituting, then solve for the parameter. This records your working; the
+        separate capstone requires a reasoning review.
+    review_policy:
+      work_review: optional
+      mastery_requires_review_pass: false
+      allow_self_review: false
+  - id: D6_RULE_STATIONARY_INPUT
+    type: generated
+    prompt_template: Find the stationary input of f(x)=x^2-({2*a})*x+({b}). Enter the input, not the output.
+    variables:
+      a:
+        type: int
+        min: -5
+        max: 5
+        exclude: []
+      b:
+        type: int
+        min: -8
+        max: 8
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{a}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'Stationary means f''(x)=0.
+
+      The derivative is 2*x-({2*a}), so the stationary input is {a}.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - stationary_vs_root
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_ZERO_AT_POINT
+    type: fixed
+    prompt_template: For f(x)=x^3, f'(0)=0. What can be concluded from that equality alone? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: The derivative is 3x^2, which vanishes at zero. The original cubic still passes from
+      negative to positive values through that point.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - stationary_vs_extremum
+    difficulty: medium
+    options:
+    - id: A
+      label: The function is constant on every interval.
+    - id: B
+      label: The tangent is horizontal at zero; a maximum or minimum is not guaranteed.
+    - id: C
+      label: Zero is necessarily a local maximum.
+    - id: D
+      label: Zero is necessarily a local minimum.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_VERTICAL_SHIFT
+    type: fixed
+    prompt_template: Functions p and q satisfy q(x)=p(x)+100, with p differentiable. How are their derivatives
+      related? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: The added constant changes every output equally, so it contributes no output change
+      and no derivative.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - constant_derivative
+    difficulty: easy
+    options:
+    - id: A
+      label: q'(x)=p'(x)+100
+    - id: B
+      label: q'(x)=100*p'(x)
+    - id: C
+      label: q'(x)=p'(x)
+    - id: D
+      label: q'(x)=p'(x)/100
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_EXPONENT_ERROR
+    type: fixed
+    prompt_template: Which derivative correctly differentiates 2x^5-3x^2+4? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    explanation_template: Multiply each power by its exponent, reduce each exponent by one, and differentiate
+      the constant to zero.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - power_rule
+    - exponent_error
+    difficulty: medium
+    options:
+    - id: A
+      label: 2x^4-3x
+    - id: B
+      label: 10x^5-6x^2
+    - id: C
+      label: 10x^4-6x+4
+    - id: D
+      label: 10x^4-6x
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_CONSTANT_PARAMETER
+    type: fixed
+    prompt_template: In f(x)=a*x^2, a is explicitly constant with respect to x. What is f'(x)? Select one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    explanation_template: The constant-multiple rule retains a; the derivative of x^2 is 2x.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - constant_derivative
+    - constant_vs_variable
+    difficulty: easy
+    options:
+    - id: A
+      label: 2*a*x
+    - id: B
+      label: a^2
+    - id: C
+      label: 2*x
+    - id: D
+      label: x^2
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_GRAPH_SLOPE
+    type: generated
+    prompt_template: For the displayed f(x)=x^2-4*x+1, find the tangent slope at x={a}.
+    variables:
+      a:
+        type: int
+        min: -1
+        max: 5
+        exclude: []
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '{2*a-4}'
+    grading:
+      method: exact_numeric
+    explanation_template: 'The derivative is 2*x-4.
+
+      At x={a}, the slope is {2*a-4}. The graph is a consistency check, not a substitute for the derivative.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - graph_interpretation
+    difficulty: medium
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    diagram:
+      kind: cartesian
+      x_range:
+      - -2
+      - 6
+      y_range:
+      - -5
+      - 15
+      alt: Graph of the stated parabola; the tangent input is {a}.
+      curves:
+      - expression: x**2-4*x+1
+        interval:
+        - -2
+        - 6
+      points:
+      - at:
+        - '{a}'
+        - ({a})**2-4*{a}+1
+        label: x={a}
+  - id: D6_RULE_EVALUATE_ORDER
+    type: fixed
+    prompt_template: A learner finds f(2)=11, then differentiates 11 and reports f'(2)=0. What went wrong? Select
+      one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    explanation_template: A single value does not determine a local rate. Obtain the derivative function, or use
+      the difference quotient, before evaluating the derivative.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - evaluate_after_differentiating
+    difficulty: medium
+    options:
+    - id: A
+      label: The derivative of a constant is actually 11.
+    - id: B
+      label: Evaluating first discarded how the original function changes near 2.
+    - id: C
+      label: Derivatives may only be evaluated at zero.
+    - id: D
+      label: Function values must always equal derivative values.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_UNITS
+    type: fixed
+    prompt_template: A polynomial s(t) gives position in metres at time t seconds. What does s'(3)=-2 mean? Select
+      one option.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    explanation_template: The signed derivative is velocity in the chosen coordinate direction. It is not position
+      or total distance.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - derivative_units
+    difficulty: medium
+    options:
+    - id: A
+      label: The position must be -2 metres.
+    - id: B
+      label: The speed is a negative physical magnitude.
+    - id: C
+      label: At t=3 seconds, position is changing at -2 metres per second.
+    - id: D
+      label: The object has travelled -2 metres in total.
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+  - id: D6_RULE_REVIEW
+    type: fixed
+    prompt_template: For p(t)=2t^3-3t^2+5 metres, find p'(-1). Enter the value, then explain the term-by-term
+      rules and distinguish the result from p(-1).
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '12'
+    grading:
+      method: exact_numeric
+    explanation_template: 'p''(t)=6t^2-6t.
+
+      p''(-1)=6+6=12 metres per second.
+
+      p(-1)=0 metres is a point value, not a rate.'
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - reasoning_review
+    - explicit_hypotheses
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Explain the reasoning, not only the answer. Address each criterion below.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Applies the constant-multiple, power, difference, and constant rules with correct signs.
+          weight: 1
+        - id: criterion_2
+          description: Forms the derivative function before evaluating it.
+          weight: 1
+        - id: criterion_3
+          description: Evaluates at t=-1 to obtain 12, not the point value 0.
+          weight: 1
+        - id: criterion_4
+          description: Uses metres per second for the derivative and explains why the constant position offset
+            contributes zero.
+          weight: 1
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+  - id: D6_RULE_FORMAL
+    type: fixed
+    prompt_template: Prove the derivative value of 3*x^4-2*x^2+7*x-1 at x=2. The allowed polynomial_derivative
+      rule verifies the stated polynomial derivative; the separate reviewed capstone assesses your term-by-term
+      explanation.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    explanation_template: The author reference is a candidate, not learner evidence. Only a fresh complete submitted-proof
+      certificate earns formal credit.
+    solution_steps: []
+    mistake_tags:
+    - polynomial_derivatives
+    - formal_proof
+    - fresh_certificate_required
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations:
+        - x:real
+        assumptions: []
+        goal: The derivative of 3*x^4-2*x^2+7*x-1 with respect to x at 2 is 95.
+      parameter_contract:
+        required_public: []
+      allowed_rules:
+      - polynomial_derivative
+      assessment_policy: {}
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: The derivative of 3*x^4-2*x^2+7*x-1 with respect to x at 2 is 95.
+          rule: polynomial_derivative
+          premises: []
+          parameters: {}
+          scope: root
+      environment:
+        backend: lean4
+        library: mathlib
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c
+media:
+- type: image
+  src: media/native-derivatives-batch6/rules-polynomial.svg
+  alt: The cubic x cubed minus 3x and its derivative 3x squared minus 3 are plotted as distinct functions.
+  caption: The cubic x cubed minus 3x and its derivative 3x squared minus 3 are plotted as distinct functions.
+  width: 900
+  height: 580
+  fit: contain
+- type: image
+  src: media/native-derivatives-batch6/rules-tangent.svg
+  alt: The cubic y=x cubed and its tangent through (1,1) with slope 3.
+  caption: The cubic y=x cubed and its tangent through (1,1) with slope 3.
+  width: 900
+  height: 580
+  fit: contain
