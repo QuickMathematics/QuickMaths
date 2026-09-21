@@ -83,3 +83,12 @@ jobs:
 
       - name: Verify shipped references and actual replay
         run: python scripts/check_formal_references.py
+
+      - name: Preserve generated kernel diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-kernel-diagnostics
+          path: formal-verifier/.lake/kernel-diagnostics/
+          if-no-files-found: ignore
+          retention-days: 14

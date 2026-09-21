@@ -83,8 +83,21 @@ def test_rewritten_content_watch_points_are_represented_in_schema():
     assert all(question.work.get("line_type") == "inequality" for question in inequalities.test.questions)
 
     sign_reversal = skills["MATH_ALG_007"]
-    assert all(question.answer_mode == "final_plus_required_work" for question in sign_reversal.test.questions)
-    assert all(question.work.get("line_type") == "inequality" for question in sign_reversal.test.questions)
+    ordinary = [q for q in sign_reversal.test.questions if not q.proof_spec]
+    formal = [q for q in sign_reversal.test.questions if q.proof_spec]
+    assert ordinary and formal
+    assert all(q.answer_mode == "final_plus_required_work" for q in ordinary)
+    assert all(q.work.get("line_type") == "inequality" for q in ordinary)
+    for question in formal:
+        assert question.answer_mode == "final_only"
+        assert question.work == {"mode": "none"}
+        assert question.proof_spec["statement"] == {
+            "declarations": ["x:real"], "assumptions": ["-3*x < 6"], "goal": "x > -2",
+        }
+        assert question.proof_spec["allowed_rules"] == ["linarith"]
+        assert question.proof_spec["reference_proof"]["steps"] == [
+            {"claim": "x > -2", "rule": "linarith", "premises": ["h1"]},
+        ]
 
     systems = skills["MATH_SYS_001"]
     assert all(question.answer_mode == "final_plus_required_work" for question in systems.test.questions)

@@ -17,6 +17,32 @@ from quickmaths_formal.rules import preflight
 from quickmaths_formal.verifier import _environment_error, _lake_command, _safe_environment, _parse_axioms
 
 
+def assemble_batch(sources):
+    """Merge generated module headers while retaining per-fixture axiom audits."""
+    imports = set()
+    bodies = []
+    for name, source in sources:
+        namespace = 'Fixture_' + name.removesuffix('.json')
+        body = []
+        for line in source.splitlines():
+            if line == 'module':
+                continue
+            if line.startswith(('public import ', 'import ')):
+                module = line.removeprefix('public ').removeprefix('import ')
+                imports.add('public import ' + module)
+            else:
+                body.append(line.replace('QuickMathsGenerated', namespace))
+        bodies.append((name, body, namespace))
+    lines = ['module', *sorted(imports), '']
+    ranges = []
+    for name, body, namespace in bodies:
+        start = len(lines) + 1
+        lines.extend(body)
+        lines.append('')
+        ranges.append({'fixture': name, 'start': start, 'end': len(lines), 'namespace': namespace})
+    return '\n'.join(lines) + '\n', ranges
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch-size', type=int, default=20)
@@ -36,26 +62,15 @@ def main():
     results = []
     for offset in range(0, len(names), args.batch_size):
         batch = names[offset:offset + args.batch_size]
-        imports = set()
-        bodies = []
+        sources = []
         for name in batch:
             request = normalize_request(load_fixture(name))
             if preflight(request):
                 raise RuntimeError(f'{name}: preflight is not ready')
-            source = render_request(request)
-            namespace = 'Fixture_' + name.removesuffix('.json')
-            imports.update(line for line in source.splitlines() if line.startswith('import '))
-            body = '\n'.join(line for line in source.splitlines() if not line.startswith('import '))
-            bodies.append((name, body.replace('QuickMathsGenerated', namespace), namespace))
-        lines = sorted(imports) + ['']
-        ranges = []
-        for name, body, namespace in bodies:
-            start = len(lines) + 1
-            lines.extend(body.splitlines())
-            lines.append('')
-            ranges.append({'fixture': name, 'start': start, 'end': len(lines), 'namespace': namespace})
+            sources.append((name, render_request(request)))
+        source, ranges = assemble_batch(sources)
         artifact = output / f'batch-{offset:03d}.lean'
-        artifact.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+        artifact.write_text(source, encoding='utf-8')
         artifact.with_suffix('.json').write_text(json.dumps(ranges, indent=2), encoding='utf-8')
         run = subprocess.run([*command, str(artifact)], cwd=ROOT, env=_safe_environment(),
                              capture_output=True, text=True, encoding='utf-8', timeout=240)
