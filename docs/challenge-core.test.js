@@ -470,19 +470,24 @@ test("ships the complete native Mathematics curriculum and opens at the profile 
   assert.equal(state.ui.route, "welcome");
 });
 
-test("every Mathematics test covers every authored scenario and keeps retake variants", () => {
+test("Mathematics catalogs retain ordinary and added formal scenarios independently of assessment length", () => {
   assert.equal(Object.values(AUTHORED_MATH_SCENARIO_COUNTS).reduce((total, count) => total + count, 0), 1083);
   for (const [skillId, expectedLength] of Object.entries(AUTHORED_MATH_SCENARIO_COUNTS)) {
     const skill = curriculum.skills.find((candidate) => candidate.id === skillId);
     assert.ok(skill, `${skillId} must ship`);
     assert.equal(skill.question_count, expectedLength, `${skillId} assessment length`);
-    assert.equal(skill.native_templates.length, expectedLength, `${skillId} runtime template coverage`);
-    assert.equal(new Set(skill.problems.map((problem) => problem.source_template_id)).size, expectedLength, `${skillId} authored scenario coverage`);
+    const ordinary = skill.native_templates.filter((template) => !template.proof_spec);
+    assert.equal(ordinary.length, expectedLength, `${skillId} ordinary runtime template coverage`);
+    assert.deepEqual(new Set(skill.problems.map((problem) => problem.source_template_id)), new Set(skill.native_templates.map((template) => template.id)), `${skillId} complete authored scenario coverage`);
+    for (const problem of skill.problems.filter((problem) => problem.proof_spec)) {
+      assert.equal(gradeProblem(problem, String(problem.expected_answer)).correct, false, `${skillId} formal answer strings cannot earn credit`);
+      assert.ok(problem.formal_job, `${skillId} formal question needs its bound verification job`);
+    }
     assert.ok(skill.problems.length >= expectedLength, `${skillId} needs a complete question bank`);
   }
 });
 
-test("every built-in assessment starts with exactly one problem from every authored scenario", () => {
+test("every built-in assessment respects configured length and selects distinct scenarios", () => {
   const { store } = harness();
   store.createProfile("Coverage Auditor");
   for (const skill of curriculum.skills) {
@@ -491,8 +496,32 @@ test("every built-in assessment starts with exactly one problem from every autho
     const scenarioIds = draft.problems.map((problem) => problem.source_template_id ?? problem.template_id);
     assert.equal(draft.problems.length, skill.question_count, `${skill.id} configured length`);
     assert.equal(new Set(scenarioIds).size, skill.question_count, `${skill.id} unique scenario coverage`);
-    assert.ok(draft.problems.every((problem) => gradeProblem(problem, String(problem.expected_answer), problem.grading_method === "rational_expression" ? { excluded_values: problem.answer_metadata?.excluded_values ?? [] } : null).correct), `${skill.id} generated answers must pass their declared graders`);
+    for (const problem of draft.problems) {
+      const grade = gradeProblem(problem, String(problem.expected_answer), problem.grading_method === "rational_expression" ? { excluded_values: problem.answer_metadata?.excluded_values ?? [] } : null);
+      assert.equal(grade.correct, !Boolean(problem.proof_spec), `${skill.id}: ordinary answers pass; formal answers require verification`);
+    }
     if (skill.native_templates?.length) assert.ok(draft.problems.every((problem) => problem.template_id.includes("__RUNTIME_")), `${skill.id} should generate every native scenario in-browser without bank fallback`);
+  }
+});
+
+test("short native assessments rotate through all scenarios including formal additions", () => {
+  const { store } = harness();
+  for (const skill of curriculum.skills.filter((skill) => skill.native_templates?.length > skill.question_count)) {
+    const seen = new Set();
+    for (let attempt = 0; attempt < Math.ceil(skill.native_templates.length / skill.question_count); attempt += 1) {
+      const preview = store.previewNativeAssessment(skill.id, attempt);
+      assert.equal(preview.problems.length, skill.question_count);
+      const ids = preview.problems.map((problem) => problem.source_template_id);
+      assert.equal(new Set(ids).size, skill.question_count);
+      for (const problem of preview.problems) {
+        seen.add(problem.source_template_id);
+        if (problem.proof_spec) {
+          assert.ok(problem.formal_job);
+          assert.equal(gradeProblem(problem, String(problem.expected_answer)).correct, false);
+        }
+      }
+    }
+    assert.deepEqual(seen, new Set(skill.native_templates.map((template) => template.id)));
   }
 });
 

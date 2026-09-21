@@ -32,3 +32,9 @@ def test_legacy_and_public_imports_are_deduplicated():
     ])
     assert source.count("public import Mathlib.Tactic.Ring") == 1
     assert source.splitlines().count("module") == 1
+
+
+def test_all_fixtures_are_classified_including_derivative_definition():
+    from kernel_acceptance import POSITIVE, NEGATIVE, EXPECTED_UNSUPPORTED, ROOT
+    assert "derivative_definition_square.json" in POSITIVE
+    assert {p.name for p in (ROOT / "fixtures").glob("*.json")} == set(POSITIVE) | set(NEGATIVE) | set(EXPECTED_UNSUPPORTED)

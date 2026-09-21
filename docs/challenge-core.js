@@ -318,7 +318,12 @@ function generateNativeProblem(skill, template, attemptCount, templateIndex) {
 }
 
 function generateNativeAssessment(skill, attemptCount) {
-  const templates = [...skill.native_templates];
+  // The catalog retains every scenario; an assessment uses its configured length.
+  // Rotate before shuffling so added scenarios remain reachable even with fixed order.
+  const pool = skill.native_templates;
+  const count = Math.min(pool.length, assessmentLength(skill));
+  const offset = (attemptCount * count) % pool.length;
+  const templates = [...pool.slice(offset), ...pool.slice(0, offset)].slice(0, count);
   if (skill.native_randomize_order !== false) {
     const random = seededRandom(stableTextSeed(`${skill.id}:order:${attemptCount}`));
     for (let index = templates.length - 1; index > 0; index -= 1) {

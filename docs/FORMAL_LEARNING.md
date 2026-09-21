@@ -227,3 +227,15 @@ for scoped references, use bounded prover search where it supports the theorem,
 or validate the learner construction directly. Search may choose another valid
 method, which does not satisfy a different required-method policy. Do not turn a
 reference or search result into learner assessment credit.
+
+## Assessment length and scenario coverage
+
+For native lessons containing formal questions, `question_count` remains the
+configured assessment length. The exported template collection and practice
+bank retain all ordinary and formal scenarios; they can be larger than a single
+assessment. The browser selects distinct scenarios up to that configured count,
+rotates the selection across retakes, then applies the lesson's order setting.
+This keeps added formal scenarios reachable without silently lengthening tests.
+An ordinary answer key remains testable with its ordinary grader. A formal
+question's answer string cannot earn credit: its exact submitted proof still
+requires the formal verifier and a fresh accepted certificate.

@@ -33,6 +33,7 @@ POSITIVE = (
     "piecewise_jump.json",
     "ivt_existence.json",
     "polynomial_derivative.json",
+    "derivative_definition_square.json",
     "quotient_derivative.json",
     "sqrt_derivative.json",
     "abs_derivative_positive.json",
