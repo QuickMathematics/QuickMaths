@@ -928,3 +928,57 @@ test:
       work_review: tutor_required
       mastery_requires_review_pass: true
       allow_self_review: false
+
+  - id: MATH_FUNC_007_FORMAL_QUOTIENT_001
+    type: fixed
+    prompt_template: 'For f(x)=x^2 and real h != 0, prove the difference-quotient identity. Retain the nonzero
+      increment. Statement: ((x+h)^2-x^2)/h = 2*x+h'
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    explanation_template: Expand the numerator and cancel only with h != 0. This is an algebraic quotient
+      identity, not yet a claim about a derivative or a limit.
+    solution_steps: []
+    mistake_tags:
+    - proof_justification
+    - domain_and_hypotheses
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations:
+        - x:real
+        - h:real
+        assumptions:
+        - h != 0
+        goal: ((x+h)^2-x^2)/h = 2*x+h
+      allowed_rules:
+      - guarded_cancel
+      assessment_policy: {}
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: ((x+h)^2-x^2)/h = 2*x+h
+          rule: guarded_cancel
+          premises:
+          - h1
+          parameters:
+            divisor: h
+      environment:
+        backend: lean4
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library: mathlib
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c

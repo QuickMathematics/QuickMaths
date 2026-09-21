@@ -5,6 +5,7 @@ const list = (value, max = 128) => Array.isArray(value) ? value.slice(0, max) : 
 const records = (value) => list(value).filter((row) => row && typeof row === "object" && !Array.isArray(row));
 const RULES = {
   derivative_from_limit: "Use the difference-quotient limit", rational_hole_limit: "Simplify a punctured limit",
+  ivt_exists: "IVT: establish existence on an interval", sqrt_square_nonnegative: "Square root of a square with a nonnegative input",
   assumption: "Use an assumption", eq_refl: "An expression equals itself",
   ring_identity: "Expand and collect terms", field_identity: "Simplify fractions (with domain checks)",
   sub_ne_zero_from_ne: "Unequal quantities have a nonzero difference", guarded_cancel: "Cancel a nonzero factor",

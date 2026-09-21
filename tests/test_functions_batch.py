@@ -59,9 +59,10 @@ def test_assessment_coverage_media_and_review_policies_are_complete():
     for s in sources():
         assert len(s['examples'])==10
         assert len(s['applications'])==4
-        assert len(s['test']['questions'])==20
+        assert len([q for q in s['test']['questions'] if not q.get('proof_spec')])==20
         gates=0
         for q in s['test']['questions']:
+            if q.get('proof_spec'): continue
             assert q['id'] not in all_ids;all_ids.add(q['id'])
             assert q['explanation_template'].strip() and q['mistake_tags']
             if q.get('media'):

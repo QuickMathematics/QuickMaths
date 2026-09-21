@@ -927,3 +927,53 @@ test:
     mistake_tags:
     - declared_domain_ignored
     - domain_intersection
+
+  - id: MATH_FUNC_004_FORMAL_COMPOSITION_001
+    type: fixed
+    prompt_template: 'For f(t)=2*t+1 and g(x)=3*x-4, prove the expanded formula for f(g(x)) for every real
+      x. Statement: 2*(3*x-4)+1 = 6*x-7'
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    explanation_template: Substitute g(x) into the input of f, then expand. This polynomial example has
+      no excluded real inputs; other compositions still require domain checks.
+    solution_steps: []
+    mistake_tags:
+    - proof_justification
+    - domain_and_hypotheses
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations:
+        - x:real
+        assumptions: []
+        goal: 2*(3*x-4)+1 = 6*x-7
+      allowed_rules:
+      - ring_identity
+      assessment_policy: {}
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: 2*(3*x-4)+1 = 6*x-7
+          rule: ring_identity
+          premises: []
+          parameters: {}
+      environment:
+        backend: lean4
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library: mathlib
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c

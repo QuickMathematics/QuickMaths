@@ -1,3 +1,8 @@
+# Historical engine demonstration, not a current installable assessment pack.
+# Its legacy method policies intentionally remain assessment-ineligible; removing
+# them would silently drop requested teaching constraints. For current patterns,
+# use examples/formal-proof-lab.lesson-set.json, examples/derivative-definition.lesson-set.json,
+# or the proof_spec exercises in the native content/math curriculum.
 id: MATH_FORMAL_002
 name: Kernel-backed algebra and calculus proofs
 domain: Math

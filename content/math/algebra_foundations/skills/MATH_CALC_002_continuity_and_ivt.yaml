@@ -956,3 +956,54 @@ test:
       width: 800
       height: 500
       fit: contain
+
+  - id: MATH_CALC_002_FORMAL_IVT_EXISTENCE_001
+    type: fixed
+    prompt_template: 'Use IVT to establish that the continuous polynomial x^2 takes the value 2 somewhere
+      on [0,2]. Claim existence only, not uniqueness. Statement: there exists c : real, (0 <= c) and ((c
+      <= 2) and (c^2 = 2))'
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    explanation_template: The polynomial is continuous on [0,2]; its endpoint values are 0 and 4, which
+      bracket 2. The IVT rule checks these hypotheses in Lean and concludes existence. Explaining theorem
+      applicability and uniqueness remains separate work.
+    solution_steps: []
+    mistake_tags:
+    - proof_justification
+    - domain_and_hypotheses
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations: []
+        assumptions: []
+        goal: 'there exists c : real, (0 <= c) and ((c <= 2) and (c^2 = 2))'
+      allowed_rules:
+      - ivt_exists
+      assessment_policy: {}
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: 'there exists c : real, (0 <= c) and ((c <= 2) and (c^2 = 2))'
+          rule: ivt_exists
+          premises: []
+          parameters: {}
+      environment:
+        backend: lean4
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library: mathlib
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c

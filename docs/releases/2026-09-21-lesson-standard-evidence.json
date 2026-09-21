@@ -1,0 +1,170 @@
+[
+  {
+    "skill": "MATH_FUNC_007",
+    "question": "MATH_FUNC_007_FORMAL_QUOTIENT_001",
+    "verified": true,
+    "seconds": 47.453,
+    "certificate": {
+      "certificate_version": "0.2",
+      "verifier_version": "phase1.0",
+      "verified_at": "2026-09-21T13:47:58.319730+00:00",
+      "request_hash": "fc04365ade6ff7864655d24c40eac719aa9368058fa305e1ad85a66f57288d21",
+      "statement_hash": "d7c1b48a33151061e8c9a4789bc0ddffbc7feae5e0f0ba082d48d5d8ee5535d5",
+      "submission_hash": "412e7b2ffaea0b008170f89e9d31ca72ae028caebd1d763e31cc71557af0bc1b",
+      "lean_source_hash": "900806445ac12cee4174f92fadb3d99e2835139e22e0434a17e8a6ad7c2a697b",
+      "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) (h : \u211d) (h1 : h \u2260 0) : ((((x + h) ^ 2) - (x ^ 2)) / h) = ((2 * x) + h) := by\n  have reference_step_1 : ((((x + h) ^ 2) - (x ^ 2)) / h) = ((2 * x) + h) := by\n    field_simp [h1] <;> ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+      "proof_mode": "reference",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "environment": {
+        "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      },
+      "elapsed_ms": 37906,
+      "certificate_digest": "d4dbb4399f3dff7be1485c4ddbce5a01da7048d105aaf86cbd7b66650bcf0d3d"
+    }
+  },
+  {
+    "skill": "MATH_SYS_001",
+    "question": "MATH_SYS_001_FORMAL_LINEAR_SYSTEM_001",
+    "verified": true,
+    "seconds": 12.828,
+    "certificate": {
+      "certificate_version": "0.2",
+      "verifier_version": "phase1.0",
+      "verified_at": "2026-09-21T13:48:11.169485+00:00",
+      "request_hash": "35bb5e0c5f11a23d3ac52989153ae22f2d26e69e785d1cbd51a1bdda73c625d6",
+      "statement_hash": "af38e7b9185bf6ab772f4f82e56f2de0067120bfff19910ecc61965facea8dc4",
+      "submission_hash": "425a24619b823fb0bf9d57d13da4b33ebf2ac9bc20c102b1c94f221ad16abb3a",
+      "lean_source_hash": "185fb87378a86532c747910000ff489c53d5840a7da886579b19e0241284031e",
+      "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) (y : \u211d) (h1 : (x + y) = 5) (h2 : (x - y) = 1) : (x = 3) \u2227 (y = 2) := by\n  have reference_step_1 : x = 3 := by\n    linarith\n  have reference_step_2 : y = 2 := by\n    clear reference_step_1\n    linarith\n  have reference_step_3 : (x = 3) \u2227 (y = 2) := by\n    clear h1 h2\n    exact \u27e8reference_step_1, reference_step_2\u27e9\n  exact reference_step_3\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+      "proof_mode": "reference",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "environment": {
+        "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      },
+      "elapsed_ms": 10518,
+      "certificate_digest": "34bb76112b641d527d014865aae25bb980518e0120edc2bb064f1e9188c058cf"
+    }
+  },
+  {
+    "skill": "MATH_CALC_001",
+    "question": "MATH_CALC_001_FORMAL_PUNCTURED_LIMIT_001",
+    "verified": true,
+    "seconds": 46.422,
+    "certificate": {
+      "certificate_version": "0.2",
+      "verifier_version": "phase1.0",
+      "verified_at": "2026-09-21T13:48:57.589628+00:00",
+      "request_hash": "afc5d40c1322182b50685f9032051f7a294d7e9315cbb2e13e9044804236a11a",
+      "statement_hash": "9905abacb34afc97e7fd1d15c413abb5be5dc43e8caa97223b684a8ae77320af",
+      "submission_hash": "1f51065df1a6287a74bf42d8aca6dc885c5e3f5407b7e7c4ede7eed34fee1bad",
+      "lean_source_hash": "fa6a980e0f202e5b7d3225698c3a75df2123b3023e80ee234dce767068452d1d",
+      "proof_artifact": "module\npublic import Lean.Elab.Tactic.NormCast\npublic import Lean.Elab.Tactic.Omega\npublic import Mathlib.Analysis.Real.Sqrt\npublic import Mathlib.Analysis.SpecialFunctions.Exp\npublic import Mathlib.Analysis.SpecialFunctions.Log.Basic\npublic import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.Continuity\npublic import Mathlib.Tactic.Convert\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.FunProp\npublic import Mathlib.Tactic.GCongr\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.NormNum.RealSqrt\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\npublic import Mathlib.Topology.Algebra.Order.Field\npublic import Mathlib.Topology.Order.IntermediateValue\n\nopen Filter Topology Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result : Filter.Tendsto (fun (x : \u211d) => ((((x ^ 2) - 9) / (x - 3)) : \u211d)) (\ud835\udcdd[\u2260] 3) (\ud835\udcdd 6) := by\n  have reference_step_1 : Filter.Tendsto (fun (x : \u211d) => ((((x ^ 2) - 9) / (x - 3)) : \u211d)) (\ud835\udcdd[\u2260] 3) (\ud835\udcdd 6) := by\n    have hs : Filter.Tendsto (fun (x : \u211d) => (x + 3)) (\ud835\udcdd[\u2260] 3) (\ud835\udcdd (6 : \u211d)) := by\n      have hc : ContinuousAt (fun (x : \u211d) => (x + 3)) 3 := by fun_prop\n      exact tendsto_nhdsWithin_of_tendsto_nhds (by convert! hc.tendsto using 1 <;> norm_num)\n    refine hs.congr' ?_\n    filter_upwards [self_mem_nhdsWithin] with x hx\n    simp only [Set.mem_compl_iff, Set.mem_singleton_iff] at hx\n    have hden : x - 3 \u2260 0 := sub_ne_zero.mpr hx\n    field_simp [hden] <;> ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+      "proof_mode": "reference",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "environment": {
+        "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      },
+      "elapsed_ms": 43464,
+      "certificate_digest": "8e5880375be0c4e618185b3e721be2acfa0dab9e18817c9442cc80fb5b2f3db3"
+    }
+  },
+  {
+    "skill": "MATH_CALC_002",
+    "question": "MATH_CALC_002_FORMAL_IVT_EXISTENCE_001",
+    "verified": true,
+    "seconds": 17.219,
+    "certificate": {
+      "certificate_version": "0.2",
+      "verifier_version": "phase1.0",
+      "verified_at": "2026-09-21T13:49:14.808173+00:00",
+      "request_hash": "80f7fb8f268313ab96b9408aaffcbc75ec4636e2b698c867b1b9cd652f3644eb",
+      "statement_hash": "a6302b4a1ec641cef7ef76d952abc5b5bf31416e384de51713377fc1db40a9f2",
+      "submission_hash": "e4dae467a9427766015cfac9cd9abdc026da1f3d0133093ae2a0a950ca238937",
+      "lean_source_hash": "5f13c8f351553306f15c1593f04f2a31f6a5243b5479bf3a08768f31c9c28fe4",
+      "proof_artifact": "module\npublic import Lean.Elab.Tactic.NormCast\npublic import Lean.Elab.Tactic.Omega\npublic import Mathlib.Analysis.Real.Sqrt\npublic import Mathlib.Analysis.SpecialFunctions.Exp\npublic import Mathlib.Analysis.SpecialFunctions.Log.Basic\npublic import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.Continuity\npublic import Mathlib.Tactic.Convert\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.FunProp\npublic import Mathlib.Tactic.GCongr\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.NormNum.RealSqrt\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\npublic import Mathlib.Topology.Algebra.Order.Field\npublic import Mathlib.Topology.Order.IntermediateValue\n\nopen Filter Topology Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result : \u2203 (c : \u211d), (0 \u2264 c) \u2227 ((c \u2264 2) \u2227 ((c ^ 2) = 2)) := by\n  have reference_step_1 : \u2203 (c : \u211d), (0 \u2264 c) \u2227 ((c \u2264 2) \u2227 ((c ^ 2) = 2)) := by\n    have hcont : ContinuousOn (fun (c : \u211d) => (c ^ 2)) (Set.Icc 0 2) := by fun_prop\n    have htarget : (2 : \u211d) \u2208 Set.Icc ((fun (c : \u211d) => (c ^ 2)) 0) ((fun (c : \u211d) => (c ^ 2)) 2) := by norm_num\n    obtain \u27e8c, hmem, hvalue\u27e9 := intermediate_value_Icc (by norm_num : (0 : \u211d) \u2264 2) hcont htarget\n    refine \u27e8c, hmem.1, hmem.2, ?_\u27e9\n    simpa using hvalue\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+      "proof_mode": "reference",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "environment": {
+        "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      },
+      "elapsed_ms": 14209,
+      "certificate_digest": "5fdf75f198d21e6bb2d1733b1579a7e7fad6be3feb236fc96d344b69753c0318"
+    }
+  },
+  {
+    "skill": "MATH_FUNC_004",
+    "question": "MATH_FUNC_004_FORMAL_COMPOSITION_001",
+    "verified": true,
+    "seconds": 12.141,
+    "certificate": {
+      "certificate_version": "0.2",
+      "verifier_version": "phase1.0",
+      "verified_at": "2026-09-21T13:51:23.633616+00:00",
+      "request_hash": "865e06faa5ffb6fd7419610b067e6260bed4aaf694560f136cd536232a98f1f1",
+      "statement_hash": "0288fb0937f6d111067d198b1167d2206f51f2b3a0047c930d1f55b61dfe3dd0",
+      "submission_hash": "ed86daa3e99698ea5bc7da427f0d456c52d03bf4a01a05d5432de9eab391d87a",
+      "lean_source_hash": "0f35d7cf182483f39e5f580637a7aa61039a3ed5760b8be7157007a2ab46423b",
+      "proof_artifact": "module\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) : ((2 * ((3 * x) - 4)) + 1) = ((6 * x) - 7) := by\n  have reference_step_1 : ((2 * ((3 * x) - 4)) + 1) = ((6 * x) - 7) := by\n    ring\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+      "proof_mode": "reference",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "environment": {
+        "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      },
+      "elapsed_ms": 9840,
+      "certificate_digest": "d03074c1d8358e2198a772f6b9898bea0a5f32f5e35fee2b0cdd04c7460c3de8"
+    }
+  },
+  {
+    "skill": "MATH_RAD_001",
+    "question": "MATH_RAD_001_FORMAL_NONNEGATIVE_001",
+    "verified": true,
+    "seconds": 14.656,
+    "certificate": {
+      "certificate_version": "0.2",
+      "verifier_version": "phase1.0",
+      "verified_at": "2026-09-21T13:51:38.298164+00:00",
+      "request_hash": "e5fdf4d908ce2a030f6971ed80b4c827f56f0dc270dd8aff95964c16708951ff",
+      "statement_hash": "10118ba11cd854189c006bfcd4d2d23796fc186a245ab949f2da35f285099939",
+      "submission_hash": "523b610edfded299f26fbafea7403724b67e72b4652f00fa2cdf197c51dec454",
+      "lean_source_hash": "2486103f47ccc1a5c28b20a2bdc178f96a03399663d7ef7d7df70fa5007eeb01",
+      "proof_artifact": "module\npublic import Mathlib.Analysis.Real.Sqrt\npublic import Mathlib.Basic.Real.Basic\npublic import Mathlib.Tactic.FieldSimp\npublic import Mathlib.Tactic.Linarith\npublic import Mathlib.Tactic.NormNum\npublic import Mathlib.Tactic.NormNum.RealSqrt\npublic import Mathlib.Tactic.Positivity\npublic import Mathlib.Tactic.Ring\n\nopen Set\n\nnamespace QuickMathsGenerated\n\npublic theorem result (x : \u211d) (h1 : 0 \u2264 x) : (Real.sqrt ((x ^ 2))) = x := by\n  have reference_step_1 : (Real.sqrt ((x ^ 2))) = x := by\n    rw [Real.sqrt_sq_eq_abs, abs_of_nonneg h1]\n  exact reference_step_1\n\n#print axioms QuickMathsGenerated.result\n\nend QuickMathsGenerated\n",
+      "proof_mode": "reference",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "environment": {
+        "lean_toolchain": "leanprover/lean4:v4.34.0-rc2",
+        "mathlib_revision": "42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c"
+      },
+      "elapsed_ms": 12368,
+      "certificate_digest": "e5c17a0ad9ae79ddd1d95e524d2f9c48721a00542aaaa2c23afc009c463b3e3a"
+    }
+  }
+]

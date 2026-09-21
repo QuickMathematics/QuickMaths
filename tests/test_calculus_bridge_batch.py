@@ -74,11 +74,12 @@ def test_teaching_coverage_and_review_requirements():
     for s in sources():
         assert len(s['theory'].split())>=750
         assert len(s['examples'])==10 and len(s['applications'])==4
-        assert len(s['test']['questions'])==20
+        assert len([q for q in s['test']['questions'] if not q.get('proof_spec')])==20
         assert s['mastery']['passing_score']==.8
         assert s['mastery']['max_guessing_allowed']=='maybe'
         gates=0
         for q in s['test']['questions']:
+            if q.get('proof_spec'): continue
             templates.append(q)
             assert q['explanation_template'].strip() and q['mistake_tags']
             assert q['answer'] and q['grading']
@@ -111,6 +112,7 @@ def test_source_placeholders_and_safe_arithmetic_dependencies():
             for item in v.values():yield from strings(item)
     for s in sources():
         for q in s['test']['questions']:
+            if q.get('proof_spec'): continue
             names=set(q['variables'])
             for name,expr in q['derived'].items():
                 tree=ast.parse(expr,mode='eval')

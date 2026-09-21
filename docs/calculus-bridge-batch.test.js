@@ -111,8 +111,8 @@ test('four lessons add a coherent graph and an explicit Calculus branch without 
  all.forEach(s=>visit(s.id));
  for(const s of additions){
   assert.equal(s.examples.length,10);assert.equal(s.applications.length,4);assert.ok(s.theory.split(/\s+/).length>=750);
-  assert.equal(s.question_count,20);assert.equal(s.native_templates.length,20);
-  assert.equal(new Set(s.problems.map(p=>p.source_template_id)).size,20);
+  assert.equal(s.question_count,20);assert.equal(s.native_templates.filter(t=>!t.proof_spec).length,20);
+  assert.equal(new Set(s.problems.map(p=>p.source_template_id)).size,s.native_templates.length);
   assert.ok(s.problems.length>=40 && s.problems.length<=100);
   assert.equal(s.native_templates.filter(t=>t.review_policy.mastery_requires_review_pass).length,1);
  }
@@ -126,6 +126,7 @@ test('all 80 scenarios satisfy independent oracles over 100 retakes each, with n
  for(let variation=0;variation<100;variation++)for(const s of additions){
   const problems=store.previewNativeAssessment(s.id,variation).problems;assert.equal(problems.length,20);
   for(const p of problems){
+   if(p.proof_spec){assert.equal(gradeProblem(p,p.expected_answer).correct,false);continue;}
    seen.add(key(p));assert.match(p.template_id,/__RUNTIME_/);assert.doesNotMatch(p.prompt,/\{[^}]+\}/);
    assert.ok(p.solution_steps.length);const answer=oracle(p);assert.notEqual(answer,undefined,key(p));
    assert.equal(gradeProblem(p,answer).correct,true,`${key(p)} independent result ${answer} for variation ${variation}`);

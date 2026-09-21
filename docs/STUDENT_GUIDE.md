@@ -766,3 +766,7 @@ The local desktop companion remains available through explicit client options.
 The native curriculum includes domain/range, transformations, composition, inverses, piecewise functions, rates of change, limits, and continuity/IVT. Each has illustrations and worked examples. Reasoning capstones still need tutor review where marked; a correct final answer alone does not complete that review.
 
 A saved test keeps its original questions, order, numbers and working when you reload or sync. New retakes draw fresh variants. If a saved question cannot be safely restored, the app keeps its data in your backup and blocks submission rather than grading a replacement question. Export a backup from Settings before repair. Restored formal proofs need a fresh verification or replay before earning new credit.
+
+## Formal practice in the native curriculum
+
+Selected composition, difference-quotient, radical, systems, limits and continuity lessons now include a proof workspace exercise. These rotate with the lesson's other questions; an individual test may not contain every available template. Numerical practice remains available, and explanation capstones still require their stated review. Submit proof steps using the offered rules, then verify them. A final answer string or a published reference proof does not earn formal credit.

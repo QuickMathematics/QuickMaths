@@ -528,3 +528,71 @@ test:
         - one_solution
         - slope_error
       difficulty: hard
+
+    - id: MATH_SYS_001_FORMAL_LINEAR_SYSTEM_001
+      type: fixed
+      prompt_template: 'For real x,y satisfying x+y=5 and x-y=1, prove both coordinate values. Statement:
+        (x = 3) and (y = 2)'
+      variables: {}
+      derived: {}
+      constraints: []
+      answer:
+        type: text
+        value: Complete Lean-verified proof
+      grading:
+        method: exact_text
+      explanation_template: Combine the two given equations to establish x=3 and y=2, then join both claims.
+        A guessed pair or a final-answer string does not replace a proof.
+      solution_steps: []
+      mistake_tags:
+      - proof_justification
+      - domain_and_hypotheses
+      difficulty: hard
+      options: []
+      max_attempts: 100
+      answer_mode: final_only
+      work:
+        mode: none
+      review_policy:
+        work_review: none
+        mastery_requires_review_pass: false
+      proof_spec:
+        version: '0.1'
+        statement:
+          declarations:
+          - x:real
+          - y:real
+          assumptions:
+          - x+y = 5
+          - x-y = 1
+          goal: (x = 3) and (y = 2)
+        allowed_rules:
+        - linarith
+        - and_intro
+        assessment_policy: {}
+        reference_proof:
+          mode: steps
+          steps:
+          - claim: x = 3
+            rule: linarith
+            premises:
+            - h1
+            - h2
+            parameters: {}
+          - claim: y = 2
+            rule: linarith
+            premises:
+            - h1
+            - h2
+            parameters: {}
+          - claim: (x = 3) and (y = 2)
+            rule: and_intro
+            premises:
+            - reference_step_1
+            - reference_step_2
+            parameters: {}
+        environment:
+          backend: lean4
+          toolchain: leanprover/lean4:v4.34.0-rc2
+          library: mathlib
+          library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c

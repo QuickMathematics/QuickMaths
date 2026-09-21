@@ -898,3 +898,56 @@ test:
       work_review: tutor_required
       mastery_requires_review_pass: true
       allow_self_review: false
+
+  - id: MATH_CALC_001_FORMAL_PUNCTURED_LIMIT_001
+    type: fixed
+    prompt_template: 'Prove the two-sided limit at 3 of (x^2-9)/(x-3). The punctured approach excludes x=3;
+      do not assert that the original quotient is defined there. Statement: As x approaches 3 from both
+      sides, (x^2-9)/(x-3) approaches 6.'
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    explanation_template: Away from 3, factor and cancel to obtain x+3. This expression approaches 6 from
+      both sides. The kernel checks equality on the punctured neighborhood; the conceptual capstone separately
+      explains isolated point values.
+    solution_steps: []
+    mistake_tags:
+    - proof_justification
+    - domain_and_hypotheses
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations:
+        - x:real
+        assumptions: []
+        goal: As x approaches 3 from both sides, (x^2-9)/(x-3) approaches 6.
+      allowed_rules:
+      - rational_hole_limit
+      assessment_policy: {}
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: As x approaches 3 from both sides, (x^2-9)/(x-3) approaches 6.
+          rule: rational_hole_limit
+          premises: []
+          parameters:
+            simplified: x+3
+      environment:
+        backend: lean4
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library: mathlib
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c

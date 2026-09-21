@@ -787,3 +787,11 @@ Native source validation accepts both structured legacy proof strategies and the
 Ordinary expression answers support `sqrt`, `abs`, `sin`, `cos`, `exp` and natural `log` (`ln` is a browser alias). Comparison is bounded numerical checking, not a theorem certificate. Use explicit multiplication for ambiguous multi-letter products. Formal generated statements may resolve only prompt-visible public parameters; invalid formal generation fails instead of falling back to ordinary grading.
 
 Existing drafts preserve complete resolved snapshots. Changes to generation defaults or scenario order apply to new draws, not already saved answers. See [native compatibility details](NATIVE_COMPATIBILITY_FIXES.md).
+
+## Native lesson standards audit (September 21, 2026)
+
+The shipped catalog contains 136 lessons; 14 native Mathematics lessons now include a formal exercise. Use formal tasks for precise statements supported by the current rules, alongside ordinary practice and explicit tutor review for explanations. Do not convert a conceptual capstone into answer-string grading or claim that an empty assessment policy enforces a requested method.
+
+For `sqrt_square_nonnegative`, author the cited guard as `0 <= x`. Difference-quotient cancellation retains `h != 0`; its algebraic identity alone is not a derivative proof. A punctured limit is separate from the assigned function value, and IVT existence does not establish uniqueness. The native composition, difference-quotient, radicals, systems, limits and continuity lessons provide current examples.
+
+Run `node scripts/audit_lesson_standards.mjs` for the catalog inventory. Run `python scripts/check_native_formal_references.py --skill MATH_CALC_001` with the configured pinned Lean environment to check published reference steps through the real kernel. Reference verification is authoring validation, never learner credit. The historical `MATH_FORMAL_002` example retains unsupported policies and is explicitly marked as historical; do not use it as a current assessment template.

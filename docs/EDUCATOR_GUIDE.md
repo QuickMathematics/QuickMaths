@@ -836,3 +836,7 @@ inserted into the learner proof. See the [proof guide](FORMAL_LEARNING.md).
 Eight native lessons extend the curriculum through domain/range, transformations, composition, inverses, piecewise functions, average rates/difference quotients, limits, and continuity/IVT. Their reasoning capstones retain explicit tutor-review requirements. These are reviewed mathematical arguments, not new Lean-certified proof modes.
 
 Saved assessments preserve their resolved questions through reload, backup and sync; editing a lesson does not reinterpret an existing draft. Invalid saved snapshots are retained for recovery and cannot produce a new assessment result. Export a backup before repairing a recovery warning. Formal verification authority is never restored from a snapshot checksum.
+
+## September 2026 lesson alignment
+
+Fourteen native Mathematics lessons include formal exercises. The latest additions cover polynomial composition, a difference quotient with a nonzero increment, a square-root identity with a nonnegative hypothesis, a linear system, a punctured rational limit and IVT existence. These supplement the existing assessment catalogs without increasing configured test lengths. Retakes rotate templates. Preserve conceptual review: an identity is not a derivative argument, a limit is not necessarily the assigned point value, and existence is not uniqueness. Reference checks certify authored mathematical statements, not learner submissions or unstated method requirements.

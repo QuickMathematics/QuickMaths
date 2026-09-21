@@ -105,10 +105,10 @@ def test_rewritten_content_watch_points_are_represented_in_schema():
         ]
 
     systems = skills["MATH_SYS_001"]
-    assert all(question.answer_mode == "final_plus_required_work" for question in systems.test.questions)
-    assert all(question.work.get("mode") in {"capture_only", "procedural_steps"} for question in systems.test.questions)
+    assert all(question.answer_mode == "final_plus_required_work" for question in systems.test.questions if not question.proof_spec)
+    assert all(question.work.get("mode") in {"capture_only", "procedural_steps"} for question in systems.test.questions if not question.proof_spec)
     assert all(question.work.get("mode") == "capture_only" for question in systems.test.questions if "CLASSIFY" in question.id)
-    assert any(question.work.get("mode") == "procedural_steps" for question in systems.test.questions)
+    assert any(question.work.get("mode") == "procedural_steps" for question in systems.test.questions if not question.proof_spec)
     systems_theory = systems.theory.casefold()
     assert all(term in systems_theory for term in ("substitution", "elimination", "check"))
 

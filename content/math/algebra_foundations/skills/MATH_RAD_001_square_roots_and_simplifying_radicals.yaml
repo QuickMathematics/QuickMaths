@@ -615,3 +615,56 @@ test:
     - real_number_domain
     - square_root_error
     difficulty: hard
+
+  - id: MATH_RAD_001_FORMAL_NONNEGATIVE_001
+    type: fixed
+    prompt_template: 'For a real x with x >= 0, prove that the principal square root of x^2 equals x. Statement:
+      sqrt(x^2) = x'
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: text
+      value: Complete Lean-verified proof
+    grading:
+      method: exact_text
+    explanation_template: The principal square root is nonnegative. The assumption x >= 0 is essential;
+      without it the correct expression is abs(x).
+    solution_steps: []
+    mistake_tags:
+    - proof_justification
+    - domain_and_hypotheses
+    difficulty: hard
+    options: []
+    max_attempts: 100
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+    proof_spec:
+      version: '0.1'
+      statement:
+        declarations:
+        - x:real
+        assumptions:
+        - 0 <= x
+        goal: sqrt(x^2) = x
+      allowed_rules:
+      - sqrt_square_nonnegative
+      assessment_policy: {}
+      reference_proof:
+        mode: steps
+        steps:
+        - claim: sqrt(x^2) = x
+          rule: sqrt_square_nonnegative
+          premises:
+          - h1
+          parameters:
+            argument: x
+      environment:
+        backend: lean4
+        toolchain: leanprover/lean4:v4.34.0-rc2
+        library: mathlib
+        library_revision: 42a3845c6d7ec6866eefa4cc327a306a0c4a7d3c
