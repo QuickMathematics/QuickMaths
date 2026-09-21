@@ -840,3 +840,9 @@ Saved assessments preserve their resolved questions through reload, backup and s
 ## September 2026 lesson alignment
 
 Fourteen native Mathematics lessons include formal exercises. The latest additions cover polynomial composition, a difference quotient with a nonzero increment, a square-root identity with a nonnegative hypothesis, a linear system, a punctured rational limit and IVT existence. Composition, rates and difference quotients, limits, and continuity/IVT use 21-question assessments so every new attempt includes the original review-required capstone alongside the formal exercise. Other lessons retain their existing lengths and rotation. Saved drafts retain their original questions. Preserve conceptual review: an identity is not a derivative argument, a limit is not necessarily the assigned point value, and existence is not uniqueness. Reference checks certify authored mathematical statements, not learner submissions or unstated method requirements.
+
+## Foundation pathway expansion
+
+Twenty native lessons add an elementary on-ramp and fill arithmetic, proportional reasoning, measurement, plane geometry, solid measurement, absolute-value tolerance and higher-root gaps. Each has ten worked examples, four applications and twenty distinct assessment scenarios, including a conceptual capstone in every attempt. The on-ramp is optional for established learners: original prerequisite lists and saved mastery are preserved.
+
+Review operation meaning, common units, reference amounts, model hypotheses and domain restrictions explicitly. A geometric picture is not evidence of an unmarked equality or right angle. Algebraic verification is not a substitute for a complete geometric argument. These lessons use ordinary assessment and explicit tutor-reviewed reasoning; existing formal lessons keep their separate kernel-verification boundary. See [the foundation roadmap](FOUNDATIONS_ROADMAP.md) for the lesson list and maintenance contract.

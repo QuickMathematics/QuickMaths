@@ -1,0 +1,759 @@
+id: MATH_GEOM_012
+schema_version: '0.2'
+name: Volume and surface area of prisms and cylinders
+domain: Math
+subdomain: Geometry
+topic: Three-dimensional measurement
+description: Calculate volume and surface area for cubes, cuboids, right prisms, and cylinders using nets,
+  exposed faces, capacity, and scaling.
+prerequisites:
+- MATH_GEOM_011
+- MATH_ARITH_013
+tags:
+- geometry
+- volume
+- surface_area
+- prisms
+- cylinders
+- nets
+- capacity
+- scaling
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 10
+  review_after_days_if_learning: 3
+theory: 'Volume measures how much three-dimensional space an object occupies. It is counted in cubic units
+  because three
+
+  independent lengths are multiplied. A cuboid with length L, width W, and height H has V = LWH. A cube
+  with
+
+  side s has V = s^3. Capacity is the same physical volume reported in a container unit: 1 litre = 1,000
+  cubic
+
+  centimetres and 1 millilitre = 1 cubic centimetre. Keep the unit conversion attached to the answer;
+  a numerical
+
+  result without units can hide a factor of 1,000 error.
+
+
+  A right prism has two congruent, parallel bases and a constant cross-section between them. If the base
+  area is
+
+  B and the prism length or height is H, V = BH. A rectangular prism uses B = LW. A triangular or polygonal
+  base
+
+  can be handled by finding its base area first, but this lesson focuses on cubes, cuboids, and right
+  prisms with a
+
+  supplied base area. The word right means the connecting edges are perpendicular to the bases, so the
+  stated
+
+  height is the perpendicular distance, not a slanted edge.
+
+
+  Surface area measures the total area of exposed faces. A cuboid has two faces of each dimension, so
+  SA = 2LW +
+
+  2LH + 2WH. A cube has six equal square faces, SA = 6s^2. A net unfolds every face into a flat arrangement.
+  Adding
+
+  the areas of all net faces once is a reliable method. Shared edges appear in the net as joins, but they
+  are not
+
+  extra surface area. If a box is open at the top, omit only the top face; if it is placed on a floor,
+  decide whether
+
+  the question asks total surface area or only the exposed area.
+
+
+  For a right prism whose base perimeter is P, the lateral area is PH. Add the two bases to obtain total
+  surface
+
+  area: SA = PH + 2B. This decomposition prevents a frequent mistake: using volume BH when the problem
+  asks for
+
+  the outside covering. A rectangular prism illustrates both formulas. Its lateral area is 2(L+W)H and
+  its bases
+
+  contribute 2LW, giving the cuboid formula after expansion.
+
+
+  A cylinder is a right prism with circular bases. Its volume is V = pi r^2 h. Its total surface area
+  is the two
+
+  circular bases plus the curved side: SA = 2pi r^2 + 2pi rh. The curved side unwraps to a rectangle of
+  width 2pi r
+
+  and height h. A cylinder net therefore has two circles and one rectangle. Use radius, not diameter,
+  in r^2; halve
+
+  a stated diameter first. For exact work leave pi; for a decimal, state the approximation. A can with
+  a lid and a
+
+  base has both circles exposed only when the context calls for the complete outside surface.
+
+
+  Exposed faces depend on the physical situation. A cube joined to another cube has a shared face hidden
+  inside, so
+
+  the two cubes contribute 12 faces minus 2 hidden faces = 10 exposed square faces. A stack of n cubes
+  in a straight
+
+  column has 6n - 2(n-1) exposed faces because each join hides two faces. A cuboid against a wall may
+  have one face
+
+  excluded from painting. State the model before calculating; “surface area” alone usually means every
+  outside face.
+
+
+  Scaling is cubic for volume and quadratic for surface area. Multiplying every length by k multiplies
+  volume by
+
+  k^3 and surface area by k^2. Doubling a box makes eight times as much room but only four times as much
+  covering.
+
+  This distinction matters in packaging, storage, and material estimates. A quick check compares dimensions:
+  a box
+
+  with sides 2, 3, and 4 has volume 24, while its surface area is 52; the two quantities cannot share
+  units.
+
+
+  A careful workflow is: identify the solid and the requested quantity; label base, height, radius, and
+  diameter;
+
+  choose a formula; preserve exact pi when useful; convert units at the end; and check whether a face
+  is hidden or
+
+  omitted. Draw a net for surface area and a cross-section for volume. The reviewed capstone asks for
+  volume,
+
+  surface area, capacity, and a sentence explaining why the units and faces differ.
+
+  '
+media:
+- src: media/native-final-foundations/geom-prism-net.svg
+  alt: A rectangular prism net shows four lateral rectangles and two congruent end faces joined along
+    shared edges.
+  caption: A net lists each exposed face exactly once; shared edges are joins, not extra area.
+  width: 520
+  height: 250
+  fit: contain
+- src: media/native-final-foundations/geom-cylinder.svg
+  alt: A right cylinder is labelled with radius r and height h beside its volume formula and two circular
+    bases.
+  caption: A cylinder has a constant circular cross-section, so volume is base area times height.
+  width: 520
+  height: 250
+  fit: contain
+examples:
+- prompt: Find the volume of a cuboid 3 cm by 4 cm by 5 cm.
+  solution: 60 cubic centimetres
+  explanation: 'Multiply three perpendicular dimensions: 3(4)(5) = 60.'
+- prompt: Find the surface area of a cuboid 2 by 3 by 4 units.
+  solution: 52 square units
+  explanation: SA = 2(2·3 + 2·4 + 3·4) = 2(26) = 52.
+- prompt: Find the volume of a cube with side 6 m.
+  solution: 216 cubic metres
+  explanation: V = 6^3 = 216.
+- prompt: Find the total surface area of a cube with side 6 m.
+  solution: 216 square metres
+  explanation: Six faces each have area 36, so SA = 6(36) = 216.
+- prompt: A right prism has base area 18 cm² and height 7 cm. Find its volume.
+  solution: 126 cm³
+  explanation: V = BH = 18(7) = 126 cubic centimetres.
+- prompt: Find the exact volume of a cylinder with radius 4 and height 9.
+  solution: 144pi cubic units
+  explanation: V = pi(4²)(9) = 144pi.
+- prompt: Find the exact total surface area of a cylinder with radius 3 and height 5.
+  solution: 48pi square units
+  explanation: SA = 2pi(3²) + 2pi(3)(5) = 18pi + 30pi = 48pi.
+- prompt: A 2 cm by 3 cm by 4 cm box is open at the top. Find the exposed area.
+  solution: 46 square centimetres
+  explanation: Total 52 minus the 2·3 top face gives 46 square centimetres.
+- prompt: Two identical cubes share one face. How many square faces are exposed?
+  solution: 10 faces
+  explanation: Twelve faces total minus two joined faces leaves ten outside faces.
+- prompt: A box has volume 3,000 cm³. Convert its capacity to litres.
+  solution: 3 litres
+  explanation: Divide cubic centimetres by 1,000.
+applications:
+- title: Packaging
+  description: Box volume predicts product capacity while net surface area estimates cardboard, labels,
+    and exposed printing.
+- title: Storage tanks
+  description: Cylinders model cans and tanks; exact pi keeps capacity and sheet-metal estimates consistent
+    before rounding.
+- title: Construction and painting
+  description: Exposed faces determine paint or insulation, while hidden faces at walls, floors, and joins
+    are omitted deliberately.
+- title: Manufacturing scale
+  description: Cubic and quadratic scaling separate how much a larger container holds from how much material
+    its surface requires.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: GEOM012_CUBOID_VOLUME
+    type: generated
+    prompt_template: Find the volume of a cuboid with dimensions {L}, {W}, and {H} units.
+    variables:
+      L:
+        type: int
+        min: 2
+        max: 9
+      W:
+        type: int
+        min: 2
+        max: 8
+      H:
+        type: int
+        min: 2
+        max: 7
+    derived:
+      V: L*W*H
+    answer:
+      type: numeric
+      value: '{V}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: 'Multiply the three perpendicular dimensions: V = {V} cubic units.'
+    mistake_tags:
+    - volume_vs_surface_area
+    - units
+    work:
+      mode: none
+  - id: GEOM012_CUBOID_SURFACE
+    type: generated
+    prompt_template: Find the total surface area of a cuboid with dimensions {L}, {W}, and {H} units.
+    variables:
+      L:
+        type: int
+        min: 2
+        max: 8
+      W:
+        type: int
+        min: 2
+        max: 7
+      H:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      SA: 2*(L*W+L*H+W*H)
+    answer:
+      type: numeric
+      value: '{SA}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: 'Add the three paired face areas and double them: SA = {SA} square units.'
+    mistake_tags:
+    - surface_area_faces
+    work:
+      mode: none
+  - id: GEOM012_CUBE_VOLUME
+    type: generated
+    prompt_template: A cube has side length {s}. Find its volume.
+    variables:
+      s:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      V: s*s*s
+    answer:
+      type: numeric
+      value: '{V}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: Cube volume is s³ = {V} cubic units.
+    mistake_tags:
+    - cube_power
+    work:
+      mode: none
+  - id: GEOM012_CUBE_SURFACE
+    type: generated
+    prompt_template: A cube has side length {s}. Find its total surface area.
+    variables:
+      s:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      SA: 6*s*s
+    answer:
+      type: numeric
+      value: '{SA}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: Six square faces give SA = 6s² = {SA} square units.
+    mistake_tags:
+    - surface_area_faces
+    work:
+      mode: none
+  - id: GEOM012_PRISM_VOLUME
+    type: generated
+    prompt_template: A right prism has base area {B} square units and height {H}. Find its volume.
+    variables:
+      B:
+        type: int
+        min: 4
+        max: 30
+      H:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      V: B*H
+    answer:
+      type: numeric
+      value: '{V}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: 'Volume is base area times perpendicular height: {B}·{H} = {V}.'
+    mistake_tags:
+    - prism_base_height
+    work:
+      mode: none
+  - id: GEOM012_CYLINDER_VOLUME_FACTOR
+    type: generated
+    prompt_template: A cylinder has radius {r} and height {h}. Enter the coefficient of pi in its exact
+      volume.
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 8
+      h:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      factor: r*r*h
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: V = pi r²h, so the coefficient is {factor}.
+    mistake_tags:
+    - cylinder_volume
+    - radius_squared
+    work:
+      mode: none
+  - id: GEOM012_CYLINDER_SURFACE_FACTOR
+    type: generated
+    prompt_template: A closed cylinder has radius {r} and height {h}. Enter the coefficient of pi in its
+      total surface area.
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 7
+      h:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      factor: 2*r*r+2*r*h
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Two bases and the curved side give coefficient 2r² + 2rh = {factor}.
+    mistake_tags:
+    - cylinder_surface
+    - missing_base
+    work:
+      mode: none
+  - id: GEOM012_CAPACITY
+    type: generated
+    prompt_template: A container measures {L} cm by {W} cm by {H} cm. What is its capacity in litres?
+    variables:
+      L:
+        type: int
+        min: 10
+        max: 40
+        exclude:
+        - 11
+        - 13
+        - 17
+        - 19
+        - 23
+        - 29
+        - 31
+        - 37
+      W:
+        type: int
+        min: 5
+        max: 20
+        exclude:
+        - 7
+        - 11
+        - 13
+        - 17
+        - 19
+      H:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      litres: L*W*H/1000
+    answer:
+      type: numeric
+      value: '{litres}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    difficulty: medium
+    explanation_template: 'Divide cubic centimetres by 1,000 to convert to litres: {litres} L.'
+    mistake_tags:
+    - capacity_conversion
+    work:
+      mode: none
+  - id: GEOM012_OPEN_BOX
+    type: generated
+    prompt_template: An open-top box has dimensions {L}, {W}, and {H}. Find its exposed surface area.
+    variables:
+      L:
+        type: int
+        min: 2
+        max: 8
+      W:
+        type: int
+        min: 2
+        max: 7
+      H:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      SA: L*W+2*L*H+2*W*H
+    answer:
+      type: numeric
+      value: '{SA}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: 'Include the base once and the four side faces: exposed area is {SA}.'
+    mistake_tags:
+    - open_top
+    - surface_area_faces
+    work:
+      mode: none
+  - id: GEOM012_LATERAL_PRISM
+    type: generated
+    prompt_template: A right prism has base perimeter {P}, base area {B}, and height {H}. Find its total
+      surface area.
+    variables:
+      P:
+        type: int
+        min: 8
+        max: 30
+      B:
+        type: int
+        min: 4
+        max: 25
+      H:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      SA: P*H+2*B
+    answer:
+      type: numeric
+      value: '{SA}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Lateral area is PH and both bases add 2B, giving {SA}.
+    mistake_tags:
+    - prism_surface_area
+    work:
+      mode: none
+  - id: GEOM012_HIDDEN_FACES
+    type: generated
+    prompt_template: A straight stack contains {n} identical cubes. How many square faces are exposed?
+    variables:
+      n:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      faces: 6*n-2*(n-1)
+    answer:
+      type: numeric
+      value: '{faces}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: 'Start with 6n faces and hide two at each of n−1 joins: {faces} remain.'
+    mistake_tags:
+    - hidden_faces
+    work:
+      mode: none
+  - id: GEOM012_SCALE_VOLUME
+    type: generated
+    prompt_template: Every length of a solid is multiplied by {k}. By what factor does its volume change?
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      factor: k*k*k
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: 'Volume scales cubically: {k}³ = {factor}.'
+    mistake_tags:
+    - cubic_scaling
+    work:
+      mode: none
+  - id: GEOM012_SCALE_SURFACE
+    type: generated
+    prompt_template: Every length of a solid is multiplied by {k}. By what factor does its surface area
+      change?
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      factor: k*k
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: 'Surface area scales quadratically: {k}² = {factor}.'
+    mistake_tags:
+    - quadratic_scaling
+    work:
+      mode: none
+  - id: GEOM012_CUBE_FROM_VOLUME
+    type: generated
+    prompt_template: A cube has volume {V} cubic units, where V is a perfect cube. Find its side length.
+    variables:
+      s:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      V: s*s*s
+    answer:
+      type: numeric
+      value: '{s}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: The side is the cube root of {V}, namely {s}.
+    mistake_tags:
+    - inverse_volume
+    work:
+      mode: none
+  - id: GEOM012_CYLINDER_DIAMETER
+    type: generated
+    prompt_template: A cylinder has diameter {d} and height {h}. Enter the coefficient of pi in its exact
+      volume.
+    variables:
+      d:
+        type: int
+        min: 4
+        max: 16
+        exclude:
+        - 5
+        - 7
+        - 9
+        - 11
+        - 13
+        - 15
+      h:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      factor: d*d*h/4
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    difficulty: medium
+    explanation_template: 'Halve the diameter before squaring: coefficient (d/2)²h = {factor}.'
+    mistake_tags:
+    - diameter_used_as_radius
+    - cylinder_volume
+    work:
+      mode: none
+  - id: GEOM012_DIMENSIONAL_CHECK
+    type: fixed
+    prompt_template: A 2 m by 3 m by 4 m box has volume 24 cubic metres and surface area 52 square metres.
+      Which statement is dimensionally valid?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: The volume is 24 square metres.
+    - id: B
+      label: The surface area is 52 square metres.
+    - id: C
+      label: The surface area is 52 cubic metres.
+    - id: D
+      label: Volume and surface area use identical units.
+    difficulty: medium
+    explanation_template: Surface area counts two-dimensional faces in square units; volume counts space
+      in cubic units.
+    mistake_tags:
+    - units
+    - volume_vs_surface_area
+    work:
+      mode: none
+  - id: GEOM012_NET_FACES
+    type: generated
+    prompt_template: A cuboid net has two faces of area {A}, two of area {B}, and two of area {C}. Find
+      the total net area.
+    variables:
+      A:
+        type: int
+        min: 4
+        max: 30
+      B:
+        type: int
+        min: 4
+        max: 30
+      C:
+        type: int
+        min: 4
+        max: 30
+    derived:
+      SA: 2*(A+B+C)
+    answer:
+      type: numeric
+      value: '{SA}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: 'Add all six faces once: 2(A+B+C) = {SA} square units.'
+    mistake_tags:
+    - net_faces
+    work:
+      mode: none
+  - id: GEOM012_LITRE_CONVERSION
+    type: generated
+    prompt_template: A cuboid has volume {v} cubic centimetres. What is its capacity in litres?
+    variables:
+      v:
+        type: int
+        min: 1000
+        max: 9000
+        exclude:
+        - 1001
+        - 1003
+        - 1007
+        - 1009
+    derived:
+      litres: v/1000
+    answer:
+      type: numeric
+      value: '{litres}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    difficulty: easy
+    explanation_template: Divide cubic centimetres by 1,000 to get litres.
+    mistake_tags:
+    - capacity_conversion
+    work:
+      mode: none
+  - id: GEOM012_JOINED_CUBES
+    type: generated
+    prompt_template: Two identical cubes share one face. If each cube has side {s}, what is the total
+      exposed surface area?
+    variables:
+      s:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      SA: 10*s*s
+    answer:
+      type: numeric
+      value: '{SA}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Ten square faces remain exposed after the shared face is hidden, giving {SA}.
+    mistake_tags:
+    - hidden_faces
+    - surface_area_faces
+    work:
+      mode: none
+  - id: GEOM012_CAPSTONE
+    type: fixed
+    prompt_template: A closed rectangular storage box is 2 m by 3 m by 4 m. Enter its volume in cubic
+      metres as the final answer. In required work, also explain its total surface area, its capacity
+      in litres, and why the measurements use different units.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '24'
+    grading:
+      method: exact_numeric
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Show formulas with units and explain every face counted.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Computes V = 2·3·4 = 24 cubic metres.
+          weight: 2
+        - id: criterion_2
+          description: Computes SA = 2(2·3 + 2·4 + 3·4) = 52 square metres and identifies the six faces.
+          weight: 2
+        - id: criterion_3
+          description: Converts 24 cubic metres to 24,000 litres and distinguishes cubic volume units
+            from square surface units.
+          weight: 2
+    media:
+    - src: media/native-final-foundations/geom-prism-net.svg
+      alt: A rectangular-prism net shows the six fixed faces that make the storage box.
+      caption: The capstone uses a net to justify counting each outside face once.
+      width: 520
+      height: 250
+      fit: contain
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: The volume is 24 cubic metres, the surface area is 52 square metres, and the
+      capacity is 24,000 litres. Volume counts space; surface area counts exposed faces.
+    mistake_tags:
+    - units
+    - volume_vs_surface_area
+    - capacity_conversion

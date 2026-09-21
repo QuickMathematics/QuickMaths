@@ -1,0 +1,626 @@
+id: MATH_ARITH_013
+schema_version: '0.2'
+name: Measurement, unit conversions and elapsed time
+domain: Math
+subdomain: Arithmetic
+topic: Arithmetic Foundations
+description: 'Measurement attaches a number to a unit so that a length, mass, time, or capacity can be interpreted.
+  A bare 5 is incomplete when a question asks for distance or duration: 5 m, 5 kg, and 5 min are dif'
+prerequisites:
+- MATH_ARITH_009
+- MATH_ARITH_011
+unlocks: []
+tags:
+- arithmetic
+- measurement
+- unit_conversions
+- elapsed_time
+- dimensional_analysis
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'Measurement attaches a number to a unit so that a length, mass, time, or capacity can be interpreted.
+  A bare 5 is incomplete when a question asks for distance or duration: 5 m, 5 kg, and 5 min are different
+  quantities. Choose a unit that suits the scale, record the given unit, and convert with an equality before
+  calculating. The equality 1 m = 100 cm is a relationship between units, not a statement that the physical
+  length changed.
+
+
+  For a single dimension, conversion factors multiply by 1 in value. To convert 2.4 m to centimetres, use 2.4
+  m×(100 cm/1 m)=240 cm; the metres cancel. To convert 3500 g to kilograms, use 3500 g×(1 kg/1000 g)=3.5 kg.
+  Larger units have more physical size, so the numerical count usually decreases when moving from small units
+  to large units. Write the units through the calculation instead of relying only on a decimal-point memory
+  trick.
+
+
+  Area and volume scale in powers of the linear conversion. Since 1 m=100 cm, a square metre is 1 m²=(100 cm)²=10,000
+  cm². A cubic metre is 1 m³=(100 cm)³=1,000,000 cm³. Converting 25,000 cm² to m² means divide by 10,000, giving
+  2.5 m²; dividing by 100 would be a one-dimensional conversion and would be wrong. For a box, 1 L=1000 cm³,
+  so 2500 cm³=2.5 L. Count the dimension: length uses the factor once, area twice, and volume three times.
+
+
+  Perimeter adds lengths around a boundary; area measures a surface; volume measures occupied space. A rectangle
+  3 m by 2 m has perimeter 10 m and area 6 m². The units themselves help catch a category error: m cannot equal
+  m², and adding 3 m to 2 m² is not meaningful. If dimensions are given in different units, convert them first,
+  then apply the formula. A scale drawing may require converting the final area or volume with the correct
+  power.
+
+
+  Elapsed time is a difference between instants, but clock notation is not ordinary decimal notation. From
+  09:35 to 11:10, count 25 minutes to 10:00 and 70 minutes from 10:00 to 11:10, for 95 minutes or 1 h 35 min.
+  Borrow one hour as 60 minutes, not as 100. If a duration crosses midnight, split at 24:00. For a schedule,
+  distinguish start time, end time, and duration; a break may need to be removed from the total.
+
+
+  Unit rates connect measurement to time or quantity: 180 km in 3 h is 60 km/h, while 3 h for 180 km is 1/60
+  h/km. Converting before dividing avoids hidden factors. For speed, distance = speed×time only when units
+  are compatible; 90 km/h for 30 minutes uses 0.5 h and gives 45 km. For medication, recipes, or engineering,
+  keep units attached so a conversion is visible and reversible.
+
+
+  Significant figures and rounding belong at the reporting stage. Keep exact conversion factors such as 100
+  cm per metre and 60 seconds per minute, then round a measured result according to the stated precision. A
+  count of 60 seconds in a minute is a defined relationship; a stopwatch reading may be approximate. Check
+  plausibility: converting metres to centimetres should increase the number by 100, while converting square
+  metres to square centimetres should increase it by 10,000.
+
+
+  A reliable workflow is: name the quantity and unit, write a conversion equality, cancel units, calculate,
+  and state the final unit. For time, draw a timeline or split at a convenient hour. The capstone combines
+  mixed length units and area, asking you to square the conversion factor rather than reuse a one-dimensional
+  factor.
+
+  Dimensional analysis is a cancellation argument. Write a conversion factor so the unit you do not want appears
+  once in the numerator and once in the denominator. If a conversion factor is squared, both copies of the
+  length unit are transformed: (1 m)²=(100 cm)². Do not convert a finished area by 100 and call the result
+  square centimetres; the missing factor of 100 is a dimensional error, not a rounding issue.
+
+
+  Elapsed-time problems often combine a duration with a clock time. Add 95 minutes to 09:35 by adding 25 minutes
+  to reach 10:00, then 70 more to reach 11:10. For a schedule with a break, calculate the gross interval first
+  and subtract the break duration in minutes. For speeds, convert every time to hours or every distance to
+  a matching unit before multiplying. A result such as 45 km is plausible for 90 km/h over half an hour; 2,700
+  km would reveal that minutes were treated as hours.
+
+  '
+examples:
+- prompt: Convert 2.4 m to centimetres.
+  solution: 240 cm
+  explanation: Multiply by 100 cm per metre; metres cancel.
+- prompt: Convert 3500 g to kilograms.
+  solution: 3.5 kg
+  explanation: Divide by 1000 g per kilogram.
+- prompt: Convert 1 m² to cm².
+  solution: 10,000 cm²
+  explanation: 'Square the linear factor: 100²=10,000.'
+- prompt: Convert 1 m³ to cm³.
+  solution: 1,000,000 cm³
+  explanation: 'Cube the linear factor: 100³=1,000,000.'
+- prompt: Find the area of a 3 m by 2 m rectangle.
+  solution: 6 m²
+  explanation: Area is length×width; both dimensions use metres.
+- prompt: Find the perimeter of the same rectangle.
+  solution: 10 m
+  explanation: Perimeter is 2(3+2) metres.
+- prompt: Elapsed time from 09:35 to 11:10?
+  solution: 1 h 35 min
+  explanation: 25 minutes to 10:00 plus 70 minutes gives 95 minutes.
+- prompt: How many seconds are in 2.5 minutes?
+  solution: 150 s
+  explanation: Multiply by 60 seconds per minute.
+- prompt: A car travels 90 km/h for 30 minutes. Distance?
+  solution: 45 km
+  explanation: 30 minutes is 0.5 h; 90×0.5=45.
+- prompt: Convert 2500 cm³ to litres.
+  solution: 2.5 L
+  explanation: 1000 cm³=1 L, so divide by 1000.
+applications:
+- title: Construction and floor plans
+  description: Length, area, and volume conversions prevent material estimates from mixing dimensions or units.
+- title: Travel and timetables
+  description: Elapsed-time subtraction and unit rates turn departure, arrival, speed, and distance into compatible
+    quantities.
+- title: Cooking and science
+  description: Capacity, mass, and volume conversions let recipes and experiments scale without confusing litres
+    with cubic centimetres.
+- title: Health and engineering
+  description: Rates and dimensional checks expose unsafe unit mismatches before a dose, flow, or design value
+    is used.
+media:
+- src: media/native-number-foundations/arith013-dimensional-powers.svg
+  alt: Three boxes show a linear metre-to-centimetre factor used once for length, twice for area, and three
+    times for volume.
+  caption: The dimension determines the power of the conversion factor.
+  width: 800
+  height: 360
+  fit: contain
+- src: media/native-number-foundations/arith013-time-line.svg
+  alt: A timeline splits 09:35 to 11:10 into 25 minutes and 70 minutes, totaling 95 minutes.
+  caption: Clock subtraction uses 60 minutes per hour, not decimal hundreds.
+  width: 800
+  height: 360
+  fit: contain
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: ARITH013_METRE_CM
+    type: generated
+    prompt_template: Convert {m}/10 metres to centimetres.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      m:
+        type: int
+        min: 10
+        max: 49
+    derived:
+      cm: m*10
+    constraints: []
+    answer:
+      type: numeric
+      value: '{cm}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: One metre is 100 centimetres, so m/10 metres equals m×10 centimetres.
+    mistake_tags:
+    - length_conversion
+  - id: ARITH013_GRAM_KG
+    type: generated
+    prompt_template: Convert {g} grams to kilograms.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      g:
+        type: int
+        min: 1000
+        max: 9000
+    derived:
+      kg: g/1000
+    constraints: []
+    answer:
+      type: numeric
+      value: '{kg}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Divide grams by 1000 because 1000 g=1 kg.
+    mistake_tags:
+    - mass_conversion
+  - id: ARITH013_AREA_FACTOR
+    type: fixed
+    prompt: For 1 m², enter the number of cm².
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '10000'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'The linear factor 100 is squared: 100²=10,000.'
+    mistake_tags:
+    - area_conversion
+    - squared_units
+  - id: ARITH013_VOLUME_FACTOR
+    type: fixed
+    prompt: For 1 m³, enter the number of cm³.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '1000000'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'The linear factor 100 is cubed: 100³=1,000,000.'
+    mistake_tags:
+    - volume_conversion
+    - cubic_units
+  - id: ARITH013_AREA_CONVERT
+    type: fixed
+    prompt: Convert 25,000 cm² to m².
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '2.5'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Divide by 10,000 cm² per m².
+    mistake_tags:
+    - area_conversion
+  - id: ARITH013_VOLUME_LITRE
+    type: fixed
+    prompt: Convert 2500 cm³ to litres.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '2.5'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Divide by 1000 cm³ per litre.
+    mistake_tags:
+    - volume_conversion
+  - id: ARITH013_RECT_AREA
+    type: fixed
+    prompt: A scale runs from 20 to 30 in five equal intervals. What value is at the third tick after 20?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '26'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Each interval is (30−20)/5=2; the third tick is 20+3×2=26.
+    mistake_tags:
+    - scale_reading
+    - equal_intervals
+  - id: ARITH013_RECT_PERIMETER
+    type: fixed
+    prompt: Convert 1 m 35 cm to centimetres.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '135'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 1 m=100 cm, so 100+35=135 cm.
+    mistake_tags:
+    - mixed_units
+    - length_conversion
+  - id: ARITH013_ELAPSED
+    type: fixed
+    prompt: From 09:35 to 11:10, enter elapsed minutes.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '95'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 25 minutes to 10:00 plus 70 gives 95 minutes.
+    mistake_tags:
+    - elapsed_time
+  - id: ARITH013_CROSS_HOUR
+    type: fixed
+    prompt: Which unit is most appropriate for the distance between two nearby cities?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Millimetres
+    - id: B
+      label: Centimetres
+    - id: C
+      label: Kilometres
+    - id: D
+      label: Square metres
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A city-to-city distance is a length on a large scale, so kilometres are appropriate.
+    mistake_tags:
+    - appropriate_units
+    - length
+  - id: ARITH013_SECONDS
+    type: fixed
+    prompt: Enter seconds in 2.5 minutes.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '150'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 2.5×60=150 seconds.
+    mistake_tags:
+    - time_conversion
+  - id: ARITH013_SPEED
+    type: fixed
+    prompt: Convert 72 km/h to metres per second.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '20'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 72×1000÷3600=20 m/s.
+    mistake_tags:
+    - rate
+    - mixed_units
+  - id: ARITH013_SPEED_VAR
+    type: generated
+    prompt_template: A cyclist travels at {speed} km/h for {half} half-hours. Enter distance in km.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      speed:
+        type: int
+        min: 20
+        max: 80
+      half:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      distance: speed*half/2
+    constraints: []
+    answer:
+      type: numeric
+      value: '{distance}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Each half-hour is 0.5 hours, so distance=speed×time.
+    mistake_tags:
+    - rate
+    - time_conversion
+  - id: ARITH013_DIMENSION_COUNT
+    type: fixed
+    prompt: Converting m to cm for an area requires using the factor how many times?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '2'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Area has two length dimensions, so square the linear factor.
+    mistake_tags:
+    - dimensional_powers
+  - id: ARITH013_DIMENSION_CUBE
+    type: fixed
+    prompt: Which unit is most suitable for the capacity of a household water tank?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Litres
+    - id: B
+      label: Square centimetres
+    - id: C
+      label: Kilometres
+    - id: D
+      label: Seconds
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Capacity is a volume; litres are a practical capacity unit.
+    mistake_tags:
+    - appropriate_units
+    - volume
+  - id: ARITH013_UNIT_CANCEL
+    type: fixed
+    prompt: In 2.4 m×(100 cm/1 m), which unit remains?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: m
+    - id: B
+      label: cm
+    - id: C
+      label: m²
+    - id: D
+      label: cm³
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The metre units cancel, leaving centimetres.
+    mistake_tags:
+    - unit_analysis
+  - id: ARITH013_MIXED_DIMENSIONS
+    type: fixed
+    prompt: Which sum is dimensionally meaningful?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 3 m + 2 m²
+    - id: B
+      label: 4 kg + 2 L
+    - id: C
+      label: 3 m + 2 m
+    - id: D
+      label: 5 s + 1 km
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Only quantities with the same dimension and unit type can be added directly.
+    mistake_tags:
+    - dimensional_reasoning
+  - id: ARITH013_MIDNIGHT
+    type: fixed
+    prompt: A trip starts 23:40 and ends 00:15 next day. Enter elapsed minutes.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '35'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 20 minutes to midnight plus 15 minutes after midnight.
+    mistake_tags:
+    - elapsed_time
+    - midnight
+  - id: ARITH013_CAPACITY
+    type: generated
+    prompt_template: A tank holds {litres} litres. Enter capacity in cm³.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      litres:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      cm3: litres*1000
+    constraints: []
+    answer:
+      type: numeric
+      value: '{cm3}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: One litre equals 1000 cubic centimetres.
+    mistake_tags:
+    - volume_conversion
+  - id: ARITH013_CAPSTONE
+    type: fixed
+    prompt: A rectangular mat is 2.5 m long and 80 cm wide. Enter its area in square metres.
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '2'
+    grading:
+      method: exact_numeric
+    work:
+      mode: rubric_check
+      prompt: Explain the model, show labelled calculations, and state units or assumptions. A final number
+        alone is not enough.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Converts 80 cm to 0.80 m before applying the rectangle-area formula.
+          weight: 2
+        - id: criterion_2
+          description: Calculates 2.5×0.80=2.0 and states square metres.
+          weight: 2
+        - id: criterion_3
+          description: Explains why converting 80 cm as if it were 80 m, or using a one-dimensional factor
+            on a finished area, would be inconsistent.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: 80 cm=0.80 m. Area=2.5 m×0.80 m=2.0 m². The conversion is done before multiplying
+      the two perpendicular lengths.
+    mistake_tags:
+    - capstone_reasoning
+    - model_selection

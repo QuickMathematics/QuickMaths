@@ -13,6 +13,7 @@ from quickmaths.config import DEFAULT_TRACK_DIR, SUPPORTED_GRADING_METHODS
 from quickmaths.formal_spec import normalize_proof_spec
 from quickmaths.lesson_display import LessonDisplayError, normalize_cartesian_diagram, normalize_math_blocks
 from quickmaths.models import Example, MasteryRules, ProblemTemplate, Skill, SkillTest, Track
+from quickmaths.problem_generator import GenerationError, generate_problem
 
 
 class ContentError(ValueError):
@@ -124,8 +125,11 @@ def validate_content(track: Track, skills: dict[str, Skill]) -> list[str]:
             try:
                 normalize_math_blocks(question.math_blocks)
                 if question.diagram is not None:
-                    normalize_cartesian_diagram(question.diagram)
-            except LessonDisplayError as exc:
+                    # Native diagrams may contain public-given placeholders. Validate
+                    # a resolved instance through the same bounded generation path;
+                    # raw template text is not a resolved Cartesian expression.
+                    normalize_cartesian_diagram(generate_problem(skill.id, question, seed=0).diagram)
+            except (LessonDisplayError, GenerationError) as exc:
                 raise ContentError(f"{skill.source_path}: question '{question.id}' has invalid native display: {exc}") from exc
             try:
                 normalize_proof_spec(question.proof_spec)

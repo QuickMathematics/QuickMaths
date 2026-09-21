@@ -253,7 +253,7 @@ test("publication status distinguishes submission from exact-release listing", a
 });
 
 test("native improvements keep native IDs and still pass full federation validation", async () => {
-  const native = structuredClone(curriculum.skills[0]);
+  const native = structuredClone(curriculum.skills.find(skill => skill.id === "MATH_ARITH_001"));
   const input = pack(); input.id = "PACK_NATIVE_FIX"; input.mode = "override"; input.skills = [native];
   input.track = { id: "TRACK_NATIVE_FIX", name: "Native fix", skills: [native.id] };
   const prepared = await preparePublicLesson(input, { namespace: "ALICE", curriculum, author: "alice" });

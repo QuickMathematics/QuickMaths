@@ -2,7 +2,7 @@
 export const LESSON_ILLUSTRATIONS = {
   "MATH_ARITH_001": {
     "name": "Integer operations",
-    "fingerprint": "593eb60c",
+    "fingerprint": "5ed76c81",
     "media": [
       {
         "type": "image",
@@ -46,7 +46,7 @@ export const LESSON_ILLUSTRATIONS = {
   },
   "MATH_ARITH_003": {
     "name": "Fractions basics",
-    "fingerprint": "34f6b43a",
+    "fingerprint": "1021d441",
     "media": [
       {
         "type": "image",
@@ -170,7 +170,7 @@ export const LESSON_ILLUSTRATIONS = {
   },
   "MATH_EXP_001": {
     "name": "Exponent laws",
-    "fingerprint": "01310b51",
+    "fingerprint": "b728157e",
     "media": [
       {
         "type": "image",
@@ -192,7 +192,7 @@ export const LESSON_ILLUSTRATIONS = {
   },
   "MATH_RAD_001": {
     "name": "Square roots and simplifying radicals",
-    "fingerprint": "8e6ef8e5",
+    "fingerprint": "463f3163",
     "media": [
       {
         "type": "image",
@@ -426,7 +426,7 @@ export const LESSON_ILLUSTRATIONS = {
   },
   "MATH_ARITH_005": {
     "name": "Decimals, percents, and conversions",
-    "fingerprint": "b2e7a4bf",
+    "fingerprint": "735e2398",
     "media": [
       {
         "type": "image",
@@ -1106,7 +1106,7 @@ export const LESSON_ILLUSTRATIONS = {
   },
   "MATH_TRIG_001": {
     "name": "Right-triangle trigonometry",
-    "fingerprint": "74de59c1",
+    "fingerprint": "361c8971",
     "media": [
       {
         "type": "image",
@@ -1258,7 +1258,7 @@ export const LESSON_ILLUSTRATIONS = {
   },
   "MATH_TRIG_006": {
     "name": "Laws of sines and cosines",
-    "fingerprint": "8741795a",
+    "fingerprint": "3fa3a948",
     "media": [
       {
         "type": "image",

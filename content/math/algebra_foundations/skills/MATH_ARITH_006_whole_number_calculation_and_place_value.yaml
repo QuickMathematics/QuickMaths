@@ -1,0 +1,790 @@
+id: MATH_ARITH_006
+schema_version: '0.2'
+name: Whole-number calculation and place value
+domain: Math
+subdomain: Arithmetic
+topic: Arithmetic Foundations
+description: 'Whole numbers count complete units: 0, 1, 2, 3, and so on. This is an entry point; you do not
+  need signed-number rules first.'
+prerequisites: []
+tags:
+- arithmetic
+- foundations
+- reasoning
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'Whole numbers count complete units: 0, 1, 2, 3, and so on. This is an entry point; you do not need
+  signed-number rules first.
+
+
+  Read a number by place value, not by the size of its digits. In 40,306, the 4 represents four ten-thousands,
+  the 3 three hundreds, the 0 no tens, and the 6 six ones. Zero is a placeholder: 406 and 46 are different.
+  Expanded notation is 40,000 + 300 + 6. A comma here separates groups of three digits; it is not a decimal
+  point. To compare nonnegative whole numbers, first compare the number of digits (ignoring leading zeros),
+  then compare from the left until a place differs. On a number line, larger numbers lie farther right. Zero
+  counts an empty collection, not a missing answer.
+
+
+  Addition combines amounts measured in the same unit. It can also describe moving forward or increasing a
+  starting amount. In 278 + 156, combine ones: 8 + 6 = 14 ones. Exchange ten ones for one ten and keep four
+  ones. Seven tens plus five tens plus the exchanged ten make thirteen tens: exchange ten tens for one hundred.
+  The final result is 434. A carried 1 is one unit of the next place, not an extra single object. Align ones
+  with ones. Adding 0 changes nothing, and the order of two addends does not change their sum.
+
+
+  Subtraction can remove objects, compare two amounts, or find a missing addend. For 402 - 178, there are not
+  enough ones or tens to subtract directly. Exchange one hundred into ten tens, then one of those tens into
+  ten ones. The same 402 is now 3 hundreds, 9 tens and 12 ones. Subtract by place to get 224. Regrouping changes
+  the representation, not the total. Check with 178 + 224 = 402. You cannot generally reverse subtraction:
+  8 - 3 is not 3 - 8. In this lesson, removal calculations keep nonnegative answers; signed numbers come next.
+
+
+  Multiplication counts equal groups. Four rows of six tiles give 4 times 6 = 24 tiles. Rotating the array
+  shows why 6 times 4 has the same total. Decomposing an array explains distribution: 7 times 23 = 7 times
+  20 + 7 times 3 = 161. The 2 in 23 represents twenty, so its partial product is 140, not 14. Multiplying by
+  1 preserves an amount; multiplying by 0 gives no objects. Addition of unequal groups cannot always be replaced
+  by one multiplication without further work.
+
+
+  Division has two useful meanings. Sharing 24 tiles among 6 children asks how many tiles per child: 4. Grouping
+  24 tiles into groups of 6 asks how many groups: also 4, but the answer has a different meaning. In a whole-number
+  calculation with divisor d greater than zero, dividend = d times quotient + remainder, where 0 <= remainder
+  < d. Thus 29 divided by 6 is 4 remainder 5 because 29 = 6 times 4 + 5. A remainder of 6 would make another
+  full group. Dividing zero by a positive number gives zero. Division by zero is undefined: no number of zero-sized
+  groups makes a positive total, and zero divided by zero would not select a unique quotient.
+
+
+  A context decides what to do with a remainder. To carry 29 pupils in six-seat vehicles, four vehicles are
+  insufficient: five are needed. To fill six-item sealed boxes from 29 items, only four full boxes can be sold,
+  with five items left. If 29 litres can be shared continuously among six containers, each can receive 4 and
+  5/6 litres. These are different questions about the same division. Read what the answer counts before rounding
+  or discarding anything.
+
+
+  A good calculation includes a plan, the operation, the unit, and a check. Estimate 398 + 205 as about 400
+  + 200 = 600 before calculating exactly 603. Estimates detect an implausible place-value slip but are not
+  exact answers. Use inverse operations to check: addition undoes subtraction, and multiplication checks division
+  when the remainder is included. For a two-stage story, identify what happens first and label its intermediate
+  result. Do not combine unlike units or let a keyword replace understanding. The reviewed capstone asks you
+  to explain grouping and the meaning of a remainder as well as find a number.'
+examples:
+- prompt: Write 50,204 in expanded notation.
+  solution: 50,000 + 200 + 4
+  explanation: The 5 is in the ten-thousands place. Zeros preserve the empty thousands and tens places.
+- prompt: 'Which is greater: 39,980 or 40,002?'
+  solution: 40,002
+  explanation: 'Compare the ten-thousands place first: four ten-thousands exceed three, regardless of later
+    digits.'
+- prompt: Calculate 278 + 156.
+  solution: '434'
+  explanation: 14 ones become 1 ten and 4 ones; 13 tens become 1 hundred and 3 tens; four hundreds remain.
+  math_blocks:
+  - type: derivation
+    steps:
+    - 278 + 156
+    - (200 + 100) + (70 + 50) + (8 + 6)
+    - 300 + 120 + 14
+    - '434'
+    alt: Addition regrouped by place value
+    linear_text: 278 plus 156 equals 300 plus 120 plus 14, which equals 434.
+- prompt: Calculate 402 - 178.
+  solution: '224'
+  explanation: Rewrite 402 as 3 hundreds, 9 tens, 12 ones. Subtract 1 hundred, 7 tens, 8 ones. Check 224 +
+    178 = 402.
+- prompt: An array has 4 rows of 6 tiles. How many tiles?
+  solution: 24 tiles
+  explanation: Each of four rows contributes six, so 6+6+6+6=24. Rotating the array gives six rows of four.
+- prompt: Calculate 7 times 23 by decomposition.
+  solution: '161'
+  explanation: 7(20+3)=140+21. Both parts must be multiplied; the tens contribute 140.
+- prompt: Share 24 counters equally among 6 people.
+  solution: 4 counters each
+  explanation: Six equal shares of four reconstruct 24. The quotient counts counters in each share.
+- prompt: Put 24 counters in bags of 6. How many bags?
+  solution: 4 bags
+  explanation: Repeatedly remove a group of six. Here the quotient counts groups, not counters per person.
+- prompt: Divide 29 by 6 as a whole-number quotient and remainder.
+  solution: 4 remainder 5
+  explanation: 6 times 4 + 5 = 29 and 0 <= 5 < 6. A remainder at least six would allow another group.
+- prompt: A trip has 29 pupils and vehicles hold 6 pupils. How many vehicles?
+  solution: 5 vehicles
+  explanation: Four carry only 24. The five remaining pupils need one additional vehicle, even though it is
+    not full.
+applications:
+- title: A shop receives 125 notebooks and then 78 more. It sells 96. How many remain?
+  description: 107 notebooks First find 203 delivered, then subtract 96. Check 107 + 96 = 203.
+- title: Six shelves hold 18 books each. Find the total.
+  description: '108 books Six equal groups: 6(10+8)=60+48. The unit is books, not shelves.'
+- title: There are 53 biscuits, with 8 in each complete gift box. How many complete boxes and leftovers?
+  description: 6 boxes and 5 biscuits 53 = 8 times 6 + 5. Do not count the incomplete seventh box as complete.
+- title: One walking route is 1,204 m and another is 985 m. How much longer is the first?
+  description: 219 m Subtraction compares the lengths; 985 + 219 = 1,204 checks the difference.
+media:
+- src: media/native-arithmetic-onramp/whole-place-value.svg
+  alt: A table shows 4 ten-thousands, 0 thousands, 3 hundreds, 0 tens and 6 ones.
+  caption: A zero keeps an empty place visible.
+  width: 800
+  height: 360
+  fit: contain
+- src: media/native-arithmetic-onramp/whole-array.svg
+  alt: Twenty-four dots arranged in four rows of six.
+  caption: Multiplication counts equal groups; both factors have a meaning.
+  width: 800
+  height: 360
+  fit: contain
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: WHOLE_PLACE
+    type: generated
+    prompt_template: In {number}, what is the value of the digit {h} in the hundreds place?
+    variables:
+      h:
+        type: int
+        min: 1
+        max: 9
+      t:
+        type: int
+        min: 0
+        max: 9
+      u:
+        type: int
+        min: 0
+        max: 9
+    derived:
+      number: 100*h+10*t+u
+      value: 100*h
+    constraints: []
+    answer:
+      type: numeric
+      value: '{value}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Hundreds have value digit times 100.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_EXPAND
+    type: generated
+    prompt_template: Write the number represented by {k} thousands + {h} hundreds + {u} ones.
+    variables:
+      k:
+        type: int
+        min: 1
+        max: 9
+      h:
+        type: int
+        min: 1
+        max: 9
+      u:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      value: 1000*k+100*h+u
+    constraints: []
+    answer:
+      type: numeric
+      value: '{value}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The absent tens contribute zero; keep that place.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_COMPARE
+    type: generated
+    prompt_template: 'Which is larger: {a} or {b}? Enter the larger number.'
+    variables:
+      k:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      a: 1000*k+999
+      b: 1000*(k+1)+1
+    constraints: []
+    answer:
+      type: numeric
+      value: '{b}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Compare the thousands before the remaining digits.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_ADD
+    type: generated
+    prompt_template: Calculate {a} + {b}.
+    variables:
+      a:
+        type: int
+        min: 178
+        max: 298
+      b:
+        type: int
+        min: 156
+        max: 287
+    derived:
+      c: a+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{c}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Add matching place values; exchange ten ones or tens when necessary.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_SUB
+    type: generated
+    prompt_template: Calculate {a} - {b}.
+    variables:
+      h:
+        type: int
+        min: 3
+        max: 9
+      b:
+        type: int
+        min: 115
+        max: 198
+    derived:
+      a: 100*h+2
+      c: a-b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{c}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Regroup across zero tens, keeping the original value unchanged.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_MISSING
+    type: generated
+    prompt_template: 'Find the missing addend: {a} + ? = {total}.'
+    variables:
+      a:
+        type: int
+        min: 100
+        max: 400
+      b:
+        type: int
+        min: 40
+        max: 200
+    derived:
+      total: a+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{b}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Subtract the known part from the whole.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_ARRAY
+    type: generated
+    prompt_template: An array has {r} rows with {c} dots per row. How many dots?
+    variables:
+      r:
+        type: int
+        min: 3
+        max: 8
+      c:
+        type: int
+        min: 4
+        max: 9
+    derived:
+      n: r*c
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'Rows are equal groups: multiply rows by dots per row.'
+    mistake_tags:
+    - place_value
+  - id: WHOLE_DISTRIBUTE
+    type: generated
+    prompt_template: Calculate {m} times {n} using tens and ones.
+    variables:
+      m:
+        type: int
+        min: 3
+        max: 9
+      t:
+        type: int
+        min: 2
+        max: 8
+      u:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      n: 10*t+u
+      ans: m*n
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply both place-value parts, then add the partial products.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_SHARE
+    type: generated
+    prompt_template: Share {n} counters equally among {d} people. How many per person?
+    variables:
+      d:
+        type: int
+        min: 2
+        max: 9
+      quot:
+        type: int
+        min: 3
+        max: 12
+    derived:
+      n: d*quot
+    constraints: []
+    answer:
+      type: numeric
+      value: '{quot}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Each equal share contains {quot}; multiplying by {d} checks the total.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_GROUP
+    type: generated
+    prompt_template: Put {n} counters into bags of {d}. How many bags?
+    variables:
+      d:
+        type: int
+        min: 3
+        max: 9
+      quot:
+        type: int
+        min: 4
+        max: 12
+    derived:
+      n: d*quot
+    constraints: []
+    answer:
+      type: numeric
+      value: '{quot}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The quotient counts complete groups of size {d}.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_REMAINDER
+    type: generated
+    prompt_template: Divide {n} by {d}. Enter only the remainder.
+    variables:
+      d:
+        type: int
+        min: 4
+        max: 9
+      quot:
+        type: int
+        min: 3
+        max: 12
+      rem:
+        type: int
+        min: 1
+        max: 3
+    derived:
+      n: d*quot+rem
+    constraints: []
+    answer:
+      type: numeric
+      value: '{rem}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: '{n} = {d} times {quot} + {rem}, and the remainder is smaller than the divisor.'
+    mistake_tags:
+    - place_value
+  - id: WHOLE_FULL_BOXES
+    type: generated
+    prompt_template: Pack {n} items into complete boxes of {d}. How many complete boxes?
+    variables:
+      d:
+        type: int
+        min: 3
+        max: 9
+      quot:
+        type: int
+        min: 3
+        max: 10
+    derived:
+      n: d*quot+1
+    constraints: []
+    answer:
+      type: numeric
+      value: '{quot}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The leftover item cannot form another complete box.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_VEHICLES
+    type: generated
+    prompt_template: Carry {n} pupils in vehicles with {d} pupil seats each. Minimum vehicles?
+    variables:
+      d:
+        type: int
+        min: 4
+        max: 9
+      quot:
+        type: int
+        min: 3
+        max: 8
+    derived:
+      n: d*quot+1
+      ans: quot+1
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The remainder needs an additional vehicle.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_RECONSTRUCT
+    type: generated
+    prompt_template: A division by {d} has quotient {quot} and remainder 2. What was the dividend?
+    variables:
+      d:
+        type: int
+        min: 3
+        max: 9
+      quot:
+        type: int
+        min: 3
+        max: 12
+    derived:
+      n: d*quot+2
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Reconstruct divisor times quotient plus remainder.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_ZERO
+    type: fixed
+    prompt_template: Which statement is correct?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Zero divided by a positive number is zero; division by zero is undefined.
+    mistake_tags:
+    - place_value
+    options:
+    - id: A
+      label: 7 divided by 0 is 0
+    - id: B
+      label: 0 divided by 0 is 1
+    - id: C
+      label: 0 divided by 7 is 0
+    - id: D
+      label: 7 times 0 is 7
+  - id: WHOLE_ERROR
+    type: fixed
+    prompt_template: A learner says 6 times 24 = 12 + 24 = 36. What went wrong?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The 2 means twenty. Its partial product is 6 times 20 = 120.
+    mistake_tags:
+    - place_value
+    options:
+    - id: A
+      label: Multiplication cannot be split
+    - id: B
+      label: The tens partial product should be 120, not 12
+    - id: C
+      label: The ones partial product should be 4
+    - id: D
+      label: Nothing went wrong
+  - id: WHOLE_ESTIMATE
+    type: fixed
+    prompt_template: Before calculating 398 + 205 exactly, which is the useful nearest-hundred estimate?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 400 + 200 = 600 is an estimate, while the exact answer is 603.
+    mistake_tags:
+    - place_value
+    options:
+    - id: A
+      label: '60'
+    - id: B
+      label: '600'
+    - id: C
+      label: 6,000
+    - id: D
+      label: 603 is the nearest-hundred estimate
+  - id: WHOLE_COMPARE_GAP
+    type: generated
+    prompt_template: One collection has {a} stamps and another has {b}. How many more in the first?
+    variables:
+      b:
+        type: int
+        min: 80
+        max: 200
+      gap:
+        type: int
+        min: 25
+        max: 90
+    derived:
+      a: b+gap
+    constraints: []
+    answer:
+      type: numeric
+      value: '{gap}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A comparison asks for the difference, not the sum.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_TWO_STAGE
+    type: generated
+    prompt_template: There are {r} trays of {c} rolls. {sold} rolls are sold. How many remain?
+    variables:
+      r:
+        type: int
+        min: 4
+        max: 9
+      c:
+        type: int
+        min: 5
+        max: 10
+      sold:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      ans: r*c-sold
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply to count the starting rolls, then subtract those sold.
+    mistake_tags:
+    - place_value
+  - id: WHOLE_CAPSTONE
+    type: fixed
+    prompt_template: There are 29 pupils and each vehicle has 6 pupil seats. Enter the minimum number of vehicles,
+      then explain what 29 divided by 6 means here, how to check its remainder, and why the remainder changes
+      the answer.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '5'
+    grading:
+      method: exact_numeric
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Explain each part in words, with a labelled calculation or drawing if useful. A final number
+        alone is not enough.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Explains grouping pupils into six-seat vehicles, with the quotient counting full groups.
+          weight: 2
+        - id: criterion_2
+          description: Uses 29 = 6 times 4 + 5 and verifies 0 <= 5 < 6.
+          weight: 2
+        - id: criterion_3
+          description: Explains why four vehicles are insufficient and five are sufficient, with correct units.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: 29 = 6 times 4 + 5. Four full vehicles leave five pupils, so a fifth is needed. Five
+      is less than six, as a remainder must be.
+    mistake_tags:
+    - place_value

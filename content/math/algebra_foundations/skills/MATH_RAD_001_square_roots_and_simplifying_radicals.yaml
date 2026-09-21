@@ -114,6 +114,9 @@ theory: |
 
   Another common mistake:
   Do not attach plus-or-minus to the principal square-root symbol. Use plus-or-minus when solving an equation whose two solutions come from squaring.
+
+  Exact values such as sqrt(2) are different from rounded decimal approximations. The principal real square root is nonnegative, so sqrt(x^2)=abs(x), and it equals x only when x>=0. Continue with Higher roots and rational exponents (MATH_RAD_002) for odd roots, negative powers and real-domain restrictions.
+
 examples:
 - prompt: 'Evaluate: sqrt(81)'
   solution: '9'

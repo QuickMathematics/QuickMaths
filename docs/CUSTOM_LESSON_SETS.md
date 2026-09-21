@@ -790,8 +790,16 @@ Existing drafts preserve complete resolved snapshots. Changes to generation defa
 
 ## Native lesson standards audit (September 21, 2026)
 
-The shipped catalog contains 136 lessons; 14 native Mathematics lessons now include a formal exercise. Use formal tasks for precise statements supported by the current rules, alongside ordinary practice and explicit tutor review for explanations. Do not convert a conceptual capstone into answer-string grading or claim that an empty assessment policy enforces a requested method.
+The shipped catalog contains 156 lessons; 14 native Mathematics lessons now include a formal exercise. Use formal tasks for precise statements supported by the current rules, alongside ordinary practice and explicit tutor review for explanations. Do not convert a conceptual capstone into answer-string grading or claim that an empty assessment policy enforces a requested method.
 
 For `sqrt_square_nonnegative`, author the cited guard as `0 <= x`. Difference-quotient cancellation retains `h != 0`; its algebraic identity alone is not a derivative proof. A punctured limit is separate from the assigned function value, and IVT existence does not establish uniqueness. The native composition, difference-quotient, radicals, systems, limits and continuity lessons provide current examples.
 
 Run `node scripts/audit_lesson_standards.mjs` for the catalog inventory. Run `python scripts/check_native_formal_references.py --skill MATH_CALC_001` with the configured pinned Lean environment to check published reference steps through the real kernel. Reference verification is authoring validation, never learner credit. The historical `MATH_FORMAL_002` example retains unsupported policies and is explicitly marked as historical; do not use it as a current assessment template.
+
+## Foundation-batch assessment contract
+
+The twenty-lesson foundation expansion supplies examples of elementary reasoning, compact reproducible instructional SVGs, structured calculations and public-parameter Cartesian graphs. Each native lesson has twenty distinct templates and question_count twenty, so its review-required capstone appears every time. Keep scenario counts distinct from assessment lengths; if you add another template, deliberately preserve every required question rather than relying on rotation.
+
+Known native Mathematics IDs in theory text are rendered as internal lesson links after escaping the text; unknown IDs remain text. These references are recommendations, not prerequisite locks. Native Studio copies retain the diagrams, mathematical displays and review rules. Portable exports contain resolved questions. Significance/precision checks must assess notation or reasoning explicitly: numeric equality alone cannot distinguish 2.4 from 2.40. Do not use ordinary floating powers to assert real odd roots of negative numbers.
+
+Run the focused foundation source/oracle tests and docs/foundations-roadmap.test.js after content changes. The latter checks one hundred generated assessments per lesson, every-attempt capstones, review boundaries, original-draft restoration, Studio copies and media integrity. See FOUNDATIONS_ROADMAP.md and the release report for the exact scope.

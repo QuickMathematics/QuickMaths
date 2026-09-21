@@ -1,0 +1,669 @@
+id: MATH_ARITH_010
+schema_version: '0.2'
+name: Rounding, significant figures and bounds
+domain: Math
+subdomain: Arithmetic
+topic: Arithmetic Foundations
+description: Rounding replaces a value by a nearby value at a stated place. It is useful when a measurement,
+  report, or decision does not need every recorded digit, but it changes the value. An exact value is spec
+prerequisites:
+- MATH_ARITH_009
+unlocks: []
+tags:
+- arithmetic
+- rounding
+- significant_figures
+- bounds
+- measurement
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'Rounding replaces a value by a nearby value at a stated place. It is useful when a measurement, report,
+  or decision does not need every recorded digit, but it changes the value. An exact value is specified without
+  approximation in the problem’s number system, such as 3/8 or exactly 0.375 kg. A measured value may be recorded
+  as 12.4 cm because the instrument resolves tenths; it is a report of a quantity with limited precision, not
+  a claim that all later digits are zero.
+
+
+  To round to a place, keep the digits through that place and inspect the first discarded digit. If it is 0,
+  1, 2, 3, or 4, keep the retained digit. If it is 5, 6, 7, 8, or 9, increase the retained digit by one. Discarded
+  digits then become zeros in whole-number places or disappear after the decimal point. For 6,347 rounded to
+  the nearest hundred, inspect the tens digit 4 and report 6,300. For 6,350, the tens digit is 5, so report
+  6,400. State the place; “6,4” is not an adequate answer to a nearest-hundred question.
+
+
+  Rounding can carry into a new place. Rounding 9.96 to the nearest tenth starts with retained digit 9 and
+  a discarded hundredths digit 6. Increasing 9 tenths produces 10 tenths, which is 1 whole, so the answer is
+  10.0. Keep a trailing zero when it communicates the requested place. A negative number is rounded by distance
+  to the target multiples; if signed values arise, decide using the same nearest-value idea rather than treating
+  a minus sign as a digit.
+
+
+  Significant figures record meaningful digits in a measurement. Nonzero digits always count. Zeros between
+  nonzero digits count, as in 1002 (four significant figures). Leading zeros only locate the decimal point
+  and do not count, as in 0.00450 (three significant figures: 4, 5, and the final zero). Trailing zeros after
+  a decimal point count, as in 2.300 (four significant figures). A whole number such as 1500 is ambiguous without
+  notation; write 1.5×10^3 for two significant figures or 1.500×10^3 for four. Scientific notation makes the
+  intended precision visible.
+
+
+  For multiplication and division, a common reporting rule is to give the result to the fewest significant
+  figures among the measured inputs. For addition and subtraction, compare decimal places instead: align the
+  values and report to the least precise decimal place. These rules describe a sensible measurement report;
+  they do not make the intermediate arithmetic less exact. Keep extra guard digits during calculation, then
+  round once at the end. Exact counted numbers, defined constants, and specified conversions do not limit significant
+  figures in the same way as measured inputs.
+
+
+  Bounds make an approximation informative. If a value x rounds to 48.4 to the nearest tenth, then 48.35 ≤
+  x < 48.45. The lower endpoint is included because 48.35 is exactly halfway and rounds up under the usual
+  half-up convention; the upper endpoint is excluded because 48.45 would round to 48.5. For rounding to the
+  nearest whole number n, the interval is [n−0.5,n+0.5). If a displayed value is truncated rather than rounded,
+  its bounds differ: 48.4 truncated to one decimal means 48.4 ≤ x < 48.5.
+
+
+  Use a symbol or inequality for uncertainty instead of inventing digits. A mass reported as 2.30 g to the
+  nearest hundredth lies from 2.295 g up to but not including 2.305 g. A calculation using bounds can estimate
+  a range for an area or cost, but the result’s precision should not imply more knowledge than the inputs provide.
+  Do not confuse accuracy (closeness to a true value) with precision (repeatable detail or resolution); rounding
+  changes the reported precision, while calibration affects accuracy.
+
+
+  Before rounding, identify the target place or number of significant figures. Mark the last kept digit, inspect
+  the next digit, and perform any carry. Afterward, check that the notation still communicates the requested
+  precision and that the result is close to the original. The capstone asks you to give a rounded measurement
+  and its half-open bounds, and to explain why the upper endpoint is excluded.
+
+  Rounding is a communication decision as well as a calculation. A bus timetable may round a duration to the
+  nearest minute, while a laboratory report may retain hundredths because the instrument supports them. The
+  same underlying value can therefore have several honest displays, provided each display states its place
+  or significant-figure rule. When comparing rounded values, remember that two displays can overlap in their
+  possible true intervals; a visible difference does not always prove the underlying values differ.
+
+
+  A bound is an interval statement, so endpoint symbols carry information. For nearest-tenth half-up rounding,
+  the lower midpoint belongs to the displayed bin and the upper midpoint belongs to the next bin. If a problem
+  uses a different tie rule, such as ties-to-even, state that rule before changing the endpoint. Bounds are
+  also useful in later calculations: adding lower bounds gives a lower bound for a sum when all quantities
+  are nonnegative, while multiplying bounds requires attention to signs. Keep the simple one-value interval
+  separate from those later interval operations.
+
+  '
+examples:
+- prompt: Round 6,347 to the nearest hundred.
+  solution: 6,300
+  explanation: The tens digit is 4, so keep the hundreds digit and replace later places by zero.
+- prompt: Round 6,350 to the nearest hundred.
+  solution: 6,400
+  explanation: The tens digit is 5, so increase the hundreds digit.
+- prompt: Round 9.96 to the nearest tenth.
+  solution: '10.0'
+  explanation: The hundredths digit 6 raises 9 tenths to 10 tenths, which is 10.0.
+- prompt: How many significant figures are in 0.00450?
+  solution: '3'
+  explanation: Leading zeros do not count; 4, 5, and the trailing decimal zero do.
+- prompt: Write 1500 to two significant figures in scientific notation.
+  solution: 1.5×10^3
+  explanation: Scientific notation makes the two meaningful digits explicit.
+- prompt: Round 12.347 to three decimal places.
+  solution: '12.347'
+  explanation: The requested place is already the thousandths place.
+- prompt: Round 12.347 to two decimal places.
+  solution: '12.35'
+  explanation: The third decimal digit is 7, so the hundredths digit increases.
+- prompt: Give bounds for a value rounding to 8.2 to the nearest tenth.
+  solution: 8.15 ≤ x < 8.25
+  explanation: Half a tenth on either side gives the interval; the upper endpoint would round to 8.3.
+- prompt: 'Which is exact: 12 counted chairs or 12.0 cm measured length?'
+  solution: 12 counted chairs
+  explanation: Counting can give an exact whole number; the measurement has instrument precision.
+- prompt: Round 0.00996 to two significant figures.
+  solution: '0.010'
+  explanation: The significant digits are 9 and 9; carrying produces 1.0×10^-2, written 0.010 to show two figures.
+applications:
+- title: Instrument readings
+  description: A ruler, scale, or sensor determines a resolution, so rounded reports need a place and meaningful
+    bounds.
+- title: Budgets and estimates
+  description: A rounded cost can support a quick decision while bounds show how much the true total could
+    differ.
+- title: Science reporting
+  description: Significant figures prevent a calculation from claiming more precision than the measured inputs
+    support.
+- title: Public data displays
+  description: Tables and dashboards use rounding to stay readable, but exact source values and rounding rules
+    should remain recoverable.
+media:
+- src: media/native-number-foundations/arith010-rounding-line.svg
+  alt: A number line marks 48.35 included, 48.37, and 48.45 excluded for a nearest-tenth report of 48.4.
+  caption: Rounding to a tenth describes a half-open interval.
+  width: 800
+  height: 360
+  fit: contain
+- src: media/native-number-foundations/arith010-significant.svg
+  alt: 0.00450 has three significant figures, while 1.500 times ten to the negative second has four. Leading
+    zeros locate the decimal place; trailing decimal zeros communicate precision.
+  caption: Scientific notation makes significant figures visible.
+  width: 800
+  height: 360
+  fit: contain
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: ARITH010_NEAREST_TEN
+    type: fixed
+    prompt: Round 4,376 to the nearest ten.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '4380'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'The ones digit 6 rounds the tens digit up: 4,380.'
+    mistake_tags:
+    - rounding
+    - place_value
+  - id: ARITH010_NEAREST_HUNDRED
+    type: fixed
+    prompt: Round 6,347 to the nearest hundred.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '6300'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The tens digit is 4, so the hundreds digit stays 3.
+    mistake_tags:
+    - rounding
+  - id: ARITH010_HALF_UP
+    type: fixed
+    prompt: Round 6,350 to the nearest hundred.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '6400'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A discarded 5 rounds the kept hundreds digit up.
+    mistake_tags:
+    - rounding
+    - tie_rule
+  - id: ARITH010_CARRY
+    type: fixed
+    prompt: Round 9.96 to the nearest tenth.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '10.0'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 6 hundredths raises 9 tenths to 10 tenths; retain the requested tenth place.
+    mistake_tags:
+    - rounding
+    - carry
+  - id: ARITH010_DECIMAL_PLACES
+    type: fixed
+    prompt: Round 12.347 to two decimal places.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '12.35'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The third decimal digit is 7, so 12.34 rounds upward.
+    mistake_tags:
+    - rounding
+    - decimal_places
+  - id: ARITH010_SIG_ZERO
+    type: fixed
+    prompt: Which statement correctly describes significant figures?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 0.00450 has 3, 1002 has 4, and 1.500×10^3 has 4
+    - id: B
+      label: Leading zeros always count
+    - id: C
+      label: 1002 has 3 because its zeros are leading
+    - id: D
+      label: 1.500×10^3 has 2 because the exponent counts
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Leading zeros do not count; captive and trailing decimal zeros do.
+    mistake_tags:
+    - significant_figures
+  - id: ARITH010_SIG_MIDDLE
+    type: fixed
+    prompt: Which is correctly rounded to 2 significant figures?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 0.0050 from 0.00496
+    - id: B
+      label: 0.005 from 0.00496
+    - id: C
+      label: 0.0049 from 0.00496
+    - id: D
+      label: 0.00496 unchanged
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The first two significant digits are 4 and 9; carrying the next 6 gives 0.0050, whose
+      trailing zero communicates two figures.
+    mistake_tags:
+    - significant_figures
+    - rounding
+  - id: ARITH010_SIG_SCI
+    type: fixed
+    prompt: For measured 3.40×2.1, how many significant figures should the product report?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: '1'
+    - id: B
+      label: '2'
+    - id: C
+      label: '3'
+    - id: D
+      label: '5'
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'Multiplication reports to the fewest significant figures: 2.1 has two.'
+    mistake_tags:
+    - significant_figures
+    - multiplication
+  - id: ARITH010_EXACT_COUNT
+    type: fixed
+    prompt: Which statement is correct?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: A count of exactly 12 chairs can be exact
+    - id: B
+      label: Every measured value is exact
+    - id: C
+      label: Rounding creates an exact value
+    - id: D
+      label: An estimate has no reference
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A counted quantity can be exact when the count is stated exactly.
+    mistake_tags:
+    - exactness
+  - id: ARITH010_MEASURED
+    type: fixed
+    prompt: A length is measured as 12.4 cm to the nearest tenth. Which description fits?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: It is an exact claim that the length is 12.400... cm
+    - id: B
+      label: It is an approximate report with bounds
+    - id: C
+      label: It has no unit
+    - id: D
+      label: It is a count
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A nearest-tenth measurement represents an interval of possible true lengths.
+    mistake_tags:
+    - exactness
+    - measurement
+  - id: ARITH010_BOUNDS_TENTH
+    type: fixed
+    prompt: A value rounds to 8.2 to the nearest tenth. Which interval contains the possible exact values?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 8.2≤x≤8.3
+    - id: B
+      label: 8.15<x≤8.25
+    - id: C
+      label: 8.15≤x<8.25
+    - id: D
+      label: 8.10≤x<8.20
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The lower midpoint is included and the upper midpoint is excluded under half-up rounding.
+    mistake_tags:
+    - bounds
+  - id: ARITH010_BOUNDS_UPPER
+    type: fixed
+    prompt: A=2.30±0.05 and B=1.20±0.02. Enter the greatest possible value of A+B.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '3.57'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'Use upper bounds: 2.35+1.22=3.57.'
+    mistake_tags:
+    - bounds
+    - propagated_measurement
+  - id: ARITH010_TRUNCATION
+    type: fixed
+    prompt: A value is truncated to 4.2 at one decimal place. Which interval is correct?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 4.1≤x<4.2
+    - id: B
+      label: 4.2≤x<4.3
+    - id: C
+      label: 4.15≤x<4.25
+    - id: D
+      label: 4.2<x≤4.3
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Truncation keeps 4.2 as the lower endpoint and stops before 4.3.
+    mistake_tags:
+    - bounds
+    - truncation
+  - id: ARITH010_TRUNCATION_UPPER
+    type: fixed
+    prompt: Which estimate/exact pair is correct for 398.6+201.7, estimating to the nearest hundred?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: D
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Estimate 500; exact 600.3
+    - id: B
+      label: Estimate 700; exact 600.3
+    - id: C
+      label: Estimate 600; exact 599.3
+    - id: D
+      label: Estimate 600; exact 600.3
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 398.6≈400 and 201.7≈200, while the unrounded exact sum is 600.3.
+    mistake_tags:
+    - estimation
+    - exact_value
+  - id: ARITH010_ADD_PRECISION
+    type: fixed
+    prompt: For 2.30 + 1.4, which decimal place should a sensible reported answer use?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Tenths
+    - id: B
+      label: Hundredths
+    - id: C
+      label: Thousandths
+    - id: D
+      label: No decimal place ever
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Addition is limited by the least precise input, 1.4, which is to tenths.
+    mistake_tags:
+    - precision
+    - addition
+  - id: ARITH010_MULT_PRECISION
+    type: fixed
+    prompt: Round 9.949 directly to the nearest tenth, without first rounding it.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '9.9'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The hundredths digit is 4, so direct rounding gives 9.9. Rounding first to 9.95 would
+      create a different double-rounding result.
+    mistake_tags:
+    - rounding
+    - double_rounding
+  - id: ARITH010_ACCURACY_PRECISION
+    type: fixed
+    prompt: Which statement distinguishes precision from accuracy?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Precision is repeatable detail; accuracy is closeness to truth
+    - id: B
+      label: Precision and accuracy are identical
+    - id: C
+      label: Accuracy counts decimal places only
+    - id: D
+      label: Precision means the answer is exact
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Precision describes resolution or repeatability; accuracy describes closeness to
+      the true value.
+    mistake_tags:
+    - measurement_reasoning
+  - id: ARITH010_HALF_OPEN
+    type: fixed
+    prompt: For nearest-whole half-up rounding to 5, which interval is correct?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 4.5 < x < 5.5
+    - id: B
+      label: 4.5 ≤ x ≤ 5.5
+    - id: C
+      label: 4.5 ≤ x < 5.5
+    - id: D
+      label: 4.0 ≤ x < 5.0
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The lower midpoint is included and the upper midpoint belongs to 6.
+    mistake_tags:
+    - bounds
+    - rounding
+  - id: ARITH010_SCI_PRECISION
+    type: fixed
+    prompt: Rounding 12.34 to the nearest tenth has what maximum absolute error?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0.05'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A nearest-tenth report can differ by at most half a tenth, 0.05.
+    mistake_tags:
+    - rounding
+    - maximum_error
+  - id: ARITH010_CAPSTONE
+    type: fixed
+    prompt: A length is displayed as 48.4 cm after rounding to the nearest tenth. Enter the lower endpoint
+      of the possible exact interval.
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '48.35'
+    grading:
+      method: exact_numeric
+    work:
+      mode: rubric_check
+      prompt: Explain the model, show labelled calculations, and state units or assumptions. A final number
+        alone is not enough.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: States the lower endpoint 48.35 cm and explains why it is included.
+          weight: 2
+        - id: criterion_2
+          description: Gives the full interval 48.35≤x<48.45 cm and connects it to nearest-tenth rounding.
+          weight: 2
+        - id: criterion_3
+          description: Provides a sensible estimate of the true length and distinguishes the displayed approximation
+            from an exact length.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: The display 48.4 cm means 48.35≤x<48.45 cm. A reasonable estimate is 48.4 cm; the
+      lower midpoint is included and the upper midpoint would round to 48.5.
+    mistake_tags:
+    - capstone_reasoning
+    - model_selection

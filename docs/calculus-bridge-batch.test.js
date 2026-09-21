@@ -103,7 +103,7 @@ function workFor(p){
 }
 
 test('four lessons add a coherent graph and an explicit Calculus branch without rewriting earlier lessons',()=>{
- assert.equal(additions.length,4);assert.equal(curriculum.skills.length,92);
+ assert.equal(additions.length,4);assert.equal(curriculum.skills.length,112);
  assert.equal(Object.keys(formulas).length+Object.keys(choiceLabels).length,80);
  const all=new Map(curriculum.skills.map(s=>[s.id,s]));assert.equal(all.size,curriculum.skills.length);
  const visiting=new Set(),visited=new Set();

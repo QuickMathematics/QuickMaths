@@ -1,0 +1,670 @@
+id: MATH_ARITH_014
+schema_version: '0.2'
+name: Scientific notation arithmetic and orders of magnitude
+domain: Math
+subdomain: Arithmetic
+topic: Arithmetic Foundations
+description: 'Scientific notation writes a nonzero number as a×10^n, where 1≤|a|<10 and n is an integer. The
+  coefficient a carries the meaningful leading digits; the exponent n records how far the decimal point is '
+prerequisites:
+- MATH_ARITH_009
+- MATH_EXP_001
+unlocks: []
+tags:
+- arithmetic
+- scientific_notation
+- exponents
+- orders_of_magnitude
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'Scientific notation writes a nonzero number as a×10^n, where 1≤|a|<10 and n is an integer. The coefficient
+  a carries the meaningful leading digits; the exponent n records how far the decimal point is from the displayed
+  coefficient. For example, 4,700,000 = 4.7×10^6 and 0.000047 = 4.7×10^-5. The exponent is a count of place
+  shifts, not a measurement unit and not the number of zeros in every written form.
+
+
+  To convert a large number to scientific notation, move the decimal point left until one nonzero digit remains
+  before it. Count left moves as a positive exponent. For a small positive number, move right and use a negative
+  exponent. Restore the ordinary number by reversing the shifts. A zero has no normalized scientific notation
+  because it has no first nonzero digit; write 0 separately. Negative values keep the negative sign in the
+  coefficient, such as −3.2×10^4.
+
+
+  Multiplication uses the product of coefficients and addition of exponents: (a×10^m)(b×10^n)=(ab)×10^(m+n).
+  If |ab| is outside [1,10), normalize by shifting its decimal and adjusting the exponent. Example: (3×10^4)(2×10^3)=6×10^7.
+  For 8×10^5 times 4×10^2, the raw coefficient 32 becomes 3.2 and the exponent 7 becomes 8, giving 3.2×10^8.
+  Keep the coefficient and power parts separate until the final normalization.
+
+
+  Division divides coefficients and subtracts exponents: (a×10^m)/(b×10^n)=(a/b)×10^(m−n), with b nonzero.
+  If a/b is less than 1, normalize by moving the decimal right and reducing the exponent. For (6×10^7)/(2×10^3),
+  the coefficient quotient is 3 and exponent difference is 4, so the result is 3×10^4. Check by multiplying
+  the quotient by the divisor.
+
+
+  Addition and subtraction require matching powers of ten first. You may rewrite 2.4×10^6 as 24×10^5, or rewrite
+  7×10^5 as 0.7×10^6. Then combine coefficients with the same power: 2.4×10^6 + 0.7×10^6 = 3.1×10^6. Adding
+  coefficients while ignoring different exponents is a common error: 2×10^6 + 3×10^4 is not 5×10^10. For widely
+  separated exponents, an estimate may show that the smaller term changes only later digits, but keep it when
+  an exact sum is requested.
+
+
+  Orders of magnitude compare powers of ten. A value near 7×10^6 has order 10^6; a value 7×10^−6 has order
+  10^−6. If “nearest order” is requested, compare the coefficient to √10≈3.16: 7×10^6 is closer on a logarithmic
+  scale to 10^7 than 10^6, while 2×10^6 is closer to 10^6. In elementary comparisons, the exponent gives the
+  main scale, then the coefficient breaks ties. State whether you mean exponent-based scale or nearest power,
+  because those are different conventions.
+
+
+  Scientific notation is especially helpful for unit conversions, astronomy, cells, computing storage, and
+  rates with extreme scales. Keep units beside the coefficient and do not let a prefix such as micro- silently
+  alter the exponent. Significant figures live in the coefficient: 4.70×10^3 has three significant figures,
+  while 4.7×10^3 has two. Round only after arithmetic and normalize again after rounding. The capstone asks
+  you to multiply two quantities with opposite exponents, normalize the coefficient, and explain why the exponents
+  add.
+
+  The exponent rules are consequences of place-value multiplication. Ten to the fourth times ten to the third
+  is ten to the seventh because four place shifts followed by three more shifts make seven shifts. Division
+  reverses those shifts, so a negative exponent naturally represents a reciprocal: 10^-3=1/1000. This interpretation
+  helps when an answer is written in ordinary notation and prevents sign mistakes in exponent subtraction.
+
+
+  Normalization is not optional decoration. A coefficient of 32 violates the convention 1≤|a|<10, so either
+  shift its decimal point or leave it explicitly unnormalized and label it as an intermediate. After addition,
+  subtraction, multiplication, or division, check the coefficient range and adjust the exponent exactly once.
+  For addition with distant powers, align exponents before combining; for example, 2.0×10^8+3.0×10^5=2.003×10^8,
+  not 5.0×10^13. The exponent indicates scale while the coefficient preserves the leading detail.
+
+
+  Orders of magnitude are a comparison tool, not an automatic rounding answer. Two values with exponents differing
+  by six are separated by a million before coefficient effects. When coefficients are close to a threshold
+  such as 3.16 for nearest-power conventions, state the convention and compare the values rather than relying
+  on the exponent alone. Units remain attached: 4×10^3 m and 4×10^3 kg have the same numerical scale but describe
+  different quantities. Scientific notation makes that distinction visible when the unit is written beside
+  the number.
+
+  '
+examples:
+- prompt: Write 4,700,000 in scientific notation.
+  solution: 4.7×10^6
+  explanation: Move the decimal six places left.
+- prompt: Write 0.000047 in scientific notation.
+  solution: 4.7×10^-5
+  explanation: Move the decimal five places right, so the exponent is negative.
+- prompt: Multiply (3×10^4)(2×10^3).
+  solution: 6×10^7
+  explanation: Multiply coefficients and add exponents.
+- prompt: Multiply (8×10^5)(4×10^2).
+  solution: 3.2×10^8
+  explanation: 8×4=32; normalize 32×10^7 to 3.2×10^8.
+- prompt: Divide (6×10^7)/(2×10^3).
+  solution: 3×10^4
+  explanation: Divide coefficients and subtract exponents.
+- prompt: Add 2.4×10^6 + 0.7×10^6.
+  solution: 3.1×10^6
+  explanation: The powers already match, so add coefficients.
+- prompt: Rewrite 7×10^5 using 10^6.
+  solution: 0.7×10^6
+  explanation: Move the decimal one place left and increase the exponent.
+- prompt: 'Which is larger: 5×10^−3 or 5×10^−4?'
+  solution: 5×10^−3
+  explanation: The exponent −3 represents ten times the size of −4 with equal coefficients.
+- prompt: How many significant figures in 4.70×10^3?
+  solution: '3'
+  explanation: The coefficient 4.70 has three significant digits.
+- prompt: What is the order-of-magnitude scale of 7×10^6 by exponent?
+  solution: 10^6
+  explanation: The written power is 10^6; nearest-power conventions should be stated separately.
+applications:
+- title: Astronomy and microscopy
+  description: Scientific notation keeps distances, masses, and cell sizes readable while preserving scale.
+- title: Computing and engineering
+  description: Very large and small capacities, frequencies, and tolerances can be multiplied or divided by
+    tracking exponents.
+- title: Unit prefixes
+  description: Nano-, micro-, kilo-, and mega-scale conversions are exponent changes attached to a physical
+    unit.
+- title: Data interpretation
+  description: Orders of magnitude help compare populations or measurements before detailed arithmetic is attempted.
+media:
+- src: media/native-number-foundations/arith014-normalize.svg
+  alt: The product 32 times ten to the seventh is normalized to 3.2 times ten to the eighth by shifting the
+    coefficient.
+  caption: Normalization keeps one nonzero digit before the decimal point.
+  width: 800
+  height: 360
+  fit: contain
+- src: media/native-number-foundations/arith014-add.svg
+  alt: The term 2 times ten to the sixth is added to 0.03 times ten to the sixth after matching powers.
+  caption: Addition requires equal powers of ten first.
+  width: 800
+  height: 360
+  fit: contain
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: ARITH014_LARGE_NORMALIZE
+    type: fixed
+    prompt: Write 4,700,000 as a coefficient only (the coefficient in scientific notation).
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '4.7'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'Move six places left: 4.7×10^6.'
+    mistake_tags:
+    - notation
+    - normalization
+  - id: ARITH014_SMALL_EXPONENT
+    type: fixed
+    prompt: In 0.000047=4.7×10^n, enter n.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '-5'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The decimal moves five places right, so n is −5.
+    mistake_tags:
+    - notation
+    - negative_exponent
+  - id: ARITH014_MULTIPLY_COEFF
+    type: generated
+    prompt_template: Compute ({a}×10^4)({b}×10^3) and enter the coefficient before normalization.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 4
+      b:
+        type: int
+        min: 2
+        max: 4
+    derived:
+      coefficient: a*b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{coefficient}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply coefficients separately; exponents add to 7 before any normalization.
+    mistake_tags:
+    - multiplication
+    - exponents
+  - id: ARITH014_MULTIPLY
+    type: fixed
+    prompt: A learner claims (3×10^4)(2×10^3)=6×10^12. What went wrong?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: The coefficient must be added
+    - id: B
+      label: Exponents should be added, giving 6×10^7
+    - id: C
+      label: Exponents should be divided
+    - id: D
+      label: The product is correct
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 10^4×10^3=10^(4+3), so the product is 6×10^7.
+    mistake_tags:
+    - conceptual_reasoning
+  - id: ARITH014_NORMALIZE_32
+    type: fixed
+    prompt: For 32×10^7, enter the normalized coefficient.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '3.2'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Move the decimal one place left to make 3.2 and raise the exponent to 8.
+    mistake_tags:
+    - normalization
+  - id: ARITH014_NORMALIZE_EXP
+    type: fixed
+    prompt: Which is the normalized form of (2×10^3)/(8×10^7)?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: D
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 2.5×10^-3
+    - id: B
+      label: 0.25×10^-4
+    - id: C
+      label: 2.5×10^5
+    - id: D
+      label: 2.5×10^-5
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The quotient is 0.25×10^-4. Multiplying its coefficient by 10 requires reducing its
+      exponent by 1.
+    mistake_tags:
+    - conceptual_reasoning
+  - id: ARITH014_DIVIDE
+    type: fixed
+    prompt: Compute (6×10^7)/(2×10^3) and enter the coefficient.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '3'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 6÷2=3 and 7−3=4.
+    mistake_tags:
+    - division
+    - exponents
+  - id: ARITH014_DIVIDE_EXP
+    type: generated
+    prompt_template: For ({a}×10^8)/({b}×10^3), enter the exponent before normalization.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 9
+      b:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      exponent: 8-3
+    constraints: []
+    answer:
+      type: numeric
+      value: '{exponent}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Division subtracts the denominator exponent from the numerator exponent.
+    mistake_tags:
+    - division
+    - exponents
+  - id: ARITH014_ADD_MATCH
+    type: fixed
+    prompt: Add 2.4×10^6 + 0.7×10^6 and enter the coefficient.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '3.1'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The powers match, so add 2.4+0.7=3.1.
+    mistake_tags:
+    - addition
+    - matching_powers
+  - id: ARITH014_REWRITE_POWER
+    type: fixed
+    prompt: Rewrite 7×10^5 as c×10^6. Enter c.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0.7'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Increasing the exponent by 1 requires dividing the coefficient by 10.
+    mistake_tags:
+    - addition
+    - matching_powers
+  - id: ARITH014_ADD_DIFFERENT
+    type: fixed
+    prompt: Subtract 2.0×10^6 − 3.0×10^5 and enter the coefficient of 10^6.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '1.7'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: First rewrite 3.0×10^5 as 0.3×10^6. Then 2.0−0.3=1.7 with the common power 10^6.
+    mistake_tags:
+    - subtraction
+    - matching_powers
+  - id: ARITH014_ORDER_COMPARE
+    type: fixed
+    prompt: Which value is larger?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 5×10^-3
+    - id: B
+      label: 5×10^-4
+    - id: C
+      label: They are equal
+    - id: D
+      label: Cannot compare powers of ten
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: With equal coefficients, exponent −3 gives the larger value.
+    mistake_tags:
+    - order_of_magnitude
+  - id: ARITH014_SIG_FIGS
+    type: fixed
+    prompt: How many significant figures are in 4.70×10^3?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '3'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: All coefficient digits 4, 7, and trailing decimal 0 count.
+    mistake_tags:
+    - significant_figures
+  - id: ARITH014_ZERO
+    type: fixed
+    prompt: Which coefficient is valid in normalized scientific notation?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: '0.4'
+    - id: B
+      label: '14'
+    - id: C
+      label: '4.0'
+    - id: D
+      label: '0'
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A normalized coefficient has absolute value at least 1 and less than 10.
+    mistake_tags:
+    - notation
+    - normalization
+  - id: ARITH014_NEGATIVE
+    type: fixed
+    prompt: In −3.2×10^4, where does the negative sign belong?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: In the coefficient
+    - id: B
+      label: In the exponent only
+    - id: C
+      label: It disappears
+    - id: D
+      label: It belongs to the unit
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The coefficient carries the sign; the exponent controls scale.
+    mistake_tags:
+    - signed_values
+  - id: ARITH014_POWER_TEN
+    type: generated
+    prompt_template: Compute 10^{m}×10^{n}; enter the exponent.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      m:
+        type: int
+        min: 2
+        max: 8
+      n:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      exp: m+n
+    constraints: []
+    answer:
+      type: numeric
+      value: '{exp}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Same-base powers multiply by adding exponents.
+    mistake_tags:
+    - powers
+    - exponents
+  - id: ARITH014_RATIO_SCALE
+    type: generated
+    prompt_template: Compute (4×10^{m})/(2×10^{n}); enter the exponent.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      m:
+        type: int
+        min: 4
+        max: 9
+      n:
+        type: int
+        min: 1
+        max: 3
+    derived:
+      exp: m-n
+    constraints: []
+    answer:
+      type: numeric
+      value: '{exp}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Divide powers of ten by subtracting exponents.
+    mistake_tags:
+    - division
+    - exponents
+  - id: ARITH014_ORDER_SCALE
+    type: fixed
+    prompt: Which is the nearest power of ten to 7×10^6 on a logarithmic scale?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 10^6
+    - id: B
+      label: 10^7
+    - id: C
+      label: 10^5
+    - id: D
+      label: 10^-6
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The logarithmic midpoint between 10^6 and 10^7 is sqrt(10)×10^6. Since 7 exceeds
+      sqrt(10), choose 10^7.
+    mistake_tags:
+    - conceptual_reasoning
+  - id: ARITH014_UNIT_PREFIX
+    type: fixed
+    prompt: How many times as long is 6×10^-3 m as 3×10^-6 m?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: '2000'
+    - id: B
+      label: '2'
+    - id: C
+      label: '0.002'
+    - id: D
+      label: '1000'
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'Divide matching units: (6/3)×10^(-3+6)=2×10^3=2000.'
+    mistake_tags:
+    - conceptual_reasoning
+  - id: ARITH014_CAPSTONE
+    type: fixed
+    prompt: Compute (3.2×10^5)(4×10^−3). Enter the ordinary-number result.
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '1280'
+    grading:
+      method: exact_numeric
+    work:
+      mode: rubric_check
+      prompt: Explain the model, show labelled calculations, and state units or assumptions. A final number
+        alone is not enough.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Multiplies coefficients and adds exponents to obtain 12.8×10^2 before normalization.
+          weight: 2
+        - id: criterion_2
+          description: Normalizes 12.8×10^2 to 1.28×10^3 and converts it to 1280.
+          weight: 2
+        - id: criterion_3
+          description: Explains why exponents add in multiplication and checks the scale or ordinary-number
+            result.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: (3.2×4)×10^(5−3)=12.8×10^2=1.28×10^3=1280. The coefficient is normalized by moving
+      the decimal one place left and increasing the exponent.
+    mistake_tags:
+    - capstone_reasoning
+    - model_selection

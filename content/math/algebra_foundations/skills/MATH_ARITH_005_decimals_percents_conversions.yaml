@@ -66,6 +66,9 @@ theory: |
 
   Another common mistake:
   Moving the decimal the wrong direction changes the value by a factor of 100. For example, 0.6 = 60%, but 0.06 = 6%.
+
+  Keep conversion separate from calculation strategy. For all four decimal operations and decimal divisors, continue with Decimal arithmetic (MATH_ARITH_009). For reference amounts, reverse percentages and percentage points, use Percentage problems and reverse percentages (MATH_ARITH_012).
+
 examples:
   - prompt: "Convert 0.37 to a percent."
     solution: "37%"

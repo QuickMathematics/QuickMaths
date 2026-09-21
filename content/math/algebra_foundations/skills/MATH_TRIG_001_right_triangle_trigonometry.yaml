@@ -86,6 +86,9 @@ theory: |-
 
   Another common mistake:
   Do not round intermediate values too early. Keep exact values or several decimal places, then round once at the end.
+
+  Optional preparation: The Pythagorean theorem and coordinate distance (MATH_GEOM_008) introduces right-triangle lengths without trigonometry. Similarity, scale drawings, and scaling laws (MATH_GEOM_010) explains why corresponding right-triangle ratios are unchanged by scale. Measurement, unit conversion, and dimensional reasoning (MATH_ARITH_013) checks consistent units before calculating.
+
 examples:
 - prompt: In a 3-4-5 right triangle, find sin(theta) when the side opposite theta is 3.
   solution: 3/5

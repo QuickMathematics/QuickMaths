@@ -102,6 +102,9 @@ theory: |-
 
   Another common mistake:
   Do not round an intermediate sine, cosine, or square root too aggressively.
+
+  Optional preparation: Review right-triangle distance in MATH_GEOM_008, correspondence and scaling in MATH_GEOM_010, and consistent measurement units in MATH_ARITH_013. Pythagoras needs a right angle; a drawing alone does not establish one.
+
 examples:
 - prompt: Angles A and B are 52 degrees and 71 degrees. Find C.
   solution: 57 degrees

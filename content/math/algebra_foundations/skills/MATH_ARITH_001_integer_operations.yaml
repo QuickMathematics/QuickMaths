@@ -58,6 +58,9 @@ theory: |
   Do not treat every minus sign the same way. In 5 - (-3), the first minus is subtraction and the second minus is the sign of the number. Subtracting a negative means adding the opposite:
 
   5 - (-3) = 5 + 3 = 8.
+
+  Optional preparation: Whole-number calculation and place value (MATH_ARITH_006) explains regrouping, arrays, grouping and inverse-operation checks before signed arithmetic. On a number line, adding a positive amount moves right and subtracting it moves left; the inverse operation returns you to your starting point.
+
 examples:
   - prompt: "Compute: -6 + (-4)"
     solution: "-10"

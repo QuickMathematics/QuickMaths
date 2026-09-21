@@ -1,0 +1,388 @@
+id: MATH_GEOM_005
+schema_version: '0.2'
+name: Angle relationships and parallel lines
+domain: Math
+subdomain: Geometry
+topic: Plane Geometry
+description: Name angles precisely, use angle sums, and justify parallel-line conclusions from a transversal.
+prerequisites:
+- MATH_ARITH_006
+unlocks:
+- MATH_GEOM_006
+tags:
+- geometry
+- angles
+- parallel_lines
+- transversals
+- proof_reasoning
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  An angle is formed by two rays with a common endpoint. The endpoint is the vertex, and the rays are its sides. The notation angle ABC names the vertex in the middle: B is the vertex, while A and C lie on the two sides. A segment has two endpoints and stops at both ends; a ray has one endpoint and continues forever in one direction; a line continues in both directions. Naming the objects prevents a common error: an angle is not the same thing as either one of its boundary segments.
+
+  Angles are measured by the amount of turn between their sides. A right angle is 90 degrees, an acute angle is between 0 and 90 degrees, an obtuse angle is between 90 and 180 degrees, and a straight angle is 180 degrees. A full turn around a point is 360 degrees. Adjacent angles share a vertex and one side without overlapping interiors. A linear pair is an adjacent pair whose other sides are opposite rays, so its measures add to 180 degrees. Vertical angles are opposite angles made by two intersecting lines; they have equal measure because each is supplementary to the same neighboring angle.
+
+  Around a point, all the small angles add to 360 degrees. This fact works whether the rays make a neat compass shape or a crowded, rotated sketch. A straight line through a point contributes 180 degrees, so the angles on one side of that line add to 180 degrees. Always identify the complete turn or straight path before subtracting. A diagram may be rotated or may not be drawn to scale; stated marks and measures control the reasoning.
+
+  Parallel lines are coplanar lines that never meet, even when extended. The symbol p || q records a hypothesis, not a visual impression. A transversal is a line or segment that crosses two other lines at distinct points. At each crossing, four angles are made. If p || q, corresponding angles are equal, alternate interior angles are equal, alternate exterior angles are equal, and same-side interior (co-interior) angles are supplementary. These rules are relationships between angle positions, not between arbitrary labels. Trace the transversal and compare which side of it and which region between the two lines each angle occupies.
+
+  The converse matters. If a transversal cuts two lines and a pair of corresponding angles is equal, or a pair of alternate interior angles is equal, then the two lines are parallel. If same-side interior angles add to 180 degrees, the lines are parallel. The converse cannot be used without a qualifying angle relationship. Two angles can happen to have equal measures in an unrelated drawing, and a single equal pair at one intersection does not establish parallelism unless the pair is positioned as a converse theorem requires.
+
+  A dependable solving routine is: (1) copy the givens, including p || q or a right-angle mark; (2) name the angle relationship; (3) write an equation using equality or a 180/360 degree sum; (4) solve and check that the result has the expected size. For a missing angle x next to 68 degrees on a straight line, x + 68 = 180, so x = 112 degrees. For a vertical angle opposite 68 degrees, x = 68 degrees. For three angles around a point, x + 95 + 125 = 360, so x = 140 degrees.
+
+  Transversal examples are easiest when you first find a matching angle and then use a local fact if needed. Suppose corresponding angles are 74 degrees; every corresponding, alternate interior, and alternate exterior partner is 74 degrees, while each adjacent supplement is 106 degrees. The entire pattern has only two measures, 74 and 106. This does not mean every angle in every parallel-line picture is equal: the supplementary family remains different unless the transversal is perpendicular to the parallel lines.
+
+  Converse reasoning also explains why parallel symbols must be explicit. A picture with two lines that look horizontal can be a perspective drawing or a deliberately misleading nonexample. Use the stated p || q, a marked equal pair in the correct positions, or a stated supplementary pair. A ray can be a transversal if it intersects both lines, but it has an endpoint; do not silently call it a full line. A segment may cross two lines in a finite diagram, but the theorem only concerns the portion and the lines it meets.
+
+  In applications, angle relationships describe roof trusses, road intersections, tile patterns, camera sight lines, and map grids. The units are degrees, not centimetres or square units. Keep exact integer sums when possible, and use a calculator only when a non-integer angle is explicitly given. A correct explanation identifies the geometric reason, such as “alternate interior angles are equal because p || q,” rather than saying merely that the picture looks right.
+
+  Self-check: Did I put the vertex in the middle of a three-letter name? Are the sides rays or segments as stated? Did I distinguish vertical from adjacent angles? Did I use the parallel hypothesis before applying a transversal theorem? If I used a converse, did I verify the angle positions? Do all angles at a point total 360 degrees and all straight-line pairs total 180 degrees?
+media:
+- src: media/native-plane-foundations/geom005-transversal.svg
+  alt: Two parallel horizontal lines p and q are crossed by transversal t, with four angle positions labeled 1, 2, 3, and 4.
+  caption: Parallel lines and a transversal create corresponding, alternate, and supplementary angle families.
+  width: 720
+  height: 420
+  fit: contain
+- src: media/native-plane-foundations/geom005-angle-families.svg
+  alt: A transversal crosses two parallel lines; colored arcs mark corresponding and alternate angle positions at actual intersections.
+  caption: 'Angle positions matter: equality and supplementary relationships depend on where each angle lies.'
+  width: 720
+  height: 360
+  fit: contain
+examples:
+- prompt: Name the vertex and sides of angle ABC.
+  solution: B is the vertex; rays BA and BC are the sides.
+  explanation: The middle letter names the common endpoint. The sides are rays starting at B and passing through A and C.
+- prompt: Two lines intersect. One angle is 68 degrees. Find its vertical angle and each adjacent angle.
+  solution: Vertical angle 68 degrees; each adjacent angle 112 degrees.
+  explanation: Vertical angles are equal. Each adjacent linear-pair angle is 180 - 68 = 112 degrees.
+- prompt: Three rays around point O make angles 95 degrees, 125 degrees, and x. Find x.
+  solution: 140 degrees.
+  explanation: Angles around a point total 360 degrees, so x = 360 - 95 - 125 = 140 degrees.
+- prompt: A straight angle is split into 47 degrees and x. Find x.
+  solution: 133 degrees.
+  explanation: A straight angle is 180 degrees, so x + 47 = 180.
+- prompt: Lines p and q are parallel. A transversal makes a 74 degree angle in the upper-left position at p. Find the corresponding angle at q.
+  solution: 74 degrees.
+  explanation: Corresponding angles are equal when parallel lines are cut by a transversal.
+- prompt: In parallel lines p || q, one interior angle is 112 degrees. Find its alternate interior partner and its same-side interior partner.
+  solution: Alternate interior 112 degrees; same-side interior 68 degrees.
+  explanation: Alternate interior angles are equal, while co-interior angles sum to 180 degrees.
+- prompt: Two lines cut by a transversal have alternate interior angles both equal to 63 degrees. What conclusion is justified?
+  solution: The two lines are parallel.
+  explanation: Equal alternate interior angles establish parallelism by the converse theorem.
+- prompt: A transversal crosses two lines, and same-side interior angles measure 121 degrees and 59 degrees. What conclusion is justified?
+  solution: The lines are parallel.
+  explanation: 121 + 59 = 180 degrees, so the supplementary co-interior converse applies.
+- prompt: A diagram labels a ray AB and a segment CD. Which object has exactly one endpoint?
+  solution: Ray AB.
+  explanation: A ray starts at A and continues through B; a segment has two endpoints.
+- prompt: One angle at a parallel-line intersection is 38 degrees. List the only two measures appearing among all eight angles.
+  solution: 38 degrees and 142 degrees.
+  explanation: Vertical, corresponding, and alternate angles copy 38 degrees; adjacent angles are its supplement, 142 degrees.
+applications:
+- title: Road and rail crossings
+  description: Parallel lane markings and a crossing road create predictable turning angles for signs, lane design, and surveying.
+- title: Roof trusses
+  description: Repeated parallel braces transfer angle constraints so a builder can check a joint from a measured partner angle.
+- title: Tile and textile patterns
+  description: Translated stripes use corresponding angles to keep borders aligned after a pattern repeats.
+- title: Maps and camera sight lines
+  description: Grid lines and a line of sight can model transversal relationships when estimating a missing direction angle.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: GEOM005_VERTEX_NAME_001
+    type: fixed
+    prompt_template: In angle XYZ, which point is the vertex?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'X'}
+    - {id: B, label: 'Y'}
+    - {id: C, label: 'Z'}
+    - {id: D, label: 'The point halfway between X and Z'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: The middle letter names the vertex, so Y is the common endpoint of rays YX and YZ.
+    mistake_tags: [angle_notation, vertex]
+    difficulty: easy
+  - id: GEOM005_VERTICAL_002
+    type: generated
+    prompt_template: Two lines intersect. One angle is {a} degrees. What is its vertical angle?
+    variables: {a: {type: int, min: 25, max: 155}}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{a}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Vertical angles are equal, so the opposite angle is {a} degrees.
+    mistake_tags: [vertical_angles]
+    difficulty: easy
+  - id: GEOM005_LINEAR_PAIR_003
+    type: generated
+    prompt_template: A linear pair contains angles {a} degrees and x. Find x.
+    variables: {a: {type: int, min: 25, max: 155}}
+    derived: {x: 180-a}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{x}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A linear pair sums to 180 degrees, so x = 180 - {a} = {x} degrees.
+    mistake_tags: [linear_pair]
+    difficulty: easy
+  - id: GEOM005_AROUND_POINT_004
+    type: fixed
+    prompt_template: Three angles around a point are 80 degrees, 120 degrees, and x. Find x.
+    answer_mode: final_only
+    answer: {type: numeric, value: '160'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Angles around a point total 360 degrees, so x = 360 - 80 - 120 = 160 degrees.
+    mistake_tags: [full_turn]
+    difficulty: easy
+  - id: GEOM005_CORRESPONDING_005
+    type: fixed
+    prompt_template: In the diagram, p || q and a corresponding angle at p is 71 degrees. What is the matching angle at q?
+    answer_mode: final_only
+    answer: {type: numeric, value: '71'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Corresponding angles are equal for parallel lines, giving 71 degrees.
+    mistake_tags: [corresponding_angles, parallel_hypothesis]
+    difficulty: medium
+  - id: GEOM005_ALTERNATE_006
+    type: generated
+    prompt_template: For p || q, an alternate interior angle is {a} degrees. Find its partner.
+    variables: {a: {type: int, min: 30, max: 150}}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{a}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Alternate interior angles are equal, so the partner is {a} degrees.
+    mistake_tags: [alternate_interior]
+    difficulty: medium
+  - id: GEOM005_COINTERIOR_007
+    type: generated
+    prompt_template: Same-side interior angles are {a} degrees and x for parallel lines. Find x.
+    variables: {a: {type: int, min: 30, max: 150}}
+    derived: {x: 180-a}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{x}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Same-side interior angles are supplementary, so x = 180 - {a} = {x} degrees.
+    mistake_tags: [cointerior, supplementary]
+    difficulty: medium
+  - id: GEOM005_CONVERSE_008
+    type: fixed
+    prompt_template: A transversal creates equal alternate interior angles of 64 degrees. What can be concluded?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'The lines are parallel'}
+    - {id: B, label: 'The lines are perpendicular'}
+    - {id: C, label: 'The lines must intersect again'}
+    - {id: D, label: 'No conclusion is possible'}
+    answer: {type: multiple_choice, value: A}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Equal alternate interior angles invoke the converse of the parallel-line theorem.
+    mistake_tags: [converse, parallel_lines]
+    difficulty: medium
+  - id: GEOM005_NOT_CONVERSE_009
+    type: fixed
+    prompt_template: Two unrelated angles elsewhere in a drawing both measure 50 degrees. Does that alone prove two lines are parallel?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Yes, any equal angles prove parallelism'}
+    - {id: B, label: 'No, their positions must form a qualifying converse pair'}
+    - {id: C, label: 'Yes, if the drawing is rotated'}
+    - {id: D, label: 'No, parallel lines cannot have equal angles'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A converse requires corresponding, alternate interior, or supplementary same-side positions.
+    mistake_tags: [converse, insufficient_information]
+    difficulty: medium
+  - id: GEOM005_OBJECTS_010
+    type: fixed
+    prompt_template: Which object has one endpoint and continues forever in one direction?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'A segment'}
+    - {id: B, label: 'A ray'}
+    - {id: C, label: 'A line'}
+    - {id: D, label: 'A point'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A ray has one endpoint and extends forever in one direction.
+    mistake_tags: [ray_segment_line]
+    difficulty: easy
+  - id: GEOM005_TWO_MEASURES_011
+    type: fixed
+    prompt_template: A right-angle mark shows a 90 degree angle split by a ray. One part is 34 degrees. Find the other part.
+    answer_mode: final_only
+    answer: {type: numeric, value: '56'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: The two parts make a right angle, so 34 + x = 90 and x = 56 degrees.
+    mistake_tags: [right_angle_sum]
+    difficulty: medium
+  - id: GEOM005_ROTATION_012
+    type: fixed
+    prompt_template: A line-angle diagram is rotated 90 degrees on the page. Does its angle measure change?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Yes, every angle becomes 90 degrees'}
+    - {id: B, label: 'No, a rigid rotation preserves angle measure'}
+    - {id: C, label: 'Yes, parallel lines become perpendicular'}
+    - {id: D, label: 'Only acute angles change'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Rotating a figure changes orientation but preserves all angle measures and parallel relationships.
+    mistake_tags: [orientation, rigid_motion]
+    difficulty: medium
+  - id: GEOM005_TUTOR_REASONING_013
+    type: fixed
+    prompt_template: Explain why the marked 72 degree angle and its same-side interior partner in the p || q diagram sum to 180 degrees. State the hypothesis and the relationship.
+    answer_mode: final_plus_required_work
+    answer: {type: numeric, value: '108'}
+    grading: {method: exact_numeric}
+    work:
+      mode: rubric_check
+      prompt: Explain the angle relationship and calculate the partner; a number without a reason is incomplete.
+      rubric:
+        criteria:
+        - {id: hypothesis, description: States that p and q are parallel and a transversal crosses them., weight: 2}
+        - {id: relationship, description: Identifies the angles as same-side interior (co-interior) and supplementary., weight: 2}
+        - {id: equation, description: Writes 72 + x = 180 or an equivalent equation., weight: 2}
+        - {id: conclusion, description: Solves x = 108 degrees and connects it to the stated relationship., weight: 2}
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: Same-side interior angles formed by a transversal of parallel lines are supplementary. Thus 72 + x = 180, giving x = 108 degrees.
+    mistake_tags: [tutor_reasoning, cointerior, parallel_hypothesis]
+    difficulty: hard
+    media:
+    - src: media/native-plane-foundations/geom005-capstone.svg
+      alt: Parallel lines p and q are crossed by a transversal; the marked same-side interior angles are 72 degrees and x.
+      width: 720
+      height: 360
+      caption: Use the parallel marks and the stated 72 degree angle; do not measure the picture.
+  - id: GEOM005_STRAIGHT_014
+    type: fixed
+    prompt_template: A straight angle is split into 113 degrees and x. Find x.
+    answer_mode: final_only
+    answer: {type: numeric, value: '67'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: x = 180 - 113 = 67 degrees.
+    mistake_tags: [straight_angle]
+    difficulty: easy
+  - id: GEOM005_FULLTURN_015
+    type: fixed
+    prompt_template: Three angles around a point are x, x + 20, and 2x + 10 degrees. Find x.
+    answer_mode: final_only
+    answer: {type: numeric, value: '82.5'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: 'Add the full turn: x + (x+20) + (2x+10) = 360, so 4x + 30 = 360 and x = 82.5 degrees.'
+    mistake_tags: [full_turn, algebraic_angle]
+    difficulty: hard
+  - id: GEOM005_ALT_EXTERIOR_016
+    type: fixed
+    prompt_template: For p || q, an alternate exterior angle is 57 degrees. Find its alternate exterior partner.
+    answer_mode: final_only
+    answer: {type: numeric, value: '57'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Alternate exterior angles are equal for parallel lines, so the partner is 57 degrees.
+    mistake_tags: [alternate_exterior]
+    difficulty: medium
+  - id: GEOM005_PARALLEL_CHECK_017
+    type: fixed
+    prompt_template: A transversal gives corresponding angles 116 degrees and 116 degrees. Are the two lines parallel?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Yes, by the corresponding-angle converse'}
+    - {id: B, label: 'No, equal corresponding angles forbid parallelism'}
+    - {id: C, label: 'Only if both angles are acute'}
+    - {id: D, label: 'Only if the transversal is a segment'}
+    answer: {type: multiple_choice, value: A}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Equal corresponding angles establish parallel lines by the converse theorem.
+    mistake_tags: [corresponding_converse]
+    difficulty: hard
+  - id: GEOM005_NO_VISUAL_018
+    type: fixed
+    prompt_template: Two lines look parallel in a sketch but no parallel mark or angle evidence is given. May you use corresponding-angle equality?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Yes, every sketch is to scale'}
+    - {id: B, label: 'No, a visual appearance alone is not a hypothesis'}
+    - {id: C, label: 'Yes, if the page is rectangular'}
+    - {id: D, label: 'No, corresponding angles never relate'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Use a stated parallel hypothesis or a qualifying converse condition; do not measure the drawing by eye.
+    mistake_tags: [diagram_not_to_scale, parallel_hypothesis]
+    difficulty: hard
+  - id: GEOM005_MIXED_019
+    type: fixed
+    prompt_template: Two lines look parallel in a sketch, but no parallel mark, equal-angle fact, or supplementary-angle fact is given. May you use a transversal theorem?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Yes, the drawing is enough'}
+    - {id: B, label: 'No, the needed hypothesis or converse evidence is missing'}
+    - {id: C, label: 'Yes, if the page is rotated'}
+    - {id: D, label: 'No, transversals never create angle relationships'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A visual appearance does not establish parallelism; use a stated hypothesis or a qualifying converse pair.
+    mistake_tags: [parallel_hypothesis, diagram_not_to_scale]
+    difficulty: hard
+  - id: GEOM005_PARALLEL_CLAIM_020
+    type: fixed
+    prompt_template: Which statement is valid for a transversal of parallel lines?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Corresponding angles are equal'}
+    - {id: B, label: 'Every adjacent angle is equal'}
+    - {id: C, label: 'Same-side interior angles are equal'}
+    - {id: D, label: 'Angles around a point total 180 degrees'}
+    answer: {type: multiple_choice, value: A}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Corresponding angles are equal; adjacent angles and same-side interior angles generally form supplementary pairs.
+    mistake_tags: [parallel_angle_rules]
+    difficulty: easy

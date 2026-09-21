@@ -60,6 +60,9 @@ theory: |
 
   Another common mistake:
   A bigger denominator does not always mean a bigger fraction. If the numerators are the same, a bigger denominator means smaller pieces.
+
+  Fractions are numbers, including values beyond one whole: 7/4 is one whole and three quarters, positioned between 1 and 2 on a number line. Use the same-sized reference whole when comparing or combining fractions. Continue with Adding and subtracting fractions and mixed numbers (MATH_ARITH_008) for common units, regrouping and signed sums.
+
 examples:
   - prompt: "In the fraction 5/8, what is the numerator?"
     solution: "5"

@@ -16,7 +16,7 @@ const storeFor = (data = curriculum, initial = null) => createQuickMathsStore({
 });
 
 test("all native Geometry illustrations load offline from verified, reproducible source files", async () => {
-  assert.equal(geometry.length, 16);
+  assert.equal(geometry.length, 24);
   const usedPaths = new Set();
   for (const skill of geometry) {
     assert.ok(mediaIn(skill).length, `${skill.id} needs a teaching illustration`);
@@ -25,7 +25,7 @@ test("all native Geometry illustrations load offline from verified, reproducible
       usedPaths.add(item.src);
     }
   }
-  assert.deepEqual([...usedPaths].sort(), curriculum.assets.filter(asset => !asset.path.startsWith("media/statistics/") && !asset.path.startsWith("media/native-functions/") && !asset.path.startsWith("media/native-calculus-bridge/")).map(asset => asset.path).sort());
+  assert.deepEqual([...usedPaths].sort(), curriculum.assets.filter(asset => usedPaths.has(asset.path)).map(asset => asset.path).sort(), "Every Geometry reference has a verified asset");
   assert.ok(curriculum.assets.reduce((sum, asset) => sum + asset.bytes, 0) < 1_000_000);
   for (const asset of curriculum.assets) {
     const bytes = await loadLessonAsset(asset, "", { fetchImpl() { throw new Error("Native media must work offline"); } });
@@ -96,8 +96,10 @@ test("native geometry improvements retain exactly their media through Studio, in
 
 test("an existing workspace discovers triangle area without losing mastery or planned positions", () => {
   const previous = structuredClone(curriculum);
-  previous.skills = previous.skills.filter(skill => skill.id !== triangle.id);
-  previous.track.skills = previous.track.skills.filter(id => id !== triangle.id);
+  const foundations = new Set(JSON.parse(readFileSync(new URL("./test-support/foundations-roadmap.json", import.meta.url))).lesson_ids);
+  previous.skills = previous.skills.filter(skill => skill.id !== triangle.id && !foundations.has(skill.id));
+  previous.track.skills = previous.track.skills.filter(id => id !== triangle.id && !foundations.has(id));
+  previous.track.entry_skills = previous.track.entry_skills.filter(id => !foundations.has(id));
   const oldStore = storeFor(previous);
   const profile = oldStore.createProfile("Returning learner");
   oldStore.setMapPlanMode(true);

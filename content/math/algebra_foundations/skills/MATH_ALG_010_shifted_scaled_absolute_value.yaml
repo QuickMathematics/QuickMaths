@@ -1,0 +1,715 @@
+id: MATH_ALG_010
+schema_version: '0.2'
+name: Shifted and scaled absolute-value equations and inequalities
+domain: Math
+subdomain: Algebra
+topic: Absolute value models
+description: Solve and interpret shifted and scaled absolute-value equations and inequalities, including
+  two, one, and no solutions with exact interval endpoints.
+prerequisites:
+- MATH_ALG_008
+- MATH_ALG_002
+- MATH_INEQ_001
+tags:
+- algebra
+- absolute_value
+- transformations
+- equations
+- inequalities
+- interval_notation
+- tolerance
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 10
+  review_after_days_if_learning: 3
+theory: 'Absolute value measures distance, so |x-h| is the distance from x to the centre h on a number
+  line. The graph
+
+  of y = |x| is a V with vertex (0,0). Replacing x by x-h moves the vertex to h, and adding k moves it
+  vertically
+
+  to (h,k). A positive scale a in y = a|x-h|+k changes the steepness; it does not move the vertex. A negative
+
+  a reflects the V downward. These shifts are easiest to read from the inside and outside separately:
+  h is the
+
+  horizontal centre, k is the vertical baseline, and a is a stretch or reflection.
+
+
+  To solve a shifted equation, isolate the absolute value before splitting cases. For a|x-h|+k = m with
+  a nonzero,
+
+  first calculate d = (m-k)/a. The equation becomes |x-h| = d. If d > 0, there are two solutions h-d and
+  h+d.
+
+  If d = 0, there is one solution x=h. If d < 0, there are no real solutions because a distance cannot
+  be
+
+  negative. If a is negative, dividing by a reverses the comparison in an inequality and may change whether
+  the
+
+  resulting condition is “inside” or “outside.” Always inspect the sign rather than memorizing one pattern.
+
+
+  The equation |x-h| = d says “x is exactly d units from h.” It therefore gives two endpoints when d is
+  positive.
+
+  An equation with a tolerance, |x-h| <= d, means the distance is at most d and gives the closed interval
+
+  [h-d,h+d]. A strict inequality |x-h| < d gives the open interval (h-d,h+d). For a lower bound, |x-h|
+  >= d,
+
+  the solution is outside the central interval: (-inf,h-d] union [h+d,inf) when equality is included.
+  With >,
+
+  both endpoints are open. Endpoint brackets are part of the answer: equality includes the point, while
+  a strict
+
+  sign excludes it.
+
+
+  Scaled inequalities follow the same isolation step. If a is positive, a|x-h| <= m-k becomes |x-h| <=
+
+  (m-k)/a. If a is negative, dividing reverses the sign; the shape can turn a bounded “within” condition
+  into an
+
+  unbounded outside condition. Before taking roots or drawing an interval, check whether the resulting
+  threshold is
+
+  positive, zero, or negative. For example, -2|x-3|+5 >= 1 gives |x-3| <= 2, so x belongs to [1,5]. In
+  contrast,
+
+  -2|x-3|+5 <= 1 gives |x-3| >= 2, so x is outside [1,5].
+
+
+  A negative threshold exposes the range of the model. Since |x-h| >= 0, the expression a|x-h|+k has minimum
+  k
+
+  when a>0 and maximum k when a<0. An equation asking a positive-scale V to equal below k has no solutions;
+
+  asking it to equal k has one vertex solution. An inequality can become all real numbers or the empty
+  set. “No
+
+  solution” and “all real numbers” are different conclusions and should be written explicitly, not approximated
+  by
+
+  an interval with a guessed endpoint.
+
+
+  Tolerances model measurement and control. If a sensor target is h and the allowed error is d, then
+
+  |x-h| <= d is a within band. If a safety rule rejects values too close to a target, |x-h| > d is an
+  outside
+
+  band. A shifted and scaled graph lets you read the same decision geometrically: horizontal intersections
+  locate
+
+  equation solutions, and horizontal strips translate into intervals on the x-axis. Use exact fractions
+  when the
+
+  data are exact; use a declared decimal tolerance only when the prompt requests an approximation.
+
+
+  A reliable workflow is: identify a, h, k, and the comparison value; isolate the absolute value; classify
+  the
+
+  threshold; choose two points, one point, no points, a central interval, an outside union, all reals,
+  or empty set;
+
+  then verify an endpoint in the original expression. The reviewed capstone requires the interval, endpoint
+  checks,
+
+  and a verbal explanation of why the inequality is within or outside the tolerance band. In a graph,
+  the horizontal coordinate is the constrained input and the vertical value is the model output. Check
+  one interior point and one exterior point when reading intervals; those substitutions expose a reversed
+  inequality or misplaced shift before submission.
+
+  '
+media:
+- src: media/native-final-foundations/alg-absolute-branches.svg
+  alt: A shifted absolute-value graph is a V with a labelled vertex and two linear branches.
+  caption: The vertex gives the shift h and k; the scale changes branch steepness.
+  width: 520
+  height: 250
+  fit: contain
+- src: media/native-final-foundations/alg-absolute-interval.svg
+  alt: A number line compares an open central interval with an included endpoint to illustrate within
+    and outside conditions.
+  caption: Strict and inclusive inequality signs determine endpoint circles and brackets.
+  width: 520
+  height: 250
+  fit: contain
+examples:
+- prompt: Solve |x-4| = 7.
+  solution: x = -3 or x = 11
+  explanation: x is 7 units from 4, so x = 4-7 or 4+7.
+- prompt: Solve 3|x+2| = 12.
+  solution: x = -6 or x = 2
+  explanation: Divide by 3 to get |x+2|=4, then use x+2=±4.
+- prompt: Solve 2|x-5|+1 = 1.
+  solution: x = 5
+  explanation: The threshold is zero, so only the vertex remains.
+- prompt: Solve 2|x-5|+1 = -3.
+  solution: No real solution
+  explanation: A positive-scale V has minimum 1, so it cannot equal -3.
+- prompt: Solve |x-3| <= 4.
+  solution:
+  - -1
+  - 7
+  explanation: Within 4 units of 3 gives 3-4 <= x <= 3+4.
+- prompt: Solve |x+1| < 2.
+  solution: (-3,1)
+  explanation: Strictly less than 2 excludes both endpoints.
+- prompt: Solve |x-2| >= 5.
+  solution: (-inf,-3] U [7,inf)
+  explanation: At least 5 units from 2 means outside the central interval.
+- prompt: Solve -2|x-3|+5 >= 1.
+  solution:
+  - 1
+  - 5
+  explanation: Rearranging gives |x-3| <= 2 because division by -2 reverses the sign.
+- prompt: Solve -2|x-3|+5 <= 1.
+  solution: (-inf,1] U [5,inf)
+  explanation: The reversed inequality gives |x-3| >= 2.
+- prompt: For y=-4|x-1|+6, identify the vertex and maximum value.
+  solution: Vertex (1,6); maximum 6
+  explanation: The negative scale reflects the V downward, so k is the maximum at x=h.
+applications:
+- title: Manufacturing tolerance
+  description: A dimension target h with allowed error d is modeled by |x-h| <= d, producing a closed
+    within interval.
+- title: Signal and sensor thresholds
+  description: A shifted absolute-value rule can accept readings inside a tolerance band or reject readings
+    outside it.
+- title: Delivery and travel planning
+  description: Distance from a target time, location, or budget naturally creates two equation solutions
+    or a bounded interval.
+- title: Pricing penalties
+  description: A fee that grows with deviation from a reference value uses a shifted and scaled absolute-value
+    model.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: ALG010_VERTEX
+    type: fixed
+    prompt_template: For y = 2|x−4|−3, which statement identifies the vertex and its role?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Vertex (−4,−3), and it is the maximum.
+    - id: B
+      label: Vertex (4,−3), and it is the minimum.
+    - id: C
+      label: Vertex (4,3), and it is the minimum.
+    - id: D
+      label: Vertex (−4,3), and it is the maximum.
+    difficulty: easy
+    explanation_template: The inside shift is h=4, the vertical shift is k=−3, and positive a makes a
+      minimum.
+    mistake_tags:
+    - vertex_shift
+    - scale_sign
+    work:
+      mode: none
+  - id: ALG010_EVALUATE
+    type: generated
+    prompt_template: Evaluate y = {a}|x−{h}|+{k} at x = {x}.
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -6
+        max: 6
+      x:
+        type: int
+        min: -8
+        max: 8
+    derived:
+      y: a*abs(x-h)+k
+    answer:
+      type: numeric
+      value: '{y}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: Find the distance |x−h| first, then scale by a and add k.
+    mistake_tags:
+    - absolute_value_evaluation
+    work:
+      mode: none
+  - id: ALG010_SCALED_EQUATION
+    type: fixed
+    prompt_template: Solve 2|x−3| = 8. Enter both solutions as a finite set.
+    variables: {}
+    derived: {}
+    answer:
+      type: finite_set
+      values:
+      - '-1'
+      - '7'
+    grading:
+      method: finite_set
+    difficulty: medium
+    explanation_template: Divide by 2, then solve x−3=4 or x−3=−4.
+    work:
+      mode: none
+  - id: ALG010_COMPOUND_INTERVAL
+    type: generated
+    prompt_template: Solve |2x−3| <= {d}. Enter the closed interval.
+    variables:
+      d:
+        type: choice
+        values:
+        - 2
+        - 4
+        - 6
+    derived:
+      left: (3-d)/2
+      right: (3+d)/2
+    answer:
+      type: interval_set
+      value: '[{left},{right}]'
+      variable: x
+    grading:
+      method: interval_set
+    difficulty: hard
+    explanation_template: The compound inequality is −d <= 2x−3 <= d; divide both bounds by 2.
+    mistake_tags:
+    - compound_absolute_value
+    - interval_endpoint
+    work:
+      mode: none
+  - id: ALG010_IMPOSSIBLE_INEQUALITY
+    type: fixed
+    prompt_template: Solve 2|x−5| <= −1 over the reals.
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: All real numbers
+    - id: B
+      label: '[4.5,5.5]'
+    - id: C
+      label: No real solution
+    - id: D
+      label: (-inf,4.5] U [5.5,inf)
+    difficulty: medium
+    explanation_template: The left side is nonnegative and cannot be at most a negative number.
+    mistake_tags:
+    - negative_threshold
+    - empty_set
+    work:
+      mode: none
+  - id: ALG010_ALWAYS_TRUE_INEQUALITY
+    type: fixed
+    prompt_template: Solve 2|x−5| >= −1 over the reals.
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: All real numbers
+    - id: B
+      label: '[4.5,5.5]'
+    - id: C
+      label: No real solution
+    - id: D
+      label: (-inf,4.5] U [5.5,inf)
+    difficulty: medium
+    explanation_template: A nonnegative expression is always at least −1.
+    mistake_tags:
+    - negative_threshold
+    - all_real_numbers
+    work:
+      mode: none
+  - id: ALG010_STRICT_OUTSIDE
+    type: generated
+    prompt_template: For |x−{h}| > {d}, how many unbounded intervals appear and are their endpoints included?
+    variables:
+      h:
+        type: int
+        min: -8
+        max: 8
+      d:
+        type: int
+        min: 1
+        max: 9
+    derived:
+      count: '2'
+    answer:
+      type: numeric
+      value: '{count}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Strictly greater distance gives two rays, with both boundary endpoints excluded.
+    mistake_tags:
+    - strict_endpoint
+    - outside_interval
+    work:
+      mode: none
+  - id: ALG010_NEG_SCALE_WITHIN
+    type: generated
+    prompt_template: For −{a}|x−{h}|+{k} >= {m}, enter the radius of the resulting within interval.
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 5
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: 4
+        max: 12
+      d:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      m: k-a*d
+      radius: d
+    answer:
+      type: numeric
+      value: '{radius}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Dividing by the negative scale reverses the sign and yields a within distance
+      of {radius}.
+    mistake_tags:
+    - negative_scale
+    - inequality_reversal
+    work:
+      mode: none
+  - id: ALG010_POS_SCALE_THRESHOLD
+    type: generated
+    prompt_template: For {a}|x−{h}|+{k} = {m}, enter the isolated distance threshold.
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 6
+      h:
+        type: int
+        min: -6
+        max: 6
+      k:
+        type: int
+        min: -5
+        max: 5
+      d:
+        type: int
+        min: 1
+        max: 6
+    derived:
+      m: a*d+k
+      threshold: d
+    answer:
+      type: numeric
+      value: '{threshold}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Isolate the absolute value before splitting cases.
+    mistake_tags:
+    - isolate_absolute_value
+    work:
+      mode: none
+  - id: ALG010_TARGET_TOLERANCE
+    type: fixed
+    prompt_template: A target is 18 with tolerance 0.25. Write the inclusive acceptable interval.
+    variables: {}
+    derived: {}
+    answer:
+      type: interval_set
+      value: '[17.75,18.25]'
+      variable: x
+    grading:
+      method: interval_set
+    difficulty: medium
+    explanation_template: At most 0.25 away from 18 includes both endpoints.
+    work:
+      mode: none
+  - id: ALG010_STRICT_TOLERANCE
+    type: fixed
+    prompt_template: A target is 18 and readings strictly more than 0.25 away are rejected. Write the
+      rejected set.
+    variables: {}
+    derived: {}
+    answer:
+      type: interval_set
+      value: (-inf,17.75) U (18.25,inf)
+      variable: x
+    grading:
+      method: interval_set
+    difficulty: hard
+    explanation_template: Strictly greater than the tolerance excludes the boundary readings.
+    work:
+      mode: none
+  - id: ALG010_BAD_DIVIDE
+    type: fixed
+    prompt_template: Which is the valid first step for −2|x−3|+5 <= 1?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Divide by 2 and keep the inequality sign.
+    - id: B
+      label: Replace the absolute value with x−3.
+    - id: C
+      label: Square both sides without isolating distance.
+    - id: D
+      label: Subtract 5, divide by −2, and reverse the inequality.
+    difficulty: medium
+    explanation_template: Division by a negative reverses the inequality.
+    mistake_tags:
+    - inequality_reversal
+    - negative_scale
+    work:
+      mode: none
+  - id: ALG010_RANGE_UPWARD
+    type: fixed
+    prompt_template: What is the range of y=2|x−4|+1 over the reals?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: '[1,inf)'
+    - id: B
+      label: (-inf,1]
+    - id: C
+      label: All reals
+    - id: D
+      label: '{1}'
+    difficulty: medium
+    explanation_template: Positive scaling gives a minimum of 1 at the vertex.
+    work:
+      mode: none
+  - id: ALG010_RANGE_DOWNWARD
+    type: fixed
+    prompt_template: What is the range of y=−2|x−4|+1 over the reals?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: '[1,inf)'
+    - id: B
+      label: (-inf,1]
+    - id: C
+      label: All reals
+    - id: D
+      label: '{1}'
+    difficulty: medium
+    explanation_template: Negative scaling gives a maximum of 1 at the vertex.
+    work:
+      mode: none
+  - id: ALG010_SIGNED_DISTANCE
+    type: generated
+    prompt_template: A measurement x={x} is compared with target h={h}. What is its nonnegative distance
+      from the target?
+    variables:
+      x:
+        type: int
+        min: -10
+        max: 10
+      h:
+        type: int
+        min: -10
+        max: 10
+    derived:
+      distance: abs(x-h)
+    answer:
+      type: numeric
+      value: '{distance}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: 'Distance ignores direction: |x−h| = {distance}.'
+    mistake_tags:
+    - distance_sign
+    work:
+      mode: none
+  - id: ALG010_CASE_SPLIT
+    type: fixed
+    prompt_template: Which pair of equations represents |x−h|=d when d>0?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: x−h=d only
+    - id: B
+      label: x−h=0
+    - id: C
+      label: x−h=d or x−h=−d
+    - id: D
+      label: x−h=d²
+    difficulty: easy
+    explanation_template: Positive distance has two signed positions.
+    work:
+      mode: none
+  - id: ALG010_ENDPOINT_BOUNDARY
+    type: fixed
+    prompt_template: For |x−10| <= 2, which statement about x=8 and x=12 is correct?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Both endpoints are included.
+    - id: B
+      label: Both endpoints are excluded.
+    - id: C
+      label: Only x=8 is included.
+    - id: D
+      label: Only x=12 is included.
+    difficulty: easy
+    explanation_template: The non-strict <= sign includes equality at both endpoints.
+    work:
+      mode: none
+  - id: ALG010_SHIFTED_FINITE_SET
+    type: generated
+    prompt_template: Solve |x−{h}| = {d}. Enter the two solution values.
+    variables:
+      h:
+        type: int
+        min: -8
+        max: 8
+      d:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      left: h-d
+      right: h+d
+    answer:
+      type: finite_set
+      values:
+      - '{left}'
+      - '{right}'
+    grading:
+      method: finite_set
+    difficulty: medium
+    explanation_template: The two positions are h−d and h+d.
+    mistake_tags:
+    - shifted_equation
+    - finite_set
+    work:
+      mode: none
+  - id: ALG010_REFLECTED_ONE
+    type: fixed
+    prompt_template: Solve −2|x−1|+5 = 5. How many real solutions are there?
+    variables: {}
+    derived: {}
+    answer:
+      type: numeric
+      value: '1'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: The threshold is zero, so the downward V meets its maximum only at x=1.
+    mistake_tags:
+    - negative_scale
+    - one_solution
+    work:
+      mode: none
+  - id: ALG010_CAPSTONE
+    type: fixed
+    prompt_template: A calibration reading x is accepted when −3|x−10|+12 >= 6. Give the exact interval,
+      check both endpoints in the original inequality, and explain why the condition is within rather
+      than outside the tolerance.
+    variables: {}
+    derived: {}
+    answer:
+      type: interval_set
+      value: '[8,12]'
+      variable: x
+    grading:
+      method: interval_set
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Show the isolation step, endpoint checks, and a sentence interpreting the calibration rule.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Rearranges to −3|x−10| >= −6 and divides by −3 with sign reversal to obtain |x−10|
+            <= 2.
+          weight: 2
+        - id: criterion_2
+          description: Gives [8,12] and checks equality at x=8 and x=12 in the original expression.
+          weight: 2
+        - id: criterion_3
+          description: Explains that the negative scale makes larger deviations lower the reading, so
+            acceptance is within the tolerance band.
+          weight: 2
+    media:
+    - src: media/native-final-foundations/alg-absolute-interval.svg
+      alt: A number line illustrates a closed interval between two fixed tolerance endpoints.
+      caption: The capstone’s inclusive inequality includes both endpoint readings.
+      width: 520
+      height: 250
+      fit: contain
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: Isolate to |x−10| <= 2, so x is in [8,12]. Both endpoints make the original
+      expression equal 6 and are accepted.
+    mistake_tags:
+    - negative_scale
+    - inequality_reversal
+    - interval_endpoint

@@ -1,0 +1,393 @@
+id: MATH_GEOM_006
+schema_version: '0.2'
+name: Triangles, quadrilaterals, and polygons
+domain: Math
+subdomain: Geometry
+topic: Plane Geometry
+description: Classify polygons, use interior and exterior angle sums, and justify triangle and quadrilateral properties.
+prerequisites:
+- MATH_GEOM_005
+unlocks:
+- MATH_GEOM_007
+tags:
+- geometry
+- triangles
+- quadrilaterals
+- polygons
+- angle_sums
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A polygon is a simple closed figure made from straight line segments. “Simple” means its sides do not cross except at shared endpoints. The sides meet at vertices, and the angles inside are interior angles. A polygon with n sides has n vertices and n interior angles. A three-sided polygon is a triangle; four sides make a quadrilateral; five, six, and seven sides make pentagons, hexagons, and heptagons. The name counts sides, even when the figure is rotated or drawn with unequal-looking lengths.
+
+  Convexity is a useful first classification. A convex polygon has every interior angle less than 180 degrees and every diagonal inside the figure. A concave polygon has at least one reflex interior angle greater than 180 degrees, and some diagonal leaves the figure. A star-like self-intersecting outline is not a simple polygon for the ordinary interior-sum formulas. Do not infer convexity from a small picture; inspect the angles and crossings described by the problem.
+
+  The interior-angle sum of an n-gon is (n - 2) * 180 degrees. The reason is triangulation: choose one vertex of a convex polygon and draw diagonals to all non-neighboring vertices. This creates n - 2 triangles, each contributing 180 degrees. A quadrilateral therefore has 2 * 180 = 360 degrees, a pentagon 540 degrees, and a hexagon 720 degrees. The same sum remains valid for a simple concave polygon if its reflex angle is counted as an interior angle greater than 180 degrees; the triangulation or an equivalent angle argument must be interpreted carefully.
+
+  For a regular polygon, all sides and all interior angles are equal. Divide the interior sum by n to get one interior angle: ((n - 2) * 180) / n. An exterior angle is formed by extending one side and using the adjacent outside turn. For a convex polygon, the exterior angles, taken one at each vertex in the same direction, sum to 360 degrees. A regular n-gon therefore has exterior angle 360/n degrees, and its interior angle is 180 - 360/n degrees. “Exterior angle” must be chosen consistently; mixing an interior reflex angle with a small outside turn creates a false equation.
+
+  Triangle facts give a strong hierarchy. Every triangle has three sides and interior sum 180 degrees. An equilateral triangle has three equal sides and three 60-degree angles; it is also isosceles because it has at least two equal sides. An isosceles triangle has at least two equal sides and equal opposite base angles. A scalene triangle has no equal sides. A right triangle has one 90-degree angle; an acute triangle has all angles less than 90 degrees; an obtuse triangle has one angle greater than 90 degrees. These classifications overlap: an isosceles triangle can be right, acute, or obtuse, while an equilateral triangle is acute.
+
+  The triangle inequality is necessary for three lengths to form a nondegenerate triangle: the sum of any two sides must be greater than the third. It is enough to check the two shorter sides against the longest. Lengths 4, 7, and 10 work because 4 + 7 > 10; lengths 3, 5, and 8 fail because 3 + 5 = 8 and would flatten into a segment. The largest angle lies opposite the longest side, and equal sides face equal angles. These comparisons are valid even when the sketch is rotated.
+
+  Quadrilateral properties also form a hierarchy. Under the explicit convention used here, a trapezoid is a quadrilateral with at least one pair of parallel sides. A parallelogram has two pairs of parallel sides, so it is a trapezoid under this inclusive convention. A rectangle is a parallelogram with four right angles. A rhombus is a parallelogram with four equal sides. A square is both a rectangle and a rhombus, hence also a parallelogram and a trapezoid. A kite has two distinct pairs of adjacent equal sides; it need not be a parallelogram. State the convention when a classification question uses “trapezoid,” because some texts require exactly one pair.
+
+  A rotated figure keeps every side length, angle measure, parallel relation, and classification. A square tilted 30 degrees is still a square; a trapezoid turned upside down still has its same pair of parallel bases. Use marks and stated facts, not screen orientation. For a missing angle, first select the most specific property available, then use a sum. A rectangle gives four 90-degree angles immediately, while a general quadrilateral only gives a 360-degree total.
+
+  Self-check: Did I count sides rather than apparent corners? Is the figure simple and convex or concave? Did I use (n - 2) * 180 for an interior sum and 360 for a complete exterior turn? Did I distinguish “at least one pair” from “exactly one pair” of parallel sides? Did I apply the triangle inequality strictly, and did rotation change only the page orientation?
+media:
+- src: media/native-plane-foundations/geom006-polygons.svg
+  alt: A six-sided polygon is triangulated from one vertex with three dashed diagonals.
+  caption: A hexagon splits into four triangles, explaining its 720 degree interior-angle sum.
+  width: 720
+  height: 400
+  fit: contain
+- src: media/native-plane-foundations/geom006-quadrilateral.svg
+  alt: An isosceles trapezoid and a second irregular quadrilateral are shown side by side for classification comparison.
+  caption: Property hierarchies require stated parallel and equality information, not visual appearance.
+  width: 720
+  height: 380
+  fit: contain
+examples:
+- prompt: Find the interior-angle sum of a pentagon.
+  solution: 540 degrees.
+  explanation: (5 - 2) * 180 = 540 degrees.
+- prompt: Find each interior angle of a regular hexagon.
+  solution: 120 degrees.
+  explanation: The sum is 720 degrees, and 720/6 = 120 degrees.
+- prompt: A triangle has angles 48 and 67 degrees. Find the third angle.
+  solution: 65 degrees.
+  explanation: Triangle angles sum to 180, so 180 - 48 - 67 = 65.
+- prompt: Can lengths 5, 8, and 13 form a nondegenerate triangle?
+  solution: No.
+  explanation: The two shorter lengths sum to 13, not more than 13, so the triangle inequality fails.
+- prompt: Classify a triangle with side lengths 9, 9, and 12.
+  solution: Isosceles.
+  explanation: Two equal sides make it isosceles; the unequal third side does not prevent that classification.
+- prompt: A triangle has angles 90, 35, and 55 degrees. Classify it by angles.
+  solution: Right triangle.
+  explanation: One angle is exactly 90 degrees.
+- prompt: Under the inclusive convention, is a square a trapezoid?
+  solution: Yes.
+  explanation: A square has two pairs of parallel sides, so it has at least one pair.
+- prompt: A quadrilateral has angles 92, 88, 104, and x. Find x.
+  solution: 76 degrees.
+  explanation: Quadrilateral sum is 360, so x = 360 - 92 - 88 - 104 = 76.
+- prompt: Find the exterior angle of a regular decagon.
+  solution: 36 degrees.
+  explanation: Regular exterior angles sum to 360, so 360/10 = 36.
+- prompt: A figure is a square rotated 30 degrees. Has its classification changed?
+  solution: No, it is still a square.
+  explanation: Rigid rotation preserves lengths, right angles, and parallel sides.
+applications:
+- title: Roof and bridge trusses
+  description: Triangle inequality and angle sums help reject impossible member lengths and check a repeated frame.
+- title: Floor and tile layouts
+  description: Polygon sums identify missing corner angles when a rotated tile must meet neighboring pieces.
+- title: Signs and panels
+  description: Regular polygon exterior turns guide repeated cuts and equal spacing around a sign.
+- title: Structural classification
+  description: The quadrilateral hierarchy helps describe which sides are parallel or equal before selecting a calculation.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: GEOM006_TRIANGLE_SUM_001
+    type: fixed
+    prompt_template: A triangle has angles 52 degrees, 61 degrees, and x. Find x.
+    answer_mode: final_only
+    answer: {type: numeric, value: '67'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: x = 180 - 52 - 61 = 67 degrees.
+    mistake_tags: [triangle_sum]
+    difficulty: easy
+  - id: GEOM006_QUAD_SUM_002
+    type: generated
+    prompt_template: A quadrilateral has angles {a}, {b}, {c}, and x degrees. Find x.
+    variables:
+      a: {type: int, min: 60, max: 120}
+      b: {type: int, min: 60, max: 120}
+      c: {type: int, min: 60, max: 120}
+    derived: {x: 360-a-b-c}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{x}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A quadrilateral totals 360 degrees, so x = 360 - {a} - {b} - {c} = {x}.
+    mistake_tags: [quadrilateral_sum]
+    difficulty: easy
+  - id: GEOM006_PENTAGON_SUM_003
+    type: fixed
+    prompt_template: What is the interior-angle sum of a pentagon?
+    answer_mode: final_only
+    answer: {type: numeric, value: '540'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: (5 - 2) * 180 = 540 degrees.
+    mistake_tags: [polygon_sum]
+    difficulty: easy
+  - id: GEOM006_REGULAR_OCTAGON_004
+    type: fixed
+    prompt_template: Find each interior angle of a regular octagon.
+    answer_mode: final_only
+    answer: {type: numeric, value: '135'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Sum 1080 degrees divided by 8 gives 135 degrees.
+    mistake_tags: [regular_polygon]
+    difficulty: medium
+  - id: GEOM006_EXTERIOR_005
+    type: generated
+    prompt_template: Find each exterior angle of a regular {n}-gon.
+    variables: {n: {type: int, min: 3, max: 12}}
+    derived: {angle: 360/n}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{angle}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Exterior turns total 360 degrees, so each is 360/{n} = {angle} degrees.
+    mistake_tags: [exterior_sum]
+    difficulty: medium
+  - id: GEOM006_TRIANGLE_INEQUALITY_006
+    type: fixed
+    prompt_template: Which side lengths can form a nondegenerate triangle?
+    options:
+    - {id: A, label: '3, 4, 8'}
+    - {id: B, label: '4, 7, 10'}
+    - {id: C, label: '2, 5, 7'}
+    - {id: D, label: '1, 2, 4'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Only 4 + 7 > 10; the other choices have shorter sides summing to at most the longest.
+    mistake_tags: [triangle_inequality]
+    difficulty: medium
+  - id: GEOM006_SIDE_CLASS_007
+    type: fixed
+    prompt_template: A triangle has side lengths 6, 6, and 9. How is it classified by sides?
+    options:
+    - {id: A, label: 'Equilateral'}
+    - {id: B, label: 'Isosceles'}
+    - {id: C, label: 'Scalene'}
+    - {id: D, label: 'Not a triangle'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Two equal sides make the triangle isosceles.
+    mistake_tags: [triangle_classification]
+    difficulty: easy
+  - id: GEOM006_ANGLE_CLASS_008
+    type: fixed
+    prompt_template: A triangle has angles 90, 45, and 45 degrees. Which classifications apply?
+    options:
+    - {id: A, label: 'Right and isosceles'}
+    - {id: B, label: 'Acute and scalene'}
+    - {id: C, label: 'Obtuse and isosceles'}
+    - {id: D, label: 'Equilateral only'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: A}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A 90 degree angle makes it right, and equal 45 degree angles imply equal opposite sides.
+    mistake_tags: [overlapping_classifications]
+    difficulty: medium
+  - id: GEOM006_HIERARCHY_009
+    type: fixed
+    prompt_template: Under the inclusive convention, which statement is true?
+    options:
+    - {id: A, label: 'No square is a parallelogram'}
+    - {id: B, label: 'Every square is a rectangle and a rhombus'}
+    - {id: C, label: 'A rectangle has no parallel sides'}
+    - {id: D, label: 'A rhombus must have four right angles'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A square has four right angles and four equal sides, and opposite sides are parallel.
+    mistake_tags: [quadrilateral_hierarchy]
+    difficulty: medium
+  - id: GEOM006_TRAPEZOID_CONVENTION_010
+    type: fixed
+    prompt_template: In this lesson's convention, a trapezoid has at least one pair of parallel sides. Is a parallelogram a trapezoid?
+    options:
+    - {id: A, label: 'No, because it has two pairs'}
+    - {id: B, label: 'Yes'}
+    - {id: C, label: 'Only when rotated'}
+    - {id: D, label: 'Only when it is a square'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: “At least one pair” includes figures with two pairs; other textbooks may use an exactly-one-pair convention.
+    mistake_tags: [trapezoid_convention]
+    difficulty: medium
+  - id: GEOM006_TUTOR_POLYGON_011
+    type: fixed
+    prompt_template: Explain how to find each interior angle of a regular nonagon and state the result.
+    answer_mode: final_plus_required_work
+    answer: {type: numeric, value: '140'}
+    grading: {method: exact_numeric}
+    work:
+      mode: rubric_check
+      prompt: Show the polygon-sum formula, the division by the number of equal angles, and the exact result.
+      rubric:
+        criteria:
+        - {id: count, description: Identifies a nonagon as a 9-sided polygon., weight: 2}
+        - {id: sum, description: Uses (9 - 2) * 180 = 1260 degrees., weight: 2}
+        - {id: divide, description: Divides the total by 9 because the polygon is regular., weight: 2}
+        - {id: conclusion, description: States 140 degrees and labels it an interior angle., weight: 2}
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: A regular nonagon has sum (9 - 2)*180 = 1260 degrees. Equal angles give 1260/9 = 140 degrees each.
+    mistake_tags: [tutor_reasoning, regular_polygon]
+    difficulty: hard
+  - id: GEOM006_ROTATION_012
+    type: fixed
+    prompt_template: A parallelogram is rotated 45 degrees. Which property is preserved?
+    options:
+    - {id: A, label: 'Opposite sides remain parallel'}
+    - {id: B, label: 'It becomes a triangle'}
+    - {id: C, label: 'Its angle sum changes'}
+    - {id: D, label: 'Its sides become curved'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: A}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A rigid rotation preserves lengths, angles, and parallel relationships.
+    mistake_tags: [rotation, rigid_motion]
+    difficulty: easy
+  - id: GEOM006_CONCAVE_013
+    type: fixed
+    prompt_template: Which feature identifies a concave simple polygon?
+    options:
+    - {id: A, label: 'All sides are equal'}
+    - {id: B, label: 'At least one interior angle is greater than 180 degrees'}
+    - {id: C, label: 'Every angle is 90 degrees'}
+    - {id: D, label: 'It has no vertices'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A concave polygon has a reflex interior angle, while convex polygons have all interior angles below 180 degrees.
+    mistake_tags: [concavity]
+    difficulty: medium
+  - id: GEOM006_DIAGONALS_014
+    type: generated
+    prompt_template: Drawing diagonals from one vertex of a convex {n}-gon makes how many triangles?
+    variables: {n: {type: int, min: 3, max: 10}}
+    derived: {triangles: n-2}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{triangles}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: One vertex triangulates an n-gon into n - 2 triangles, so the answer is {triangles}.
+    mistake_tags: [triangulation]
+    difficulty: medium
+  - id: GEOM006_TRIANGLE_ORDER_015
+    type: fixed
+    prompt_template: A triangle has sides 7, 8, and 12. Which angle is largest?
+    options:
+    - {id: A, label: 'The angle opposite side 12'}
+    - {id: B, label: 'The angle opposite side 7'}
+    - {id: C, label: 'The angle opposite side 8'}
+    - {id: D, label: 'All angles are equal'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: A}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: The longest side is opposite the largest angle.
+    mistake_tags: [side_angle_order]
+    difficulty: medium
+  - id: GEOM006_EXTERIOR_SUM_016
+    type: fixed
+    prompt_template: A convex polygon has one exterior turn at each vertex, all taken in the same direction. What is their sum?
+    answer_mode: final_only
+    answer: {type: numeric, value: '360'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A complete trip around a convex polygon turns through 360 degrees.
+    mistake_tags: [exterior_sum]
+    difficulty: easy
+  - id: GEOM006_SIMPLE_017
+    type: fixed
+    prompt_template: A six-sided outline has two crossing sides away from vertices. Is it a simple polygon for the standard sum formula?
+    options:
+    - {id: A, label: 'Yes, every closed outline is simple'}
+    - {id: B, label: 'No, the crossing violates the simple-polygon condition'}
+    - {id: C, label: 'Yes, if it is rotated'}
+    - {id: D, label: 'No, because six-sided figures cannot have sums'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A simple polygon's sides meet only at shared endpoints; an extra crossing makes a self-intersecting outline.
+    mistake_tags: [simple_polygon]
+    difficulty: hard
+  - id: GEOM006_SQUARE_018
+    type: fixed
+    prompt_template: Which two classifications always apply to a square?
+    options:
+    - {id: A, label: 'Kite only'}
+    - {id: B, label: 'Rectangle and rhombus'}
+    - {id: C, label: 'Scalene triangle'}
+    - {id: D, label: 'Concave polygon'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A square has four right angles and four equal sides, so it is both a rectangle and a rhombus.
+    mistake_tags: [square_hierarchy]
+    difficulty: easy
+  - id: GEOM006_REGULAR_DECAGON_019
+    type: fixed
+    prompt_template: What is each interior angle of a regular decagon?
+    answer_mode: final_only
+    answer: {type: numeric, value: '144'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Sum = 8*180 = 1440; divide by 10 to get 144 degrees.
+    mistake_tags: [regular_polygon]
+    difficulty: medium
+  - id: GEOM006_INEQUALITY_020
+    type: fixed
+    prompt_template: A proposed triangle has sides 2, 6, and 9. What is the correct conclusion?
+    options:
+    - {id: A, label: 'Valid because 2 + 6 equals 9'}
+    - {id: B, label: 'Impossible because 2 + 6 is not greater than 9'}
+    - {id: C, label: 'Equilateral'}
+    - {id: D, label: 'Right by side lengths alone'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: The strict triangle inequality requires the sum of the two shorter sides to exceed the longest.
+    mistake_tags: [triangle_inequality]
+    difficulty: medium

@@ -2,7 +2,7 @@
   "manifest_version": "1.0",
   "name": "QuickMaths Unified Agent Guide",
   "app": "QuickMaths Web",
-  "app_version": 36,
+  "app_version": 37,
   "description": "The single operating guide for routing fresh visitors, tutoring learners, and helping educators design portable curricula inside local-first QuickMaths, its public Lesson Depot, and its optional GitHub Bridge.",
   "homepage": "https://quickmathematics.github.io/QuickMaths/",
   "discovery": {
@@ -489,7 +489,7 @@
         "flac",
         "opus"
       ],
-      "illustration_library": "All 136 shipped lesson pages have teaching figures. A content-matched library adds 130 hosted Matplotlib SVGs across 118 library lessons without reinstalling packs or rewriting saved work. Native overrides keep their own media. Studio copies include matching assets under normal media limits. Hosted figures load near the viewport and are not guaranteed offline. Spatial tests include 73 trigonometry scenarios and eleven additional triangle-area scenarios, derived only from displayed givens; six abstract identity scenarios remain text-only."
+      "illustration_library": "All 156 shipped lesson pages have teaching figures. A content-matched library adds 130 hosted Matplotlib SVGs across 118 library lessons without reinstalling packs or rewriting saved work. Native overrides keep their own media. Studio copies include matching assets under normal media limits. Hosted figures load near the viewport and are not guaranteed offline. Spatial tests include 73 trigonometry scenarios and eleven additional triangle-area scenarios, derived only from displayed givens; six abstract identity scenarios remain text-only."
     },
     "native_authoring_function_allowlist": "Trusted native authoring may use normal_cdf(z), inverse_normal_cdf(p), t_cdf(t, df), chi_square_cdf(x, df), chi_square_sf(x, df), and f_sf(x, df1, df2), with finite/domain-checked inputs. These helpers are first-party native functions only; uploaded, Depot, and community lesson packages remain fixed data and cannot execute generator or helper code."
   },
@@ -513,7 +513,7 @@
   },
   "native_compatibility": {
     "state_version": 18,
-    "native_lessons": 92,
+    "native_lessons": 112,
     "drafts": "Preserve resolved question snapshots, order and responses across reload/backup/sync. Recovery-needed drafts block grading; retain a backup before repair. Checksums are not verification authority.",
     "review": "Functions and calculus bridge capstones retain required tutor review. Formal proofs separately require fresh exact Lean verification or replay."
   },
@@ -534,6 +534,40 @@
         "MATH_CALC_002"
       ],
       "policy": "Every new assessment includes the original review-required capstone and the formal exercise; saved drafts retain their original questions."
-    }
+    },
+    "scope": "Historical pre-foundation audit of 136 lessons; see foundation_expansion for the current addition."
+  },
+  "foundation_expansion": {
+    "lesson_ids": [
+      "MATH_ARITH_006",
+      "MATH_ARITH_007",
+      "MATH_ARITH_008",
+      "MATH_ARITH_009",
+      "MATH_ARITH_010",
+      "MATH_ARITH_011",
+      "MATH_ARITH_012",
+      "MATH_ARITH_013",
+      "MATH_ARITH_014",
+      "MATH_ALG_009",
+      "MATH_GEOM_005",
+      "MATH_GEOM_006",
+      "MATH_GEOM_007",
+      "MATH_GEOM_008",
+      "MATH_GEOM_009",
+      "MATH_GEOM_010",
+      "MATH_GEOM_011",
+      "MATH_GEOM_012",
+      "MATH_ALG_010",
+      "MATH_RAD_002"
+    ],
+    "native_lessons": 112,
+    "shipped_lessons": 156,
+    "ordinary_scenarios_added": 400,
+    "assessment_length_per_new_lesson": 20,
+    "required_capstone_per_attempt": true,
+    "existing_prerequisites": "unchanged",
+    "guide": "FOUNDATIONS_ROADMAP.md",
+    "trust_contract": "unchanged; conceptual review is separate from kernel-certified formal work",
+    "report": "releases/2026-09-21-foundation-expansion.md"
   }
 }

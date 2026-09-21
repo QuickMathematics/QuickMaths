@@ -1,0 +1,659 @@
+id: MATH_ARITH_007
+schema_version: '0.2'
+name: Factors, multiples, primes, GCF and LCM
+domain: Math
+subdomain: Arithmetic
+topic: Arithmetic Foundations
+description: Factors and multiples describe how whole numbers are built and repeated. A factor of n is a whole
+  number that divides n with no remainder. If 4 times 9 = 36, then 4 and 9 are factors of 36, while 36 i
+prerequisites:
+- MATH_ARITH_006
+unlocks: []
+tags:
+- arithmetic
+- factors
+- multiples
+- primes
+- gcf
+- lcm
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'Factors and multiples describe how whole numbers are built and repeated. A factor of n is a whole
+  number that divides n with no remainder. If 4 times 9 = 36, then 4 and 9 are factors of 36, while 36 is a
+  multiple of both 4 and 9. The word factor names the parts of a product; multiple names a result in a skip-counting
+  sequence. Zero is a multiple of every whole number because 0 times k = 0, but zero is not a factor of any
+  number because division by zero is undefined.
+
+
+  To list factors, test whole numbers in pairs. For 36, start at 1: 1 times 36, 2 times 18, 3 times 12, and
+  4 times 9. Once the smaller factor passes the square root, the pairs repeat in reverse, so the complete positive
+  list is 1, 2, 3, 4, 6, 9, 12, 18, 36. A factor-pair check is safer than guessing divisors: every claimed
+  factor must multiply by its partner to make the target, and no pair should be counted twice. A square number
+  such as 49 has a middle pair 7 times 7, so that factor appears once in the list even though it supplies both
+  positions in the pair.
+
+
+  Prime numbers have exactly two positive factors, 1 and themselves. The number 2 is the only even prime. One
+  is neither prime nor composite because it has only one positive factor. A composite number has at least one
+  additional factor; 15 has 1, 3, 5, and 15. To test whether a number n is prime, try divisors up to the square
+  root of n. If none divides evenly, no larger factor can appear without a smaller partner already found. This
+  makes a short, reasoned test instead of a long list of guesses. Divisibility shortcuts help: a number divisible
+  by 2 is even; one ending in 0 or 5 is divisible by 5; a number whose digit sum is divisible by 3 is divisible
+  by 3.
+
+
+  Prime factorization writes a composite number as a product of primes. Factor 84 by splitting 84 = 2 times
+  42, then 42 = 2 times 21, and 21 = 3 times 7. Thus 84 = 2 times 2 times 3 times 7, or 2 squared times 3 times
+  7. The order of factors does not matter, but every factor must be prime at the end. A factor tree is a record
+  of choices, not a different answer: splitting 84 as 6 times 14 eventually gives the same multiset of prime
+  factors. Multiplying the primes back together checks the factorization.
+
+
+  The greatest common factor (GCF) of two or more numbers is the largest positive factor they share. For 24
+  and 36, the common factors include 1, 2, 3, 4, 6, and 12, so the GCF is 12. A factor-list method is transparent
+  for small numbers. A prime-factor method is efficient for larger numbers: write each number in primes, keep
+  only primes that appear in every number, and use the smallest exponent. The GCF is useful for making equal
+  groups as large as possible or simplifying a fraction without changing its value.
+
+
+  The least common multiple (LCM) is the smallest positive number that belongs to both multiple lists. Multiples
+  of 6 are 6, 12, 18, 24, 30; multiples of 8 are 8, 16, 24, so the LCM is 24. With prime factors, keep every
+  prime using the largest exponent appearing in any number. For 12 = 2 squared times 3 and 18 = 2 times 3 squared,
+  the LCM is 2 squared times 3 squared = 36. The LCM answers repeat-together questions; the GCF answers shared-building
+  questions. They can be linked by GCF(a,b) times LCM(a,b) = a times b for positive a and b, which is a useful
+  check rather than a replacement for understanding.
+
+
+  Read the context before choosing GCF or LCM. If 48 red beads and 60 blue beads must be split into identical
+  bags with no leftovers, the greatest possible number of bags is GCF(48,60) = 12. If a red light flashes every
+  8 seconds and a blue light every 12 seconds and both flash now, the next simultaneous flash is after LCM(8,12)
+  = 24 seconds. For a factor question, ask “what equal groups fit exactly?” For a multiple question, ask “when
+  does this repeated step land?” A number can be a factor of one target and a multiple of another; the roles
+  depend on the sentence.
+
+
+  Explain your method with a product, list, or prime record. Do not call 1 prime, stop a factor tree with a
+  composite leaf, or choose a large common factor that is not actually common. The capstone asks you to model
+  a repeated schedule and justify why the first shared time is the least common multiple.'
+examples:
+- prompt: List the positive factor pairs of 36.
+  solution: 1×36, 2×18, 3×12, 4×9, 6×6
+  explanation: Each pair multiplies to 36; after 6×6, the pairs reverse.
+- prompt: Is 29 prime or composite?
+  solution: Prime
+  explanation: Only 1 and 29 divide it; testing primes through √29 is enough.
+- prompt: Write 84 as a product of prime factors.
+  solution: 2×2×3×7
+  explanation: Split 84 into 2×42 and 42 into 2×3×7; every final factor is prime.
+- prompt: Find the GCF of 24 and 36.
+  solution: '12'
+  explanation: The shared factors end at 12, or keep 2²×3 from both prime factorizations.
+- prompt: Find the LCM of 6 and 8.
+  solution: '24'
+  explanation: 24 is the first number in both multiple lists.
+- prompt: Why is 1 neither prime nor composite?
+  solution: It has exactly one positive factor.
+  explanation: Prime requires exactly two positive factors; composite requires more than two.
+- prompt: What is the first positive multiple of every whole number?
+  solution: The number itself
+  explanation: For positive k, 1×k=k, and no positive multiple is smaller.
+- prompt: Use divisibility to decide whether 735 is divisible by 3.
+  solution: 'Yes'
+  explanation: 7+3+5=15, and 15 is divisible by 3.
+- prompt: What is the GCF useful for when making equal groups?
+  solution: The largest possible group count or shared size, depending on what is being grouped.
+  explanation: 'Translate the nouns: GCF captures the greatest exact sharing structure.'
+- prompt: Two bells ring every 9 and 15 minutes. When do they ring together again?
+  solution: 45 minutes
+  explanation: The first shared positive multiple is LCM(9,15)=45.
+applications:
+- title: Packing equal kits
+  description: A coordinator uses a GCF to make the largest number of identical kits from several inventories
+    without leftovers.
+- title: Repeating signals
+  description: Traffic lights, alarms, and machine cycles use LCM reasoning to predict the next simultaneous
+    event.
+- title: Tiling and arrays
+  description: Factor pairs describe the possible rectangular rows and columns of a fixed collection of tiles.
+- title: Fraction simplification
+  description: The GCF removes a common factor from numerator and denominator while preserving the represented
+    quantity.
+media:
+- src: media/native-number-foundations/arith007-factor-pairs.svg
+  alt: Four factor-pair cards for 36, followed by the square pair 6 times 6.
+  caption: Factor pairs certify divisors by multiplying back to the target.
+  width: 800
+  height: 360
+  fit: contain
+- src: media/native-number-foundations/arith007-gcf-lcm.svg
+  alt: A two-circle comparison labels GCF as shared building and LCM as shared repeat.
+  caption: Choose GCF for exact sharing and LCM for synchronized repetition.
+  width: 800
+  height: 360
+  fit: contain
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: ARITH007_PRODUCT_FACTOR
+    type: generated
+    prompt_template: A tray has {p} rows of {q} markers. How many markers are on the tray?
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      p:
+        type: int
+        min: 3
+        max: 9
+      q:
+        type: int
+        min: 4
+        max: 8
+    derived:
+      total: p*q
+    constraints: []
+    answer:
+      type: numeric
+      value: '{total}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply rows by markers per row; the result is the requested total count.
+    mistake_tags:
+    - factors
+    - multiplication
+  - id: ARITH007_FACTOR_LIST
+    type: fixed
+    prompt: Enter the greatest positive factor of 48 that is less than 48.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '24'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Factor pairs 1×48, 2×24, 3×16, 4×12, 6×8 show that 24 is the largest proper factor.
+    mistake_tags:
+    - factor_pairs
+  - id: ARITH007_PRIME_TEST
+    type: fixed
+    prompt: Classify 91.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Prime
+    - id: B
+      label: Composite
+    - id: C
+      label: Neither prime nor composite
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 91=7×13, so it has more than two positive factors.
+    mistake_tags:
+    - prime_test
+  - id: ARITH007_PRIME_DIGIT_SUM
+    type: generated
+    prompt_template: A number has digits 4, {a}, and 5. Enter its remainder when divided by 3.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 0
+        max: 9
+    derived:
+      n: 4*100+a*10+5
+      digit_sum: 9+a
+      remainder: (9+a)%3
+    constraints: []
+    answer:
+      type: numeric
+      value: '{remainder}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The digit sum is 9+{a}; its remainder modulo 3 is the requested remainder.
+    mistake_tags:
+    - divisibility
+    - digit_sum
+  - id: ARITH007_ONE_STATUS
+    type: fixed
+    prompt: Enter 1 if 1 is prime, or 0 if it is not prime.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '0'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: One has exactly one positive factor, so it is neither prime nor composite.
+    mistake_tags:
+    - prime_definition
+  - id: ARITH007_PRIME_FACTOR_POWER
+    type: fixed
+    prompt: Which is the complete prime factorization of 84?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 2×42
+    - id: B
+      label: 2×2×3×7
+    - id: C
+      label: 4×3×7
+    - id: D
+      label: 2×2×21
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Only option B has prime factors all the way to the leaves; multiplying them gives
+      84.
+    mistake_tags:
+    - prime_factorization
+  - id: ARITH007_GCF_LIST
+    type: fixed
+    prompt: How many positive common factors do 24 and 36 have?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '6'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The common factors are 1, 2, 3, 4, 6, and 12, so there are six.
+    mistake_tags:
+    - gcf
+    - factor_lists
+  - id: ARITH007_GCF_COMMON
+    type: fixed
+    prompt: Which tool answers largest equal grouping with no leftovers?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Greatest common factor
+    - id: B
+      label: Least common multiple
+    - id: C
+      label: Prime test
+    - id: D
+      label: Remainder
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A greatest common factor captures the largest shared divisor.
+    mistake_tags:
+    - gcf
+    - tool_choice
+  - id: ARITH007_LCM_LIST
+    type: fixed
+    prompt: Find LCM(6, 8).
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '24'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The first shared positive multiple is 24.
+    mistake_tags:
+    - lcm
+  - id: ARITH007_LCM_PRIMES
+    type: generated
+    prompt_template: A number has prime factorization 2^{a}×3^{b}. Enter the number.
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 4
+      b:
+        type: int
+        min: 1
+        max: 3
+    derived:
+      n: 2**a*3**b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 'Multiply the prime powers: 2^{a}×3^{b}={n}.'
+    mistake_tags:
+    - prime_factorization
+    - prime_exponents
+  - id: ARITH007_GCF_PACK
+    type: fixed
+    prompt: Find the greatest common factor of 84 and 126.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '42'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Common factors of 84 and 126 have greatest value 42.
+    mistake_tags:
+    - gcf
+    - factor_lists
+  - id: ARITH007_LCM_BELLS
+    type: fixed
+    prompt: Two repeating bells must be synchronized at the earliest future time. Which tool is appropriate?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: GCF
+    - id: B
+      label: LCM
+    - id: C
+      label: Prime factor count
+    - id: D
+      label: Rounding
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Earliest shared repetition is a least common multiple question.
+    mistake_tags:
+    - lcm
+    - tool_choice
+  - id: ARITH007_MULTIPLE_STEP
+    type: generated
+    prompt_template: A runner marks every {step} metres. Which mark is the {count}th positive multiple of {step}?
+    difficulty: medium
+    answer_mode: final_only
+    variables:
+      step:
+        type: int
+        min: 4
+        max: 9
+      count:
+        type: int
+        min: 3
+        max: 8
+    derived:
+      mark: step*count
+    constraints: []
+    answer:
+      type: numeric
+      value: '{mark}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The kth positive multiple is k groups of the step, so {count}×{step}.
+    mistake_tags:
+    - multiples
+    - sequence
+  - id: ARITH007_FACTOR_OR_MULTIPLE
+    type: fixed
+    prompt: In 7×8=56, which statement is true?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 7 is a factor of 56
+    - id: B
+      label: 7 is a multiple of 56
+    - id: C
+      label: 56 is a factor of 7
+    - id: D
+      label: Neither number has a factor relationship
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The product equation certifies 7 as a factor of 56.
+    mistake_tags:
+    - language
+  - id: ARITH007_FACTOR_PAIR
+    type: fixed
+    prompt: A number is 2²×3¹. How many positive factors does it have?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '6'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Choose exponents 0,1,2 for 2 and 0,1 for 3, giving 3×2=6 factors.
+    mistake_tags:
+    - factor_count
+    - prime_exponents
+  - id: ARITH007_SQUARE_MIDDLE
+    type: fixed
+    prompt: Which positive factor pair is the middle pair for 49? Enter the factor.
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '7'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: '49 is a square: 7×7=49, so 7 is the middle factor.'
+    mistake_tags:
+    - square_numbers
+  - id: ARITH007_DIVISIBILITY_FIVE
+    type: fixed
+    prompt: Which test shows that 735 is divisible by 5?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Its digit sum is 15
+    - id: B
+      label: It is odd
+    - id: C
+      label: Its last digit is 5
+    - id: D
+      label: It has three digits
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Divisibility by 5 is determined by a final digit of 0 or 5.
+    mistake_tags:
+    - divisibility
+    - last_digit
+  - id: ARITH007_IDENTITY_CHECK
+    type: fixed
+    prompt: For positive a=12 and b=18, enter GCF(a,b)×LCM(a,b).
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '216'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: GCF=6 and LCM=36; 6×36=216=12×18.
+    mistake_tags:
+    - gcf
+    - lcm
+    - check
+  - id: ARITH007_COMMON_MULTIPLE
+    type: fixed
+    prompt: Which number is divisible by both 6 and 9?
+    difficulty: medium
+    answer_mode: final_only
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: '18'
+    - id: B
+      label: '36'
+    - id: C
+      label: '27'
+    - id: D
+      label: '45'
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 36÷6=6 and 36÷9=4, so 36 is divisible by both.
+    mistake_tags:
+    - divisibility
+    - common_multiple
+  - id: ARITH007_CAPSTONE
+    type: fixed
+    prompt: A red signal repeats every 8 seconds and a blue signal every 12 seconds; both flash at time 0.
+      Enter the first positive time they flash together.
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '24'
+    grading:
+      method: exact_numeric
+    work:
+      mode: rubric_check
+      prompt: Explain the model, show labelled calculations, and state units or assumptions. A final number
+        alone is not enough.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Models each repeat time as a positive multiple and identifies the shared event.
+          weight: 2
+        - id: criterion_2
+          description: Shows that 24 is a common multiple of 8 and 12.
+          weight: 2
+        - id: criterion_3
+          description: Explains why 8, 12, or any smaller positive time is not a common multiple, so 24 is
+            least, with seconds stated.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: Multiples of 8 are 8, 16, 24; multiples of 12 are 12, 24. Therefore the first positive
+      shared time is LCM(8,12)=24 seconds.
+    mistake_tags:
+    - capstone_reasoning
+    - model_selection

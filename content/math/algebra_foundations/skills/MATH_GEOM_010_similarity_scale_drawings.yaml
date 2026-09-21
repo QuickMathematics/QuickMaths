@@ -1,0 +1,391 @@
+id: MATH_GEOM_010
+schema_version: '0.2'
+name: Similarity, scale drawings, and scaling laws
+domain: Math
+subdomain: Geometry
+topic: Plane Geometry
+description: Recognize similar figures, use correspondence and scale factors, and connect length and area scaling to trigonometry.
+prerequisites:
+- MATH_ARITH_011
+- MATH_GEOM_009
+unlocks: []
+tags:
+- geometry
+- similarity
+- scale_factor
+- scale_drawings
+- proportional_reasoning
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Similar figures have the same shape: corresponding angles are equal and corresponding side lengths are proportional. Their orientation may differ, and one may be larger or smaller. Congruent figures are the special case with scale factor 1. Similarity does not require equal size. A scale factor k from a source to an image multiplies every length by k. If k > 1 the image is enlarged; if 0 < k < 1 it is reduced. Lengths remain positive, so use a positive factor for ordinary scale drawings.
+
+  Correspondence is the foundation. If triangle ABC is similar to triangle A'B'C', the order says A matches A', B matches B', and C matches C'. Therefore AB/A'B' = BC/B'C' = AC/A'C', with the ratio direction kept consistent. A common error is to match sides by their page position or apparent length instead of by their opposite angles and vertex order. Label the correspondence before writing a proportion.
+
+  The triangle similarity criteria are AA, SAS, and SSS. AA requires two pairs of equal corresponding angles; the third pair follows from the triangle angle sum. SAS requires two proportional corresponding sides and the included angle equal. SSS requires all three pairs of corresponding sides in one common ratio. Unlike congruence, the lengths need not be equal. Three angles alone establish similarity by AA but do not establish congruence because the size can vary.
+
+  A scale drawing uses a fixed ratio between drawing length and real length. If 1 cm represents 4 m, then a 7 cm drawing segment represents 28 m. Write the units on both sides and multiply by the real-units-per-drawing-unit ratio. To find a drawing length, divide the real length by the same ratio. Mixed units must be converted first: 1 m is 100 cm, and the scale statement determines which direction the conversion runs.
+
+  Area scales by the square of the length factor. If all lengths multiply by k, then a rectangle's area changes from lw to (kl)(kw) = k^2 lw. A scale factor 3 gives nine times the area; a reduction by 1/2 gives one quarter the area. Surface materials therefore require a squared factor. Perimeter scales linearly by k because it adds lengths. Volume, when introduced later, scales by k^3; do not use that rule for a plane area.
+
+  For similar triangles, corresponding altitudes, medians, and other lengths also share factor k. If a small triangle has base 5 and its image has corresponding base 8, the factor is 8/5. A small area of 20 then becomes 20*(8/5)^2 = 20*64/25 = 256/5 square units. Keep an exact fraction when the scale factor is not an integer. A perimeter of 18 becomes 18*(8/5) = 144/5.
+
+  Parallel lines create useful similar triangles. When a segment is drawn parallel to one side of a triangle, corresponding angles are equal, giving AA similarity. This is the bridge from angle relationships to proportional lengths. The same idea supports shadows: a vertical object and its shadow form a triangle similar to a shorter reference object and its shadow when the sun rays are treated as parallel. The ratio compares corresponding heights and shadow lengths, not arbitrary pairs.
+
+  Trigonometry later packages the same right-triangle correspondences into sine, cosine, and tangent. Similar right triangles with the same acute angle have a constant ratio of opposite to hypotenuse, for example, so a scale change preserves the trigonometric ratio. A triangle can be similar without being right, but a trig ratio must be matched to the chosen angle and sides. Similarity is the geometric reason a ratio stays stable across different-sized right triangles.
+
+  Similarity is not a license to assume proportionality from appearance. A diagram may be compressed on a screen. Use stated equal angles, parallel marks, side ratios, or a scale statement. A dilation changes size while preserving shape and angles; a rigid transformation preserves size as well. If two figures share only one angle and one side, there is not enough information for a general similarity conclusion.
+
+  Self-check: Did I write the correspondence in the correct order? Are my proportions oriented consistently? Did I distinguish similarity from congruence? Did I square the length factor for area but use the first power for perimeter? Did I convert scale units and connect any trig ratio to the same angle?
+media:
+- src: media/native-plane-foundations/geom010-similar.svg
+  alt: A large triangle and a smaller triangle show corresponding angle positions and proportional side shapes.
+  caption: Similar triangles have equal corresponding angles and side lengths in one common ratio.
+  width: 720
+  height: 400
+  fit: contain
+- src: media/native-plane-foundations/geom010-scale.svg
+  alt: A 3 by 2 rectangle and a 6 by 4 rectangle compare length factor 2 with area factor 4.
+  caption: Doubling every length quadruples a plane area.
+  width: 720
+  height: 380
+  fit: contain
+examples:
+- prompt: A 4 cm side corresponds to a 10 cm side. Find the scale factor from small to large.
+  solution: 2.5.
+  explanation: k = 10/4 = 5/2 = 2.5.
+- prompt: A drawing uses 1 cm for 3 m. What real length is 8 cm?
+  solution: 24 m.
+  explanation: Multiply 8 by 3 m per cm.
+- prompt: A 12 m wall is drawn at 1:100. How long is the drawing in cm?
+  solution: 12 cm.
+  explanation: 12 m = 1200 cm; divide by 100.
+- prompt: Two triangles have two matching angles. What similarity criterion applies?
+  solution: AA.
+  explanation: The third angles must also match because triangle sums are 180 degrees.
+- prompt: Sides of one triangle are 3, 4, 5 and a similar triangle has factor 2. Find its side lengths.
+  solution: 6, 8, 10.
+  explanation: Multiply each corresponding side by 2.
+- prompt: A rectangle 3 by 5 is enlarged by factor 4. By what factor does its area change?
+  solution: 16.
+  explanation: Area scales by k^2 = 4^2.
+- prompt: A perimeter 18 cm is enlarged by factor 1.5. Find the new perimeter.
+  solution: 27 cm.
+  explanation: 'Perimeter scales linearly: 18*1.5 = 27.'
+- prompt: A small similar triangle has area 12 cm^2 and length factor 3. Find the large area.
+  solution: 108 cm^2.
+  explanation: 12*3^2 = 108.
+- prompt: A 2 m person casts a 1.5 m shadow; a tree casts a 6 m shadow. Find the tree height under parallel rays.
+  solution: 8 m.
+  explanation: h/6 = 2/1.5, so h = 8.
+- prompt: Does one equal angle and one equal side prove arbitrary triangles similar?
+  solution: No.
+  explanation: A second angle or enough side ratios is needed.
+applications:
+- title: Maps and blueprints
+  description: A fixed scale converts drawing lengths to real distances while preserving shape.
+- title: Photography and screen design
+  description: Enlarging a frame scales lengths linearly but changes pixel or material area by the square factor.
+- title: Shadows and indirect measurement
+  description: Parallel sunlight makes object-shadow triangles similar, allowing heights to be found without direct access.
+- title: Trigonometric modeling
+  description: Similar right triangles explain why sine, cosine, and tangent ratios depend on an angle rather than on size.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: GEOM010_FACTOR_001
+    type: fixed
+    prompt_template: A 5 cm side corresponds to a 15 cm side. Find the scale factor from small to large.
+    answer_mode: final_only
+    answer: {type: numeric, value: '3'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: k = 15/5 = 3.
+    mistake_tags: [scale_factor]
+    difficulty: easy
+  - id: GEOM010_DRAWING_002
+    type: generated
+    prompt_template: A scale drawing uses 1 cm for {r} m. A segment is {d} cm on the drawing. Find its real length in metres.
+    variables:
+      r: {type: int, min: 2, max: 8}
+      d: {type: int, min: 2, max: 12}
+    derived: {real: r*d}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{real}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: 'Multiply drawing length by metres per centimetre: {d}*{r} = {real} m.'
+    mistake_tags: [scale_drawing]
+    difficulty: easy
+  - id: GEOM010_AA_003
+    type: fixed
+    prompt_template: Two pairs of corresponding angles are equal. Which similarity criterion applies?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'SSS'}
+    - {id: B, label: 'AA'}
+    - {id: C, label: 'SSA'}
+    - {id: D, label: 'None'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Two equal angles establish AA similarity.
+    mistake_tags: [aa_similarity]
+    difficulty: easy
+  - id: GEOM010_SAS_004
+    type: fixed
+    prompt_template: Which data establish SAS similarity?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Three equal angles only'}
+    - {id: B, label: 'Two equal sides and any angle'}
+    - {id: C, label: 'Two proportional sides and their included equal angle'}
+    - {id: D, label: 'One side ratio'}
+    answer: {type: multiple_choice, value: C}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: SAS similarity needs the included angle between the two proportional side pairs.
+    mistake_tags: [sas_similarity]
+    difficulty: medium
+  - id: GEOM010_SSS_005
+    type: fixed
+    prompt_template: Triangle sides 4, 6, 8 correspond to 6, 9, 12. Are the triangles similar by SSS?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'No, side ratios can never prove similarity'}
+    - {id: B, label: 'No, only one ratio matches'}
+    - {id: C, label: 'Yes, because all triangles are similar'}
+    - {id: D, label: 'Yes, every ratio is 3/2'}
+    answer: {type: multiple_choice, value: D}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: 6/4 = 9/6 = 12/8 = 3/2.
+    mistake_tags: [sss_similarity]
+    difficulty: medium
+  - id: GEOM010_CORRESPONDENCE_006
+    type: fixed
+    prompt_template: If triangle ABC is similar to A'B'C', which side corresponds to AC?
+    answer_mode: final_only
+    answer: {type: text, value: "A'C'"}
+    grading: {method: exact_text}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Corresponding vertex order maps A to A' and C to C'.
+    mistake_tags: [correspondence]
+    difficulty: easy
+  - id: GEOM010_AREA_FACTOR_007
+    type: generated
+    prompt_template: A similar figure has length scale factor {k}. By what factor does its area change?
+    variables: {k: {type: int, min: 2, max: 6}}
+    derived: {area_factor: k*k}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{area_factor}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Area factor is k^2 = {k}^2 = {area_factor}.
+    mistake_tags: [area_scaling]
+    difficulty: medium
+  - id: GEOM010_PERIMETER_FACTOR_008
+    type: generated
+    prompt_template: A similar figure has perimeter {p} cm and length scale factor {k}. Find the new perimeter.
+    variables:
+      p: {type: int, min: 4, max: 30}
+      k: {type: int, min: 2, max: 5}
+    derived: {newp: p*k}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{newp}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Perimeter is a sum of lengths, so {p}*{k} = {newp} cm.
+    mistake_tags: [perimeter_scaling]
+    difficulty: medium
+  - id: GEOM010_TUTOR_SCALE_009
+    type: fixed
+    prompt_template: Explain why a 3 by 2 rectangle enlarged by factor 3 has area 54 square units, not 18.
+    answer_mode: final_plus_required_work
+    answer: {type: numeric, value: '54'}
+    grading: {method: exact_numeric}
+    work:
+      mode: rubric_check
+      prompt: Show the original area, the two length factors, and the squared scale rule.
+      rubric:
+        criteria:
+        - {id: original, description: Calculates original area 3*2 = 6 square units., weight: 2}
+        - {id: lengths, description: States both length dimensions are multiplied by 3., weight: 2}
+        - {id: square, description: Uses area factor 3^2 = 9, not just 3., weight: 2}
+        - {id: conclusion, description: Concludes 6*9 = 54 square units., weight: 2}
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: Original area is 6. Both lengths triple, so area multiplies by 9; 6*9 = 54 square units.
+    mistake_tags: [tutor_reasoning, area_scaling]
+    difficulty: hard
+  - id: GEOM010_SHADOW_010
+    type: fixed
+    prompt_template: A 1.5 m pole casts a 2 m shadow. A tree casts an 8 m shadow under the same parallel sunlight. Find the tree height.
+    answer_mode: final_only
+    answer: {type: numeric, value: '6'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Similar triangles give h/8 = 1.5/2, so h = 6 m.
+    mistake_tags: [similar_triangles, shadows]
+    difficulty: medium
+  - id: GEOM010_CONGRUENT_011
+    type: fixed
+    prompt_template: If two similar figures have scale factor 1, what stronger relationship holds?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'They are unrelated'}
+    - {id: B, label: 'They are congruent'}
+    - {id: C, label: 'They are necessarily perpendicular'}
+    - {id: D, label: 'They are both circles'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Similarity with factor 1 preserves all corresponding lengths, so the figures are congruent.
+    mistake_tags: [similarity_congruence]
+    difficulty: easy
+  - id: GEOM010_UNIT_012
+    type: fixed
+    prompt_template: A map scale is 1 cm to 5 km. A road is 30 km long. How long is it on the map?
+    answer_mode: final_only
+    answer: {type: numeric, value: '6'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: 'Divide real length by 5 km per cm: 30/5 = 6 cm.'
+    mistake_tags: [scale_units]
+    difficulty: medium
+  - id: GEOM010_NO_ASSUMPTION_013
+    type: fixed
+    prompt_template: One equal angle and one equal side are given for two arbitrary triangles. Is similarity guaranteed?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Yes, if the drawing looks alike'}
+    - {id: B, label: 'Yes, one angle always fixes shape'}
+    - {id: C, label: 'No, more correspondence information is needed'}
+    - {id: D, label: 'No, triangles cannot be similar'}
+    answer: {type: multiple_choice, value: C}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Similarity needs AA, SAS, SSS, or equivalent information; one angle and one side are insufficient.
+    mistake_tags: [insufficient_information]
+    difficulty: hard
+  - id: GEOM010_RIGHT_TRIG_014
+    type: fixed
+    prompt_template: Why do two right triangles with the same acute angle have the same sine ratio?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Their side lengths must be equal'}
+    - {id: B, label: 'All right triangles are congruent'}
+    - {id: C, label: 'Area never changes'}
+    - {id: D, label: 'They are similar by AA'}
+    answer: {type: multiple_choice, value: D}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: A right angle and one matching acute angle give AA similarity, preserving opposite-to-hypotenuse ratio.
+    mistake_tags: [similarity_trig_bridge]
+    difficulty: medium
+  - id: GEOM010_AREA_VALUE_015
+    type: fixed
+    prompt_template: A similar figure has area factor 25 from source to image. What is the positive length scale factor?
+    answer_mode: final_only
+    answer: {type: numeric, value: '5'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Area factor is k^2, so k^2 = 25 and the positive length scale factor is 5.
+    mistake_tags: [reverse_area_scaling, square_root]
+    difficulty: hard
+  - id: GEOM010_REDUCTION_016
+    type: fixed
+    prompt_template: A rectangle is changed by doubling its width and tripling its height. Is the result similar to the original rectangle?
+    options:
+    - {id: A, label: 'No, corresponding lengths use different factors'}
+    - {id: B, label: 'Yes, any two rectangles are similar'}
+    - {id: C, label: 'Yes, because area always scales linearly'}
+    - {id: D, label: 'No, rectangles cannot be similar'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: A}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Similarity requires one common length factor; doubling one dimension and tripling the other changes the shape ratio.
+    mistake_tags: [nonuniform_scaling, similarity]
+    difficulty: hard
+  - id: GEOM010_PROPORTION_017
+    type: fixed
+    prompt_template: In similar triangles, a small side 6 corresponds to a large side 9. A second small side is 8. Find its large counterpart.
+    answer_mode: final_only
+    answer: {type: numeric, value: '12'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Scale factor is 9/6 = 3/2, so 8*3/2 = 12.
+    mistake_tags: [proportional_sides]
+    difficulty: medium
+  - id: GEOM010_SSS_CHECK_018
+    type: fixed
+    prompt_template: Side ratios for two triangles are 2/3, 4/6, and 5/8. Are they similar by SSS?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Yes, all ratios equal 2/3'}
+    - {id: B, label: 'No, the third ratio differs'}
+    - {id: C, label: 'Yes, because three sides are listed'}
+    - {id: D, label: 'No, SSS never proves similarity'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: 2/3 = 4/6 but 5/8 is different, so one common ratio is missing.
+    mistake_tags: [sss_similarity]
+    difficulty: hard
+  - id: GEOM010_PARALLEL_019
+    type: fixed
+    prompt_template: A segment parallel to one side of a triangle creates two equal angle pairs with the outer triangle. Which conclusion follows?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'They have no angle relationship'}
+    - {id: B, label: 'They are necessarily congruent'}
+    - {id: C, label: 'The smaller and larger triangles are similar by AA'}
+    - {id: D, label: 'Only their perimeters are equal'}
+    answer: {type: multiple_choice, value: C}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Parallel lines create corresponding equal angles, giving AA similarity.
+    mistake_tags: [parallel_similarity]
+    difficulty: medium
+  - id: GEOM010_LENGTH_V_AREA_020
+    type: fixed
+    prompt_template: A design's every length is doubled. Which pair of changes is correct?
+    options:
+    - {id: A, label: 'Both quadruple'}
+    - {id: B, label: 'Perimeter quadruples and area doubles'}
+    - {id: C, label: 'Both double'}
+    - {id: D, label: 'Perimeter doubles and area quadruples'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: D}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Perimeter is linear in lengths; area has two length factors, so it scales by 2^2 = 4.
+    mistake_tags: [length_vs_area_scaling]
+    difficulty: easy

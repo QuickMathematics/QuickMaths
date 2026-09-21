@@ -84,3 +84,20 @@ def test_elementary_graph_domains_and_interval_bounds():
             for j in range(11):
                 y = getattr(math, name)(lo + (hi-lo)*j/10)
                 assert lower-1e-12 <= y <= upper+1e-12
+
+def test_native_loader_validates_resolved_public_diagrams_without_allowing_hidden_values():
+    from dataclasses import replace
+    from pathlib import Path
+    from quickmaths.content_loader import load_skill_file, validate_content, ContentError
+    from quickmaths.models import Track, SkillTest
+    root = Path(__file__).resolve().parents[1]
+    skill = load_skill_file(next((root/'content/math/algebra_foundations/skills').glob('MATH_ALG_009_*.yaml')))
+    question = next(q for q in skill.test.questions if q.id == 'PROP_DIRECT_OUTPUT')
+    skill = replace(skill, prerequisites=[], test=SkillTest(question_count=1, randomize_order=False, questions=[question]))
+    track = Track('TEST', 'Test', 'Math', '', [skill.id], [skill.id], [skill.id])
+    validate_content(track, {skill.id: skill})
+    for expression in ['{secret}*x', '__import__(x)', 'x**999']:
+        bad = {**question.diagram, 'curves': [{'expression': expression, 'interval': [0, 10]}]}
+        broken = replace(skill, test=replace(skill.test, questions=[replace(question, diagram=bad)]))
+        with pytest.raises(ContentError, match='invalid native display'):
+            validate_content(track, {skill.id: broken})

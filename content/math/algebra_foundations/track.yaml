@@ -3,12 +3,16 @@ schema_version: 0.2
 name: 'Mathematics Foundations: Algebra, Calculus, Statistics, and Probability'
 domain: Math
 description: A rigorous path through arithmetic, pre-algebra, functions, domains and ranges, transformations, composition
-  and inverses, exponents, sequences, polynomials, radicals, rational expressions and equations, rational functions and inequalities,
-  interval notation, polynomial inequalities, quadratics, coordinate graphing, triangle area and measurement, linear equations,
-  systems, logarithms, trigonometry, descriptive and inferential statistics, and probability, piecewise functions, average
-  rates of change, limits, continuity, and the intermediate value theorem.
+  and inverses, exponents, sequences, polynomials, radicals, rational expressions and equations, rational functions
+  and inequalities, interval notation, polynomial inequalities, quadratics, coordinate graphing, triangle area and
+  measurement, linear equations, systems, logarithms, trigonometry, descriptive and inferential statistics, and
+  probability, piecewise functions, average rates of change, limits, continuity, and the intermediate value theorem.
+  Additional beginner and geometry pathways cover whole numbers, factors, fraction and decimal arithmetic, estimation,
+  ratios, proportion, everyday percentages, units, scientific notation, plane and solid measurement, congruence,
+  similarity, tolerances, and higher roots.
 entry_skills:
 - MATH_ARITH_001
+- MATH_ARITH_006
 exit_skills:
 - MATH_GEOM_004
 - MATH_ARITH_004
@@ -24,7 +28,16 @@ exit_skills:
 - MATH_PROB_005
 - MATH_FUNC_005
 - MATH_CALC_002
+- MATH_ARITH_010
+- MATH_ARITH_012
+- MATH_ARITH_014
+- MATH_ALG_009
+- MATH_GEOM_010
+- MATH_GEOM_012
+- MATH_ALG_010
+- MATH_RAD_002
 skills:
+- MATH_ARITH_006
 - MATH_ARITH_001
 - MATH_ARITH_002
 - MATH_ARITH_003
@@ -114,3 +127,22 @@ skills:
 - MATH_FUNC_007
 - MATH_CALC_001
 - MATH_CALC_002
+- MATH_ARITH_007
+- MATH_ARITH_008
+- MATH_ARITH_009
+- MATH_ARITH_010
+- MATH_ARITH_011
+- MATH_ARITH_012
+- MATH_ARITH_013
+- MATH_ARITH_014
+- MATH_ALG_009
+- MATH_GEOM_005
+- MATH_GEOM_006
+- MATH_GEOM_007
+- MATH_GEOM_008
+- MATH_GEOM_009
+- MATH_GEOM_010
+- MATH_GEOM_011
+- MATH_GEOM_012
+- MATH_ALG_010
+- MATH_RAD_002

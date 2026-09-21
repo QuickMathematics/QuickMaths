@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="800" height="360">
+<rect width="800" height="360" rx="20" fill="#fffdf7"/>
+<g font-family="sans-serif" fill="#163f36"><text x="28" y="40" font-size="24" font-weight="bold">Decimal place-value shifts</text><text x="38" y="110" font-size="28">3.47</text><path d="M140 102 H285" stroke="#287365" stroke-width="4"/><text x="310" y="110" font-size="28">347</text><text x="38" y="160" font-size="19">×100: digits shift two place-value columns left</text><text x="38" y="235" font-size="28">4.2</text><path d="M140 227 H285" stroke="#287365" stroke-width="4"/><text x="310" y="235" font-size="28">0.042</text><text x="38" y="285" font-size="19">÷100: digits shift two place-value columns right</text></g></svg>

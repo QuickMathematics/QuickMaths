@@ -1,0 +1,716 @@
+id: MATH_GEOM_011
+schema_version: '0.2'
+name: Circle areas, sectors, annuli, and composite circular regions
+domain: Math
+subdomain: Geometry
+topic: Area and measurement
+description: Find exact and approximate areas of disks, sectors, annuli, and composite circular regions
+  while keeping radius, diameter, and arc length distinct.
+prerequisites:
+- MATH_GEOM_007
+tags:
+- geometry
+- circles
+- area
+- sectors
+- annuli
+- composite_regions
+- exact_pi
+unlocks:
+- MATH_GEOM_012
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 10
+  review_after_days_if_learning: 3
+theory: "A circle is a boundary; the disk is the filled region inside it. In area questions, the object\
+  \ is usually the\ndisk, so the formula is A = pi r^2. The radius r runs from the centre to the boundary.\
+  \ A diameter d runs all\nthe way across the centre, so d = 2r and r = d/2. Substituting a diameter directly\
+  \ into pi r^2 produces an\nanswer four times too large. Before calculating, label every given length\
+  \ as radius, diameter, circumference,\nor arc length. Those measurements describe different geometric\
+  \ features.\n\nExact form preserves pi. If r = 6, the disk area is 36pi square units, not 113.04 square\
+  \ units. The exact form\ndisplays the structure and can be compared without rounding. A decimal is useful\
+  \ when a context asks for an\nestimate; then choose a stated value such as pi approximately 3.14159\
+  \ and label the result with square units.\nDo not mix an exact coefficient with an unannounced decimal.\
+  \ A useful size check is that a disk of radius 6 has\narea a little more than 36 times 3, so a result\
+  \ near 113 is plausible.\n\nCircle arc and angle work from MATH_GEOM_002 is optional bridge context:\
+  \ this lesson uses the same central-angle fraction while focusing on filled area.\n\n  A sector is a\
+  \ slice bounded by two radii and an arc. If its central angle is theta degrees, it is theta/360 of\n\
+  a full turn, so its area is A_sector = (theta/360)pi r^2. A 90-degree sector is one quarter of the disk,\
+  \ and a\n180-degree sector is a semicircle. The angle must be central: an angle measured at another\
+  \ point may not select\nthe same fraction. When theta is in radians, the fraction is theta/(2pi), giving\
+  \ A_sector = (1/2)r^2 theta.\nKeep degree and radian formulas separate; inserting 90 into the radian\
+  \ formula is a unit error.\n\nAn annulus is the ring between two concentric circles. Let R be the outer\
+  \ radius and r the inner radius. Its\narea is the large disk minus the hole: A_annulus = pi R^2 - pi\
+  \ r^2 = pi(R^2-r^2). Subtract squared radii,\nnot radii. If the problem gives outer and inner diameters,\
+  \ halve both before squaring. The inner circle is a\nhole, so its area is excluded even though its boundary\
+  \ may still be part of a perimeter question.\n\nComposite circular regions combine pieces. Add non-overlapping\
+  \ sectors and disks, or subtract holes and cutouts.\nA washer with a rectangular tab has area pi(R^2-r^2)\
+  \ + LW only when the tab and ring do not overlap. A repeated\npattern of equal sectors can often be\
+  \ recognized as a full disk: four quarter-disks have total area pi r^2.\nState which boundaries are\
+  \ shared; a shared boundary changes perimeter bookkeeping, but it does not create extra\narea. A diagram\
+  \ is a plan for the decomposition, not a scale drawing to measure with a ruler.\n\nArea scales quadratically.\
+  \ If every length is multiplied by k, every disk, sector, and annulus area is multiplied\nby k^2. Doubling\
+  \ a radius quadruples area; tripling it multiplies area by nine. This is why two circles can have\n\
+  equal central angles but different arc lengths and areas: the radius controls the scale. Arc length\
+  \ scales by k,\nwhile area scales by k^2. Confusing these scaling laws is a common source of answers\
+  \ that have the wrong size.\n\nA reliable workflow is: draw or read the centre and boundaries; convert\
+  \ diameter to radius; choose disk, sector,\nannulus, or a sum/difference of pieces; substitute into\
+  \ an exact formula; simplify the coefficient of pi; then\napproximate only if requested. Check that\
+  \ the answer is nonnegative, that a sector is no larger than the whole\ndisk when its angle is at most\
+  \ 360 degrees, and that an annulus is smaller than its outer disk. Report square\nunits. A boundary\
+  \ curve can have a length while the filled region has an area; use the requested dimension and\n  units\
+  \ rather than borrowing the circumference formula. For a composite drawing, mark each piece once and\
+  \ cancel\n  overlaps only when they truly share interior. The reviewed capstone asks for an exact coefficient\
+  \ of pi, an\n  approximation, and a decomposition explanation.\n"
+media:
+- src: media/native-final-foundations/geom-circle-area.svg
+  alt: A circle and a shaded sector show a radius from the centre and the formulas for disk area and sector
+    fraction.
+  caption: Area uses the squared radius; a sector takes the central-angle fraction of the disk.
+  width: 520
+  height: 250
+  fit: contain
+- src: media/native-final-foundations/geom-annulus.svg
+  alt: Two concentric circles label the outer radius R and inner radius r, with the ring shaded between
+    them.
+  caption: An annulus is the outer disk minus the inner disk.
+  width: 520
+  height: 250
+  fit: contain
+examples:
+- prompt: Find the exact area of a disk with radius 7.
+  solution: 49pi square units
+  explanation: Use A = pi r^2, so A = pi(7^2) = 49pi.
+- prompt: A circle has diameter 18. Find its exact area.
+  solution: 81pi square units
+  explanation: The radius is 9, so A = pi(9^2) = 81pi. Using 18 as the radius would be four times too
+    large.
+- prompt: Find the area of a 90-degree sector with radius 10.
+  solution: 25pi square units
+  explanation: A quarter of pi(10^2) is 100pi/4 = 25pi.
+- prompt: Find the area of a 120-degree sector with radius 6.
+  solution: 12pi square units
+  explanation: The fraction is 120/360 = 1/3, so (1/3)pi(36) = 12pi.
+- prompt: Find the exact area of an annulus with outer radius 9 and inner radius 5.
+  solution: 56pi square units
+  explanation: 'Subtract disks: pi(9^2-5^2) = pi(81-25) = 56pi.'
+- prompt: A ring has outer diameter 20 and inner diameter 12. Find its area.
+  solution: 64pi square units
+  explanation: The radii are 10 and 6, so pi(100-36) = 64pi.
+- prompt: Four non-overlapping 90-degree sectors have radius 4. What is their combined area?
+  solution: 16pi square units
+  explanation: Four quarters make one disk, so the total is pi(4^2) = 16pi.
+- prompt: A disk of radius 3 is enlarged so every length is multiplied by 5. How does its area change?
+  solution: It is multiplied by 25.
+  explanation: 'Area scales by the square of the length scale: 5^2 = 25.'
+- prompt: A 60-degree sector has radius 12. Give its area as a multiple of pi.
+  solution: 24pi square units
+  explanation: 60/360 = 1/6, and (1/6)pi(144) = 24pi.
+- prompt: A circular sign has radius 8 and a concentric circular cutout of radius 3. Estimate the remaining
+    area using pi approximately 3.14159.
+  solution: Approximately 172.78745 square units
+  explanation: The exact area is pi(64-9) = 55pi; multiplying by 3.14159 gives 172.78745.
+applications:
+- title: Flooring and paving
+  description: Circular patios, curved garden beds, and ring-shaped borders require square-unit area so
+    material quantities can be estimated.
+- title: Manufacturing cutouts
+  description: A washer or plate is modeled as an outer disk minus a concentric hole, preserving an exact
+    coefficient before pricing material.
+- title: Sports and signage
+  description: Sector-shaped lanes, fan banners, and circular signs use central-angle fractions to calculate
+    paint, fabric, or turf.
+- title: Scale drawings and maps
+  description: Quadratic scaling predicts how the area changes when a design is enlarged, while arc length
+    changes only linearly.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: GEOM011_DISK_RADIUS
+    type: generated
+    prompt_template: A disk has radius {r}. Enter the coefficient of pi in its exact area.
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 15
+    derived:
+      factor: r*r
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: 'Square the radius: the area is {factor}pi.'
+    mistake_tags:
+    - diameter_used_as_radius
+    - area_formula
+    work:
+      mode: none
+  - id: GEOM011_DIAMETER_RADIUS
+    type: generated
+    prompt_template: A circle has diameter {d}. What is its radius?
+    variables:
+      d:
+        type: int
+        min: 4
+        max: 30
+        exclude:
+        - 5
+        - 7
+        - 9
+        - 11
+        - 13
+        - 15
+        - 17
+        - 19
+        - 21
+        - 23
+        - 25
+        - 27
+        - 29
+    derived:
+      radius: d/2
+    answer:
+      type: numeric
+      value: '{radius}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: Radius is half the diameter, so r = {radius}.
+    mistake_tags:
+    - diameter_used_as_radius
+    work:
+      mode: none
+  - id: GEOM011_SECTOR_ANGLE
+    type: generated
+    prompt_template: A sector has central angle {angle} degrees and radius {r}. Enter the coefficient
+      of pi in its exact area.
+    variables:
+      angle:
+        type: choice
+        values:
+        - 30
+        - 45
+        - 60
+        - 90
+        - 120
+        - 180
+        - 270
+      r:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      factor: angle*r*r/360
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    difficulty: medium
+    explanation_template: Multiply pi r² by the central-angle fraction angle/360 to obtain coefficient
+      {factor}.
+    mistake_tags:
+    - sector_fraction
+    - angle_units
+    work:
+      mode: none
+  - id: GEOM011_SEMIDISK_MODEL
+    type: fixed
+    prompt_template: A semicircular garden has radius 6. Which statement correctly distinguishes its area
+      from the length of its curved boundary?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Both are measured in square units.
+    - id: B
+      label: Its area is 18pi square units; a boundary length is measured in linear units.
+    - id: C
+      label: Its area is 6pi square units because a semicircle uses half the radius.
+    - id: D
+      label: Its curved boundary is an area.
+    difficulty: medium
+    explanation_template: Half of pi(6²) is 18pi square units; boundary length answers a different question.
+    mistake_tags:
+    - area_vs_length
+    - semidisk
+    work:
+      mode: none
+  - id: GEOM011_SECTOR_FRACTION
+    type: generated
+    prompt_template: A sector has central angle {angle} degrees. What fraction of its circle's area does
+      it occupy?
+    variables:
+      angle:
+        type: choice
+        values:
+        - 30
+        - 45
+        - 60
+        - 90
+        - 120
+        - 180
+        - 270
+    derived:
+      fraction: angle/360
+    answer:
+      type: numeric
+      value: '{fraction}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    difficulty: medium
+    explanation_template: 'The area fraction equals the central-angle fraction: {angle}/360 = {fraction}.'
+    mistake_tags:
+    - sector_fraction
+    work:
+      mode: none
+  - id: GEOM011_SECTOR_ANGLE_FROM_FRACTION
+    type: generated
+    prompt_template: A sector occupies fraction {f} of a circle's area. What is its central angle in degrees?
+    variables:
+      f:
+        type: choice
+        values:
+        - 0.125
+        - 0.25
+        - 0.5
+        - 0.75
+    derived:
+      angle: 360*f
+    answer:
+      type: numeric
+      value: '{angle}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Multiply the area fraction by 360 degrees to recover angle {angle}.
+    mistake_tags:
+    - inverse_sector_fraction
+    work:
+      mode: none
+  - id: GEOM011_SECTOR_ARC_UNITS
+    type: fixed
+    prompt_template: A 90-degree sector has radius 4. Which statement is correct?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Its area and its arc length both use square units.
+    - id: B
+      label: Its area is found with 2pi r.
+    - id: C
+      label: Its area is 4pi square units, while its arc length is 2pi linear units.
+    - id: D
+      label: Arc length is independent of radius.
+    difficulty: medium
+    explanation_template: Quarter-disk area is 4pi; quarter circumference arc length is 2pi, with different
+      units.
+    mistake_tags:
+    - area_vs_arc_length
+    - units
+    work:
+      mode: none
+  - id: GEOM011_ANNULUS_MODEL
+    type: fixed
+    prompt_template: An annulus has outer radius 9 and inner radius 5. Which exact area model is correct?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: pi(9−5)
+    - id: B
+      label: pi(9²−5²) = 56pi
+    - id: C
+      label: pi(9²+5²) = 106pi
+    - id: D
+      label: 2pi(9+5)
+    difficulty: medium
+    explanation_template: Subtract the inner disk from the outer disk, so the coefficient is 81−25 = 56.
+    mistake_tags:
+    - annulus_subtraction
+    - radius_squared
+    work:
+      mode: none
+  - id: GEOM011_ANNULUS_DIAMETERS
+    type: generated
+    prompt_template: An annulus has outer diameter {D} and inner diameter {d}. Enter the coefficient of
+      pi in its area.
+    variables:
+      D:
+        type: int
+        min: 12
+        max: 30
+        exclude:
+        - 13
+        - 15
+        - 17
+        - 19
+        - 21
+        - 23
+        - 25
+        - 27
+        - 29
+      d:
+        type: int
+        min: 4
+        max: 10
+        exclude:
+        - 5
+        - 7
+        - 9
+    constraints:
+    - D > d
+    derived:
+      factor: D*D/4-d*d/4
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.001
+    difficulty: medium
+    explanation_template: Halve both diameters before subtracting disk areas; the coefficient is {factor}.
+    mistake_tags:
+    - diameter_used_as_radius
+    - annulus_subtraction
+    work:
+      mode: none
+  - id: GEOM011_SCALE
+    type: generated
+    prompt_template: Every length in a circular design is multiplied by {k}. By what factor does every
+      area change?
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      factor: k*k
+    answer:
+      type: numeric
+      value: '{factor}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: Areas scale quadratically, so the factor is {k}² = {factor}.
+    mistake_tags:
+    - linear_vs_quadratic_scaling
+    work:
+      mode: none
+  - id: GEOM011_CIRCUMFERENCE_COEFFICIENT
+    type: generated
+    prompt_template: A circle has circumference {c}pi. What is its radius?
+    variables:
+      c:
+        type: int
+        min: 4
+        max: 30
+        exclude:
+        - 5
+        - 7
+        - 9
+        - 11
+        - 13
+        - 15
+        - 17
+        - 19
+        - 21
+        - 23
+        - 25
+        - 27
+        - 29
+    derived:
+      radius: c/2
+    answer:
+      type: numeric
+      value: '{radius}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Since circumference is 2pi r, divide coefficient {c} by 2 to get {radius}.
+    mistake_tags:
+    - circumference_vs_area
+    work:
+      mode: none
+  - id: GEOM011_AREA_COEFFICIENT
+    type: generated
+    prompt_template: A disk has exact area {q}pi, where q is a perfect square. What is its radius?
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 12
+    derived:
+      q: r*r
+    answer:
+      type: numeric
+      value: '{r}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: The coefficient is r² = {q}, so the radius is {r}.
+    mistake_tags:
+    - inverse_area_formula
+    work:
+      mode: none
+  - id: GEOM011_NONCONCENTRIC_HOLES
+    type: fixed
+    prompt_template: A 20 by 12 rectangular plate has two non-overlapping circular holes of radii 2 and
+      3. Which exact remaining area is correct?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 240−5pi square units
+    - id: B
+      label: 240−(2²+3²)pi square units
+    - id: C
+      label: 240−13pi square units
+    - id: D
+      label: 240+13pi square units
+    difficulty: hard
+    explanation_template: The rectangle contributes 240 and the two hole areas contribute 4pi+9pi = 13pi.
+    mistake_tags:
+    - composite_decomposition
+    - multiple_holes
+    work:
+      mode: none
+  - id: GEOM011_AREA_ARC_SCALE
+    type: fixed
+    prompt_template: If every length in a circular design doubles, how do its arc length and area change?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Both double.
+    - id: B
+      label: Arc length doubles and area becomes four times as large.
+    - id: C
+      label: Arc length quadruples and area doubles.
+    - id: D
+      label: Neither changes.
+    difficulty: medium
+    explanation_template: Length scales linearly while area scales quadratically.
+    mistake_tags:
+    - linear_vs_quadratic_scaling
+    - area_vs_arc_length
+    work:
+      mode: none
+  - id: GEOM011_SQUARE_MINUS_QUARTER
+    type: fixed
+    prompt_template: A 4 by 4 square has a quarter-disk of radius 4 removed from one corner. Which exact
+      area remains?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 16−4pi square units
+    - id: B
+      label: 16−16pi square units
+    - id: C
+      label: 16+4pi square units
+    - id: D
+      label: 4−16pi square units
+    difficulty: hard
+    explanation_template: The square area is 16 and the quarter-disk area is 16pi/4 = 4pi.
+    mistake_tags:
+    - composite_decomposition
+    - sector_fraction
+    work:
+      mode: none
+  - id: GEOM011_SECTOR_ANGLE_ERROR
+    type: fixed
+    prompt_template: Which error statement is correct when finding a 90-degree sector area?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Use the full disk area without multiplying by 90/360.
+    - id: B
+      label: Use diameter as radius after reading a diameter.
+    - id: C
+      label: Report area in linear units.
+    - id: D
+      label: All of A, B, and C are errors.
+    difficulty: medium
+    explanation_template: A sector requires its angle fraction, radius, and square units.
+    mistake_tags:
+    - sector_fraction
+    - diameter_used_as_radius
+    - units
+    work:
+      mode: none
+  - id: GEOM011_COMPOSITE_CHECK
+    type: fixed
+    prompt_template: Which statement correctly compares a circle's area and circumference?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Area is 2pi r and circumference is pi r².
+    - id: B
+      label: Area is pi r² in square units and circumference is 2pi r in linear units.
+    - id: C
+      label: Both use the same units.
+    - id: D
+      label: Both are found by squaring r.
+    difficulty: easy
+    explanation_template: Area fills a region; circumference measures its boundary.
+    mistake_tags:
+    - area_vs_circumference
+    - units
+    work:
+      mode: none
+  - id: GEOM011_OUTER_FROM_RING
+    type: generated
+    prompt_template: An annulus has inner radius {r} and area coefficient {factor}; its outer radius is
+      the positive integer R. Find R.
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 5
+      R:
+        type: int
+        min: 6
+        max: 12
+    derived:
+      factor: R*R-r*r
+    answer:
+      type: numeric
+      value: '{R}'
+    grading:
+      method: exact_numeric
+    difficulty: hard
+    explanation_template: Add the inner squared radius to the coefficient and take the positive square
+      root.
+    mistake_tags:
+    - annulus_subtraction
+    - inverse_area_formula
+    work:
+      mode: none
+  - id: GEOM011_SECTOR_COMPARISON
+    type: fixed
+    prompt_template: Two sectors have the same radius; one has a 60-degree angle and the other a 120-degree
+      angle. How do their areas compare?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: They have equal area because the radius matches.
+    - id: B
+      label: The 120-degree sector has twice the area of the 60-degree sector.
+    - id: C
+      label: The 60-degree sector has twice the area.
+    - id: D
+      label: Their areas cannot be compared.
+    difficulty: medium
+    explanation_template: With the same radius, sector area is proportional to central angle.
+    mistake_tags:
+    - sector_comparison
+    - sector_fraction
+    work:
+      mode: none
+  - id: GEOM011_CAPSTONE
+    type: fixed
+    prompt_template: A circular plate has outer radius 8 cm and a concentric hole of radius 6 cm. Enter
+      the coefficient of pi in the exact remaining area as the final answer. In required work, also give
+      the exact expression, an approximation using pi approximately 3.14159, and explain why the inner
+      disk is subtracted and why the result is an area rather than a circumference.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '28'
+    grading:
+      method: exact_numeric
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Show a labelled decomposition and explain the units and approximation.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Writes the outer-minus-inner model pi(8²−6²) and simplifies it to 28pi square centimetres.
+          weight: 2
+        - id: criterion_2
+          description: Gives a reasonable approximation, 28(3.14159) = 87.96452 square centimetres, with
+            square units.
+          weight: 2
+        - id: criterion_3
+          description: Explains that the hole is excluded and distinguishes area from boundary length
+            or circumference.
+          weight: 2
+    media:
+    - src: media/native-final-foundations/geom-annulus.svg
+      alt: Two concentric circles are shown with the outer and inner radii labelled; the ring is the material
+        region.
+      caption: The fixed capstone gives both radii so the material region can be decomposed as two disks.
+      width: 520
+      height: 250
+      fit: contain
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: The exact area is pi(64−36) = 28pi square centimetres, and the approximation
+      is 87.96452 square centimetres. The inner disk is a hole, so it is subtracted.
+    mistake_tags:
+    - annulus_subtraction
+    - circumference_vs_area
+    - units

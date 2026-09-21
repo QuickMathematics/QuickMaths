@@ -1,0 +1,812 @@
+id: MATH_ALG_009
+schema_version: '0.2'
+name: Direct and inverse proportion
+domain: Math
+subdomain: Algebra
+topic: Proportional reasoning
+description: A proportional model describes a particular relationship between quantities. You must identify
+  the quantities, their units, and the conditions under which the model makes sense. A table or graph can suggest
+  a model; an unexplained pattern in a few measurements is not a proof that the model will work everywhere.
+prerequisites:
+- MATH_ARITH_011
+- MATH_FUNC_001
+- MATH_ALG_001
+tags:
+- algebra
+- proportion
+- unit_rates
+- model_assumptions
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'A proportional model describes a particular relationship between quantities. You must identify the
+  quantities, their units, and the conditions under which the model makes sense. A table or graph can suggest
+  a model; an unexplained pattern in a few measurements is not a proof that the model will work everywhere.
+
+
+  Direct proportion means y = kx with one fixed constant k on the stated domain. For x not zero, y/x = k. If
+  each metre of identical ribbon costs 3 currency units and there is no extra fee, 2 metres costs 6 and 5 metres
+  costs 15. Doubling the length doubles the cost. The unit rate is 3 currency units per metre. Zero metres
+  costs zero, so the complete mathematical line goes through the origin. In a context, only nonnegative lengths
+  may make sense even though the formula can accept negative inputs.
+
+
+  Find k by dividing an output by its matching nonzero input, not by dividing two outputs from different rows.
+  If y = 18 when x = 6, then k = 18/6 = 3. Use y = 3x to find another output, or divide y by 3 to recover an
+  input. A ratio table scales both quantities by the same factor. The factor may be a fraction: halving a quantity
+  halves its directly proportional partner. Matching units matters: convert minutes to hours before comparing
+  rates quoted per hour.
+
+
+  A straight line is not automatically direct proportion. A delivery charge y = 3x + 5 is linear, but the fixed
+  fee makes y/x depend on x. For x = 1 the ratio is 8; for x = 2 it is 11/2. The graph does not pass through
+  the origin, and doubling x does not double y. A constant difference between consecutive outputs shows a constant
+  slope when inputs have equal steps; it does not by itself show a constant output-to-input ratio. In contrast,
+  for y = 3x, both the slope and the direct-proportion test agree.
+
+
+  Inverse proportion means y = k/x with a fixed nonzero k on a domain excluding x = 0. The product xy = k remains
+  fixed. If a fixed 24-litre supply is shared equally among x identical containers, each receives y = 24/x
+  litres. Twice as many containers means half as much in each, and three times as many means one third as much.
+  The constant has units of the product: in this example container-count times litres per container gives the
+  fixed number of litres. With x as a positive count, only positive integer inputs are physically possible
+  even if a smooth curve helps show the pattern.
+
+
+  Find an inverse constant by multiplying a matched input and output. If y = 8 when x = 3, then k = 24; y =
+  24/x gives y = 4 at x = 6. To find x from y, solve xy = k, so x = k/y when y is nonzero. Do not use y/x here:
+  that ratio changes. For positive k and positive inputs, the graph curves down as x grows. It approaches the
+  axes without meeting them. The point x = 0 is excluded, not a hidden value on the vertical axis, and the
+  curve must not be drawn across that gap.
+
+
+  Not every decreasing relationship is inverse proportion. The rule y = 10 - x decreases but its product xy
+  is not fixed: at x = 2 the product is 16, while at x = 3 it is 21. Likewise, not every increasing relationship
+  is direct: y = x squared has ratios x, not one constant. Check the invariant the definition requires. For
+  direct proportion test y/x wherever x is nonzero and include the origin when the domain includes zero. For
+  inverse proportion test xy and exclude zero from the input domain. A single matching pair cannot distinguish
+  the models; both can be made to pass through one nonzero point.
+
+
+  Real situations need assumptions. More workers may shorten a job in inverse proportion only when the amount
+  of work is fixed, workers have equal constant productivity, and they can work independently without delays.
+  Doubling workers need not halve travel time or a task with a single shared machine. A constant-speed journey
+  has distance directly proportional to time, whereas time is inversely proportional to speed for a fixed distance.
+  Naming which quantity is fixed prevents these statements from being confused.
+
+
+  Representations should tell the same story. Use a table to test the ratio or product, an equation to calculate
+  exact values, and a graph to see shape and domain. Axis scales may differ, so the angle a line seems to make
+  on screen is not its numerical slope. The generated graphs in this lesson are drawn from the stated formula
+  and parameters, not from a hidden answer. Explain why you selected a model, state its restrictions, and verify
+  a result in the original relation. The reviewed capstone compares direct proportion, a line with an intercept
+  and inverse proportion; selecting a familiar formula without justification is insufficient.'
+examples:
+- prompt: Ribbon costs 3 units per metre with no fixed charge. Cost of 5 m?
+  solution: 15 units
+  explanation: y=3x; 3 times 5=15. The unit rate is currency per metre.
+- prompt: y is directly proportional to x; y=18 when x=6. Find k.
+  solution: '3'
+  explanation: 'Divide matching values: k=y/x=18/6. The model is y=3x.'
+- prompt: Use y=3x to find x when y=27.
+  solution: '9'
+  explanation: Solve 27=3x. Dividing both sides by3 gives x=9.
+- prompt: Do pairs (2,6),(4,12),(7,21) fit direct proportion?
+  solution: Yes, k=3
+  explanation: Each y/x is3; both quantities scale together.
+- prompt: Is y=3x+5 direct proportion?
+  solution: 'No'
+  explanation: At x=0 output5 is nonzero; ratios at1 and2 differ. It is linear but not directly proportional.
+- prompt: A fixed24L is shared across3 containers. Then across6. Amount per container?
+  solution: 8L then4L
+  explanation: xy=24 stays fixed; doubling the count halves the amount per container.
+- prompt: y is inversely proportional to x; y=8 at x=3. Find y at x=6.
+  solution: '4'
+  explanation: k=3 times8=24, so y=24/6=4.
+- prompt: For y=24/x, find x if y=2.
+  solution: '12'
+  explanation: xy=24 gives2x=24. Input zero is never allowed.
+- prompt: Is y=10-x inverse proportion?
+  solution: 'No'
+  explanation: At x=2 the product is16; at x=3 it is21. Decreasing alone is not enough.
+- prompt: Four equal independent workers finish a divisible job in6 hours. Ideal time for8 workers?
+  solution: 3 hours
+  explanation: Under constant equal productivity, worker-hours stay24. Shared bottlenecks would invalidate
+    this model.
+applications:
+- title: At constant60km/h, how far in2.5hours?
+  description: 150km Distance=rate times time; no fixed starting-distance offset is included.
+- title: A60km journey is driven at30km/h or60km/h. Compare times.
+  description: 2h and1h Distance stays fixed, so speed times time=60 and time is inverse to speed.
+- title: A taxi charges5 units plus2 per kilometre. Is fare proportional to kilometres?
+  description: Not directly proportional The fixed charge causes a nonzero intercept; the fare for twice the
+    distance is less than twice the original fare.
+- title: A printer produces150 pages in5min at a fixed rate. Time for420pages?
+  description: 14min Rate=30pages/min. With no setup delay, time=420/30=14min.
+media:
+- src: media/native-arithmetic-onramp/proportion-contrast.svg
+  alt: The line y=3x passes through the origin; y=3x+5 has intercept5. The positive curve y=24/x has fixed
+    product24.
+  caption: A constant difference, constant ratio and constant product are different claims.
+  width: 800
+  height: 360
+  fit: contain
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: PROP_DIRECT_RATE
+    type: generated
+    prompt_template: y is directly proportional to x. At x={x}, y={y}. Find k in y=kx.
+    variables:
+      x:
+        type: int
+        min: 2
+        max: 9
+      k:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      y: k*x
+    constraints: []
+    answer:
+      type: numeric
+      value: '{k}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: k=y/x for a nonzero paired input.
+    mistake_tags:
+    - common_units
+  - id: PROP_DIRECT_OUTPUT
+    type: generated
+    prompt_template: For y={k}x, find y when x={x}.
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 6
+      x:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      y: k*x
+    constraints: []
+    answer:
+      type: numeric
+      value: '{y}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply the input by the stated unit rate.
+    mistake_tags:
+    - common_units
+    diagram:
+      kind: cartesian
+      x_range:
+      - 0
+      - 10
+      y_range:
+      - 0
+      - 60
+      alt: The given direct-proportion line y={k}x for nonnegative inputs.
+      curves:
+      - expression: '{k}*x'
+        interval:
+        - 0
+        - 10
+  - id: PROP_DIRECT_INPUT
+    type: generated
+    prompt_template: For y={k}x, find x when y={y}.
+    variables:
+      k:
+        type: int
+        min: 2
+        max: 8
+      x:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      y: k*x
+    constraints: []
+    answer:
+      type: numeric
+      value: '{x}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Divide the output by the nonzero constant.
+    mistake_tags:
+    - common_units
+  - id: PROP_DIRECT_FRACTION
+    type: generated
+    prompt_template: For y=x/{d}, find y at x={x}.
+    variables:
+      d:
+        type: int
+        min: 2
+        max: 5
+      n:
+        type: int
+        min: 3
+        max: 9
+    derived:
+      x: n
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{d}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A fractional unit rate still defines direct proportion.
+    mistake_tags:
+    - common_units
+  - id: PROP_DIRECT_SCALE
+    type: generated
+    prompt_template: Directly proportional quantities have y={y} at x={x}. Find y at x={newx}.
+    variables:
+      x:
+        type: int
+        min: 2
+        max: 5
+      y:
+        type: int
+        min: 3
+        max: 9
+      factor:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      newx: x*factor
+      ans: y*factor
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Both inputs and outputs scale by {factor}.
+    mistake_tags:
+    - common_units
+  - id: PROP_DIRECT_ZERO
+    type: fixed
+    prompt_template: A direct-proportion model includes x=0. What must y be there?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '0'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: y=k times0=0. This distinguishes a nonzero-intercept line.
+    mistake_tags:
+    - common_units
+  - id: PROP_INTERCEPT
+    type: fixed
+    prompt_template: Which formula is direct proportion?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Only y=4x has a fixed y/x and passes through the origin.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: y=4x+3
+    - id: B
+      label: y=4x
+    - id: C
+      label: y=4/x
+    - id: D
+      label: y=x^2
+  - id: PROP_TABLE
+    type: fixed
+    prompt_template: Pairs (1,5),(2,8),(3,11) have equal output differences. Are they directly proportional?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The differences are3, but y/x is5,4,11/3. The intercept is2.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: Yes because they form a line
+    - id: B
+      label: Yes because y increases
+    - id: C
+      label: No because y/x changes
+    - id: D
+      label: No because direct proportion decreases
+  - id: PROP_INVERSE_CONSTANT
+    type: generated
+    prompt_template: y is inversely proportional to x. At x={x}, y={y}. Find k in y=k/x.
+    variables:
+      x:
+        type: int
+        min: 2
+        max: 9
+      y:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      k: x*y
+    constraints: []
+    answer:
+      type: numeric
+      value: '{k}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply matching values to find the fixed product.
+    mistake_tags:
+    - common_units
+  - id: PROP_INVERSE_OUTPUT
+    type: generated
+    prompt_template: For y={k}/x, find y at x={x}.
+    variables:
+      x:
+        type: int
+        min: 2
+        max: 9
+      y:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      k: x*y
+    constraints: []
+    answer:
+      type: numeric
+      value: '{y}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Divide the fixed product by the input.
+    mistake_tags:
+    - common_units
+  - id: PROP_INVERSE_INPUT
+    type: generated
+    prompt_template: For y={k}/x, find x when y={y}.
+    variables:
+      x:
+        type: int
+        min: 2
+        max: 9
+      y:
+        type: int
+        min: 2
+        max: 9
+    derived:
+      k: x*y
+    constraints: []
+    answer:
+      type: numeric
+      value: '{x}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: xy={k}, so divide by the stated nonzero output.
+    mistake_tags:
+    - common_units
+  - id: PROP_INVERSE_SCALE
+    type: generated
+    prompt_template: For inverse proportion, y={y} at x={x}. Find y at x={newx}.
+    variables:
+      x:
+        type: int
+        min: 2
+        max: 6
+      base:
+        type: int
+        min: 2
+        max: 6
+      f:
+        type: int
+        min: 2
+        max: 5
+    derived:
+      y: base*f
+      newx: x*f
+    constraints: []
+    answer:
+      type: numeric
+      value: '{base}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiplying the input by {f} divides its inverse partner by {f}.
+    mistake_tags:
+    - common_units
+  - id: PROP_INVERSE_DOMAIN
+    type: fixed
+    prompt_template: Why is x=0 excluded from y=24/x?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Division by zero is undefined, and 0 times y cannot equal24.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: No value of y makes 0 times y equal24
+    - id: B
+      label: The answer is secretly zero
+    - id: C
+      label: The graph merely hides a value
+    - id: D
+      label: Only negative inputs are forbidden
+  - id: PROP_DECREASE
+    type: fixed
+    prompt_template: Which check proves that y=10-x is not inverse proportion on positive inputs?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Inverse proportion requires a fixed product, not simply decreasing outputs.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: It decreases
+    - id: B
+      label: At x=2 and3, xy is16 and21
+    - id: C
+      label: It has two variables
+    - id: D
+      label: It can be drawn
+  - id: PROP_UNITS
+    type: generated
+    prompt_template: At {rate} km/h, a journey lasts {minutes} minutes. How many km are travelled?
+    variables:
+      r:
+        type: int
+        min: 2
+        max: 8
+      m:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      rate: 12*r
+      minutes: 5*m
+      distance: r*m
+    constraints: []
+    answer:
+      type: numeric
+      value: '{distance}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Convert minutes to hours, then multiply by speed.
+    mistake_tags:
+    - common_units
+  - id: PROP_FIXED_DISTANCE
+    type: generated
+    prompt_template: A fixed {distance} km journey is driven at {speed} km/h. Time in hours?
+    variables:
+      hours:
+        type: int
+        min: 2
+        max: 6
+      speed:
+        type: int
+        min: 20
+        max: 60
+    derived:
+      distance: hours*speed
+    constraints: []
+    answer:
+      type: numeric
+      value: '{hours}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Time=distance/speed; distance is the fixed quantity.
+    mistake_tags:
+    - common_units
+  - id: PROP_WORKERS
+    type: generated
+    prompt_template: With equal constant independent productivity, {a} workers take {t} hours. How many hours
+      for {b} workers on the same divisible job?
+    variables:
+      a:
+        type: int
+        min: 2
+        max: 5
+      ans:
+        type: int
+        min: 2
+        max: 6
+      f:
+        type: int
+        min: 2
+        max: 4
+    derived:
+      t: ans*f
+      b: a*f
+    constraints: []
+    answer:
+      type: numeric
+      value: '{ans}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Keep worker-hours fixed; the extra assumption of independent work matters.
+    mistake_tags:
+    - common_units
+  - id: PROP_ASSUMPTION
+    type: fixed
+    prompt_template: When is time inversely proportional to worker count for a fixed job?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The model requires equal constant rates and work that can be divided without bottlenecks.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: For every job regardless of conditions
+    - id: B
+      label: Whenever time decreases at all
+    - id: C
+      label: With equal constant productivity and independent divisible work
+    - id: D
+      label: Only when the number of workers is zero
+  - id: PROP_GRAPH
+    type: generated
+    prompt_template: The graph shows the stated model y={k}/x for positive x. If x changes from 2 to 4, what
+      happens to y?
+    variables:
+      k:
+        type: int
+        min: 4
+        max: 12
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The fixed product stays {k}; doubling x halves y.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: It doubles
+    - id: B
+      label: It halves
+    - id: C
+      label: It decreases by exactly2 for every k
+    - id: D
+      label: It stays fixed
+    diagram:
+      kind: cartesian
+      x_range:
+      - 0
+      - 8
+      y_range:
+      - 0
+      - 14
+      alt: The stated positive-input curve y={k}/x; zero input is excluded.
+      curves:
+      - expression: '{k}/x'
+        interval:
+        - 0.5
+        - 8
+        endpoints:
+        - none
+        - none
+  - id: PROP_CAPSTONE
+    type: fixed
+    prompt_template: Model A is y=3x; B is y=3x+5; C is y=24/x for x>0. How many are directly proportional?
+      Enter the count, then justify each classification using ratio or product, explain the intercept test,
+      and state C's input restriction.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: '1'
+    grading:
+      method: exact_numeric
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Explain each part in words, with a labelled calculation or drawing if useful. A final number
+        alone is not enough.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Shows A has fixed ratio and zero intercept.
+          weight: 2
+        - id: criterion_2
+          description: Rejects B using its varying ratio or nonzero intercept, despite its straight graph.
+          weight: 2
+        - id: criterion_3
+          description: Identifies C as inverse with fixed product and explicitly excludes zero.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: A has y/x=3; B has a nonzero intercept and changing y/x; C has xy=24 and excludes
+      zero. Only A is direct.
+    mistake_tags:
+    - common_units

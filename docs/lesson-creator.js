@@ -3,7 +3,7 @@ import { normalizeLimitSpec } from "./limit-work.js?v=20260909-calculus-v1";
 import { normalizeMathBlocks, renderMathBlocks } from "./math-display.js?v=20260909-calculus-v1";
 import { normalizeCartesianDiagram, renderCartesianDiagram } from "./cartesian-diagrams.js?v=20260909-calculus-v1";
 import { normalizeLessonMedia, renderLessonMedia, mediaPath, mediaDigest, encodeMediaData, MEDIA_TYPES, MAX_EMBEDDED_MEDIA_BYTES } from "./lesson-media.js?v=20260906-media-v1";
-import { includeLessonIllustrations } from "./lesson-illustrations.js?v=20260908-statistics-v1";
+import { includeLessonIllustrations } from "./lesson-illustrations.js?v=20260921-foundations-v1";
 import { learningFields, lessonClassification, normalizeLessonTaxonomy, standardBranches } from "./learning-fields.js?v=20260921-native-compat-v1";
 import { checkFormalReferenceProof } from "./formal-proof-client.js?v=20260913-formal-kernel-v1";
 import { normalizeFormalCapabilities } from "./formal-capabilities.js?v=20260913-formal-capabilities-v1";
@@ -419,7 +419,7 @@ function displayPreview(owner) {
 }
 function renderDisplayEditor(owner, scope, index) {
   const indexed = html => html.replaceAll("data-creator-field", `data-index="${index}" data-creator-field`);
-  return `<details class="studio-advanced"><summary>Mathematical displays${scope === "problem" ? " and function graph" : ""} <small>optional</small></summary><p>Use structured mathematical data for piecewise rules, fractions, limits and derivations. Each block needs a description and copyable linear text. <a href="./CALCULUS_ENGINE.md" target="_blank" rel="noopener">Authoring examples ↗</a></p>${indexed(area("Math display blocks (JSON list)", `${scope}.mathBlocksJson`, owner.mathBlocksJson ?? JSON.stringify(owner.math_blocks ?? [], null, 2), {rows:6}))}${scope === "problem" ? indexed(area("Resolved Cartesian graph (JSON object)", `${scope}.diagramJson`, owner.diagramJson ?? JSON.stringify(owner.diagram ?? null, null, 2), {rows:6, hint:"Coordinates in exported lesson packs are numbers. Curves support x, arithmetic, integer powers, sqrt, abs, sin, cos, exp and natural log. Angles use radians; log requires a positive input. Randomized parameter binding belongs in native templates."})) : ""}${displayPreview(owner)}</details>`;
+  return `<details class="studio-advanced"><summary>Mathematical displays${scope === "problem" ? " and function graph" : ""} <small>optional</small></summary><p>Use structured mathematical data for piecewise rules, fractions, limits and derivations. Native foundation lessons provide examples of unit reasoning, regrouping and proportional graphs. Each block needs a description and copyable linear text. <a href="./CALCULUS_ENGINE.md" target="_blank" rel="noopener">Authoring examples ↗</a></p>${indexed(area("Math display blocks (JSON list)", `${scope}.mathBlocksJson`, owner.mathBlocksJson ?? JSON.stringify(owner.math_blocks ?? [], null, 2), {rows:6}))}${scope === "problem" ? indexed(area("Resolved Cartesian graph (JSON object)", `${scope}.diagramJson`, owner.diagramJson ?? JSON.stringify(owner.diagram ?? null, null, 2), {rows:6, hint:"Coordinates in exported lesson packs are numbers. Curves support x, arithmetic, integer powers, sqrt, abs, sin, cos, exp and natural log. Angles use radians; log requires a positive input. Randomized parameter binding belongs in native templates."})) : ""}${displayPreview(owner)}</details>`;
 }
 
 function renderMediaEditor(items = [], scope, sectionIndex, assets = [], owner = {}) {
@@ -866,9 +866,15 @@ export function createLessonStudio({ store, download, showToast, getSnapshot, op
     if (source.overridden) throw new Error("Restore this lesson's installed improvement in Settings before creating a replacement.");
     const subject = snapshot.subjects.find((item) => item.id === source.subjectId);
     if (!subject) throw new Error("The native lesson field is unavailable.");
+    // A native copy carries only its own assets. The entire curriculum can
+    // exceed a portable pack's asset limit and must not suppress its figures.
+    const nativeMedia = store.getLessonMediaAssets?.() ?? {};
+    const mediaPaths = new Set([source, ...(source.examples ?? []), ...(source.applications ?? []), ...(source.problems ?? [])]
+      .flatMap(section => (section.media ?? []).flatMap(item => [item.src, ...(item.sources ?? []), item.poster])));
     draft = draftFromPack({
       format: "quickmaths.lesson-set", schema_version: "2.1", mode: "override",
-      ...store.getLessonMediaAssets?.(),
+      ...nativeMedia,
+      assets: (nativeMedia.assets ?? []).filter(asset => mediaPaths.has(asset.path)),
       id: cleanId(`IMPROVE_${source.id}`, "PACK_"),
       name: `Improvement · ${source.name}`,
       description: `A reversible improvement to the native QuickMaths lesson ${source.name}.`,

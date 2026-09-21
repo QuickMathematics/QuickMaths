@@ -1,0 +1,697 @@
+id: MATH_GEOM_008
+schema_version: '0.2'
+name: Pythagoras and coordinate distance
+domain: Math
+subdomain: Geometry
+topic: Plane Geometry
+description: Use the Pythagorean theorem only for right triangles, find exact distances on coordinates,
+  and use the converse.
+prerequisites:
+- MATH_RAD_001
+- MATH_GRAPH_001
+- MATH_GEOM_006
+unlocks:
+- MATH_GEOM_009
+tags:
+- geometry
+- right_triangles
+- pythagorean_theorem
+- coordinate_distance
+- radicals
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'The Pythagorean theorem belongs to right triangles. If the legs meet at the marked 90-degree
+  angle and c is the side opposite that angle, the hypotenuse, then a^2 + b^2 = c^2. The hypotenuse is
+  always the longest side and is never one of the two legs. A label saying “triangle” is not enough; a
+  right-angle mark or an explicitly stated right angle is required before applying the theorem.
+
+
+  To find a hypotenuse, add the squares of the legs and take the positive square root: c = sqrt(a^2 +
+  b^2). To find a missing leg, subtract the known leg square from the hypotenuse square: a = sqrt(c^2
+  - b^2). The positive root is used for a length. Keep exact radicals when a square root is not an integer.
+  For legs 5 and 12, c = sqrt(25+144) = 13. For legs 3 and 4, c = 5. For legs 6 and 8, c = 10. For legs
+  1 and 1, c = sqrt(2), which should not be changed to a rounded decimal unless requested.
+
+
+  The converse tests whether a triangle is right when all three side lengths are known. Put the longest
+  side c first. If a^2 + b^2 = c^2, the triangle is right. If a^2 + b^2 > c^2, the largest angle is acute;
+  if a^2 + b^2 < c^2, the largest angle is obtuse. The converse is a statement about side lengths and
+  the angle opposite the longest side. Do not compare an arbitrary pair of sides or forget to identify
+  the largest length.
+
+
+  A coordinate distance problem becomes a right triangle by drawing horizontal and vertical helper segments
+  between two points. For A(x1,y1) and B(x2,y2), the horizontal leg has length |x2-x1| and the vertical
+  leg has length |y2-y1|. The distance is d = sqrt((x2-x1)^2 + (y2-y1)^2). Absolute values give nonnegative
+  leg lengths, but squaring makes the sign irrelevant in the final formula. A negative run or rise simply
+  records direction; distance itself is positive.
+
+
+  Coordinate grids are visual aids, not permission to count inaccurately. Read the ordered pairs, subtract
+  corresponding coordinates, and square both differences. The formula is symmetric: reversing A and B
+  changes the signs but not the distance. Horizontal points with equal y have distance |delta x|, and
+  vertical points with equal x have distance |delta y|. A point and the origin use d = sqrt(x^2 + y^2),
+  which is the same right-triangle idea.
+
+
+  Exact form communicates structure. sqrt(50) simplifies to 5sqrt(2) because 50 = 25*2. sqrt(72) = 6sqrt(2).
+  Do not write sqrt(50) as 25sqrt(2), and do not replace an exact radical with 7.07 when the prompt asks
+  for exact form. A calculator approximation is useful for checking magnitude, but it is not the exact
+  answer.
+
+
+  In a word problem, first decide whether the requested segment is a right-triangle hypotenuse, a leg,
+  or a coordinate distance. A ladder against a vertical wall forms a right triangle only if the wall and
+  ground are perpendicular. A diagonal of a rectangle is a hypotenuse because adjacent sides meet at right
+  angles. A diagonal of a general parallelogram is not automatically covered by Pythagoras; extra right-angle
+  information is needed. Similarly, an arbitrary triangle with three side lengths needs the converse or
+  another theorem, not an invented right angle.
+
+
+  Visual justification is part of the method. Mark the right angle, draw the two helper legs, and name
+  the hypotenuse opposite the right angle. Then write the equation before substituting numbers. Check
+  that a computed hypotenuse is longer than either leg and that a computed leg is shorter than the hypotenuse.
+  For coordinates, check whether the result is at least as large as each absolute coordinate change.
+
+
+  A visual proof can use a square dissection. Make a large square of side a+b and place four congruent
+  right triangles with legs a and b around a central square of side c. The four triangles have total area
+  4(ab/2), so comparing the large square with its pieces gives (a+b)^2 = 4(ab/2) + c^2 and therefore a^2
+  + b^2 = c^2. For coordinate distance, the horizontal and vertical helper segments are the same perpendicular
+  legs in this dissection idea.
+
+
+  Self-check: Is there an actual right angle? Did I put the longest side on the c^2 side? Did I use positive
+  lengths and simplify radicals exactly? For a converse, did I compare the two shorter squares with the
+  longest square? For coordinates, did I subtract x-values from x-values and y-values from y-values?
+
+  '
+media:
+- src: media/native-plane-foundations/geom008-right-triangle.svg
+  alt: A right triangle labels its perpendicular legs a and b and its opposite hypotenuse c, with the
+    equation a squared plus b squared equals c squared.
+  caption: The hypotenuse is opposite the marked right angle; only a right triangle supports the theorem.
+  width: 720
+  height: 400
+  fit: contain
+- src: media/native-plane-foundations/geom008-dissection.svg
+  alt: A square of side a plus b contains four congruent right triangles with legs a and b surrounding
+    a central square of side c. Subtracting the four triangle areas gives c squared equals a squared plus
+    b squared.
+  caption: 'An area dissection justifies the theorem: the outer square is exactly the four triangles plus
+    the central square.'
+  width: 720
+  height: 360
+  fit: contain
+- src: media/native-plane-foundations/geom008-coordinate.svg
+  alt: Two coordinate points are connected by a diagonal with dashed horizontal and vertical helper legs
+    labeled run and rise.
+  caption: Coordinate distance is the hypotenuse of a right triangle made from the horizontal and vertical
+    changes.
+  width: 720
+  height: 420
+  fit: contain
+examples:
+- prompt: Find the hypotenuse of a right triangle with legs 6 and 8.
+  solution: 10.0
+  explanation: sqrt(6^2+8^2) = sqrt(100) = 10.
+- prompt: Find the missing leg when the hypotenuse is 13 and one leg is 5.
+  solution: 12.0
+  explanation: sqrt(13^2-5^2) = sqrt(144) = 12.
+- prompt: Find the exact hypotenuse for legs 1 and 1.
+  solution: sqrt(2).
+  explanation: sqrt(1+1) = sqrt(2), which is already exact.
+- prompt: Simplify sqrt(72).
+  solution: 6sqrt(2).
+  explanation: 72 = 36*2, so sqrt(72) = 6sqrt(2).
+- prompt: Do sides 7, 24, and 25 form a right triangle?
+  solution: Yes.
+  explanation: 7^2 + 24^2 = 49 + 576 = 625 = 25^2.
+- prompt: Find the distance from (2, -1) to (8, 7).
+  solution: 10.0
+  explanation: Changes are 6 and 8, so d = sqrt(36+64) = 10.
+- prompt: Find the distance from (-3, 4) to (5, 4).
+  solution: 8.0
+  explanation: The points share y, so the horizontal distance is |5 - (-3)| = 8.
+- prompt: A rectangle is 9 m by 12 m. Find its diagonal.
+  solution: 15 m.
+  explanation: The diagonal is sqrt(9^2+12^2) = 15.
+- prompt: Can Pythagoras find an arbitrary triangle's side from two sides 5 and 7?
+  solution: No.
+  explanation: Without a right angle or included-angle information, the right-triangle equation is not
+    justified.
+- prompt: Compare the largest angle in side lengths 5, 6, and 8.
+  solution: Obtuse.
+  explanation: 5^2+6^2=61 < 64=8^2, so the converse says the largest angle is obtuse.
+applications:
+- title: Accessibility ramps
+  description: A horizontal run and vertical rise form legs of a right triangle, giving the exact ramp
+    length.
+- title: Surveying and mapping
+  description: Coordinate distance estimates a straight separation from east-west and north-south changes.
+- title: Construction diagonals
+  description: A rectangle diagonal checks squareness when its side lengths are known.
+- title: Navigation and robotics
+  description: Grid movement can be converted into a direct distance while preserving direction signs
+    separately.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: GEOM008_HYPOTENUSE_001
+    type: fixed
+    prompt_template: A right triangle has legs 9 and 12. Find its hypotenuse.
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '15'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: c = sqrt(9^2+12^2) = sqrt(225) = 15.
+    mistake_tags:
+    - hypotenuse
+    - pythagorean_theorem
+    difficulty: easy
+  - id: GEOM008_MISSING_LEG_002
+    type: fixed
+    prompt_template: A right triangle has hypotenuse 17 and one leg 8. Find the other leg.
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '15'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: a = sqrt(17^2-8^2) = sqrt(225) = 15.
+    mistake_tags:
+    - missing_leg
+    difficulty: medium
+  - id: GEOM008_RADICAL_003
+    type: fixed
+    prompt_template: Find the exact hypotenuse of a right triangle with legs 2 and 3.
+    answer_mode: final_only
+    answer:
+      type: text
+      value: sqrt(13)
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: c = sqrt(4+9) = sqrt(13), already in simplest exact form.
+    mistake_tags:
+    - exact_radical
+    difficulty: medium
+  - id: GEOM008_SIMPLIFY_004
+    type: fixed
+    prompt_template: Simplify sqrt(98) exactly.
+    answer_mode: final_only
+    answer:
+      type: text
+      value: 7sqrt(2)
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 98 = 49*2, so sqrt(98) = 7sqrt(2).
+    mistake_tags:
+    - radical_simplification
+    difficulty: medium
+  - id: GEOM008_DISTANCE_005
+    type: fixed
+    prompt_template: Find the distance from (-1, 2) to (5, 10).
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '10'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Changes are 6 and 8, so d = sqrt(36+64) = 10.
+    mistake_tags:
+    - coordinate_distance
+    difficulty: medium
+  - id: GEOM008_HORIZONTAL_006
+    type: generated
+    prompt_template: Find the distance between ({x1}, {y}) and ({x2}, {y}).
+    variables:
+      x1:
+        type: int
+        min: -8
+        max: 2
+      x2:
+        type: int
+        min: 3
+        max: 12
+      y:
+        type: int
+        min: -5
+        max: 5
+    derived:
+      d: x2-x1
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '{d}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Same y-coordinate means horizontal distance |{x2} - {x1}| = {d}.
+    mistake_tags:
+    - horizontal_distance
+    difficulty: easy
+  - id: GEOM008_VERTICAL_007
+    type: generated
+    prompt_template: Find the distance between ({x}, {y1}) and ({x}, {y2}).
+    variables:
+      x:
+        type: int
+        min: -5
+        max: 5
+      y1:
+        type: int
+        min: -8
+        max: -2
+      y2:
+        type: int
+        min: 2
+        max: 10
+    derived:
+      d: y2-y1
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '{d}'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Same x-coordinate means vertical distance |{y2} - {y1}| = {d}.
+    mistake_tags:
+    - vertical_distance
+    difficulty: easy
+  - id: GEOM008_CONVERSE_008
+    type: fixed
+    prompt_template: Do side lengths 8, 15, and 17 form a right triangle?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Yes, because 8^2 + 15^2 = 17^2
+    - id: B
+      label: No, because 8 + 15 is not 17
+    - id: C
+      label: Yes, because all triangles are right
+    - id: D
+      label: No, because 17 is the shortest
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The longest side is 17 and 64 + 225 = 289 = 17^2.
+    mistake_tags:
+    - converse
+    difficulty: medium
+  - id: GEOM008_NOT_RIGHT_009
+    type: fixed
+    prompt_template: Can the equation a^2 + b^2 = c^2 be applied to any triangle with three side lengths?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: No, a right angle is required
+    - id: B
+      label: Yes, every triangle has a hypotenuse
+    - id: C
+      label: Yes, if it is rotated
+    - id: D
+      label: Only if all sides are equal
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Only a right triangle has a hypotenuse and the Pythagorean relationship.
+    mistake_tags:
+    - right_angle_hypothesis
+    difficulty: easy
+  - id: GEOM008_TUTOR_DISTANCE_010
+    type: fixed
+    prompt_template: Explain the coordinate distance from A(-2, 1) to B(4, 9), including the helper legs
+      and exact calculation.
+    answer_mode: final_plus_required_work
+    answer:
+      type: numeric
+      value: '10'
+    grading:
+      method: exact_numeric
+    work:
+      mode: rubric_check
+      prompt: Describe the horizontal and vertical changes, write the distance equation, and give the
+        exact result.
+      rubric:
+        criteria:
+        - id: run
+          description: Finds horizontal change |4 - (-2)| = 6.
+          weight: 2
+        - id: rise
+          description: Finds vertical change |9 - 1| = 8.
+          weight: 2
+        - id: equation
+          description: Uses d = sqrt(6^2 + 8^2).
+          weight: 2
+        - id: conclusion
+          description: Concludes d = 10 units and identifies it as a hypotenuse.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: The helper legs have lengths 6 and 8. Thus d = sqrt(36+64) = 10 units.
+    mistake_tags:
+    - tutor_reasoning
+    - coordinate_distance
+    difficulty: hard
+  - id: GEOM008_RECT_DIAGONAL_011
+    type: fixed
+    prompt_template: Find the diagonal of a 5 by 12 rectangle.
+    answer_mode: final_only
+    answer:
+      type: numeric
+      value: '13'
+    grading:
+      method: exact_numeric
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Rectangle sides meet at right angles, so diagonal = sqrt(25+144) = 13.
+    mistake_tags:
+    - rectangle_diagonal
+    difficulty: easy
+  - id: GEOM008_OBTUSE_012
+    type: fixed
+    prompt_template: For side lengths 4, 5, and 7, is the largest angle acute, right, or obtuse?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Acute
+    - id: B
+      label: Right
+    - id: C
+      label: Obtuse
+    - id: D
+      label: Impossible triangle
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 4^2+5^2 = 41 < 49 = 7^2, so the largest angle is obtuse.
+    mistake_tags:
+    - converse_angle_type
+    difficulty: hard
+  - id: GEOM008_ACUTE_013
+    type: fixed
+    prompt_template: For side lengths 6, 7, and 8, is the largest angle acute, right, or obtuse?
+    answer_mode: final_only
+    options:
+    - id: A
+      label: Acute
+    - id: B
+      label: Right
+    - id: C
+      label: Obtuse
+    - id: D
+      label: Impossible triangle
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review: true
+      allow_self_review: true
+    explanation_template: 6^2+7^2 = 85 > 64 = 8^2, so the largest angle is acute.
+    mistake_tags:
+    - converse_angle_type
+    difficulty: hard
+  - id: GEOM008_ORIGIN_014
+    type: fixed
+    prompt_template: A point (x, 4) is 5 units from the origin. Which x-values are possible?
+    options:
+    - id: A
+      label: x = 3 only
+    - id: B
+      label: x = -3 only
+    - id: C
+      label: x = 3 or x = -3
+    - id: D
+      label: x = 4 or x = -4
+    answer_mode: final_only
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: x^2 + 4^2 = 5^2 gives x^2 = 9, so x = 3 or -3.
+    mistake_tags:
+    - inverse_distance
+    - two_solutions
+    difficulty: hard
+  - id: GEOM008_RADICAL_015
+    type: generated
+    prompt_template: A right triangle has equal legs {a} and {a}. Give the exact hypotenuse.
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 8
+    derived:
+      radicand: a*a+a*a
+    answer_mode: final_only
+    answer:
+      type: text
+      value: sqrt({radicand})
+    grading:
+      method: exact_text
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review: true
+      allow_self_review: true
+    explanation_template: c = sqrt({a}^2 + {a}^2) = sqrt({radicand}); simplify further only if a square
+      factor is present.
+    mistake_tags:
+    - exact_radical
+    difficulty: medium
+  - id: GEOM008_LONGEST_016
+    type: fixed
+    prompt_template: In a right triangle, which side is the hypotenuse?
+    options:
+    - id: A
+      label: The side opposite the right angle
+    - id: B
+      label: The shortest leg
+    - id: C
+      label: Any horizontal side
+    - id: D
+      label: A side adjacent to the right angle
+    answer_mode: final_only
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The hypotenuse is opposite the marked 90 degree angle and is the longest side.
+    mistake_tags:
+    - hypotenuse_definition
+    difficulty: easy
+  - id: GEOM008_SIGN_017
+    type: fixed
+    prompt_template: Why are absolute coordinate changes used before describing distance?
+    options:
+    - id: A
+      label: Length is nonnegative even when direction is negative
+    - id: B
+      label: Coordinates cannot be negative
+    - id: C
+      label: Squaring is forbidden
+    - id: D
+      label: It makes every point the origin
+    answer_mode: final_only
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A coordinate difference records direction; its absolute value is the corresponding
+      leg length.
+    mistake_tags:
+    - coordinate_signs
+    difficulty: medium
+  - id: GEOM008_CHECK_018
+    type: fixed
+    prompt_template: A computed hypotenuse is 7 while a leg is 9. What does that indicate?
+    options:
+    - id: A
+      label: An arithmetic or setup error
+    - id: B
+      label: A valid right triangle
+    - id: C
+      label: The figure was rotated
+    - id: D
+      label: A hypotenuse can be shorter than a leg
+    answer_mode: final_only
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The hypotenuse must be the longest side, so the result needs checking.
+    mistake_tags:
+    - sanity_check
+    difficulty: medium
+  - id: GEOM008_DISTANCE_019
+    type: fixed
+    prompt_template: Why do horizontal and vertical coordinate helper segments justify the distance formula?
+    options:
+    - id: A
+      label: They meet at a right angle, so the requested distance is a hypotenuse
+    - id: B
+      label: They make every triangle equilateral
+    - id: C
+      label: They remove the need to square differences
+    - id: D
+      label: They work only when both coordinates are positive
+    answer_mode: final_only
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Horizontal and vertical changes are perpendicular, forming the right triangle
+      whose hypotenuse is the point-to-point distance.
+    mistake_tags:
+    - visual_justification
+    - coordinate_distance
+    difficulty: medium
+  - id: GEOM008_NONRIGHT_020
+    type: fixed
+    prompt_template: Which additional fact makes the Pythagorean theorem valid for a triangle?
+    options:
+    - id: A
+      label: A marked or stated right angle
+    - id: B
+      label: That the drawing is rotated
+    - id: C
+      label: That one side is horizontal on the page
+    - id: D
+      label: That two sides look perpendicular
+    answer_mode: final_only
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Pythagoras requires an actual right angle; orientation or visual appearance
+      is not enough.
+    mistake_tags:
+    - right_angle_hypothesis
+    - insufficient_information
+    difficulty: medium

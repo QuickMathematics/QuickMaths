@@ -1,0 +1,367 @@
+id: MATH_GEOM_007
+schema_version: '0.2'
+name: Perimeter, area, and composite plane figures
+domain: Math
+subdomain: Geometry
+topic: Plane Geometry
+description: Calculate perimeter and area, find missing dimensions, and decompose or subtract composite figures with correct units.
+prerequisites:
+- MATH_GEOM_004
+- MATH_GEOM_006
+- MATH_ARITH_013
+unlocks:
+- MATH_GEOM_008
+tags:
+- geometry
+- perimeter
+- area
+- composite_figures
+- units
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  Perimeter measures the total distance around a two-dimensional boundary. Area measures the amount of surface inside that boundary. They use different units: a rectangle with side lengths in metres has perimeter in metres and area in square metres. A drawing can have a large perimeter and small area or a small perimeter and large area, so never swap the formulas. Perimeter follows the outside edge only; internal partition lines are not included unless the question explicitly asks for all fencing or all marked segments.
+
+  A rectangle has opposite sides equal, perimeter P = 2l + 2w, and area A = l*w. A square is a rectangle with l = w, so P = 4s and A = s^2. The units explain the area formula: multiplying a length by a perpendicular width counts a grid of unit squares. A parallelogram has A = b*h, where h is perpendicular to the chosen base, and its perimeter is 2a + 2b when a and b are adjacent side lengths. A slanted side is not automatically the height; the height is the shortest perpendicular distance between the parallel base lines.
+
+  A trapezoid, using a and b for its parallel bases and h for the perpendicular height, has A = (a + b)h/2. This is the average of the two parallel widths times the distance between them. The nonparallel legs are useful for perimeter but are not substituted for h unless a right-angle relationship makes one a height. Under the inclusive convention from the polygon lesson, a parallelogram has two pairs of parallel sides and also qualifies as a trapezoid; use the formula that best matches the information and the stated figure.
+
+  The units must be aligned before arithmetic. Convert 100 cm to 1 m before finding an area in square metres. For area conversions, square the length conversion: 1 m^2 = 10,000 cm^2. A perimeter conversion uses the ordinary factor: 1 m = 100 cm. Write the unit after each intermediate result so a length does not accidentally become an area. Exact fractions and decimals are valid; do not round unless requested.
+
+  Missing dimensions are inverse problems. From A = l*w, w = A/l. From P = 2l + 2w, w = P/2 - l. For a parallelogram, h = A/b. For a trapezoid, h = 2A/(a+b). Substitute a recovered dimension back into the original formula. A dimension must be positive for a nondegenerate figure; a zero or negative result signals inconsistent givens.
+
+  Composite figures can be solved by decomposition or subtraction. Draw a segment that splits an L-shape into two rectangles, add their areas, and add only the exposed outer edges for perimeter. Alternatively, surround a notched figure with a larger rectangle and subtract the missing rectangle. For a rectangle with a triangular corner removed, subtract the triangle area (base*height/2) and replace the removed straight boundary with the two new sloping or perpendicular edges when finding perimeter. Internal construction lines are scaffolding, not automatically boundary.
+
+  A composite perimeter often has cancellation opportunities. If a rectangular corner is removed from a larger rectangle, the lost horizontal and vertical pieces are replaced by equal-length new edges, so the perimeter can sometimes be found by walking every outside segment or by using the original perimeter plus the new exposed edge minus the removed edge. Do not assume this for a diagonal cut; a sloping edge has its own length and may require Pythagoras.
+
+  A reliable workflow is: identify the requested quantity; sketch or label all needed dimensions; convert units; choose a formula; solve for a missing dimension if needed; calculate each component; combine by addition or subtraction; and attach the correct unit. A 2D area is measured in cm^2, m^2, or another squared unit. A perimeter is measured in cm or m. A price per square metre multiplies an area, while a price per metre multiplies a perimeter.
+
+  Rotating or reflecting a figure leaves its perimeter and area unchanged. A floor plan drawn sideways is still governed by the same lengths. A sketch is not necessarily to scale; rely on labels, parallel marks, right-angle marks, and stated relationships. For a parallelogram, a base of 8 cm and slanted side 5 cm does not determine area until the perpendicular height is given. For a trapezoid, two bases without a height do not determine area.
+
+  Self-check: Did I trace only the outside for perimeter? Did I use a perpendicular height? Are all lengths in the same unit? Did I subtract a cutout exactly once? Are my final units linear or squared? Does the answer have a reasonable size compared with the enclosing figure?
+media:
+- src: media/native-plane-foundations/geom007-composite.svg
+  alt: A rectangle has a triangular corner removed, illustrating subtraction for a composite area.
+  caption: Find the enclosing rectangle area, subtract the triangular cutout, and treat new exposed edges separately for perimeter.
+  width: 720
+  height: 400
+  fit: contain
+- src: media/native-plane-foundations/geom007-trapezoid.svg
+  alt: A trapezoid has two parallel bases and dashed perpendicular segments marking its height.
+  caption: Trapezoid area uses the average of the parallel bases times the perpendicular height.
+  width: 720
+  height: 380
+  fit: contain
+examples:
+- prompt: Find the perimeter and area of a 9 cm by 4 cm rectangle.
+  solution: Perimeter 26 cm; area 36 cm^2.
+  explanation: P = 2(9+4) = 26 and A = 9*4 = 36.
+- prompt: A square has side 7 m. Find its perimeter and area.
+  solution: 28 m and 49 m^2.
+  explanation: P = 4*7 and A = 7^2.
+- prompt: A parallelogram has base 12 cm and perpendicular height 5 cm. Find its area.
+  solution: 60 cm^2.
+  explanation: A = b*h = 12*5; the slanted side is irrelevant to area.
+- prompt: A trapezoid has bases 8 m and 14 m and height 5 m. Find its area.
+  solution: 55 m^2.
+  explanation: A = (8+14)*5/2 = 55.
+- prompt: A rectangle has area 72 cm^2 and length 9 cm. Find its width.
+  solution: 8 cm.
+  explanation: w = A/l = 72/9.
+- prompt: A garden has perimeter 34 m and length 11 m. Find its width.
+  solution: 6 m.
+  explanation: 34 = 2(11+w), so w = 17 - 11 = 6.
+- prompt: A 12 cm by 8 cm rectangle has a 3 cm by 2 cm rectangular notch removed. Find its area.
+  solution: 90 cm^2.
+  explanation: 12*8 - 3*2 = 96 - 6 = 90.
+- prompt: A composite floor is two non-overlapping rectangles of areas 24 m^2 and 35 m^2. Find the total area.
+  solution: 59 m^2.
+  explanation: 'Non-overlapping pieces add: 24 + 35 = 59.'
+- prompt: Convert 2.4 m^2 to cm^2.
+  solution: 24,000 cm^2.
+  explanation: 1 m^2 = 10,000 cm^2, so 2.4*10,000 = 24,000.
+- prompt: A rectangle is rotated and its sides remain 5 cm and 13 cm. Find its area.
+  solution: 65 cm^2.
+  explanation: Rotation does not change the product of side lengths.
+applications:
+- title: Fencing and edging
+  description: Perimeter estimates the length of a boundary material, while gates or openings must be excluded from the walked boundary.
+- title: Flooring and paint
+  description: Area gives the surface quantity; composite rooms can be split into rectangles or enclosed and subtracted.
+- title: Garden beds and paving
+  description: Trapezoid and parallelogram formulas model slanted beds when a perpendicular height is measured.
+- title: Materials and pricing
+  description: Match a price per metre to perimeter and a price per square metre to area before multiplying.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: GEOM007_RECT_AREA_001
+    type: fixed
+    prompt_template: Find the area of a rectangle 11 cm long and 6 cm wide.
+    answer_mode: final_only
+    answer: {type: numeric, value: '66'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A = l*w = 11*6 = 66 cm^2.
+    mistake_tags: [rectangle_area]
+    difficulty: easy
+  - id: GEOM007_RECT_PERIMETER_002
+    type: generated
+    prompt_template: Find the perimeter of a rectangle with length {l} cm and width {w} cm.
+    variables:
+      l: {type: int, min: 4, max: 20}
+      w: {type: int, min: 2, max: 12}
+    derived: {p: 2*l+2*w}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{p}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: P = 2{l} + 2{w} = {p} cm.
+    mistake_tags: [perimeter_formula]
+    difficulty: easy
+  - id: GEOM007_SQUARE_003
+    type: generated
+    prompt_template: A square has side {s} cm. Find its area.
+    variables: {s: {type: int, min: 3, max: 15}}
+    derived: {a: s*s}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{a}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A = s^2 = {s}^2 = {a} cm^2.
+    mistake_tags: [square_area]
+    difficulty: easy
+  - id: GEOM007_PARALLELOGRAM_004
+    type: fixed
+    prompt_template: A parallelogram has base 13 cm and perpendicular height 4 cm. Find its area.
+    answer_mode: final_only
+    answer: {type: numeric, value: '52'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A = b*h = 13*4 = 52 cm^2.
+    mistake_tags: [parallelogram_height]
+    difficulty: easy
+  - id: GEOM007_TRAPEZOID_005
+    type: fixed
+    prompt_template: A trapezoid has parallel bases 7 m and 15 m and height 6 m. Find its area.
+    answer_mode: final_only
+    answer: {type: numeric, value: '66'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: A = (7+15)*6/2 = 66 m^2.
+    mistake_tags: [trapezoid_area]
+    difficulty: medium
+  - id: GEOM007_MISSING_WIDTH_006
+    type: generated
+    prompt_template: A rectangle has area {a} cm^2 and length {l} cm. Find its width.
+    variables:
+      l: {type: int, min: 3, max: 12}
+      w: {type: int, min: 2, max: 10}
+    derived: {a: l*w}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{w}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: w = A/l = {a}/{l} = {w} cm.
+    mistake_tags: [inverse_area]
+    difficulty: medium
+  - id: GEOM007_MISSING_HEIGHT_007
+    type: generated
+    prompt_template: A parallelogram has area {a} cm^2 and base {b} cm. Find its perpendicular height.
+    variables:
+      b: {type: int, min: 3, max: 12}
+      h: {type: int, min: 2, max: 10}
+    derived: {a: b*h}
+    answer_mode: final_only
+    answer: {type: numeric, value: '{h}'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: h = A/b = {a}/{b} = {h} cm.
+    mistake_tags: [perpendicular_height, inverse_area]
+    difficulty: medium
+  - id: GEOM007_UNIT_008
+    type: fixed
+    prompt_template: What is 3 m^2 in cm^2?
+    answer_mode: final_only
+    answer: {type: numeric, value: '30000'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Since 1 m^2 = 10,000 cm^2, 3 m^2 = 30,000 cm^2.
+    mistake_tags: [square_unit_conversion]
+    difficulty: medium
+  - id: GEOM007_COMPOSITE_009
+    type: fixed
+    prompt_template: A 14 cm by 9 cm rectangle has a 4 cm by 3 cm corner removed. Find the remaining area.
+    answer_mode: final_only
+    answer: {type: numeric, value: '114'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: 14*9 - 4*3 = 126 - 12 = 114 cm^2.
+    mistake_tags: [composite_subtraction]
+    difficulty: medium
+  - id: GEOM007_TUTOR_COMPOSITE_010
+    type: fixed
+    prompt_template: Explain a reliable method for finding the area of an L-shaped floor made from two non-overlapping rectangles, and apply it to rectangles 8 by 3 m and 5 by 4 m.
+    answer_mode: final_plus_required_work
+    answer: {type: numeric, value: '44'}
+    grading: {method: exact_numeric}
+    work:
+      mode: rubric_check
+      prompt: State the decomposition, calculate both component areas, and combine them with square units.
+      rubric:
+        criteria:
+        - {id: decomposition, description: Identifies two non-overlapping rectangular pieces., weight: 2}
+        - {id: first_area, description: Calculates 8*3 = 24 m^2., weight: 2}
+        - {id: second_area, description: Calculates 5*4 = 20 m^2., weight: 2}
+        - {id: combine, description: Adds 24 + 20 = 44 m^2 and labels the result as area., weight: 2}
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: Split the L-shape into non-overlapping rectangles. Their areas are 24 and 20 m^2, so the total is 44 m^2.
+    mistake_tags: [tutor_reasoning, composite_area, units]
+    difficulty: hard
+  - id: GEOM007_PERIMETER_COMPOSITE_011
+    type: fixed
+    prompt_template: A 10 cm by 6 cm rectangle has a 3 cm wide by 2 cm deep notch cut from the middle of one long edge. Find the perimeter of the remaining shape.
+    answer_mode: final_only
+    answer: {type: numeric, value: '36'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: The original perimeter is 32 cm. The notch removes 3 cm of outside edge but adds 2+3+2 = 7 cm, so the new perimeter is 36 cm.
+    mistake_tags: [composite_perimeter, notch]
+    difficulty: hard
+  - id: GEOM007_NOT_HEIGHT_012
+    type: fixed
+    prompt_template: A parallelogram has base 8 cm and slanted side 5 cm, but no perpendicular height. Can its area be determined?
+    answer_mode: final_only
+    options:
+    - {id: A, label: 'Yes, use 8*5'}
+    - {id: B, label: 'No, a perpendicular height is missing'}
+    - {id: C, label: 'Yes, use 2*(8+5)'}
+    - {id: D, label: 'No, parallelograms have no area'}
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Area requires base times perpendicular height; a slanted side is not automatically the height.
+    mistake_tags: [perpendicular_height, insufficient_information]
+    difficulty: hard
+  - id: GEOM007_PERIMETER_UNITS_013
+    type: fixed
+    prompt_template: A rectangle is 2 m by 50 cm. What is its perimeter in metres?
+    answer_mode: final_only
+    answer: {type: numeric, value: '5'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: 50 cm = 0.5 m, so P = 2(2 + 0.5) = 5 m.
+    mistake_tags: [mixed_units]
+    difficulty: medium
+  - id: GEOM007_TRAPEZOID_MISSING_014
+    type: fixed
+    prompt_template: A trapezoid has bases 6 cm and 10 cm and area 48 cm^2. Find its height.
+    answer_mode: final_only
+    answer: {type: numeric, value: '6'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: h = 2A/(a+b) = 96/16 = 6 cm.
+    mistake_tags: [inverse_trapezoid]
+    difficulty: hard
+  - id: GEOM007_RECT_SCALE_015
+    type: fixed
+    prompt_template: 'Two rectangles have the same area: 6 cm by 8 cm and 4 cm by 12 cm. Which has the greater perimeter?'
+    options:
+    - {id: A, label: The 6 by 8 rectangle}
+    - {id: B, label: The 4 by 12 rectangle}
+    - {id: C, label: They have equal perimeters}
+    - {id: D, label: Area and perimeter are the same quantity}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Both areas are 48 cm^2, but perimeters are 28 cm and 32 cm; the 4 by 12 rectangle has the greater perimeter.
+    mistake_tags: [area_vs_perimeter, same_area]
+    difficulty: hard
+  - id: GEOM007_ROTATION_016
+    type: fixed
+    prompt_template: A 4 cm by 12 cm rectangle is rotated. What happens to its area?
+    answer_mode: final_only
+    answer: {type: numeric, value: '48'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Rotation preserves area, which remains 4*12 = 48 cm^2.
+    mistake_tags: [rotation, area_invariance]
+    difficulty: easy
+  - id: GEOM007_PRICE_017
+    type: fixed
+    prompt_template: Flooring costs 8 euros per m^2 for a 6 m by 4 m rectangle. Find the cost.
+    answer_mode: final_only
+    answer: {type: numeric, value: '192'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Area is 24 m^2, so cost is 24*8 = 192 euros.
+    mistake_tags: [area_cost]
+    difficulty: medium
+  - id: GEOM007_PERIMETER_PRICE_018
+    type: fixed
+    prompt_template: A 9 m by 5 m garden needs edging at 3 euros per metre. Find the cost.
+    answer_mode: final_only
+    answer: {type: numeric, value: '84'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: P = 2(9+5) = 28 m, and 28*3 = 84 euros.
+    mistake_tags: [perimeter_cost]
+    difficulty: medium
+  - id: GEOM007_UNIT_CHOICE_019
+    type: fixed
+    prompt_template: Which unit is appropriate for the area of a 10 cm by 3 cm panel?
+    options:
+    - {id: A, label: 'cm^3'}
+    - {id: B, label: 'cm^2'}
+    - {id: C, label: 'cm'}
+    - {id: D, label: 'degrees'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Area multiplies two lengths, so the unit is square centimetres.
+    mistake_tags: [area_units]
+    difficulty: easy
+  - id: GEOM007_OUTSIDE_BOUNDARY_020
+    type: fixed
+    prompt_template: When finding the perimeter of a composite shape, which segments should be added?
+    options:
+    - {id: A, label: 'Every construction line, inside or outside'}
+    - {id: B, label: 'Only the exposed outside boundary'}
+    - {id: C, label: 'Only the shortest segments'}
+    - {id: D, label: 'Only horizontal segments'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Perimeter traces the exposed boundary; internal partition lines are not part of it.
+    mistake_tags: [composite_perimeter]
+    difficulty: medium

@@ -1,0 +1,581 @@
+id: MATH_RAD_002
+schema_version: '0.2'
+name: Higher roots and rational exponents
+domain: Math
+subdomain: Algebra
+topic: Radicals and exponents
+description: Interpret higher-index roots and rational exponents over the reals, including principal roots,
+  equation solutions, negative powers, domains, exact forms, and approximations.
+prerequisites:
+- MATH_RAD_001
+- MATH_EXP_001
+tags:
+- radicals
+- roots
+- rational_exponents
+- principal_root
+- domain
+- exact_form
+- approximation
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 10
+  review_after_days_if_learning: 3
+theory: "The nth root of a is a number whose nth power is a. The index n is written on the radical: n√a.\
+  \ When n is even,\nthe real radical is defined only for a >= 0, and the principal root is the nonnegative\
+  \ value. Thus √49 = 7 and\nthe principal fourth root of 81 is 3. The radical symbol names one principal\
+  \ value; it does not automatically\nmean plus or minus. When n is odd, every real radicand has one real\
+  \ nth root, including negative values: the real\ncube root of -8 is -2 because (-2)^3 = -8.\n\nRoot\
+  \ notation and equation solving ask different questions. The statement √49 = 7 names the principal root.\
+  \ The\nequation x^2 = 49 asks for every real x whose square is 49, so x = -7 or x = 7. Likewise, the\
+  \ principal fourth\nroot of 16 is 2, but x^4 = 16 has x = -2 and x = 2 in the real numbers. For an odd\
+  \ power, x^3 = -8 has only\nx = -2 because an odd-power function is one-to-one on the reals. Add a plus-or-minus\
+  \ only when the equation and\nthe even power justify it.\n\nRational exponents encode roots and powers.\
+  \ For a positive base a, a^(m/n) means (n√a)^m, equivalently the\nnth root of a^m. The denominator n\
+  \ is the root index and the numerator m is the power. For example,\n16^(3/4) = (fourth root of 16)^3\
+  \ = 2^3 = 8, while 27^(2/3) = (cube root of 27)^2 = 9. Reduce the fraction\nwhen possible, but preserve\
+  \ the domain. Exact perfect powers are preferable in exact questions; leave an answer\nsuch as 2^(1/3)\
+  \ in radical or exponent form when no simpler real form exists.\n\nNegative rational exponents mean\
+  \ reciprocals: a^(-m/n) = 1/a^(m/n), provided the base is nonzero. For instance,\n8^(-2/3) = 1/(cube\
+  \ root of 8)^2 = 1/4. The base cannot be zero because a negative power divides by the positive\npower.\
+  \ A negative base requires care. Odd denominators can describe a real odd root, while even denominators\n\
+  require a nonnegative radicand under the real-number convention. Do not let a calculator’s complex or\
+  \ language-\nspecific fractional-power behavior silently change the real domain.\n\nDomain restrictions\
+  \ follow the root index and any denominator. An expression such as fourth root of (x-3) is\nreal only\
+  \ when x-3 >= 0, so its domain is [3,inf). An odd root of (2x+1) accepts every real x. An expression\n\
+  (x-4)^(-1/3) accepts every real x except 4, because the odd root exists at every input but the reciprocal\
+  \ would\ndivide by zero. For an even root in a denominator, combine both conditions: the radicand must\
+  \ be positive, not\nmerely nonnegative, because zero would make the denominator zero.\n\nFor a negative\
+  \ base, state the convention before using a rational exponent: reduce the fraction to lowest terms,\
+  \ and treat an odd denominator as an odd root in the real numbers. Do not assume that a nested even-root\
+  \ rewrite is interchangeable with a real odd root. For example, ((-8)^2)^(1/6) = 2, while the real cube\
+  \ root expression (-8)^(1/3) = -2. The positive-base laws agree more freely because all intermediate\
+  \ roots stay in the positive domain; negative bases need the parity and domain check first.\n\n  Simplification\
+  \ must respect signs. For even roots, √(x^2) = |x|, not x for every real x, because the principal\n\
+  root is nonnegative. For odd roots, cube root of (x^3) = x for every real x. This parity distinction\
+  \ explains\nwhy an algebraic cancellation that looks identical can have different real meanings. Check\
+  \ by raising the proposed\nprincipal value back to the index and by checking its sign.\n\nApproximation\
+  \ is appropriate when the exact root is not a convenient rational or radical. Bracket a root between\n\
+  nearby perfect powers: 2^3=8 and 3^3=27, so cube root of 20 lies between 2 and 3. A decimal answer should\
+  \ state\nthe requested precision and a tolerance. Keep exact and approximate forms visibly distinct.\
+  \ A negative odd root\ncan be approximated by first finding the positive magnitude and then restoring\
+  \ the negative sign, rather than\nrelying on a floating-language expression whose branch convention\
+  \ may be complex.\n\nA reliable workflow is: identify the index and parity; decide whether the task\
+  \ asks for a principal radical or all\nequation solutions; translate rational exponents into roots and\
+  \ powers; apply reciprocal and domain restrictions;\nsimplify exactly; and approximate only at the end.\
+  \ The reviewed capstone asks for both the principal-root statement\nand the complete equation solution,\
+  \ with a domain and sign explanation.\n"
+media:
+- src: media/native-final-foundations/rad-root-index.svg
+  alt: An indexed radical diagram contrasts odd-index real roots with even-index nonnegative-radicand
+    roots and principal values.
+  caption: Index parity controls the real domain; an even principal root is nonnegative.
+  width: 520
+  height: 250
+  fit: contain
+- src: media/native-final-foundations/rad-domain.svg
+  alt: A number line shades the domain beginning at an included endpoint for an even root and notes that
+    negative powers exclude zero.
+  caption: Root domains and reciprocal restrictions must both be checked.
+  width: 520
+  height: 250
+  fit: contain
+examples:
+- prompt: Find the principal cube root of -125.
+  solution: -5
+  explanation: (-5)^3 = -125, and an odd root preserves the negative sign.
+- prompt: Find the principal fourth root of 81.
+  solution: 3
+  explanation: 3^4 = 81 and the principal even root is nonnegative.
+- prompt: Solve x^4 = 16 over the reals.
+  solution: x = -2 or x = 2
+  explanation: Both signs have fourth power 16; this is an equation, not a principal radical.
+- prompt: Simplify 16^(3/4).
+  solution: 8
+  explanation: The fourth root of 16 is 2, then 2^3 = 8.
+- prompt: Simplify 27^(2/3).
+  solution: 9
+  explanation: The cube root of 27 is 3, and 3^2 = 9.
+- prompt: Simplify 8^(-2/3).
+  solution: 1/4
+  explanation: 8^(2/3)=4, and a negative exponent takes the reciprocal.
+- prompt: State the real domain of the fourth root of (x-3).
+  solution: '[3,inf)'
+  explanation: 'An even-index radicand must be nonnegative: x-3 >= 0.'
+- prompt: State the real domain of (x-4)^(-1/3).
+  solution: (-inf,4) U (4,inf)
+  explanation: The odd root accepts all real inputs, but the reciprocal excludes x=4.
+- prompt: Simplify √(x^2) for real x.
+  solution: '|x|'
+  explanation: The principal square root is nonnegative, so √(x²)=|x|.
+- prompt: Approximate the real cube root of 20 to two decimal places.
+  solution: Approximately 2.71
+  explanation: 2.71^3 is close to 20; the root lies between 2 and 3.
+applications:
+- title: Engineering scale laws
+  description: Roots recover a length from an area, volume, or power relationship while index parity controls
+    which real dimensions are allowed.
+- title: Data and signal transforms
+  description: Rational powers compress positive measurements, and negative exponents represent reciprocal
+    scale factors with a zero restriction.
+- title: Geometry inversion
+  description: Solving for a radius or side from a measured area or volume requires distinguishing a principal
+    root from all algebraic equation solutions.
+- title: Numerical estimation
+  description: Bracketing between perfect powers gives a defensible approximation when an exact higher
+    root is not simple.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: RAD002_ODD_ROOT
+    type: generated
+    prompt_template: The real cube root of {x}³ is what number?
+    variables:
+      x:
+        type: int
+        min: -10
+        max: 10
+    derived:
+      root: x
+    answer:
+      type: numeric
+      value: '{root}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: Odd roots preserve sign, so the real root is {root}.
+    mistake_tags:
+    - odd_root_sign
+    work:
+      mode: none
+  - id: RAD002_EVEN_ROOT
+    type: generated
+    prompt_template: The principal fourth root of {x}⁴ is what number?
+    variables:
+      x:
+        type: int
+        min: 1
+        max: 10
+    derived:
+      root: x
+    answer:
+      type: numeric
+      value: '{root}'
+    grading:
+      method: exact_numeric
+    difficulty: easy
+    explanation_template: The principal even root is nonnegative, so it is {root}.
+    mistake_tags:
+    - principal_root
+    work:
+      mode: none
+  - id: RAD002_RATIONAL_POWER
+    type: generated
+    prompt_template: Simplify {b}^({m}/{n}), where {b} is a perfect nth power and the result is positive.
+    variables:
+      q:
+        type: int
+        min: 2
+        max: 6
+      m:
+        type: int
+        min: 1
+        max: 3
+      n:
+        type: int
+        min: 2
+        max: 3
+    constraints:
+    - m <= n
+    derived:
+      b: q**n
+      value: q**m
+    answer:
+      type: numeric
+      value: '{value}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Take the nth root first, then raise to m.
+    mistake_tags:
+    - rational_exponent_order
+    work:
+      mode: none
+  - id: RAD002_NEGATIVE_POWER
+    type: generated
+    prompt_template: Simplify {b}^(-1/{n}), where {b} is a perfect nth power.
+    variables:
+      q:
+        type: int
+        min: 2
+        max: 8
+      n:
+        type: int
+        min: 2
+        max: 3
+    derived:
+      b: q**n
+      value: 1/q
+    answer:
+      type: numeric
+      value: '{value}'
+    grading:
+      method: numeric_with_tolerance
+      tolerance: 0.0001
+    difficulty: medium
+    explanation_template: The root is q, and the negative exponent takes its reciprocal.
+    mistake_tags:
+    - negative_exponent
+    work:
+      mode: none
+  - id: RAD002_PRINCIPAL_VS_EQUATION
+    type: fixed
+    prompt_template: Which statement correctly distinguishes sqrt(49) from the real solutions of x²=49?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Both have only −7.
+    - id: B
+      label: sqrt(49)=7, while x²=49 has x=−7 and x=7.
+    - id: C
+      label: sqrt(49)=±7, while x²=49 has only 7.
+    - id: D
+      label: Neither has a real value.
+    difficulty: medium
+    explanation_template: A principal radical names one nonnegative value; an even-power equation asks
+      for both signs.
+    mistake_tags:
+    - principal_vs_equation
+    work:
+      mode: none
+  - id: RAD002_EVEN_ABS_SYMBOLIC
+    type: fixed
+    prompt_template: For real x, how does sqrt(x²) simplify?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: x for every real x
+    - id: B
+      label: −x for every real x
+    - id: C
+      label: '|x|'
+    - id: D
+      label: x²
+    difficulty: medium
+    explanation_template: The principal square root is nonnegative, so sqrt(x²)=|x|.
+    mistake_tags:
+    - principal_root
+    - absolute_value
+    work:
+      mode: none
+  - id: RAD002_NEGATIVE_BASE_COUNTEREXAMPLE
+    type: fixed
+    prompt_template: Which comparison correctly warns about negative-base rational powers?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: A
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: ((-8)²)^(1/6)=2, while the real (-8)^(1/3)=−2.
+    - id: B
+      label: Both expressions must equal −2.
+    - id: C
+      label: Both expressions are always nonreal.
+    - id: D
+      label: The distinction disappears for even roots.
+    difficulty: hard
+    explanation_template: Nested even roots and real odd roots are not interchangeable for a negative
+      base.
+    mistake_tags:
+    - negative_base
+    - domain
+    work:
+      mode: none
+  - id: RAD002_ODD_RATIONAL_NEGATIVE
+    type: fixed
+    prompt_template: Simplify the real value of (−8)^(2/3), using the reduced fraction and odd denominator
+      convention.
+    variables: {}
+    derived: {}
+    answer:
+      type: numeric
+      value: '4'
+    grading:
+      method: exact_numeric
+    difficulty: hard
+    explanation_template: The cube root of −8 is −2, and (−2)²=4.
+    mistake_tags:
+    - negative_base
+    - odd_denominator
+    work:
+      mode: none
+  - id: RAD002_EVEN_DOMAIN
+    type: fixed
+    prompt_template: State the real domain of fourth-root(x−3).
+    variables: {}
+    derived: {}
+    answer:
+      type: interval_set
+      value: '[3,inf)'
+      variable: x
+    grading:
+      method: interval_set
+    difficulty: medium
+    explanation_template: An even radicand must be nonnegative, so x>=3.
+    work:
+      mode: none
+  - id: RAD002_ODD_DOMAIN
+    type: fixed
+    prompt_template: State the real domain of cube-root(2x+1).
+    variables: {}
+    derived: {}
+    answer:
+      type: interval_set
+      value: (-inf,inf)
+      variable: x
+    grading:
+      method: interval_set
+    difficulty: medium
+    explanation_template: Odd roots accept every real radicand.
+    work:
+      mode: none
+  - id: RAD002_RECIPROCAL_EVEN_DOMAIN
+    type: fixed
+    prompt_template: State the real domain of (x−2)^(-1/2).
+    variables: {}
+    derived: {}
+    answer:
+      type: interval_set
+      value: (2,inf)
+      variable: x
+    grading:
+      method: interval_set
+    difficulty: hard
+    explanation_template: The square-root radicand must be positive because the root is in a denominator.
+    work:
+      mode: none
+  - id: RAD002_RECIPROCAL_ODD_DOMAIN
+    type: fixed
+    prompt_template: State the real domain of (x−2)^(-1/3).
+    variables: {}
+    derived: {}
+    answer:
+      type: interval_set
+      value: (-inf,2) U (2,inf)
+      variable: x
+    grading:
+      method: interval_set
+    difficulty: hard
+    explanation_template: The odd root exists at every input, but the reciprocal excludes x=2.
+    work:
+      mode: none
+  - id: RAD002_APPROX_BRACKET
+    type: generated
+    prompt_template: The real cube root of {n} lies between which consecutive integers? Enter the lower
+      integer.
+    variables:
+      n:
+        type: int
+        min: 9
+        max: 26
+    derived:
+      lower: '2'
+    answer:
+      type: numeric
+      value: '{lower}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: Since 2³=8 and 3³=27, the root lies between 2 and 3.
+    mistake_tags:
+    - root_approximation
+    work:
+      mode: none
+  - id: RAD002_FOURTH_EQUATION
+    type: fixed
+    prompt_template: Solve x⁴=16 over the reals. Enter all solutions.
+    variables: {}
+    derived: {}
+    answer:
+      type: finite_set
+      values:
+      - '-2'
+      - '2'
+    grading:
+      method: finite_set
+    difficulty: medium
+    explanation_template: Both signs have fourth power 16.
+    work:
+      mode: none
+  - id: RAD002_ODD_EQUATION
+    type: fixed
+    prompt_template: Solve x³=−8 over the reals. Enter all solutions.
+    variables: {}
+    derived: {}
+    answer:
+      type: finite_set
+      values:
+      - '-2'
+    grading:
+      method: finite_set
+    difficulty: medium
+    explanation_template: An odd-power equation is one-to-one over the reals.
+    work:
+      mode: none
+  - id: RAD002_NO_REAL_EVEN
+    type: fixed
+    prompt_template: Does x⁴=−16 have a real solution?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: B
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Yes, x=2.
+    - id: B
+      label: No, every real fourth power is nonnegative.
+    - id: C
+      label: Yes, x=−2.
+    - id: D
+      label: Yes, x=±4.
+    difficulty: medium
+    explanation_template: No real even power can be negative.
+    work:
+      mode: none
+  - id: RAD002_PRODUCT_LAW
+    type: fixed
+    prompt_template: Which exact statement is valid for positive bases?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: C
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: 16^(1/4)·16^(1/4)=16.
+    - id: B
+      label: 16^(1/4)·16^(1/4)=2.
+    - id: C
+      label: 16^(1/4)·16^(1/4)=4.
+    - id: D
+      label: The product has no real value.
+    difficulty: medium
+    explanation_template: Each fourth root is 2, so the product is 4.
+    work:
+      mode: none
+  - id: RAD002_EXACT_POWER
+    type: fixed
+    prompt_template: Simplify 16^(3/4) exactly.
+    variables: {}
+    derived: {}
+    answer:
+      type: numeric
+      value: '8'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    explanation_template: The fourth root of 16 is 2, and 2³=8.
+    work:
+      mode: none
+  - id: RAD002_NEGATIVE_POWER_ZERO
+    type: fixed
+    prompt_template: Why is 0^(−1/3) undefined over the reals?
+    variables: {}
+    derived: {}
+    answer:
+      type: multiple_choice
+      value: D
+    grading:
+      method: multiple_choice
+    options:
+    - id: A
+      label: Because odd roots cannot use zero.
+    - id: B
+      label: Because zero is negative.
+    - id: C
+      label: Because the exponent is fractional.
+    - id: D
+      label: Because a negative exponent takes a reciprocal of zero.
+    difficulty: medium
+    explanation_template: The odd root of zero exists, but its reciprocal is undefined.
+    mistake_tags:
+    - negative_exponent
+    - zero_domain
+    work:
+      mode: none
+  - id: RAD002_CAPSTONE
+    type: fixed
+    prompt_template: Over the real numbers, solve x⁴ = 81 and enter the complete equation solution set
+      as the final answer. In required work, separately state the principal fourth root of 81, explain
+      why the equation has two solutions while the principal radical has one, and state the domain of
+      fourth-root(x−2).
+    variables: {}
+    derived: {}
+    answer:
+      type: finite_set
+      values:
+      - '-3'
+      - '3'
+    grading:
+      method: finite_set
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Show the sign and domain reasoning, not only the final set.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Gives both equation solutions x = −3 and x = 3 and verifies that each fourth power
+            is 81.
+          weight: 2
+        - id: criterion_2
+          description: Separately identifies the principal fourth root as 3 because the principal even
+            root is nonnegative.
+          weight: 2
+        - id: criterion_3
+          description: States the domain of fourth-root(x−2) as [2,inf) and explains the even-radicand
+            condition.
+          weight: 2
+    media:
+    - src: media/native-final-foundations/rad-domain.svg
+      alt: A number line begins at the included endpoint 2 to represent the fixed even-root domain.
+      caption: The domain condition comes from requiring the even-index radicand to be nonnegative.
+      width: 520
+      height: 250
+      fit: contain
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: x⁴=81 gives x=−3 or 3, while the principal fourth root is 3 only. The domain
+      of fourth-root(x−2) is [2,inf).
+    mistake_tags:
+    - principal_vs_equation
+    - even_root_domain
+    - sign

@@ -1,4 +1,4 @@
-import { LESSON_ILLUSTRATIONS } from "./lesson-illustration-data.js?v=20260908-statistics-v1";
+import { LESSON_ILLUSTRATIONS } from "./lesson-illustration-data.js?v=20260921-foundations-v1";
 
 // A compatibility stamp, not an authenticity or security check. Only bundled,
 // trusted metadata provides asset URLs. Edited lessons keep their own content.

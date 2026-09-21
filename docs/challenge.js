@@ -1,10 +1,11 @@
+import { lessonReferenceText } from "./lesson-references.js?v=20260921-foundations-v1";
 import { renderLimitWork, collectLimitWork } from "./limit-work.js?v=20260909-calculus-v1";
 import { renderFormalWorkspace } from "./formal-proof-workspace.js?v=20260913-formal-kernel-v1";
 import { renderMathBlocks } from "./math-display.js?v=20260909-calculus-v1";
 import { parseLessonManifest, readLessonFolder } from "./lesson-folder.js?v=20260906-media-v1";
 import { renderQuestionDiagram } from "./question-diagrams.js?v=20260909-calculus-v1";
 import { renderLessonMedia } from "./lesson-media.js?v=20260906-media-v1";
-import { lessonIllustrations, illustrationAssets } from "./lesson-illustrations.js?v=20260908-statistics-v1";
+import { lessonIllustrations, illustrationAssets } from "./lesson-illustrations.js?v=20260921-foundations-v1";
 import { createLessonMediaRenderer } from "./lesson-media-renderer.js?v=20260906-media-v1";
 import { fieldBranchMapLayout as mapLayout } from "./map-layout.js?v=20260921-native-compat-v1";
 import { buildGroupedMasteryMap, COLLAPSED_NODE_HEIGHT, COLLAPSED_NODE_WIDTH } from "./map-groups.js?v=20260921-native-compat-v1";
@@ -14,7 +15,7 @@ import { openWorkspaceMerge } from "./workspace-merge-ui.js?v=20260908-profile-s
 import { LESSON_REACTION_GROUPS, lessonReactionTotals } from "./depot-reactions.js?v=20260905-confused-neutral-v5";
 import { APP_VERSION, BUNDLED_LESSON_MIGRATION_VERSION, createQuickMathsStore, MAX_LONG_WORK_CHARS, STATUS_COLORS, STORAGE_KEY } from "./challenge-core.js?v=20260921-native-compat-v1";
 import { registerWebMcpTools, TOOL_NAMES } from "./webmcp-tools.js?v=20260921-native-compat-v1";
-import { createLessonStudio } from "./lesson-creator.js?v=20260921-native-compat-v1";
+import { createLessonStudio } from "./lesson-creator.js?v=20260921-foundations-v1";
 import { createLessonPublisherDialog } from "./lesson-publisher-ui.js?v=20260906-media-v1";
 import {
   buildDepotSubmissionPrompt,
@@ -1499,15 +1500,17 @@ function renderMap(snapshot, { designer = false } = {}) {
 }
 
 function formatTheory(value) {
+  const knownIds = new Set(Object.keys(store.skillsById));
+  const formatText = text => lessonReferenceText(text, knownIds);
   const blocks = String(value ?? "").trim().split(/\n\s*\n/);
   return blocks.map((block) => {
     const lines = block.split(/\n/).map((line) => line.trim()).filter(Boolean);
     if (lines.length > 1 && lines.every((line) => /^\d+\.|^-/.test(line))) {
       const ordered = /^\d+\./.test(lines[0]);
-      return `<${ordered ? "ol" : "ul"}>${lines.map((line) => `<li>${escapeHtml(line.replace(/^\d+\.\s*|^-\s*/, ""))}</li>`).join("")}</${ordered ? "ol" : "ul"}>`;
+      return `<${ordered ? "ol" : "ul"}>${lines.map((line) => `<li>${formatText(line.replace(/^\d+\.\s*|^-\s*/, ""))}</li>`).join("")}</${ordered ? "ol" : "ul"}>`;
     }
-    if (lines.length === 1 && /:$/.test(lines[0]) && lines[0].length < 80) return `<h3>${escapeHtml(lines[0].slice(0, -1))}</h3>`;
-    return `<p>${lines.map(escapeHtml).join("<br>")}</p>`;
+    if (lines.length === 1 && /:$/.test(lines[0]) && lines[0].length < 80) return `<h3>${formatText(lines[0].slice(0, -1))}</h3>`;
+    return `<p>${lines.map(formatText).join("<br>")}</p>`;
   }).join("");
 }
 
@@ -3738,7 +3741,7 @@ async function boot() {
   const communityConfigPromise = fetch("./github-community-config.json", { cache: "no-store" })
     .then(response => response.ok ? response.json() : { enabled: false })
     .catch(() => ({ enabled: false }));
-  const response = await fetch("./curriculum-data.json?v=20260921-native-compat-v1");
+  const response = await fetch("./curriculum-data.json?v=20260921-foundations-v1");
   if (!response.ok) throw new Error("Could not load the QuickMaths curriculum.");
   const curriculum = await response.json();
   let bundledLessonPacks = [];

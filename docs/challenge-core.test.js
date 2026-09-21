@@ -31,6 +31,7 @@ const lessonSetExample = readFileSync(new URL("./lesson-set-example.json", impor
 const geographyLessonSet = readFileSync(new URL("./lesson-depot/lessons/geography/1.0.0/lesson-set.json", import.meta.url), "utf8");
 const programmingLessonSet = readFileSync(new URL("./lesson-depot/lessons/programming-fundamentals-python/1.2.0/lesson-set.json", import.meta.url), "utf8");
 const AUTHORED_MATH_SCENARIO_COUNTS = Object.freeze({
+  MATH_ARITH_006: 20, MATH_ARITH_007: 20, MATH_ARITH_008: 20, MATH_ARITH_009: 20, MATH_ARITH_010: 20, MATH_ARITH_011: 20, MATH_ARITH_012: 20, MATH_ARITH_013: 20, MATH_ARITH_014: 20, MATH_ALG_009: 20, MATH_GEOM_005: 20, MATH_GEOM_006: 20, MATH_GEOM_007: 20, MATH_GEOM_008: 20, MATH_GEOM_009: 20, MATH_GEOM_010: 20, MATH_GEOM_011: 20, MATH_GEOM_012: 20, MATH_ALG_010: 20, MATH_RAD_002: 20,
   MATH_LOG_001: 12, MATH_LOG_002: 13, MATH_LOG_003: 13,
   MATH_TRIG_001: 12, MATH_TRIG_002: 12, MATH_TRIG_003: 13,
   MATH_TRIG_004: 13, MATH_TRIG_005: 13, MATH_TRIG_006: 16,
@@ -459,12 +460,12 @@ for (const mode of ["proof_obligations", "rubric_check"]) {
 test("ships the complete native Mathematics curriculum and opens at the profile picker", () => {
   const { store } = harness();
   const state = store.snapshot();
-  assert.equal(curriculum.skills.length, 92);
-  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 1277);
-  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 1277);
+  assert.equal(curriculum.skills.length, 112);
+  assert.equal(curriculum.skills.reduce((count, skill) => count + skill.question_count, 0), 1677);
+  assert.ok(curriculum.skills.reduce((count, skill) => count + skill.problems.length, 0) > 1677);
   assert.equal(curriculum.skills.filter((skill) => skill.subjectId === "SUBJECT_GEOGRAPHY").length, 0);
-  assert.equal(curriculum.skills.filter((skill) => skill.id.startsWith("MATH_GEOM_")).length, 4);
-  assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [["SUBJECT_MATH", 92]]);
+  assert.equal(curriculum.skills.filter((skill) => skill.id.startsWith("MATH_GEOM_")).length, 12);
+  assert.deepEqual(state.subjects.map((subject) => [subject.id, subject.skillIds.length]), [["SUBJECT_MATH", 112]]);
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "MATH_ARITH_002").questionCount, 16);
   assert.equal(state.profiles.length, 0);
   assert.equal(state.activeProfile, null);
@@ -472,7 +473,7 @@ test("ships the complete native Mathematics curriculum and opens at the profile 
 });
 
 test("Mathematics catalogs retain ordinary and added formal scenarios independently of assessment length", () => {
-  assert.equal(Object.values(AUTHORED_MATH_SCENARIO_COUNTS).reduce((total, count) => total + count, 0), 1243);
+  assert.equal(Object.values(AUTHORED_MATH_SCENARIO_COUNTS).reduce((total, count) => total + count, 0), 1643);
   const assessmentLengths = { MATH_FUNC_004: 21, MATH_FUNC_007: 21, MATH_CALC_001: 21, MATH_CALC_002: 21 };
   for (const [skillId, ordinaryScenarioCount] of Object.entries(AUTHORED_MATH_SCENARIO_COUNTS)) {
     const skill = curriculum.skills.find((candidate) => candidate.id === skillId);
@@ -541,7 +542,7 @@ test("Depot Geography is substantial, installable, and bridges through native Ma
   store.createProfile("Geography Learner");
   assert.deepEqual(store.snapshot().subjects.map((subject) => subject.id), ["SUBJECT_MATH"]);
   const installed = store.importLessonPack(geographyLessonSet);
-  assert.equal(installed.totalSkillCount, 107);
+  assert.equal(installed.totalSkillCount, 127);
   const bridge = store.skillsById.GEO_CART_002;
   assert.ok(bridge.prerequisites.includes("MATH_GEOM_003"));
   assert.deepEqual(bridge.prerequisiteRefs, [
@@ -768,9 +769,9 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   assert.equal(welcome.ok, true);
   assert.match(store.snapshot().activeProfile.educatorGuideSeenAt, /^2026-/);
   store.importLessonPack(geographyLessonSet);
-  assert.equal(store.snapshot().curriculum.allSkills.length, 107);
+  assert.equal(store.snapshot().curriculum.allSkills.length, 127);
   store.setCurriculumPackEnabled("PACK_GEOGRAPHY", false);
-  assert.equal(store.snapshot().curriculum.allSkills.length, 92);
+  assert.equal(store.snapshot().curriculum.allSkills.length, 112);
   store.updateCurriculum({ name: "Ada's rigorous route", description: "A focused mathematics curriculum." });
   store.updateCurriculumSettings({
     studentName: "Ada",
@@ -803,7 +804,7 @@ test("educator curricula isolate packs, export canonical plans, and keep practic
   assert.equal("maxAttemptsPerLesson" in state.activeCurriculum.settings, false, "legacy retake caps are ignored");
   assert.equal("masteryEnabled" in state.activeCurriculum.settings, false);
   assert.equal(state.progressionMode, "soft");
-  assert.equal(state.curriculum.allSkills.length, 92);
+  assert.equal(state.curriculum.allSkills.length, 112);
   assert.equal(state.curriculumPlan.paths[0].name, "Arithmetic start");
   assert.equal(state.mapPlan.paths[0].name, "Arithmetic start", "the learner receives an editable copy of the canonical plan");
   assert.deepEqual(state.curriculumPlan.layouts["all-subjects"].MATH_ARITH_001, { x: 120, y: 80 });
@@ -1161,13 +1162,13 @@ test("a valid custom lesson set joins the real curriculum without replacing buil
   const preview = store.previewLessonPack(lessonSetExample);
   assert.equal(preview.id, "PACK_PERSONAL_FINANCE");
   assert.equal(preview.skillCount, 1);
-  assert.equal(store.snapshot().progressRows.length, 92, "preview must not mutate state");
+  assert.equal(store.snapshot().progressRows.length, 112, "preview must not mutate state");
 
   const installed = store.importLessonPack(lessonSetExample);
   const state = store.snapshot();
-  assert.equal(installed.totalSkillCount, 93);
+  assert.equal(installed.totalSkillCount, 113);
   assert.equal(state.lessonPacks.length, 1);
-  assert.equal(state.progressRows.length, 93);
+  assert.equal(state.progressRows.length, 113);
   assert.equal(state.curriculum.skills.find((skill) => skill.id === "CUSTOM_FINANCE_DISCOUNTS").custom, true);
   assert.equal(store.statusForSkill("CUSTOM_FINANCE_DISCOUNTS"), "locked");
   assert.match(store.exportLessonPack("PACK_PERSONAL_FINANCE"), new RegExp(LESSON_SET_FORMAT));
@@ -1213,7 +1214,7 @@ test("native lesson improvements replace content reversibly without moving IDs o
   const preview = store.previewLessonPack(nativeImprovement());
   assert.equal(preview.mode, "override");
   assert.deepEqual(preview.overridesNativeSkills, ["MATH_ARITH_001"]);
-  assert.equal(store.snapshot().curriculum.allSkills.length, 92, "preview must not mutate the curriculum");
+  assert.equal(store.snapshot().curriculum.allSkills.length, 112, "preview must not mutate the curriculum");
 
   const installed = store.importLessonPack(nativeImprovement());
   let state = store.snapshot();
@@ -1221,8 +1222,8 @@ test("native lesson improvements replace content reversibly without moving IDs o
   assert.equal(installed.mode, "override");
   assert.equal(installed.completedProgressPreserved, true);
   assert.equal(installed.restartedDraftCount, 1);
-  assert.equal(installed.totalSkillCount, 92);
-  assert.equal(state.curriculum.allSkills.length, 92);
+  assert.equal(installed.totalSkillCount, 112);
+  assert.equal(state.curriculum.allSkills.length, 112);
   assert.equal(improved.name, "Integer operations · revised");
   assert.equal(improved.native, true);
   assert.equal(improved.overridden, true);
@@ -1304,7 +1305,7 @@ test("native improvements enforce the built-in identity and round-trip through f
   target.store.selectProfile(target.store.snapshot().profiles[0].id);
   const restored = target.store.snapshot();
   assert.equal(restored.lessonPacks[0].mode, "override");
-  assert.equal(restored.curriculum.allSkills.length, 92);
+  assert.equal(restored.curriculum.allSkills.length, 112);
   assert.equal(restored.allProgressRows.find((row) => row.id === "MATH_ARITH_001").name, "Integer operations · revised");
 });
 
@@ -1318,8 +1319,8 @@ test("subjects share one visible map, apply bridge locks, and theme the last ope
   let state = store.snapshot();
   assert.equal(state.activeSubject.id, "SUBJECT_MATH", "installing a pack does not change the retained lesson theme");
   assert.equal(state.subjects.length, 2);
-  assert.equal(state.progressRows.length, 92);
-  assert.equal(state.allProgressRows.length, 93);
+  assert.equal(state.progressRows.length, 112);
+  assert.equal(state.allProgressRows.length, 113);
   assert.equal(state.allProgressRows.find((row) => row.id === "CUSTOM_BIO_CELL_001").status, "locked");
   assert.deepEqual(state.allProgressRows.find((row) => row.id === "CUSTOM_BIO_CELL_001").unmetPrerequisites, ["MATH_ARITH_005"]);
   store.setLearningPreferences({ progressionMode: "soft" });
@@ -1600,7 +1601,7 @@ test("custom progress and content round-trip together through a full backup", ()
   target.store.importBackup(raw);
   target.store.selectProfile(target.store.snapshot().profiles[0].id);
   const restored = target.store.snapshot();
-  assert.equal(restored.progressRows.length, 93);
+  assert.equal(restored.progressRows.length, 113);
   assert.equal(restored.attempts[0].skillId, "CUSTOM_FINANCE_DISCOUNTS");
   assert.equal(restored.progressRows.find((row) => row.id === "CUSTOM_FINANCE_DISCOUNTS").attemptCount, 1);
 });

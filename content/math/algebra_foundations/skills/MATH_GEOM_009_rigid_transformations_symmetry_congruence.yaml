@@ -1,0 +1,381 @@
+id: MATH_GEOM_009
+schema_version: '0.2'
+name: Rigid transformations, symmetry, and congruence
+domain: Math
+subdomain: Geometry
+topic: Plane Geometry
+description: Describe translations, rotations, reflections, and congruence using preserved measurements and correspondence.
+prerequisites:
+- MATH_GEOM_006
+- MATH_GRAPH_001
+unlocks:
+- MATH_GEOM_010
+tags:
+- geometry
+- transformations
+- symmetry
+- congruence
+- coordinates
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  max_guessing_allowed: maybe
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: |
+  A transformation maps every point of a figure to an image point. The original is often called the preimage and the result the image; corresponding points can be named A and A'. A transformation description should say what happens to points, where it happens, and which measurements are preserved. A rigid transformation, also called an isometry, preserves distances and angle measures. It can move or turn a figure, but it cannot stretch, shrink, shear, or change the shape.
+
+  A translation slides every point the same distance in the same direction. In coordinates, a translation by vector (h,k) sends (x,y) to (x+h,y+k). Corresponding segments remain parallel and equal in length, and the orientation is unchanged. A translation has no fixed point unless its vector is zero. To describe a translation clearly, give the horizontal and vertical change or a directed vector, not just “move right.”
+
+  A rotation turns a figure about a center through a directed angle. The center stays fixed, and every point travels along a circular arc centered there. A positive counterclockwise quarter-turn about the origin sends (x,y) to (-y,x); a half-turn sends (x,y) to (-x,-y). Rotations preserve distances, angles, and orientation, although the page direction changes. “Clockwise” and “counterclockwise” matter; a 90-degree turn in opposite directions gives different images.
+
+  A reflection flips a figure across a line called the line of reflection. Each point and its image lie on a perpendicular to the axis and are the same distance from it. Points on the axis are fixed. Reflection preserves lengths and angles but reverses orientation: a clockwise order becomes counterclockwise. Reflection over the x-axis sends (x,y) to (x,-y), and reflection over the y-axis sends (x,y) to (-x,y). A mirror line is a geometric object, not merely a visual crease.
+
+  Symmetry is a transformation that maps a figure onto itself. A line of symmetry is a reflection axis; rotational symmetry of order n means the figure matches itself after turns such as 360/n degrees, with the identity full turn excluded from the count. A square has four reflection axes and rotational symmetry of order 4. A non-square rectangle has two reflection axes and rotational symmetry of order 2. A general parallelogram has a 180-degree rotational symmetry but usually no reflection symmetry. A scalene triangle has no nontrivial symmetry.
+
+  Two figures are congruent when a rigid transformation or a sequence of rigid transformations maps one exactly onto the other. Congruence preserves all corresponding side lengths and angle measures. Correspondence must be explicit: if triangle ABC maps to A'B'C', then AB corresponds to A'B', angle B corresponds to angle B', and so on. A correct vertex order in a congruence statement encodes those matches. A congruent figure may be translated, rotated, or reflected and may face the opposite direction.
+
+  Triangle congruence can be established by SSS (three corresponding sides), SAS (two sides and their included angle), or ASA (two angles and their included side). AAS is also sufficient, since the third angle follows from the triangle sum, but this lesson uses SSS, SAS, and ASA as the core tests. SSA is not generally sufficient: two different triangles can share two side lengths and a non-included angle. An arbitrary visual overlap is not a proof of congruence.
+
+  Coordinate transformations are easiest when applied to every vertex. For a translation, add the same vector to each coordinate. For a reflection, change the coordinate named by the axis. For a rotation, use the rule or trace perpendicular distances from the center. Then check one or two distances to confirm the map. If all pairwise distances are preserved, the image is congruent even if the orientation changed.
+
+  A dilation is deliberately excluded from rigid motions because it changes lengths unless the scale factor is 1. A shape enlarged by factor 2 is similar to the original but not congruent. Likewise, a shear can preserve some parallel lines while changing angles and lengths, so it is not rigid. The words “same shape,” “same size,” and “same orientation” should be separated: congruence requires same size, while orientation may change.
+
+  Self-check: Did I name the center and direction for a rotation, the vector for a translation, or the axis for a reflection? Are point correspondences in the right order? Did I use a valid congruence criterion with an included angle for SAS? Did I reject SSA and resizing? Do preserved lengths and angles support the claim?
+media:
+- src: media/native-plane-foundations/geom009-transform.svg
+  alt: Two matching triangles show a translation from preimage ABC to image A-prime B-prime C-prime.
+  caption: A translation keeps every length, angle, and orientation while moving all points by one vector.
+  width: 720
+  height: 400
+  fit: contain
+- src: media/native-plane-foundations/geom009-symmetry.svg
+  alt: A dashed vertical line of reflection lies between two mirror-image triangles.
+  caption: Reflection preserves distances and angles while reversing orientation across its axis.
+  width: 720
+  height: 400
+  fit: contain
+examples:
+- prompt: Translate (2, -1) by vector (4, 3).
+  solution: (6, 2).
+  explanation: 'Add corresponding vector components: (2+4, -1+3) = (6,2).'
+- prompt: Reflect (5, -2) across the x-axis.
+  solution: (5, 2).
+  explanation: Reflection across x-axis changes y to -y.
+- prompt: Rotate (3, 1) 90 degrees counterclockwise about the origin.
+  solution: (-1, 3).
+  explanation: Use (x,y) -> (-y,x).
+- prompt: Rotate (-4, 2) 180 degrees about the origin.
+  solution: (4, -2).
+  explanation: A half-turn negates both coordinates.
+- prompt: Which transformation maps a shape by the same vector at every point?
+  solution: Translation.
+  explanation: A translation applies one displacement vector everywhere.
+- prompt: A square has how many lines of reflection symmetry?
+  solution: Four.
+  explanation: Two diagonals and two midlines are axes.
+- prompt: Is a dilation by factor 2 a rigid transformation?
+  solution: No.
+  explanation: It doubles distances, so the image is similar but not congruent.
+- prompt: Are triangles with side sets 5, 6, 7 and 5, 6, 7 congruent?
+  solution: Yes by SSS.
+  explanation: All three corresponding sides are equal.
+- prompt: Can SSA alone prove triangle congruence?
+  solution: No.
+  explanation: The non-included angle can produce two possible triangles.
+- prompt: A reflection maps ABC to A'B'C'. Which side corresponds to AB?
+  solution: A'B'.
+  explanation: Corresponding vertex names determine corresponding segments.
+applications:
+- title: Logo and interface design
+  description: Rigid copies move a mark through a layout while keeping its measurements and visual proportions exact.
+- title: Robotics and navigation
+  description: Coordinate translations and rotations describe a rigid tool moving without stretching.
+- title: Architecture and tiling
+  description: Symmetry axes and congruent tiles reduce repeated construction measurements.
+- title: Quality inspection
+  description: Congruence tests compare a manufactured part with a reference independent of its orientation.
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: GEOM009_TRANSLATE_001
+    type: fixed
+    prompt_template: Translate (-3, 2) by vector (5, -4). Give the image point.
+    answer_mode: final_only
+    answer: {type: text, value: '(2, -2)'}
+    grading: {method: exact_text}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: 'Add the vector: (-3+5, 2-4) = (2,-2).'
+    mistake_tags: [translation_coordinates]
+    difficulty: easy
+  - id: GEOM009_REFLECT_X_002
+    type: fixed
+    prompt_template: Reflect (7, -5) over the x-axis.
+    answer_mode: final_only
+    answer: {type: text, value: '(7, 5)'}
+    grading: {method: exact_text}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: x stays 7 and y changes sign to 5.
+    mistake_tags: [reflection_coordinates]
+    difficulty: easy
+  - id: GEOM009_REFLECT_Y_003
+    type: fixed
+    prompt_template: Reflect (-2, 6) over the y-axis.
+    answer_mode: final_only
+    answer: {type: text, value: '(2, 6)'}
+    grading: {method: exact_text}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: y stays 6 and x changes sign.
+    mistake_tags: [reflection_coordinates]
+    difficulty: easy
+  - id: GEOM009_ROTATE_004
+    type: fixed
+    prompt_template: Rotate (4, -1) 90 degrees counterclockwise about the origin.
+    answer_mode: final_only
+    answer: {type: text, value: '(1, 4)'}
+    grading: {method: exact_text}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: (x,y) -> (-y,x), giving (1,4).
+    mistake_tags: [rotation_direction]
+    difficulty: medium
+  - id: GEOM009_ROTATE_005
+    type: fixed
+    prompt_template: Rotate (-3, 5) 180 degrees about the origin.
+    answer_mode: final_only
+    answer: {type: text, value: '(3, -5)'}
+    grading: {method: exact_text}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: A half-turn sends (x,y) to (-x,-y).
+    mistake_tags: [half_turn]
+    difficulty: easy
+  - id: GEOM009_VECTOR_006
+    type: generated
+    prompt_template: Reflect ({x}, {y}) across the line y = x. Give the image point.
+    variables:
+      x: {type: int, min: -8, max: 8}
+      y: {type: int, min: -8, max: 8}
+    derived: {x2: y, y2: x}
+    answer_mode: final_only
+    answer: {type: text, value: '({x2}, {y2})'}
+    grading: {method: exact_text}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Reflection in y = x swaps coordinates, so ({x},{y}) becomes ({y},{x}).
+    mistake_tags: [reflection_y_equals_x]
+    difficulty: medium
+  - id: GEOM009_RIGID_007
+    type: fixed
+    prompt_template: Which transformation preserves all distances and angles?
+    options:
+    - {id: A, label: 'A dilation by factor 2'}
+    - {id: B, label: 'A rigid transformation'}
+    - {id: C, label: 'A shear'}
+    - {id: D, label: 'Any resizing'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Isometries preserve distances and angle measures.
+    mistake_tags: [rigid_motion]
+    difficulty: easy
+  - id: GEOM009_ROTATION_CENTER_008
+    type: fixed
+    prompt_template: What must be named to specify a rotation completely?
+    options:
+    - {id: A, label: 'Only a scale factor'}
+    - {id: B, label: 'Only the color'}
+    - {id: C, label: 'Center and directed angle'}
+    - {id: D, label: 'Perimeter only'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: C}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A rotation is determined by its center, angle size, and direction.
+    mistake_tags: [rotation_specification]
+    difficulty: medium
+  - id: GEOM009_SYMMETRY_009
+    type: fixed
+    prompt_template: How many reflection axes does a non-square rectangle have?
+    answer_mode: final_only
+    answer: {type: numeric, value: '2'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: Its horizontal and vertical midlines are axes; diagonals are not axes unless it is a square.
+    mistake_tags: [line_symmetry]
+    difficulty: medium
+  - id: GEOM009_TUTOR_CONGRUENCE_010
+    type: fixed
+    prompt_template: Explain why triangles with sides 7, 8, 10 and 7, 8, 10 are congruent, and state the valid criterion.
+    answer_mode: final_plus_required_work
+    answer: {type: text, value: 'SSS'}
+    grading: {method: exact_text}
+    work:
+      mode: rubric_check
+      prompt: Identify corresponding sides, the theorem, and the conclusion about congruence.
+      rubric:
+        criteria:
+        - {id: data, description: 'States that all three pairs of corresponding sides are equal: 7, 8, and 10.', weight: 2}
+        - {id: criterion, description: Names SSS as the congruence criterion., weight: 2}
+        - {id: rigidity, description: Explains that a rigid motion maps one triangle to the other., weight: 2}
+        - {id: conclusion, description: Concludes the triangles are congruent, with same size and angles., weight: 2}
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: Three corresponding equal sides satisfy SSS, so a rigid motion maps the triangles and they are congruent.
+    mistake_tags: [tutor_reasoning, sss]
+    difficulty: hard
+  - id: GEOM009_SAS_011
+    type: fixed
+    prompt_template: Which information supports SAS congruence?
+    options:
+    - {id: A, label: 'Two sides and any non-included angle'}
+    - {id: B, label: 'Two sides and their included angle'}
+    - {id: C, label: 'One side only'}
+    - {id: D, label: 'Three angles only'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: SAS requires the angle between the two known sides.
+    mistake_tags: [sas_included_angle]
+    difficulty: medium
+  - id: GEOM009_ASA_012
+    type: fixed
+    prompt_template: Which information supports ASA congruence?
+    options:
+    - {id: A, label: 'Two non-included sides'}
+    - {id: B, label: 'Three angles only'}
+    - {id: C, label: 'Two angles and their included side'}
+    - {id: D, label: 'One angle'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: C}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: ASA includes the side between the two known angles.
+    mistake_tags: [asa_included_side]
+    difficulty: medium
+  - id: GEOM009_SSA_013
+    type: fixed
+    prompt_template: Is SSA generally enough to prove two triangles congruent?
+    options:
+    - {id: A, label: 'No, triangles can never be congruent'}
+    - {id: B, label: 'Yes, it is stronger than SSS'}
+    - {id: C, label: 'Yes, for every angle'}
+    - {id: D, label: 'No, it can produce two different triangles'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: D}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: SSA is the ambiguous case because the angle is not included.
+    mistake_tags: [ssa_ambiguity]
+    difficulty: hard
+  - id: GEOM009_DILATION_014
+    type: fixed
+    prompt_template: A dilation has scale factor 3. Are the original and image congruent?
+    options:
+    - {id: A, label: 'Yes, every transformation is rigid'}
+    - {id: B, label: 'No, corresponding lengths are tripled'}
+    - {id: C, label: 'Yes, if rotated'}
+    - {id: D, label: 'No, because angles always change'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A non-unit dilation changes size; it creates similarity, not congruence.
+    mistake_tags: [dilation_vs_congruence]
+    difficulty: medium
+  - id: GEOM009_REFLECTION_015
+    type: fixed
+    prompt_template: Reflecting a point over a line leaves which points fixed?
+    options:
+    - {id: A, label: 'Only points at the origin'}
+    - {id: B, label: 'Every point in the plane'}
+    - {id: C, label: 'Points on the reflection axis'}
+    - {id: D, label: 'No points'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: C}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A point on the axis is the same distance zero from the axis and maps to itself.
+    mistake_tags: [reflection_axis]
+    difficulty: easy
+  - id: GEOM009_CORRESPONDENCE_016
+    type: fixed
+    prompt_template: If ABC maps to A'B'C', which side corresponds to BC?
+    answer_mode: final_only
+    answer: {type: text, value: "B'C'"}
+    grading: {method: exact_text}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: "Match each vertex in order: B maps to B' and C maps to C'."
+    mistake_tags: [correspondence]
+    difficulty: easy
+  - id: GEOM009_ORIENTATION_017
+    type: fixed
+    prompt_template: Which rigid transformation reverses orientation?
+    options:
+    - {id: A, label: 'Identity'}
+    - {id: B, label: 'Translation'}
+    - {id: C, label: 'Rotation'}
+    - {id: D, label: 'Reflection'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: D}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: A reflection reverses clockwise order, although it preserves lengths and angles.
+    mistake_tags: [orientation]
+    difficulty: medium
+  - id: GEOM009_SQUARE_SYMMETRY_018
+    type: fixed
+    prompt_template: What is the rotational symmetry order of a square?
+    answer_mode: final_only
+    answer: {type: numeric, value: '4'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review: true, allow_self_review: true}
+    explanation_template: It matches after 90, 180, 270, and 360 degree turns, so the order is 4.
+    mistake_tags: [rotational_symmetry]
+    difficulty: medium
+  - id: GEOM009_DISTANCE_CHECK_019
+    type: fixed
+    prompt_template: A translation sends A to A'. If AA' is 5 units, what is the image of a 9-unit segment under the same translation?
+    answer_mode: final_only
+    answer: {type: numeric, value: '9'}
+    grading: {method: exact_numeric}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Rigid translations preserve every segment length, so 9 units remains 9 units.
+    mistake_tags: [distance_preservation]
+    difficulty: easy
+  - id: GEOM009_COMBINE_020
+    type: fixed
+    prompt_template: A reflection followed by a translation is applied to a triangle. Is the final image congruent to the original?
+    options:
+    - {id: A, label: 'No, reflection destroys lengths'}
+    - {id: B, label: 'Yes, a composition of rigid transformations is rigid'}
+    - {id: C, label: 'Only if the triangle is equilateral'}
+    - {id: D, label: 'No, translations resize figures'}
+    answer_mode: final_only
+    answer: {type: multiple_choice, value: B}
+    grading: {method: multiple_choice}
+    work: {mode: none}
+    review_policy: {work_review: none, mastery_requires_review_pass: false, allow_self_review: true}
+    explanation_template: Each step preserves lengths and angles, so the composition also preserves them.
+    mistake_tags: [composition_rigid]
+    difficulty: hard

@@ -770,3 +770,9 @@ A saved test keeps its original questions, order, numbers and working when you r
 ## Formal practice in the native curriculum
 
 Selected composition, difference-quotient, radical, systems, limits and continuity lessons now include a proof workspace exercise. Composition, rates and difference quotients, limits, and continuity/IVT now have 21-question assessments: every new attempt includes both the original reviewed capstone and the formal exercise. Other lessons retain their configured question rotation. Numerical practice remains available, and explanation capstones still require their stated review. Submit proof steps using the offered rules, then verify them. A final answer string or a published reference proof does not earn formal credit.
+
+## A gentler start and new foundations
+
+Whole-number calculation (MATH_ARITH_006) is an additional beginner entry point. The new pathway covers factors, fraction and decimal operations, estimation, ratios, everyday percentages and measurement before extending plane and solid geometry. Existing lessons remain unlocked under their previous prerequisite rules. Optional lesson references in the explanations open the related lesson.
+
+Each of the twenty new lessons includes twenty questions on every fresh assessment, including its reasoning capstone. Give both the final answer and the requested explanation. Tutor review remains necessary for that capstone even when the numerical score is perfect. Exact fractions, stated units and domain restrictions matter; follow each question's requested answer format. Existing saved tests keep their original questions.

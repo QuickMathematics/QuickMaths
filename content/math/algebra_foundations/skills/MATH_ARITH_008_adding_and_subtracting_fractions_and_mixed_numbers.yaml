@@ -1,0 +1,789 @@
+id: MATH_ARITH_008
+schema_version: '0.2'
+name: Adding and subtracting fractions and mixed numbers
+domain: Math
+subdomain: Arithmetic
+topic: Arithmetic Foundations
+description: Fractions count equal-sized parts of a chosen whole. Adding and subtracting them means combining
+  or comparing numbers measured in the same unit. Begin with positive amounts; the signed cases later use Integer
+  operations (MATH_ARITH_001).
+prerequisites:
+- MATH_ARITH_003
+- MATH_ARITH_007
+tags:
+- arithmetic
+- foundations
+- reasoning
+unlocks: []
+mastery:
+  passing_score: 0.8
+  minimum_confidence: 3
+  review_after_days_if_mastered: 7
+  review_after_days_if_learning: 2
+theory: 'Fractions count equal-sized parts of a chosen whole. Adding and subtracting them means combining or
+  comparing numbers measured in the same unit. Begin with positive amounts; the signed cases later use Integer
+  operations (MATH_ARITH_001).
+
+
+  With a common denominator, the unit already matches: 2/7 + 3/7 = 5/7. Count two sevenths and three sevenths.
+  The denominator stays seven because adding portions does not change the size of each portion. Likewise, 6/9
+  - 2/9 = 4/9. Fractions may exceed one: 9/7 means one whole and two sevenths. A large numerator is not itself
+  an error.
+
+
+  Unlike denominators require a common unit. To add 1/2 and 1/3 of the same whole, split each half into three
+  sixths and each third into two sixths. The amounts do not change: 1/2 = 3/6 and 1/3 = 2/6. Now count 3/6
+  + 2/6 = 5/6. The incorrect answer 2/5 is smaller than 1/2 even though a positive amount was added. More fundamentally,
+  adding denominators invents a new unit without preserving either original fraction. Pictures must use the
+  same-sized whole: half a small pizza and a third of a large pizza cannot be combined as fractions of one
+  unspecified pizza.
+
+
+  A common multiple of the denominators supplies a common denominator. The least common multiple is efficient
+  but not compulsory. For 1/6 + 1/4, twelfths give 2/12 + 3/12 = 5/12. Twenty-fourths give 4/24 + 6/24 = 10/24,
+  the same value. Multiply both numerator and denominator by the same nonzero number to preserve a fraction;
+  changing only the denominator changes its value. If one denominator divides the other, use the larger: 3/8
+  + 1/4 = 3/8 + 2/8 = 5/8. Simplify your final fraction when useful. Equivalent exact fractions describe the
+  same number even when written differently.
+
+
+  Subtraction uses the same unit rule. For 5/6 - 1/4, write 10/12 - 3/12 = 7/12. Do not subtract denominators
+  or reverse the numerator subtraction to force a positive answer. For a missing addend, subtract the known
+  part from the total: 2/5 + x = 7/10 gives x = 7/10 - 4/10 = 3/10. Check by adding the result back.
+
+
+  Mixed notation combines a whole number with a proper fraction. The number 2 3/5 means 2 + 3/5, not multiplication.
+  Two wholes contain ten fifths, so 2 3/5 = 13/5. Conversely, 17/6 = 2 5/6 because 17 = 6 times 2 + 5. On this
+  lesson''s answer line use an improper fraction such as 13/5 rather than mixed notation unless asked for just
+  a whole part or numerator. This avoids ambiguity while keeping an exact answer.
+
+
+  For mixed-number addition, convert first or add whole and fractional parts carefully. In 1 3/4 + 2 2/3, the
+  whole parts make 3 and the fractional parts make 9/12 + 8/12 = 17/12 = 1 5/12. Combine them to obtain 4 5/12,
+  or 53/12. Do not lose the extra whole created by the fractional sum.
+
+
+  For mixed subtraction, exchange a whole if the first fractional part is too small. The calculation 3 1/4
+  - 1 2/3 becomes 2 15/12 - 1 8/12 = 1 7/12. Exchanging a whole adds twelve twelfths to the fractional part
+  while removing one from the whole part; it does not change the starting number. Subtracting the whole parts
+  and then reversing the fractional subtraction is invalid. Improper fractions independently check the result:
+  39/12 - 20/12 = 19/12.
+
+
+  Signed fractions follow number-line addition. For -1/2 + 3/4, start at -2/4 and move three quarter-units
+  right, ending at 1/4. For 1/3 - (-1/6), subtracting a negative adds a positive: 2/6 + 1/6 = 1/2. A negative
+  mixed amount, minus two and one third, means -(2+1/3) = -7/3, not -2+1/3. Parentheses make the intended sign
+  explicit. Review signed integers first if this section is unfamiliar.
+
+
+  Interpret and check. A sum of positive fractions exceeds each addend. Subtracting a smaller positive amount
+  reduces a positive starting quantity. Length, time and capacity problems need matching measurement units
+  and a shared reference whole. Explain why the conversion preserves the amount, then explain the operation.
+  The capstone requires equal-unit reasoning and error analysis; the number 5/6 alone does not demonstrate
+  understanding.'
+examples:
+- prompt: Calculate 2/7 + 3/7.
+  solution: 5/7
+  explanation: Both count sevenths. Add their counts without changing that unit.
+- prompt: Calculate 1/2 + 1/3.
+  solution: 5/6
+  explanation: 'Split the same whole into sixths: 3/6 + 2/6 = 5/6.'
+  math_blocks:
+  - type: derivation
+    steps:
+    - 1/2 + 1/3
+    - 3/6 + 2/6
+    - 5/6
+    alt: Halves and thirds converted to sixths
+    linear_text: One half plus one third equals three sixths plus two sixths, which equals five sixths.
+- prompt: Calculate 1/6 + 1/4 using two common denominators.
+  solution: 5/12
+  explanation: Twelfths give 2/12+3/12; twenty-fourths give 4/24+6/24=10/24=5/12.
+- prompt: Calculate 5/6 - 1/4.
+  solution: 7/12
+  explanation: Convert to 10/12-3/12. Subtract counts of twelfths.
+- prompt: Write 2 3/5 as an improper fraction.
+  solution: 13/5
+  explanation: Two wholes are ten fifths; add three more fifths.
+- prompt: Calculate 1 3/4 + 2 2/3.
+  solution: 53/12
+  explanation: 21/12+32/12=53/12, or 4 5/12. The fractional sum contributes another whole.
+- prompt: Calculate 3 1/4 - 1 2/3.
+  solution: 19/12
+  explanation: 'Exchange a whole: 2 15/12 - 1 8/12=1 7/12. Check 39/12-20/12.'
+- prompt: Calculate -1/2 + 3/4.
+  solution: 1/4
+  explanation: -2/4+3/4=1/4. A rightward move crosses zero.
+- prompt: Calculate 1/3 - (-1/6).
+  solution: 1/2
+  explanation: 'Subtracting a negative adds: 2/6+1/6=3/6=1/2.'
+- prompt: Find x in 2/5 + x = 7/10.
+  solution: 3/10
+  explanation: 7/10-4/10=3/10; adding 4/10 back checks the answer.
+applications:
+- title: Walk 3/4 km then 2/3 km. Find the total.
+  description: 17/12 km 9/12+8/12=17/12. The total is greater than one kilometre.
+- title: Pour 5/6 litre from a jug containing 2 1/4 litres. What remains?
+  description: 17/12 litres 27/12-10/12=17/12. Subtract from the original capacity.
+- title: Preparation takes 1/3 hour and finishing takes 1/4 hour. Total time?
+  description: 7/12 hour 4/12+3/12=7/12 hour; 20+15=35 minutes checks the result.
+- title: Cut 3/5 m and 1/4 m from a 2 m ribbon. What remains?
+  description: 23/20 m 40/20-12/20-5/20=23/20. Subtract both cuts.
+media:
+- src: media/native-arithmetic-onramp/fraction-sixths.svg
+  alt: Three equal strips divided into six parts show three sixths, two sixths, and five sixths.
+  caption: Common denominators give common-sized units.
+  width: 800
+  height: 360
+  fit: contain
+- src: media/native-arithmetic-onramp/fraction-beyond-one.svg
+  alt: A number line marks sixths from zero to two, with three halves highlighted.
+  caption: Fractions can lie beyond one whole.
+  width: 800
+  height: 360
+  fit: contain
+test:
+  question_count: 20
+  randomize_order: true
+  questions:
+  - id: FRADD_SAME
+    type: generated
+    prompt_template: Calculate {a}/{d} + {b}/{d}. Enter an exact fraction.
+    variables:
+      a:
+        type: int
+        min: 1
+        max: 4
+      b:
+        type: int
+        min: 1
+        max: 4
+      d:
+        type: int
+        min: 5
+        max: 12
+    derived:
+      n: a+b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{d}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Add counts of the same fractional unit.
+    mistake_tags:
+    - common_units
+  - id: FRADD_SUB_SAME
+    type: generated
+    prompt_template: Calculate {a}/{d} - {b}/{d}.
+    variables:
+      a:
+        type: int
+        min: 6
+        max: 9
+      b:
+        type: int
+        min: 1
+        max: 4
+      d:
+        type: int
+        min: 10
+        max: 15
+    derived:
+      n: a-b
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{d}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Subtract numerators; keep the common unit.
+    mistake_tags:
+    - common_units
+  - id: FRADD_UNLIKE
+    type: generated
+    prompt_template: Calculate 1/{d} + 1/{e}.
+    variables:
+      d:
+        type: int
+        min: 2
+        max: 6
+      e:
+        type: int
+        min: 7
+        max: 11
+    derived:
+      den: d*e
+      n: d+e
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{den}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Convert to {e}/{den}+{d}/{den}.
+    mistake_tags:
+    - common_units
+  - id: FRADD_NESTED
+    type: generated
+    prompt_template: Calculate 1/{d} + {a}/{den}.
+    variables:
+      d:
+        type: int
+        min: 2
+        max: 6
+      k:
+        type: int
+        min: 2
+        max: 4
+      a:
+        type: int
+        min: 1
+        max: 3
+    derived:
+      den: d*k
+      n: k+a
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{den}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The first numerator becomes {k} after making equivalent fractions.
+    mistake_tags:
+    - common_units
+  - id: FRADD_SUB_UNLIKE
+    type: generated
+    prompt_template: Calculate {a}/{d} - 1/{e}.
+    variables:
+      d:
+        type: int
+        min: 3
+        max: 7
+      e:
+        type: int
+        min: 8
+        max: 12
+    derived:
+      a: d-1
+      den: d*e
+      n: a*e-d
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{den}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use denominator {den} and preserve the subtraction order.
+    mistake_tags:
+    - common_units
+  - id: FRADD_EQUIVALENT
+    type: generated
+    prompt_template: Write 1/{d} with denominator {den}. Enter only the numerator.
+    variables:
+      d:
+        type: int
+        min: 2
+        max: 9
+      k:
+        type: int
+        min: 2
+        max: 6
+    derived:
+      den: d*k
+    constraints: []
+    answer:
+      type: numeric
+      value: '{k}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Multiply the numerator by the same factor as the denominator.
+    mistake_tags:
+    - common_units
+  - id: FRADD_MIXED_CONVERT
+    type: generated
+    prompt_template: Convert {w} and 1/{d} to an improper fraction.
+    variables:
+      w:
+        type: int
+        min: 2
+        max: 6
+      d:
+        type: int
+        min: 3
+        max: 9
+    derived:
+      n: w*d+1
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{d}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Count fractional units in the whole part before adding one more.
+    mistake_tags:
+    - common_units
+  - id: FRADD_IMPROPER_WHOLE
+    type: generated
+    prompt_template: Write {n}/{d} as a mixed number. Enter only the whole-number part.
+    variables:
+      w:
+        type: int
+        min: 2
+        max: 7
+      d:
+        type: int
+        min: 3
+        max: 9
+    derived:
+      n: w*d+1
+    constraints: []
+    answer:
+      type: numeric
+      value: '{w}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: '{n}={d} times {w}+1.'
+    mistake_tags:
+    - common_units
+  - id: FRADD_MIX_ADD
+    type: generated
+    prompt_template: Calculate ({w}+3/4)+({v}+2/3). Enter an improper fraction.
+    variables:
+      w:
+        type: int
+        min: 1
+        max: 5
+      v:
+        type: int
+        min: 1
+        max: 5
+    derived:
+      n: 12*(w+v)+17
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/12'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: The fractional sum 17/12 contributes an additional whole.
+    mistake_tags:
+    - common_units
+  - id: FRADD_REGROUP
+    type: generated
+    prompt_template: Calculate ({w}+1/4)-(1+2/3). Enter an exact fraction.
+    variables:
+      w:
+        type: int
+        min: 3
+        max: 7
+    derived:
+      n: 12*w-17
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/12'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Exchange one whole for twelve twelfths before subtracting.
+    mistake_tags:
+    - common_units
+  - id: FRADD_FROM_WHOLE
+    type: generated
+    prompt_template: Calculate {w}-{a}/{d}.
+    variables:
+      w:
+        type: int
+        min: 2
+        max: 6
+      a:
+        type: int
+        min: 1
+        max: 3
+      d:
+        type: int
+        min: 4
+        max: 9
+    derived:
+      n: w*d-a
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{d}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Write the whole number using the fractional unit first.
+    mistake_tags:
+    - common_units
+  - id: FRADD_MISSING
+    type: generated
+    prompt_template: 'Find x: 1/{d}+x={a}/{den}.'
+    variables:
+      d:
+        type: int
+        min: 3
+        max: 7
+      a:
+        type: int
+        min: 3
+        max: 5
+    derived:
+      den: 2*d
+      n: a-2
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{den}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Subtract 2/{den} from the total.
+    mistake_tags:
+    - common_units
+  - id: FRADD_SIGNED
+    type: generated
+    prompt_template: Calculate -1/{d}+3/{den}.
+    variables:
+      d:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      den: 2*d
+    constraints: []
+    answer:
+      type: numeric
+      value: 1/{den}
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Convert the negative amount to -2/{den}, then add.
+    mistake_tags:
+    - common_units
+  - id: FRADD_NEGATIVE_SUB
+    type: generated
+    prompt_template: Calculate 1/{d}-(-1/{den}).
+    variables:
+      d:
+        type: int
+        min: 2
+        max: 8
+    derived:
+      den: 2*d
+    constraints: []
+    answer:
+      type: numeric
+      value: 3/{den}
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Subtracting a negative adds a positive.
+    mistake_tags:
+    - common_units
+  - id: FRADD_CONTEXT
+    type: generated
+    prompt_template: A ribbon is {w} m long. Cut off 1/{d} m and 1/{e} m. Metres remaining?
+    variables:
+      w:
+        type: int
+        min: 2
+        max: 5
+      d:
+        type: int
+        min: 2
+        max: 6
+      e:
+        type: int
+        min: 7
+        max: 10
+    derived:
+      den: d*e
+      n: w*den-e-d
+    constraints: []
+    answer:
+      type: numeric
+      value: '{n}/{den}'
+    grading:
+      method: exact_numeric
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Use a common unit and subtract both cuts.
+    mistake_tags:
+    - common_units
+  - id: FRADD_WRONG_DEN
+    type: fixed
+    prompt_template: Why is 1/2+1/3=2/5 incorrect?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: Halves and thirds must be replaced by equivalent amounts in the same unit.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: The numerator must stay one
+    - id: B
+      label: It combines counts of unequal units without equivalent fractions
+    - id: C
+      label: Fractions cannot exceed one
+    - id: D
+      label: Addition of fractions is impossible
+  - id: FRADD_COMMON_NOT_LEAST
+    type: fixed
+    prompt_template: Is denominator 24 valid for 1/6+1/4?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: C
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 4/24+6/24=10/24=5/12. Least is efficient, not mandatory.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: No, only the least denominator works
+    - id: B
+      label: Yes, giving 2/24
+    - id: C
+      label: Yes, if both fractions are converted correctly
+    - id: D
+      label: No, the denominator must be 10
+  - id: FRADD_MIX_ERROR
+    type: fixed
+    prompt_template: A learner writes 3 1/4 - 1 2/3 = 2 5/12 by reversing the fractional subtraction. Choose
+      the correction.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: A
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: 39/12-20/12=19/12; subtraction order cannot be reversed.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: 19/12, using regrouping or improper fractions
+    - id: B
+      label: The original answer is correct
+    - id: C
+      label: Only the whole parts should be subtracted
+    - id: D
+      label: Add the denominators
+  - id: FRADD_REFERENCE
+    type: fixed
+    prompt_template: Is half a small pizza plus a third of a large pizza automatically five sixths of one pizza?
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: choice
+      value: B
+    grading:
+      method: multiple_choice
+    difficulty: medium
+    answer_mode: final_only
+    work:
+      mode: none
+    review_policy:
+      work_review: none
+      mastery_requires_review_pass: false
+      allow_self_review: true
+    explanation_template: A common-sized reference whole is essential.
+    mistake_tags:
+    - common_units
+    options:
+    - id: A
+      label: Yes, sizes never matter
+    - id: B
+      label: No, first specify the reference whole
+    - id: C
+      label: Yes, by adding denominators
+    - id: D
+      label: Fractions cannot describe pizza
+  - id: FRADD_CAPSTONE
+    type: fixed
+    prompt_template: Calculate 1/2+1/3 of the same whole. Enter an exact fraction, then explain with equal
+      units why it is correct and why 2/5 is not.
+    variables: {}
+    derived: {}
+    constraints: []
+    answer:
+      type: numeric
+      value: 5/6
+    grading:
+      method: exact_numeric
+    difficulty: hard
+    answer_mode: final_plus_required_work
+    work:
+      mode: rubric_check
+      prompt: Explain each part in words, with a labelled calculation or drawing if useful. A final number
+        alone is not enough.
+      rubric:
+        criteria:
+        - id: criterion_1
+          description: Explains a shared whole subdivided into sixths.
+          weight: 2
+        - id: criterion_2
+          description: Preserves both amounts and counts five sixths.
+          weight: 2
+        - id: criterion_3
+          description: Explains the denominator error and supplies a valid magnitude check or counterexample.
+          weight: 2
+    review_policy:
+      work_review: tutor_required
+      mastery_requires_review_pass: true
+      allow_self_review: false
+    explanation_template: 1/2=3/6 and 1/3=2/6, so the sum is 5/6. Adding denominators changes the unit. Also
+      2/5<1/2 cannot result from adding a positive amount.
+    mistake_tags:
+    - common_units

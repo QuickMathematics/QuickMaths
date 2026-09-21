@@ -92,6 +92,9 @@ theory: |
 
   Another common mistake:
   x^(-3) means 1/x^3. It does not mean -x^3.
+
+  When exponents cease to be integers, domain conditions require extra care. An exact root expression is not the same as a rounded decimal approximation. Higher roots and rational exponents (MATH_RAD_002) explains even versus odd roots and why identities involving rational powers require stated real domains.
+
 examples:
   - prompt: "Simplify: x^4 * x^3"
     solution: "x^7"
